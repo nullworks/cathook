@@ -40,7 +40,7 @@ void CMenuWindow::AddElements() {
 	for (auto var : FindCatVars("aimbot_")) ADDCVAR(var);
 	AddTab("esp", "ESP");
 	tab = GetTab("esp");
-	for (auto var : FindCatVars("esp_")) ADDCVAR(var);
+	for (auto var : FindCatV#ars("esp_")) ADDCVAR(var);
 	AddTab("triggerbot", "Triggerbot");
 	tab = GetTab("triggerbot");
 	for (auto var : FindCatVars("triggerbot_")) ADDCVAR(var);
@@ -53,7 +53,7 @@ void CMenuWindow::AddElements() {
 	AddTab("misc", "Misc");
 	tab = GetTab("misc");
 	ADDCVARS("thirdperson");
-	ADDCVARS("log");
+	ADDCVARS("log"); // this also catches the logo cvar
 	ADDCVARS("no_");
 	ADDCVARS("fov");
 	ADDCVARS("clean_");
@@ -63,7 +63,6 @@ void CMenuWindow::AddElements() {
 	ADDCVARS("ignore_");
 	ADDCVARS("rollspeedhack");
 	ADDCVARS("minigun");
-	ADDCVARS("logo");
 	ADDCVARS("disconnect");
 
 	if (TF) ADDCVAR(&hacks::tf::autoheal::enabled);

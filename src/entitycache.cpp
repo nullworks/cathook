@@ -217,7 +217,7 @@ void EntityCache::Update() {
 }
 
 CachedEntity* EntityCache::GetEntity(int idx) {
-	if (idx < 0 || idx >= m_nMax) {
+	if (idx < 0 || idx > m_nMax) {
 		logging::Info("Requested invalid entity: %i max %i", idx, m_nMax);
 	}
 	//logging::Info("Request entity: %i, 0x%08x", idx, m_pArray[idx].m_pEntity);

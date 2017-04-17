@@ -10,9 +10,9 @@
 
 namespace hacks { namespace shared { namespace chams {
 
-extern CatVar enable;
+//extern CatVar enable;
 
-void DrawModelExecute(IVModelRender* _this, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix);
+//void DrawModelExecute(IVModelRender* _this, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix);
 
 }}}
 

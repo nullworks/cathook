@@ -9,7 +9,7 @@
 
 namespace hacks { namespace shared { namespace chams {
 
-CatVar enable(CV_SWITCH, "chams_enable", "0", "Enable");
+/*CatVar enable(CV_SWITCH, "chams_enable", "0", "Enable");
 static CatVar flat(CV_SWITCH, "chams_flat", "0", "Flat");
 static CatVar health(CV_SWITCH, "chams_health", "0", "Health");
 static CatVar teammates(CV_SWITCH, "chams_teammates", "0", "Teammates");
@@ -192,11 +192,11 @@ void DrawModelExecute(IVModelRender* _this, const DrawModelState_t& state, const
 				mat_unlit->AlphaModulate(1.0f);
 				g_IVRenderView->SetColorModulation(color_2);
 				g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit : mat_lit);
-			}*/
+			}
 
 
 		}
 	}
-}
+}*/
 
 }}}

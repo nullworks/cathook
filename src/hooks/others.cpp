@@ -36,7 +36,7 @@ void DrawModelExecute_hook(IVModelRender* _this, const DrawModelState_t& state, 
 			}
 		}
 	}*/
-	if (!(no_arms || no_hats || hacks::shared::chams::enable)) {
+	if (!(no_arms || no_hats || (clean_screenshots && g_IEngine->IsTakingScreenshot()))) {
 		((DrawModelExecute_t)(hooks::hkIVModelRender->GetMethod(hooks::offDrawModelExecute)))(_this, state, info, matrix);
 		return;
 	}
@@ -55,12 +55,15 @@ void DrawModelExecute_hook(IVModelRender* _this, const DrawModelState_t& state, 
 		}
 	}
 
-	float mod_old[3] { 0.0f };
-	g_IVRenderView->GetColorModulation(mod_old);
-	hacks::shared::chams::DrawModelExecute(_this, state, info, matrix);
+	IClientUnknown* unk = info.pRenderable->GetIClientUnknown();
+	if (unk) {
+		IClientEntity* ent = unk->GetIClientEntity();
+		if (ent && !g_EffectChams.drawing && g_EffectChams.ShouldRenderChams(ent)) {
+			return;
+		}
+	}
+
 	((DrawModelExecute_t)(hooks::hkIVModelRender->GetMethod(hooks::offDrawModelExecute)))(_this, state, info, matrix);
-	g_IVModelRender->ForcedMaterialOverride(nullptr);
-	g_IVRenderView->SetColorModulation(mod_old);
 }
 
 bool CanPacket_hook(void* thisptr) {

@@ -295,6 +295,7 @@ List& MainList() {
     "spyalert_warning"
     "spyalert_backstab"
     "spyalert_sound"
+    "spyalert_interval"
 ]
  
 "Miscellaneous" [

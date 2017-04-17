@@ -53,6 +53,7 @@
 #include <engine/ivdebugoverlay.h>
 
 #include "sdk/in_buttons.h"
+#include "sdk/imaterialsystemfixed.h"
 #include "sdk/ScreenSpaceEffects.h"
 #include "sdk/iinput.h"
 

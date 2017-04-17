@@ -77,7 +77,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	//if (!cmd) return ret;
 
 	bool time_replaced = false;
-	float curtime_old = g_GlobalVars->curtime;;
+	float curtime_old = g_GlobalVars->curtime;
 
 	if (hacks::shared::airstuck::IsStuck()) {
 		return ret;
@@ -150,6 +150,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 
 	}
 	if (CE_GOOD(g_pLocalPlayer->entity)) {
+		ResetCritHack();
 		if (TF2) SAFE_CALL(UpdateHoovyList());
 			g_pLocalPlayer->v_OrigViewangles = cmd->viewangles;
 //		PROF_BEGIN();
@@ -242,6 +243,9 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	}
 
 //	PROF_END("CreateMove");
+	if (!(cmd->buttons & IN_ATTACK)) {
+		//LoadSavedState();
+	}
 	g_pLocalPlayer->bAttackLastTick = (cmd->buttons & IN_ATTACK);
 	return ret;
 

@@ -8,7 +8,10 @@
 #include "../common.h"
 
 namespace hacks { namespace shared { namespace chams {
-
+// -----------------------
+// SEE src/EffectChams.cpp
+// -----------------------
+	
 /*CatVar enable(CV_SWITCH, "chams_enable", "0", "Enable");
 static CatVar flat(CV_SWITCH, "chams_flat", "0", "Flat");
 static CatVar health(CV_SWITCH, "chams_health", "0", "Health");

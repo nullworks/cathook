@@ -9,10 +9,14 @@ HL2DM teams
 fullbright toggle
 Hunter Rifle
 inspect shit
-instant taunt
 TTS
 noise spam
-Auto backstab, noise maker spam, kill say, team name spam (pre round team name spam thing),  insta taunt (taunts for like .5 ms and then you can do it again lithium has it) auto vacc, namesteal, autovote, fix the menu im to lazy to hit x when i want to close the cheat, custom esp, voice command spam (not like 1 voice command every 1 ms but like just spamming it on the menu)
+team name spam (pre round team name spam thing)
+insta taunt (taunts for like .5 ms and then you can do it again lithium has it) 
+auto vacc
+namesteal
+autovote
+voice command spam (not like 1 voice command every 1 ms but like just spamming it on the menu)
 
 Player List
 dominatesay assistsay worldsay
@@ -20,9 +24,6 @@ AutoDetonator
 
 ProjPredOrigin
 MAX -> MIN priority
-Crit Hack
-AutoTrashtalk
-Noisemaker Spam
 Deflected by enemy player
  Aim Stickies
 FLAG ESP
@@ -33,7 +34,6 @@ Smoothe the smooth aim
 Display on the left
 Flare aim on fire
 Aim Sticky
-Ignore hoovy
 Proj Pred visuals
 Hook + Aimbot FIX
 ESP Icons
@@ -42,20 +42,14 @@ Show sapped buildings in ESP
 Make hacks respect Mannpower powerups and other conditions when calcuating damage, hitbox and prioritizing targets
 Fake Lag
 Engine Prediction
-An option to ignore taunting enemies
 AutoSticky improve
 No AutoShoot when disguised
 Ambassador bodyshotting
 No Trigger Mediguns
 More projectile weapons aimbot (wrap assassin, wrangler, stickybomb, airstrike)
-Auto Uber Flash
 Auto trigger DR before rockets
-AutoUber
 Sticky vischeck
-KillSay
 InsultSpam
-Airstuck Idle Kick fix
-Anti Backstab
 Critical rifles bodyshotting
 FLAG ESP
 Spy alert uses angles
@@ -63,12 +57,10 @@ halloween medkits
 carrying esp
 Tracers/Spy Cam
 Bodyshot if not zoomed
-Glow Hack
 Proper medic followbot AI
 Bot option for aiming at owner's prey (just for fun)
 Bot pathfinding & navigation files system
 SkinChanger
-Teamname spam
 Proper entity classes (actually I might just use a lot of helper functions taking IClientEntity* as first arg)
 Priority system optimization and testing
 General optimization and refactoring

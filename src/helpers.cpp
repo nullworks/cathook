@@ -472,6 +472,7 @@ weaponmode GetWeaponMode(CachedEntity* player) {
 	} else if ( weapon->m_iClassID == g_pClassID->CTFRocketLauncher_DirectHit ||
 				weapon->m_iClassID == g_pClassID->CTFRocketLauncher ||
 				weapon->m_iClassID == g_pClassID->CTFGrenadeLauncher ||
+				weapon->m_iClassID == g_pClassID->CTFPipebombLauncher ||
 				weapon->m_iClassID == g_pClassID->CTFCompoundBow ||
 				weapon->m_iClassID == g_pClassID->CTFBat_Wood ||
 				weapon->m_iClassID == g_pClassID->CTFBat_Giftwrap ||

@@ -23,6 +23,25 @@ static CatVar pop_uber_auto(CV_SWITCH, "autoheal_uber", "1", "AutoUber");
 static CatVar pop_uber_percent(CV_FLOAT, "autoheal_uber_health", "30", "Pop uber if health% <");
 static CatVar share_uber(CV_SWITCH, "autoheal_share_uber", "1", "Share ubercharge");
 
+int force_healing_target { 0 };
+
+static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with SteamID (ONCE. Use for easy airstuck med setup)", [](const CCommand& args) {
+	if (args.ArgC() < 2) {
+		logging::Info("Invalid call!");
+		return;
+	}
+	for (int i = 1; i <= 32 && i < HIGHEST_ENTITY; i++) {
+		CachedEntity* ent = ENTITY(i);
+		if (CE_BAD(ent)) continue;
+		if (ent->m_Type != ENTITY_PLAYER) continue;
+		if (!ent->m_pPlayerInfo) continue;
+		if (ent->m_pPlayerInfo->friendsID == strtol(args.Arg(1), nullptr, 10)) {
+			force_healing_target = i;
+			return;
+		}
+	}
+});
+
 bool IsPopped() {
 	CachedEntity* weapon = g_pLocalPlayer->weapon();
 	if (CE_BAD(weapon) || weapon->m_iClassID != g_pClassID->CWeaponMedigun) return false;
@@ -55,8 +74,19 @@ bool ShouldPop() {
 }
 
 void CreateMove() {
-	if (!enabled) return;
+	if (!enabled && !force_healing_target) return;
 	if (GetWeaponMode(g_pLocalPlayer->entity) != weapon_medigun) return;
+	if (force_healing_target) {
+		CachedEntity* target = ENTITY(force_healing_target);
+		if (CE_GOOD(target)) {
+			Vector out;
+			GetHitbox(target, 7, out);
+			AimAt(g_pLocalPlayer->v_Eye, out, g_pUserCmd);
+			g_pUserCmd->buttons |= IN_ATTACK;
+			force_healing_target = 0;
+		}
+	}
+	if (!enabled) return;
 	UpdateData();
 	int old_target = m_iCurrentHealingTarget;
 	m_iCurrentHealingTarget = BestTarget();

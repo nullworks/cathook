@@ -71,7 +71,11 @@ static CTextureReference buffers[4] {};
 
 ITexture* GetBuffer(int i) {
 	if (!buffers[i]) {
-		ITexture* fullframe = g_IMaterialSystem->FindTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+		ITexture* fullframe;
+		if (TF2)
+			fullframe = g_IMaterialSystem->FindTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+		else
+			fullframe = g_IMaterialSystemHL->FindTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
 		char* newname = new char[32];
 		std::string name = format("_cathook_buff", i);
 		strncpy(newname, name.c_str(), 30);
@@ -80,8 +84,15 @@ ITexture* GetBuffer(int i) {
 		int textureFlags = TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_EIGHTBITALPHA;
 		int renderTargetFlags = CREATERENDERTARGETFLAGS_HDR;
 
-		ITexture* texture = g_IMaterialSystem->CreateNamedRenderTargetTextureEx( newname, fullframe->GetActualWidth(), fullframe->GetActualHeight(), RT_SIZE_LITERAL, IMAGE_FORMAT_RGBA8888,
-			MATERIAL_RT_DEPTH_SEPARATE, textureFlags, renderTargetFlags );
+		ITexture* texture;
+		if (TF2) {
+			texture = g_IMaterialSystem->CreateNamedRenderTargetTextureEx( newname, fullframe->GetActualWidth(), fullframe->GetActualHeight(), RT_SIZE_LITERAL, IMAGE_FORMAT_RGBA8888,
+					MATERIAL_RT_DEPTH_SEPARATE, textureFlags, renderTargetFlags );
+		} else {
+			texture = g_IMaterialSystemHL->CreateNamedRenderTargetTextureEx( newname, fullframe->GetActualWidth(), fullframe->GetActualHeight(), RT_SIZE_LITERAL, IMAGE_FORMAT_RGBA8888,
+					MATERIAL_RT_DEPTH_SEPARATE, textureFlags, renderTargetFlags );
+		}
+
 		buffers[i].Init(texture);
 	}
 	return buffers[i];
@@ -243,7 +254,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity* entity) {
 
 void EffectGlow::BeginRenderGlow() {
 	drawing = true;
-	CMatRenderContextPtr ptr(vfunc<IMatRenderContext*(*)(IMaterialSystemFixed*)>(g_IMaterialSystem, 100, 0)(g_IMaterialSystem));
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	ptr->ClearColor4ub(0, 0, 0, 0);
 	ptr->PushRenderTargetAndViewport();
 	ptr->SetRenderTarget(GetBuffer(1));
@@ -256,7 +267,7 @@ void EffectGlow::BeginRenderGlow() {
 
 void EffectGlow::EndRenderGlow() {
 	drawing = false;
-	CMatRenderContextPtr ptr(vfunc<IMatRenderContext*(*)(IMaterialSystemFixed*)>(g_IMaterialSystem, 100, 0)(g_IMaterialSystem));
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	ptr->DepthRange(0.0f, 1.0f);
 	g_IVModelRender->ForcedMaterialOverride(nullptr);
 	ptr->PopRenderTargetAndViewport();
@@ -270,7 +281,7 @@ static CatVar solid_when(solid_when_enum, "glow_solid_when", "0", "Solid when", 
 void EffectGlow::StartStenciling() {
 	ShaderStencilState_t state;
 	state.m_bEnable = true;
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	switch ((int)solid_when) {
 	case 0:
 		SS_NeverSolid.SetStencilState(ptr);
@@ -292,7 +303,7 @@ void EffectGlow::StartStenciling() {
 
 void EffectGlow::EndStenciling() {
 	g_IVModelRender->ForcedMaterialOverride(nullptr);
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	ShaderStencilState_t state {};
 	state.SetStencilState(ptr);
 	ptr->DepthRange(0.0f, 1.0f);
@@ -308,7 +319,6 @@ void EffectGlow::DrawToBuffer(IClientEntity* entity) {
 }
 
 void EffectGlow::DrawEntity(IClientEntity* entity) {
-	g_IVModelRender->ForcedMaterialOverride(mat_unlit_z);
 	entity->DrawModel(1);
 	IClientEntity* attach = g_IEntityList->GetClientEntity(*(int*)((uintptr_t)entity + netvar.m_Collision - 24) & 0xFFF);
 	int passes = 0;
@@ -321,13 +331,14 @@ void EffectGlow::DrawEntity(IClientEntity* entity) {
 }
 
 void EffectGlow::RenderGlow(IClientEntity* entity) {
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	int color = GlowColor(entity);
 	unsigned char _b = (color >> 16) & 0xFF;
 	unsigned char _g = (color >> 8)  & 0xFF;
 	unsigned char _r = (color) & 0xFF;
 	float color_1[] = { (float)_r / 255.0f, (float)_g / 255.0f, (float)_b / 255.0f };
 	g_IVRenderView->SetColorModulation(color_1);
+	g_IVModelRender->ForcedMaterialOverride(mat_unlit_z);
 	DrawEntity(entity);
 }
 
@@ -335,7 +346,7 @@ void EffectGlow::Render(int x, int y, int w, int h) {
 	if (!init) Init();
 	if (!cathook || (g_IEngine->IsTakingScreenshot() && clean_screenshots) || g_Settings.bInvalid) return;
 	if (!enable) return;
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	ITexture* orig = ptr->GetRenderTarget();
 	BeginRenderGlow();
 	for (int i = 1; i < HIGHEST_ENTITY; i++) {

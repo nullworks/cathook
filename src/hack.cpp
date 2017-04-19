@@ -179,14 +179,16 @@ void hack::Initialize() {
 	hack::command_stack().push("cat_spam_reload");
 	logging::Info("Hooked!");
 	playerlist::Load();
-	effect_chams::g_pEffectChams = new CScreenSpaceEffectRegistration("_cathook_chams", &effect_chams::g_EffectChams);
-	g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_chams");
-	effect_chams::g_EffectChams.Init();
-	effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration("_cathook_glow", &effect_glow::g_EffectGlow);
+	if (TF2 || HL2DM) {
+		effect_chams::g_pEffectChams = new CScreenSpaceEffectRegistration("_cathook_chams", &effect_chams::g_EffectChams);
+		g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_chams");
+		effect_chams::g_EffectChams.Init();
+		effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration("_cathook_glow", &effect_glow::g_EffectGlow);
+		g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_glow");
+	}
 	//for (CScreenSpaceEffectRegistration* reg = *g_ppScreenSpaceRegistrationHead; reg; reg = reg->m_pNext) {
 	//	logging::Info("%s", reg->m_pEffectName);
 	//}
-	g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_glow");
 	logging::Info("SSE enabled..");
 }
 

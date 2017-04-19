@@ -12,8 +12,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "tier1/KeyValues.h"
 
-#include "imaterialsystemfixed.h"
-#include "../interfaces.h"
+#include "../common.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -44,7 +43,12 @@ CMaterialReference::~CMaterialReference()
 //-----------------------------------------------------------------------------
 void CMaterialReference::Init( char const* pMaterialName, const char *pTextureGroupName, bool bComplain )
 {
-	IMaterial *pMaterial = g_IMaterialSystem->FindMaterial( pMaterialName, pTextureGroupName, bComplain);
+	IMaterial *pMaterial;
+	if (TF2) {
+		pMaterial = g_IMaterialSystem->FindMaterial( pMaterialName, pTextureGroupName, bComplain);
+	} else {
+		pMaterial = g_IMaterialSystemHL->FindMaterial( pMaterialName, pTextureGroupName, bComplain);
+	}
 	if( IsErrorMaterial( pMaterial ) )
 	{
 		if (IsOSX())
@@ -61,12 +65,19 @@ void CMaterialReference::Init( const char *pMaterialName, KeyValues *pVMTKeyValu
 {
 	// CreateMaterial has a refcount of 1
 	Shutdown();
-	m_pMaterial = g_IMaterialSystem->CreateMaterial( pMaterialName, pVMTKeyValues );
+	if (TF2)
+		m_pMaterial = g_IMaterialSystem->CreateMaterial( pMaterialName, pVMTKeyValues );
+	else
+		m_pMaterial = g_IMaterialSystemHL->CreateMaterial( pMaterialName, pVMTKeyValues );
 }
 
 void CMaterialReference::Init( const char *pMaterialName, const char *pTextureGroupName, KeyValues *pVMTKeyValues )
 {
-	IMaterial *pMaterial = g_IMaterialSystem->FindProceduralMaterial( pMaterialName, pTextureGroupName, pVMTKeyValues );
+	IMaterial *pMaterial;
+	if (TF2)
+		pMaterial = g_IMaterialSystem->FindProceduralMaterial( pMaterialName, pTextureGroupName, pVMTKeyValues );
+	else
+		pMaterial = g_IMaterialSystemHL->FindProceduralMaterial( pMaterialName, pTextureGroupName, pVMTKeyValues );
 	Assert( pMaterial );
 	Init( pMaterial );
 }
@@ -150,7 +161,10 @@ CTextureReference::~CTextureReference( )
 void CTextureReference::Init( char const* pTextureName, const char *pTextureGroupName, bool bComplain )
 {
 	Shutdown();
-	m_pTexture = g_IMaterialSystem->FindTexture( pTextureName, pTextureGroupName, bComplain );
+	if (TF2)
+		m_pTexture = g_IMaterialSystem->FindTexture( pTextureName, pTextureGroupName, bComplain );
+	else
+		m_pTexture = g_IMaterialSystemHL->FindTexture( pTextureName, pTextureGroupName, bComplain );
 	if ( m_pTexture )
 	{
 		m_pTexture->IncrementReferenceCount();
@@ -172,8 +186,10 @@ void CTextureReference::InitProceduralTexture( const char *pTextureName, const c
 {
 	Shutdown();
 
-	m_pTexture = g_IMaterialSystem->CreateProceduralTexture( pTextureName, pTextureGroupName, w, h, fmt, nFlags );
-	
+	if (TF2)
+		m_pTexture = g_IMaterialSystem->CreateProceduralTexture( pTextureName, pTextureGroupName, w, h, fmt, nFlags );
+	else
+		m_pTexture = g_IMaterialSystemHL->CreateProceduralTexture( pTextureName, pTextureGroupName, w, h, fmt, nFlags );
 	// NOTE: The texture reference is already incremented internally above!
 	/*
 	if ( m_pTexture )
@@ -196,8 +212,12 @@ void CTextureReference::InitRenderTarget( int w, int h, RenderTargetSizeMode_t s
 	// NOTE: Refcount returned by CreateRenderTargetTexture is 1
 	//m_pTexture = vfunc<ITexture*(*)(IMaterialSystem*, char const*,int,int,RenderTargetSizeMode_t,ImageFormat,MaterialRenderTargetDepth_t,uint,uint)>(materials, 87, 0)(materials, pStrOptionalName, w, h, sizeMode, fmt,
 	//		depth, textureFlags, renderTargetFlags);
-	m_pTexture = g_IMaterialSystem->CreateNamedRenderTargetTextureEx( pStrOptionalName, w, h, sizeMode, fmt,
-		depth, textureFlags, renderTargetFlags );
+	if (TF2) {
+		m_pTexture = g_IMaterialSystem->CreateNamedRenderTargetTextureEx( pStrOptionalName, w, h, sizeMode, fmt, depth, textureFlags, renderTargetFlags );
+	} else {
+		m_pTexture = g_IMaterialSystemHL->CreateNamedRenderTargetTextureEx( pStrOptionalName, w, h, sizeMode, fmt, depth, textureFlags, renderTargetFlags );
+	}
+
 
 	Assert( m_pTexture );
 }

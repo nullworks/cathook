@@ -78,8 +78,200 @@ void Init() {
 	MainList().AddChild(new ItemSublist("Cheat Settings", nullptr));*/
 }
 
-List& MainList() {
-	static List* main = List::FromString(R"(
+static const std::string list_hl2dm = R"(
+		"Cat Hook"
+		"Aim Bot" [
+		    "Aim Bot Menu"
+		    "aimbot_enabled"
+		    "aimbot_aimkey"
+		    "aimbot_aimkey_mode"
+		    "aimbot_autoshoot"
+		    "aimbot_silent"
+		    "aimbot_hitboxmode"
+		    "aimbot_fov"
+		    "aimbot_prioritymode"
+		    "aimbot_projectile"
+		    "aimbot_proj_fovpred"
+		    "aimbot_proj_vispred"
+		    "aimbot_interp"
+		    "Preferences" [
+		        "Aim Bot Preferences"
+		        "aimbot_only_when_can_shoot"
+		        "aimbot_enable_attack_only"
+		        "aimbot_maxrange"
+		        "aimbot_teammates"
+		        "aimbot_zoomed"
+		        "aimbot_hitbox"
+		        "Projectile Aimbot" [
+		            "Projectile Aimbot Tweaks"
+		            "aimbot_proj_gravity"
+		            "aimbot_proj_speed"
+		        ]
+		    ]
+		]
+		 
+		"Trigger Bot" [
+		    "Trigger Bot Menu"
+		    "trigger_enabled"
+		    "trigger_accuracy"
+		    "trigger_range"
+		    "trigger_hitbox"
+		]
+		 
+		"Chams" [
+		    "Chams Menu"
+		    "chams_enable"
+		    "chams_health"
+		    "chams_players"
+		    "chams_teammates"
+		    "chams_flat"
+		    "chams_weapons"
+		    "chams_medkits"
+		    "chams_ammo"
+		]
+
+		"Glow" [
+		    "Glow Menu"
+		    "glow_enable"
+		    "glow_solid_when"
+		    "glow_blur_scale"
+		    "glow_health"
+		    "glow_players"
+		    "glow_teammates"
+		    "glow_medkits"
+		    "glow_ammo"
+		    "glow_stickies"
+		]
+
+		"ESP" [
+		    "ESP Menu"
+		    "esp_enabled"
+		    "font_esp_family"
+		    "font_esp_height"
+		    "esp_name"
+		    "esp_distance"
+		    "esp_box"
+		    "esp_box_text_position"
+		    "esp_box_nodraw"
+		    "esp_box_expand"
+		    "3D Box" [
+		        "3D Box Settings"
+		        "esp_3d_box"
+		        "esp_3d_box_thick"
+		        "esp_3d_box_health"
+		        "esp_3d_box_expand"
+		        "esp_3d_box_smoothing"
+		        "esp_3d_box_expand_size"
+		        "esp_3d_box_healthbar"
+		    ]
+		    "esp_legit"
+		    "esp_health_num"
+		    "esp_model_name"
+		    "esp_weapon"
+		    "esp_vischeck"
+		    "esp_entity_id"
+		    "esp_followbot_id"
+		    "esp_teammates"
+		    "esp_entity"
+		    "esp_buildings"
+		    "esp_local"
+		    "Items" [
+		        "Item ESP Menu"
+		        "esp_item"
+		        "esp_item_health"
+		        "esp_item_ammo"
+		        "esp_item_weapons"
+		        "esp_money_red"
+		        "esp_money"
+		    ]
+		]
+		 
+		"Anti-Aim" [
+		    "Anti-Aim Menu"
+		    "aa_enabled"
+		    "aa_pitch"
+		    "aa_pitch_mode"
+		    "aa_yaw"
+		    "aa_yaw_mode"
+		    "aa_spin"
+		    "aa_roll"
+		    "aa_no_clamp"
+		    "Anti-Anti-AA" [
+		        "Anti-Anti-Anti-Aim Menu"
+		        "aa_aaaa_enabled"
+		        "aa_aaaa_interval"
+		        "aa_aaaa_interval_low"
+		        "aa_aaaa_interval_high"
+		        "aa_aaaa_mode"
+		        "aa_aaaa_flip_key"
+		    ]
+		]
+		 
+		"Airstuck" [
+		    "Airstuck Menu"
+		    "airstuck"
+		    "airstuck_toggle"
+		]
+		 
+		"Chat" [
+		    "Chat Options Menu"
+		    "killsay"
+		    "spam"
+		    "spam_newlines"
+		    "clean_chat"
+		]
+		 
+		"Miscellaneous" [
+		    "Miscellaneous Settings"
+		    "enabled"
+		    "fast_outline"
+		    "no_arms"
+		    "bhop_enabled"
+		    "fov"
+		    "rollspeedhack"
+		    "fast_vischeck"
+		    "anti_afk"
+		    "flashlight"
+		    "no_visuals"
+		    "clean_screenshots"
+		    "logo"
+		    "debug_info"
+		    "log"
+		]
+		 
+		"Follow Bot" [
+		    "Follow Bot Settings"
+		    "fb_bot"
+		    "fb_mimic_slot"
+		    "fb_always_medigun"
+		    "fb_autoclass"
+		]
+		 
+		"GUI" [
+		    "GUI Settings"
+		    "gui_color_b"
+		    "gui_color_g"
+		    "gui_color_r"
+		    "gui_rainbow"
+		    "gui_bounds"
+		    "gui_nullcore"
+		    "gui_visible"
+		]
+
+		"Radar" [
+			"Radar Menu"
+			"radar"
+			"radar_size"
+			"radar_zoom"
+			"radar_health"
+			"radar_enemies_top"
+			"radar_icon_size"
+			"radar_x"
+			"radar_y"
+		]
+		)";
+
+static const std::string list_tf2 = R"(
 "Cat Hook"
 "Aim Bot" [
     "Aim Bot Menu"

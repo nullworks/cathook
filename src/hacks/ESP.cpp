@@ -293,7 +293,7 @@ void DrawBox(CachedEntity* ent, int clr, float widthFactor, float addHeight, boo
 
 	if (healthbar) {
 		int hp = colors::Transparent(colors::Health(health, healthmax), trf);
-		int hbh = (height) * min((float)health / (float)healthmax, 1.0f);
+		int hbh = (max_y - min_y) * min((float)health / (float)healthmax, 1.0f);
 		draw::OutlineRect(min_x - 6, min_y, 7, max_y - min_y, border);
 		draw::DrawRect(min_x - 5, max_y - hbh - 1, 5, hbh, hp);
 	}

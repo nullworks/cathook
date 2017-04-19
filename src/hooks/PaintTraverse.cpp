@@ -15,7 +15,7 @@
 
 CatVar clean_screenshots(CV_SWITCH, "clean_screenshots", "1", "Clean screenshots", "Don't draw visuals while taking a screenshot");
 CatVar disable_visuals(CV_SWITCH, "no_visuals", "0", "Disable ALL drawing", "Completely hides cathook");
-CatVar no_zoom(CV_SWITCH, "no_zoom", "1", "Disable scope", "Disables black scope overlay");
+CatVar no_zoom(CV_SWITCH, "no_zoom", "0", "Disable scope", "Disables black scope overlay");
 CatVar logo(CV_SWITCH, "logo", "1", "Show logo", "Show cathook text in top left corner");
 
 

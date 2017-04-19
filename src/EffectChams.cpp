@@ -58,12 +58,13 @@ void EffectChams::Init() {
 
 void EffectChams::BeginRenderChams() {
 	drawing = true;
-	CMatRenderContextPtr ptr(vfunc<IMatRenderContext*(*)(IMaterialSystemFixed*)>(g_IMaterialSystem, 100, 0)(g_IMaterialSystem));
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
+	g_IVRenderView->SetBlend(1.0f);
 }
 
 void EffectChams::EndRenderChams() {
 	drawing = false;
-	CMatRenderContextPtr ptr(vfunc<IMatRenderContext*(*)(IMaterialSystemFixed*)>(g_IMaterialSystem, 100, 0)(g_IMaterialSystem));
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	g_IVModelRender->ForcedMaterialOverride(nullptr);
 }
 
@@ -141,7 +142,7 @@ bool EffectChams::ShouldRenderChams(IClientEntity* entity) {
 }
 
 void EffectChams::RenderChams(int idx) {
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	IClientEntity* entity = g_IEntityList->GetClientEntity(idx);
 	if (entity && !entity->IsDormant()) {
 		if (ShouldRenderChams(entity)) {
@@ -170,7 +171,7 @@ void EffectChams::Render(int x, int y, int w, int h) {
 	if (!init) Init();
 	if (!cathook || (g_IEngine->IsTakingScreenshot() && clean_screenshots)) return;
 	if (!enable) return;
-	CMatRenderContextPtr ptr(g_IMaterialSystem->GetRenderContext());
+	CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
 	BeginRenderChams();
 	for (int i = 1; i < HIGHEST_ENTITY; i++) {
 		IClientEntity* ent = g_IEntityList->GetClientEntity(i);

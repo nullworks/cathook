@@ -571,5 +571,4 @@ public:
 	virtual ITexture*			CreateNamedTextureFromBitsEx( const char* pName, const char *pTextureGroupName, int w, int h, int mips, ImageFormat fmt, int srcBufferSize, byte* srcBits, int nFlags ) = 0;
 };
 
-
 #endif // IMATERIALSYSTEMFIXED_H

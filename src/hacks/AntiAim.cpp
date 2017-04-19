@@ -112,7 +112,7 @@ bool ShouldAA(CUserCmd* cmd) {
 	case weapon_melee:
 	case weapon_throwable:
 		if ((cmd->buttons & (IN_ATTACK | IN_ATTACK2)) || g_pLocalPlayer->bAttackLastTick) {
-			SetSafeSpace(4);
+			SetSafeSpace(8);
 			return false;
 		}
 	}

@@ -197,9 +197,9 @@ static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Wait for sniper 
 static CatVar respect_vaccinator(CV_SWITCH, "aimbot_respect_vaccinator", "1", "Respect Vaccinator", "Hitscan weapons won't fire if enemy is vaccinated against bullets");
 
 //Multipoint int of vars
-static CatVar multipoint_enable(CV_SWITCH, "aimbot_multipoint_enable", "0", "Multipoint", "Searches for other points on a hitbox to hit.\nVery resource intensive!!!");
+static CatVar multipoint_enable(CV_SWITCH, "aimbot_multipoint_enable", "0", "Multipoint", "Searches for other points on a hitbox to hit.\nVery resource intensive!!!\nEXPEREMENTAL!!!");
 static CatVar multipoint_points(CV_INT, "aimbot_multipoint_searchpoints", "3", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!", 15);
-static CatVar multipoint_spread(CV_FLOAT, "aimbot_multipoint_spread", "5", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!", 15);
+static CatVar multipoint_spread(CV_FLOAT, "aimbot_multipoint_spread", "5", "Multipoint Spread", "Scaling for how the spread algorythm works", 15);
 bool multiPointFound = false; 
 float multiPointedx = 0;
 float multiPointedy = 0;
@@ -221,7 +221,7 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
     if ( (multiRayEntType < 1) || (multiRayEntType > 2) ) return false;
     
     //Main ray tracing area
-    logging::Info("Multi, Tracing");
+    //logging::Info("Multi, Tracing");
     std::unique_ptr<trace_t> trace(new trace_t);
     Ray_t ray;
     trace::g_pFilterDefault->SetSelf(RAW_ENT(g_pLocalPlayer->entity));
@@ -240,27 +240,27 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
     
     
     //If the entity isnt good i guess, then return this as a miss
-    logging::Info("Multi, Testing entity");
+    //logging::Info("Multi, Testing entity");
     IClientEntity* raw_entity = (IClientEntity*)(trace->m_pEnt);
     if (!raw_entity) return false;
-    logging::Info("Multi, Passed Raw Test");
+    //logging::Info("Multi, Passed Raw Test");
     
     //Attatch the raw entity to a var
-    logging::Info("Multi, Passed to entity");
+    //logging::Info("Multi, Passed to entity");
     CachedEntity* multiRayEntity = ENTITY(raw_entity->entindex());
     
     
     
     //Check for player
-    logging::Info("Multi, Check type");
+    //logging::Info("Multi, Check type");
     if (multiRayEntType == 1) { 
         //Check if this is even a player
         switch (multiRayEntity->m_Type) {
         case EntityType::ENTITY_PLAYER: 
-            logging::Info("Multi, Found player");
+            //logging::Info("Multi, Found player");
             return true;
         default:
-            logging::Info("Multi, Found nothing");
+            //logging::Info("Multi, Found nothing");
             return false;
         }; 
     }
@@ -270,10 +270,10 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
         //Check if this is even a building
         switch (multiRayEntity->m_Type) {
         case EntityType::ENTITY_BUILDING: 
-            logging::Info("Multi, Found building");
+            //logging::Info("Multi, Found building");
             return true;
         default:
-            logging::Info("Multi, Found nothing");
+            //logging::Info("Multi, Found nothing");
             return false;
         }; 
     }
@@ -288,7 +288,7 @@ bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
     //debud1 = resultAim.x;
     //debud2 = resultAim.y;
     multiPointFound = false;
-    logging::Info("Multi, Checking");
+    //logging::Info("Multi, Checking");
     //Pasted From the aim bool
     Vector hit;
     Vector angles;
@@ -317,8 +317,8 @@ bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
     //Generate a top refrence point to go off of
     float multiTestPointTopx = angles.x + multiDistance;
     float multiTestPointTopy = angles.y + multiDistance;
-    logging::Info("Multi, Making top y", multiTestPointTopy);
-    logging::Info("Multi, Making top x", multiTestPointTopx);
+    //logging::Info("Multi, Making top y", multiTestPointTopy);
+    //logging::Info("Multi, Making top x", multiTestPointTopx);
                     
     float multiTestPointy = 0;
     float multiTestPointx = 0;
@@ -336,7 +336,7 @@ bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
         
             //Same with up top, but insteas generate the point to test for the yaw axis
             multiTestPointy = multiTestPointTopy + ( multiDistance * (y - 1) );
-            logging::Info("Multi, Making y ", multiTestPointy);
+            //logging::Info("Multi, Making y ", multiTestPointy);
             
             //Vector hits is not a real call, Its a place holder until i find a raytrace that detects players in the angle inputed.
             if ( multiTraceAngle(multiTestPointx, multiTestPointy, multiEntType) ) {
@@ -344,7 +344,7 @@ bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
                 //Since were vis checking already, Save the point that hits for later so we dont need to again.
                 multiPointedx = multiTestPointx;
                 multiPointedy = multiTestPointy;
-                logging::Info("Multi, Saving hit angles");
+                //logging::Info("Multi, Saving hit angles");
                                     
                 //Notify the loops to end since we found a point that hits
                 multiPointFound = true;

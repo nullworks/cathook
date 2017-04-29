@@ -196,6 +196,11 @@ static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Wait for sniper 
 
 static CatVar respect_vaccinator(CV_SWITCH, "aimbot_respect_vaccinator", "1", "Respect Vaccinator", "Hitscan weapons won't fire if enemy is vaccinated against bullets");
 
+static CatVar multipoint_enable(CV_SWITCH, "aimbot_multipoint_enable", "0", "Multipoint", "Searches for other points on a hitbox to hit.\nVery resource intensive!!!");
+static CatVar multipoint_points(CV_INT, "aimbot_multipoint_searchpoints", "3", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!");
+//Debug Var
+//static CatVar debud1(CV_FLOAT, "debug_info1", "0", "Var1");
+
 int ShouldTarget(CachedEntity* entity) {
 	// Just assuming CE is good
 	// TODO IsSniperRifle.. ugh
@@ -254,7 +259,65 @@ int ShouldTarget(CachedEntity* entity) {
 				if (!IsEntityVisiblePenetration(entity, v_eHitbox->GetInt())) return false;
 			} else*/ {
 				if (!GetHitbox(entity, hitbox, resultAim)) return 17;
-				if (!IsEntityVisible(entity, hitbox)) return 18;
+                //if (!IsEntityVisible(entity, hitbox)) return 18;
+				if (!IsEntityVisible(entity, hitbox)) {
+                    
+                    //Cuz its not working right now, I want to skip all this.
+                    return 18;
+                    
+                    //If Multipoint is disabled, then just return with whatever we have
+                    if (!multipoint_enable) return 18;
+                    
+                    //Debug vars
+                    //debud1 = resultAim.x;
+                    //debud2 = resultAim.y;
+                    
+                    //Save the distance to we dont have to call it many times since pointers are expensive
+                    //Since the farther the enemy is, the tighter you want the points so we divide by distance.
+                    //This still needs tweaking, its just a test number till i can get the correct one in here.
+                    //Divide everything by multipoint_points so we van fit more potential hitpoints in there.
+                    float multiDistance = ( (5 / entity->m_flDistance->GetFloat()) / multipoint_points );
+                    
+                    //Generate a top refrence point to go off of
+                    multiTestPointTopx = angles.x + multiDistance;
+                    multiTestPointTopy = angles.y + multiDistance;
+                    
+                    //Var for if we find a point that hits
+                    bool multiPointFound = false; 
+                    
+                    //Multipoint Vis Check
+                    for (int p = 1; p < multipoint_points; p++) {  
+                        
+                        //Break if we found a point that hits
+                        if (multiPointFound = true) break; 
+                
+                        //Generate the point to test for the pitch axis
+                        //if p = 1, It doesnt add distance since we want to stay in the corner.
+                        multiTestPointx = multiTestPointTopx + ( multiDistance * (p - 1) );
+                        
+                        for (int y = 1; y < multipoint_points; y++) {
+                            
+                            //Same with up top, but insteas generate the point to test for the yaw axis
+                            multiTestPointy = multiTestPointTopy + ( multiDistance * (y - 1) );
+                            
+                            //Vector hits is not a real call, Its a place holder until i find a raytrace that detects players in the angle inputed.
+                            if ( VectorHits(multiTestPointy, multiTestPointx) ) {
+                                
+                                //Since were vis checking already, Save the point that hits for later so we dont need to again.
+                                float multiPointedp = multiTestPointp;
+                                float multiPointedy = multiTestPointy;
+                                
+                                //Notify the loops to end since we found a point that hits
+                                multiPointFound = true;
+                            } 
+                            
+                            //Break since we found a point that hits
+                            if (multiPointFound = true) break; 
+                        }
+                    }
+                    
+                    
+                }
 			}
 		}
 		if ((float)fov > 0.0f && (GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, resultAim) > (float)fov)) return 25;

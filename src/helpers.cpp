@@ -342,7 +342,7 @@ bool IsEntityVectorVisible(CachedEntity* entity, Vector endpos) {
 	ray.Init(g_pLocalPlayer->v_Eye, endpos);
 	{
 		PROF_SECTION(IEVV_TraceRay);
-		g_ITrace->TraceRay(ray, MASK_SHOT, trace::g_pFilterDefault, &trace_object);
+		g_ITrace->TraceRay(ray, MASK_SHOT_HULL, trace::g_pFilterDefault, &trace_object);
 	}
 	return (trace_object.fraction >= 0.99f || (((IClientEntity*)trace_object.m_pEnt)) == RAW_ENT(entity));
 }

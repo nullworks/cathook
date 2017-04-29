@@ -1,45 +1,38 @@
-# Disclaimer
-I know that the style sucks. There is a lot of design errors and cancerous patterns. Most of the code was intended to be *temporary*.
-
 # Discord Server
 [Official Discord Server](https://discord.gg/7bu3AFw)
 
-# You need g++\-6 to compile/use cathook
+# INSTALLATION
 
-### Full install script for ubuntu (installs g++\-6 and cathook)
+Ubuntu (and probably Debian) users can run this script:
+
 ```
-sudo apt update && \
-sudo apt install build-essential software-properties-common -y && \
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-sudo apt update && \
-sudo apt install gcc-snapshot -y && \
-sudo apt update && \
-sudo apt install gcc-6 g++-6 g++-6-multilib -y && \
-sudo apt install gdb
-git clone --recursive https://github.com/nullifiedcat/cathook && \
-cd cathook && \
-make -j4
+sudo apt update && sudo apt install build-essential software-properties-common -y && sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y && sudo apt update && sudo apt install gcc-snapshot -y && sudo apt update && sudo apt install libc6-dev gcc-6 g++-6 g++-6-multilib gdb -y && git clone --recursive https://github.com/nullifiedcat/cathook && cd cathook && make -j4
 ```
 
-### Updating cathook
-Navigate into cathook directory (where src, makefile and other files are) and run:
-```
-git pull origin master && \
-git submodule update --remote --recursive && \
-make clean && \
-make -j4
-```
+**Errors while installing?** 
 
-# Injection
+`/usr/include/c++/5/string:38:28: fatal error: bits/c++config.h: No such file or directory` - You don't have g++6 or g++6 multilib installed correctly
+
+`src/<any file>: fatal error: mathlib/vector.h: No such file or directory` - You didn't download Source SDK. **DO NOT DOWNLOAD CATHOOK USING "DOWNLOAD .ZIP" FROM GITHUB. USE git clone --recursive**!
+
+If you are using other distro, make sure to have g++-6, gdb, libc6 and build essentials installed.
+
+## Updating cathook
+Run the `update` script in cathook folder.
+
+## Injection
 `sudo ./attach` to attach to tf2 process (can take argument number 0-N - # of tf2 instance to attach to (for bots))
 
 `sudo ./attach-backtrace` to attach and print backtrace if tf2 crashes. Some users reported that this method makes you get less FPS ingame.
 
-# Followbots
+## Followbots
 
-To run followbots, you need to download and install `cathook-ipc-server`.
+Followbot installation is quite complex and I won't cover it fully here.
+You have to have several user accounts ready to run tf2 - use google for that.
+You can ask someone in my discord server for help with installation.
+To control followbots, you need to download and install `cathook-ipc-server`.
 
-### Installing script
+### Followbot server installation script
 ```
 git clone --recursive https://github.com/nullifiedcat/cathook-ipc-server && \
 cd cathook-ipc-server && \

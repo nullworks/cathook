@@ -274,19 +274,14 @@ void DrawBox(CachedEntity* ent, int clr, float widthFactor, float addHeight, boo
 		draw::OutlineRect(min_x, min_y, max_x - min_x, max_y - min_y, border);
 		draw::OutlineRect(min_x + 1, min_y + 1, max_x - min_x - 2, max_y - min_y - 2, clr);
 		draw::OutlineRect(min_x + 2, min_y + 2, max_x - min_x - 4, max_y - min_y - 4, border);
-		//draw::OutlineRect(so.x - width / 2 - 1, so.y - 1 - height, width + 2, height + 2, border);
-		//draw::OutlineRect(so.x - width / 2, so.y - height, width, height, clr);
-		//draw::OutlineRect(so.x - width / 2 + 1, so.y + 1 - height, width - 2, height - 2, border);
 	}
 
 	if (healthbar) {
 		int hp = colors::Transparent(colors::Health(health, healthmax), trf);
-		int hbh = (max_y - min_y) * min((float)health / (float)healthmax, 1.0f);
+		int hbh = (max_y - min_y - 2) * min((float)health / (float)healthmax, 1.0f);
 		draw::OutlineRect(min_x - 6, min_y, 7, max_y - min_y, border);
 		draw::DrawRect(min_x - 5, max_y - hbh - 1, 5, hbh, hp);
 	}
-	//draw::OutlineRect(min(smin.x, smax.x) - 1, min(smin.y, smax.y) - 1, max(smin.x, smax.x), max(smin.y, smax.y), draw::black);
-	//draw::OutlineRect(min(smin.x, smax.x), min(smin.y, smax.y), max(smin.x, smax.x), max(smin.y, smax.y), clr);
 }
 
 void ProcessEntity(CachedEntity* ent) {
@@ -392,7 +387,7 @@ void ProcessEntity(CachedEntity* ent) {
 				return;
 			}*/
 		}
-		AddEntityString(ent, format("LV ", level, ' ', name));
+		if (show_name || show_class) AddEntityString(ent, format("LV ", level, ' ', name));
 		if (show_health) {
 			AddEntityString(ent, format(ent->m_iHealth, '/', ent->m_iMaxHealth, " HP"), colors::Health(ent->m_iHealth, ent->m_iMaxHealth));
 		}
@@ -465,7 +460,7 @@ void ProcessEntity(CachedEntity* ent) {
 }
 
 static CatVar esp_3d_box(CV_SWITCH, "esp_3d_box", "0", "3D box");
-
+static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar");
 
 void ProcessEntityPT(CachedEntity* ent) {
 	if (!enabled) return;
@@ -494,11 +489,12 @@ void ProcessEntityPT(CachedEntity* ent) {
 			if (!ent->m_bEnemy && !teammates && playerlist::IsDefault(ent)) break;
 			if (!ent->m_bAlivePlayer) break;
 			if (vischeck && !ent->IsVisible()) transparent = true;
+			if (!fg) fg = colors::EntityF(ent);
 			if (transparent) fg = colors::Transparent(fg);
 			if (esp_3d_box) {
 				Draw3DBox(ent, fg, true, CE_INT(ent, netvar.iHealth), ent->m_iMaxHealth);
 			} else {
-				DrawBox(ent, fg, 3.0f, -15.0f, true, CE_INT(ent, netvar.iHealth), ent->m_iMaxHealth);
+				DrawBox(ent, fg, 3.0f, -15.0f, static_cast<bool>(box_healthbar), CE_INT(ent, netvar.iHealth), ent->m_iMaxHealth);
 			}
 		break;
 		}
@@ -510,11 +506,12 @@ void ProcessEntityPT(CachedEntity* ent) {
 			}
 			if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !teammates) break;
 			if (!transparent && vischeck && !ent->IsVisible()) transparent = true;
+			if (!fg) fg = colors::EntityF(ent);
 			if (transparent) fg = colors::Transparent(fg);
 			if (esp_3d_box) {
 				Draw3DBox(ent, fg, true, CE_INT(ent, netvar.iBuildingHealth), CE_INT(ent, netvar.iBuildingMaxHealth));
 			} else {
-				DrawBox(ent, fg, 1.0f, 0.0f, true, CE_INT(ent, netvar.iBuildingHealth), CE_INT(ent, netvar.iBuildingMaxHealth));
+				DrawBox(ent, fg, 1.0f, 0.0f, static_cast<bool>(box_healthbar), CE_INT(ent, netvar.iBuildingHealth), CE_INT(ent, netvar.iBuildingMaxHealth));
 			}
 		break;
 		}

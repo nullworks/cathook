@@ -112,14 +112,18 @@ void CatGUI::Update() {
 				if (changed) {
 					//logging::Info("Key %i changed! Now %i.", i, down);
 					if (i == ButtonCode_t::MOUSE_LEFT) {
-						if (down) root->OnMousePress();
-						else root->OnMouseRelease();
+						if (Visible()) {
+							if (down) root->OnMousePress();
+							else root->OnMouseRelease();
+						}
 					} else {
 						if (i == ButtonCode_t::KEY_INSERT && down) {
 							gui_visible = !gui_visible;
 						}
-						if (down) root->OnKeyPress((ButtonCode_t)i, false);
-						else root->OnKeyRelease((ButtonCode_t)i);
+						if (Visible()) {
+							if (down) root->OnKeyPress((ButtonCode_t)i, false);
+							else root->OnKeyRelease((ButtonCode_t)i);
+						}
 					}
 				} else {
 					if (down) {
@@ -134,7 +138,9 @@ void CatGUI::Update() {
 								}
 							}
 						}
-						if (shouldrepeat) root->OnKeyPress((ButtonCode_t)i, true);
+						if (Visible()) {
+							if (shouldrepeat) root->OnKeyPress((ButtonCode_t)i, true);
+						}
 					}
 				}
 			}
@@ -155,8 +161,10 @@ void CatGUI::Update() {
 		root->Update();
 		if (!m_bShowTooltip && m_pTooltip->IsVisible()) m_pTooltip->Hide();
 		root->Draw(0, 0);
-		//draw::DrawRect(m_iMouseX - 5, m_iMouseY - 5, 10, 10, colors::Transparent(colors::white));
-		//draw::OutlineRect(m_iMouseX - 5, m_iMouseY - 5, 10, 10, GUIColor());
+		if (Visible()) {
+			draw::DrawRect(m_iMouseX - 5, m_iMouseY - 5, 10, 10, colors::Transparent(colors::white));
+			draw::OutlineRect(m_iMouseX - 5, m_iMouseY - 5, 10, 10, GUIColor());
+		}
 		if (gui_draw_bounds) {
 			root->DrawBounds(0, 0);
 		}

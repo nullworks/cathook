@@ -22,14 +22,7 @@ int GetScoreForEntity(CachedEntity* entity) {
 	// TODO
 	if (entity->m_Type == ENTITY_BUILDING) {
 		if (entity->m_iClassID == g_pClassID->CObjectSentrygun) {
-			float distance = (g_pLocalPlayer->v_Origin - entity->m_vecOrigin).Length();
-			// TODO
-			int total = 1;
-			if (distance != 0) {
-				int distance_factor = (4096 / distance) * 4;
-				total += distance_factor;
-			}
-			return 15;
+			return 1;
 		}
 		return 0;
 	}

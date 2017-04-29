@@ -260,6 +260,10 @@ int ShouldTarget(CachedEntity* entity) {
 			} else*/ {
 				if (!GetHitbox(entity, hitbox, resultAim)) return 17;
                 //if (!IsEntityVisible(entity, hitbox)) return 18;
+                
+                //Var for if we find a point that hits, placed back here in case we find a point without needing multipoint.
+                bool multiPointFound = false; 
+                
 				if (!IsEntityVisible(entity, hitbox)) {
                     
                     //Cuz its not working right now, I want to skip all this.
@@ -282,8 +286,7 @@ int ShouldTarget(CachedEntity* entity) {
                     multiTestPointTopx = angles.x + multiDistance;
                     multiTestPointTopy = angles.y + multiDistance;
                     
-                    //Var for if we find a point that hits
-                    bool multiPointFound = false; 
+
                     
                     //Multipoint Vis Check
                     for (int p = 1; p < multipoint_points; p++) {  
@@ -389,6 +392,12 @@ bool Aim(CachedEntity* entity, CUserCmd* cmd) {
 	//logging::Info("ayyming!");
 	Vector tr = (hit - g_pLocalPlayer->v_Eye);
 	fVectorAngles(tr, angles);
+    
+    //Since we have angles from before that hit, Inject them here.
+    if (multipoint_enable &&  multiPointFound) {
+        angles.x = multiPointedp;
+        angles.y = multiPointedy;
+    }
     
     //Needed for logic to determine whether to use slow aim. Without this, sai set to 0 will loop and freeze system
     sai = slowaim_shunting;

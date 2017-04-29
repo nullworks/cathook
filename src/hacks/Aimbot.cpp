@@ -276,6 +276,21 @@ int ShouldTarget(CachedEntity* entity) {
                     //debud1 = resultAim.x;
                     //debud2 = resultAim.y;
                     
+                    //Pasted From the aim bool
+                    Vector hit;
+                    Vector angles;
+                    if (CE_BAD(entity)) return false;
+                    int hitbox = BestHitbox(entity);
+                    //if (m_bHeadOnly) hitbox = 0;
+                    //logging::Info("A");
+                    GetHitbox(entity, hitbox, hit);
+                    //logging::Info("B");
+                    if (lerp) SimpleLatencyPrediction(entity, hitbox);
+                    //logging::Info("C");
+                    //logging::Info("ayyming!");
+                    Vector tr = (hit - g_pLocalPlayer->v_Eye);
+                    fVectorAngles(tr, angles);
+                    
                     //Save the distance to we dont have to call it many times since pointers are expensive
                     //Since the farther the enemy is, the tighter you want the points so we divide by distance.
                     //This still needs tweaking, its just a test number till i can get the correct one in here.
@@ -372,31 +387,33 @@ int slowdir;
 
 bool Aim(CachedEntity* entity, CUserCmd* cmd) {
 	//logging::Info("Aiming!");
-	Vector hit;
-	Vector angles;
-	if (CE_BAD(entity)) return false;
-	int hitbox = BestHitbox(entity);
-	//if (m_bHeadOnly) hitbox = 0;
-	if (entity->m_Type == ENTITY_PLAYER) {
-		//logging::Info("A");
-		GetHitbox(entity, hitbox, hit);
-		//logging::Info("B");
-		if (lerp) SimpleLatencyPrediction(entity, hitbox);
-		//logging::Info("C");
-	} else if (entity->m_Type == ENTITY_BUILDING) {
-		hit = GetBuildingPosition(entity);
-	}
-	if (projectile_mode) {
-		hit = ProjectilePrediction(entity, hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity));
-	}
-	//logging::Info("ayyming!");
-	Vector tr = (hit - g_pLocalPlayer->v_Eye);
-	fVectorAngles(tr, angles);
     
-    //Since we have angles from before that hit, Inject them here.
+    //Since we have angles from before, that hit, Inject them here.
     if (multipoint_enable &&  multiPointFound) {
         angles.x = multiPointedp;
         angles.y = multiPointedy;
+    } else {
+        //If we dont have angles already, then calculate them here.
+        Vector hit;
+        Vector angles;
+        if (CE_BAD(entity)) return false;
+        int hitbox = BestHitbox(entity);
+        //if (m_bHeadOnly) hitbox = 0;
+        if (entity->m_Type == ENTITY_PLAYER) {
+            //logging::Info("A");
+            GetHitbox(entity, hitbox, hit);
+            //logging::Info("B");
+            if (lerp) SimpleLatencyPrediction(entity, hitbox);
+            //logging::Info("C");
+        } else if (entity->m_Type == ENTITY_BUILDING) {
+            hit = GetBuildingPosition(entity);
+        }
+        if (projectile_mode) {
+            hit = ProjectilePrediction(entity, hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity));
+        }
+        //logging::Info("ayyming!");
+        Vector tr = (hit - g_pLocalPlayer->v_Eye);
+        fVectorAngles(tr, angles);
     }
     
     //Needed for logic to determine whether to use slow aim. Without this, sai set to 0 will loop and freeze system

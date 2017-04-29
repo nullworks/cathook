@@ -198,13 +198,15 @@ static CatVar respect_vaccinator(CV_SWITCH, "aimbot_respect_vaccinator", "1", "R
 
 //Multipoint int of vars
 static CatVar multipoint_enable(CV_SWITCH, "aimbot_multipoint_enable", "0", "Multipoint", "Searches for other points on a hitbox to hit.\nVery resource intensive!!!");
-static CatVar multipoint_points(CV_INT, "aimbot_multipoint_searchpoints", "3", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!");
+static CatVar multipoint_points(CV_INT, "aimbot_multipoint_searchpoints", "3", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!", 15);
+static CatVar multipoint_spread(CV_FLOAT, "aimbot_multipoint_spread", "5", "Multipoint Strenth", "Scaling for how many points to search for\nWith more points it becomes very resource intensive!!!", 15);
 bool multiPointFound = false; 
-float multiPointedp;
-float multiPointedy;
+float multiPointedx = 0;
+float multiPointedy = 0;
 //Slow aim is up here so that the compiler knows that it exists
 static CatVar slowaim(CV_SWITCH, "aimbot_slow", "0", "Slow Aim", "Slowly moves your crosshair onto the targets face\nUse with triggerbot.\nSilent breaks this");
-static CatVar slowaim_shunting(CV_FLOAT, "aimbot_slow_shunt", "0", "Slow Aim Shunt", "How strongly to shunt the aiming.", 100);
+static CatVar slowaim_shunting(CV_FLOAT, "aimbot_slow_shunt", "0", "Slow Aim Shunt", "How strongly to shunt the aiming.", 10);
+
 //Debug Var
 //static CatVar debud1(CV_FLOAT, "debug_info1", "0", "Var1");
 
@@ -219,6 +221,8 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
     if ( (multiRayEntType < 1) || (multiRayEntType > 2) ) return false;
     
     //Main ray tracing area
+    logging::Info("Multi, Tracing");
+    std::unique_ptr<trace_t> trace(new trace_t);
     Ray_t ray;
     trace::g_pFilterDefault->SetSelf(RAW_ENT(g_pLocalPlayer->entity));
     Vector forward;
@@ -234,17 +238,29 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
     ray.Init(g_pLocalPlayer->v_Eye, forward);
     g_ITrace->TraceRay(ray, 0x4200400B, trace::g_pFilterDefault, trace.get());
     
+    
     //If the entity isnt good i guess, then return this as a miss
+    logging::Info("Multi, Testing entity");
     IClientEntity* raw_entity = (IClientEntity*)(trace->m_pEnt);
     if (!raw_entity) return false;
+    logging::Info("Multi, Passed Raw Test");
+    
+    //Attatch the raw entity to a var
+    logging::Info("Multi, Passed to entity");
+    CachedEntity* multiRayEntity = ENTITY(raw_entity->entindex());
+    
+    
     
     //Check for player
+    logging::Info("Multi, Check type");
     if (multiRayEntType == 1) { 
         //Check if this is even a player
-        switch (entity->m_Type) {
+        switch (multiRayEntity->m_Type) {
         case EntityType::ENTITY_PLAYER: 
+            logging::Info("Multi, Found player");
             return true;
         default:
+            logging::Info("Multi, Found nothing");
             return false;
         }; 
     }
@@ -252,10 +268,12 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
     //Check for building
     if (multiRayEntType == 2) { 
         //Check if this is even a building
-        switch (entity->m_Type) {
+        switch (multiRayEntity->m_Type) {
         case EntityType::ENTITY_BUILDING: 
+            logging::Info("Multi, Found building");
             return true;
         default:
+            logging::Info("Multi, Found nothing");
             return false;
         }; 
     }
@@ -265,10 +283,12 @@ bool multiTraceAngle(float multiRayPitch, float multiRayYaw, int multiRayEntType
 }
 
 bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
+    //logging::Info("Multi, Check point start");
     //Debug vars
     //debud1 = resultAim.x;
     //debud2 = resultAim.y;
-    multiPointFound = false;                
+    multiPointFound = false;
+    logging::Info("Multi, Checking");
     //Pasted From the aim bool
     Vector hit;
     Vector angles;
@@ -278,47 +298,59 @@ bool multiPointCheckPoints(CachedEntity* multiEntity, int multiEntType) {
     if (lerp) SimpleLatencyPrediction(multiEntity, hitbox);
     Vector tr = (hit - g_pLocalPlayer->v_Eye);
     fVectorAngles(tr, angles);
+    
+    //Angle clamping for when the aimbot chooses too high of values
+    if (angles.y > 180) angles.y = angles.y - 360;
+    if (angles.y < -180) angles.y = angles.y + 360;
+    if (angles.x > 89) angles.x = angles.x - 360;
+    
+    //Alias this from the catvar because the catvar isnt a float
     float multiPoints = multipoint_points;
+    float multiSpread = multipoint_spread;
     
     //Save the distance to we dont have to call it many times since pointers are expensive
     //Since the farther the enemy is, the tighter you want the points so we divide by distance.
     //This still needs tweaking, its just a test number till i can get the correct one in here.
     //Divide everything by multipoint_points so we van fit more potential hitpoints in there.
-    float multiDistance = ( (5 / multiEntity->m_flDistance) / multiPoints );
+    float multiDistance = ( (multiSpread / multiEntity->m_flDistance) / multiPoints );
                 
     //Generate a top refrence point to go off of
     float multiTestPointTopx = angles.x + multiDistance;
     float multiTestPointTopy = angles.y + multiDistance;
-    
-
+    logging::Info("Multi, Making top y", multiTestPointTopy);
+    logging::Info("Multi, Making top x", multiTestPointTopx);
                     
+    float multiTestPointy = 0;
+    float multiTestPointx = 0;
     //Multipoint Vis Check
     for (int x = 1; x < multiPoints; x++) {  
                 
         //Break if we found a point that hits
-        if (multiPointFound = true) break; 
+        if (multiPointFound == true) break; 
             
         //Generate the point to test for the pitch axis
         //if p = 1, It doesnt add distance since we want to stay in the corner.
-        float multiTestPointx = multiTestPointTopx + ( multiDistance * (x - 1) );
+        multiTestPointx = multiTestPointTopx + ( multiDistance * (x - 1) );
                             
         for (int y = 1; y < multiPoints; y++) {
         
             //Same with up top, but insteas generate the point to test for the yaw axis
-            float multiTestPointy = multiTestPointTopy + ( multiDistance * (y - 1) );
+            multiTestPointy = multiTestPointTopy + ( multiDistance * (y - 1) );
+            logging::Info("Multi, Making y ", multiTestPointy);
             
             //Vector hits is not a real call, Its a place holder until i find a raytrace that detects players in the angle inputed.
             if ( multiTraceAngle(multiTestPointx, multiTestPointy, multiEntType) ) {
                                 
                 //Since were vis checking already, Save the point that hits for later so we dont need to again.
-                multiPointedp = multiTestPointx;
+                multiPointedx = multiTestPointx;
                 multiPointedy = multiTestPointy;
+                logging::Info("Multi, Saving hit angles");
                                     
                 //Notify the loops to end since we found a point that hits
                 multiPointFound = true;
             }
             //Break since we found a point that hits
-            if (multiPointFound = true) break; 
+            if (multiPointFound == true) break; 
         }
     }
 //Return with "If we found a point that hits"
@@ -453,20 +485,12 @@ int slowdir;
 
 bool Aim(CachedEntity* entity, CUserCmd* cmd) {
 	//logging::Info("Aiming!");
-    
-    //If we dont have angles already, then calculate them here.
     Vector hit;
     Vector angles;
     if (CE_BAD(entity)) return false;
     int hitbox = BestHitbox(entity);
     //if (m_bHeadOnly) hitbox = 0;
-    //Since we have angles from before, that hit, Inject them here.
-    if (multipoint_enable) {
-        if (multiPointFound) {
-            angles.x = multiPointedp;
-            angles.y = multiPointedy;
-        }
-    } else if (entity->m_Type == ENTITY_PLAYER) {
+    if (entity->m_Type == ENTITY_PLAYER) {
         //logging::Info("A");
         GetHitbox(entity, hitbox, hit);
         //logging::Info("B");
@@ -481,7 +505,14 @@ bool Aim(CachedEntity* entity, CUserCmd* cmd) {
     //logging::Info("ayyming!");
     Vector tr = (hit - g_pLocalPlayer->v_Eye);
     fVectorAngles(tr, angles);
-
+    
+    if (multipoint_enable) {
+        if (multiPointFound) {
+            //Since we have angles from before, that hit, Inject them here.
+            angles.x = multiPointedx;
+            angles.y = multiPointedy;
+        }
+    }
     
     //Needed for logic to determine whether to use slow aim. Without this, sai set to 0 will loop and freeze system
     sai = slowaim_shunting;

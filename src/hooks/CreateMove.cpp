@@ -45,9 +45,13 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	if (TF2C && CE_GOOD(LOCAL_W) && minigun_jump && LOCAL_W->m_iClassID == g_pClassID->CTFMinigun) {
 		CE_INT(LOCAL_W, netvar.iWeaponState) = 0;
 	}
-	bool ret = ((CreateMove_t*)hooks::hkClientMode->GetMethod(hooks::offCreateMove))(thisptr, inputSample, cmd);
+	bool ret;
+	{
+		PROF_SECTION(VALVE_CreateMove);
+		ret = ((CreateMove_t*)hooks::hkClientMode->GetMethod(hooks::offCreateMove))(thisptr, inputSample, cmd);
+	};
 
-	PROF_SECTION(CreateMove);
+	PROF_SECTION(CATHOOK_CreateMove);
 
 	if (!cmd) {
 		return ret;
@@ -88,15 +92,23 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 		gEntityCache.Invalidate();
 	}
 //	PROF_BEGIN();
-	{ PROF_SECTION(EntityCache); SAFE_CALL(gEntityCache.Update()); }
+	{
+		PROF_SECTION(EntityCache);
+		SAFE_CALL(gEntityCache.Update());
+	}
 //	PROF_END("Entity Cache updating");
-	SAFE_CALL(g_pPlayerResource->Update());
-	SAFE_CALL(g_pLocalPlayer->Update());
+
+	{
+		PROF_SECTION(OtherCache);
+		SAFE_CALL(g_pPlayerResource->Update());
+		SAFE_CALL(g_pLocalPlayer->Update());
+	}
 	g_Settings.bInvalid = false;
 	// Disabled because this causes EXTREME aimbot inaccuracy
 	//if (!cmd->command_number) return ret;
 
 	if (hacks::shared::followbot::bot) {
+		PROF_SECTION(CM_FollowBot);
 		static int team_joining_state = 0;
 		static float last_jointeam_try = 0;
 
@@ -148,25 +160,62 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	if (CE_GOOD(g_pLocalPlayer->entity)) {
 		ResetCritHack();
 		if (TF2) SAFE_CALL(UpdateHoovyList());
-			g_pLocalPlayer->v_OrigViewangles = cmd->viewangles;
-//		PROF_BEGIN();
-		//RunEnginePrediction(g_pLocalPlayer->entity, cmd);
-		SAFE_CALL(hacks::shared::esp::CreateMove());
+		g_pLocalPlayer->v_OrigViewangles = cmd->viewangles;
+		{
+			PROF_SECTION(CM_ESP);
+			SAFE_CALL(hacks::shared::esp::CreateMove());
+		}
 		if (!g_pLocalPlayer->life_state && CE_GOOD(g_pLocalPlayer->weapon())) {
-			if (TF2) SAFE_CALL(hacks::tf2::antibackstab::CreateMove());
-			if (TF2) SAFE_CALL(hacks::tf2::noisemaker::CreateMove());
-			SAFE_CALL(hacks::shared::bunnyhop::CreateMove());
-			SAFE_CALL(hacks::shared::aimbot::CreateMove());
-			SAFE_CALL(hacks::shared::antiaim::ProcessUserCmd(cmd));
-			if (TF) SAFE_CALL(hacks::tf::autosticky::CreateMove());
-			if (TF) SAFE_CALL(hacks::tf::autoreflect::CreateMove());
-			SAFE_CALL(hacks::shared::triggerbot::CreateMove());
-			if (TF) SAFE_CALL(hacks::tf::autoheal::CreateMove());
-			if (TF2) SAFE_CALL(hacks::tf2::autobackstab::CreateMove());
+			if (TF2) {
+				PROF_SECTION(CM_AntiBackstab);
+				SAFE_CALL(hacks::tf2::antibackstab::CreateMove());
+			}
+			if (TF2) {
+				PROF_SECTION(CM_Noisemaker);
+				SAFE_CALL(hacks::tf2::noisemaker::CreateMove());
+			}
+			{
+				PROF_SECTION(CM_Bunnyhop);
+				SAFE_CALL(hacks::shared::bunnyhop::CreateMove());
+			}
+			{
+				PROF_SECTION(CM_Aimbot);
+				SAFE_CALL(hacks::shared::aimbot::CreateMove());
+			}
+			{
+				PROF_SECTION(CM_AntiAim);
+				SAFE_CALL(hacks::shared::antiaim::ProcessUserCmd(cmd));
+			}
+			if (TF) {
+				PROF_SECTION(CM_AutoSticky);
+				SAFE_CALL(hacks::tf::autosticky::CreateMove());
+			}
+			if (TF) {
+				PROF_SECTION(CM_AutoReflect);
+				SAFE_CALL(hacks::tf::autoreflect::CreateMove());
+			}
+			{
+				PROF_SECTION(CM_Triggerbot);
+				SAFE_CALL(hacks::shared::triggerbot::CreateMove());
+			}
+			if (TF) {
+				PROF_SECTION(CM_AutoHeal);
+				SAFE_CALL(hacks::tf::autoheal::CreateMove());
+			}
+			if (TF2) {
+				PROF_SECTION(CM_AutoBackstab);
+				SAFE_CALL(hacks::tf2::autobackstab::CreateMove());
+			}
 		}
 		//SAFE_CALL(CREATE_MOVE(FollowBot));
-		SAFE_CALL(hacks::shared::misc::CreateMove());
-		SAFE_CALL(hacks::shared::spam::CreateMove());
+		{
+			PROF_SECTION(CM_Misc);
+			SAFE_CALL(hacks::shared::misc::CreateMove());
+		}
+		{
+			PROF_SECTION(CM_Spam);
+			SAFE_CALL(hacks::shared::spam::CreateMove());
+		}
 //		PROF_END("Hacks processing");
 		if (time_replaced) g_GlobalVars->curtime = curtime_old;
 	}
@@ -180,13 +229,15 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 
 	// TODO Auto Steam Friend
 	if (g_GlobalVars->framecount % 1000 == 0) {
+		PROF_SECTION(CM_Playerlist);
 		playerlist::DoNotKillMe();
 		ipc::UpdatePlayerlist();
 	}
 
 	if (CE_GOOD(g_pLocalPlayer->entity)) {
+		PROF_SECTION(CM_FinalizingAngles);
 		bool speedapplied = false;
-		if (roll_speedhack && g_pGUI->m_bPressedState[(int)roll_speedhack] && !(cmd->buttons & IN_ATTACK)) { // FIXME OOB
+		if ((int)roll_speedhack > 0 && (int)roll_speedhack <= BUTTON_CODE_LAST && g_pGUI->m_bPressedState[(int)roll_speedhack] && !(cmd->buttons & IN_ATTACK)) {
 			float speed = cmd->forwardmove;
 			if (fabs(speed) > 0.0f) {
 				cmd->forwardmove = -speed;
@@ -198,23 +249,6 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 				g_pLocalPlayer->bUseSilentAngles = true;
 				speedapplied = true;
 			}
-			/*Vector vecMove( cmd->forwardmove, 0.0f, 0.0f );
-			float flLength = vecMove.Length();
-			if( flLength > 0.0f && !(cmd->buttons & IN_ATTACK) )
-			{
-
-				//Vector nvm = -vecMove;
-				Vector angMoveReverse;
-				VectorAngles( vecMove, angMoveReverse );
-				cmd->forwardmove = -flLength;
-				cmd->sidemove = 0.0f; // Move only backwards, no sidemove
-				cmd->viewangles.y = AngleDiff( cmd->viewangles.y , angMoveReverse.y ) ;
-				logging::Info("yaw %.2f", cmd->viewangles.y);
-				cmd->viewangles.y += 180.0f;
-				if (cmd->viewangles.y > 180.0f) cmd->viewangles.y -= 360.0f;
-				cmd->viewangles.z = 89.0f; // OMFG SUPER 1337 SPEEDHAQ METHODS 8)
-				g_pLocalPlayer->bUseSilentAngles = true;
-			}*/
 		}
 
 		if (g_pLocalPlayer->bUseSilentAngles) {

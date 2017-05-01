@@ -27,19 +27,12 @@ static CatVar no_arms(CV_SWITCH, "no_arms", "0", "No Arms", "Removes arms from f
 static CatVar no_hats(CV_SWITCH, "no_hats", "0", "No Hats", "Removes non-stock hats");
 
 void DrawModelExecute_hook(IVModelRender* _this, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix) {
-	/*IClientUnknown* unknown = info.pRenderable->GetIClientUnknown();
-	if (unknown) {
-		IClientEntity* entity = unknown->GetIClientEntity();
-		if (entity && entity->entindex() != -1) {
-			if (entity->GetClientClass()->m_ClassID == g_pClassID->C_Player) {
-				//CMatRenderContextPtr ptr();
-			}
-		}
-	}*/
 	if (!cathook || !(no_arms || no_hats || (clean_screenshots && g_IEngine->IsTakingScreenshot()))) {
 		((DrawModelExecute_t)(hooks::hkIVModelRender->GetMethod(hooks::offDrawModelExecute)))(_this, state, info, matrix);
 		return;
 	}
+
+	PROF_SECTION(TOTAL_DrawModelExecute);
 
 	if (no_arms || no_hats) {
 		if (info.pModel) {
@@ -63,7 +56,10 @@ void DrawModelExecute_hook(IVModelRender* _this, const DrawModelState_t& state, 
 		}
 	}
 
-	((DrawModelExecute_t)(hooks::hkIVModelRender->GetMethod(hooks::offDrawModelExecute)))(_this, state, info, matrix);
+	{
+		PROF_SECTION(VALVE_DrawModelExecute);
+		((DrawModelExecute_t)(hooks::hkIVModelRender->GetMethod(hooks::offDrawModelExecute)))(_this, state, info, matrix);
+	}
 }
 
 bool CanPacket_hook(void* thisptr) {
@@ -146,55 +142,59 @@ static CatVar glow_alpha(CV_FLOAT, "glow_old_alpha", "1", "Alpha", "Glow Transpa
 void FrameStageNotify_hook(void* thisptr, int stage) {
 	SEGV_BEGIN;
 	if (!g_IEngine->IsInGame()) g_Settings.bInvalid = true;
+	PROF_SECTION(TOTAL_FrameStageNotify);
 	// TODO hack FSN hook
 	if (TF && cathook && !g_Settings.bInvalid && stage == FRAME_RENDER_START) {
-		if (glow_enabled) {
-			for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.m_Size; i++) {
-				GlowObjectDefinition_t& glowobject = g_GlowObjectManager->m_GlowObjectDefinitions[i];
-				if (glowobject.m_nNextFreeSlot != ENTRY_IN_USE)
-					continue;
-				int color = GetEntityGlowColor(glowobject.m_hEntity.m_Index & 0xFFF);
-				if (color == 0) {
-					glowobject.m_flGlowAlpha = 0.0f;
-				} else {
-					glowobject.m_flGlowAlpha = (float)glow_alpha;
-				}
-				unsigned char _b = (color >> 16) & 0xFF;
-				unsigned char _g = (color >> 8)  & 0xFF;
-				unsigned char _r = (color) & 0xFF;
-				glowobject.m_vGlowColor.x = (float)_r / 255.0f;
-				glowobject.m_vGlowColor.y = (float)_g / 255.0f;
-				glowobject.m_vGlowColor.z = (float)_b / 255.0f;
-			}
-		}
-		// Remove glow from dead entities
-		for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.Count(); i++) {
-			if (g_GlowObjectManager->m_GlowObjectDefinitions[i].m_nNextFreeSlot != ENTRY_IN_USE) continue;
-			IClientEntity* ent = (IClientEntity*)g_IEntityList->GetClientEntityFromHandle(g_GlowObjectManager->m_GlowObjectDefinitions[i].m_hEntity);
-			if (ent && ent->IsDormant()) {
-				g_GlowObjectManager->DisableGlow(i);
-			} else if (ent && ent->GetClientClass()->m_ClassID == g_pClassID->C_Player) {
-				if (NET_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE) {
-					g_GlowObjectManager->DisableGlow(i);
-				}
-			}
-		}
-		if (glow_enabled) {
-			for (int i = 1; i < g_IEntityList->GetHighestEntityIndex(); i++) {
-				IClientEntity* entity = g_IEntityList->GetClientEntity(i);
-				if (!entity || i == g_IEngine->GetLocalPlayer() || entity->IsDormant())
-					continue;
-				if (!CanEntityEvenGlow(i)) continue;
-				int clazz = entity->GetClientClass()->m_ClassID;
-				int current_handle = g_GlowObjectManager->GlowHandle(entity);
-				bool shouldglow = ShouldEntityGlow(i);
-				if (current_handle != -1) {
-					if (!shouldglow) {
-						g_GlowObjectManager->DisableGlow(current_handle);
+		{
+			PROF_SECTION(FSN_Glow);
+			if (glow_enabled) {
+				for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.m_Size; i++) {
+					GlowObjectDefinition_t& glowobject = g_GlowObjectManager->m_GlowObjectDefinitions[i];
+					if (glowobject.m_nNextFreeSlot != ENTRY_IN_USE)
+						continue;
+					int color = GetEntityGlowColor(glowobject.m_hEntity.m_Index & 0xFFF);
+					if (color == 0) {
+						glowobject.m_flGlowAlpha = 0.0f;
+					} else {
+						glowobject.m_flGlowAlpha = (float)glow_alpha;
 					}
-				} else {
-					if (shouldglow) {
-						g_GlowObjectManager->EnableGlow(entity, colors::white);
+					unsigned char _b = (color >> 16) & 0xFF;
+					unsigned char _g = (color >> 8)  & 0xFF;
+					unsigned char _r = (color) & 0xFF;
+					glowobject.m_vGlowColor.x = (float)_r / 255.0f;
+					glowobject.m_vGlowColor.y = (float)_g / 255.0f;
+					glowobject.m_vGlowColor.z = (float)_b / 255.0f;
+				}
+			}
+			// Remove glow from dead entities
+			for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.Count(); i++) {
+				if (g_GlowObjectManager->m_GlowObjectDefinitions[i].m_nNextFreeSlot != ENTRY_IN_USE) continue;
+				IClientEntity* ent = (IClientEntity*)g_IEntityList->GetClientEntityFromHandle(g_GlowObjectManager->m_GlowObjectDefinitions[i].m_hEntity);
+				if (ent && ent->IsDormant()) {
+					g_GlowObjectManager->DisableGlow(i);
+				} else if (ent && ent->GetClientClass()->m_ClassID == g_pClassID->C_Player) {
+					if (NET_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE) {
+						g_GlowObjectManager->DisableGlow(i);
+					}
+				}
+			}
+			if (glow_enabled) {
+				for (int i = 1; i < g_IEntityList->GetHighestEntityIndex(); i++) {
+					IClientEntity* entity = g_IEntityList->GetClientEntity(i);
+					if (!entity || i == g_IEngine->GetLocalPlayer() || entity->IsDormant())
+						continue;
+					if (!CanEntityEvenGlow(i)) continue;
+					int clazz = entity->GetClientClass()->m_ClassID;
+					int current_handle = g_GlowObjectManager->GlowHandle(entity);
+					bool shouldglow = ShouldEntityGlow(i);
+					if (current_handle != -1) {
+						if (!shouldglow) {
+							g_GlowObjectManager->DisableGlow(current_handle);
+						}
+					} else {
+						if (shouldglow) {
+							g_GlowObjectManager->EnableGlow(entity, colors::white);
+						}
 					}
 				}
 			}
@@ -209,7 +209,10 @@ void FrameStageNotify_hook(void* thisptr, int stage) {
 			}
 		}
 	}
-	SAFE_CALL(((FrameStageNotify_t*)hooks::hkClient->GetMethod(hooks::offFrameStageNotify))(thisptr, stage));
+	{
+		PROF_SECTION(VALVE_FrameStageNotify);
+		SAFE_CALL(((FrameStageNotify_t*)hooks::hkClient->GetMethod(hooks::offFrameStageNotify))(thisptr, stage));
+	}
 	SEGV_END;
 }
 

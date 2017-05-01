@@ -51,7 +51,6 @@ public:
 	CTooltip* m_pTooltip;
 	RootWindow* m_pRootWindow;
 
-	// TODO NullCore tooltip
 	menu::ncc::Root* root_nullcore;
 
 	int  last_scroll_value;

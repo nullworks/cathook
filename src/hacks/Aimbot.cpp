@@ -60,12 +60,10 @@ void CreateMove() {
 		if (!projectile_aimbot) return;
 	};
 
-	CUserCmd* cmd = g_pUserCmd; // FIXME
-
 	if (HasCondition(g_pLocalPlayer->entity, TFCond_Cloaked)) return; // TODO other kinds of cloak
 	// TODO m_bFeignDeathReady no aim
 
-	if(cmd->buttons & IN_USE) return;
+	if(g_pUserCmd->buttons & IN_USE) return;
 
 	/*if (this->v_bTriggerMode->GetBool() ) {
 		cmd->buttons = cmd->buttons &~ IN_ATTACK;
@@ -149,7 +147,7 @@ void CreateMove() {
 
 	if (CE_GOOD(target_highest)) {
 		hacks::shared::esp::SetEntityColor(target_highest, colors::pink);
-		if (ShouldAim(cmd)) {
+		if (ShouldAim(g_pUserCmd)) {
 			last_target = target_highest->m_IDX;
 			if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFCompoundBow) { // There is no Huntsman in TF2C.
 				float begincharge = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargeBeginTime);
@@ -160,18 +158,18 @@ void CreateMove() {
 					silent_huntsman = true;
 				}
 				if (charge >= (float)huntsman_autoshoot) {
-					cmd->buttons &= ~IN_ATTACK;
+					g_pUserCmd->buttons &= ~IN_ATTACK;
 					hacks::shared::antiaim::SetSafeSpace(3);
 				} else if (autoshoot && huntsman_full_auto) {
 					huntsman_ticks = 3;
-					cmd->buttons |= IN_ATTACK;
+					g_pUserCmd->buttons |= IN_ATTACK;
 				}
-				if (!(cmd->buttons & IN_ATTACK) && silent_huntsman) {
-					Aim(target_highest, cmd);
+				if (!(g_pUserCmd->buttons & IN_ATTACK) && silent_huntsman) {
+					Aim(target_highest, g_pUserCmd);
 					silent_huntsman = false;
 				}
 			} else {
-				Aim(target_highest, cmd);
+				Aim(target_highest, g_pUserCmd);
 			}
 			if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFMinigun)
 				minigun_fix_ticks = 40;
@@ -180,8 +178,8 @@ void CreateMove() {
 	if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFMinigun &&
 			target_highest == 0 &&
 			IDX_GOOD(last_target) &&
-			minigun_fix_ticks && ShouldAim(cmd)) {
-		Aim(ENTITY(last_target), cmd);
+			minigun_fix_ticks && ShouldAim(g_pUserCmd)) {
+		Aim(ENTITY(last_target), g_pUserCmd);
 	}
 	if (silent) g_pLocalPlayer->bUseSilentAngles = true;
 	return;

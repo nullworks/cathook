@@ -43,10 +43,13 @@ void PaintTraverse_hook(void* p, unsigned int vp, bool fr, bool ar) {
 		g_ISurface->SetCursorAlwaysVisible(vis);
 	}
 
-	if (call_default) SAFE_CALL(((PaintTraverse_t*)hooks::hkPanel->GetMethod(hooks::offPaintTraverse))(p, vp, fr, ar));
+	if (call_default) {
+		PROF_SECTION(VALVE_PaintTraverse);
+		SAFE_CALL(((PaintTraverse_t*)hooks::hkPanel->GetMethod(hooks::offPaintTraverse))(p, vp, fr, ar));
+	}
 	// To avoid threading problems.
 
-	PROF_SECTION(PaintTraverse);
+	PROF_SECTION(CATHOOK_PaintTraverse);
 	if (vp == panel_top) draw_flag = true;
 	if (!cathook) return;
 
@@ -78,6 +81,7 @@ void PaintTraverse_hook(void* p, unsigned int vp, bool fr, bool ar) {
 	draw_flag = false;
 
 	{
+		PROF_SECTION(Command_Stack);
 		std::lock_guard<std::mutex> guard(hack::command_stack_mutex);
 		while (!hack::command_stack().empty()) {
 			logging::Info("executing %s", hack::command_stack().top().c_str());
@@ -100,16 +104,34 @@ void PaintTraverse_hook(void* p, unsigned int vp, bool fr, bool ar) {
 	}
 
 	if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid) {
-		if (TF) SAFE_CALL(hacks::tf2::antidisguise::Draw());
-		SAFE_CALL(hacks::shared::misc::Draw());
-		SAFE_CALL(hacks::shared::esp::Draw());
-		if (TF) SAFE_CALL(hacks::tf::spyalert::Draw());
-		if (TF) SAFE_CALL(hacks::tf::radar::Draw());
+		if (TF) {
+			PROF_SECTION(PT_AntiDisguise);
+			SAFE_CALL(hacks::tf2::antidisguise::Draw());
+		}
+		{
+			PROF_SECTION(PT_Misc);
+			SAFE_CALL(hacks::shared::misc::Draw());
+		}
+		{
+			PROF_SECTION(PT_ESP);
+			SAFE_CALL(hacks::shared::esp::Draw());
+		}
+		if (TF) {
+			PROF_SECTION(PT_SPYALERT);
+			SAFE_CALL(hacks::tf::spyalert::Draw());
+		}
+		if (TF) {
+			PROF_SECTION(PT_RADAR);
+			SAFE_CALL(hacks::tf::radar::Draw());
+		}
 	}
 
 
 #if GUI_ENABLED == true
+	{
+		PROF_SECTION(GUI);
 		g_pGUI->Update();
+	}
 #endif
 
 	DrawStrings();

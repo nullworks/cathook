@@ -107,17 +107,6 @@ void CachedEntity::Update(int idx) {
 		m_flDistance = (g_pLocalPlayer->v_Origin.DistTo(m_vecOrigin));
 	}
 	m_bAlivePlayer = false;
-	// TODO temporary!
-	/*m_bCritProjectile = false;
-	m_bIsVisible = false;
-	m_iTeam = 0;
-	m_bEnemy = false;
-	m_bAlivePlayer = false;
-	m_pPlayerInfo = 0;
-	m_iHealth = 0;
-	m_iMaxHealth = 0;
-	m_lLastSeen = 0;
-	m_lSeenTicks = 0;*/
 
 	if (CE_BAD(g_pLocalPlayer->entity)) return;
 

@@ -46,6 +46,7 @@
 #include "netvars.h"
 #include "vfunc.h"
 #include "hooks.h"
+#include "profiler.h"
 #include "prediction.h"
 #include "conditions.h"
 #include "itemtypes.h"

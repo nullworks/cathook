@@ -56,7 +56,6 @@ Vector ProjectilePrediction(CachedEntity* ent, int hb, float speed, float gravit
 	if (speed == 0.0f) return Vector();
 	float dtg = DistanceToGround(ent);
 	Vector vel = CE_VECTOR(ent, netvar.vVelocity);
-	// TODO ProjAim
 	float medianTime = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
 	float range = 1.5f;
 	float currenttime = medianTime - range;

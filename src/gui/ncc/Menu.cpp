@@ -269,9 +269,15 @@ static const std::string list_tf2 = R"(
         "aimbot_zoomed"
         "aimbot_only_when_can_shoot"
         "aimbot_enable_attack_only"
-	"aimbot_slow_shunt"
+        "aimbot_slow_shunt"
         "aimbot_maxrange"
         "aimbot_interp"
+        "Experemental" [
+            "Experemental Menu"
+            "aimbot_multipoint_enable"
+            "aimbot_multipoint_searchpoints"
+            "aimbot_multipoint_spread"
+        ]
         "Projectile Aimbot" [
             "Projectile Aimbot Tweaks"
             "aimbot_projectile"

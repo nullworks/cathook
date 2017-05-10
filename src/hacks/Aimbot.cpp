@@ -660,6 +660,7 @@ EAimbotLocalState ShouldAim() {
 int BestHitbox(CachedEntity* target) {
 	static int preferred, ci, flags, bdmg;
 	static float cdmg;
+    static float bodmg;
 	static bool ground;
 	preferred = hitbox;
 	switch ((int)hitbox_mode) {
@@ -691,27 +692,27 @@ int BestHitbox(CachedEntity* target) {
 		}
 		if (LOCAL_W->m_iClassID == g_pClassID->CTFSniperRifle || LOCAL_W->m_iClassID == g_pClassID->CTFSniperRifleDecap) {
 			cdmg = CE_FLOAT(LOCAL_W, netvar.flChargedDamage);
-			bdmg = 50;
+			bodmg = 50;
 			//Darwins damage correction
 			if (target->m_iMaxHealth == 150 && target->m_iClassID == tf_sniper) {
-				bdmg = (bdmg / 1.15) - 1;
-				cdmg = (cdmg / 1.15) - 1;
+				bodmg = (bodmg * .85) - 1;
+				cdmg = (cdmg * .85) - 1;
 			}
 			//Vaccinator damage correction
 			if (HasCondition(target, TFCond_UberBulletResist)) {
-				bdmg = (bdmg / 1.75) - 1;
-				cdmg = (cdmg / 1.75) - 1;
+				bodmg = (bodmg * .25) - 1;
+				cdmg = (cdmg * .25) - 1;
 			} else if (HasCondition(target, TFCond_SmallBulletResist)) {
-				bdmg = (bdmg / 1.1) - 1;
-				cdmg = (cdmg / 1.1) - 1;
+				bodmg = (bodmg * .90) - 1;
+				cdmg = (cdmg * .90) - 1;
 			}
 			//Invis damage correction
 			if (IsPlayerInvisible(target)) {
-				bdmg = (bdmg / 1.20) - 1;
-				cdmg = (cdmg / 1.20) - 1;
+				bodmg = (bodmg * .80) - 1;
+				cdmg = (cdmg * .80) - 1;
 			}
 			//If can headshot and if bodyshot kill from charge damage, or if crit boosted and they have 150 health, or if player isnt zoomed, or if the enemy has less than 40, due to darwins, and only if they have less than 150 health will it try to bodyshot
-			if (CanHeadshot() && (cdmg >= target->m_iHealth || IsPlayerCritBoosted(g_pLocalPlayer->entity) || !g_pLocalPlayer->bZoomed || target->m_iHealth <= bdmg)  && target->m_iHealth <= 150) {
+			if (CanHeadshot() && (cdmg >= target->m_iHealth || IsPlayerCritBoosted(g_pLocalPlayer->entity) || !g_pLocalPlayer->bZoomed || target->m_iHealth <= bodmg)  && target->m_iHealth <= 150) {
 				preferred = ClosestHitbox(target);
 				headonly = false;
 			}

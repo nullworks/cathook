@@ -10,6 +10,7 @@
 
 class CatVar;
 
+extern CatVar no_zoom;
 extern CatVar clean_screenshots;
 void PaintTraverse_hook(void*, unsigned int, bool, bool);
 

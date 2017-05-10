@@ -17,6 +17,17 @@ Tooltip::Tooltip() : CTextLabel("ncc_tooltip") {
 	SetMaxSize(220, -1);
 	SetAutoSize(false);
 	SetSize(220, -1);
+	Props()->SetInt("font", font_item);
+}
+
+void Tooltip::HandleCustomEvent(KeyValues* event) {
+	if (!strcmp(event->GetName(), "scale_update")) {
+		SetMaxSize(Item::psize_x * (float)scale, -1);
+		SetSize(Item::psize_x * (float)scale, -1);
+		SetText(GetText()); // To update word wrapping.
+	} else if (!strcmp(event->GetName(), "font_update")) {
+		Props()->SetInt("font", font_item);
+	}
 }
 
 void Tooltip::Draw(int x, int  y) {
@@ -29,7 +40,7 @@ void Tooltip::Draw(int x, int  y) {
 	static int fgcolor = colors::Create(200, 200, 190, 255);
 	draw::DrawRect(x, y, size.first, size.second, bgcolor);
 	draw::OutlineRect(x, y, size.first, size.second, GUIColor());
-	draw::String(fonts::MENU, x + Props()->GetInt("padding_x"), y + Props()->GetInt("padding_y"), fgcolor, 2, GetText());
+	draw::String(font_item, x + Props()->GetInt("padding_x"), y + Props()->GetInt("padding_y"), fgcolor, 2, GetText());
 }
 
 }}

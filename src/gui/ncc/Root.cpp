@@ -39,6 +39,7 @@ void Root::Setup() {
 	AddChild(logo);
 	AddChild(tooltip);
 	AddChild(&menu::ncc::MainList());
+	menu::ncc::MainList().ChildByIndex(0)->Props()->SetBool("brackets3", true);
 	AddChild(new Radar());
 	menu::ncc::MainList().Show();
 	menu::ncc::MainList().SetOffset(draw::width / 2, draw::height / 2);

@@ -46,16 +46,7 @@ void List::OpenSublist(List* sublist, int dy) {
 	if (open_sublist) open_sublist->Hide();
 	open_sublist = sublist;
 	if (sublist) {
-		/*auto absp = AbsolutePosition();
-		int x = 221;
-		int y = dy;
-		if (absp.first + 221 * 2 > draw::width)
-			x = 0;
-		auto sls = sublist->GetSize();
-		if (absp.second + dy + sls.second > draw::height)
-			y = dy - sls.second;*
-		sublist->SetOffset(x, y);*/
-		sublist->SetOffset(221, dy);
+		sublist->SetOffset(Item::size_x + 1, dy);
 		sublist->Show();
 	}
 }
@@ -168,9 +159,9 @@ void List::OnMouseLeave() {
 
 void List::Draw(int x, int y) {
 	//const auto& size = GetSize();
-	draw::OutlineRect(x, y, 222, Props()->GetInt("items") * 15 + 2, GUIColor());
+	draw::OutlineRect(x, y, 2 + Item::size_x, Props()->GetInt("items") * Item::size_y + 2, GUIColor());
 	for (int i = 1; i < Props()->GetInt("items"); i++) {
-		draw::DrawLine(x + 1, y + 15 * i, 220, 0, GUIColor());
+		draw::DrawLine(x + 1, y + Item::size_y * i, Item::size_x, 0, GUIColor());
 	}
 	//CBaseContainer::Draw(x, y);
 	for (int i = 0; i < ChildCount(); i++) {
@@ -218,8 +209,8 @@ void List::MoveChildren() {
 			if (ChildByIndex(i)->GetName().find("ncc_list") == 0) continue;
 			throw std::runtime_error("Invalid cast in NCC-List:MoveChildren! Offender " + ChildByIndex(i)->GetName());
 		}
-		item->SetOffset(1, j * 15 + 1);
-		accy += 15;
+		item->SetOffset(1, j * Item::size_y + 1);
+		accy += Item::size_y;
 		j++;
 	}
 	Props()->SetInt("items", j);
@@ -227,9 +218,9 @@ void List::MoveChildren() {
 	if (list) {
 		const auto& size = list->GetSize();
 		const auto& offset = list->GetOffset();
-		SetSize(222 + size.first, max(accy, offset.second + size.second));
+		SetSize(Item::size_x + 2 + size.first, max(accy, offset.second + size.second));
 	} else {
-		SetSize(222, accy);
+		SetSize(Item::size_x + 2, accy);
 	}
 }
 

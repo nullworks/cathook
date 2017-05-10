@@ -125,12 +125,12 @@ int ClosestHitbox(CachedEntity* target) {
 
 	//If you can see the spine, no need to check for another hitbox
     if ((int)hitbox_mode == 0) {
-        if (target->m_pHitboxCache->VisibilityCheck(hitbox_t::spine_1)) return hitbox_t::spine_1;
+        if (target->hitboxes.VisibilityCheck(hitbox_t::spine_1)) return hitbox_t::spine_1;
     }
 	closest = -1;
 	closest_fov = 256;
-	for (int i = 0; i < target->m_pHitboxCache->GetNumHitboxes(); i++) {
-		fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, target->m_pHitboxCache->GetHitbox(i)->center);
+	for (int i = 0; i < target->hitboxes.GetNumHitboxes(); i++) {
+		fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, target->hitboxes.GetHitbox(i)->center);
 		if (fov < closest_fov || closest == -1) {
 			closest = i;
 			closest_fov = fov;
@@ -252,6 +252,10 @@ void CreateMove() {
 				minigun_fix_ticks = 40;
 		}
 	}
+	if (minigun_fix_ticks > 0) {
+		minigun_fix_ticks--;
+		g_pUserCmd->buttons |= IN_ATTACK;
+	}
 	if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFMinigun &&
 			target_highest == 0 &&
 			IDX_GOOD(last_target) &&
@@ -332,7 +336,7 @@ EAimbotTargetState TargetState(CachedEntity* entity) {
 				if (respect_vaccinator && HasCondition(entity, TFCond_UberBulletResist)) return EAimbotTargetState::VACCINATED;
 		}
 		if (playerlist::IsFriendly(playerlist::AccessData(entity).state)) return EAimbotTargetState::FRIENDLY;
-		if (ignore_hoovy) {
+		if (TF && ignore_hoovy) {
 			if (IsHoovy(entity)) return EAimbotTargetState::HOOVY;
 		}
 		hitbox = BestHitbox(entity);
@@ -586,16 +590,17 @@ EAimbotLocalState ShouldAim() {
 	}
 	if (g_pUserCmd->buttons & IN_USE) return EAimbotLocalState::USE_BUTTON;
 	if (g_pLocalPlayer->using_action_slot_item) return EAimbotLocalState::ACTION_SLOT_ITEM;
-	if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject)) return EAimbotLocalState::CARRYING_BUILDING;
-	if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady)) return EAimbotLocalState::DEAD_RINGER_OUT;
 	if (!UpdateAimkey()) return EAimbotLocalState::AIMKEY_RELEASED;
-	if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle) {
-		if (!g_pLocalPlayer->bZoomed && !(g_pUserCmd->buttons & IN_ATTACK)) return EAimbotLocalState::NOT_ZOOMED;
+	if (TF2) {
+		if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject)) return EAimbotLocalState::CARRYING_BUILDING;
+		if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady)) return EAimbotLocalState::DEAD_RINGER_OUT;
+		if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle) {
+			if (!g_pLocalPlayer->bZoomed && !(g_pUserCmd->buttons & IN_ATTACK)) return EAimbotLocalState::NOT_ZOOMED;
+		}
+		if (HasCondition(g_pLocalPlayer->entity, TFCond_Taunting)) return EAimbotLocalState::TAUNTING;
+		if (IsPlayerInvisible(g_pLocalPlayer->entity)) return EAimbotLocalState::CLOAKED;
+		if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFPipebombLauncher) return EAimbotLocalState::DISABLED_FOR_THIS_WEAPON;
 	}
-	if (HasCondition(g_pLocalPlayer->entity, TFCond_Taunting)) return EAimbotLocalState::TAUNTING;
-	if (IsPlayerInvisible(g_pLocalPlayer->entity)) return EAimbotLocalState::CLOAKED;
-
-	if (g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFPipebombLauncher) return EAimbotLocalState::DISABLED_FOR_THIS_WEAPON;
 	if (only_can_shoot) {
 		// Miniguns should shoot and aim continiously. TODO smg
 		if (g_pLocalPlayer->weapon()->m_iClassID != g_pClassID->CTFMinigun) {
@@ -616,12 +621,12 @@ EAimbotLocalState ShouldAim() {
 	default:
 		return EAimbotLocalState::DISABLED_FOR_THIS_WEAPON;
 	};
-	if (g_pLocalPlayer->bZoomed) {
+	if (TF && g_pLocalPlayer->bZoomed) {
 		if (!(g_pUserCmd->buttons & (IN_ATTACK | IN_ATTACK2))) {
 			if (!CanHeadshot()) return EAimbotLocalState::SNIPER_RIFLE_DELAY;
 		}
 	}
-	if (!AmbassadorCanHeadshot()) return EAimbotLocalState::AMBASSADOR_COOLDOWN;
+	if (TF2 && !AmbassadorCanHeadshot()) return EAimbotLocalState::AMBASSADOR_COOLDOWN;
 	do_minigun_checks = true;
 #ifdef IPC_ENABLED
 	if (hacks::shared::followbot::bot) {
@@ -633,7 +638,7 @@ EAimbotLocalState ShouldAim() {
 		}
 	}
 #endif
-	if (do_minigun_checks && g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFMinigun) {
+	if (TF && do_minigun_checks && g_pLocalPlayer->weapon()->m_iClassID == g_pClassID->CTFMinigun) {
 		weapon_state = CE_INT(g_pLocalPlayer->weapon(), netvar.iWeaponState);
 		if ((weapon_state == MinigunState_t::AC_STATE_IDLE || weapon_state == MinigunState_t::AC_STATE_STARTFIRING) && !auto_spin_up) {
 			return EAimbotLocalState::MINIGUN_IDLE;
@@ -647,7 +652,7 @@ EAimbotLocalState ShouldAim() {
 			cmd->buttons |= IN_ATTACK;
 		}*/
 	}
-	if (!AllowAttacking())
+	if (TF && !AllowAttacking())
 		return EAimbotLocalState::CRIT_HACK_LOCKS_ATTACK;
 	return EAimbotLocalState::GOOD;
 }
@@ -713,9 +718,9 @@ int BestHitbox(CachedEntity* target) {
 		}
 
 		if (headonly) return hitbox_t::head;
-		if (target->m_pHitboxCache->VisibilityCheck(preferred)) return preferred;
-		for (int i = projectile_mode ? 1 : 0; i < target->m_pHitboxCache->GetNumHitboxes(); i++) {
-			if (target->m_pHitboxCache->VisibilityCheck(i)) return i;
+		if (target->hitboxes.VisibilityCheck(preferred)) return preferred;
+		for (int i = projectile_mode ? 1 : 0; i < target->hitboxes.GetNumHitboxes(); i++) {
+			if (target->hitboxes.VisibilityCheck(i)) return i;
 		}
 	} break;
 	case 1: { // AUTO-CLOSEST

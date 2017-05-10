@@ -120,8 +120,8 @@ void Draw3DBox(CachedEntity* ent, int clr, bool healthbar, int health, int healt
 	set = false;
 	success = true;
 
-	for (int i = 0; i < ent->m_pHitboxCache->GetNumHitboxes(); i++) {
-		hb = ent->m_pHitboxCache->GetHitbox(i);
+	for (int i = 0; i < ent->hitboxes.GetNumHitboxes(); i++) {
+		hb = ent->hitboxes.GetHitbox(i);
 		if (!hb) return;
 		if (!set || hb->min.x < mins.x) mins.x = hb->min.x;
 		if (!set || hb->min.y < mins.y) mins.y = hb->min.y;

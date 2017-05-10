@@ -32,6 +32,7 @@ public:
 	virtual void OnMousePress();
 	virtual void OnMouseRelease();
 	virtual void Update();
+	virtual void HandleCustomEvent(KeyValues* event);
 
 	virtual void SortByZIndex();
 	void UpdateHovers();

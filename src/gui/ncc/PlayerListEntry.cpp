@@ -38,7 +38,8 @@ void PlayerListEntry::Update() {
 					safename[j++] = info.name[i];
 				}
 				name->text = format(safename);
-				int iclazz = g_pPlayerResource->GetClass(ENTITY(idx));
+				int iclazz = 0;
+				if (TF) iclazz = g_pPlayerResource->GetClass(ENTITY(idx));
 				int team = g_pPlayerResource->GetTeam(idx);
 				clazz->color_bg = 0;
 				if (idx != g_IEngine->GetLocalPlayer()) {
@@ -73,10 +74,10 @@ void PlayerListEntry::MoveChildren() {
 	for (int i = 0; i < ChildCount() && i < (sizeof(size_table) / sizeof(int)); i++) {
 		IWidget* child = ChildByIndex(i);
 		child->SetOffset(it, 0);
-		child->SetSize(size_table[i], 16);
-		it += 1 + size_table[i];
+		child->SetSize(size_table[i] * (float)scale, Item::size_y + 1);
+		it += (size_table[i] + 1) * (float)scale;
 	}
-	SetSize(it, 16);
+	SetSize(it, Item::size_y + 1);
 }
 
 void PlayerListEntry::OnKeyPress(ButtonCode_t key, bool repeat) {

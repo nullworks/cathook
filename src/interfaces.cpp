@@ -87,10 +87,15 @@ void CreateInterfaces() {
 	HSteamPipe sp = g_ISteamClient->CreateSteamPipe();
 	HSteamUser su = g_ISteamClient->ConnectToGlobalUser(sp);
 	g_IVModelRender = BruteforceInterface<IVModelRender>("VEngineModel", sharedobj::engine, 16);
-	uintptr_t sig_steamapi = gSignatures.GetEngineSignature("55 0F 57 C0 89 E5 83 EC 18 F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F 10 05 ? ? ? ? C7 04 24 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? ? E8 ? ? ? ? C7 44 24 08 ? ? ? ? C7 44 24 04 ? ? ? ? C7 04 24 ? ? ? ? E8 ? ? ? ? C9 C3");
-	logging::Info("SteamAPI: 0x%08x", sig_steamapi);
-	void** SteamAPI_engine = *reinterpret_cast<void***>(sig_steamapi + 36);
-	g_ISteamFriends = (ISteamFriends*)(SteamAPI_engine[1]);//g_ISteamClient->GetISteamFriends(su, sp, "SteamFriends002");
+	if (TF2) {
+		uintptr_t sig_steamapi = gSignatures.GetEngineSignature("55 0F 57 C0 89 E5 83 EC 18 F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F 10 05 ? ? ? ? C7 04 24 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? ? E8 ? ? ? ? C7 44 24 08 ? ? ? ? C7 44 24 04 ? ? ? ? C7 04 24 ? ? ? ? E8 ? ? ? ? C9 C3");
+		logging::Info("SteamAPI: 0x%08x", sig_steamapi);
+		void** SteamAPI_engine = *reinterpret_cast<void***>(sig_steamapi + 36);
+		g_ISteamFriends = (ISteamFriends*)(SteamAPI_engine[1]);//
+	} else {
+		// FIXME SIGNATURE
+		g_ISteamFriends = g_ISteamClient->GetISteamFriends(su, sp, "SteamFriends002");
+	}
 	g_GlobalVars = **(reinterpret_cast<CGlobalVarsBase***>((uintptr_t)11 + gSignatures.GetClientSignature("55 89 E5 83 EC ? 8B 45 08 8B 15 ? ? ? ? F3 0F 10")));
 	g_IPrediction = BruteforceInterface<IPrediction>("VClientPrediction", sharedobj::client);
 	g_IGameMovement = BruteforceInterface<IGameMovement>("GameMovement", sharedobj::client);

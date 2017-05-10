@@ -31,11 +31,20 @@ namespace menu { namespace ncc {
 class List;
 class Tooltip;
 
-constexpr int font_item_height = 12;
+extern CatVar scale;
+extern CatVar font_family;
+extern CatVar font_title_family;
+
+constexpr int psize_font_item = 12;
+constexpr int psize_font_title = 14;
+
 extern unsigned long font_title; // Verdana Bold 10px?
 extern unsigned long font_item;  // Verdana 	 10px?
-extern Tooltip* tooltip;
 
+extern Tooltip* tooltip;
+extern Root* root;
+
+void RefreshFonts();
 void ShowTooltip(const std::string& text);
 
 void Init();

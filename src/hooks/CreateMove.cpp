@@ -140,7 +140,6 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	g_Settings.bInvalid = false;
 	// Disabled because this causes EXTREME aimbot inaccuracy
 	//if (!cmd->command_number) return ret;
-	hacks::shared::lagexploit::CreateMove();
 #ifdef IPC_ENABLED
 	static int team_joining_state = 0;
 	static float last_jointeam_try = 0;
@@ -170,8 +169,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 			for (int i = 1; i < 32 && i < HIGHEST_ENTITY; i++) {
 				ent = ENTITY(i);
 				if (CE_BAD(ent)) continue;
-				if (!ent->m_pPlayerInfo) continue;
-				if (ent->m_pPlayerInfo->friendsID == hacks::shared::followbot::follow_steamid) {
+				if (ent->player_info.friendsID == hacks::shared::followbot::follow_steamid) {
 					found_entity = ent;
 					break;
 				}
@@ -227,6 +225,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	}*/
 	g_Settings.bInvalid = false;
 	chat_stack::OnCreateMove();
+	hacks::shared::lagexploit::CreateMove();
 
 	// TODO Auto Steam Friend
 	if (g_GlobalVars->framecount % 1000 == 0) {

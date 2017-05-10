@@ -83,6 +83,7 @@ public:
 	typedef std::function<void(CatVar*)> RegisterCallbackFn;
 	std::vector<RegisterCallbackFn> callbacks {};
 	void OnRegister(RegisterCallbackFn fn);
+	void InstallChangeCallback(FnChangeCallback_t callback);
 
 	[[deprecated]]
 	inline bool GetBool() const { return this->operator bool();  }

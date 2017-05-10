@@ -35,17 +35,18 @@ void CTextLabel::SetPadding(int x, int y) {
 }
 
 void CTextLabel::SetText(std::string text) {
+	unsigned long font_handle = Props()->GetInt("font", fonts::MENU);
 	Props()->SetString("text", text.c_str());
 	auto padding = std::make_pair(Props()->GetInt("padding_x"), Props()->GetInt("padding_y"));
-	auto size = draw::GetStringLength(fonts::MENU, text);
+	auto size = draw::GetStringLength(font_handle, text);
 	if (Props()->GetBool("autosize")) {
 		SetSize(size.first + padding.first * 2, size.second + padding.second * 2);
 	} else {
 		auto ms = GetMaxSize();
 		SetSize(-1, size.second + padding.second * 2);
 		if (ms.first > 0) {
-			std::string txt = WordWrap(text, ms.first - 2 * padding.first);
-			auto size2 = draw::GetStringLength(fonts::MENU, txt);
+			std::string txt = WordWrap(text, ms.first - 2 * padding.first, menu::ncc::font_item);
+			auto size2 = draw::GetStringLength(font_handle, txt);
 			SetSize(size2.first + padding.first * 2, size2.second + padding.second * 2);
 			Props()->SetString("text", txt.c_str());
 		}

@@ -212,8 +212,7 @@ static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with Ste
 		CachedEntity* ent = ENTITY(i);
 		if (CE_BAD(ent)) continue;
 		if (ent->m_Type != ENTITY_PLAYER) continue;
-		if (!ent->m_pPlayerInfo) continue;
-		if (ent->m_pPlayerInfo->friendsID == strtol(args.Arg(1), nullptr, 10)) {
+		if (ent->player_info.friendsID == strtol(args.Arg(1), nullptr, 10)) {
 			force_healing_target = i;
 			return;
 		}

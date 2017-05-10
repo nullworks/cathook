@@ -211,8 +211,8 @@ unsigned long ESP = 0;
 unsigned long MENU = 0;
 unsigned long MENU_BIG = 0;
 
-static const std::vector<std::string> fonts = {"Tahoma Bold", "Tahoma", "TF2 Build", "Verdana", "Verdana Bold", "Arial", "Courier New", "Ubuntu Mono Bold"};
-static CatEnum family_enum(fonts);
+const std::vector<std::string> fonts = {"Tahoma Bold", "Tahoma", "TF2 Build", "Verdana", "Verdana Bold", "Arial", "Courier New", "Ubuntu Mono Bold"};
+CatEnum family_enum(fonts);
 CatVar esp_family(family_enum, "font_esp_family", "2", "ESP font", "ESP font family");
 CatVar esp_height(CV_INT, "font_esp_height", "14", "ESP height", "ESP font height");
 

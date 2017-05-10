@@ -110,8 +110,8 @@ int Color(unsigned steamid) {
 }
 
 int Color(CachedEntity* player) {
-	if (player->m_pPlayerInfo)
-		return Color(player->m_pPlayerInfo->friendsID);
+	if (CE_GOOD(player))
+		return Color(player->player_info.friendsID);
 	return 0;
 }
 
@@ -126,8 +126,8 @@ userdata& AccessData(unsigned steamid) {
 
 // Assume player is non-null
 userdata& AccessData(CachedEntity* player) {
-	if (CE_GOOD(player) && player->m_pPlayerInfo)
-		return AccessData(player->m_pPlayerInfo->friendsID);
+	if (CE_GOOD(player))
+		return AccessData(player->player_info.friendsID);
 	return AccessData(0U);
 }
 
@@ -137,8 +137,8 @@ bool IsDefault(unsigned steamid) {
 }
 
 bool IsDefault(CachedEntity* entity) {
-	if (CE_GOOD(entity) && entity->m_pPlayerInfo)
-		return IsDefault(entity->m_pPlayerInfo->friendsID);
+	if (CE_GOOD(entity))
+		return IsDefault(entity->player_info.friendsID);
 	return true;
 }
 

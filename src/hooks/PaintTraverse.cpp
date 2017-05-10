@@ -36,6 +36,7 @@ void PaintTraverse_hook(void* _this, unsigned int vp, bool fr, bool ar) {
 	static bool call_default = true;
 	static ConVar* software_cursor = g_ICvar->FindVar("cl_software_cursor");
 	static const char *name;
+	static std::string name_s, name_stripped, reason_stripped;
 #if DEBUG_SEGV == true
 	if (!segvcatch::handler_fpe || !segvcatch::handler_segv) {
 		if (!segvcatch::handler_fpe) segvcatch::init_segv();
@@ -144,12 +145,12 @@ void PaintTraverse_hook(void* _this, unsigned int vp, bool fr, bool ar) {
 		AddSideString("Press 'INSERT' or 'F11' key to open/close cheat menu.", GUIColor());
 		AddSideString("Use mouse to navigate in menu.", GUIColor());
 		if (!g_IEngine->IsInGame() || g_pGUI->Visible()) {
-			std::string name(force_name.GetString());
-			if (name.length() < 3) name = "*Not Set*";
+			name_s = force_name.GetString();
+			if (name_s.length() < 3) name = "*Not Set*";
 			AddSideString(""); // foolish
-			std::string name_stripped(name); // RIP fps
+			name_stripped = name_s	;
 			ReplaceString(name_stripped, "\n", "\\n");
-			std::string reason_stripped(disconnect_reason.GetString());
+			reason_stripped = disconnect_reason.GetString();
 			ReplaceString(reason_stripped, "\n", "\\n");
 			AddSideString(format("Custom Name: ", name_stripped), GUIColor());
 			AddSideString(format("Custom Disconnect Reason: ", (reason_stripped.length() > 3 ? reason_stripped : "*Not Set*")), GUIColor());

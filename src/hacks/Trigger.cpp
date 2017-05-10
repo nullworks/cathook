@@ -113,7 +113,7 @@ void CreateMove() {
 	}
 	//debug->AddBoxOverlay(enemy_trace->endpos, Vector(-1.0f, -1.0f, -1.0f), Vector(1.0f, 1.0f, 1.0f), QAngle(0, 0, 0), 255, 0, 0, 255, 2.0f);
 	//IClientEntity* weapon;
-	CachedHitbox* hb = entity->m_pHitboxCache->GetHitbox(trace->hitbox);
+	CachedHitbox* hb = entity->hitboxes.GetHitbox(trace->hitbox);
 	//logging::Info("hitbox: %i 0x%08x", enemy_trace->hitbox, hb);
 
 	/*if (v_bImproveAccuracy->GetBool()) {

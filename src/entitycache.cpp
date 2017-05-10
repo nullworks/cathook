@@ -13,21 +13,42 @@
 
 // This method of const'ing the index is weird.
 CachedEntity::CachedEntity() :
-	m_IDX(((unsigned)this - (unsigned)&entity_cache::array) / sizeof(CachedEntity)) {
+	m_IDX(((unsigned)this - (unsigned)&entity_cache::array) / sizeof(CachedEntity)),
+	hitboxes(this) {
 #if PROXY_ENTITY != true
 	m_pEntity = nullptr;
 #endif
-	m_Bones = 0;
-	m_Bones = new matrix3x4_t[MAXSTUDIOBONES];
-	m_pHitboxCache = new EntityHitboxCache(this);
-	m_pPlayerInfo = 0;
 	m_fLastUpdate = 0.0f;
 }
 
-CachedEntity::~CachedEntity() {
-	delete [] m_Bones;
-	delete m_pHitboxCache;
+void CachedEntity::Reset() {
+	m_Type = ENTITY_GENERIC;
+	m_iClassID = 0;
+	m_flDistance = 0.0f;
+	m_bCritProjectile = false;
+	m_bGrenadeProjectile = false;
+	m_bAnyHitboxVisible = false;
+	m_bVisCheckComplete = false;
+	m_vecOrigin.Zero();
+	m_ItemType = ITEM_NONE;
+	m_iTeam = 0;
+	m_bAlivePlayer = false;
+	m_bEnemy = false;
+	m_iMaxHealth = 0;
+	m_iHealth = 0;
+	m_lLastSeen = 0;
+	m_lSeenTicks = 0;
+	memset(&player_info, 0, sizeof(player_info_s));
+	memset(&m_Bones, 0, sizeof(matrix3x4_t) * 128);
+	m_bBonesSetup = false;
+	m_vecAcceleration.Zero();
+	m_vecVOrigin.Zero();
+	m_vecVelocity.Zero();
+	m_fLastUpdate = 0;
+	hitboxes.Reset();
 }
+
+CachedEntity::~CachedEntity() {}
 
 IClientEntity* CachedEntity::InternalEntity() {
 	return g_IEntityList->GetClientEntity(m_IDX);
@@ -69,9 +90,9 @@ void CachedEntity::Update() {
 	m_bBonesSetup = false;
 
 	m_bVisCheckComplete = false;
-	if (m_pHitboxCache) {
-		SAFE_CALL(m_pHitboxCache->Update());
-	}
+
+	SAFE_CALL(hitboxes.Update());
+
 	if (m_iClassID == g_pClassID->C_Player) {
 		m_Type = EntityType::ENTITY_PLAYER;
 	} else if (m_iClassID == g_pClassID->CTFGrenadePipebombProjectile ||
@@ -124,12 +145,7 @@ void CachedEntity::Update() {
 
 	if (m_Type == EntityType::ENTITY_PLAYER) {
 		m_bAlivePlayer = !(NET_BYTE(RAW_ENT(this), netvar.iLifeState));
-		if (m_pPlayerInfo) {
-			delete m_pPlayerInfo;
-			m_pPlayerInfo = 0;
-		}
-		m_pPlayerInfo = new player_info_s;
-		g_IEngine->GetPlayerInfo(m_IDX, m_pPlayerInfo);
+		g_IEngine->GetPlayerInfo(m_IDX, &player_info);
 		m_iTeam = CE_INT(this, netvar.iTeamNum); // TODO
 		m_bEnemy = (m_iTeam != g_pLocalPlayer->team);
 		m_iHealth = CE_INT(this, netvar.iHealth);
@@ -147,7 +163,7 @@ void CachedEntity::Update() {
 static CatVar fast_vischeck(CV_SWITCH, "fast_vischeck", "0", "Fast VisCheck", "VisCheck only certain player hitboxes");
 
 bool CachedEntity::IsVisible() {
-	static const int hitboxes[] = { hitbox_t::head, hitbox_t::foot_L, hitbox_t::hand_R, hitbox_t::spine_1 };
+	static constexpr int optimal_hitboxes[] = { hitbox_t::head, hitbox_t::foot_L, hitbox_t::hand_R, hitbox_t::spine_1 };
 	static bool vischeck0, vischeck;
 
 	PROF_SECTION(CE_IsVisible);
@@ -164,7 +180,7 @@ bool CachedEntity::IsVisible() {
 
 	if (m_Type == ENTITY_PLAYER && fast_vischeck) {
 		for (int i = 0; i < 4; i++) {
-			if (m_pHitboxCache->VisibilityCheck(hitboxes[i])) {
+			if (hitboxes.VisibilityCheck(optimal_hitboxes[i])) {
 				m_bAnyHitboxVisible = true;
 				m_bVisCheckComplete = true;
 				return true;
@@ -175,9 +191,9 @@ bool CachedEntity::IsVisible() {
 		return false;
 	}
 
-	for (int i = 0; i < m_pHitboxCache->m_nNumHitboxes; i++) {
+	for (int i = 0; i < hitboxes.m_nNumHitboxes; i++) {
 		vischeck = false;
-		SAFE_CALL(vischeck = m_pHitboxCache->VisibilityCheck(i));
+		SAFE_CALL(vischeck = hitboxes.VisibilityCheck(i));
 		if (vischeck) {
 			m_bAnyHitboxVisible = true;
 			m_bVisCheckComplete = true;
@@ -227,7 +243,9 @@ void Update() {
 
 void Invalidate() {
 	for (auto& ent : array) {
-		ent.m_pEntity = nullptr;
+		// pMuch useless line!
+		// ent.m_pEntity = nullptr;
+		ent.Reset();
 	}
 }
 

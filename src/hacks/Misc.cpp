@@ -275,7 +275,7 @@ void CreateMove() {
 		g_pUserCmd->buttons = rand();
 	}
 	
-    if (nopush_enabled == pNoPush-> GetBool()) pNoPush->SetValue (!nopush_enabled);
+    if (TF2 && nopush_enabled == pNoPush-> GetBool()) pNoPush->SetValue (!nopush_enabled);
 }
 
 void Draw() {

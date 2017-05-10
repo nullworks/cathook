@@ -12,6 +12,8 @@
 #include "itemtypes.h"
 #include "fixsdk.h"
 #include <mathlib/vector.h>
+#include <mathlib/mathlib.h>
+#include <cdll_int.h>
 
 struct matrix3x4_t;
 
@@ -40,7 +42,7 @@ struct mstudiobbox_t;
 #define CE_BYTE(entity, offset) CE_VAR(entity, offset, unsigned char)
 #define CE_VECTOR(entity, offset) CE_VAR(entity, offset, Vector)
 
-#define CE_GOOD(entity) (!g_Settings.bInvalid && dynamic_cast<CachedEntity*>(entity) && RAW_ENT(entity) && !RAW_ENT(entity)->IsDormant())
+#define CE_GOOD(entity) (!g_Settings.bInvalid && dynamic_cast<CachedEntity*>(entity) && entity->m_iClassID && RAW_ENT(entity) && !RAW_ENT(entity)->IsDormant())
 #define CE_BAD(entity) (!CE_GOOD(entity))
 
 #define IDX_GOOD(idx) (idx >= 0 && idx <= HIGHEST_ENTITY && idx < MAX_ENTITIES)
@@ -69,19 +71,21 @@ public:
 	bool VisibilityCheck(int id);
 	void Init();
 	int GetNumHitboxes();
+	void Reset();
 
-	bool* m_VisCheckValidationFlags;
-	bool* m_VisCheck;
+	bool m_VisCheckValidationFlags[CACHE_MAX_HITBOXES] { false };
+	bool m_VisCheck[CACHE_MAX_HITBOXES] { false };
+	bool m_CacheValidationFlags[CACHE_MAX_HITBOXES] { false };
+	CachedHitbox m_CacheInternal[CACHE_MAX_HITBOXES] {};
 
 	int m_nNumHitboxes;
-	model_t* m_pLastModel;
 	bool m_bModelSet;
-	mstudiohitboxset_t* m_pHitboxSet;
 	bool m_bInit;
 	bool m_bSuccess;
-	CachedEntity* m_pParentEntity;
-	bool* m_CacheValidationFlags;
-	CachedHitbox* m_CacheInternal;
+
+	mstudiohitboxset_t* m_pHitboxSet;
+	model_t* m_pLastModel;
+	CachedEntity* parent_ref; // TODO FIXME turn this into an actual reference
 };
 
 class CachedEntity {
@@ -90,6 +94,10 @@ public:
 	~CachedEntity();
 
 	void Update();
+	bool IsVisible();
+	matrix3x4_t* GetBones();
+	IClientEntity* InternalEntity();
+	void Reset();
 
 	// Entity fields start here
 	EntityType m_Type { ENTITY_GENERIC };
@@ -102,7 +110,6 @@ public:
 
 	bool m_bAnyHitboxVisible { false };
 	bool m_bVisCheckComplete { false };
-	bool IsVisible();
 
 	Vector m_vecOrigin { 0 };
 
@@ -116,31 +123,29 @@ public:
 	unsigned long m_lSeenTicks { 0 };
 	unsigned long m_lLastSeen { 0 };
 
-	player_info_s* m_pPlayerInfo { nullptr };
-	matrix3x4_t* m_Bones { nullptr };
+	player_info_s player_info {};
+	matrix3x4_t m_Bones[128]; // MAXSTUDIOBONES
 	bool m_bBonesSetup { false };
-	matrix3x4_t* GetBones();
 
 	// Players, Buildings, Stickies
 
 
 	// Entity fields end here.
 
-	EntityHitboxCache* m_pHitboxCache { nullptr };
 	const int m_IDX;
-	IClientEntity* InternalEntity();
 	Vector m_vecVOrigin { 0 };
 	Vector m_vecVelocity { 0 };
 	Vector m_vecAcceleration { 0 };
 	float m_fLastUpdate { 0.0f };
-#if PROXY_ENTITY != true || 1 // FIXME??
+	EntityHitboxCache hitboxes;
+#if PROXY_ENTITY != true
 	IClientEntity* m_pEntity { nullptr };
 #endif
 };
 
 namespace entity_cache {
 
-extern CachedEntity array[MAX_ENTITIES];
+extern CachedEntity array[MAX_ENTITIES]; // b1g fat array in
 inline CachedEntity& Get(int idx) {
 	if (idx < 0 || idx >= 2048) throw std::out_of_range("Entity index out of range!");
 	return array[idx];

@@ -61,8 +61,7 @@ void CatGUI::Setup() {
 	m_pRootWindow = new RootWindow();
 	m_pRootWindow->Setup();
 	menu::ncc::Init();
-	root_nullcore = new menu::ncc::Root();
-	root_nullcore->Setup();
+	root_nullcore = menu::ncc::root;
 	gui_visible.OnRegister([](CatVar* var) {
 		var->convar->InstallChangeCallback(GUIVisibleCallback);
 	});

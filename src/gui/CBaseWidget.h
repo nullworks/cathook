@@ -42,6 +42,8 @@ public:
 	inline virtual void OnFocusGain() { m_KeyValues->SetBool("focus", true); }
 	inline virtual void OnFocusLose() {	m_KeyValues->SetBool("focus", false); }
 
+	inline virtual void HandleCustomEvent(KeyValues* event) {};
+
 	inline virtual bool ConsumesKey(ButtonCode_t key) { return false; }
 
 	inline virtual bool AlwaysVisible() { return m_KeyValues->GetBool("always_visible"); }

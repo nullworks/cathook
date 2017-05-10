@@ -11,12 +11,14 @@
 #include "beforecheaders.h"
 #include <string>
 #include <utility>
+#include <vector>
 #include "aftercheaders.h"
 
 class CachedEntity;
 class Vector;
 class CatVar;
 class IClientEntity;
+class CatEnum;
 
 namespace fonts {
 
@@ -27,6 +29,8 @@ extern unsigned long MENU_BIG;
 
 void Update();
 
+extern const std::vector<std::string> fonts;
+extern CatEnum family_enum;
 extern CatVar esp_family;
 extern CatVar esp_height;
 

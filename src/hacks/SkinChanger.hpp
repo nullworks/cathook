@@ -101,6 +101,7 @@ public:
 };
 
 struct def_attribute_modifier {
+	bool Default() const;
 	void Apply(int entity);
 	void Set(int id, float value);
 	void Remove(int id);
@@ -118,7 +119,7 @@ def_attribute_modifier& GetModifier(int idx);
 
 constexpr unsigned SERIALIZE_VERSION = 1;
 void Save(std::string filename);
-void Load(std::string filename);
+void Load(std::string filename, bool merge = false);
 
 void InvalidateCookie();
 void FrameStageNotify(int stage);

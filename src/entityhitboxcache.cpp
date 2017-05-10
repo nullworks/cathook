@@ -8,12 +8,8 @@
 #include "common.h"
 
 EntityHitboxCache::EntityHitboxCache(CachedEntity* parent) {
-	m_CacheInternal = new CachedHitbox[CACHE_MAX_HITBOXES];
-	m_CacheValidationFlags = new bool[CACHE_MAX_HITBOXES];
-	m_VisCheck = new bool[CACHE_MAX_HITBOXES];
-	m_VisCheckValidationFlags = new bool[CACHE_MAX_HITBOXES];
 	InvalidateCache();
-	m_pParentEntity = parent;
+	parent_ref = parent;
 	m_bModelSet = false;
 	m_nNumHitboxes = 0;
 }
@@ -24,12 +20,7 @@ int EntityHitboxCache::GetNumHitboxes() {
 	return m_nNumHitboxes;
 }
 
-EntityHitboxCache::~EntityHitboxCache() {
-	delete [] m_CacheInternal;
-	delete [] m_CacheValidationFlags;
-	delete [] m_VisCheck;
-	delete [] m_VisCheckValidationFlags;
-}
+EntityHitboxCache::~EntityHitboxCache() {}
 
 void EntityHitboxCache::InvalidateCache() {
 	for (int i = 0; i < CACHE_MAX_HITBOXES; i++) {
@@ -42,7 +33,7 @@ void EntityHitboxCache::InvalidateCache() {
 
 void EntityHitboxCache::Update() {
 	SAFE_CALL(InvalidateCache());
-	if (CE_BAD(m_pParentEntity)) return;
+	if (CE_BAD(parent_ref)) return;
 }
 
 void EntityHitboxCache::Init() {
@@ -52,13 +43,13 @@ void EntityHitboxCache::Init() {
 
 	m_bInit = true;
 	model = 0;
-	if (CE_BAD(m_pParentEntity)) return;
-	SAFE_CALL(model = (model_t*)RAW_ENT(m_pParentEntity)->GetModel());
+	if (CE_BAD(parent_ref)) return;
+	SAFE_CALL(model = (model_t*)RAW_ENT(parent_ref)->GetModel());
 	if (!model) return;
 	if (!m_bModelSet || model != m_pLastModel) {
 		shdr = g_IModelInfo->GetStudiomodel(model);
 		if (!shdr) return;
-		set = shdr->pHitboxSet(CE_INT(m_pParentEntity, netvar.iHitboxSet));
+		set = shdr->pHitboxSet(CE_INT(parent_ref, netvar.iHitboxSet));
 		if (!dynamic_cast<mstudiohitboxset_t*>(set)) return;
 		m_pLastModel = model;
 		m_pHitboxSet = set;
@@ -82,9 +73,22 @@ bool EntityHitboxCache::VisibilityCheck(int id) {
 	// TODO corners
 	hitbox = GetHitbox(id);
 	if (!hitbox) return 0;
-	SAFE_CALL(m_VisCheck[id] = (IsEntityVectorVisible(m_pParentEntity, hitbox->center)));
+	SAFE_CALL(m_VisCheck[id] = (IsEntityVectorVisible(parent_ref, hitbox->center)));
 	m_VisCheckValidationFlags[id] = true;
 	return m_VisCheck[id];
+}
+
+void EntityHitboxCache::Reset() {
+	memset(m_VisCheck, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
+	memset(m_VisCheckValidationFlags, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
+	memset(m_CacheValidationFlags, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
+	memset(m_CacheInternal, 0, sizeof(CachedHitbox) * CACHE_MAX_HITBOXES);
+	m_nNumHitboxes = 0;
+	m_bInit = false;
+	m_bModelSet = false;
+	m_bSuccess = false;
+	m_pHitboxSet = nullptr;
+	m_pLastModel = nullptr;
 }
 
 CachedHitbox* EntityHitboxCache::GetHitbox(int id) {
@@ -97,8 +101,8 @@ CachedHitbox* EntityHitboxCache::GetHitbox(int id) {
 		box = m_pHitboxSet->pHitbox(id);
 		if (!box) return 0;
 		if (box->bone < 0 || box->bone >= MAXSTUDIOBONES) return 0;
-		VectorTransform(box->bbmin, m_pParentEntity->GetBones()[box->bone], m_CacheInternal[id].min);
-		VectorTransform(box->bbmax, m_pParentEntity->GetBones()[box->bone], m_CacheInternal[id].max);
+		VectorTransform(box->bbmin, parent_ref->GetBones()[box->bone], m_CacheInternal[id].min);
+		VectorTransform(box->bbmax, parent_ref->GetBones()[box->bone], m_CacheInternal[id].max);
 		m_CacheInternal[id].bbox = box;
 		m_CacheInternal[id].center = (m_CacheInternal[id].min + m_CacheInternal[id].max) / 2;
 		m_CacheValidationFlags[id] = true;

@@ -43,6 +43,8 @@ public:
 	virtual void OnFocusGain() = 0;
 	virtual void OnFocusLose() = 0;
 
+	virtual void HandleCustomEvent(KeyValues* event) = 0;
+
 	virtual bool ConsumesKey(ButtonCode_t key) = 0;
 
 	// Widget will be visible even when gui is turned off

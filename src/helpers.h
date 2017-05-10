@@ -91,7 +91,7 @@ void Patch(void* address, void* patch, size_t length);
 void AimAt(Vector origin, Vector target, CUserCmd* cmd);
 void AimAtHitbox(CachedEntity* ent, int hitbox, CUserCmd* cmd);
 
-std::string WordWrap(std::string& in, int max);
+std::string WordWrap(std::string& in, int max, unsigned long font);
 
 bool IsMeleeWeapon(CachedEntity* ent);
 bool IsProjectileCrit(CachedEntity* ent);

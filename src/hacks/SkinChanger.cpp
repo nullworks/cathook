@@ -121,11 +121,21 @@ static CatCommand load("skinchanger_load", "Load", [](const CCommand& args) {
 	}
 	Load(filename);
 });
+static CatCommand load_merge("skinchanger_load_merge", "Load with merge", [](const CCommand& args) {
+	std::string filename = "skinchanger";
+	if (args.ArgC() > 1) {
+		filename = args.Arg(1);
+	}
+	Load(filename, true);
+});
 static CatCommand remove_redirect("skinchanger_remove_redirect", "Remove redirect", [](const CCommand& args) {
 	unsigned redirectid = strtoul(args.Arg(1), nullptr, 10);
 	GetModifier(redirectid).defidx_redirect = 0;
 	logging::Info("Redirect removed");
 	InvalidateCookie();
+});
+static CatCommand reset("skinchanger_reset", "Reset", []() {
+	modifier_map.clear();
 });
 
 static CatCommand invalidate_cookies("skinchanger_bite_cookie", "Bite Cookie", InvalidateCookie);
@@ -134,8 +144,10 @@ void FrameStageNotify(int stage) {
 	static int my_weapon, handle, eid, *weapon_list;
 	static IClientEntity *entity, *my_weapon_ptr, *last_weapon_out = nullptr;
 
+	if (stage != FRAME_NET_UPDATE_POSTDATAUPDATE_START) return;
 	if (!enabled) return;
 	if (CE_BAD(LOCAL_E)) return;
+
 	if (!SetRuntimeAttributeValueFn) {
 		SetRuntimeAttributeValueFn = (SetRuntimeAttributeValue_t)(gSignatures.GetClientSignature((char*)sig_SetRuntimeAttributeValue));
 		logging::Info("SetRuntimeAttributeValue: 0x%08x", SetRuntimeAttributeValueFn);
@@ -145,17 +157,21 @@ void FrameStageNotify(int stage) {
 		logging::Info("GetAttributeDefinition: 0x%08x", GetAttributeDefinitionFn);
 	}
 
-	if (stage != FRAME_NET_UPDATE_POSTDATAUPDATE_START) return;
 	weapon_list = (int*)((unsigned)(RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
 	my_weapon = CE_INT(g_pLocalPlayer->entity, netvar.hActiveWeapon);
 	my_weapon_ptr = g_IEntityList->GetClientEntity(my_weapon & 0xFFF);
-	for (int i = 0; i < 5; i++) {
+	if (!my_weapon_ptr) return;
+	if (!vfunc<bool(*)(IClientEntity*)>(my_weapon_ptr, 190, 0)(my_weapon_ptr)) return;
+	for (int i = 0; i < 4; i++) {
 		handle = weapon_list[i];
 		eid = handle & 0xFFF;
 		if (eid < 32 || eid > HIGHEST_ENTITY) continue;
 		//logging::Info("eid, %i", eid);
 		entity = g_IEntityList->GetClientEntity(eid);
 		if (!entity) continue;
+		// TODO IsBaseCombatWeapon
+		// or TODO PlatformOffset
+		if (!vfunc<bool(*)(IClientEntity*)>(entity, 190, 0)(entity)) continue;
 		if ((my_weapon_ptr != last_weapon_out) || !cookie.Check()) {
 			GetModifier(NET_INT(entity, netvar.iItemDefinitionIndex)).Apply(eid);
 		}
@@ -221,7 +237,7 @@ void Save(std::string filename) {
 	}
 }
 
-void Load(std::string filename) {
+void Load(std::string filename, bool merge) {
 	uid_t uid = geteuid();
 	passwd* pw = getpwuid(uid);
 	if (!pw) {
@@ -246,7 +262,8 @@ void Load(std::string filename) {
 		size_t size = 0;
 		BINARY_FILE_READ(file, size);
 		logging::Info("Reading %i entries...", size);
-		modifier_map.clear();
+		if (!merge)
+			modifier_map.clear();
 		for (int i = 0; i < size; i++) {
 			int defindex;
 			BINARY_FILE_READ(file, defindex);
@@ -256,7 +273,13 @@ void Load(std::string filename) {
 			BINARY_FILE_READ(file, count);
 			modifier.modifiers.resize(count);
 			file.read(reinterpret_cast<char*>(modifier.modifiers.data()), sizeof(attribute_s) * count);
-			modifier_map.insert(std::make_pair(defindex, std::move(modifier)));
+			if (!merge) {
+				modifier_map.insert(std::make_pair(defindex, std::move(modifier)));
+			} else {
+				if (!modifier.Default()) {
+					modifier_map[defindex] = modifier;
+				}
+			}
 		}
 		file.close();
 		logging::Info("Reading successful! Result: %i entries.", modifier_map.size());
@@ -292,7 +315,8 @@ void patched_weapon_cookie::Update(int entity) {
 
 	ent = g_IEntityList->GetClientEntity(entity);
 	if (!ent || ent->IsDormant()) return;
-	logging::Info("Updating cookie for %i", entity); // FIXME DEBUG LOGS!
+	if (show_debug_info)
+		logging::Info("Updating cookie for %i", entity); // FIXME DEBUG LOGS!
 	list = (CAttributeList*)((uintptr_t)ent + netvar.AttributeList);
 	attrs = list->m_Attributes.Size();
 	eidx = entity;
@@ -326,15 +350,21 @@ void def_attribute_modifier::Remove(int id) {
 	}
 }
 
+bool def_attribute_modifier::Default() const {
+	return defidx_redirect == 0 && modifiers.empty();
+}
+
 void def_attribute_modifier::Apply(int entity) {
 	static IClientEntity *ent;
 	static CAttributeList *list;
 
 	ent = g_IEntityList->GetClientEntity(entity);
 	if (!ent) return;
+	if (!vfunc<bool(*)(IClientEntity*)>(ent, 190, 0)(ent)) return;
 	if (defidx_redirect && NET_INT(ent, netvar.iItemDefinitionIndex) != defidx_redirect) {
 		NET_INT(ent, netvar.iItemDefinitionIndex) = defidx_redirect;
-		logging::Info("Redirect -> %i", NET_INT(ent, netvar.iItemDefinitionIndex));
+		if (show_debug_info)
+			logging::Info("Redirect -> %i", NET_INT(ent, netvar.iItemDefinitionIndex));
 		GetModifier(defidx_redirect).Apply(entity);
 		return;
 	}

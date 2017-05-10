@@ -214,8 +214,9 @@ void FrameStageNotify_hook(void* _this, int stage) {
 				Vector& angles = NET_VECTOR(ent, netvar.m_angEyeAngles);
 				if (angles.x >= 90) angles.x = -89;
 				if (angles.x <= -90) angles.x = 89;
-				while (angles.y > 180) angles.y -= 360;
-				while (angles.y < -180) angles.y += 360;
+				angles.y = fmod(angles.y + 180.0f, 360.0f);
+				if (angles.y < 0) angles.y += 360.0f;
+				angles.y -= 180.0f;
 			}
 		}
 	}
@@ -227,10 +228,10 @@ void FrameStageNotify_hook(void* _this, int stage) {
 				g_ISurface->SetCursorAlwaysVisible(false);
 			}
 		}
-		if (CE_GOOD(LOCAL_E)) RemoveCondition(LOCAL_E, TFCond_Zoomed);
+		if (CE_GOOD(LOCAL_E) && no_zoom) RemoveCondition(LOCAL_E, TFCond_Zoomed);
 		if (glow_outline_effect->GetBool()) {
 			if (glow_enabled) {
-				for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.m_Size; i++) {
+				for (int i = 0; i < g_GlowObjectManager->m_GlowObjectDefinitions.Size(); i++) {
 					GlowObjectDefinition_t& glowobject = g_GlowObjectManager->m_GlowObjectDefinitions[i];
 					if (glowobject.m_nNextFreeSlot != ENTRY_IN_USE)
 						continue;

@@ -100,6 +100,12 @@ void CatVar::Register() {
 	registered = true;
 }
 
+void CatVar::InstallChangeCallback(FnChangeCallback_t callback) {
+	OnRegister([callback](CatVar* var) {
+		var->convar_parent->InstallChangeCallback(callback);
+	});
+}
+
 void RegisterCatVars() {
 	while (registrationArray().size()) {
 		CatVar* var = registrationArray().back();

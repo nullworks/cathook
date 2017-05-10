@@ -135,7 +135,7 @@ void Draw() {
 	x = (int)radar_x;
 	y = (int)radar_y;
 	draw::DrawRect(x, y, (int)size, (int)size, colors::Transparent(colors::black, 0.4f));
-	outlineclr = hacks::shared::aimbot::CurrentTarget() ? colors::pink : GUIColor();
+	outlineclr = (hacks::shared::aimbot::state == hacks::shared::aimbot::EAimbotState::AIMING ? colors::pink : GUIColor());
 	draw::OutlineRect(x, y, (int)size, (int)size, outlineclr);
 	draw::DrawLine(x + (int)size / 2, y, 0, (int)size, GUIColor());
 	draw::DrawLine(x, y + (int)size / 2, (int)size, 0, GUIColor());

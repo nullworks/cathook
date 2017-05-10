@@ -118,12 +118,10 @@ float crumbDistanceToFloor(CachedEntity* ent) {
 bool IsBot(CachedEntity* entity) {
 	if (!ipc::peer) return false;
 	if (entity->m_Type == ENTITY_PLAYER) {
-		if (entity->m_pPlayerInfo) {
-			if (ipc::peer) {
-				for (unsigned i = 1; i < cat_ipc::max_peers; i++) {
-					if (!ipc::peer->memory->peer_data[i].free && ipc::peer->memory->peer_user_data[i].friendid == entity->m_pPlayerInfo->friendsID) {
-						return true;
-					}
+		if (ipc::peer) {
+			for (unsigned i = 1; i < cat_ipc::max_peers; i++) {
+				if (!ipc::peer->memory->peer_data[i].free && ipc::peer->memory->peer_user_data[i].friendid == entity->player_info.friendsID) {
+					return true;
 				}
 			}
 		}
@@ -188,9 +186,8 @@ unsigned MakeMask() {
 	for (const auto& idx : selection) {
 		CachedEntity* ent = ENTITY(idx);
 		if (CE_BAD(ent)) continue;
-		if (!ent->m_pPlayerInfo) continue;
 		for (unsigned i = 1; i < cat_ipc::max_peers; i++) {
-			if (!ipc::peer->memory->peer_data[i].free && ipc::peer->memory->peer_user_data[i].friendid == ent->m_pPlayerInfo->friendsID) {
+			if (!ipc::peer->memory->peer_data[i].free && ipc::peer->memory->peer_user_data[i].friendid == ent->player_info.friendsID) {
 				result |= (1 << i);
 			}
 		}
@@ -339,8 +336,7 @@ void DoWalking() {
 	for (int i = 1; i < 32 && i < HIGHEST_ENTITY; i++) {
 		CachedEntity* ent = ENTITY(i);
 		if (CE_BAD(ent)) continue;
-		if (!ent->m_pPlayerInfo) continue;
-		if (ent->m_pPlayerInfo->friendsID == follow_steamid) {
+		if (ent->player_info.friendsID == follow_steamid) {
 			following_idx = i;
 			break;
 		}

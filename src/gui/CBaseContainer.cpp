@@ -19,6 +19,12 @@ CBaseContainer::CBaseContainer(std::string name, IWidget* parent) : CBaseWidget(
 	m_pPressedChild = 0;
 }
 
+void CBaseContainer::HandleCustomEvent(KeyValues* event) {
+	for (auto& child : m_children) {
+		child->HandleCustomEvent(event);
+	}
+}
+
 void CBaseContainer::AddChild(IWidget* child) {
 	m_children.push_back(child);
 	child->SetParent(this);

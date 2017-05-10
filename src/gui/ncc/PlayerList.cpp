@@ -9,10 +9,22 @@
 
 namespace menu { namespace ncc {
 
+int size_table_width() {
+	int accum = 1;
+	for (int i = 0; i < sizeof(size_table) / sizeof(int); i++) {
+		accum += (size_table[i] + 1) * (float)scale;
+	}
+	return accum;
+}
+
 PlayerList::PlayerList() : CBaseContainer() {
 	for (int i = 0; i <= 32; i++) {
 		AddChild(new PlayerListEntry(i));
 	}
+}
+
+bool PlayerList::IsVisible() {
+	return !g_Settings.bInvalid;
 }
 
 void PlayerList::Draw(int x, int y) {
@@ -21,12 +33,12 @@ void PlayerList::Draw(int x, int y) {
 	draw::DrawRect(x, y, size.first, size.second, colors::Create(0, 0, 0, 77));
 	draw::OutlineRect(x, y, size.first, size.second, GUIColor());
 	for (int i = 0; i < Props()->GetInt("vischildren"); i++) {
-		draw::DrawLine(x, y + i * 17, size_table_width(), 0, GUIColor());
+		draw::DrawLine(x, y + i * (Item::size_y + 2), size_table_width(), 0, GUIColor());
 	}
 	int accum = 0;
 	for (int i = 0; i < sizeof(size_table) / sizeof(int); i++) {
 		draw::DrawLine(x + accum, y, 0, size.second, GUIColor());
-		accum += size_table[i] + 1;
+		accum += (size_table[i] + 1) * (float)scale;
 	}
 	CBaseContainer::Draw(x, y);
 }
@@ -49,10 +61,10 @@ void PlayerList::Update() {
 void PlayerList::MoveChildren() {
 	int visible = 0;
 	for (int i = 0; i < ChildCount(); i++) {
-		ChildByIndex(i)->SetOffset(0, 1 + visible * 17);
+		ChildByIndex(i)->SetOffset(0, 1 + visible * (Item::size_y + 2));
 		if (ChildByIndex(i)->IsVisible()) visible++;
 	}
-	SetSize(size_table_width(), visible * 17 + 1);
+	SetSize(size_table_width(), visible * (Item::size_y + 2) + 1);
 	Props()->SetInt("vischildren", visible);
 }
 

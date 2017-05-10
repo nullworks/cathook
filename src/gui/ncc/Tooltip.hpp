@@ -19,6 +19,7 @@ public:
 	Tooltip();
 
 	virtual void Draw(int x, int  y) override;
+	virtual void HandleCustomEvent(KeyValues* event) override;
 	inline virtual PositionMode GetPositionMode() override { return PositionMode::FLOATING; }
 };
 

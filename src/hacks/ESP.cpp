@@ -33,6 +33,7 @@ CatVar show_distance(CV_SWITCH, "esp_distance", "1", "Distance ESP", "Show dista
 CatVar show_name(CV_SWITCH, "esp_name", "1", "Name ESP", "Show name");
 CatVar show_class(CV_SWITCH, "esp_class", "1", "Class ESP", "Show class");
 CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions ESP", "Show conditions");
+CatVar show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge ESP", "Show ubercharge percentage while players medigun is out");
 CatVar vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck", "ESP visibility check - makes enemy info behind walls darker, disable this if you get FPS drops");
 CatVar legit(CV_SWITCH, "esp_legit", "0", "Legit Mode", "Don't show invisible enemies");
 CatVar show_health(CV_SWITCH, "esp_health_num", "1", "Health numbers", "Show health in numbers");
@@ -457,6 +458,16 @@ void ProcessEntity(CachedEntity* ent) {
 			if (show_health) {
 				AddEntityString(ent, format(ent->m_iHealth, '/', ent->m_iMaxHealth, " HP"), colors::Health(ent->m_iHealth, ent->m_iMaxHealth));
 			}
+            if (show_ubercharge) {
+                if (CE_INT(ent, netvar.iClass) == tf_medic) {
+                    weapon = ENTITY(CE_INT(ent, netvar.hActiveWeapon) & 0xFFF);
+                    if (!CE_BAD(weapon) && weapon->m_iClassID == g_pClassID->CWeaponMedigun) {
+                        if (CE_INT(weapon, netvar.iItemDefinitionIndex) != 998) {
+                            AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber"), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
+                        } else AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber | Charges: ", floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f )), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
+                    }
+                }
+            }
 			if (show_conditions && TF) {
 				if (IsPlayerInvisible(ent)) {
 					AddEntityString(ent, "INVISIBLE");
@@ -473,7 +484,7 @@ void ProcessEntity(CachedEntity* ent) {
 				if (IsPlayerCritBoosted(ent)) {
 					AddEntityString(ent, "CRIT BOOSTED");
 				}
-			}
+            }
 			if (IsHoovy(ent)) AddEntityString(ent, "Hoovy");
 			weapon = ENTITY(CE_INT(ent, netvar.hActiveWeapon) & 0xFFF);
 			if (CE_GOOD(weapon)) {

@@ -382,6 +382,7 @@ static const std::string list_tf2 = R"(
         "esp_class"
         "esp_name"
         "esp_distance"
+        "esp_ubercharge"
         "esp_box"
         "esp_box_text_position"
         "esp_box_nodraw"

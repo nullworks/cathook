@@ -30,7 +30,7 @@ if grep -q "$(realpath bin/libcathook.so)" /proc/"$proc"/maps; then
 fi
 
 echo loading "$(realpath bin/libcathook.so)" to "$proc"
-gdb -n -q -batch \
+sudo gdb -n -q -batch \
   -ex "attach $proc" \
   -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
   -ex "call \$dlopen(\"$(realpath bin/libcathook.so)\", 1)" \

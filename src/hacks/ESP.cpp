@@ -306,12 +306,13 @@ void DrawBox(CachedEntity* ent, int clr, float widthFactor, float addHeight, boo
 
 void ProcessEntity(CachedEntity* ent) {
 	static const model_t* model;
-	static int string_count_backup, level, pclass;
+	static int string_count_backup, level, pclass, *weapon_list, handle, eid;
 	static bool shown;
 	static player_info_s info;
 	static powerup_type power;
 	static CachedEntity* weapon;
 	static const char* weapon_name;
+    
 
 	if (!enabled) return;
 	if (CE_BAD(ent)) return;
@@ -460,11 +461,19 @@ void ProcessEntity(CachedEntity* ent) {
 			}
             if (show_ubercharge) {
                 if (CE_INT(ent, netvar.iClass) == tf_medic) {
-                    weapon = ENTITY(CE_INT(ent, netvar.hActiveWeapon) & 0xFFF);
-                    if (!CE_BAD(weapon) && weapon->m_iClassID == g_pClassID->CWeaponMedigun) {
-                        if (CE_INT(weapon, netvar.iItemDefinitionIndex) != 998) {
-                            AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber"), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
-                        } else AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber | Charges: ", floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f )), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
+                    weapon_list = (int*)((unsigned)(RAW_ENT(ent)) + netvar.hMyWeapons);
+                    for (int i = 0; weapon_list[i]; i++) {
+                        handle = weapon_list[i];
+                        eid = handle & 0xFFF;
+                        if (eid >= 32 && eid <= HIGHEST_ENTITY) {
+                            weapon = ENTITY(eid);
+                            if (!CE_BAD(weapon) && weapon->m_iClassID == g_pClassID->CWeaponMedigun && weapon) {
+                                if (CE_INT(weapon, netvar.iItemDefinitionIndex) != 998) {
+                                    AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber"), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
+                                } else AddEntityString(ent, format(floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), '%', " Uber | Charges: ", floor( CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f )), colors::Health(( CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100 ), 100));
+                                break;
+                            }
+                        }
                     }
                 }
             }

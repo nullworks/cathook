@@ -618,10 +618,8 @@ static const std::string list_tf2 = R"(
         "log"
     ]
 ]
-)";
 
-List& MainList() {
-	static List* main = List::FromString(TF2 ? list_tf2 : list_hl2dm);
+)");
 	return *main;
 }
 

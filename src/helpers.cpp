@@ -704,43 +704,43 @@ bool IsEntityVisiblePenetration(CachedEntity* entity, int hb) {
 }
 
 void RunEnginePrediction(IClientEntity* ent, CUserCmd *ucmd) {
-    if (!ent) return;
-
-    typedef void(*SetupMoveFn)(IPrediction*, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
-    typedef void(*FinishMoveFn)(IPrediction*, IClientEntity *, CUserCmd*, CMoveData*);
-
-    void **predictionVtable = *((void ***)g_IPrediction);
-    SetupMoveFn oSetupMove = (SetupMoveFn)(*(unsigned*)(predictionVtable + 19));
-    FinishMoveFn oFinishMove = (FinishMoveFn)(*(unsigned*)(predictionVtable + 20));
-
-    CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr + 0x1F69C0C);
-
+    if (!ent) 
+	return;
+	
+    static CMoveData movedata;
+	
+    memset(&movedata,0,sizeof(CMoveData); //Zero it out every time
+	   
     float frameTime = g_GlobalVars->frametime;
     float curTime = g_GlobalVars->curtime;
 
-    CUserCmd defaultCmd;
-    if(ucmd == NULL) {
+    static CUserCmd defaultCmd;
+    if(!ucmd) 
         ucmd = &defaultCmd;
-    }
+    
 
-    NET_VAR(ent, 4188, CUserCmd*) = ucmd;
+    NET_VAR(ent, 0x107C, CUserCmd*) = ucmd;
 
     g_GlobalVars->curtime =  g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = g_GlobalVars->interval_per_tick;
 
-    *g_PredictionRandomSeed = MD5_PseudoRandom(g_pUserCmd->command_number) & 0x7FFFFFFF;
-    g_IGameMovement->StartTrackPredictionErrors(reinterpret_cast<CBasePlayer*>(ent));
-    oSetupMove(g_IPrediction, ent, ucmd, NULL, pMoveData);
-    g_IGameMovement->ProcessMovement(reinterpret_cast<CBasePlayer*>(ent), pMoveData);
-    oFinishMove(g_IPrediction, ent, ucmd, pMoveData);
-    g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer*>(ent));
+    *g_PredictionRandomSeed = ucmd->random_seed;
+	   
+    g_IGameMovement->StartTrackPredictionErrors((CBasePlayer*)(ent));
+	   
+    g_IPrediction->SetupMove(ent, ucmd, 0, pMoveData);
+    g_IGameMovement->ProcessMovement((CBasePlayer*)(ent), pMoveData);
+    g_IPrediction->FinishMove(ent, ucmd, pMoveData);
+	   
+    g_IGameMovement->FinishTrackPredictionErrors((CBasePlayer*)(ent));
 
-    NET_VAR(ent, 4188, CUserCmd*) = nullptr;
+    *g_PredictionRandomSeed = -1;
+    NET_VAR(ent, 0x107C, CUserCmd*) = 0;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime = curTime;
-
-    return;
+	  
+    NET_INT(ent, netvar.nTickBase) += 1; //Dont know how this works for u but yeah add 1 to tickbase and subtract it after aimbot!
 }
 
 

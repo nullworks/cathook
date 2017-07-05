@@ -47,7 +47,7 @@ bool C_TFPlayer__ShouldDraw_hook(IClientEntity* thisptr) {
 	}
 }
 
-CatVar crit_hack_next(CV_SWITCH, "crit_hack_next", "0", "Next crit info", "Displays information on screen about crit hack");
+CatVar crit_hack_next(CV_SWITCH, "crit_hack_next", "0", "Next crit info", "Displays info on when you get your next crit");
 
 void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char* ft, unsigned acc_offset) {
 	bool forcetable = ft && strlen(ft);

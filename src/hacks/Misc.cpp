@@ -472,7 +472,7 @@ CatCommand name("name_set", "Immediate name change", [](const CCommand& args) {
 		return;
 	}
 	if (g_Settings.bInvalid) {
-		logging::Info("Use this command in-game to immediantly change your name.");
+		logging::Info("Use this command in-game to immediately change your name.");
 		return;
 	}
 	std::string new_name(args.ArgS());

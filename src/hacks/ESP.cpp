@@ -21,8 +21,8 @@ CatVar teammates(CV_SWITCH, "esp_teammates", "0", "Teammates", "Displays ESP on 
 CatVar item_esp(CV_SWITCH, "esp_item", "1", "Item ESP", "Master Item ESP switch (health packs, etc.)");
 CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbots", "Show followbot ID");
 CatVar item_dropped_weapons(CV_SWITCH, "esp_item_weapons", "0", "Dropped weapons", "Show dropped weapons");
-CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "1", "Ammos", "Display ESP on ammo packs\ni = Small, ii = Medium, iii = Large");
-CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1", "Healths", "Display ESP on health packs\n+ = Small, ++ = Medium, +++ = Large");
+CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "1", "Ammopacks", "Display ESP on ammo packs\ni = Small, ii = Medium, iii = Large");
+CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1", "Healthpacks", "Display ESP on health packs\n+ = Small, ++ = Medium, +++ = Large");
 CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups", "Display ESP on powerups");
 CatVar item_money(CV_SWITCH, "esp_money", "1", "Money", "Display ESP on money\nUseful for MvM");
 CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red Money", "Display ESP on red team money");

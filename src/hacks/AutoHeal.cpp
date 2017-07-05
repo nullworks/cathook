@@ -13,24 +13,24 @@
 namespace hacks { namespace tf { namespace autoheal {
 
 CatVar enabled(CV_SWITCH, "autoheal_enabled", "0", "AutoHeal", "Automatically heals nearby teammates");
-CatVar silent(CV_SWITCH, "autoheal_silent", "1", "Silent AutoHeal", "Silent AutoHeal. Disable this to make ghetto followbot");
+CatVar silent(CV_SWITCH, "autoheal_silent", "1", "Silent AutoHeal", "Do not snap crosshair to target\nDisable for ghetto followbot");
 //extern CatVar target_only;
 
 int m_iCurrentHealingTarget { -1 };
 int m_iNewTarget { 0 };
 
-static CatVar pop_uber_auto(CV_SWITCH, "autoheal_uber", "1", "AutoUber", "Use ubercharge automatically");
-static CatVar pop_uber_percent(CV_FLOAT, "autoheal_uber_health", "30", "Pop uber if health% <", "When under a percentage of health, use ubercharge");
-static CatVar share_uber(CV_SWITCH, "autoheal_share_uber", "1", "Share ubercharge", "Aimbot will attempt to share uber charge with un-ubered players");
+static CatVar pop_uber_auto(CV_SWITCH, "autoheal_uber", "1", "AutoUber", "Automatically ubercharges target if health is bellow Pop Health");
+static CatVar pop_uber_percent(CV_FLOAT, "autoheal_uber_health", "30", "Pop Health", "Percentage of health target must have to AutoUber");
+static CatVar share_uber(CV_SWITCH, "autoheal_share_uber", "1", "Share ubercharge", "Aimbot will attempt to share uber charge with un-ubered players\nThis will reduce uber time per person\nDoes not share with mediguns like Kreitzreg");
 
 int vaccinator_change_stage = 0;
 int vaccinator_change_ticks = 0;
 int vaccinator_ideal_resist = 0;
 int vaccinator_change_timer = 0;
 
-static CatVar auto_vacc_bullets(CV_SWITCH, "auto_vacc_bullets", "1", "Check bullet danger");
-static CatEnum vacc_sniper_enum({"NEVER", "ZOOM & VISIBLE", "ANY ZOOMED"});
-static CatVar vacc_sniper(vacc_sniper_enum, "auto_vacc_sniper_pop", "1", "Pop if Sniper", "Defines Auto-Vacc behaviour with snipers");
+static CatVar auto_vacc_bullets(CV_SWITCH, "auto_vacc_bullets", "1", "Bullet Check", "Switch to bullet resistence if target is being pelted with bullets");
+static CatEnum vacc_sniper_enum({"NEVER", "ZOOMED & VISIBLE", "ZOOMED"});
+static CatVar vacc_sniper(vacc_sniper_enum, "auto_vacc_sniper_pop", "1", "Sniper Check Mode", "Auto-pop bullet resistence if a sniper is...");
 
 int ChargeCount() {
 	return (CE_FLOAT(LOCAL_W, netvar.m_flChargeLevel) / 0.25f);
@@ -55,11 +55,11 @@ int BulletDangerValue(CachedEntity* patient) {
 	return any_zoomed_snipers;
 }
 
-static CatVar auto_vacc_fire_checking(CV_SWITCH, "auto_vacc_fire", "1", "Check fire danger");
+static CatVar auto_vacc_fire_checking(CV_SWITCH, "auto_vacc_fire", "1", "Fire Check", "Fire Check", "Switch to fire resistence when target is being burned");
 static CatEnum pyro_enum({"NEVER", "PRIMARY OUT", "ALWAYS"});
-static CatVar auto_vacc_pop_if_pyro(pyro_enum, "auto_vacc_fire_pop_pyro", "1", "Pop if pyro is near", "Defines Auto-Vacc behaviour with pyros");
-static CatVar auto_vacc_check_on_fire(CV_SWITCH, "auto_vacc_afterburn", "1", "Anti-Afterburn");
-static CatVar auto_vacc_pyro_range(CV_INT, "auto_vacc_pyro_range", "450", "Pyro Danger Range");
+static CatVar auto_vacc_pop_if_pyro(pyro_enum, "auto_vacc_fire_pop_pyro", "1", "Pyro Check Mode", "Auto-pop bullet if a pyro is nearby");
+static CatVar auto_vacc_check_on_fire(CV_SWITCH, "auto_vacc_afterburn", "1", "Afterburn", "Switch to fire resistence if target is still on fire");
+static CatVar auto_vacc_pyro_range(CV_INT, "auto_vacc_pyro_range", "450", "Pyro Danger Range", "How close should a pyro be to switch to fire resistence");
 
 int FireDangerValue(CachedEntity* patient) {
 	// Find nearby pyros
@@ -89,10 +89,10 @@ struct proj_data_s {
 
 std::vector<proj_data_s> proj_data_array;
 
-static CatVar auto_vacc_blast_health(CV_INT, "auto_vacc_blast_pop_health", "80", "Pop Blast if rocket & HP <");
-static CatVar auto_vacc_blast_crit_pop(CV_SWITCH, "auto_vacc_blast_pop_crit", "1", "Pop Blast if crit rocket near");
-static CatVar auto_vacc_blast_checking(CV_SWITCH, "auto_vacc_blast", "1", "Check blast danger");
-static CatVar auto_vacc_proj_danger_range(CV_INT, "auto_vacc_rocket_range", "650", "Rocket Danger Range", "This range should be high enough to give more time to change resistances.");
+static CatVar auto_vacc_blast_health(CV_INT, "auto_vacc_blast_pop_health", "80", "Rocket Safety Pop", "Pop blast resistence if a rocket is nearby & target has less than # percent health");
+static CatVar auto_vacc_blast_crit_pop(CV_SWITCH, "auto_vacc_blast_pop_crit", "1", "Rocket Crit Pop", "Pop blast resistence if a crit rocket is detected");
+static CatVar auto_vacc_blast_checking(CV_SWITCH, "auto_vacc_blast", "1", "Blast Check", "Switch to blast resistence when rocket is nearby");
+static CatVar auto_vacc_proj_danger_range(CV_INT, "auto_vacc_rocket_range", "650", "Rocket Danger Range", "How close does a rocket need to be in order to be considered a threat\nThis range should be high enough to give more time to change resistance");
 
 int BlastDangerValue(CachedEntity* patient) {
 	if (!auto_vacc_blast_checking) return 0;
@@ -136,11 +136,11 @@ int CurrentResistance() {
 	return CE_INT(LOCAL_W, netvar.m_nChargeResistType);
 }
 
-static CatVar change_timer(CV_INT, "auto_vacc_reset_timer", "200", "Reset Timer", "If no dangers were detected for # ticks, resistance will be reset to default, 0 to disable");
+static CatVar change_timer(CV_INT, "auto_vacc_reset_timer", "200", "Reset Timer", "Reset redistance to default after # ticks of no danger\nSet to 0 to disable");
 
-static CatVar auto_vacc_bullet_pop_ubers(CV_INT, "auto_vacc_bullet_pop_ubers", "0", "Pop Bullet if Ubers >=", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
-static CatVar auto_vacc_fire_pop_ubers(CV_INT, "auto_vacc_fire_pop_ubers", "0", "Pop Fire if Ubers >=", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
-static CatVar auto_vacc_blast_pop_ubers(CV_INT, "auto_vacc_blast_pop_ubers", "0", "Pop Blast if Ubers >=", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
+static CatVar auto_vacc_bullet_pop_ubers(CV_INT, "auto_vacc_bullet_pop_ubers", "0", "Minimum Charges for Bullet Pop", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
+static CatVar auto_vacc_fire_pop_ubers(CV_INT, "auto_vacc_fire_pop_ubers", "0", "Minimum Charges for Fire Pop", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
+static CatVar auto_vacc_blast_pop_ubers(CV_INT, "auto_vacc_blast_pop_ubers", "0", "Minimum Charges for Blast Pop", "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
 
 int OptimalResistance(CachedEntity* patient, bool* shouldPop) {
 	int bd = BlastDangerValue(patient),
@@ -203,7 +203,7 @@ void DoResistSwitching() {
 
 int force_healing_target { 0 };
 
-static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with SteamID (ONCE. Use for easy airstuck med setup)", [](const CCommand& args) {
+static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with SteamID ONCE\nUseful for easy airstuck med setup (patched?)", [](const CCommand& args) {
 	if (args.ArgC() < 2) {
 		logging::Info("Invalid call!");
 		return;

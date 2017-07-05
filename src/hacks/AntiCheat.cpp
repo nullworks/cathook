@@ -21,7 +21,7 @@ static CatVar enabled(CV_SWITCH, "ac_enabled", "0", "Enable Anticheat", "Checks 
 static CatVar accuse_chat(CV_SWITCH, "ac_chat", "0", "Accuse", "Calls out other cheaters when detected");
 static CatVar skip_local(CV_SWITCH, "ac_ignore_local", "1", "Ignore Local", "Ignores yourself. Should probably have this on.");
 
-	void Accuse(int eid, const std::string& hack, const std::string& details) {
+void Accuse(int eid, const std::string& hack, const std::string& details) {
 	player_info_s info;
 	if (g_IEngine->GetPlayerInfo(eid, &info)) {
 		CachedEntity* ent = ENTITY(eid);

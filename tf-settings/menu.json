@@ -378,7 +378,7 @@
 	},
 	{
 		"type": "list",
-		"name": "Anti-Cheat",
+		"name": "Hacker Detector",
 		"list": [
 			"ac_enabled",
 			"ac_ignore_local",

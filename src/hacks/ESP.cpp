@@ -28,7 +28,7 @@ CatVar item_money(CV_SWITCH, "esp_money", "1", "Money", "Display ESP on money\nU
 CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red Money");
 CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "ID", "Display ID of entities");
 CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Tanks", "Display ESP on tanks\nUseful for MvM");
-CatVar box_esp(CV_SWITCH, "esp_box", "1", "Box", "Display a box around certain entities\nIncludes a fancy health bar");
+CatVar box_esp(CV_SWITCH, "esp_box", "1", "Box", "Display a box around certain players\nIncludes a fancy health bar");
 CatVar show_distance(CV_SWITCH, "esp_distance", "0", "Distance", "Display distance the player is from you");
 CatVar show_name(CV_SWITCH, "esp_name", "1", "Name", "Display steam name of players");
 CatVar show_class(CV_SWITCH, "esp_class", "1", "Class", "Display player class alongside ESP");

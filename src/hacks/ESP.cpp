@@ -153,8 +153,8 @@ static CatEnum esp_box_text_position_enum({"TOP RIGHT", "BOTTOM RIGHT", "CENTER"
 static CatVar esp_box_text_position(esp_box_text_position_enum, "esp_box_text_position", "0", "Text position", "Defines text position");
 static CatVar box_nodraw(CV_SWITCH, "esp_box_nodraw", "0", "Invisible 2D Box", "Don't draw 2D box");
 static CatVar box_expand(CV_INT, "esp_box_expand", "0", "Expand 2D Box", "Expand 2D box by N units");
-static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners","Display the corners only\nFancy");
-static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerups","Display ESP on powerups");
+static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners", "Display the corners only\nFancy");
+static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerups", "Display ESP on powerups");
 
 const Vector dims_player[] = { { -16, -16, -4 }, { 16, 16, 72 } };
 

@@ -13,9 +13,9 @@
 namespace hacks { namespace tf { namespace autosticky {
 
 // Vars for user settings
-CatVar enabled(CV_SWITCH, "sticky_enabled", "0", "AutoSticky", "Master AutoSticky switch");
-CatVar buildings(CV_SWITCH, "sticky_buildings", "1", "Detonate buildings", "Stickies react to buildings");
-CatVar legit(CV_SWITCH, "sticky_legit", "0", "Legit", "Stickys only detonate when you see them\nAlso ignores invis spies");
+CatVar enabled(CV_SWITCH, "sticky_enabled", "0", "Auto Sticky", "Automatically detonate stickybombs when it'll deal damage");
+CatVar buildings(CV_SWITCH, "sticky_buildings", "1", "Buildings", "Auto-detonate on buildings, too");
+CatVar legit(CV_SWITCH, "sticky_legit", "0", "Legit", "Only detonate stickybombs when you see them\nAlso ignores invis spies");
 
 // A storage array for ents
 std::vector<CachedEntity*> bombs;

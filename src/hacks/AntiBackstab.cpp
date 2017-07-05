@@ -13,7 +13,7 @@ namespace hacks { namespace tf2 { namespace antibackstab {
 static CatVar enabled(CV_SWITCH, "antibackstab", "0", "Enable", "Look at nearby spies to keep them from backstabbing you");
 static CatVar distance(CV_FLOAT, "antibackstab_distance", "200", "Distance", "How close does a spy need to be to trigger anti-backstab");
 static CatVar silent(CV_SWITCH, "antibackstab_silent", "1", "Silent", "Stop antibackstab from moving your screen");
-static CatVar angle(CV_FLOAT, "antibackstab_angle", "150", "Max angle for anti-backstab to trigger");
+static CatVar angle(CV_FLOAT, "antibackstab_angle", "150","Max Angle", "Max angle for anti-backstab to trigger");
 static CatVar sayno(CV_SWITCH, "antibackstab_nope", "0", "Nope!", "Calls out \"No\" when triggered");
 
 void SayNope() {

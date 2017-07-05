@@ -12,7 +12,7 @@
 
 namespace hacks { namespace tf2 { namespace antidisguise {
 
-CatVar enabled(CV_SWITCH, "antidisguise", "0", "Remove spy disguise", "Removes the disguise from spies\nUsefull for aimbot");
+CatVar enabled(CV_SWITCH, "antidisguise", "0", "AntiDisguise", "Removes the disguises from spies\nUsefull for aimbot");
 
 void Draw() {
 	CachedEntity *ent;

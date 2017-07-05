@@ -17,8 +17,8 @@
 
 namespace hacks { namespace shared { namespace anticheat {
 
-static CatVar enabled(CV_SWITCH, "ac_enabled", "0", "Enable HackerDetector", "Checks other players for aimbot");
-static CatVar accuse_chat(CV_SWITCH, "ac_chat", "0", "Accuse", "Calls out other hackers when detected");
+static CatVar enabled(CV_SWITCH, "ac_enabled", "0", "Enable Anticheat", "Checks other players for aimbot");
+static CatVar accuse_chat(CV_SWITCH, "ac_chat", "0", "Accuse", "Calls out other cheaters when detected");
 static CatVar skip_local(CV_SWITCH, "ac_ignore_local", "1", "Ignore Local", "Ignores yourself. Should probably have this on.");
 
 	void Accuse(int eid, const std::string& hack, const std::string& details) {

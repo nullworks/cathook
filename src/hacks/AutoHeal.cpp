@@ -55,7 +55,7 @@ int BulletDangerValue(CachedEntity* patient) {
 	return any_zoomed_snipers;
 }
 
-static CatVar auto_vacc_fire_checking(CV_SWITCH, "auto_vacc_fire", "1", "Fire Check", "Fire Check", "Switch to fire resistence when target is being burned");
+static CatVar auto_vacc_fire_checking(CV_SWITCH, "auto_vacc_fire", "1", "Fire Check", "Switch to fire resistence when target is being burned");
 static CatEnum pyro_enum({"NEVER", "PRIMARY OUT", "ALWAYS"});
 static CatVar auto_vacc_pop_if_pyro(pyro_enum, "auto_vacc_fire_pop_pyro", "1", "Pyro Check Mode", "Auto-pop bullet if a pyro is nearby");
 static CatVar auto_vacc_check_on_fire(CV_SWITCH, "auto_vacc_afterburn", "1", "Afterburn", "Switch to fire resistence if target is still on fire");

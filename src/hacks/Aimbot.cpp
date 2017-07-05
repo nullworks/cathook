@@ -53,7 +53,7 @@ static CatVar priority_mode(priority_mode_enum, "aimbot_prioritymode", "0", "Pri
 		"FOV: Aim at whoever is closest to your crosshair\n"
 		"DISTANCE: Aim at whoever's closest\n"
 		"HEALTH: Aim at whoever has the lowest health");
-static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Sniper Charge", "Make aimbot wait until it has enough charge to kill to shoot");
+static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Wait for Charge", "Force aimbot to wait until it has enough charge one-shot the target");
 static CatVar ignore_vaccinator(CV_SWITCH, "aimbot_ignore_vaccinator", "1", "Ignore Vaccinator", "Hitscan weapons won't fire if enemy is vaccinated against bullets");
 static CatVar ignore_hoovy(CV_SWITCH, "aimbot_ignore_hoovy", "0", "Ignore Hoovies", "Aimbot won't attack hoovies");
 static CatVar ignore_cloak(CV_SWITCH, "aimbot_ignore_cloak", "1", "Ignore cloaked", "Aimbot won't attack invisible enemies");
@@ -74,12 +74,12 @@ static CatVar attack_only(CV_SWITCH, "aimbot_enable_attack_only", "0", "Active w
 static CatVar max_range(CV_INT, "aimbot_maxrange", "0", "Max Distance",
 		"Max range for aimbot\n"
 		"900-1100 range is efficient for scout/widowmaker engineer", 4096.0f);
-static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0", "Latency Extrapolation", "If you can read this text then somebody\ndidn't explain to me what this does.\nrip me -Espeon");
+static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0", "Latency Extrapolation", "Latency extrapolation\nNOT RECOMMENDED!");
 static CatVar slowaim(CV_SWITCH, "aimbot_slow", "0", "Slow Aim", "Slowly moves your crosshair onto the target for more legit play\nDisables silent aimbot");
 static CatVar slowaim_smoothing(CV_INT, "aimbot_slow_smooth", "10", "Slow Aim Smooth", "How slow the slow aim's aiming should be", 50);
-static CatVar slowaim_autoshoot(CV_INT, "aimbot_slow_autoshoot", "10", "Slow Aim Threshhold", "How close to the target do you have to be to to autoshoot\nRequires autoshoot enabled, otherwise ignore this", 25);
+static CatVar slowaim_autoshoot(CV_INT, "aimbot_slow_autoshoot", "10", "Slow Aim Threshhold", "How close you want your crosshair to be to the target", 25);
 static CatVar projectile_aimbot(CV_SWITCH, "aimbot_projectile", "1", "Projectile Aimbot", "Should Aimbot attempt to predict and aim with projectile-based weapons?\nProjectile aimbot + silent aimbot = your aimbot is silent to spectators/players");
-static CatVar proj_fov(CV_SWITCH, "aimbot_proj_fovpred", "0", "Projectile FOV Mode", "Does aimbot FOV restrict looking at players or rockets?");
+static CatVar proj_fov(CV_SWITCH, "aimbot_proj_fovpred", "0", "Projectile FOV Mode", "Enabled: Will only shoot if predicted \"landing\" spot if it is inside aimbot FOV\nDisabled: Will only shoot if the player is inside the predicted FOV\n\"Landing spot\" is an example. Basically the spot where cathook will shoot in order to hit the target.");
 static CatVar proj_visibility(CV_SWITCH, "aimbot_proj_vispred", "0", "Projectile visibility prediction", "If enabled, projectile aimbot will perform additional visibility checking and won't try to predict enemies behind walls");
 static CatVar proj_gravity(CV_FLOAT, "aimbot_proj_gravity", "0", "Projectile gravity",
 		"Force override projectile gravity for debugging purposes", 1.0f);
@@ -88,13 +88,13 @@ static CatVar proj_speed(CV_FLOAT, "aimbot_proj_speed", "0", "Projectile speed",
 		"Can be useful for playing with MvM upgrades or on x10 servers "
 		"since there is no \"automatic\" projectile speed detection in "
 		"cathook yet");
-static CatVar huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5", "Huntsman Autoshoot Charge", "How long for Huntsman to charge bow before shooting.\n"
+static CatVar huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5", "Huntsman Autoshoot Charge", "How long for Huntsman to charge bow before autoshooting.\n"
 		"Set it to 0.01 if you want to shoot as soon as you start pulling the arrow\n"
 		"Requires autoshoot enabled", 0.01f, 1.0f);
-static CatVar huntsman_full_auto(CV_SWITCH, "aimbot_full_auto_huntsman", "1", "Auto Autoshoot Pull", "Should autoshoot pull the huntsman bow automatically?");
+static CatVar huntsman_full_auto(CV_SWITCH, "aimbot_full_auto_huntsman", "1", "Auto Autoshoot Pull", "Automatically pull/charge huntsman when target is found");
 // Debug vars
 static CatVar aimbot_debug(CV_SWITCH, "aimbot_debug", "0", "Aimbot Debug", "Display simple debug info for aimbot");
-static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0", "Engine Projectile Prediction", "Use the TF2 engine for projectile prediction");
+static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0", "Engine Projectile Prediction");
 /* TODO IMPLEMENT
 static CatVar auto_spin_up(CV_SWITCH, "aimbot_spin_up", "0", "Auto Spin Up", "Spin up minigun if you can see target, useful for followbots");
 static CatVar auto_zoom(CV_SWITCH, "aimbot_auto_zoom", "0", "Auto Zoom", "Automatically zoom in if you can see target, useful for followbots");

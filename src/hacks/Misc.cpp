@@ -83,7 +83,7 @@ void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char* f
 		logging::Info("==== END OF TABLE: %s", table->GetName());
 }
 
-static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand& args) { 
+static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand& args) {
 	if (args.ArgC() < 1) return;
 	if (!atoi(args[1])) return;
 	int idx = atoi(args[1]);

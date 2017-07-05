@@ -33,7 +33,7 @@ CatVar show_distance(CV_SWITCH, "esp_distance", "0", "Distance", "Display distan
 CatVar show_name(CV_SWITCH, "esp_name", "1", "Name", "Display steam name of players");
 CatVar show_class(CV_SWITCH, "esp_class", "1", "Class", "Display player class alongside ESP");
 CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions", "Display active effects on player");
-CatVar show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge", "Show ubercharge percentage on medics\nRequires medics to have their medigun out");
+CatVar show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge", "Show ubercharge percentage on medics");
 CatVar vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck", "ESP visibility check - makes enemy info behind walls darker\nDisable this if you get FPS drops");
 CatVar legit(CV_SWITCH, "esp_legit", "0", "Legit", "Don't show invisible enemies");
 CatVar show_health(CV_SWITCH, "esp_health_num", "1", "Health Numbers", "Show the current/max health of players in numbers");

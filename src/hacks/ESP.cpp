@@ -25,7 +25,7 @@ CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "1", "Ammopacks", "Display ES
 CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1", "Healthpacks", "Display ESP on health packs\n+ = Small, ++ = Medium, +++ = Large");
 CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups", "Display ESP on powerups");
 CatVar item_money(CV_SWITCH, "esp_money", "1", "Money", "Display ESP on money\nUseful for MvM");
-CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red Money", "Display ESP on red team money");
+CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red Money");
 CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "ID", "Display ID of entities");
 CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Tanks", "Display ESP on tanks\nUseful for MvM");
 CatVar box_esp(CV_SWITCH, "esp_box", "1", "Box", "Display a box around certain entities\nIncludes a fancy health bar");

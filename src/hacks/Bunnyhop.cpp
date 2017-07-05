@@ -13,7 +13,7 @@
 namespace hacks { namespace shared { namespace bunnyhop {
 
 // Var for user settings
-CatVar enabled(CV_SWITCH, "bhop_enabled", "0", "Bunnyhop", "Jump immediantly when touching ground\nUseful for gaining speed via strafing\nNot compatible with Engine Prediction\nPrevious features (cliff-jump/limiter) temporarily removed");
+CatVar enabled(CV_SWITCH, "bhop_enabled", "0", "Bunnyhop", "Jump immediantly when touching ground\nUseful for gaining speed via strafing\nNot compatible with Engine Prediction\nPrevious features temporarily removed");
 
 int iTicksLastJump = 0;
 	

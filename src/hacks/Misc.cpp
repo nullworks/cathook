@@ -461,7 +461,7 @@ CatVar debug_info(CV_SWITCH, "debug_info", "0", "Debug info", "Shows some debug 
 CatVar flashlight_spam(CV_SWITCH, "flashlight", "0", "HL2DM Flashlight Spam", "Spam flashlight super fast in Half Life 2: Death Match");
 CatVar crit_info(CV_SWITCH, "crit_info", "0", "Show crit info", "Shows information on current crit status"); // TODO separate
 CatVar crit_hack(CV_KEY, "crit_hack", "0", "Crit Key", "When Crit Key is held, cathook will attempt to crit the next shot\nRequires crit key held down during attack");
-CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits","Forces 100% crits on melee weapons\nBreaks weapons with no random crits");
+CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits", "Forces crits on melee weapons\nBreaks weapons with no random crits");
 CatVar crit_suppress(CV_SWITCH, "crit_suppress", "0", "Disable Random Crits", "Skips random criticals that you would normally receive\nUseful for saving crits in bucket\nIf you don't use crit hack much, disable this");
 CatVar anti_afk(CV_SWITCH, "anti_afk", "0", "Anti-AFK", "Sends random commands to prevent being kicked from server");
 CatVar tauntslide(CV_SWITCH, "tauntslide", "0", "TF2C Tauntslide", "Allows moving and shooting while taunting");

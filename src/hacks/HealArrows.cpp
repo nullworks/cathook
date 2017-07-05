@@ -11,7 +11,7 @@ namespace hacks { namespace tf2 { namespace healarrow {
 
 static CatVar healarrow_charge(CV_FLOAT, "healarrow_charge", "0.99", "Healarrow Charge","How long should cathook charge the bow");
 static CatVar healarrow_timeout(CV_FLOAT, "healarrow_timeout", "7", "Healarrow Timeout","How long shoudl cathook wait between healarrows\nSetting this value too low or too high will break healarrows);
-static CatVar healarrow(CV_SWITCH, "healarrow", "0", "Heal Arrow", "Super l33t healing arrows. Use huntsman and let Cathook setup an arrow shot that will heal enemies.\nRequires you to actually hit something, so it\'s recommended to have a friend on the enemy team.\nThis has no end to the health it can provide, but a max health of 1000 health per shot.\nPersonally, I once got a friend up to 50K health. Literally immortal butterknife spy of death\nUse huntsman, obviously.");
+static CatVar healarrow(CV_SWITCH, "healarrow", "0", "Heal Arrow", "Super l33t healing arrows. Use huntsman and let Cathook setup an arrow shot that will heal enemies.\nRequires you to actually hit something, so its recommended to have a friend on the enemy team.\nThis has no end to the health it can provide, but a max health of 1000 health per shot.\nPersonally, I once got a friend up to 50K health. Literally immortal butterknife spy of death\nUse huntsman, obviously.");
 
 float healarrow_time = 0.0f;
 

@@ -17,7 +17,7 @@ CatVar local_esp(CV_SWITCH, "esp_local", "1", "Self", "Show ESP on YOU in third 
 CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Buildings", "Show buildings");
 CatVar enabled(CV_SWITCH, "esp_enabled", "0", "ESP", "Master ESP switch");
 CatVar entity_info(CV_SWITCH, "esp_entity", "0", "Entity ESP", "Show entity info\nNot recommended, only for debugging");
-CatVar teammates(CV_SWITCH, "esp_teammates", "0", "Teammates", "Displays ESP on teammates\nUseful for medic-ing");
+CatVar teammates(CV_SWITCH, "esp_teammates", "0", "Teammates", "Display ESP on teammates");
 CatVar item_esp(CV_SWITCH, "esp_item", "1", "Item ESP", "Master Item ESP switch (health packs, etc.)");
 CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbots", "Show followbot ID");
 CatVar item_dropped_weapons(CV_SWITCH, "esp_item_weapons", "0", "Dropped weapons", "Show dropped weapons");

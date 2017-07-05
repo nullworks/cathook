@@ -482,8 +482,8 @@ void _FASTCALL ProcessEntity(CachedEntity* ent) {
 		return;
 	}
 }
-static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar","Draw a green healthbar on the side of ESP\nSuper fancy");
-static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Bone ESP","Draws lines between different hitboxes to simulate bone ESP\nnot technically \"bone\" esp, but whatever");
+static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar", "Draw a green healthbar on the side of ESP\nSuper fancy");
+static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Bone ESP", "Draws lines between different hitboxes to simulate bone ESP\nnot technically \"bone\" esp, but whatever");
 
 const std::string bonenames_leg_r[] = { "bip_foot_R", "bip_knee_R", "bip_hip_R" };
 const std::string bonenames_leg_l[] = { "bip_foot_L", "bip_knee_L", "bip_hip_L" };

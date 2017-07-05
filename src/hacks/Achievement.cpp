@@ -11,7 +11,7 @@
 
 namespace hacks { namespace tf2 { namespace achievement {
 
-CatVar safety(CV_SWITCH, "achievement_safety", "1", "Achievement commands safety switch");
+CatVar safety(CV_SWITCH, "achievement_safety", "1","Safe Mode", "Achievement commands safety switch");
 
 void Lock() {
 	if (safety) {

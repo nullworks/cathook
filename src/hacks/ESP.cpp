@@ -76,7 +76,7 @@ void AddEntityString(CachedEntity* entity, const std::string& string, const rgba
 std::vector<int> entities_need_repaint {};
 std::mutex entities_need_repaint_mutex {};
 
-static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10", "Corner Size");
+static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10", "Corner Size", "How long the lines in the corner ESP are.");
 
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t& color, bool transparent) {
 	const rgba_t& black = transparent ? colors::Transparent(colors::black) : colors::black;
@@ -153,8 +153,8 @@ static CatEnum esp_box_text_position_enum({"TOP RIGHT", "BOTTOM RIGHT", "CENTER"
 static CatVar esp_box_text_position(esp_box_text_position_enum, "esp_box_text_position", "0", "Text position", "Defines text position");
 static CatVar box_nodraw(CV_SWITCH, "esp_box_nodraw", "0", "Invisible 2D Box", "Don't draw 2D box");
 static CatVar box_expand(CV_INT, "esp_box_expand", "0", "Expand 2D Box", "Expand 2D box by N units");
-static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners");
-static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerup ESP");
+static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners","Display the corners only\nFancy");
+static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerups","Display ESP on powerups");
 
 const Vector dims_player[] = { { -16, -16, -4 }, { 16, 16, 72 } };
 
@@ -482,8 +482,8 @@ void _FASTCALL ProcessEntity(CachedEntity* ent) {
 		return;
 	}
 }
-static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar");
-static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Draw Bone ID's");
+static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar","Draw a green healthbar on the side of ESP\nSuper fancy");
+static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Bone ESP","Draws lines between different hitboxes to simulate bone ESP\nnot technically \"bone\" esp, but whatever");
 
 const std::string bonenames_leg_r[] = { "bip_foot_R", "bip_knee_R", "bip_hip_R" };
 const std::string bonenames_leg_l[] = { "bip_foot_L", "bip_knee_L", "bip_hip_L" };
@@ -589,9 +589,9 @@ std::unordered_map<studiohdr_t*, bonelist_s> bonelist_map {};
  */
 
 CatEnum emoji_esp({ "None", "Joy", "Thinking" });
-CatVar joy_esp(CV_SWITCH, "esp_emoji", "0", "Emoji ESP");
-CatVar joy_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size");
-CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1", "Emoji ESP Scaling");
+CatVar joy_esp(CV_SWITCH, "esp_emoji", "0", "Emoji ESP", ":joy:");
+CatVar joy_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size", ":joy: or :JOY:");
+CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1", "Emoji Auto Scaling", ":joy: far away, :JOY: up close");
 CatVar emoji_min_size(CV_INT, "esp_emoji_min_size", "20", "Emoji ESP min size", "Minimum size for an emoji when you use auto scaling");
 textures::AtlasTexture joy_texture(64 * 4, textures::atlas_height - 64 * 4, 64, 64);
 textures::AtlasTexture thinking_texture(64 * 5, textures::atlas_height - 64 * 4, 64, 64);

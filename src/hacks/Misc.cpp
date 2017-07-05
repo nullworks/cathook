@@ -32,7 +32,7 @@ namespace hacks { namespace shared { namespace misc {
 
 //static CatVar remove_conditions(CV_SWITCH, "remove_conditions", "0", "Remove conditions");
 
-static CatVar render_zoomed(CV_SWITCH, "render_zoomed", "0", "Render model when zoomed-in", "Renders player model while being zoomed in as Sniper");
+static CatVar render_zoomed(CV_SWITCH, "render_zoomed", "0", "Render Zoomed Model", "Renders your player model while being zoomed in as Sniper in third person");
 
 void* C_TFPlayer__ShouldDraw_original = nullptr;
 
@@ -47,7 +47,7 @@ bool C_TFPlayer__ShouldDraw_hook(IClientEntity* thisptr) {
 	}
 }
 
-CatVar crit_hack_next(CV_SWITCH, "crit_hack_next", "0", "Next crit info");
+CatVar crit_hack_next(CV_SWITCH, "crit_hack_next", "0", "Next crit info", "Displays information on screen about crit hack");
 
 void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char* ft, unsigned acc_offset) {
 	bool forcetable = ft && strlen(ft);
@@ -83,7 +83,7 @@ void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char* f
 		logging::Info("==== END OF TABLE: %s", table->GetName());
 }
 
-static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand& args) {
+static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand& args) { 
 	if (args.ArgC() < 1) return;
 	if (!atoi(args[1])) return;
 	int idx = atoi(args[1]);
@@ -103,8 +103,8 @@ int last_number = 0;
 
 // SUPER SECRET CODE DONOT STEEL
 
-static CatEnum spycrab_mode_enum({"DISABLED", "FORCE CRAB", "FORCE NON-CRAB"});
-static CatVar spycrab_mode(spycrab_mode_enum, "spycrab", "0", "Spycrab", "Defines spycrab taunting mode");
+static CatEnum spycrab_mode_enum({"DISABLED", "ONLY CRAB", "NEVER CRAB"});
+static CatVar spycrab_mode(spycrab_mode_enum, "spycrab", "0", "Spycrab", "Forces spycrab taunt by skipping taunts until you get spycrab\nIncompatible with Taunting enabled in RemoveCond\nHold disguise panel, obviously");
 
 int no_taunt_ticks = 0;
 
@@ -143,7 +143,7 @@ static CatCommand test_chat_print("debug_print_chat", "machine broke", [](const 
 });
 
 float afkTimeIdle = 0;
-static CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide", "Allows free movement while taunting with movable taunts\nOnly works in tf2\nWIP");
+static CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide", "Allows free movement while taunting with movable taunts\nOnly works in tf2\nWIP!!");
 	
 void CreateMove() {
 	static bool flswitch = false;
@@ -458,21 +458,21 @@ void Schema_Reload() {
 }
 
 CatVar debug_info(CV_SWITCH, "debug_info", "0", "Debug info", "Shows some debug info in-game");
-CatVar flashlight_spam(CV_SWITCH, "flashlight", "0", "Flashlight spam", "HL2DM flashlight spam");
-CatVar crit_info(CV_SWITCH, "crit_info", "0", "Show crit info"); // TODO separate
-CatVar crit_hack(CV_KEY, "crit_hack", "0", "Crit Key");
-CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits");
-CatVar crit_suppress(CV_SWITCH, "crit_suppress", "0", "Disable random crits", "Can help saving crit bucket for forced crits");
+CatVar flashlight_spam(CV_SWITCH, "flashlight", "0", "HL2DM Flashlight Spam", "Spam flashlight super fast in Half Life 2: Death Match");
+CatVar crit_info(CV_SWITCH, "crit_info", "0", "Show crit info", "Shows information on current crit status"); // TODO separate
+CatVar crit_hack(CV_KEY, "crit_hack", "0", "Crit Key", "When Crit Key is held, cathook will attempt to crit the next shot\nRequires crit key held down during attack");
+CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits","Forces 100% crits on melee weapons\nBreaks weapons with no random crits");
+CatVar crit_suppress(CV_SWITCH, "crit_suppress", "0", "Disable Random Crits", "Skips random criticals that you would normally receive\nUseful for saving crits in bucket\nIf you don't use crit hack much, disable this");
 CatVar anti_afk(CV_SWITCH, "anti_afk", "0", "Anti-AFK", "Sends random commands to prevent being kicked from server");
-CatVar tauntslide(CV_SWITCH, "tauntslide", "0", "TF2C tauntslide", "Allows moving and shooting while taunting");
+CatVar tauntslide(CV_SWITCH, "tauntslide", "0", "TF2C Tauntslide", "Allows moving and shooting while taunting");
 
 CatCommand name("name_set", "Immediate name change", [](const CCommand& args) {
 	if (args.ArgC() < 2) {
-		logging::Info("Set a name, silly");
+		logging::Info("Set a name, silly! Names must be more than 2 characters long.");
 		return;
 	}
 	if (g_Settings.bInvalid) {
-		logging::Info("Only works ingame!");
+		logging::Info("Use this command in-game to immediantly change your name.");
 		return;
 	}
 	std::string new_name(args.ArgS());
@@ -506,7 +506,7 @@ CatCommand save_settings("save", "Save settings (optional filename)", [](const C
 	}
 	file.close();
 });
-CatCommand say_lines("say_lines", "Say with newlines (\\n)", [](const CCommand& args) {
+CatCommand say_lines("say", "Basically \"say\" but replaces (\\n) with new lines", [](const CCommand& args) {
 	std::string message(args.ArgS());
 	ReplaceString(message, "\\n", "\n");
 	std::string cmd = format("say ", message);

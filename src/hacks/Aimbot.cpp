@@ -39,59 +39,62 @@
 namespace hacks { namespace shared { namespace aimbot {
 	
 // User settings are stored and used by these vars
-static CatVar enabled(CV_SWITCH, "aimbot_enabled", "0", "Enable Aimbot", "Main aimbot switch");
-static CatVar aimkey(CV_KEY, "aimbot_aimkey", "0", "Aimkey", "Aimkey. Look at Aimkey Mode too!");
+static CatVar enabled(CV_SWITCH, "aimbot_enabled", "0", "Enabled", "Is aimbot enabled or not?");
+static CatVar aimkey(CV_KEY, "aimbot_aimkey", "0", "Aimkey", "Key used for enabling/disabled aimbot");
 static CatEnum aimkey_modes_enum({ "DISABLED", "AIMKEY", "REVERSE", "TOGGLE" });
-static CatVar aimkey_mode(aimkey_modes_enum, "aimbot_aimkey_mode", "1", "Aimkey mode", "DISABLED: aimbot is always active\nAIMKEY: aimbot is active when key is down\nREVERSE: aimbot is disabled when key is down\nTOGGLE: pressing key toggles aimbot");
-static CatVar autoshoot(CV_SWITCH, "aimbot_autoshoot", "1", "Autoshoot", "Shoot automatically when the target is locked, isn't compatible with 'Enable when attacking'");
-static CatEnum hitbox_mode_enum({ "AUTO-HEAD", "AUTO-CLOSEST", "STATIC" });
-static CatVar hitbox_mode(hitbox_mode_enum, "aimbot_hitboxmode", "0", "Hitbox Mode", "Defines hitbox selection mode");
-static CatVar fov(CV_FLOAT, "aimbot_fov", "0", "Aimbot FOV", "FOV range for aimbot to lock targets. \"Smart FOV\" coming eventually.", 360.0f);
+static CatVar aimkey_mode(aimkey_modes_enum, "aimbot_aimkey_mode", "1", "Aimkey mode", "DISABLED: Aimbot is always active\nAIMKEY: Aimbot is only active when aimkey is pressedn\nREVERSE: Aimbot is only active when aimkey is not pressed\nTOGGLE: Pressing aimkey toggles aimbot");
+static CatVar autoshoot(CV_SWITCH, "aimbot_autoshoot", "1", "Autoshoot", "Automatically shoot at enemies\nWARNING: not compatible with 'Enable when attacking'");
+static CatEnum hitbox_mode_enum({ "AUTO-HEAD", "AUTO-CLOSEST", "USER-DEFINED" });
+static CatVar hitbox_mode(hitbox_mode_enum, "aimbot_hitboxmode", "0", "Hitbox Mode", "Defines hitbox selection mode\nAUTO-HEAD: Aim at head when visible. Otherwise, attempt body shot\nAUTO-CLOSEST: Aim at whatever body part is closest to crosshair\nSTATIC: User-defined hitbox");
+static CatVar fov(CV_FLOAT, "aimbot_fov", "0", "Aimbot FOV", "FOV range for aimbot to lock targets\n\"Smart FOV\" coming eventually", 360.0f);
 static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
-static CatVar priority_mode(priority_mode_enum, "aimbot_prioritymode", "0", "Priority mode", "Priority mode.\n"
-		"SMART: Basically Auto-Threat. Will be tweakable eventually. "
-		"FOV, DISTANCE, HEALTH are self-explainable. HEALTH picks the weakest enemy");
-static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Wait for sniper rifle charge", "Aimbot waits until it has enough charge to kill");
+static CatVar priority_mode(priority_mode_enum, "aimbot_prioritymode", "0", "Priority Mode", "Who should aimbot target first?\n"
+		"SMART: Auto-threat detection\n"
+		"FOV: Aim at whoever is closest to your crosshair\n"
+		"DISTANCE: Aim at whoever's closest\n"
+		"HEALTH: Aim at whoever has the lowest health");
+static CatVar wait_for_charge(CV_SWITCH, "aimbot_charge", "0", "Sniper Charge", "Make aimbot wait until it has enough charge to kill to shoot");
 static CatVar ignore_vaccinator(CV_SWITCH, "aimbot_ignore_vaccinator", "1", "Ignore Vaccinator", "Hitscan weapons won't fire if enemy is vaccinated against bullets");
 static CatVar ignore_hoovy(CV_SWITCH, "aimbot_ignore_hoovy", "0", "Ignore Hoovies", "Aimbot won't attack hoovies");
-static CatVar ignore_cloak(CV_SWITCH, "aimbot_ignore_cloak", "1", "Ignore cloaked", "Don't aim at invisible enemies");
-static CatVar buildings_sentry(CV_SWITCH, "aimbot_buildings_sentry", "1", "Aim Sentry", "Should aimbot aim at sentryguns?");
-static CatVar buildings_other(CV_SWITCH, "aimbot_buildings_other", "1", "Aim Other building", "Should aimbot aim at other buildings");
-static CatVar stickybot(CV_SWITCH, "aimbot_stickys", "0", "Aim Sticky", "Should aimbot aim at stickys");
-static CatVar teammates(CV_SWITCH, "aimbot_teammates", "0", "Aim at teammates", "Aim at your own team. Useful for HL2DM");
-static CatVar silent(CV_SWITCH, "aimbot_silent", "1", "Silent", "Your screen doesn't get snapped to the point where aimbot aims at");
-static CatVar target_lock(CV_SWITCH, "aimbot_target_lock", "0", "Target Lock", "Keeps your previously chosen target untill target check fails");
+static CatVar ignore_cloak(CV_SWITCH, "aimbot_ignore_cloak", "1", "Ignore cloaked", "Aimbot won't attack invisible enemies");
+static CatVar buildings_sentry(CV_SWITCH, "aimbot_buildings_sentry", "1", "Sentries", "Aim at sentry guns");
+static CatVar buildings_other(CV_SWITCH, "aimbot_buildings_other", "1", "Other Buildings", "Aim at dispensers, teleporters, etc");
+static CatVar stickybot(CV_SWITCH, "aimbot_stickys", "0", "Stickies", "Aim at sticky bombs");
+static CatVar teammates(CV_SWITCH, "aimbot_teammates", "0", "Teammates", "Aim at your own team\nUseful for HL2DM");
+static CatVar silent(CV_SWITCH, "aimbot_silent", "1", "Silent", "Stops aimbot from snapping your screen to enemies\nClient-side only, others will still see you snap\nUse \"Attack when can shoot\"");
+static CatVar target_lock(CV_SWITCH, "aimbot_target_lock", "0", "Target Lock", "Don't change targets until your current target is behind a wall or dead");
 static CatEnum hitbox_enum({
 		"HEAD", "PELVIS", "SPINE 0", "SPINE 1", "SPINE 2", "SPINE 3", "UPPER ARM L", "LOWER ARM L",
 		"HAND L", "UPPER ARM R", "LOWER ARM R", "HAND R", "HIP L", "KNEE L", "FOOT L", "HIP R",
 		"KNEE R", "FOOT R" });
-static CatVar hitbox(hitbox_enum, "aimbot_hitbox", "0", "Hitbox", "Hitbox to aim at. Ignored if AutoHitbox is on");
+static CatVar hitbox(hitbox_enum, "aimbot_hitbox", "0", "Hitbox", "Manual hitbox selection\nMake sure hitbox mode is set to user-defined");
 static CatVar zoomed_only(CV_SWITCH, "aimbot_zoomed", "1", "Zoomed only", "Don't autoshoot with unzoomed rifles");
-static CatVar only_can_shoot(CV_SWITCH, "aimbot_only_when_can_shoot", "1", "Active when can shoot", "Aimbot only activates when you can instantly shoot, sometimes making the autoshoot invisible for spectators");
-static CatVar attack_only(CV_SWITCH, "aimbot_enable_attack_only", "0", "Active when attacking", "Basically makes Mouse1 an AimKey, isn't compatible with AutoShoot");
-static CatVar max_range(CV_INT, "aimbot_maxrange", "0", "Max distance",
+static CatVar only_can_shoot(CV_SWITCH, "aimbot_only_when_can_shoot", "1", "Active when can shoot", "Aimbot only aims at target when it is immediantly shooting\nMakes it harder for others to notice your aimbot");
+static CatVar attack_only(CV_SWITCH, "aimbot_enable_attack_only", "0", "Active when attacking", "Aimbot is only active when YOU are shooting.\nWARNING: isn't compatible with AutoShoot");
+static CatVar max_range(CV_INT, "aimbot_maxrange", "0", "Max Distance",
 		"Max range for aimbot\n"
 		"900-1100 range is efficient for scout/widowmaker engineer", 4096.0f);
-static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0", "Latency extrapolation", "(NOT RECOMMENDED) latency extrapolation");
+static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0", "Latency Extrapolation", "If you can read this text then somebody\ndidn't explain to me what this does.\nrip me -Espeon");
 static CatVar slowaim(CV_SWITCH, "aimbot_slow", "0", "Slow Aim", "Slowly moves your crosshair onto the target for more legit play\nDisables silent aimbot");
 static CatVar slowaim_smoothing(CV_INT, "aimbot_slow_smooth", "10", "Slow Aim Smooth", "How slow the slow aim's aiming should be", 50);
-static CatVar slowaim_autoshoot(CV_INT, "aimbot_slow_autoshoot", "10", "Slow Aim Threshhold", "Distance to autoshoot while smooth aiming", 25);
-static CatVar projectile_aimbot(CV_SWITCH, "aimbot_projectile", "1", "Projectile aimbot", "If you turn it off, aimbot won't try to aim with projectile weapons");
-static CatVar proj_fov(CV_SWITCH, "aimbot_proj_fovpred", "0", "Projectile FOV mode", "If disabled, FOV restrictions apply to current target position");
+static CatVar slowaim_autoshoot(CV_INT, "aimbot_slow_autoshoot", "10", "Slow Aim Threshhold", "How close to the target do you have to be to to autoshoot\nRequires autoshoot enabled, otherwise ignore this", 25);
+static CatVar projectile_aimbot(CV_SWITCH, "aimbot_projectile", "1", "Projectile Aimbot", "Should Aimbot attempt to predict and aim with projectile-based weapons?\nProjectile aimbot + silent aimbot = your aimbot is silent to spectators/players");
+static CatVar proj_fov(CV_SWITCH, "aimbot_proj_fovpred", "0", "Projectile FOV Mode", "Does aimbot FOV restrict looking at players or rockets?");
 static CatVar proj_visibility(CV_SWITCH, "aimbot_proj_vispred", "0", "Projectile visibility prediction", "If enabled, projectile aimbot will perform additional visibility checking and won't try to predict enemies behind walls");
 static CatVar proj_gravity(CV_FLOAT, "aimbot_proj_gravity", "0", "Projectile gravity",
-		"Force override projectile gravity. Useful for debugging.", 1.0f);
+		"Force override projectile gravity for debugging purposes", 1.0f);
 static CatVar proj_speed(CV_FLOAT, "aimbot_proj_speed", "0", "Projectile speed",
-		"Force override projectile speed.\n"
+		"Force override projectile speed for debugging purposes\n"
 		"Can be useful for playing with MvM upgrades or on x10 servers "
 		"since there is no \"automatic\" projectile speed detection in "
-		"cathook. Yet.");
-static CatVar huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5", "Huntsman autoshoot", "Minimum charge for autoshooting with huntsman.\n"
-		"Set it to 0.01 if you want to shoot as soon as you start pulling the arrow", 0.01f, 1.0f);
-static CatVar huntsman_full_auto(CV_SWITCH, "aimbot_full_auto_huntsman", "1", "Auto Huntsman", "Autoshoot will pull huntsman's string");
+		"cathook yet");
+static CatVar huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5", "Huntsman Autoshoot Charge", "How long for Huntsman to charge bow before shooting.\n"
+		"Set it to 0.01 if you want to shoot as soon as you start pulling the arrow\n"
+		"Requires autoshoot enabled", 0.01f, 1.0f);
+static CatVar huntsman_full_auto(CV_SWITCH, "aimbot_full_auto_huntsman", "1", "Auto Autoshoot Pull", "Should autoshoot pull the huntsman bow automatically?");
 // Debug vars
 static CatVar aimbot_debug(CV_SWITCH, "aimbot_debug", "0", "Aimbot Debug", "Display simple debug info for aimbot");
-static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0", "Engine ProjPred");
+static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0", "Use the TF2 engine for projectile prediction");
 /* TODO IMPLEMENT
 static CatVar auto_spin_up(CV_SWITCH, "aimbot_spin_up", "0", "Auto Spin Up", "Spin up minigun if you can see target, useful for followbots");
 static CatVar auto_zoom(CV_SWITCH, "aimbot_auto_zoom", "0", "Auto Zoom", "Automatically zoom in if you can see target, useful for followbots");

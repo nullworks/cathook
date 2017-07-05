@@ -13,12 +13,12 @@
 namespace hacks { namespace tf { namespace autoreflect {
 
 // Vars for user settings
-CatVar enabled(CV_SWITCH, "reflect_enabled", "0", "Auto Reflect", "Master AutoReflect switch");
-CatVar idle_only(CV_SWITCH, "reflect_only_idle", "0", "Only when not shooting", "Don't AutoReflect if you're holding M1");
-CatVar legit(CV_SWITCH, "reflect_legit", "0", "Legit Reflect", "Only Auto-airblasts projectiles that you can see, doesnt move your crosshair");
-CatVar dodgeball(CV_SWITCH, "reflect_dodgeball", "0", "Dodgeball Mode", "Allows auto-reflect to work in dodgeball servers");
+CatVar enabled(CV_SWITCH, "reflect_enabled", "0", "Auto Reflect", "Should Cathook attempt to reflect projectiles?");
+CatVar idle_only(CV_SWITCH, "reflect_only_idle", "0", "Only when not shooting", "Don't autoreflect if you're shooting\nLooks legit-ish");
+CatVar legit(CV_SWITCH, "reflect_legit", "0", "Legit", "Stops autoreflect from moving your crosshair\nYou'll only be able to shoot projectiles infront of you,\nthough this looks super legit.");
+CatVar dodgeball(CV_SWITCH, "reflect_dodgeball", "0", "Dodgeball", "Dodgeball server compatibility\nNot recommended unless you're on a dodgeball server");
 	
-CatVar stickies(CV_SWITCH, "reflect_stickybombs", "0", "Reflect stickies", "Reflect Stickybombs");
+CatVar stickies(CV_SWITCH, "reflect_stickybombs", "0", "Stickies", "Attempt to reflect stickybombs thrown at you");
 // TODO setup proj sorting
 // TODO CatVar big_proj(CV_SWITCH, "reflect_big_projectile", "0", "Reflect big projectiles", "Reflect Rockets");
 // TODO CatVar small_proj(CV_SWITCH, "reflect_small_projectile", "0", "Reflect small projectiles", "Reflect Huntsman arrows, Crusaders bolts");

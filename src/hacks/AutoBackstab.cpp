@@ -10,7 +10,7 @@
 
 namespace hacks { namespace tf2 { namespace autobackstab {
 
-static CatVar enabled(CV_SWITCH, "autobackstab", "0", "Auto Backstab", "Does not depend on triggerbot!");
+static CatVar enabled(CV_SWITCH, "autobackstab", "0", "Auto Backstab", "Automatically backstabs when can\nActivated regarldess of Triggerbot setting when enabled");
 
 // TODO improve
 void CreateMove() {

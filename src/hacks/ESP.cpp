@@ -12,39 +12,39 @@
 
 namespace hacks { namespace shared { namespace esp {
 
-CatVar show_weapon(CV_SWITCH, "esp_weapon", "1", "Show weapon name", "Show which weapon does the enemy use");
-CatVar local_esp(CV_SWITCH, "esp_local", "1", "ESP Local Player", "Shows local player ESP in thirdperson");
-CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Building ESP", "Show buildings");
+CatVar show_weapon(CV_SWITCH, "esp_weapon", "0", "Weapon Type ESP", "Shows what weapons players are using IN TEXT");
+CatVar local_esp(CV_SWITCH, "esp_local", "1", "Self", "Show ESP on YOU in third person");
+CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Buildings", "Show buildings");
 CatVar enabled(CV_SWITCH, "esp_enabled", "0", "ESP", "Master ESP switch");
-CatVar entity_info(CV_SWITCH, "esp_entity", "0", "Entity ESP", "Show entity info (debug)");
-CatVar teammates(CV_SWITCH, "esp_teammates", "0", "ESP Teammates", "Teammate ESP");
+CatVar entity_info(CV_SWITCH, "esp_entity", "0", "Entity ESP", "Show entity info\nNot recommended, only for debugging");
+CatVar teammates(CV_SWITCH, "esp_teammates", "0", "Teammates", "Display ESP on teammates");
 CatVar item_esp(CV_SWITCH, "esp_item", "1", "Item ESP", "Master Item ESP switch (health packs, etc.)");
-CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbot ESP", "Show followbot ID");
+CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbots", "Show followbot ID");
 CatVar item_dropped_weapons(CV_SWITCH, "esp_item_weapons", "0", "Dropped weapons", "Show dropped weapons");
-CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "0", "Ammo packs", "Show ammo packs");
-CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1", "Health packs", "Show health packs");
-CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups", "Show powerups");
-CatVar item_money(CV_SWITCH, "esp_money", "1", "MvM money", "Show MvM money");
-CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red MvM money", "Show red MvM money");
-CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "Entity ID", "Used with Entity ESP. Shows entityID");
-CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Show tank", "Show tank");
-CatVar box_esp(CV_SWITCH, "esp_box", "1", "Box", "Draw 2D box with healthbar. fancy.");
-CatVar show_distance(CV_SWITCH, "esp_distance", "1", "Distance ESP", "Show distance to target");
-CatVar show_name(CV_SWITCH, "esp_name", "1", "Name ESP", "Show name");
-CatVar show_class(CV_SWITCH, "esp_class", "1", "Class ESP", "Show class");
-CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions ESP", "Show conditions");
-CatVar show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge ESP", "Show ubercharge percentage while players medigun is out");
-CatVar vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck", "ESP visibility check - makes enemy info behind walls darker, disable this if you get FPS drops");
-CatVar legit(CV_SWITCH, "esp_legit", "0", "Legit Mode", "Don't show invisible enemies");
-CatVar show_health(CV_SWITCH, "esp_health_num", "1", "Health numbers", "Show health in numbers");
-CatEnum proj_esp_enum({ "OFF", "ALL", "CRIT" });
-CatVar proj_rockets(proj_esp_enum, "esp_proj_rockets", "1", "Rockets", "Rockets");
-CatVar proj_arrows(proj_esp_enum, "esp_proj_arrows", "1", "Arrows", "Arrows");
-CatVar proj_pipes(proj_esp_enum, "esp_proj_pipes", "1", "Pipes", "Pipebombs");
-CatVar proj_stickies(proj_esp_enum, "esp_proj_stickies", "1", "Stickies", "Stickybombs");
-CatVar proj_enemy(CV_SWITCH, "esp_proj_enemy", "1", "Only enemy projectiles", "Don't show friendly projectiles");
-CatVar proj_esp(CV_SWITCH, "esp_proj", "1", "Projectile ESP", "Projectile ESP");
-CatVar entity_model(CV_SWITCH, "esp_model_name", "0", "Model name ESP", "Model name esp (DEBUG ONLY)");
+CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "0", "Ammopacks", "Display ESP on ammo packs\ni = Small, ii = Medium, iii = Large");
+CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1", "Healthpacks", "Display ESP on health packs\n+ = Small, ++ = Medium, +++ = Large");
+CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups", "Display ESP on powerups");
+CatVar item_money(CV_SWITCH, "esp_money", "1", "Money", "Display ESP on money\nUseful for MvM");
+CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red Money");
+CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "ID", "Display ID of entities");
+CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Tanks", "Display ESP on tanks\nUseful for MvM");
+CatVar box_esp(CV_SWITCH, "esp_box", "1", "Box", "Display a box around certain players\nIncludes a fancy health bar");
+CatVar show_distance(CV_SWITCH, "esp_distance", "0", "Distance", "Display distance the player is from you");
+CatVar show_name(CV_SWITCH, "esp_name", "1", "Name", "Display steam name of players");
+CatVar show_class(CV_SWITCH, "esp_class", "1", "Class", "Display player class alongside ESP");
+CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions", "Display active effects on player");
+CatVar show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge", "Show ubercharge percentage on medics");
+CatVar vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck", "ESP visibility check - makes enemy info behind walls darker\nDisable this if you get FPS drops");
+CatVar legit(CV_SWITCH, "esp_legit", "0", "Legit", "Don't show invisible enemies");
+CatVar show_health(CV_SWITCH, "esp_health_num", "1", "Health Numbers", "Show the current/max health of players in numbers");
+CatEnum proj_esp_enum({ "OFF", "ALL", "CRIT ONLY" });
+CatVar proj_rockets(proj_esp_enum, "esp_proj_rockets", "1", "Rockets", "Show ESP on rockets");
+CatVar proj_arrows(proj_esp_enum, "esp_proj_arrows", "1", "Arrows", "Show ESP on arrows");
+CatVar proj_pipes(proj_esp_enum, "esp_proj_pipes", "1", "Pipes", "Show ESP on pipebombs");
+CatVar proj_stickies(proj_esp_enum, "esp_proj_stickies", "1", "Stickies", "Show ESP on stickybombs");
+CatVar proj_enemy(CV_SWITCH, "esp_proj_enemy", "1", "Enemies Only", "Disable this to show ESP on friendly projectiles, too");
+CatVar proj_esp(CV_SWITCH, "esp_proj", "1", "Projectiles", "Display ESP on projectiles");
+CatVar entity_model(CV_SWITCH, "esp_model_name", "0", "Model Name", "Model name esp (DEBUG ONLY)");
 CatVar item_weapon_spawners(CV_SWITCH, "esp_weapon_spawners", "1", "Show weapon spawners", "TF2C deathmatch weapon spawners");
 CatVar item_adrenaline(CV_SWITCH, "esp_item_adrenaline", "0", "Show Adrenaline", "TF2C adrenaline pills");
 
@@ -76,7 +76,7 @@ void AddEntityString(CachedEntity* entity, const std::string& string, const rgba
 std::vector<int> entities_need_repaint {};
 std::mutex entities_need_repaint_mutex {};
 
-static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10", "Corner Size");
+static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10", "Corner Size", "How long the lines in the corner ESP are.");
 
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t& color, bool transparent) {
 	const rgba_t& black = transparent ? colors::Transparent(colors::black) : colors::black;
@@ -153,8 +153,8 @@ static CatEnum esp_box_text_position_enum({"TOP RIGHT", "BOTTOM RIGHT", "CENTER"
 static CatVar esp_box_text_position(esp_box_text_position_enum, "esp_box_text_position", "0", "Text position", "Defines text position");
 static CatVar box_nodraw(CV_SWITCH, "esp_box_nodraw", "0", "Invisible 2D Box", "Don't draw 2D box");
 static CatVar box_expand(CV_INT, "esp_box_expand", "0", "Expand 2D Box", "Expand 2D box by N units");
-static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners");
-static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerup ESP");
+static CatVar box_corners(CV_SWITCH, "esp_box_corners", "1", "Box Corners", "Display the corners only\nFancy");
+static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerups", "Display ESP on powerups");
 
 const Vector dims_player[] = { { -16, -16, -4 }, { 16, 16, 72 } };
 
@@ -482,8 +482,8 @@ void _FASTCALL ProcessEntity(CachedEntity* ent) {
 		return;
 	}
 }
-static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar");
-static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Draw Bone ID's");
+static CatVar box_healthbar(CV_SWITCH, "esp_box_healthbar", "1", "Box Healthbar", "Draw a green healthbar on the side of ESP\nSuper fancy");
+static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Bone ESP", "Draws lines between different hitboxes to simulate bone ESP\nnot technically \"bone\" esp, but whatever");
 
 const std::string bonenames_leg_r[] = { "bip_foot_R", "bip_knee_R", "bip_hip_R" };
 const std::string bonenames_leg_l[] = { "bip_foot_L", "bip_knee_L", "bip_hip_L" };
@@ -589,9 +589,9 @@ std::unordered_map<studiohdr_t*, bonelist_s> bonelist_map {};
  */
 
 CatEnum emoji_esp({ "None", "Joy", "Thinking" });
-CatVar joy_esp(CV_SWITCH, "esp_emoji", "0", "Emoji ESP");
-CatVar joy_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size");
-CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1", "Emoji ESP Scaling");
+CatVar joy_esp(CV_SWITCH, "esp_emoji", "0", "Emoji ESP", ":joy:");
+CatVar joy_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size", ":joy: or :JOY:");
+CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1", "Emoji Auto Scaling", ":joy: far away, :JOY: up close");
 CatVar emoji_min_size(CV_INT, "esp_emoji_min_size", "20", "Emoji ESP min size", "Minimum size for an emoji when you use auto scaling");
 textures::AtlasTexture joy_texture(64 * 4, textures::atlas_height - 64 * 4, 64, 64);
 textures::AtlasTexture thinking_texture(64 * 5, textures::atlas_height - 64 * 4, 64, 64);

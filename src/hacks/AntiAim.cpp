@@ -20,10 +20,9 @@ CatEnum pitch_mode_enum({ "KEEP", "STATIC", "JITTER", "RANDOM", "FLIP", "FAKEFLI
 CatVar yaw_mode(yaw_mode_enum, "aa_yaw_mode", "0", "Yaw mode", "Yaw mode");
 CatVar pitch_mode(pitch_mode_enum, "aa_pitch_mode", "0", "Pitch mode", "Pitch mode");
 CatVar roll(CV_FLOAT, "aa_roll", "0", "Roll", "Roll angle (viewangles.z)", -180, 180);
-CatVar no_clamping(CV_SWITCH, "aa_no_clamp", "0", "Don't clamp angles", "Use this with STATIC mode for unclamped manual angles");
+CatVar no_clamping(CV_SWITCH, "aa_no_clamp", "0", "Disable Angle Clamping", "Use this with STATIC mode for unclamped manual angles");
 CatVar spin(CV_FLOAT, "aa_spin", "10.0", "Spin speed", "Spin speed (degrees/second)");
-
-CatVar aaaa_enabled(CV_SWITCH, "aa_aaaa_enabled", "0", "Enable AAAA", "Enable Anti-Anti-Anti-Aim (Overrides AA Pitch)");
+CatVar aaaa_enabled(CV_SWITCH, "aa_aaaa_enabled", "0", "Enable AAAA", "Enable Anti-Anti-Anti-Aim\nOverrides AA Pitch");
 CatVar aaaa_interval(CV_FLOAT, "aa_aaaa_interval", "0", "Interval", "Interval in seconds, 0 = random");
 CatVar aaaa_interval_random_high(CV_FLOAT, "aa_aaaa_interval_high", "15", "Interval Ceiling", "Upper bound for random AAAA interval");
 CatVar aaaa_interval_random_low(CV_FLOAT, "aa_aaaa_interval_low", "3", "Interval Floor", "Lower bound for random AAAA interval");

@@ -40,7 +40,7 @@
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 #include "ftrender.hpp"
 #endif
 
@@ -97,8 +97,8 @@ const std::string& hack::GetType() {
 		version += " DYNAMIC";
 #endif
 		
-#ifdef TEXTMODE
-		version += " TEXTMODE";
+#if not ENABLE_VISUALS
+		version += " NOVISUALS";
 #endif
 
 	version = version.substr(1);
@@ -112,7 +112,7 @@ std::stack<std::string>& hack::command_stack() {
 	return stack;
 }
 
-#ifndef TEXTMODE /* Why would we need colored chat stuff in textmode? */
+#if ENABLE_VISUALS == 1 /* Why would we need colored chat stuff in textmode? */
 
 class AdvancedEventListener : public IGameEventListener {
 public:
@@ -162,8 +162,9 @@ void hack::CC_Cat(const CCommand& args) {
 }
 
 void hack::Initialize() {
+	time_injected = time(nullptr);
 	// Essential files must always exist, except when the game is running in text mode.
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 
 	{
 		std::vector<std::string> essential = {
@@ -173,9 +174,9 @@ void hack::Initialize() {
 			"menu.json", "fonts/opensans-bold.ttf"
 		};
 		for (const auto& s : essential) {
-			std::ifstream exists("cathook/" + s, std::ios::in);
+			std::ifstream exists(DATA_PATH "/" + s, std::ios::in);
 			if (not exists) {
-				Error("Missing essential file: cathook/%s\nYou MUST run update-data script to finish installation", s.c_str());
+				Error("Missing essential file: " DATA_PATH "/%s\nYou MUST run update-data script to finish installation", s.c_str());
 			}
 		}
 	}
@@ -196,7 +197,7 @@ void hack::Initialize() {
 	logging::Info("Is TF? %d", IsTF());
 	InitClassTable();
 
-#ifndef TEXTMODE /* We don't need medal to flip 100% when running textmode */
+#if ENABLE_VISUALS == 1 /* We don't need medal to flip 100% when running textmode */
 
 	IF_GAME (IsTF2()) {
 		uintptr_t mmmf = (gSignatures.GetClientSignature("C7 44 24 04 09 00 00 00 BB ? ? ? ? C7 04 24 00 00 00 00 E8 ? ? ? ? BA ? ? ? ? 85 C0 B8 ? ? ? ? 0F 44 DA") + 37);
@@ -220,7 +221,7 @@ void hack::Initialize() {
 	g_Settings.Init();
 	EndConVars();
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 
 	draw::Initialize();
 #if ENABLE_GUI
@@ -234,7 +235,7 @@ void hack::Initialize() {
 	InitNetVars();
 	g_pLocalPlayer = new LocalPlayer();
 	g_pPlayerResource = new TFPlayerResource();
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	hooks::panel.Set(g_IPanel);
 	hooks::panel.HookMethod((void*)PaintTraverse_hook, offsets::PaintTraverse());
 	hooks::panel.Apply();
@@ -247,7 +248,7 @@ void hack::Initialize() {
 	}
 	hooks::clientmode.Set((void*)clientMode);
 	hooks::clientmode.HookMethod((void*)CreateMove_hook, offsets::CreateMove());
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	hooks::clientmode.HookMethod((void*)OverrideView_hook, offsets::OverrideView());
 #endif /* TEXTMODE */
 	hooks::clientmode.HookMethod((void*)LevelInit_hook, offsets::LevelInit());
@@ -260,10 +261,11 @@ void hack::Initialize() {
 	hooks::client.HookMethod((void*)FrameStageNotify_hook, offsets::FrameStageNotify());
 	hooks::client.HookMethod((void*)DispatchUserMessage_hook, offsets::DispatchUserMessage());
 
-#if TEXTMODE
-	//g_IMaterialSystem->SetInStubMode(true);
-	/*IF_GAME(IsTF2()) {
+#if ENABLE_NULL_GRAPHICS == 1
+	g_IMaterialSystem->SetInStubMode(true);
+	IF_GAME(IsTF2()) {
 		logging::Info("Graphics Nullified");
+		logging::Info("The game will crash");
 		// TODO offsets::()?
 		hooks::materialsystem.Set((void*)g_IMaterialSystem);
 		uintptr_t base = *(uintptr_t*)(g_IMaterialSystem);
@@ -275,16 +277,16 @@ void hack::Initialize() {
 		hooks::materialsystem.HookMethod((void*)FindMaterialEx_null_hook, 123);
 		hooks::materialsystem.Apply();
 		//hooks::materialsystem.HookMethod();
-	}*/
+	}
 #endif
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	hooks::client.HookMethod((void*)IN_KeyEvent_hook, offsets::IN_KeyEvent());
 #endif /* TEXTMODE */
 	hooks::client.Apply();
 	hooks::input.Set(g_IInput);
 	hooks::input.HookMethod((void*)GetUserCmd_hook, offsets::GetUserCmd());
 	hooks::input.Apply();
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	hooks::modelrender.Set(g_IVModelRender);
 	hooks::modelrender.HookMethod((void*)DrawModelExecute_hook, offsets::DrawModelExecute());
 	hooks::modelrender.Apply();
@@ -310,7 +312,7 @@ void hack::Initialize() {
 	velocity::Init();
 	playerlist::Load();
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 
 	InitStrings();
 #if ENABLE_GUI
@@ -334,7 +336,7 @@ void hack::Initialize() {
 	hacks::shared::anticheat::Init();
 	hacks::tf2::healarrow::Init();
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	InitSpinner();
 	logging::Info("Initialized Fidget Spinner");
 	hacks::shared::spam::Init();
@@ -351,7 +353,7 @@ void hack::Initialize() {
 	}
 	logging::Info("Initializer stack done");
 
-#ifdef TEXTMODE
+#if not ENABLE_VISUALS
 	hack::command_stack().push("exec cat_autoexec_textmode");
 #endif
 	hack::command_stack().push("exec cat_autoexec");

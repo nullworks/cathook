@@ -77,7 +77,7 @@ void CreateMove() {
 }
 
 void Draw() {
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 	if (healarrow) {
 		if ((g_GlobalVars->curtime - healarrow_time) < float(healarrow_timeout)) {
 			AddCenterString(format("Heal arrow charge: ", int(min(100.0f, (g_GlobalVars->curtime - healarrow_time) / float(healarrow_timeout)) * 100.0f), '%'), colors::yellow);

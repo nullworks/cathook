@@ -35,7 +35,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1168214098." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.965909756" name="Linux GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.exe.debug" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1799148153" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
-							<builder arguments="-e GAME=tf2 NOIPC=1 BUILD_DEBUG=1 TEXTMODE=1 NO_WARNINGS=1 CC=gcc-7 CXX=g++-7" buildPath="${workspace_loc:/cathook}" command="make" id="cdt.managedbuild.target.gnu.builder.exe.debug.1548213350" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
+							<builder arguments="" buildPath="${workspace_loc:/cathook}" command="make" id="cdt.managedbuild.target.gnu.builder.exe.debug.1548213350" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.782611349" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool command="g++" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.883030293" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.908662295" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -129,21 +129,15 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="UranHack.cdt.managedbuild.target.gnu.exe.1493648584" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
+		<project id="cathook.null.2129761708" name="cathook"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="TF2"/>
-		<configuration configurationName="Lilac"/>
 		<configuration configurationName="Main">
-			<resource resourceType="PROJECT" workspacePath="/kathook"/>
+			<resource resourceType="PROJECT" workspacePath="/cathook"/>
 		</configuration>
-		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/UranHack"/>
-		</configuration>
-		<configuration configurationName="HL2DM"/>
-		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/UranHack"/>
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/cathook"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

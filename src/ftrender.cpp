@@ -40,7 +40,7 @@ void FTGL_PreInit() {
 	mat4_set_identity(&view);
 	mat4_set_identity(&model);
 	mat4_set_orthographic(&projection, 0, draw::width, 0, draw::height, -1, 1);
-	fonts::ftgl_ESP = ftgl::texture_font_new_from_file(atlas, 14, "cathook/fonts/opensans-bold.ttf");
+	fonts::ftgl_ESP = ftgl::texture_font_new_from_file(atlas, 14, DATA_PATH "/fonts/opensans-bold.ttf");
 	logging::Info("Pre-Init done %d %d", draw::width, draw::height);
 }
 
@@ -50,7 +50,7 @@ void FTGL_Init() {
 	logging::Info("Done...");
 	glGenTextures(1, &atlas->id);
 	logging::Info("Loading shaders...");
-	shader = shader_load("cathook/shaders/v3f-t2f-c4f.vert", "cathook/shaders/v3f-t2f-c4f.frag");
+	shader = shader_load(DATA_PATH "/shaders/v3f-t2f-c4f.vert", DATA_PATH "/shaders/v3f-t2f-c4f.frag");
 	logging::Info("Done init");
 }
 
@@ -113,7 +113,7 @@ void FTGL_NewFrame() {
 
 void FTGL_ChangeFont(texture_font_t** font, const char* newfont) {
 	texture_atlas_clear(atlas);
-	texture_font_t* replacement = texture_font_new_from_file(atlas, 14, strfmt("cathook/fonts/%s.ttf", newfont));
+	texture_font_t* replacement = texture_font_new_from_file(atlas, 14, strfmt(DATA_PATH "/fonts/%s.ttf", newfont));
 	if (replacement) {
 		texture_font_delete(*font);
 		*font = replacement;

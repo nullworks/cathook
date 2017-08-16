@@ -9,6 +9,7 @@
 #include "sdk.h"
 #include "copypasted/CSignature.h"
 
+time_t time_injected { 0 };
 
 int g_AppID = 0;
 

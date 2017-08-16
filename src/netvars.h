@@ -75,6 +75,7 @@ public:
 	offset_t iNextMeleeCrit;
 	offset_t flNextPrimaryAttack;
 	offset_t iNextThinkTick;
+	offset_t m_iClip1;
 	//offset_t flReloadPriorNextFire;
 	//offset_t flObservedCritChance;
 	offset_t nTickBase;

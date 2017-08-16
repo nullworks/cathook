@@ -86,16 +86,14 @@ If gcc-6 is not an option for you, Ubuntu users can use gcc-7 for compiling cath
 ## Updating cathook
 Run the `update` script in cathook folder.
 
-Cathook requires the shader folder provided in order to launch properly. To install this, run the `update-data` script. This will create a sym-link for the required folders.  
-If you wish to do this manually, copy the tf-settings folder inside Cathook into your Team Fortress 2 folder and rename it to "cathook".  
-You will want to update these files if you wish to have an updated menu.
+Cathook requires a special data folder (contains shaders, font files, walkbot paths, etc). This folder is located at `/opt/cathook/data` and is generated automatically when you compile cathook.
 
 ## Injection
 `sudo ./attach` to attach cathook into TF2. Optionally, you can provide an argument number (0-n - #) to provide the TF2 process ID (for bots).
 
 `sudo ./attach-backtrace` to attach and print backtrace incase TF2 crashes. Some users report that this causes FPS drop in-game. This is recommended to grab a log of what went wrong if Cathook is crashing on you.
 
-## Followbots
+## Followbots (outdated)
 `cathook-ipc-server` allows you to run and control Followbots to do your evil bidding in-game. The installation for Followbots is quite complex, and will not be covered on this page. Obviously, you must have several user accounts ready to run TF2.  
 A guide for Followbots can be found here: [How to setup and use followbots.](https://www.youtube.com/watch?v=kns5-nw7xUg)  
 You may also ask someone in our discord server to help you out.

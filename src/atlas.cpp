@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 
 #include "atlas.hpp"
 

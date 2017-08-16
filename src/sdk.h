@@ -53,6 +53,7 @@
 #include <engine/ivdebugoverlay.h>
 #include <iprediction.h>
 #include <engine/ICollideable.h>
+#include <icommandline.h>
 
 #include "sdk/TFGCClientSystem.hpp"
 #include "sdk/in_buttons.h"

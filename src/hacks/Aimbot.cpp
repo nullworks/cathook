@@ -143,7 +143,7 @@ void CreateMove() {
 			}
 		}
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 		// Set target esp color to pink
 		hacks::shared::esp::SetEntityColor(target, colors::pink);
 #endif
@@ -965,7 +965,7 @@ void Reset() {
 	projectile_mode = false;
 }
 
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 
 // Function called when we need to draw to screen
 static CatVar fov_draw(CV_SWITCH, "aimbot_fov_draw", "0", "Draw Fov Ring", "Draws a ring to represent your current aimbot fov");

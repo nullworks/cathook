@@ -1,1 +1,1 @@
-make -j4 -e GAME=tf2 BUILD_DEBUG=1
+make -j4 BUILD_DEBUG=1

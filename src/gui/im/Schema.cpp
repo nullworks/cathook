@@ -116,7 +116,7 @@ void TraverseList(const ListEntry_List* list) {
 CatCommand reloadscheme("reloadscheme", "Reload Scheme", []() {
 	main_list_array.clear();
 	try {
-		std::ifstream in("cathook/menu.json", std::ios::in);
+		std::ifstream in(DATA_PATH "/menu.json", std::ios::in);
 		nlohmann::json jo("[]");
 		if (in.good()) {
 			jo = jo.parse(in);

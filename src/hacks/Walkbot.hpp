@@ -10,7 +10,7 @@
 namespace hacks { namespace shared { namespace walkbot {
 
 void Initialize();
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 void Draw();
 #endif
 void Move();

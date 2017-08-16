@@ -24,7 +24,7 @@ float PlayerGravityMod(CachedEntity* player);
 
 Vector EnginePrediction(CachedEntity* player, float time);
 void Prediction_CreateMove();
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 void Prediction_PaintTraverse();
 #endif
 

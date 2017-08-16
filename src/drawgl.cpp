@@ -43,7 +43,7 @@ void Initialize() {
 	mat4_set_orthographic(&projection, 0, draw::width, draw::height, 0, -1, 1);
 	//view.m11 = -1;
 
-	shader_v2fc4f = shader_load("cathook/shaders/v2f-c4f.vert", "cathook/shaders/v2f-c4f.frag");
+	shader_v2fc4f = shader_load(DATA_PATH "/shaders/v2f-c4f.vert", DATA_PATH "/shaders/v2f-c4f.frag");
 	glUseProgram(shader_v2fc4f);
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader_v2fc4f, "model"), 1, 0, model.data);
@@ -51,7 +51,7 @@ void Initialize() {
 		glUniformMatrix4fv(glGetUniformLocation(shader_v2fc4f, "projection"), 1, 0, projection.data);
 	}
 
-	shader_v2ft2fc4f = shader_load("cathook/shaders/v2f-t2f-c4f.vert", "cathook/shaders/v2f-t2f-c4f.frag");
+	shader_v2ft2fc4f = shader_load(DATA_PATH "/shaders/v2f-t2f-c4f.vert", DATA_PATH "/shaders/v2f-t2f-c4f.frag");
 	glUseProgram(shader_v2ft2fc4f);
 	{
 		glUniform1i(glGetUniformLocation(shader_v2ft2fc4f, "texture"), 0);

@@ -8,6 +8,8 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
+#include <time.h>
+
 class Vector;
 class ConVar;
 class CatVar;
@@ -36,6 +38,8 @@ extern int last_cmd_number;
 
 extern char* disconnect_reason_newlined;
 extern CatVar disconnect_reason;
+
+extern time_t time_injected;
 
 class GlobalSettings {
 public:

@@ -81,7 +81,7 @@ void Prediction_CreateMove() {
 		}
 	}
 }
-#ifndef TEXTMODE
+#if ENABLE_VISUALS == 1
 void Prediction_PaintTraverse() {
 	if (!debug_enginepred) return;
 	for (int i = 1; i < predicted_player_count; i++) {

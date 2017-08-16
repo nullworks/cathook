@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#
+# THIS IS FOR ARCH USERS ONLY
+# Cathook requires gcc6 to build. Steam requires gcc7 to run. There is no gcc6 and gcc7 package on arch, only a single gcc package that is currently updated to gcc7.
+# A solution to this would be to simply downgrade to gcc6 to update cathook, then re-upgrade to gcc7 to launch steam.
+# This will install gcc6, backup the files, then upgrade to gcc7 and place the files back. This way, gcc7 will be installed, but cathook can still use gcc6.
+#
+
+# Get gcc6
+sudo pacman -U /var/cache/pacman/pkg/lib32-gcc-libs-6.3.1-2-x86_64.pkg.tar.xz /var/cache/pacman/pkg/gcc-libs-multilib-6.3.1-2-x86_64.pkg.tar.xz /var/cache/pacman/pkg/gcc-multilib-6.3.1-2-x86_64.pkg.tar.xz 
+# Backup gcc6 to /tmp
+sudo cp -r /usr/include/c++/6.3.1/ /tmp/
+# Update back to gcc7
+sudo pacman -S lib62-gcc-libs gcc-libs-multilib gcc-multilib
+# Use backup of gcc6 and place back into c++
+sudo cp -r  /tmp/6.3.1/ /usr/include/c++/
+# Should we remove the tmp folder afterwards..? It'll be deleted on restart regardless.

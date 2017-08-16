@@ -147,4 +147,3 @@ void Invalidate() {
 }
 
 }
-

@@ -30,13 +30,13 @@ bool ShouldSave(const userdata& data) {
 }
 
 void Save() {
-	DIR* cathook_directory = opendir(DATA_PATH);
+	DIR* cathook_directory = opendir("cathook");
 	if (!cathook_directory) {
-		logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
-		return;
+		logging::Info("[WARNING] cathook data directory doesn't exist! How did the cheat even get injected?");
+		mkdir("cathook", S_IRWXU | S_IRWXG);
 	} else closedir(cathook_directory);
 	try {
-		std::ofstream file(DATA_PATH "/plist", std::ios::out | std::ios::binary);
+		std::ofstream file("cathook/plist", std::ios::out | std::ios::binary);
 		file.write(reinterpret_cast<const char*>(&SERIALIZE_VERSION), sizeof(SERIALIZE_VERSION));
 		int size = 0;
 		for (const auto& item : data) {
@@ -57,13 +57,13 @@ void Save() {
 
 void Load() {
 	data.clear();
-	DIR* cathook_directory = opendir(DATA_PATH);
+	DIR* cathook_directory = opendir("cathook");
 	if (!cathook_directory) {
-		logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
-		return;
+		logging::Info("[WARNING] cathook data directory doesn't exist! How did the cheat even get injected?");
+		mkdir("cathook", S_IRWXU | S_IRWXG);
 	} else closedir(cathook_directory);
 	try {
-		std::ifstream file(DATA_PATH "/plist", std::ios::in | std::ios::binary);
+		std::ifstream file("cathook/plist", std::ios::in | std::ios::binary);
 		int file_serialize = 0;
 		file.read(reinterpret_cast<char*>(&file_serialize), sizeof(file_serialize));
 		if (file_serialize != SERIALIZE_VERSION) {

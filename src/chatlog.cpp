@@ -34,7 +34,7 @@ public:
 		if (pw) {
 			uname = std::string(pw->pw_name);
 		}
-		stream.open(DATA_PATH "/chat-" + uname + ".log", std::ios::out | std::ios::app);
+		stream.open("cathook/chat-" + uname + ".log", std::ios::out | std::ios::app);
 	}
 	void log(const std::string& msg) {
 		if (stream.bad() or not stream.is_open()) {

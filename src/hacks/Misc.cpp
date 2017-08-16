@@ -143,22 +143,7 @@ static CatCommand test_chat_print("debug_print_chat", "machine broke", [](const 
 });
 
 
-CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide", "Allows free movement while taunting with movable taunts\nOnly works in tf2");
-CatVar auto_balance_spam(CV_SWITCH, "request_balance_spam", "0", "Inf Auto Balance Spam", "Use to send a autobalance request to the server that doesnt prevent you from using it again\nCredits to Blackfire");
-	
-// Use to send a autobalance request to the server that doesnt prevent you from using it again
-// Allowing infinite use of it.
-// Credits to blackfire 
-void SendAutoBalanceRequest() {
-	if (!g_IEngine->IsInGame()) return;
-	KeyValues* kv = new KeyValues("AutoBalanceVolunteerReply");
-	kv->SetInt("response", 1);
-	g_IEngine->ServerCmdKeyValues(kv);
-}
-// Catcommand for above
-CatCommand SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance", [](const CCommand& args) {
-	SendAutoBalanceRequest();
-});
+static CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide", "Allows free movement while taunting with movable taunts\nOnly works in tf2\nWIP");
 	
 void CreateMove() {
 	static bool flswitch = false;
@@ -335,60 +320,36 @@ void CreateMove() {
 		flswitch = !flswitch;
 	}
 	
-	
-	// AntiAfk That after a certian time without movement keys depressed, causes random keys to be spammed for 1 second
+	static float afkTimeIdle = 0;
+	// Check if user settings allow anti-afk
 	if (anti_afk) {
 		
-		// Time last idle
-		static float afk_time_idle = 0;
-		
 		// If the timer exceeds 1 minute, jump and reset the timer
-		if (g_GlobalVars->curtime - 60 > afk_time_idle) {
+		if (g_GlobalVars->curtime - 60 > afkTimeIdle) {
 		
 			// Send random commands
 			g_pUserCmd->sidemove = RandFloatRange(-450.0, 450.0);
 			g_pUserCmd->forwardmove  = RandFloatRange(-450.0, 450.0);
 			g_pUserCmd->buttons = rand();
-			// Prevent attack command
-			g_pUserCmd->buttons &= ~IN_ATTACK; 
 			
 			// After 1 second we reset the idletime
-			if (g_GlobalVars->curtime - 61 > afk_time_idle) {
+			if (g_GlobalVars->curtime - 61 > afkTimeIdle) {
 				logging::Info("Finish anti-idle");
-				afk_time_idle = g_GlobalVars->curtime;
+				afkTimeIdle = g_GlobalVars->curtime;
 			}
 		} else {
 			// If the player uses a button, reset the timer
 			if (g_pUserCmd->buttons & IN_FORWARD || g_pUserCmd->buttons & IN_BACK || g_pUserCmd->buttons & IN_MOVELEFT || g_pUserCmd->buttons & IN_MOVERIGHT || g_pUserCmd->buttons & IN_JUMP || !LOCAL_E->m_bAlivePlayer)
-				afk_time_idle = g_GlobalVars->curtime;
+				afkTimeIdle = g_GlobalVars->curtime;
 		}
 	}
 	
-	IF_GAME (IsTF2()) {
-		
-		// Spams infinite autobalance spam function 
-		if (auto_balance_spam) {
-
-			// Time Last used
-			static float auto_balance_time = 0;
-
-			// If the timer exceeds 1 minute, jump and reset the timer
-			if (g_GlobalVars->curtime - 0.15 > auto_balance_time) {
-				
-				// Use the Inf Request func
-				SendAutoBalanceRequest();
-				
-				// Reset timer
-				auto_balance_time = g_GlobalVars->curtime;
-			}
-		}
-		
-		// Simple No-Push through cvars
+    IF_GAME (IsTF2()) {
     	if (nopush_enabled == pNoPush-> GetBool()) pNoPush->SetValue (!nopush_enabled);
     }
 }
 
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 
 void DrawText() {
 	if (crit_info && CE_GOOD(LOCAL_W)) {

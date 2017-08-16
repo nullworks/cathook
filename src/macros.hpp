@@ -5,8 +5,13 @@
  *      Author: nullifiedcat
  */
 
-#pragma once
+#ifndef MACROS_HPP_
+#define MACROS_HPP_
 
-#ifndef DATA_PATH
-#	define DATA_PATH "/opt/cathook-data"
+#if defined(NOGUI) and NOGUI == 1 or defined(TEXTMODE)
+#define ENABLE_GUI false
+#else
+#define ENABLE_GUI true
 #endif
+
+#endif /* MACROS_HPP_ */

@@ -10,10 +10,9 @@
 #include "../chatlog.hpp"
 #include "../hack.h"
 #include "ucccccp.hpp"
-#include "../hitrate.hpp"
 #include "hookedmethods.h"
 
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 
 static CatVar no_invisibility(CV_SWITCH, "no_invis", "0", "Remove Invisibility", "Useful with chams!");
 
@@ -378,8 +377,6 @@ void FireGameEvent_hook(void* _this, IGameEvent* event) {
 	original(_this, event);
 }
 
-static CatVar hitrate_check(CV_SWITCH, "hitrate", "0", "Monitor hitrate");
-
 void FrameStageNotify_hook(void* _this, int stage) {
 	static IClientEntity *ent;
 
@@ -388,7 +385,7 @@ void FrameStageNotify_hook(void* _this, int stage) {
 	static const FrameStageNotify_t original = (FrameStageNotify_t)hooks::client.GetMethod(offsets::FrameStageNotify());
 	SEGV_BEGIN;
 	if (!g_IEngine->IsInGame()) g_Settings.bInvalid = true;
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 	{
 		PROF_SECTION(FSN_skinchanger);
 		hacks::tf2::skinchanger::FrameStageNotify(stage);
@@ -397,9 +394,6 @@ void FrameStageNotify_hook(void* _this, int stage) {
 	if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
 		angles::Update();
 		hacks::shared::anticheat::CreateMove();
-		if (hitrate_check) {
-			hitrate::Update();
-		}
 	}
 	if (resolver && cathook && !g_Settings.bInvalid && stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
 		PROF_SECTION(FSN_resolver);
@@ -442,7 +436,7 @@ void FrameStageNotify_hook(void* _this, int stage) {
 				hack::command_stack().pop();
 			}
 		}
-#if TEXTMODE_STDIN == 1
+#if defined(TEXTMODE) and defined(TEXTMODE_STDIN)
 		static auto last_stdin = std::chrono::system_clock::from_time_t(0);
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last_stdin).count();
 		if (ms > 500) {
@@ -451,7 +445,7 @@ void FrameStageNotify_hook(void* _this, int stage) {
 		}
 #endif
 	}
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 	if (cathook && !g_Settings.bInvalid && stage == FRAME_RENDER_START) {
 #if ENABLE_GUI
 		if (cursor_fix_experimental) {
@@ -537,11 +531,6 @@ void LevelInit_hook(void* _this, const char* newmap) {
 	hacks::shared::anticheat::ResetEverything();
 	original(_this, newmap);
 	hacks::shared::walkbot::OnLevelInit();
-#if IPC_ENABLED
-	if (ipc::peer) {
-		ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_connected = time(nullptr);
-	}
-#endif
 }
 
 void LevelShutdown_hook(void* _this) {
@@ -553,10 +542,5 @@ void LevelShutdown_hook(void* _this) {
 	chat_stack::Reset();
 	hacks::shared::anticheat::ResetEverything();
 	original(_this);
-#if IPC_ENABLED
-	if (ipc::peer) {
-		ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_disconnected = time(nullptr);
-	}
-#endif
 }
 

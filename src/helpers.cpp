@@ -557,14 +557,12 @@ bool GetProjectileData(CachedEntity* weapon, float& speed, float& gravity) {
 	return (rspeed || rgrav);
 }
 
-constexpr unsigned developer_list[] = { 306902159 };
+constexpr unsigned developer_list[] = { 306902159, 347272825, 401679596, 416491033, 175278337 };
 
 bool Developer(CachedEntity* ent) {
-	/*
 	for (int i = 0; i < sizeof(developer_list) / sizeof(unsigned); i++) {
 		if (developer_list[i] == ent->player_info.friendsID) return true;
 	}
-	*/
 	return false;
 }
 
@@ -781,7 +779,7 @@ CatCommand print_classnames("debug_print_classnames", "Lists classnames currentl
 });
 
 void PrintChat(const char* fmt, ...) {
-#if not ENABLE_VISUALS
+#if TEXTMODE
 	return;
 #endif
 	CHudBaseChat* chat = (CHudBaseChat*)g_CHUD->FindElement("CHudChat");

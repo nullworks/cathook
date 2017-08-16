@@ -1,1 +1,2 @@
-make -j4 NO_WARNINGS=1
+make -j4 -e GAME=tf2 NO_WARNINGS=1
+strip --strip-all bin/libcathook.so

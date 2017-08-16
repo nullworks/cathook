@@ -42,7 +42,7 @@
 #include "macros.hpp"
 #include "colors.hpp"
 
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 
 extern "C" {
 #include <vec234.h>

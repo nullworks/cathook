@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 
 #include "common.h"
 #include "sdk.h"

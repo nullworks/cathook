@@ -41,7 +41,7 @@ void PaintTraverse_hook(void* _this, unsigned int vp, bool fr, bool ar) {
 		if (!segvcatch::handler_segv) segvcatch::init_fpe();
 	}
 #endif
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 	if (!textures_loaded) {
 		textures_loaded = true;
 		hacks::tf::radar::Init();
@@ -130,7 +130,7 @@ void PaintTraverse_hook(void* _this, unsigned int vp, bool fr, bool ar) {
 	if (clean_screenshots && g_IEngine->IsTakingScreenshot()) return;
 
 	PROF_SECTION(PT_active);
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 	draw::UpdateWTS();
 	BeginCheatVisuals();
 	DrawCheatVisuals();

@@ -225,13 +225,13 @@ void Save(std::string filename) {
 		return;
 	}
 	{
-		DIR* walkbot_dir = opendir(DATA_PATH "/walkbot");
+		DIR* walkbot_dir = opendir("cathook/walkbot");
 		if (!walkbot_dir) {
 			logging::Info("Walkbot directory doesn't exist, creating one!");
-			mkdir(DATA_PATH "/walkbot", S_IRWXU | S_IRWXG);
+			mkdir("cathook/walkbot", S_IRWXU | S_IRWXG);
 		} else closedir(walkbot_dir);
 	}
-	std::string path = format(DATA_PATH "/walkbot/", GetLevelName());
+	std::string path = format("cathook/walkbot/", GetLevelName());
 	{
 		DIR* level_dir = opendir(path.c_str());
 		if (!level_dir) {
@@ -267,13 +267,13 @@ void Save(std::string filename) {
 
 bool Load(std::string filename) {
 	{
-		DIR* walkbot_dir = opendir(DATA_PATH "/walkbot");
+		DIR* walkbot_dir = opendir("cathook/walkbot");
 		if (!walkbot_dir) {
-			logging::Info("Walkbot directory doesn't exist!");
-			return false;
+			logging::Info("Walkbot directory doesn't exist, creating one!");
+			mkdir("cathook/walkbot", S_IRWXU | S_IRWXG);
 		} else closedir(walkbot_dir);
 	}
-	std::string path = format(DATA_PATH "/walkbot/", GetLevelName());
+	std::string path = format("cathook/walkbot/", GetLevelName());
 	{
 		DIR* level_dir = opendir(path.c_str());
 		if (!level_dir) {
@@ -796,7 +796,7 @@ void RecordNode() {
 	state::active_node = node;
 }
 
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 
 // Draws a single colored connection between 2 nodes
 void DrawConnection(index_t a, connection_s& b) {
@@ -939,7 +939,7 @@ void CheckLivingSpace() {
 		int count = 0;
 		unsigned highest = 0;
 		std::vector<unsigned> botlist {};
-		for (unsigned i = 0; i < cat_ipc::max_peers; i++) {
+		for (unsigned i = 1; i < cat_ipc::max_peers; i++) {
 			if (!ipc::peer->memory->peer_data[i].free) {
 				for (auto& k : players) {
 					if (ipc::peer->memory->peer_user_data[i].friendid && k == ipc::peer->memory->peer_user_data[i].friendid) {

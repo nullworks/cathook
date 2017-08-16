@@ -44,10 +44,10 @@ sudo pacman -U /var/cache/pacman/pkg/lib32-gcc-libs-6.3.1-2-x86_64.pkg.tar.xz /v
 ```
 
 If you don't use Ubuntu or Arch (or if Arch script gets outdated), here's the list of what cathook requires:
-
-* `gcc-multilib`
-* `gcc-libs-multilib`
-* `lib32-gcc-libs`
+* `gcc-6`
+* `g++-6`
+* `gcc-6-multilib`
+* `g++-6-multilib`
 * `gdb` (for the injection script, you can use different injector if you want)
 * `glew`
 * `libssl-dev:i386`
@@ -56,14 +56,6 @@ If you don't use Ubuntu or Arch (or if Arch script gets outdated), here's the li
 * `libglew-dev:i386`
 * `libfreetype6-dev:i386`
 * `rsync` (used for copying shaders/fonts to tf2 data directory, `update-data` script)
-
-You may or may not need these depending on your setup:
-
-* `gcc-6`
-* `g++-6`
-* `gcc-6-multilib`
-* `g++-6-multilib`
-
 
 Cathook installation script:
 ```bash
@@ -79,9 +71,6 @@ You don't have gcc-multilib-6 installed correctly.
 You didn't download Source SDK. **DO NOT DOWNLOAD CATHOOK USING "DOWNLOAD .ZIP" FROM GITHUB. USE git clone --recursive!**
 
 If you are using another distro, make sure to have g++, gdb, libc6 and build essentials installed. g++-6 may be required depending on your setup.
-
-Arch users have reported being able to compile cathook with gcc-7, while some Ubuntu users say they require gcc-6. There are also reports saying that some users can not run steam without gcc-7. If you're having this problem, a possible fix for Ubuntu users is to install both gcc-6 and gcc-7.
-If gcc-6 is not an option for you, Ubuntu users can use gcc-7 for compiling cathook by adding `-e CC=gcc-7 CXX=g++-7` to the make command line.
 
 ## Updating cathook
 Run the `update` script in cathook folder.

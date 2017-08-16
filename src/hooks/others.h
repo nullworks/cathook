@@ -27,7 +27,7 @@ void LevelInit_hook(void*, const char*);
 void LevelShutdown_hook(void*);
 
 
-#if ENABLE_NULL_GRAPHICS == 1
+#ifdef TEXTMODE
 typedef ITexture*(*FindTexture_t)(void*, const char*, const char*, bool, int);
 typedef IMaterial*(*FindMaterialEx_t)(void*, const char*, const char*, int, bool, const char*);
 typedef IMaterial*(*FindMaterial_t)(void*, const char*, const char*, bool, const char*);

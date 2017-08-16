@@ -80,7 +80,7 @@ void LoadAllSharedObjects() {
 		tier0().Load();
 		inputsystem().Load();
 		materialsystem().Load();
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 		vguimatsurface().Load();
 		vgui2().Load();
 		studiorender().Load();
@@ -119,7 +119,7 @@ SharedObject& materialsystem() {
 	static SharedObject obj("materialsystem.so", true);
 	return obj;
 }
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 SharedObject& vguimatsurface() {
 	static SharedObject obj("vguimatsurface.so", true);
 	return obj;

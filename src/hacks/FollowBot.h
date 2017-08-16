@@ -34,7 +34,7 @@ extern int following_idx;
 bool IsBot(CachedEntity* entity);
 void AddMessageHandlers(ipc::peer_t* peer);
 void AfterCreateMove();
-#if ENABLE_VISUALS == 1
+#ifndef TEXTMODE
 void Draw();
 #endif
 void CrumbReset();

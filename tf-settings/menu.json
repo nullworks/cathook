@@ -424,7 +424,6 @@
 			"tauntslide_tf2",
 			"tauntslide",
 			"flashlight",
-			"request_balance_spam",
 			{
 				"type": "list",
 				"name": "Remove Conditions",

@@ -44,7 +44,7 @@ CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Building ESP", "Show building
 CatVar teammates(CV_SWITCH, "esp_teammates", "0", "ESP Teammates", "Teammate ESP");
 CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Show tank", "Show tanks in mvm");
 // Text Esps
-CatVar show_weapon(CV_SWITCH, "esp_weapon", "1", "Show weapon name", "Show which weapon the enemy is using");
+CatVar show_weapon(CV_SWITCH, "esp_weapon", "0", "Show weapon name", "Show which weapon the enemy is using");
 CatVar show_distance(CV_SWITCH, "esp_distance", "1", "Distance ESP", "Show distance to target");
 CatVar show_name(CV_SWITCH, "esp_name", "1", "Name ESP", "Show name");
 CatVar show_class(CV_SWITCH, "esp_class", "1", "Class ESP", "Show class");
@@ -500,13 +500,13 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 					draw_point = Vector(max_x + 2, min_y, 0);
 				} break;
 				case 1: { // BOTTOM RIGHT
-					draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * ((int)fonts::ftgl_ESP->height), 0);
+					draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * ((int)fonts::font_main->height), 0);
 				} break;
 				case 2: { // CENTER
 					origin_is_zero = true; // origin is still zero so we set to true
 				} break;
 				case 3: { // ABOVE
-					draw_point = Vector(min_x, min_y - data.at(ent->m_IDX).string_count * ((int)fonts::ftgl_ESP->height), 0);
+					draw_point = Vector(min_x, min_y - data.at(ent->m_IDX).string_count * ((int)fonts::font_main->height), 0);
 				} break;
 				case 4: { // BELOW
 					draw_point = Vector(min_x, max_y, 0);
@@ -530,15 +530,15 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 			
 			// If the origin is centered, we use one method. if not, the other
 			if (!origin_is_zero) {
-				FTGL_Draw(string.data, draw_point.x, draw_point.y, fonts::ftgl_ESP, color);
+				FTGL_Draw(string.data, draw_point.x, draw_point.y, fonts::font_main, color);
 			} else {
 				int size_x;
-				FTGL_StringLength(string.data, fonts::ftgl_ESP, &size_x);
-				FTGL_Draw(string.data, draw_point.x - size_x / 2, draw_point.y, fonts::ftgl_ESP, color);
+				FTGL_StringLength(string.data, fonts::font_main, &size_x);
+				FTGL_Draw(string.data, draw_point.x - size_x / 2, draw_point.y, fonts::font_main, color);
 			}
 			
 			// Add to the y due to their being text in that spot
-			draw_point.y += (int)fonts::ftgl_ESP->height - 1;
+			draw_point.y += (int)fonts::font_main->height - 1;
 		}
 	}
 	

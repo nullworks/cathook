@@ -211,6 +211,29 @@ void RenderList(ListEntry_List* list) {
 }
 
 int active_list = 0;
+	//(color_for_text, color_for_head, color_for_area, color_for_body, color_for_pops)
+// Settings use Easy theming
+CatVar imgui_custom(CV_SWITCH, "imgui_custom", "0", "Custom ImGui", "Allows usersettings to overwrite the default imgui style");
+	
+CatEnum imgui_color_text_enum({ "White", "Black" });
+CatVar imgui_color_text(imgui_color_text_enum, "imgui_color_text", "0", "Text", "Text Color");
+	
+CatVar imgui_color_head_r(CV_INT, "imgui_color_head_r", "13", "Head Color: (red)", "Defines red component of imgui head color", 100);
+CatVar imgui_color_head_g(CV_INT, "imgui_color_head_g", "10", "Head Color: (green)", "Defines green component of imgui head color", 100);
+CatVar imgui_color_head_b(CV_INT, "imgui_color_head_b", "15", "Head Color: (blue)", "Defines blue component of imgui head color", 100);
+	
+CatVar imgui_color_area_r(CV_INT, "imgui_color_area_r", "10", "Area Color: (red)", "Defines red component of imgui area color", 100);
+CatVar imgui_color_area_g(CV_INT, "imgui_color_area_g", "9", "Area Color: (green)", "Defines green component of imgui area color", 100);
+CatVar imgui_color_area_b(CV_INT, "imgui_color_area_b", "12", "Area Color: (blue)", "Defines blue component of imgui area color", 100);
+	
+CatVar imgui_color_body_r(CV_INT, "imgui_color_body_r", "6", "Body Color: (red)", "Defines red component of imgui body color", 100);
+CatVar imgui_color_body_g(CV_INT, "imgui_color_body_g", "5", "Body Color: (green)", "Defines green component of imgui body color", 100);
+CatVar imgui_color_body_b(CV_INT, "imgui_color_body_b", "7", "Body Color: (blue)", "Defines blue component of imgui body color", 100);
+	
+CatVar imgui_color_pops_r(CV_INT, "imgui_color_pops_r", "7", "Pops Color: (red)", "Defines red component of imgui pops color", 100);
+CatVar imgui_color_pops_g(CV_INT, "imgui_color_pops_g", "7", "Pops Color: (green)", "Defines green component of imgui pops color", 100);
+CatVar imgui_color_pops_b(CV_INT, "imgui_color_pops_b", "9", "Pops Color: (blue)", "Defines blue component of imgui pops color", 100);	
+	
 
 struct ImVec3 { float x, y, z; ImVec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) { x = _x; y = _y; z = _z; } };
 
@@ -220,7 +243,7 @@ void imgui_easy_theming(ImVec3 color_for_text, ImVec3 color_for_head, ImVec3 col
 
     style.Colors[ImGuiCol_Text] = ImVec4( color_for_text.x, color_for_text.y, color_for_text.z, 1.00f );
     style.Colors[ImGuiCol_TextDisabled] = ImVec4( color_for_text.x, color_for_text.y, color_for_text.z, 0.58f );
-    style.Colors[ImGuiCol_WindowBg] = ImVec4( color_for_body.x, color_for_body.y, color_for_body.z, 0.95f );
+    style.Colors[ImGuiCol_WindowBg] = ImVec4( color_for_body.x, color_for_body.y, color_for_body.z, 1.00f );
     style.Colors[ImGuiCol_ChildWindowBg] = ImVec4( color_for_area.x, color_for_area.y, color_for_area.z, 0.58f );
     style.Colors[ImGuiCol_Border] = ImVec4( color_for_body.x, color_for_body.y, color_for_body.z, 0.00f );
     style.Colors[ImGuiCol_BorderShadow] = ImVec4( color_for_body.x, color_for_body.y, color_for_body.z, 0.00f );
@@ -259,7 +282,7 @@ void imgui_easy_theming(ImVec3 color_for_text, ImVec3 color_for_head, ImVec3 col
     style.Colors[ImGuiCol_PlotHistogram] = ImVec4( color_for_text.x, color_for_text.y, color_for_text.z, 0.63f );
     style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4( color_for_head.x, color_for_head.y, color_for_head.z, 1.00f );
     style.Colors[ImGuiCol_TextSelectedBg] = ImVec4( color_for_head.x, color_for_head.y, color_for_head.z, 0.43f );
-    style.Colors[ImGuiCol_PopupBg] = ImVec4( color_for_pops.x, color_for_pops.y, color_for_pops.z, 0.92f );
+    style.Colors[ImGuiCol_PopupBg] = ImVec4( color_for_pops.x, color_for_pops.y, color_for_pops.z, 1.00f );
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4( color_for_area.x, color_for_area.y, color_for_area.z, 0.73f );
 }
 
@@ -347,6 +370,30 @@ void Render() {
 		ImGui::GetIO().MouseDrawCursor = true;
 		ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 	}
+	
+	// Check if usersettings allow custom ui
+	if (imgui_custom) {
+		
+		// Create ImVectors from user settings 
+		// "White", "Black"  true false
+		ImVec3 imgui_text(0,0,0);
+		if (!imgui_color_text)
+			imgui_text = ImVec3(0.80, 0.80, 0.83); // White
+		else
+			imgui_text = ImVec3(0.05, 0.05, 0.07); // Black
+		// Multiply by .01 to get im colors from whole numbers
+		ImVec3 imgui_head((int)imgui_color_head_r * 0.01, (int)imgui_color_head_g * 0.01, (int)imgui_color_head_b * 0.01);
+		ImVec3 imgui_area((int)imgui_color_area_r * 0.01, (int)imgui_color_area_g * 0.01, (int)imgui_color_area_b * 0.01);
+		ImVec3 imgui_body((int)imgui_color_body_r * 0.01, (int)imgui_color_body_g * 0.01, (int)imgui_color_body_b * 0.01);
+		ImVec3 imgui_pops((int)imgui_color_pops_r * 0.01, (int)imgui_color_pops_g * 0.01, (int)imgui_color_pops_b * 0.01);
+							  
+		// Push users theme settings
+		imgui_easy_theming(imgui_text, imgui_head, imgui_area, imgui_body, imgui_pops);
+		
+		// Make the gui reset to default next time around
+		styles_setup = false;
+	}
+	
 	
 	if (gui_debug)
 		ImGui::ShowTestWindow();

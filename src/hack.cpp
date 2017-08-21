@@ -162,6 +162,7 @@ void hack::CC_Cat(const CCommand& args) {
 }
 
 void hack::Initialize() {
+	signal(SIGPIPE, SIG_IGN);
 	time_injected = time(nullptr);
 	// Essential files must always exist, except when the game is running in text mode.
 #if ENABLE_VISUALS == 1
@@ -171,7 +172,7 @@ void hack::Initialize() {
 			"shaders/v2f-c4f.frag", "shaders/v2f-c4f.vert",
 			"shaders/v2f-t2f-c4f.frag", "shaders/v2f-t2f-c4f.vert",
 			"shaders/v3f-t2f-c4f.frag", "shaders/v3f-t2f-c4f.vert",
-			"menu.json", "fonts/opensans-bold.ttf"
+			"menu.json", "fonts/tf2build.ttf"
 		};
 		for (const auto& s : essential) {
 			std::ifstream exists(DATA_PATH "/" + s, std::ios::in);

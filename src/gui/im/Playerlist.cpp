@@ -127,6 +127,10 @@ void RenderPlayer(int eid) {
 		}
 		x += 200;
 		ImGui::PopItemWidth();
+		ImGui::SameLine(x);
+		if (ImGui::Button("Spectate")) {
+			spectator_target = eid;
+		}
 	}
 	ImGui::PopID();
 }

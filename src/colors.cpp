@@ -7,13 +7,13 @@
 
 #include "common.h"
 
-CatVar user_red_blue(CV_INT, "esp_color_red_blue", "0", "Red: Blue", "Blue color for red team", 255);
-CatVar user_red_green(CV_INT, "esp_color_red_green", "0", "Red: Green", "Green color for red team", 255);
-CatVar user_red_red(CV_INT, "esp_color_red_red", "0", "Red: Red", "Red color for red team", 255);
+CatVar user_red_blue(CV_INT, "esp_color_red_b", "0", "Red Team: Blue", "Blue color for red team", 255);
+CatVar user_red_green(CV_INT, "esp_color_red_g", "0", "Red Team: Green", "Green color for red team", 255);
+CatVar user_red_red(CV_INT, "esp_color_red_r", "0", "Red Team: Red", "Red color for red team", 255);
 
-CatVar user_blue_blue(CV_INT, "esp_color_blue_blue", "0", "Blue: Blue", "Blue color for blue team", 255);
-CatVar user_blue_green(CV_INT, "esp_color_blue_green", "0", "Blue: Green", "Green color for blue team", 255);
-CatVar user_blue_red(CV_INT, "esp_color_blue_red", "0", "Blue: Red", "Red color for blue team", 255);
+CatVar user_blue_blue(CV_INT, "esp_color_blue_b", "0", "Blue Team: Blue", "Blue color for blue team", 255);
+CatVar user_blue_green(CV_INT, "esp_color_blue_g", "0", "Blue Team: Green", "Green color for blue team", 255);
+CatVar user_blue_red(CV_INT, "esp_color_blue_r", "0", "Blue Team: Red", "Red color for blue team", 255);
 
 rgba_t colors::EntityF(CachedEntity* ent) {
 	rgba_t result, plclr;

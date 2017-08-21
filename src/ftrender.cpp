@@ -40,7 +40,7 @@ void FTGL_PreInit() {
 	mat4_set_identity(&view);
 	mat4_set_identity(&model);
 	mat4_set_orthographic(&projection, 0, draw::width, 0, draw::height, -1, 1);
-	fonts::ftgl_ESP = ftgl::texture_font_new_from_file(atlas, 14, DATA_PATH "/fonts/opensans-bold.ttf");
+	fonts::font_main = ftgl::texture_font_new_from_file(atlas, 14, DATA_PATH "/fonts/tf2build.ttf");
 	logging::Info("Pre-Init done %d %d", draw::width, draw::height);
 }
 

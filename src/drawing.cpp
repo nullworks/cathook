@@ -39,15 +39,15 @@ void AddSideString(const std::string& string, const rgba_t& color) {
 void DrawStrings() {
 	int y { 8 };
 	for (size_t i = 0; i < side_strings_count; ++i) {
-		FTGL_Draw(side_strings[i], 8, y, fonts::ftgl_ESP, side_strings_colors[i]);
-		y += fonts::ftgl_ESP->height + 1;
+		FTGL_Draw(side_strings[i], 8, y, fonts::font_main, side_strings_colors[i]);
+		y += fonts::font_main->height + 1;
 	}
 	y = draw::height / 2;
 	for (size_t i = 0; i < center_strings_count; ++i) {
 		int sx;
-		FTGL_StringLength(center_strings[i], fonts::ftgl_ESP, &sx, nullptr);
-		FTGL_Draw(center_strings[i], (draw::width - sx) / 2, y, fonts::ftgl_ESP, center_strings_colors[i]);
-		y += fonts::ftgl_ESP->height + 1;
+		FTGL_StringLength(center_strings[i], fonts::font_main, &sx, nullptr);
+		FTGL_Draw(center_strings[i], (draw::width - sx) / 2, y, fonts::font_main, center_strings_colors[i]);
+		y += fonts::font_main->height + 1;
 	}
 }
 
@@ -65,8 +65,8 @@ float draw::fov = 90.0f;
 
 namespace fonts {
 
-ftgl::texture_font_t* ftgl_ESP = nullptr;
-CatVar esp_ftgl_font(CV_STRING, "font_ftgl_esp", "opensans-bold", "FTGL Font");
+ftgl::texture_font_t* font_main = nullptr;
+CatVar font_ftgl(CV_STRING, "font_ftgl", "tf2build", "FTGL Font");
 
 }
 
@@ -77,8 +77,8 @@ void draw::Initialize() {
 
 	FTGL_PreInit();
 
-	fonts::esp_ftgl_font.InstallChangeCallback([](IConVar* var, const char* pOldValue, float flOldValue) {
-		FTGL_ChangeFont(&fonts::ftgl_ESP, fonts::esp_ftgl_font.GetString());
+	fonts::font_ftgl.InstallChangeCallback([](IConVar* var, const char* pOldValue, float flOldValue) {
+		FTGL_ChangeFont(&fonts::font_main, fonts::font_ftgl.GetString());
 		(void)flOldValue;
 	});
 }

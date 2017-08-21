@@ -10,8 +10,12 @@
 			"aimbot_hitboxmode",
 			"aimbot_fov",
 			"aimbot_fov_draw",
+			"aimbot_fov_draw_opacity",
 			"aimbot_prioritymode",
 			"aimbot_charge",
+			"aimbot_auto_unzoom",
+			"aimbot_auto_zoom",
+			"aimbot_rage_only",
 			{
 				"type": "list",
 				"name": "Ignore",
@@ -42,6 +46,7 @@
 				"type": "list",
 				"name": "Preferences",
 				"list": [
+					"aimbot_miss_chance",
 					"aimbot_silent",
 					"aimbot_target_lock",
 					"aimbot_hitbox",
@@ -182,16 +187,17 @@
 					"esp_entity",
 					"esp_model_name",
 					"esp_entity_id",
+					"esp_spellbooks",
 					{
 						"type": "list",
 						"name": "Colors",
 						"list": [
-							"esp_color_red_red",
-							"esp_color_red_green",
-							"esp_color_red_blue",
-							"esp_color_blue_red",
-							"esp_color_blue_green",
-							"esp_color_blue_blue"
+							"esp_color_red_r",
+							"esp_color_red_g",
+							"esp_color_red_b",
+							"esp_color_blue_r",
+							"esp_color_blue_g",
+							"esp_color_blue_b"
 						]
 					},
 					{
@@ -285,7 +291,8 @@
 					"glow_medkits",
 					"glow_ammo",
 					"glow_stickies",
-					"glow_powerups"
+					"glow_powerups",
+					"glow_weapons_white"
 				]
 			},
 			{
@@ -295,6 +302,20 @@
 					"gui_color_b",
 					"gui_color_g",
 					"gui_color_r",
+					"imgui_color_head_r",
+					"imgui_color_head_g",
+					"imgui_color_head_b",
+					"imgui_color_area_r",
+					"imgui_color_area_g",
+					"imgui_color_area_b",
+					"imgui_color_body_r",
+					"imgui_color_body_g",
+					"imgui_color_body_b",
+					"imgui_color_pops_r",
+					"imgui_color_pops_g",
+					"imgui_color_pops_b",
+					"imgui_color_text",
+					"imgui_custom",
 					"gui_rainbow"
 				]
 			},
@@ -378,7 +399,11 @@
 			"uberspam_build",
 			"uberspam_file",
 			"spam_voicecommand",
-			"spam_teamname"
+			"spam_teamname",
+			"chat_log",
+			"chat_log_noipc",
+			"chat_log_nospam",
+			"chat_log_template"
 		]
 	},
 	{
@@ -414,6 +439,11 @@
 		"type": "list",
 		"name": "Miscellaneous",
 		"list": [
+			"autotaunt",
+			"autotaunt_chance",
+			"autojoin_team",
+			"autojoin_class",
+			"autoqueue",
 			"events",
 			"airstuck",
 			"instant_weapon_switch",

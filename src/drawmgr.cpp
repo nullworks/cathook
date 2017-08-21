@@ -56,6 +56,9 @@ void DrawCheatVisuals() {
 				}
 			}
 		}
+		if (spectator_target) {
+			AddCenterString("Press SPACE to stop spectating");
+		}
 		if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid) {
 			PROF_SECTION(PT_total_hacks);
 			{

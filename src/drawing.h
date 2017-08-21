@@ -22,7 +22,7 @@ class CatEnum;
 
 namespace fonts {
 
-extern ftgl::texture_font_t* ftgl_ESP;
+extern ftgl::texture_font_t* font_main;
 
 }
 

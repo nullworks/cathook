@@ -95,7 +95,7 @@ CatVar override_fov(CV_FLOAT, "fov", "0", "FOV override", "Overrides FOV with th
 CatVar freecam(CV_KEY, "debug_freecam", "0", "Freecam");
 int spectator_target { 0 };
 
-CatCommand spectate("debug_spectate", "Spectate", [](const CCommand& args) {
+CatCommand spectate("spectate", "Spectate", [](const CCommand& args) {
 	if (args.ArgC() < 1) {
 		spectator_target = 0;
 		return;
@@ -131,6 +131,9 @@ void OverrideView_hook(void* _this, CViewSetup* setup) {
 			} else {
 				setup->angles = CE_VAR(spec, netvar.m_angEyeAngles, QAngle);
 			}
+		}
+		if (g_IInputSystem->IsButtonDown(ButtonCode_t::KEY_SPACE)) {
+			spectator_target = 0;
 		}
 	}
 

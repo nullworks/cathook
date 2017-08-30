@@ -151,10 +151,11 @@ void CreateMove() {
 			if (!(g_pUserCmd->buttons & IN_ATTACK) && currently_charging_huntsman) {
 				currently_charging_huntsman = false;
 				Aim(target);
-			} else return;
+			}
 			
 		// Not release type weapon
-		} else if (CanShoot() && (g_pUserCmd->buttons & IN_ATTACK) && CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) != 0) Aim(target);
+		} else if (CanShoot() && (g_pUserCmd->buttons & IN_ATTACK) && CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) != 0)
+			Aim(target);
 	} else
 		Aim(target);
 
@@ -208,21 +209,6 @@ bool ShouldAim() {
 		if (g_pLocalPlayer->bZoomed) {
 			if (!(g_pUserCmd->buttons & (IN_ATTACK | IN_ATTACK2))) {
 				if (!CanHeadshot()) return false;
-			}
-		}
-		
-		// Minigun spun up handler
-		if (g_pLocalPlayer->weapon()->m_iClassID == CL_CLASS(CTFMinigun)) {
-			int weapon_state = CE_INT(g_pLocalPlayer->weapon(), netvar.iWeaponState);
-			// If user setting for autospin isnt true, then we check if minigun is already zoomed 
-			if ((weapon_state == MinigunState_t::AC_STATE_IDLE || weapon_state == MinigunState_t::AC_STATE_STARTFIRING) && !auto_spin_up) {
-				return false;
-			}
-			if (auto_spin_up) {
-				g_pUserCmd->buttons |= IN_ATTACK2;
-			}
-			if (!(g_pUserCmd->buttons & (IN_ATTACK2 | IN_ATTACK))) {
-				return false;
 			}
 		}
 
@@ -519,6 +505,14 @@ void DoAutoshoot() {
 			// Check if ambasador can headshot
 			if (!AmbassadorCanHeadshot()) attack = false;	
 		}
+	}
+	
+	// Minigun spun up handler
+	if (!auto_spin_up && g_pLocalPlayer->weapon()->m_iClassID == CL_CLASS(CTFMinigun)) {
+		int weapon_state = CE_INT(g_pLocalPlayer->weapon(), netvar.iWeaponState);
+			
+		if (weapon_state == MinigunState_t::AC_STATE_IDLE || weapon_state == MinigunState_t::AC_STATE_STARTFIRING)
+			attack = false;	
 	}
 	
 	// Forbidden weapons check

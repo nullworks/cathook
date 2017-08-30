@@ -967,7 +967,7 @@ bool GetCollide(CachedEntity* ent) {
 		Vector points_r[8]; // World vectors
 		Vector points[8]; // Screen vectors
 
-		// If user setting for box expnad is true, spread the max and mins
+		// If user setting for box expand is true, spread the max and mins
 		if (esp_expand) {
 			const float& exp = (float)esp_expand;
 			maxs.x += exp;

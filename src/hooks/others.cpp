@@ -256,17 +256,16 @@ bool SendNetMsg_hook(void* _this, INetMessage& msg, bool bForceReliable = false,
 			//}
 		}
 	}
+	// Airstuck
 	static ConVar* sv_player_usercommand_timeout = g_ICvar->FindVar("sv_player_usercommand_timeout");
 	static float lastcmd = 0.0f;
-	if (lastcmd > g_GlobalVars->absoluteframetime) {
-		lastcmd = g_GlobalVars->absoluteframetime;
-	}
 	if (airstuck.KeyDown() && !g_Settings.bInvalid) {
 		if (CE_GOOD(LOCAL_E)) {
-			if (lastcmd + sv_player_usercommand_timeout->GetFloat() - 0.1f < g_GlobalVars->curtime) {
+			// TODO, Disable airstuck while can shoot
+			if (g_GlobalVars->curtime - (sv_player_usercommand_timeout->GetFloat() - 0.15) <= lastcmd) {
 				if (msg.GetType() == clc_Move) return false;
 			} else {
-				lastcmd = g_GlobalVars->absoluteframetime;
+				lastcmd = g_GlobalVars->curtime;
 			}
 		}
 	}

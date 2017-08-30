@@ -2,6 +2,8 @@
 ![banner](http://i.imgur.com/w96wdtE.png)
 
 ## Discord Server
+The discord server is depreciated due to discord taking action.    
+Please use the new [Official Telegram Group](https://t.me/nullifiedcat).    
 [Official Discord Server](https://discord.gg/kvNVNSX)
 
 cathook is a training software designed for Team Fortress 2 for Linux. cathook includes some joke features like
@@ -43,7 +45,7 @@ sudo apt update && sudo apt install git libssl-dev:i386 libc6-dev:i386 gdb libsd
 
 Arch gcc6 & dependencies installation:
 ```bash
-sudo pacman -U /var/cache/pacman/pkg/lib32-gcc-libs-6.3.1-2-x86_64.pkg.tar.xz /var/cache/pacman/pkg/gcc-libs-multilib-6.3.1-2-x86_64.pkg.tar.xz /var/cache/pacman/pkg/gcc-multilib-6.3.1-2-x86_64.pkg.tar.xz && sudo cp -r /usr/include/c++/6.3.1/ /tmp/ && sudo pacman -S gdb gdb-common glew1.10 glew lib32-glew1.10 rsync lib62-gcc-libs gcc-libs-multilib gcc-multilib --noconfirm && yes | sudo cp -r  /tmp/6.3.1/ /usr/include/c++/
+sudo pacman -U https://archive.archlinux.org/packages/g/gcc-multilib/gcc-multilib-6.3.1-2-x86_64.pkg.tar.xz https://archive.archlinux.org/packages/g/gcc-libs-multilib/gcc-libs-multilib-6.3.1-2-x86_64.pkg.tar.xz https://archive.archlinux.org/packages/l/lib32-gcc-libs/lib32-gcc-libs-6.3.1-2-x86_64.pkg.tar.xz && sudo cp -r /usr/include/c++/6.3.1/ /tmp/ && sudo pacman -S gdb gdb-common glew1.10 glew lib32-glew1.10 rsync lib62-gcc-libs gcc-libs-multilib gcc-multilib --noconfirm && yes | sudo cp -r  /tmp/6.3.1/ /usr/include/c++/
 ```
 
 If you don't use Ubuntu or Arch (or if Arch script gets outdated), here's the list of what cathook requires:

@@ -189,88 +189,63 @@ bool ShouldAA(CUserCmd* cmd) {
 	return true;
 }
 
-//Initialize Edge vars
-float edgeYaw = 0;
-float edgeToEdgeOn = 0;
-
-//Function to return distance from you to a yaw directed to
-float edgeDistance(float edgeRayYaw) {
-    //Main ray tracing area
-    trace_t trace;
-    Ray_t ray;
-    Vector forward;
-    float sp, sy, cp, cy;
-    sy = sinf(DEG2RAD(edgeRayYaw)); // yaw
-    cy = cosf(DEG2RAD(edgeRayYaw));
-    sp = sinf(DEG2RAD(0)); // pitch
-    cp = cosf(DEG2RAD(0));
-    forward.x = cp * cy;
-    forward.y = cp * sy;
-    forward.z = -sp;
-    forward = forward * 300.0f + g_pLocalPlayer->v_Eye;
-    ray.Init(g_pLocalPlayer->v_Eye, forward);
-    //trace::g_pFilterNoPlayer to only focus on the enviroment
-    g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
-    //Pythagorean theorem to calculate distance
-    float edgeDistance = ( sqrt( pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2) ) );
-    return edgeDistance;
+/*
+// Way to get a general angle on an axis
+int EdgeRoundUserAngle(float yaw) {
+	// Clamping
+	while (yaw > 180) {
+		yaw -= 360;
+	}
+	while (yaw < -180) {
+		yaw += 360;
+	}
+	if ((yaw < -135) || (yaw > 135)) return 180;
+	if ((yaw >= -135) && (yaw < -45)) return -90;
+	if ((yaw >= -45) && (yaw < 45)) return 0;
+	if ((yaw <= 135) && (yaw >= 45)) return 90;
+	return 0;
 }
 
-//Function to Find an edge and report if one is found at all
-bool findEdge(float edgeOrigYaw) {
-    //distance two vectors and report their combined distances
-    float edgeLeftDist = edgeDistance(edgeOrigYaw - 21);
-    edgeLeftDist = edgeLeftDist + edgeDistance(edgeOrigYaw - 27);
-    float edgeRightDist = edgeDistance(edgeOrigYaw + 21);
-    edgeRightDist = edgeRightDist + edgeDistance(edgeOrigYaw + 27);
-    
-    //If the distance is too far, then set the distance to max so the angle isnt used
-    if (edgeLeftDist >= 260) edgeLeftDist = 999999999;
-    if (edgeRightDist >= 260) edgeRightDist = 999999999;
-    
-    //If none of the vectors found a wall, then dont edge
-    if (edgeLeftDist == edgeRightDist) return false;
-
-    //Depending on the edge, choose a direction to face
-    if (edgeRightDist < edgeLeftDist) {
-        edgeToEdgeOn = 1;
-        //Correction for pitches to keep the head behind walls
-        if ( ((int)pitch_mode == 7) || ((int)pitch_mode == 2) || ((int)pitch_mode == 8)) edgeToEdgeOn = 2;
-        return true;
-    } else {
-        edgeToEdgeOn = 2;
-        //Same as above
-        if ( ((int)pitch_mode == 7) || ((int)pitch_mode == 2) || ((int)pitch_mode == 8)) edgeToEdgeOn = 1;
-        return true;
-    }
-}   
-
-//Function to give you a static angle to use
-float useEdge(float edgeViewAngle) {
-    //Var to be disabled when a angle is choosen to prevent the others from conflicting
-    bool edgeTest = true;
-    if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest == true) {
-        if (edgeToEdgeOn == 1) edgeYaw = (float)-90;
-        if (edgeToEdgeOn == 2) edgeYaw = (float)90;
-        edgeTest = false;
-    }
-    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true) {
-        if (edgeToEdgeOn == 1) edgeYaw = (float)0;
-        if (edgeToEdgeOn == 2) edgeYaw = (float)179;
-        edgeTest = false;
-    }
-    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true) {
-        if (edgeToEdgeOn == 1) edgeYaw = (float)90;
-        if (edgeToEdgeOn == 2) edgeYaw = (float)-90;
-        edgeTest = false;
-    }
-    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true) {
-        if (edgeToEdgeOn == 1) edgeYaw = (float)179;
-        if (edgeToEdgeOn == 2) edgeYaw = (float)0;
-        edgeTest = false;
-    }
-    //return with the angle choosen
-    return edgeYaw;
+// Move a vector in a direction based on edge angle
+Vector EdgeDirectional(Vector start, int angle, int distance) {
+	switch(angle) {
+	case 180:
+		start.x -= distance;
+		return start;
+		break;
+	case -90:
+		start.y -= distance;
+		return start;
+		break;
+	case 0:
+		start.x += distance;
+		return start;
+		break;
+	case 90;
+		start.y += distance;
+		return start;
+		break;
+	case default;
+		return start;
+		break;
+	}
+}
+	
+// Get distance from 2 points
+float EdgeDistance(Vector start, Vector end) {
+	Ray_t ray;
+    ray.Init(start, end);
+	trace_t trace;
+    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_no_player, &trace);
+    return start.DistTo(trace.endpos);
+}
+*/
+// Get angle for edge
+float Edge() {
+	return 0;
+	//int direction = EdgeRoundUserAngle(g_pUserCmd->viewangles.y);
+	//bool flipEdge = (int)pitch_mode == 7 || (int)pitch_mode == 2 || (int)pitch_mode == 8;
+	
 }
 
 void ProcessUserCmd(CUserCmd* cmd) {
@@ -279,6 +254,7 @@ void ProcessUserCmd(CUserCmd* cmd) {
 	float& y = cmd->viewangles.y;
 	static bool flip = false;
 	bool clamp = !no_clamping;
+	
     switch ((int)yaw_mode) {
     case 1: // FIXED
         y = (float)yaw;
@@ -303,52 +279,51 @@ void ProcessUserCmd(CUserCmd* cmd) {
     case 6: // OFFSETKEEP
         y += (float)yaw;
         break;
-    case 7: //Edge
-        //Attemt to find an edge and if found, edge
-        if (findEdge(y)) y = useEdge(y);
+    case 7: // EDGE
+        y += Edge();
         break;
-    case 8:
+    case 8: // HECK
     	FuckYaw(y);
 		clamp = false;
     }
     
 	switch ((int)pitch_mode) {
-	case 1:
+	case 1: // STATIC
 		p = (float)pitch;
 		break;
-	case 2:
+	case 2: // JITTER
 		if (flip) p += 30.0f;
 		else p -= 30.0f;
 		break;
-	case 3:
+	case 3: // RANDOM
 		p = RandFloatRange(-89.0f, 89.0f);
 		break;
-	case 4:
+	case 4: // FLIP
 		p = flip ? 89.0f : -89.0f;
 		break;
-	case 5:
+	case 5: // FAKE FLIP
 		p = flip ? 271.0f : -271.0f;
 		clamp = false;
 		break;
-	case 6:
+	case 6: // FAKEUP
 		p = -271.0f;
 		clamp = false;
 		break;
-	case 7:
+	case 7: // FAKEDOWN
 		p = 271.0f;
 		clamp = false;
 		break;
-	case 8:
+	case 8: // FAKECENTER
 		p = -3256.0f;
 		clamp = false;
 		break;
-	case 9:
+	case 9: // UP
 		p = -89.0f;
 		break;
-	case 10:
+	case 10: // DOWN
 		p = 89.0f;
 		break;
-	case 11:
+	case 11: // HECK
 		FuckPitch(p);
 		clamp = false;
 	}

@@ -211,6 +211,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	hacks::shared::autojoin::Update();
 
 #if ENABLE_IPC == 1
+	// Auto Team Join
 	static int team_joining_state = 0;
 	static float last_jointeam_try = 0;
 	CachedEntity *found_entity, *ent;
@@ -358,6 +359,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 
 	// TODO Auto Steam Friend
 
+	// Auto-Set ipc playerstate
 #if ENABLE_IPC
 	{
 		PROF_SECTION(CM_playerlist);
@@ -372,6 +374,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	*bSendPackets = true;
 
 	if (CE_GOOD(g_pLocalPlayer->entity)) {
+		// Fake lag
 		static int fakelag_queue = 0;
 		if (fakelag_amount) {
 			if (fakelag_queue == int(fakelag_amount) || (g_pUserCmd->buttons & IN_ATTACK)) {
@@ -383,8 +386,9 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 			}
 			fakelag_queue++;
 		}
+		// Roll speedhack
 		speedapplied = false;
-		if (roll_speedhack && g_IInputSystem->IsButtonDown((ButtonCode_t)((int)roll_speedhack)) && !(cmd->buttons & IN_ATTACK)) {
+		if (roll_speedhack && g_IInputSystem->IsButtonDown((ButtonCode_t)((int)roll_speedhack)) && !(CanShoot() && (g_pUserCmd->buttons & IN_ATTACK) && CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) != 0)) {
 			speed = cmd->forwardmove;
 			if (fabs(speed) > 0.0f) {
 				cmd->forwardmove = -speed;
@@ -397,7 +401,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 				speedapplied = true;
 			}
 		}
-
+		// Apply silent angles
 		if (g_pLocalPlayer->bUseSilentAngles) {
 			if (!speedapplied) {
 				vsilent.x = cmd->forwardmove;
@@ -413,6 +417,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 			ret = false;
 		}
 #if ENABLE_IPC == 1
+		// does this need to be seperate from the other stuff?
 		if (CE_GOOD(g_pLocalPlayer->entity) && !g_pLocalPlayer->life_state) {
 			PROF_SECTION(CM_followbot);
 			SAFE_CALL(hacks::shared::followbot::AfterCreateMove());
@@ -422,13 +427,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 			g_Settings.last_angles = cmd->viewangles;
 	}
 
-//	PROF_END("CreateMove");
-	if (!(cmd->buttons & IN_ATTACK)) {
-		//LoadSavedState();
-	}
+
 	g_pLocalPlayer->bAttackLastTick = (cmd->buttons & IN_ATTACK);
 	return ret;
-
-	SEGV_END;
-	return true;
 }

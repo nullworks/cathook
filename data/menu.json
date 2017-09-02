@@ -426,7 +426,8 @@
 			"fb_mimic_slot",
 			"fb_always_medigun",
 			"fb_sync_taunt",
-			"fb_crumb_draw"
+			"fb_crumb_draw",
+			"fb_preferred_target"
 		]
 	},
 	{

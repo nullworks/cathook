@@ -28,7 +28,40 @@ CatVar always_medigun(CV_SWITCH, "fb_always_medigun", "0", "Always use Medigun",
 CatVar crumb_draw(CV_SWITCH, "fb_crumb_draw", "1", "Draw Crumbs", "Draws the path made for the followbot");
 CatVar roaming(CV_SWITCH, "fb_roaming", "0", "Roaming", "Allows the bot to find a different target if it cant find one using the steam id");
 CatVar sync_taunt(CV_SWITCH, "fb_sync_taunt", "0", "Mimic taunts", "Bots will taunt if target is taunting");
+CatEnum pref_target({"None", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"});
+CatVar preferred_target(pref_target, "fb_preferred_target", "0", "Preferred Target", "Bots will Prefer this class, and switch to following it when it's in the Activation range");
 
+const std::string classname = "";
+if (preferred_target == 1) {
+	classname = "NONE";
+}
+if (preferred_target == 2) {
+	classname = tf_scout
+}
+if (preferred_target == 3) {
+	classname = tf_sniper
+}
+if (preferred_target == 4) {
+	classname = tf_soldier
+}
+if (preferred_target == 5) {
+	classname = tf_demoman
+}
+if (preferred_target == 6) {
+	classname = tf_medic
+}
+if (preferred_target == 7) {
+	classname = tf_heavy
+}
+if (preferred_target == 8) {
+	classname = tf_pyro
+}
+if (preferred_target == 9) {
+	classname = tf_spy
+}
+if (preferred_target == 10) {
+	classname = tf_engineer
+}
 // Var to store the current steamid to follow
 unsigned follow_steamid { 1 };
 
@@ -152,7 +185,16 @@ void DoWalking() {
 			best_target = target_priority;
 		}
 	} 
-	
+	//Priority.... i guess?
+	if (roaming && CE_GOOD(best_target)) {
+		if (classname != "NONE" && classname != "") {
+			if (target_last->IsVisible()) {
+				if (CE_INT(target_last, netvar.iClass) == classname) {
+					best_target = target_last
+				}
+			}
+		}
+	}
 	// If we cant use steam id target, try someone else
 	if (roaming && CE_BAD(best_target)) {
 	

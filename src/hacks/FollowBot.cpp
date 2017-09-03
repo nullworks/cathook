@@ -20,6 +20,7 @@ namespace hacks { namespace shared { namespace followbot {
 
 	
 // User settings
+
 CatVar bot(CV_SWITCH, "fb_bot", "0", "Master Followbot Switch", "Set to 1 in followbots' configs");
 CatVar follow_distance(CV_FLOAT, "fb_distance", "175", "Follow Distance", "How close the bots should stay to the target");
 CatVar follow_activation(CV_FLOAT, "fb_activation", "175", "Activation Distance", "How close a player should be until the followbot will pick them as a target");
@@ -28,40 +29,9 @@ CatVar always_medigun(CV_SWITCH, "fb_always_medigun", "0", "Always use Medigun",
 CatVar crumb_draw(CV_SWITCH, "fb_crumb_draw", "1", "Draw Crumbs", "Draws the path made for the followbot");
 CatVar roaming(CV_SWITCH, "fb_roaming", "0", "Roaming", "Allows the bot to find a different target if it cant find one using the steam id");
 CatVar sync_taunt(CV_SWITCH, "fb_sync_taunt", "0", "Mimic taunts", "Bots will taunt if target is taunting");
-CatEnum pref_target({"None", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer"});
-CatVar preferred_target(pref_target, "fb_preferred_target", "0", "Preferred Target", "Bots will Prefer this class, and switch to following it when it's in the Activation range");
+CatEnum classes_enum({ "DISABLED", "SCOUT", "SNIPER", "SOLDIER", "DEMOMAN", "MEDIC", "HEAVY", "PYRO", "SPY", "ENGINEER" });
+CatVar preferred_target(classes_enum, "fb_preferred_target", "0", "Preferred Target", "Followbots will Prefer following targets of this class, Needs roaming to be active");
 
-const std::string classname = "";
-if (preferred_target == 1) {
-	classname = "NONE";
-}
-if (preferred_target == 2) {
-	classname = tf_scout
-}
-if (preferred_target == 3) {
-	classname = tf_sniper
-}
-if (preferred_target == 4) {
-	classname = tf_soldier
-}
-if (preferred_target == 5) {
-	classname = tf_demoman
-}
-if (preferred_target == 6) {
-	classname = tf_medic
-}
-if (preferred_target == 7) {
-	classname = tf_heavy
-}
-if (preferred_target == 8) {
-	classname = tf_pyro
-}
-if (preferred_target == 9) {
-	classname = tf_spy
-}
-if (preferred_target == 10) {
-	classname = tf_engineer
-}
 // Var to store the current steamid to follow
 unsigned follow_steamid { 1 };
 
@@ -185,16 +155,6 @@ void DoWalking() {
 			best_target = target_priority;
 		}
 	} 
-	//Priority.... i guess?
-	if (roaming && CE_GOOD(best_target)) {
-		if (classname != "NONE" && classname != "") {
-			if (target_last->IsVisible()) {
-				if (CE_INT(target_last, netvar.iClass) == classname) {
-					best_target = target_last
-				}
-			}
-		}
-	}
 	// If we cant use steam id target, try someone else
 	if (roaming && CE_BAD(best_target)) {
 	
@@ -215,7 +175,7 @@ void DoWalking() {
 			
 			for (int i = 0; i < HIGHEST_ENTITY; i++) {
 				ent = ENTITY(i);
-
+				int ent_class = 0;
 				if (CE_BAD(ent)) continue;
 				if (ent == LOCAL_E) continue;
 				if (!ent->m_bAlivePlayer) continue;
@@ -226,10 +186,44 @@ void DoWalking() {
 				// Check activation distance
 				if (g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin) > (float)follow_activation) continue;
 				if (!ent->IsVisible()) continue;
-					
+				if (CE_INT(ent, netvar.iClass) == tf_scout) {
+					ent_class = 1;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_sniper) {
+					ent_class = 2;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_soldier) {
+					ent_class = 3;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_demoman) {
+					ent_class = 4;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_medic) {
+					ent_class = 5;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_heavy) {
+					ent_class = 6;
+				}	
+				if (CE_INT(ent, netvar.iClass) == tf_pyro) {
+					ent_class = 7;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_spy) {
+					ent_class = 8;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_engineer) {
+					ent_class = 9;
+				}
 				// Distance Priority works in our case
 				float scr = 4096.0f - g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin);
 				if (scr > target_highest_score) {
+					target_highest_score = scr;
+					target_last = ent;
+					best_target = ent;
+				}
+				//Priority for preferred class
+				if (ent_class >  || ent_class < 1) continue;
+				if (ent_class == int(preferred_target)) {
+					float scr = 40096.0f - g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin);
 					target_highest_score = scr;
 					target_last = ent;
 					best_target = ent;
@@ -244,6 +238,61 @@ void DoWalking() {
 	// For now this works and it will stay like this untill I find a way to fix it
 	int following_idx2 = 0;
 	if (CE_GOOD(found_entity)) {
+		if (roaming) {
+			for (int i = 0; i < HIGHEST_ENTITY; i++) {
+				int ent_class = 0;
+				float target_highest_score = -256;
+				CachedEntity* ent;
+				ent = ENTITY(i);
+			
+				if (CE_BAD(ent)) continue;
+				if (ent == LOCAL_E) continue;
+				if (!ent->m_bAlivePlayer) continue;
+				if (IsBot(ent)) continue;
+				
+				if (ent->m_bEnemy) continue;
+				if (g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin) > 3400.0F) continue;
+				// Check activation distance
+				if (g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin) > (float)follow_activation) continue;
+				if (!ent->IsVisible()) continue;
+				if (CE_INT(ent, netvar.iClass) == tf_scout) {
+					ent_class = 1;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_sniper) {
+					ent_class = 2;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_soldier) {
+					ent_class = 3;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_demoman) {
+					ent_class = 4;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_medic) {
+					ent_class = 5;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_heavy) {
+					ent_class = 6;
+				}	
+				if (CE_INT(ent, netvar.iClass) == tf_pyro) {
+					ent_class = 7;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_spy) {
+					ent_class = 8;
+				}
+				if (CE_INT(ent, netvar.iClass) == tf_engineer) {
+					ent_class = 9;
+				}
+				//Priority for preferred class
+				if (ent_class > 9 || ent_class < 1) continue;
+				if (ent_class == int(preferred_target)) {
+					float scr = 40096.0f - g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin);
+					target_highest_score = scr;
+					target_last = ent;
+					best_target = ent;
+					found_entity = ent;
+				}
+			}
+		}
 		following_idx2 = found_entity->m_IDX;
 #if ENABLE_VISUALS == 1
 		hacks::shared::esp::AddEntityString(found_entity, "[FOLLOWING]", colors::green);

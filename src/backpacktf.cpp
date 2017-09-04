@@ -86,7 +86,7 @@ void processing_thread() {
 									unsigned userid = strtoul(it.key().substr(5).c_str(), nullptr, 10);
 									const auto& v = it.value();
 									if (not v.is_object()) {
-										logging::Info("Data for %u (%s) is not an object!", userid, it.key());
+										logging::Info("Data for %u (%s) is not an object!", userid, it.key().c_str());
 										continue;
 									}
 									std::string name = v.at("name");

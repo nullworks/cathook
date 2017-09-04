@@ -1,3 +1,7 @@
+# IMPORTANT - UNMAINTAINED
+
+## This project is no longer maintained. Do not contact me about bugs in the software, don't open pull requests, make a fork instead (or find a maintained one)
+
 # Cathook Training Software
 ![banner](http://i.imgur.com/w96wdtE.png)
 
@@ -99,3 +103,4 @@ The installation script is as followed:
 git clone --recursive https://github.com/nullifiedcat/cathook-ipc-server && cd cathook-ipc-server && make -j4
 ```
 To run the Followbot server, run `./bin/cathook-ipc-server`. You can also use `./bin/cathook-ipc-server &>/dev/null &` to run it in background.
+

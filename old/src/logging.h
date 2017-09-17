@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 
-// Hmm???
 typedef void(fn_Msg_t)(const char* msg, va_list);
 
 #ifdef __cplusplus

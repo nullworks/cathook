@@ -8,35 +8,34 @@
 #ifndef HACK_H_
 #define HACK_H_
 
-class IHack;
+/*class IHack;
 class CUserCmd;
 class CViewSetup;
 class bf_read;
 class ConCommand;
-class CCommand;
+class CCommand;*/
 
-#include "beforecheaders.h"
 #include <stack>
 #include <string>
 #include <mutex>
-#include "aftercheaders.h"
+
 
 namespace hack {
-
-extern std::mutex command_stack_mutex;
+	
+/*extern std::mutex command_stack_mutex;
 std::stack<std::string>& command_stack();
-void ExecuteCommand(const std::string command);
+void ExecuteCommand(const std::string command);*/
 
 extern bool shutdown;
 
-const std::string& GetVersion();
-const std::string& GetType();
+/*const std::string& GetVersion();
+const std::string& GetType();*/
 void Initialize();
 void Think();
 void Shutdown();
 
-void CC_Cat(const CCommand& args);
-extern ConCommand* c_Cat;
+/*void CC_Cat(const CCommand& args);
+extern ConCommand* c_Cat;*/
 
 }
 

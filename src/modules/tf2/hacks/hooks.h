@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-
+namespace hooks {
 
 typedef void*			ptr_t;
 typedef void* 			method_t;
@@ -22,8 +22,6 @@ typedef method_t* 		method_table_t;
 typedef method_table_t* table_ptr_t;
 typedef method_table_t& table_ref_t;
 
-
-	
 constexpr size_t ptr_size = sizeof(ptr_t);
 
 unsigned CountMethods(method_table_t table);
@@ -47,7 +45,7 @@ public:
 	method_table_t vtable_original 	{ nullptr };
 	method_table_t vtable_hooked 	{ nullptr };
 };
-namespace modules { namespace tf2 { namespace hacks {
+
 extern VMTHook panel;
 extern VMTHook clientmode;
 extern VMTHook clientmode4;
@@ -63,6 +61,6 @@ extern VMTHook baseclientstate8;
 extern VMTHook steamfriends;
 extern VMTHook materialsystem;
 
-}}}
+}
 
 #endif /* HOOKS_H_ */

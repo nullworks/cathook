@@ -4,8 +4,6 @@
 
 //#include "SDK.h"
 #include <stdint.h>
-
-namespace modules { namespace tf2 { namespace hacks {
 	
 class CSignature
 {
@@ -17,5 +15,3 @@ public:
 };
 
 extern CSignature gSignatures;
-
-}}}

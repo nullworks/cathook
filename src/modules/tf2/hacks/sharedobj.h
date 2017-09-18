@@ -17,7 +17,7 @@
 struct link_map;
 typedef void *(*fn_CreateInterface_t)(const char*, int*);
 
-namespace modules { namespace tf2 { namespace hacks { namespace sharedobj {
+namespace sharedobj {
 	
 bool LocateSharedObject(std::string& name, std::string& out_full_path);
 
@@ -53,6 +53,6 @@ SharedObject& libsdl();
 
 void LoadAllSharedObjects();
 
-}}}}
+}
 
 #endif /* SHAREDOBJ_H_ */

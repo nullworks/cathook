@@ -17,7 +17,7 @@
 //#include "copypasted/CSignature.h"
 #include "sharedobj.h"
 
-namespace modules { namespace tf2 { namespace hacks { namespace sharedobj {
+namespace sharedobj {
 
 bool LocateSharedObject(std::string& name, std::string& out_full_path) {
 	FILE* proc_maps = fopen(strfmt("/proc/%i/maps", getpid()), "r");
@@ -141,4 +141,4 @@ SharedObject& libsdl() {
 }
 //#endif
 
-}}}}
+}

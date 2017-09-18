@@ -20,8 +20,6 @@
 #include "interfaces.h"
 
 //class ISteamFriends002;
-
-namespace modules { namespace tf2 { namespace hacks {
 	
 IVModelRender* g_IVModelRender = nullptr;
 ISteamClient* g_ISteamClient = nullptr;
@@ -53,7 +51,7 @@ CBaseClientState* g_IBaseClientState = nullptr;
 IGameEventManager* g_IGameEventManager = nullptr;
 TFGCClientSystem* g_TFGCClientSystem = nullptr;
 CHud* g_CHUD = nullptr;
-
+	
 template<typename T>
 T* BruteforceInterface(std::string name, sharedobj::SharedObject& object, int start = 0) {
 	T* result = nullptr;
@@ -142,5 +140,4 @@ void CreateInterfaces() {
 	logging::Info("HUD 0x%08x 0x%08x", hud_sig, g_CHUD);
 //#endif
 }
-	
-}}}
+

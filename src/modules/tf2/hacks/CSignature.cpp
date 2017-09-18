@@ -21,9 +21,6 @@
 #define INRANGE(x,a,b)   (x >= a && x <= b) 
 #define getBits( x )   	 (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
 #define getByte( x )   	 (getBits(x[0]) << 4 | getBits(x[1]))
-
-
-namespace modules { namespace tf2 { namespace hacks {
 	
 // module should be a pointer to the base of an elf32 module
 // this is not the value returned by dlopen (which returns an opaque handle to the module)
@@ -107,9 +104,9 @@ uintptr_t CSignature::GetClientSignature(char* chPattern)
 {
 	// we need to do this becuase (i assume that) under the hood, dlopen only loads up the sections that it needs
 	// into memory, meaning that we cannot get the string table from the module.
-	static int fd = open(modules::tf2::hacks::sharedobj::client().path.c_str(), O_RDONLY);
+	static int fd = open(sharedobj::client().path.c_str(), O_RDONLY);
 	static void *module = mmap(NULL, lseek(fd, 0, SEEK_END), PROT_READ, MAP_SHARED, fd, 0);
-	static link_map *moduleMap = modules::tf2::hacks::sharedobj::client().lmap;
+	static link_map *moduleMap = sharedobj::client().lmap;
 
 	//static void *module = (void *)moduleMap->l_addr;
 	
@@ -128,9 +125,9 @@ uintptr_t CSignature::GetEngineSignature(char* chPattern)
 {
 	// we need to do this becuase (i assume that) under the hood, dlopen only loads up the sections that it needs
 	// into memory, meaning that we cannot get the string table from the module.
-	static int fd = open(modules::tf2::hacks::sharedobj::engine().path.c_str(), O_RDONLY);
+	static int fd = open(sharedobj::engine().path.c_str(), O_RDONLY);
 	static void *module = mmap(NULL, lseek(fd, 0, SEEK_END), PROT_READ, MAP_SHARED, fd, 0);
-	static link_map *moduleMap = modules::tf2::hacks::sharedobj::engine().lmap;
+	static link_map *moduleMap = sharedobj::engine().lmap;
 
 	//static void *module = (void *)moduleMap->l_addr;
 	
@@ -146,5 +143,3 @@ uintptr_t CSignature::GetEngineSignature(char* chPattern)
 }
 
 CSignature gSignatures;
-
-}}}

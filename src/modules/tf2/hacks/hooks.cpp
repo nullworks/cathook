@@ -14,7 +14,7 @@
 
 
 
-
+namespace hooks {
 
 unsigned CountMethods(method_table_t table) {
 	unsigned int i = -1;
@@ -76,7 +76,6 @@ void VMTHook::Apply() {
 	*vtable_ptr = &vtable_hooked[2];
 }
 
-namespace modules { namespace tf2 { namespace hacks {
 VMTHook input {};
 VMTHook steamfriends {};
 VMTHook baseclientstate {};
@@ -91,5 +90,5 @@ VMTHook studiorender {};
 VMTHook modelrender {};
 VMTHook clientmode4 {};
 VMTHook materialsystem {};
-
-}}}
+	
+}

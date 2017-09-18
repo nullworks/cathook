@@ -55,8 +55,6 @@ class CHud;
 class IGameEventManager;
 class TFGCClientSystem;
 
-namespace modules { namespace tf2 { namespace hacks {
-	
 extern TFGCClientSystem* g_TFGCClientSystem;
 extern CHud* g_CHUD;
 extern ISteamClient* g_ISteamClient;
@@ -87,9 +85,7 @@ extern IVRenderView* g_IVRenderView;
 extern IMoveHelperServer* g_IMoveHelperServer;
 extern CBaseClientState* g_IBaseClientState;
 extern IGameEventManager* g_IGameEventManager;
-
-void CreateInterfaces();
 	
-}}}
+void CreateInterfaces();
 
 #endif /* INTERFACES_H_ */

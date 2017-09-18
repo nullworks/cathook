@@ -18,7 +18,7 @@
 CUserCmd* g_pUserCmd = nullptr;
 
 bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
-	static CreateMove_t original_method = (CreateMove_t)modules::tf2::hacks::clientmode.GetMethod(modules::tf2::hacks::offsets::CreateMove());
+	static CreateMove_t original_method = (CreateMove_t)hooks::clientmode.GetMethod(offsets::CreateMove());
 	bool ret = original_method(thisptr, inputSample, cmd);
 	if (!cmd) return ret; // Cant do anything without cmd
 	g_pUserCmd = cmd; // Update cmd
@@ -33,7 +33,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 
 
 void PaintTraverse_hook(void* _this, unsigned int vp, bool fr, bool ar) {
-	static const PaintTraverse_t original = (PaintTraverse_t)modules::tf2::hacks::panel.GetMethod(modules::tf2::hacks::offsets::PaintTraverse());
+	static const PaintTraverse_t original = (PaintTraverse_t)hooks::panel.GetMethod(offsets::PaintTraverse());
 	SAFE_CALL(original(_this, vp, fr, ar)); // To avoid threading problems.
 
 	/*draw::UpdateWTS();

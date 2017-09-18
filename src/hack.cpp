@@ -10,8 +10,8 @@
 #include <vector>
 //#include <map>
 #include <cstring>
-#include <fstream>
-#include <iostream>
+//#include <fstream>
+//#include <iostream>
 //#include <sys/prctl.h> // Linux specific headers for dumping and stuff
 #include <unistd.h> // Unix like headers for read write and stuff like that
 //#include <link.h> // unknown, uncomment if needed
@@ -27,8 +27,8 @@
 //#include "hacks/hacklist.h"
 
 //#include "common.h"
-#include "sharedobj.h"
-#include "hooks.h"
+//#include "sharedobj.h"
+//#include "hooks.h"
 //#include "netmessage.h"
 //#include "profiler.h"
 //#include "cvwrapper.h"
@@ -44,13 +44,14 @@
 //#include "init.hpp"
 
 //#include "sdk.h"
-#include "vfunc.h"
+//#include "vfunc.h"
 //#include "copypasted/CSignature.h"
 //#include "copypasted/Netvar.h"
 //#include "CDumper.h"
 //#include <KeyValues.h>
 
 #include "logging.h"
+#include "modules/tf2/init.hpp"
 
 
 /*
@@ -140,114 +141,28 @@ void hack::Initialize() {
 	//time_injected = time(nullptr);
 
 	logging::Info("Initializing...");
-	srand(time(0));
+	srand(time(0)); // Setting random seed?
 	//prctl(PR_SET_DUMPABLE,0,42,42,42); // Lets not change this to prevent detection, its usefull for debugging I think. http://man7.org/linux/man-pages/man2/prctl.2.html
 	
-	// Hack stuff
-	//sharedobj::LoadAllSharedObjects();
-	//CreateInterfaces();
 	
-	// Dump netvars
-	/*CDumper dumper;
-	dumper.SaveDump();*/
+	// Please put modules here with correct compiler options to load only the ones needed.
+	// Please also put compiler options to not compile the modules if they are not needed.
+	// Modules need to be initialized first to let the managers know what they can do.
+	logging::Info("Loading Modules...");
 	
-
-	//BeginConVars();
-	//hack::c_Cat = CreateConCommand(CON_NAME, &hack::CC_Cat, "Info");
-	//g_Settings.Init();
-	//EndConVars();
-	
-/*	// !!!!Hooks!!!!
-#if ENABLE_VISUALS == 1
-	hooks::panel.Set(g_IPanel);
-	hooks::panel.HookMethod((void*)PaintTraverse_hook, offsets::PaintTraverse());
-	hooks::panel.Apply();
-#endif
-	
-	// Clientmode??? Wut!!!!
-	uintptr_t* clientMode = 0;
-	// Bad way to get clientmode.
-	// FIXME [MP]?
-	while(!(clientMode = **(uintptr_t***)((uintptr_t)((*(void***)g_IBaseClient)[10]) + 1))) {
-		sleep(1);
-	}
-	hooks::clientmode.Set((void*)clientMode);
-	hooks::clientmode.HookMethod((void*)CreateMove_hook, offsets::CreateMove());
-	
-#if ENABLE_VISUALS == 1
-	hooks::clientmode.HookMethod((void*)OverrideView_hook, offsets::OverrideView());
-#endif
-	
-	hooks::clientmode.HookMethod((void*)LevelInit_hook, offsets::LevelInit());
-	hooks::clientmode.HookMethod((void*)LevelShutdown_hook, offsets::LevelShutdown());
-	hooks::clientmode.Apply();
-	hooks::clientmode4.Set((void*)(clientMode), 4);
-	hooks::clientmode4.HookMethod((void*)FireGameEvent_hook, offsets::FireGameEvent());
-	hooks::clientmode4.Apply();
-	hooks::client.Set(g_IBaseClient);
-	hooks::client.HookMethod((void*)FrameStageNotify_hook, offsets::FrameStageNotify());
-	hooks::client.HookMethod((void*)DispatchUserMessage_hook, offsets::DispatchUserMessage());
-
-#if ENABLE_VISUALS == 1
-	hooks::client.HookMethod((void*)IN_KeyEvent_hook, offsets::IN_KeyEvent());
-#endif
-	
-	hooks::client.Apply();
-	hooks::input.Set(g_IInput);
-	hooks::input.HookMethod((void*)GetUserCmd_hook, offsets::GetUserCmd());
-	hooks::input.Apply();
-	
-#if ENABLE_VISUALS == 1
-	hooks::modelrender.Set(g_IVModelRender);
-	hooks::modelrender.HookMethod((void*)DrawModelExecute_hook, offsets::DrawModelExecute());
-	hooks::modelrender.Apply();
-#endif
-	
-	hooks::steamfriends.Set(g_ISteamFriends);
-	hooks::steamfriends.HookMethod((void*)GetFriendPersonaName_hook, offsets::GetFriendPersonaName());
-	hooks::steamfriends.Apply();*/
-
-	//gNetvars.init();
-	//InitNetVars();
-	
-	//g_pLocalPlayer = new LocalPlayer();
-	//g_pPlayerResource = new TFPlayerResource();
-	
-
-
-	// FIXME [MP]
-	//hacks::shared::killsay::Init();
-	//logging::Info("Hooked!");
+	modules::tf2::Init();
 	
 	
-
-	// HOOKING IS DONEE!!!! DO OTHER INITS
 	
-	
-	//velocity::Init();
-	//playerlist::Load();
-
-
-
-	//hacks::shared::anticheat::Init();
-	//hacks::tf2::healarrow::Init();
-	//hacks::shared::walkbot::Initialize();
-	
-	
-	logging::Info("Clearing initializer stack");
+	//logging::Info("Clearing initializer stack");
 	/*while (!init_stack().empty()) {
 		init_stack().top()();
 		init_stack().pop();
 	}*/
-	logging::Info("Initializer stack done");
-/*
-#if not ENABLE_VISUALS
-	hack::command_stack().push("exec cat_autoexec_textmode");
-#endif
+	//logging::Info("Initializer stack done");
+
 	
-	hack::command_stack().push("exec cat_autoexec");
-	hack::command_stack().push("cat_killsay_reload");
-	hack::command_stack().push("cat_spam_reload");*/
+	logging::Info("Initializing Done!");
 }
 
 // Umm, what??? Does this need to be here?

@@ -20,11 +20,9 @@ CUserCmd* g_pUserCmd = nullptr;
 bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	static CreateMove_t original_method = (CreateMove_t)modules::tf2::hacks::clientmode.GetMethod(modules::tf2::hacks::offsets::CreateMove());
 	bool ret = original_method(thisptr, inputSample, cmd);
-	
+	if (!cmd) return ret; // Cant do anything without cmd
 	g_pUserCmd = cmd; // Update cmd
 
-	if (!cmd) return ret;
-	
 	/* 
 	 *	Do stuff here
 	 */

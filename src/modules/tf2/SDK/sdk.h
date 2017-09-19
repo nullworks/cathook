@@ -64,10 +64,10 @@
 
 #include "cathook/TFGCClientSystem.hpp"
 #include "cathook/in_buttons.h"
-#include "cathook/imaterialsystemfixed.h"
+//#include "cathook/imaterialsystemfixed.h"
 #include "cathook/ScreenSpaceEffects.h"
 #include "cathook/iinput.h"
 #include "cathook/igamemovement.h"
-#include "cathook/HUD.h"
+//#include "cathook/HUD.h"
 
 #endif /* SDK_H_ */

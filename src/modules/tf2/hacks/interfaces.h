@@ -54,6 +54,8 @@ class CBaseClientState;
 class CHud;
 class IGameEventManager;
 class TFGCClientSystem;
+//class IScreenSpaceEffectManager;
+//class CScreenSpaceEffectRegistration;
 
 extern TFGCClientSystem* g_TFGCClientSystem;
 extern CHud* g_CHUD;
@@ -85,7 +87,9 @@ extern IVRenderView* g_IVRenderView;
 extern IMoveHelperServer* g_IMoveHelperServer;
 extern CBaseClientState* g_IBaseClientState;
 extern IGameEventManager* g_IGameEventManager;
-	
+/*extern IScreenSpaceEffectManager* g_pScreenSpaceEffects;
+extern CScreenSpaceEffectRegistration* g_ppScreenSpaceRegistrationHead;*/
+
 void CreateInterfaces();
 
 #endif /* INTERFACES_H_ */

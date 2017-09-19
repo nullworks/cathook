@@ -51,7 +51,9 @@ CBaseClientState* g_IBaseClientState = nullptr;
 IGameEventManager* g_IGameEventManager = nullptr;
 TFGCClientSystem* g_TFGCClientSystem = nullptr;
 CHud* g_CHUD = nullptr;
-	
+/*IScreenSpaceEffectManager* g_pScreenSpaceEffects = nullptr;
+CScreenSpaceEffectRegistration* g_ppScreenSpaceRegistrationHead = nullptr;*/
+
 template<typename T>
 T* BruteforceInterface(std::string name, sharedobj::SharedObject& object, int start = 0) {
 	T* result = nullptr;
@@ -130,8 +132,8 @@ void CreateInterfaces() {
 	g_IStudioRender = BruteforceInterface<IStudioRender>("VStudioRender", sharedobj::studiorender());
 	g_IVRenderView = BruteforceInterface<IVRenderView>("VEngineRenderView", sharedobj::engine());
 	g_IMaterialSystemHL = (IMaterialSystem*)g_IMaterialSystem;
-	g_pScreenSpaceEffects = **(IScreenSpaceEffectManager***)(gSignatures.GetClientSignature("F3 0F 10 83 40 05 00 00 C7 44 24 04 ? ? ? ? 89 34 24 F3 0F 11 44 24 08 E8 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 89 74 24 08 C7 44 24 04 ? ? ? ? FF 52 0C A1 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 14") + 31);
-	g_ppScreenSpaceRegistrationHead = *(CScreenSpaceEffectRegistration***)(gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 8B 1D ? ? ? ? 85 DB 74 25 8D B4 26 00 00 00 00 8B 43 04 85 C0 74 10") + 9);
+	//g_pScreenSpaceEffects = **(IScreenSpaceEffectManager***)(gSignatures.GetClientSignature("F3 0F 10 83 40 05 00 00 C7 44 24 04 ? ? ? ? 89 34 24 F3 0F 11 44 24 08 E8 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 89 74 24 08 C7 44 24 04 ? ? ? ? FF 52 0C A1 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 14") + 31);
+	//g_ppScreenSpaceRegistrationHead = *(CScreenSpaceEffectRegistration***)(gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 8B 1D ? ? ? ? 85 DB 74 25 8D B4 26 00 00 00 00 8B 43 04 85 C0 74 10") + 9);
 	
 	logging::Info("Finding HUD");
 

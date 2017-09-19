@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-sudo ./detach "$1" && sudo ./attach "$1"

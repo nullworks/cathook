@@ -12,7 +12,7 @@
 #endif
 
 
-#include "appframework/IAppSystem.h"
+#include "../appframework/IAppSystem.h"
 
 
 //-----------------------------------------------------------------------------

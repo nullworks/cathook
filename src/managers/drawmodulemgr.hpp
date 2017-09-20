@@ -1,13 +1,14 @@
 
+
+#ifndef DRAWMODMGR
+#define DRAWMODMGR
+
 #include <string.h> 
 #include <functional>
 
 #include "../util/colors.hpp"
 #include "../util/mathlib.hpp"
 
-
-namespace drawmgr {
-	
 enum EFont {
 	NONE,
 	OPENSANS,
@@ -15,6 +16,10 @@ enum EFont {
 	UNISPACE,
 	TF2BUILD	// Le meme
 };
+
+namespace drawmgr {
+	
+
 	
 // Drawing Functions
 void Line(int x, int y, int w, int h, rgba_t color);
@@ -42,3 +47,5 @@ void InitWorldToScreen (void *func(const CatVector&, CatVector&));
 }
 	
 }
+
+#endif

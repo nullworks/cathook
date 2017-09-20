@@ -10,9 +10,11 @@
  *
  */
 
+
+
 #include <math.h>
 #include <stdarg.h>
-#include "drawmgr.hpp"
+#include "drawmodulemgr.hpp"
 
 #define PI 3.14159265
 
@@ -31,7 +33,7 @@ void Line(int x, int y, int w, int h, rgba_t color) {
 	if (!line_defined) return; // Check if module has claimed this yet	
 	StoredLine(x, y, w, h, color);
 }
-void InitLine (void *func(int, int, int, int, rgba_t)) {
+void InitLine(void *func(int, int, int, int, rgba_t)) {
 	line_defined = true;
 	StoredLine = func;
 }
@@ -54,7 +56,7 @@ void Rect(int x, int y, int w, int h, rgba_t color) {
 	Line(x + w, y + 1, 0, h - 1, color); // Right
 	
 }
-void InitRect (void *func(int, int, int, int, rgba_t)) {
+void InitRect(void *func(int, int, int, int, rgba_t)) {
 	rect_defined = true;
 	StoredRect = func; 
 }
@@ -75,7 +77,7 @@ void RectFilled(int x, int y, int w, int h, rgba_t color) {
 		Line(x + i, y, w, h, color);
 	}
 }
-void InitRectFilled (void *func(int, int, int, int, rgba_t)) {
+void InitRectFilled(void *func(int, int, int, int, rgba_t)) {
 	rect_filled_defined = true;
 	StoredRectFilled = func;
 }
@@ -110,7 +112,7 @@ void Circle(int x, int y, float radius, int steps, rgba_t &color) {
 		py = dy;
 	}	
 }
-void InitCircle (void *func(int, int, float, int, rgba_t)) {
+void InitCircle(void *func(int, int, float, int, rgba_t)) {
 	circle_defined = true;
 	StoredCircle = func;
 }
@@ -121,33 +123,33 @@ namespace strings {
 
 // String
 static bool string_defined = false;
-void(*StoredString)(const char*, int, int, EFont, rgba_t);
-void String(const char* text, int x, int y, EFont font, rgba_t color) {
+void(*StoredString)(const char*, int, int, EFont, int, rgba_t);
+void String(const char* text, int x, int y, EFont font, int size, rgba_t color) {
 	if (string_defined) {
-		StoredString(text, x, y, font, color);
+		StoredString(text, x, y, font, size, color);
 	}
 	//if (!line_defined) return; // TODO, make shitty font system with drawline
 }
 // Crying, but in spanish
-void String(std::string text, int x, int y, EFont font, rgba_t color) {
-	String(text.c_str(), x, y, font, color);
+void String(std::string text, int x, int y, EFont font, int size, rgba_t color) {
+	String(text.c_str(), x, y, font, size, color);
 }
-void InitString (void *func(const char*, int, int, EFont, rgba_t)) {
+void InitString(void *func(const char*, int, int, EFont, int, rgba_t)) {
 	string_defined = true;
 	StoredString = func;
 }
 
 // String length in pixels
 static bool string_length_defined = false;
-void(*StoredStringLength)(const char*, EFont, int&, int&);
-void GetStringLength(const char* string, EFont font, int& length, int& height) {
+void(*StoredStringLength)(const char*, EFont, int, int&, int&);
+void GetStringLength(const char* string, EFont font, int size, int& length, int& height) {
 	if (string_defined && string_length_defined) {
-		StoredStringLength(string, font, length, height);
+		StoredStringLength(string, font, size, length, height);
 		return;
 	}
 	//if (!string_defined && !line_defined) return; // Use the crappy font rendering workaround
 }
-void InitStringLength (void *func(const char*, int, int, EFont, rgba_t)) {
+void InitStringLength(void *func(const char*, EFont, int, int&, int&)) {
 	string_length_defined = true;
 	StoredStringLength = func;
 }
@@ -166,7 +168,7 @@ bool WorldToScreen(const CatVector& world, CatVector& screen) {
 	}
 	return false; // We cant do this ourself quite yet sadly...
 }
-void InitWorldToScreen (void *func(const CatVector&, CatVector&)) {
+void InitWorldToScreen(void *func(const CatVector&, CatVector&)) {
 	world_to_screen_defined = true;
 	StoredWorldToScreen = func;
 }
@@ -174,44 +176,4 @@ void InitWorldToScreen (void *func(const CatVector&, CatVector&)) {
 }}
 
 
-
-/*
-	// Check if newlined
-	bool newlined = false;
-	size_t len = strlen(text);
-	for (int i = 0; i < len; i++) {
-		if (text[i] == '\n') {
-			newlined = true; break;
-		}
-	}
-	// Correct for newlines?
-	if (newlined) {
-		char ch[512];
-		memset(ch, 0, sizeof(char) * 512);
-		int w, h;
-		GetStringLength("W", font, w, h);
-		strncpy(ch, text, 511);
-		int s = 0;
-		int n = 0;
-		for (int i = 0; i < len; i++) {
-			if (ch[i] == '\n') {
-				ch[i] = 0;
-				draw::String(font, x, y + n * (h), color, shadow, &ch[0] + s);
-				n++;
-				s = i + 1;
-			}
-		}
-		draw::String(font, x, y + n * (h), color, shadow, &ch[0] + s);
-	} else {
-		wchar_t string[512];
-		memset(string, 0, sizeof(wchar_t) * 512);
-		mbstowcs(string, text, 511);
-		draw::WString(font, x, y, color, shadow, string);
-	}*/
-
-
-/*wchar_t buf[512];
-	memset(buf, 0, sizeof(wchar_t) * 512);
-	mbstowcs(buf, string, strlen(string));
-	g_ISurface->GetTextSize(font, buf, length, height);*/
 

@@ -6,7 +6,8 @@
  *			-Onee
  *
  */
-
+#ifndef CATVECTOR
+#define CATVECTOR
 
 // Struct for point in 3d space
 // I stole it from imgui, but it works too good
@@ -16,3 +17,5 @@ struct CatVector {
 		x = _x; y = _y; z = _z; 
 	} 
 };
+
+#endif

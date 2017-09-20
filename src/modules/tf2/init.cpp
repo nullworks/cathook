@@ -25,7 +25,7 @@ void Init(){
 	
 	// Pasted strait from the old hack.cpp
 	// Clean out unneed shit please
-	logging::Info("Begin Hooking for tf2");
+	logging::Info("Begin tf2 Hooking!");
 	hooks::panel.Set(g_IPanel);
 	hooks::panel.HookMethod((void*)PaintTraverse_hook, offsets::PaintTraverse()); // Draw Tick
 	hooks::panel.Apply();
@@ -39,7 +39,7 @@ void Init(){
 	/*modules::tf2::hacks::client.Set(modules::tf2::hacks::g_IBaseClient);
 	modules::tf2::hacks::client.HookMethod((void*)IN_KeyEvent_hook, modules::tf2::hacks::offsets::IN_KeyEvent()); // Keypress detection for gui
 	modules::tf2::hacks::client.Apply();*/
-	logging::Info("Finish Tf2 Hooking!");
+	logging::Info("Finish tf2 Hooking!");
 	
 }
 	

@@ -15,7 +15,6 @@
 #include "sharedobj.h"
 #include "CSignature.h"
 #include "../../../logging.h"
-#include "../SDK/sdk.h"
 
 #include "interfaces.h"
 

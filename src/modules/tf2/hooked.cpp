@@ -7,7 +7,7 @@
  */
 
 #include "../../util/safecall.hpp"
-#include "SDK/sdk.h"
+
 #include "hacks/hooks.h"
 #include "offsets.hpp"
 

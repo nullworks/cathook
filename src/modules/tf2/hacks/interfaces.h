@@ -8,7 +8,7 @@
 //#include <string>
 
 #include "sharedobj.h"
-#include "../SDK/sdk.h"
+#include "../../Source_2013_SDK/sdk.h"
 
 #ifndef INTERFACES_H_
 #define INTERFACES_H_

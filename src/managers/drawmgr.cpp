@@ -11,7 +11,7 @@
  */
 
 #include <math.h>
-
+#include <stdarg.h>
 #include "drawmgr.hpp"
 
 #define PI 3.14159265
@@ -19,16 +19,21 @@
 
 namespace drawmgr {
 
+// Dont use more than needed, credits to cat for giving this to me
+typedef void(*fn_name_int)(int, ...); 
+typedef void(*fn_name_const_char)(const char*, ...);
+typedef bool(*fn_name_catvector)(const CatVector&, ...);	
+	
 // Line
 static bool line_defined = false;
-void *StoredLine(int, int, int, int, rgba_t);
+void(*StoredLine)(int, int, int, int, rgba_t);
 void Line(int x, int y, int w, int h, rgba_t color) {
 	if (!line_defined) return; // Check if module has claimed this yet	
 	StoredLine(x, y, w, h, color);
 }
 void InitLine (void *func(int, int, int, int, rgba_t)) {
 	line_defined = true;
-	//*StoredLine = *func;
+	StoredLine = func;
 }
 
 	
@@ -79,7 +84,7 @@ void InitRectFilled (void(*func)(int, int, int, int, rgba_t)) {
 // Outline circle
 static bool circle_defined = false;
 void *StoredCircle(int, int, float, int, rgba_t);
-void Circle(int x, int y, float radius, int steps, rgba_t color) {
+void Circle(int x, int y, float radius, int steps, rgba_t &color) {
 	if (circle_defined) {
 		StoredCircle(x, y, radius, steps, color);
 		return;
@@ -110,9 +115,103 @@ void InitCircle (void(*func)(int, int, float, int, rgba_t)) {
 	//StoredCircle = func;
 }
 	
+	
 // Keep string stuff tidy
 namespace strings {
-	
 
+// String
+static bool string_defined = false;
+void *StoredString(const char*, int, int, EFont, rgba_t);
+void String(const char* text, int x, int y, EFont font, rgba_t color) {
+	if (string_defined) {
+		StoredString(text, x, y, font, color);
+	}
+	//if (!line_defined) return; // TODO, make shitty font system with drawline
+}
+// Crying, but in spanish
+void String(std::string text, int x, int y, EFont font, rgba_t color) {
+	String(text.c_str(), x, y, font, color);
+}
+void InitString (void(*func)(const char*, int, int, EFont, rgba_t)) {
+	string_defined = true;
+	//StoredString = func;
+}
+
+// String length in pixels
+static bool string_length_defined = false;
+void *StoredStringLength(const char*, EFont, int&, int&);
+void GetStringLength(const char* string, EFont font, int& length, int& height) {
+	if (string_defined && string_length_defined) {
+		StoredStringLength(string, font, length, height);
+		return;
+	}
+	//if (!string_defined && !line_defined) return; // Use the crappy font rendering workaround
+}
+void InitStringLength (void(*func)(const char*, int, int, EFont, rgba_t)) {
+	string_length_defined = true;
+	//StoredString = func;
+}
+}
+	
+	
+// Other stuff that doesnt belong to either namespace but is needed
+namespace other {
+	
+// World to screen, this is performed as a module option as the game can do this for us, but In the future, I would like to be able to do this fully in the cheat
+static bool world_to_screen_defined = false;
+bool *StoredWorldToScreen(const CatVector&, CatVector&);
+bool WorldToScreen(const CatVector& world, CatVector& screen) {
+	if (world_to_screen_defined) {
+		return StoredWorldToScreen(world, screen);
+	}
+	return false; // We cant do this ourself quite yet sadly...
+}
+void InitWorldToScreen (void(*func)(const CatVector&, CatVector&)) {
+	world_to_screen_defined = true;
+	//StoredCircle = func;
+}
 	
 }}
+
+
+
+/*
+	// Check if newlined
+	bool newlined = false;
+	size_t len = strlen(text);
+	for (int i = 0; i < len; i++) {
+		if (text[i] == '\n') {
+			newlined = true; break;
+		}
+	}
+	// Correct for newlines?
+	if (newlined) {
+		char ch[512];
+		memset(ch, 0, sizeof(char) * 512);
+		int w, h;
+		GetStringLength("W", font, w, h);
+		strncpy(ch, text, 511);
+		int s = 0;
+		int n = 0;
+		for (int i = 0; i < len; i++) {
+			if (ch[i] == '\n') {
+				ch[i] = 0;
+				draw::String(font, x, y + n * (h), color, shadow, &ch[0] + s);
+				n++;
+				s = i + 1;
+			}
+		}
+		draw::String(font, x, y + n * (h), color, shadow, &ch[0] + s);
+	} else {
+		wchar_t string[512];
+		memset(string, 0, sizeof(wchar_t) * 512);
+		mbstowcs(string, text, 511);
+		draw::WString(font, x, y, color, shadow, string);
+	}*/
+
+
+/*wchar_t buf[512];
+	memset(buf, 0, sizeof(wchar_t) * 512);
+	mbstowcs(buf, string, strlen(string));
+	g_ISurface->GetTextSize(font, buf, length, height);*/
+

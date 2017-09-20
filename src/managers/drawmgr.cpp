@@ -39,7 +39,7 @@ void InitLine (void *func(int, int, int, int, rgba_t)) {
 	
 // Outline rect
 static bool rect_defined = false;
-void *StoredRect(int, int, int, int, rgba_t);
+void(*StoredRect)(int, int, int, int, rgba_t);
 void Rect(int x, int y, int w, int h, rgba_t color) {
 	if (rect_defined) { // Check if module has claimed this yet	
 		StoredRect(x, y, w, h, color);
@@ -56,13 +56,13 @@ void Rect(int x, int y, int w, int h, rgba_t color) {
 }
 void InitRect (void *func(int, int, int, int, rgba_t)) {
 	rect_defined = true;
-	//StoredRect = func; 
+	StoredRect = func; 
 }
 	
 	
 // Filled Rect
 static bool rect_filled_defined = false;
-void *StoredRectFilled(int, int, int, int, rgba_t);
+void(*StoredRectFilled)(int, int, int, int, rgba_t);
 void RectFilled(int x, int y, int w, int h, rgba_t color) {
 	if (rect_filled_defined) {
 		StoredRectFilled(x, y, w, h, color);
@@ -75,15 +75,15 @@ void RectFilled(int x, int y, int w, int h, rgba_t color) {
 		Line(x + i, y, w, h, color);
 	}
 }
-void InitRectFilled (void(*func)(int, int, int, int, rgba_t)) {
+void InitRectFilled (void *func(int, int, int, int, rgba_t)) {
 	rect_filled_defined = true;
-	//*StoredRectFilled = *func;
+	StoredRectFilled = func;
 }
 
 	
 // Outline circle
 static bool circle_defined = false;
-void *StoredCircle(int, int, float, int, rgba_t);
+void(*StoredCircle)(int, int, float, int, rgba_t);
 void Circle(int x, int y, float radius, int steps, rgba_t &color) {
 	if (circle_defined) {
 		StoredCircle(x, y, radius, steps, color);
@@ -110,9 +110,9 @@ void Circle(int x, int y, float radius, int steps, rgba_t &color) {
 		py = dy;
 	}	
 }
-void InitCircle (void(*func)(int, int, float, int, rgba_t)) {
+void InitCircle (void *func(int, int, float, int, rgba_t)) {
 	circle_defined = true;
-	//StoredCircle = func;
+	StoredCircle = func;
 }
 	
 	
@@ -121,7 +121,7 @@ namespace strings {
 
 // String
 static bool string_defined = false;
-void *StoredString(const char*, int, int, EFont, rgba_t);
+void(*StoredString)(const char*, int, int, EFont, rgba_t);
 void String(const char* text, int x, int y, EFont font, rgba_t color) {
 	if (string_defined) {
 		StoredString(text, x, y, font, color);
@@ -132,14 +132,14 @@ void String(const char* text, int x, int y, EFont font, rgba_t color) {
 void String(std::string text, int x, int y, EFont font, rgba_t color) {
 	String(text.c_str(), x, y, font, color);
 }
-void InitString (void(*func)(const char*, int, int, EFont, rgba_t)) {
+void InitString (void *func(const char*, int, int, EFont, rgba_t)) {
 	string_defined = true;
-	//StoredString = func;
+	StoredString = func;
 }
 
 // String length in pixels
 static bool string_length_defined = false;
-void *StoredStringLength(const char*, EFont, int&, int&);
+void(*StoredStringLength)(const char*, EFont, int&, int&);
 void GetStringLength(const char* string, EFont font, int& length, int& height) {
 	if (string_defined && string_length_defined) {
 		StoredStringLength(string, font, length, height);
@@ -147,9 +147,9 @@ void GetStringLength(const char* string, EFont font, int& length, int& height) {
 	}
 	//if (!string_defined && !line_defined) return; // Use the crappy font rendering workaround
 }
-void InitStringLength (void(*func)(const char*, int, int, EFont, rgba_t)) {
+void InitStringLength (void *func(const char*, int, int, EFont, rgba_t)) {
 	string_length_defined = true;
-	//StoredString = func;
+	StoredStringLength = func;
 }
 }
 	
@@ -159,16 +159,16 @@ namespace other {
 	
 // World to screen, this is performed as a module option as the game can do this for us, but In the future, I would like to be able to do this fully in the cheat
 static bool world_to_screen_defined = false;
-bool *StoredWorldToScreen(const CatVector&, CatVector&);
+bool(*StoredWorldToScreen)(const CatVector&, CatVector&);
 bool WorldToScreen(const CatVector& world, CatVector& screen) {
 	if (world_to_screen_defined) {
 		return StoredWorldToScreen(world, screen);
 	}
 	return false; // We cant do this ourself quite yet sadly...
 }
-void InitWorldToScreen (void(*func)(const CatVector&, CatVector&)) {
+void InitWorldToScreen (void *func(const CatVector&, CatVector&)) {
 	world_to_screen_defined = true;
-	//StoredCircle = func;
+	StoredWorldToScreen = func;
 }
 	
 }}

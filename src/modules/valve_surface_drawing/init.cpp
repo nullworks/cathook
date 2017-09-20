@@ -9,30 +9,27 @@
  *
  */
 
+#include "../../logging.h"
 #include "../../managers/drawmodulemgr.hpp"
 #include "draw.hpp"
 
 #include "init.hpp"
-
-// So that the modularity funcs work
-typedef void(*fn_name_int)(int, ...); 
-typedef void(*fn_name_const_char)(const char*, ...);
-typedef bool(*fn_name_catvector)(const CatVector&, ...);	
 
 
 namespace modules { namespace valvesurface {
 
 void Init(vgui::ISurface* VSurface) { // To pass surface into the module, it requests it at init
 	
+	logging::Info("Begin Valve Surface Draw Module Init...");
 	g_ISurface = VSurface; // Set the pointer passed from the game module into the draw functions
 	
 	// Pass the surface functions to the drawmodule manager
 	drawmgr::InitLine(Line);
 	drawmgr::InitRect(Rect);
 	drawmgr::InitRectFilled(RectFilled);
-	drawmgr::string::InitString(String1);
-	drawmgr::string::InitStringLength(StringLength);
-	
+	drawmgr::strings::InitString(String1);
+	drawmgr::strings::InitStringLength(StringLength);
+	logging::Info("Finish Valve Surface Draw Module Init...");
 }
 	
 }} 

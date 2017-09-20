@@ -10,6 +10,7 @@
 #include "hacks/sharedobj.h"
 #include "hacks/interfaces.h"
 #include "offsets.hpp"
+#include "../valve_surface_drawing/init.hpp" // Put compiler option here for including graphics modules
 
 #include "hooked.hpp"
 
@@ -19,6 +20,7 @@ namespace modules { namespace tf2 {
 // The startup function for the module
 void Init(){
 	
+	logging::Info("Begin Team Fortress 2 module init...");
 	// Please remove unneeded hooks, objects, and interfaces
 	sharedobj::LoadAllSharedObjects();
 	CreateInterfaces();
@@ -35,11 +37,16 @@ void Init(){
 	hooks::clientmode.Set((void*)clientMode);
 	hooks::clientmode.HookMethod((void*)CreateMove_hook, offsets::CreateMove()); // World Tick
 	hooks::clientmode.Apply();
-
-	/*modules::tf2::hacks::client.Set(modules::tf2::hacks::g_IBaseClient);
-	modules::tf2::hacks::client.HookMethod((void*)IN_KeyEvent_hook, modules::tf2::hacks::offsets::IN_KeyEvent()); // Keypress detection for gui
-	modules::tf2::hacks::client.Apply();*/
 	logging::Info("Finish tf2 Hooking!");
+	
+	logging::Info("Loading graphics module!");
+	// Put possible graphics modules here. 
+	// Put compiler options here to allow user choice
+	modules::valvesurface::Init(g_ISurface);
+	
+	
+	
+	logging::Info("Finish Team Fortress 2 module init...");
 	
 }
 	

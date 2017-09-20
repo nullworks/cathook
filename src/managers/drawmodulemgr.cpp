@@ -1,7 +1,7 @@
  
 /*
  *
- *	Welcome to the draw manager!
+ *	Welcome to the draw module manager!
  *	Here is the modular drawing system you can tap into if needed!
  *	It is designed to only require draw line but you may add other specialized functions if needed.
  *	Currently the init functions are unable to save the functions input into them!!!
@@ -10,7 +10,7 @@
  *
  */
 
-
+// TODO, add texture func with texture load with drawline
 
 #include <math.h>
 #include <stdarg.h>
@@ -20,11 +20,6 @@
 
 
 namespace drawmgr {
-
-// Dont use more than needed, credits to cat for giving this to me
-typedef void(*fn_name_int)(int, ...); 
-typedef void(*fn_name_const_char)(const char*, ...);
-typedef bool(*fn_name_catvector)(const CatVector&, ...);	
 	
 // Line
 static bool line_defined = false;
@@ -171,6 +166,20 @@ bool WorldToScreen(const CatVector& world, CatVector& screen) {
 void InitWorldToScreen(void *func(const CatVector&, CatVector&)) {
 	world_to_screen_defined = true;
 	StoredWorldToScreen = func;
+}
+	
+// A reset command run every draw tick. Some graphics may require one through its not always needed.
+static bool reset_defined = false;
+void(*StoredReset)();
+void Reset() {
+	if (reset_defined) {
+		return StoredReset();
+	}
+	return;
+}
+void InitReset(void *func()) {
+	reset_defined = true;
+	StoredReset = func;
 }
 	
 }}

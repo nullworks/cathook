@@ -145,13 +145,14 @@ void hack::Initialize() {
 	//prctl(PR_SET_DUMPABLE,0,42,42,42); // Lets not change this to prevent detection, its usefull for debugging I think. http://man7.org/linux/man-pages/man2/prctl.2.html
 	
 	
-	// Please put modules here with correct compiler options to load only the ones needed.
-	// Please also put compiler options to not compile the modules if they are not needed.
+	// Please put only one GAME module here. Any other potential module can screw with things.
+	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
 	logging::Info("Loading Modules...");
 	
 	modules::tf2::Init();
 	
+	logging::Info("Modules Done!");
 	
 	
 	//logging::Info("Clearing initializer stack");

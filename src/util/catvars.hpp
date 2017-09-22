@@ -36,7 +36,7 @@ public:
 
 class CatVar {
 public:
-	CatVar(CatVar_t type, CatVarEnum gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long = "no description");
+	CatVar(CatVar_t type, CatVarEnum gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long);
 	CatVar(CatVar_t type, CatVarEnum gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long, float max_val);
 	CatVar(CatVar_t type, CatVarEnum gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long, float min_val, float max_val);
 	CatVar(CatVarEnum& cat_enum, CatVarEnum gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long);

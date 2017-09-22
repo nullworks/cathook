@@ -33,7 +33,7 @@ void DrawTick(){
 	other::Reset();
 	side_strings.Reset();
 	
-	side_strings.AddString("Cathook", rgba_t(100, 100, 100, 255));
+	side_strings.AddString("Cathook", rgba_t(140, 80, 60, 255));
 	
 	//RectFilled(40, 40, 40, 40, rgba_t(100, 100, 100, 255));
 	DrawSideStrings();// Do this last

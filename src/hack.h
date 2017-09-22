@@ -16,7 +16,7 @@ class ConCommand;
 class CCommand;*/
 
 #include <stack>
-#include <string>
+//#include <string>
 #include <mutex>
 
 

@@ -4,7 +4,7 @@
 
 #include <string.h> // String stuff
 #include <stdarg.h> // Infinit arguments, va_lists
-#include <stdio.h>	// vsprintf()
+#include <sstream>	// For formatting to work properly
 
 #include "colors.hpp"
 
@@ -13,5 +13,16 @@ char* strfmt(const char* fmt, ...);
 rgba_t StrToRgba(char* text);
 //wchar_t* GetWC(const char* fmt, ...);
 
-
+void format_internal(std::stringstream& stream);
+template<typename T, typename... Targs>
+void format_internal(std::stringstream& stream, T value, Targs... args) {
+	stream << value;
+	format_internal(stream, args...);
+}
+template<typename... Args>
+std::string format(const Args&... args) {
+	std::stringstream stream;
+	format_internal(stream, args...);
+	return stream.str();
+}
 #endif

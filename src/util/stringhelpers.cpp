@@ -4,8 +4,10 @@
  *  Created on: Sep 17, 2016
  *      Author: oneechan
  */
-#include <stdlib.h>     /* atoi */
+#include <stdlib.h>     // atoi 
+#include <stdio.h>		// vsprintf()
 #include <cctype>		// isdigit
+
 
 #include "stringhelpers.hpp"
 
@@ -42,6 +44,10 @@ rgba_t StrToRgba(char* text) {
 		found_tick++; // We found next number
 	}
 	return color;
+}
+
+void format_internal(std::stringstream& stream) {
+	(void)(stream);
 }
 
 

@@ -11,7 +11,6 @@
 #include "logging.h"
 #include "shutdown.hpp"
 
-#include "util/x11inputhandler.hpp"
 #include "hack.h"
 
 // Game Modules
@@ -38,8 +37,6 @@ void hack::Initialize() {
 	logging::Info("Loading Modules...");
 	
 	modules::tf2::Init();
-	
-	InputHandler::GetXWindow();
 	
 	logging::Info("Modules Done!");
 	

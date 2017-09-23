@@ -64,7 +64,7 @@ void FontInit()	{
 }
 
 // Retrieves one of the fonts generated and saved into
-unsigned long GetSurfaceFont(EFont font, int size) {
+unsigned long GetSurfaceFont(int font, int size) {
 	if (!font_init) FontInit(); // Init fonts if we havent
 	while (size > 31) {size--;} // Clamping as we dont have that many font sizes
 	switch(font) {

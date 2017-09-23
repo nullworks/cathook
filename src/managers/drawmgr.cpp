@@ -9,6 +9,9 @@
  */
 #include <mutex>
 
+#include "../util/stringhelpers.hpp" // format()
+#include "inputmgr.hpp"	// We reset user input on draw
+
 #include "drawmgr.hpp"
 
 namespace drawmgr {
@@ -32,6 +35,7 @@ void DrawTick(){
 	// Reset things
 	other::Reset();
 	side_strings.Reset();
+	CatUserInp.Refresh(); // Ask for another poll
 	
 	side_strings.AddString("Cathook", rgba_t(140, 80, 60, 255));
 	

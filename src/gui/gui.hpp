@@ -2,4 +2,4 @@
 
 #include "../util/catvars.hpp"
 
-extern CatVarColor GUIColor;
+rgba_t GUIColor();

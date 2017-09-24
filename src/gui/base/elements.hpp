@@ -5,5 +5,8 @@
  *
  */
 
+#include "baseelement.hpp"
 #include "root.hpp"
 #include "button.hpp"
+#include "slider.hpp"
+#include "divider.hpp"

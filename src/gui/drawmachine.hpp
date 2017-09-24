@@ -5,3 +5,9 @@
  *
  *
  */
+
+namespace gui {
+	
+void Draw();	
+	
+}

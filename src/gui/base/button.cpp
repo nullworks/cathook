@@ -11,7 +11,7 @@
 
 namespace gui { namespace element {
 	
-void ButtonDraw(const CBaseWidget* base_widget, rgba_t& color) {
+void ButtonDraw(const CBaseWidget* base_widget, rgba_t color) {
 	if (base_widget == nullptr || !base_widget->visible) return;	// Draw name
 	if (base_widget->child_bool != nullptr && base_widget->child_bool) {
 		drawmgr::RectFilled(base_widget->rootx - 1, base_widget->rooty - 1, base_widget->widthx - 1, base_widget->widthy - 1, rgba_t(25, 25, 25, 192));// Depressed look

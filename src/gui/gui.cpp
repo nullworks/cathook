@@ -10,11 +10,13 @@
 #include "gui.hpp"
 
 CatEnum menu_gui({ "Visuals", "GUI" });
-CatVarColor GUIColor(menu_gui, "gui_color", rgba_t(255, 0, 240, 255), "GUI Color", "Controls the color of the gui");	
+CatVarColor CatGUIColor(menu_gui, "gui_color", rgba_t(255, 0, 240, 255), "GUI Color", "Controls the color of the gui");	
 
 
 
-
+rgba_t GUIColor() {
+	return (rgba_t)CatGUIColor;
+}
 
 
 

@@ -31,5 +31,5 @@ void DrawSideStrings() {
 }
 
 void DefaultSideStrings() {
-	side_strings.AddString("Cathook", (rgba_t)GUIColor);
+	side_strings.AddString("Cathook", GUIColor());
 }

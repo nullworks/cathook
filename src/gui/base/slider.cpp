@@ -12,7 +12,7 @@
 
 namespace gui { namespace element {
 	
-void SliderDraw(const CBaseWidget* base_widget, rgba_t& color) {
+void SliderDraw(const CBaseWidget* base_widget, rgba_t color) {
 	if (base_widget == nullptr || !base_widget->visible) return; // Use colors "205 205 205 255"
 	drawmgr::Line(base_widget->rootx, base_widget->rooty, base_widget->widthx, base_widget->widthy, color);
 }

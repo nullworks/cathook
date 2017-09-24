@@ -12,7 +12,7 @@
 
 namespace gui { namespace element {
 	
-void DividerDraw(const CBaseWidget* base_widget, rgba_t& color) {
+void DividerDraw(const CBaseWidget* base_widget, rgba_t color) {
 	if (base_widget == nullptr || !base_widget->visible) return;
 	drawmgr::Line(base_widget->rootx, base_widget->rooty, base_widget->widthx, base_widget->widthy, color);
 }

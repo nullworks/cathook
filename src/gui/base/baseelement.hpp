@@ -5,6 +5,7 @@
  *	While making your own widget, pass your draw and userinput to it.
  *
  */
+
 #ifndef BASEWIDGETBASEGUI
 #define BASEWIDGETBASEGUI
 
@@ -17,8 +18,9 @@ namespace gui { namespace element {
 
 class CBaseWidget {
 public:
-	CBaseWidget(CBaseWidget* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t&)); 
+	CBaseWidget(CBaseWidget* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t)); 
 	CBaseWidget();
+	~CBaseWidget();
 		
 public:
 	CBaseWidget* root_parent;	// What root does this button belong to, if any at all
@@ -39,8 +41,8 @@ public:
 	std::string* child_string;
 	rgba_t* child_rgba;	
 	
-	const void(*draw)(CBaseWidget*, const rgba_t*);	// We send draw requests to widgets
-	bool(*usrinput)(CBaseWidget*);					// We send out request to the widget to see if its accepting userinp. it returns true if it is
+	void(*draw)(const CBaseWidget*, rgba_t);	// We send draw requests to widgets
+	bool(*usrinput)(CBaseWidget*);				// We send out request to the widget to see if its accepting userinp. it returns true if it is
 };
 	
 extern std::vector<CBaseWidget*>& CBaseWidgetList();

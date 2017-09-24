@@ -12,10 +12,17 @@ const int aspecty = 7;
 
 // The root of cathooks menu
 //gui::element::CRoot cathook_menu();
-
+gui::element::CBaseWidget* main_menu = nullptr;
 	
+	
+void Construct() {
+	if (!main_menu) main_menu = new gui::element::CBaseWidget();
+	main_menu->widthx = 400;
+	main_menu->widthy = 250;	
+	
+}
 void Init() {
-	
+
 	
 	
 }

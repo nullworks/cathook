@@ -163,13 +163,15 @@ void Refresh(CCatUserInp *input_class) {
 		//if (mask_return & (Button5Mask)) input_class->stored_pressed.insert(CATKEY_MOUSE_5, true); 
 	}
 	
+	// !!!!!TODO!!!!! !!!!!FIX!!!!
+	
 	// Find depressed keys and save them to the stored map
-	char keys[32];
+	/*char keys[32];
 	XQueryKeymap(xAppDisplay, keys);
 	for( const auto& current : xlibToCatVar ) {	// Recurse through the map looking for depressed keys
 		// Sue me i dare you
 		//if (keys & (current.first)) input_class->stored_pressed.insert({{current.second}, {true}}); // Commented so i can compile
-	}
+	}*/
 }
 
 

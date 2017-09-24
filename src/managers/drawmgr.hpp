@@ -1,22 +1,12 @@
 
 
-
-#include "drawmodulemgr.hpp"
-
-
-
 namespace drawmgr {
 	
-void DrawTick();
+void DrawTick(); // So that a hooked function from a module can call this
 	
-class HudStrings {
-public:
-	std::string string[32];
-	rgba_t color[32];
-	int count;
-	void AddString(const std::string&, const rgba_t&);
-	void Reset();
-} 
-extern HudStringsside_strings;
+// Used by various parts of code to request to have its function run by the draw manager
+void RequestDrawOnBefore(void(*func)(void));
+void RequestDrawOnDraw(void(*func)(void));
+void RequestDrawOnAfter(void(*func)(void));
 }
 

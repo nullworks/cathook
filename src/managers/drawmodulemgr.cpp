@@ -11,6 +11,7 @@
  */
 
 // TODO, add texture func with texture load with drawline
+// TODO, make storage pointers = nullptr, remove the static defined and check if the var isnt null ptr
 
 #include <math.h>
 #include <stdarg.h>
@@ -23,7 +24,7 @@ namespace drawmgr {
 	
 // Line
 static bool line_defined = false;
-void(*StoredLine)(int, int, int, int, rgba_t);
+void(*StoredLine)(int, int, int, int, rgba_t);// = nullptr
 void Line(int x, int y, int w, int h, rgba_t color) {
 	if (!line_defined) return; // Check if module has claimed this yet	
 	StoredLine(x, y, w, h, color);
@@ -49,7 +50,6 @@ void Rect(int x, int y, int w, int h, rgba_t color) {
 	Line(x, y + 1, 0, h, color); // Left
 	Line(x + 1, y + h, w - 1, 0, color); // Botton
 	Line(x + w, y + 1, 0, h - 1, color); // Right
-	
 }
 void InitRect(void *func(int, int, int, int, rgba_t)) {
 	rect_defined = true;

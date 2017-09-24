@@ -16,6 +16,9 @@
 // Game Modules
 #include "modules/tf2/init.hpp"
 
+// GUI
+#include "gui/init.hpp"
+
 /*
  *	The cheats entry point is in entry.cpp, which creates a thread for cathook to use.
  *	From there, the init below here is run
@@ -39,6 +42,10 @@ void hack::Initialize() {
 	modules::tf2::Init();
 	
 	logging::Info("Modules Done!");
+	
+	
+	gui::Init(); // init the gui
+	
 	
 	logging::Info("Initializing Done!");
 }

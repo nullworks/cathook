@@ -21,8 +21,17 @@ char* strfmt(const char* fmt, ...) {
 	return buf;
 }
 
+// Over simplified string to bool
+bool StrToBool(const std::string* str) {
+	if (str == "true" || str == "1") {
+		return true;
+	}
+	return false;
+}
+
+
 // Attempts to get a rgba color from a string
-rgba_t StrToRgba(char* text) {
+rgba_t StrToRgba(const char* text) {
 	char ch[3];
 	memset(ch, "n", sizeof(char) * 3); // clean out the char
 	rgba_t color = rgba_t(0, 0, 0, 255);

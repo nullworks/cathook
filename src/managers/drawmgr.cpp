@@ -8,50 +8,53 @@
  *
  */
 #include <mutex>
+#include <vector>
 
-#include "../util/stringhelpers.hpp" // format()
+#include "drawmodulemgr.hpp" // So we can send a draw reset to whatever draw module needs it
 #include "inputmgr.hpp"	// We reset user input on draw
 
 #include "drawmgr.hpp"
 
 namespace drawmgr {
 std::mutex drawing_mutex;// Help prevent multithreadding call this multiple times
-HudStrings side_strings;// Stores side strings
-	
-void DrawSideStrings() {
-	int y = 8;	// TODO, make this change depending on screen size.
-	int tmp, tmp2;
-	for (int i = 0; i < side_strings.count; i++) {
-		strings::String(side_strings.string[i].c_str(), 8, y, OPENSANS, 30, side_strings.color[i]); // TODO, make gui use user defined font as well as size
-		strings::GetStringLength(side_strings.string[i].c_str(), OPENSANS, 30, tmp2, tmp);
-		y += tmp + 1;
-	}
-}
+
+// Stores functions that request to be called at times during draw
+typedef void(*funcptr)(void);
+std::vector<funcptr> before_draw_functions;
+std::vector<funcptr> draw_functions;
+std::vector<funcptr> after_draw_functions;
 	
 // This should be run on drawtick
 void DrawTick(){
-	std::lock_guard<std::mutex> draw_lock(drawing_mutex);	// multithreadding fix
+	std::lock_guard<std::mutex> draw_lock(drawing_mutex);	// multithreadding fix?
 	
-	// Reset things
-	other::Reset();
-	side_strings.Reset();
-	CatUserInp.Refresh(); // Ask for another poll
+	// Reset things. We prepare drawing stuff for other input asked from request
+	other::Reset();	// This is drawing and we know we have to do it anyways if we are using the draw manager
+	CatUserInp.Refresh(); // Ask for another poll, this also deserves to be done anyways as if a input module wasnt used, this would do nothing. GUI also needs this to be done first!
+	for(const auto& func : before_draw_functions) {
+		func();
+	}
 	
-	side_strings.AddString("Cathook", rgba_t(140, 80, 60, 255));
+	// During draw, esp and stuff should be done here!
+	for(const auto& func : draw_functions) {
+		func();
+	}
 	
-	//RectFilled(40, 40, 40, 40, rgba_t(100, 100, 100, 255));
-	DrawSideStrings();// Do this last
+	// After Draw, finalizing and stuff. GUI and other hud elements should be done here!
+	for(const auto& func : after_draw_functions) {
+		func();
+	}
 }
-	
-void HudStrings::AddString(const std::string& input_string, const rgba_t& input_color) {
-	string[count] = input_string;
-	color[count] = input_color;
-	++count;
+// Input your function to request that draw mgr runs your function during a stage of draw.
+void RequestDrawOnBefore(void(*func)(void)) {
+	before_draw_functions.push_back(func);
 }
-void HudStrings::Reset() {
-	count = 0;
+void RequestDrawOnDraw(void(*func)(void)) {
+	draw_functions.push_back(func);
 }
-
+void RequestDrawOnAfter(void(*func)(void)) {
+	after_draw_functions.push_back(func);
+}
 }
 
 	

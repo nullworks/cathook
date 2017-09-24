@@ -10,7 +10,6 @@
 #include "../../managers/drawmodulemgr.hpp"
 #include "../gui.hpp"			// guicolor
 
-namespace gui { namespace sidestrings {
 HudStrings side_strings;// Stores side strings
 void HudStrings::AddString(const std::string& input_string, const rgba_t& input_color) {
 	if (count >= 32) return; // To prevent overflow 
@@ -34,4 +33,3 @@ void DrawSideStrings() {
 void DefaultSideStrings() {
 	side_strings.AddString("Cathook", GUIColor());
 }
-}}

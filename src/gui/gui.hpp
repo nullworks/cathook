@@ -1,5 +1,7 @@
 
 
-#include "../util/catvars.hpp"
+#include "../util/colors.hpp"	// Colors
 
+namespace gui {
 rgba_t GUIColor();
+}

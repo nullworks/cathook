@@ -90,7 +90,10 @@ CatVarColor::CatVarColor(CatEnum gui_position, std::string name, rgba_t defaults
 	value_rgba = defaults;
 	CatVarList().push_back(new CatVar(CV_RGBA, nullptr, nullptr, nullptr, nullptr, this));
 }
-
+// Main CatVar
+CatVar::CatVar(CatVar_t type, CatVarBool* cat_bool, CatVarInt* cat_int, CatVarFloat* cat_float, CatVarString* cat_string, CatVarColor* cat_color)
+	: type(type), cat_bool(cat_bool), cat_int(cat_int), cat_float(cat_float), cat_string(cat_string), cat_color(cat_color) {
+}
 
 CatEnum::CatEnum(std::vector<std::string> values) : value_names(values) {
 	min_value = 0;

@@ -8,6 +8,6 @@
 
 namespace gui {
 	
-void DrawMachine();	
+void Draw();	
 	
 }

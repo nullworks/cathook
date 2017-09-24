@@ -43,6 +43,7 @@ CBaseWidget* RootCreate() {
 	CBaseWidget* tmp = new CBaseWidget();
 	tmp->usrinput = RootHandleUi;
 	tmp->draw = RootDraw;
+	tmp->root = true;
 	return tmp;
 }
 }}

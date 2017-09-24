@@ -14,6 +14,8 @@
 
 #include "../../util/colors.hpp"
 
+namespace gui { namespace element {
+
 class CBaseWidget {
 public:
 	CBaseWidget(CBaseWidget* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t)); 
@@ -43,6 +45,7 @@ public:
 	bool(*usrinput)(CBaseWidget*);				// We send out request to the widget to see if its accepting userinp. it returns true if it is
 };
 	
-extern std::vector<CBaseWidget*> CBaseWidgetList;
+extern std::vector<CBaseWidget*>& CBaseWidgetList();
+}}
 
 #endif

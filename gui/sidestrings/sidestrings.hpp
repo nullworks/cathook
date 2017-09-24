@@ -2,7 +2,6 @@
 #include <string>
 #include "../../util/colors.hpp"
 
-namespace gui { namespace sidestrings {
 class HudStrings {
 public:
 	std::string string[32];
@@ -15,4 +14,3 @@ extern HudStringsside_strings;
 void DefaultSideStrings();
 	
 void DrawSideStrings();
-}}

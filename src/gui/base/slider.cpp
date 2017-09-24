@@ -21,7 +21,7 @@ bool SliderHandleUi(CBaseWidget* base_widget) {
 	return false;	// TODO, make it functional
 }
 
-CBaseWidget* SliderCreate(CRoot* root_parent, int layer){		// Use when creating a slider. This returns a pointer to the widget
+CBaseWidget* SliderCreate(CBaseWidget* root_parent, int layer){		// Use when creating a slider. This returns a pointer to the widget
 	CBaseWidget* tmp = new CBaseWidget(root_parent, layer, SliderDraw);
 	tmp->usrinput = SliderHandleUi;
 	return tmp;

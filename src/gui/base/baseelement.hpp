@@ -9,19 +9,19 @@
 #define BASEWIDGETBASEGUI
 
 #include <string>
+#include <vector>
 
 #include "../../util/colors.hpp"
-
-#include "root.hpp"
 
 namespace gui { namespace element {
 
 class CBaseWidget {
 public:
-	CBaseWidget(CRoot* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t&)); 
-	
+	CBaseWidget(CBaseWidget* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t&)); 
+	CBaseWidget();
+		
 public:
-	CRoot* root_parent;	// What root does this button belong to
+	CBaseWidget* root_parent;	// What root does this button belong to, if any at all
 	int layer = 0;				// Makes it easier to keep track of where it is in the heierarchy
 	int rootx = 0;
 	int rooty = 0;
@@ -30,6 +30,7 @@ public:
 	std::string* name;   			// Depends on if its used or not. Be sure to check if its null
 	bool visible = false;			// Keep it false untill someone makes it otherwise
 	bool performed_last = false; 	// If the user action was performed last time.
+	bool root = false;
 	
 	// If a widget needs a pointer to a var for refrence
 	bool* child_bool;

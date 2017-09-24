@@ -11,7 +11,7 @@ const int aspectx = 11;
 const int aspecty = 7;
 
 // The root of cathooks menu
-gui::element::CRoot cathook_menu();
+//gui::element::CRoot cathook_menu();
 
 	
 void Init() {

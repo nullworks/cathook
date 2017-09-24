@@ -17,7 +17,7 @@ void DividerDraw(const CBaseWidget* base_widget, rgba_t& color) {
 	drawmgr::Line(base_widget->rootx, base_widget->rooty, base_widget->widthx, base_widget->widthy, color);
 }
 
-CBaseWidget* DividerCreate(CRoot* root_parent, int layer) {	// Use when creating a devider. This returns a pointer to the widget
+CBaseWidget* DividerCreate(CBaseWidget* root_parent, int layer) {	// Use when creating a devider. This returns a pointer to the widget
 	return new CBaseWidget(root_parent, layer, DividerDraw);
 }
 	

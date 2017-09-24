@@ -13,14 +13,22 @@
 
 namespace gui { namespace element {
 	
-CRoot::CRoot() { 					// When creating this, i want to push it to the list
-	CRootList().push_back(this);
-}
-void CRoot::draw(rgba_t color) {
-	if (!visible) return;
-	drawmgr::RectFilled(rootx - 1, rooty - 1, widthx - 1, widthy - 1, rgba_t(25, 25, 25, 192));// Nice transparent gray inner box, 75% opacity
-	drawmgr::Rect(rootx, rooty, widthx, widthy, color);
+
+void RootDraw(CBaseWidget* base_widget, rgba_t& color) {
+	if (base_widget == nullptr || !base_widget->visible) return;
+	drawmgr::RectFilled(base_widget->rootx - 1, base_widget->rooty - 1, base_widget->widthx - 1, base_widget->widthy - 1, rgba_t(25, 25, 25, 192));// Nice transparent dark gray inner box, 75% opacity
+	drawmgr::Rect(base_widget->rootx, base_widget->rooty, base_widget->widthx, base_widget->widthy, color);
 }
 	
-std::vector<CRoot*>& CRootList();
+bool RootHandleUi(CBaseWidget* base_widget) {
+	if (base_widget == nullptr || !base_widget->visible) return false;
+	return false; // TODO, make happen
+}
+	
+CBaseWidget* RootCreate() {
+	CBaseWidget* tmp = new CBaseWidget();
+	tmp->usrinput = RootHandleUi;
+	tmp->draw = RootDraw;
+	return tmp;
+}
 }}

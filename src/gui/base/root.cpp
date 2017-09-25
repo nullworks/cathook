@@ -28,14 +28,17 @@ bool RootHandleUi(CBaseWidget* base_widget) {
 	if (CatUserInp.IsKeyPressed(CATKEY_MOUSE_1)) {	// Check for m1
 		if (!base_widget->performed_last) {
 			if (!(CatUserInp.mousex > base_widget->rootx && CatUserInp.mousey > base_widget->rooty && CatUserInp.mousex < base_widget->rootx + base_widget->widthx && CatUserInp.mousey < base_widget->rooty + base_widget->widthy)) return false; // check if in bounds
-			mouseoffsetx = CatUserInp.mousex - base_widget->rootx;
-			mouseoffsety = CatUserInp.mousey - base_widget->rooty;
+			mouseoffsetx = base_widget->rootx - CatUserInp.mousex;
+			mouseoffsety = base_widget->rooty - CatUserInp.mousey;
+			base_widget->performed_last = true;
+			PushOnTop(base_widget);
 		} else {
 			base_widget->rootx = CatUserInp.mousex + mouseoffsetx;
 			base_widget->rooty = CatUserInp.mousey + mouseoffsety;
 		}
 		return true;
 	}
+	base_widget->performed_last = false;
 	return false; // TODO, make happen
 }
 	

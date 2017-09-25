@@ -9,6 +9,7 @@
 #define LOGGING_H_
 
 #include <stdio.h>
+#include "util/stringhelpers.hpp" // format()
 
 // Hmm???
 typedef void(fn_Msg_t)(const char* msg, va_list);

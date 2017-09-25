@@ -21,13 +21,12 @@ CBaseWidget::CBaseWidget() {
 	root = true;
 	CBaseWidget* tmp = this;
 	CBaseWidgetList.push_back(tmp); // When creating this, i want to push it to the list
-	//PushOnTop(this);	// Put new root on top
 }
 
 CBaseWidget::~CBaseWidget() { 	
 	
 	// If a root was deleted, we want to delete anything this owns.
-	if (root) {	
+	if (root) {
 		for(int i = 0; i < CBaseWidgetList.size(); i++) {
 			CBaseWidget* widget = CBaseWidgetList[i];
 			if (widget->root) continue;			// dont delete other/our root/s
@@ -39,5 +38,29 @@ CBaseWidget::~CBaseWidget() {
 		CBaseWidgetList.shrink_to_fit();
 	}
 }
+
+// Pushes a root to the top of the stack
+void PushOnTop(CBaseWidget* base_widget) {
+	if (!base_widget || !base_widget->root) return; // Check if root
+		
+	// Attempt to find the root and remove it
+	int list_size = CBaseWidgetList.size();
+	for(int i = 0; i < list_size; i++) {
+		CBaseWidget* find = CBaseWidgetList[i];
+		if (find && base_widget == find) CBaseWidgetList.erase(CBaseWidgetList.begin() + i);
+	}
+	
+	// Place root on top
+	CBaseWidgetList.push_back(base_widget);
+}
+
+// This is used to clean the list of any unused or stray elements not used.
+/*void CleanStack() {
+	int list_size = CBaseWidgetList.size();
+	for(int i = 0; i < list_size; i++) {
+		CBaseWidget* find = CBaseWidgetList[i];
+		if (!find) CBaseWidgetList.erase(c.begin() + i);
+	}
+}*/
 	
 std::vector<CBaseWidget*> CBaseWidgetList;

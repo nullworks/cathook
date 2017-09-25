@@ -17,11 +17,10 @@ void DrawMachine() {
 	if (CBaseWidgetList.empty()) return; // Cant draw nothing
 	
 	// Recurse backwards through to find roots from the bottom up
-	int list_size = CBaseWidgetList.size();
-	for(int i = list_size; i >= 0; i--) {
-		CBaseWidget* i_widget = CBaseWidgetList[i];
+	for(CBaseWidget* i_widget : CBaseWidgetList) {
 		if (i_widget == nullptr) continue;
-		if (!i_widget->root) continue;	// We only want roots
+		if (!i_widget->root) continue;		// We only want roots
+		if (!i_widget->visible) continue;	// root needs to be visible
 		
 		// Draw the root so we can put stuff on top of it
 		i_widget->draw(i_widget, GUIColor());

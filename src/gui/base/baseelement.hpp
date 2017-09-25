@@ -42,7 +42,8 @@ public:
 	void(*draw)(const CBaseWidget*, rgba_t);	// We send draw requests to widgets
 	bool(*usrinput)(CBaseWidget*);				// We send out request to the widget to see if its accepting userinp. it returns true if it is
 };
-	
+
+void PushOnTop(CBaseWidget* base_widget);
 extern std::vector<CBaseWidget*> CBaseWidgetList;
 
 #endif

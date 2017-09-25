@@ -7,6 +7,6 @@
 
 namespace gui { namespace menu {
 	
-void Construct();
+void ReConstruct();
 	
 }}

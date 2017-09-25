@@ -9,58 +9,62 @@
 
 #include "divider.hpp"
 
-CBaseWidget::CBaseWidget(CBaseWidget* root_parent, int layer, void(*draw)(const CBaseWidget*, rgba_t)) 
-	: root_parent(root_parent), layer(layer), draw(draw){ 
-	root = false; // Its owned by something else. Its not a root
+CBaseWidget::CBaseWidget(CBaseWidget* root_parent, void(*draw)(const CBaseWidget*)) 
+	: root_parent(root_parent), draw(draw){ 
 	CBaseWidget* tmp = this;
-	CBaseWidgetList.push_back(tmp); // When creating this, i want to push it to the list
+	root_parent->child_widgets.push_back(tmp); // When creating this, i want to push it to the parent
 }
 
 // This is for creating a root
 CBaseWidget::CBaseWidget() { 
-	root = true;
 	CBaseWidget* tmp = this;
-	CBaseWidgetList.push_back(tmp); // When creating this, i want to push it to the list
+	CBaseWidgetRoots.push_back(tmp); // When creating this, i want to push it to the root list
+}
+
+// Deletes a widget as well as any children
+void DeleteWidgetTree(CBaseWidget* base_widget) {
+	if (!base_widget) return;
+	
+	// If there are no children, we our var and return, else we recurse
+	if (base_widget->child_widgets.empty()) {
+		delete base_widget;
+		return;
+	}
+	
+	// Recurse and delete children
+	for(CBaseWidget* widget : base_widget->child_widgets) {
+		if (!widget) continue;
+		DeleteWidgetTree(widget);
+	}
+	// We are done deleting children, suicide is only option
+	delete base_widget;
 }
 
 CBaseWidget::~CBaseWidget() { 	
 	
-	// If a root was deleted, we want to delete anything this owns.
-	if (root) {
-		for(int i = 0; i < CBaseWidgetList.size(); i++) {
-			CBaseWidget* widget = CBaseWidgetList[i];
-			if (widget->root) continue;			// dont delete other/our root/s
-			if (widget->root_parent == this) {	// If the parent is our root, delete it as well as in the vector
-				delete widget;
-				CBaseWidgetList.erase(CBaseWidgetList.begin() + i);
-			}
-		}
-		CBaseWidgetList.shrink_to_fit();
+	// If something has children, we want to delete them... Recursivly... Fuck children lol
+	if (!child_widgets.empty()) {
+		
+		// Delete everything in the tree
+		DeleteWidgetTree(this);
 	}
 }
 
 // Pushes a root to the top of the stack
 void PushOnTop(CBaseWidget* base_widget) {
-	if (!base_widget || !base_widget->root) return; // Check if root
+	if (!base_widget) return; // Check if root
 		
 	// Attempt to find the root and remove it
-	int list_size = CBaseWidgetList.size();
+	int list_size = CBaseWidgetRoots.size();
 	for(int i = 0; i < list_size; i++) {
-		CBaseWidget* find = CBaseWidgetList[i];
-		if (find && base_widget == find) CBaseWidgetList.erase(CBaseWidgetList.begin() + i);
+		CBaseWidget* find = CBaseWidgetRoots[i];
+		if (find && base_widget == find) {
+			CBaseWidgetRoots.erase(CBaseWidgetRoots.begin() + i);
+			CBaseWidgetRoots.push_back(base_widget);// Place root on top
+		}
 	}
-	
-	// Place root on top
-	CBaseWidgetList.push_back(base_widget);
 }
-
-// This is used to clean the list of any unused or stray elements not used.
-/*void CleanStack() {
-	int list_size = CBaseWidgetList.size();
-	for(int i = 0; i < list_size; i++) {
-		CBaseWidget* find = CBaseWidgetList[i];
-		if (!find) CBaseWidgetList.erase(c.begin() + i);
-	}
-}*/
 	
-std::vector<CBaseWidget*> CBaseWidgetList;
+std::vector<CBaseWidget*> CBaseWidgetRoots;
+
+

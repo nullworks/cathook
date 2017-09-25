@@ -12,25 +12,35 @@
 
 namespace gui {
 	
+void DrawFromTree(CBaseWidget* base_widget) {
+	if (!base_widget) return;
+	if (!base_widget->visible) return; // If it isnt visible, we dont want to draw it or anything owned by it.
+	
+	base_widget->draw(base_widget);
+	
+	// If there are children, we recurse
+	if (base_widget->child_widgets.empty()) return;
+	
+	// Recurse throught the children and draw them
+	for(CBaseWidget* widget : base_widget->child_widgets) {
+		if (!widget) continue;
+		
+		DrawFromTree(widget);
+	}
+}
+
 // This should be called on draw. The init file requests this for us!
 void DrawMachine() {
-	if (CBaseWidgetList.empty()) return; // Cant draw nothing
+	if (CBaseWidgetRoots.empty()) return; // Cant draw nothing
 	
-	// Recurse backwards through to find roots from the bottom up
-	for(CBaseWidget* i_widget : CBaseWidgetList) {
-		if (i_widget == nullptr) continue;
-		if (!i_widget->root) continue;		// We only want roots
-		if (!i_widget->visible) continue;	// root needs to be visible
+	// Find roots on the bottom
+	for(CBaseWidget* widget : CBaseWidgetRoots) {
+		if (!widget) continue;
 		
-		// Draw the root so we can put stuff on top of it
-		i_widget->draw(i_widget, GUIColor());
-		
-		// We found a root, draw stuff owned by it
-		for(CBaseWidget* ii_widget : CBaseWidgetList) {
-			if (ii_widget == nullptr) continue;
-			if (ii_widget->root || ii_widget->root_parent != i_widget) continue;	// dont draw roots and stuff not part of our root-tree
-				ii_widget->draw(ii_widget, GUIColor());
-		}
+		// Recurse into the root and draw it and its children
+		DrawFromTree(widget);		
 	}
 }	
+
+	
 }

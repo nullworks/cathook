@@ -6,37 +6,42 @@
  */
 
 #include "base/baseelement.hpp"
-#include "../logging.h"
 
 #include "inputmachine.hpp"
 
 namespace gui {
 	
+bool InputFromTree(CBaseWidget* base_widget) {
+	if (base_widget == nullptr) return false;
+	if (!base_widget->visible) return false; // If it isnt visible, we dont check it or anything it owns
+	
+	// If it wants user input, check if widget is accepting user input
+	if (base_widget->usrinput && base_widget->usrinput(base_widget)) return true;
+	
+	// If there are children, we recurse
+	if (base_widget->child_widgets.empty()) return false;
+	
+	// Recurse throught the children and draw them
+	for(CBaseWidget* widget : base_widget->child_widgets) {
+		if (!widget) continue;
+		// check if something is using user input down the tree
+		if (InputFromTree(widget)) return true;
+	}
+	return false;
+}
+	
 // This should be called on draw. The init file requests this for us!
 void InputMachine() {
-	if (CBaseWidgetList.empty()) return; // Cant check nothing
+	if (CBaseWidgetRoots.empty()) return; // Cant check nothing
 	
 	// Recurse backwards through to find roots from top down
-	int list_size = CBaseWidgetList.size();
-	logging::Info(format("Size: ", list_size).c_str());
-	for(int i = list_size; i > 0; i--) {
-		CBaseWidget* i_widget = CBaseWidgetList[i - 1];
-		logging::Info(format("Inp: ", i).c_str());
+	int list_size = CBaseWidgetRoots.size();
+	for (int i = list_size; i > 0; i--) {
+		CBaseWidget* base_widget = CBaseWidgetRoots[i - 1];
+		if (!base_widget) continue;	// To prevent crash
 		
-		if (!i_widget) continue;		// To prevent crash
-		if (!i_widget->root) continue;	// We only want roots
-		if (!i_widget->visible) continue;	// root needs to be visible
-		
-		// We found a root, find something accepting user input
-		for(CBaseWidget* ii_widget : CBaseWidgetList) {
-			if (i_widget == nullptr) continue;
-			if (ii_widget->root || ii_widget->root_parent != i_widget) continue;	 // Dont check any roots and stuff not part of our root-tree
-			if (!i_widget->visible) continue;
-			if (ii_widget->usrinput(ii_widget)) return;
-		}
-		
-		// no elements of the root returned true so we check the root itself now
-		if (i_widget->usrinput(i_widget)) return;
+		// If something returns true, then ui is being used by an element
+		if (InputFromTree(base_widget)) return;
 	}
 }	
 }

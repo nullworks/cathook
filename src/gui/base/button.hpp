@@ -6,6 +6,6 @@
 
 namespace gui { namespace element {
 
-CBaseWidget* ButtonCreate(CBaseWidget* root_parent, int layer);
+CBaseWidget* ButtonCreate(CBaseWidget* root_parent);
 	
 }}

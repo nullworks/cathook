@@ -20,7 +20,7 @@ namespace gui {
 void Init() {
 	
 	// Setup the draw manager to run gui
-	drawmgr::RequestDrawOnDraw(menu::ReConstruct);
+	//drawmgr::RequestDrawOnDraw(menu::ReConstruct);
 	drawmgr::RequestDrawOnDraw(InputMachine);
 	
 	// Setup the draw manager to run gui

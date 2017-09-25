@@ -6,14 +6,13 @@
  */
 
 #include "base/baseelement.hpp"
-#include "gui.hpp" // GUIColor()
 
 #include "drawmachine.hpp"
 
 namespace gui {
 	
 void DrawFromTree(CBaseWidget* base_widget) {
-	if (!base_widget) return;
+	if (base_widget == nullptr) return;
 	if (!base_widget->visible) return; // If it isnt visible, we dont want to draw it or anything owned by it.
 	
 	base_widget->draw(base_widget);
@@ -23,7 +22,7 @@ void DrawFromTree(CBaseWidget* base_widget) {
 	
 	// Recurse throught the children and draw them
 	for(CBaseWidget* widget : base_widget->child_widgets) {
-		if (!widget) continue;
+		if (widget == nullptr) continue;
 		
 		DrawFromTree(widget);
 	}
@@ -35,7 +34,7 @@ void DrawMachine() {
 	
 	// Find roots on the bottom
 	for(CBaseWidget* widget : CBaseWidgetRoots) {
-		if (!widget) continue;
+		if (widget == nullptr) continue;
 		
 		// Recurse into the root and draw it and its children
 		DrawFromTree(widget);		

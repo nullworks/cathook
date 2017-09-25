@@ -23,7 +23,7 @@ bool InputFromTree(CBaseWidget* base_widget) {
 	
 	// Recurse throught the children and draw them
 	for(CBaseWidget* widget : base_widget->child_widgets) {
-		if (!widget) continue;
+		if (widget == nullptr) continue;
 		// check if something is using user input down the tree
 		if (InputFromTree(widget)) return true;
 	}
@@ -38,7 +38,7 @@ void InputMachine() {
 	int list_size = CBaseWidgetRoots.size();
 	for (int i = list_size; i > 0; i--) {
 		CBaseWidget* base_widget = CBaseWidgetRoots[i - 1];
-		if (!base_widget) continue;	// To prevent crash
+		if (base_widget == nullptr) continue;	// To prevent crash
 		
 		// If something returns true, then ui is being used by an element
 		if (InputFromTree(base_widget)) return;

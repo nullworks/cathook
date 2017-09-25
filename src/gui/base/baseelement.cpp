@@ -9,7 +9,11 @@
 
 #include "divider.hpp"
 
-CBaseWidget::CBaseWidget(CBaseWidget* root_parent, void(*draw)(const CBaseWidget*)) 
+// Used by elements for mouse actions
+static int widget_mouseoffsetx;
+static int widget_mouseoffsety;
+
+CBaseWidget::CBaseWidget(CBaseWidget* root_parent, void(*draw)(CBaseWidget*)) 
 	: root_parent(root_parent), draw(draw){ 
 	CBaseWidget* tmp = this;
 	root_parent->child_widgets.push_back(tmp); // When creating this, i want to push it to the parent
@@ -52,8 +56,14 @@ CBaseWidget::~CBaseWidget() {
 
 // Pushes a root to the top of the stack
 void PushOnTop(CBaseWidget* base_widget) {
-	if (!base_widget) return; // Check if root
-		
+	if (!base_widget) return;
+	
+	// If this has a parent, we send the parent through this function instead.
+	if (base_widget->root_parent != nullptr) {
+		PushOnTop(base_widget);
+		return;
+	}
+	
 	// Attempt to find the root and remove it
 	int list_size = CBaseWidgetRoots.size();
 	for(int i = 0; i < list_size; i++) {

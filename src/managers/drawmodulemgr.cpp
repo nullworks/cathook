@@ -69,7 +69,7 @@ void RectFilled(int x, int y, int w, int h, rgba_t color) {
 	
 	// Make filled rect with lines
 	for (int i = 0; i < w; i++) {
-		Line(x + i, y, w, h, color);
+		Line(x + i, y, 0, h, color);
 	}
 }
 void InitRectFilled(void *func(int, int, int, int, rgba_t)) {

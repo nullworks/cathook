@@ -4,6 +4,7 @@
  *	This is an element to contain button elements in a small space.
  *	This element autosizes the buttons given to it based on the height and width parameters given to it.
  *	Please use extra_ints[0] for font and extra_ints[1] for font size of the buttons.
+ *	Change extra_ints[3] to a 1 and it will stretch the buttons if it doesnt need to scroll
  *	Please only give it buttons or related
  *
  */
@@ -18,7 +19,7 @@
 namespace gui { namespace element {
 	
 void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of our child buttons. We may take over drawing at times.
-	if (!base_widget || !base_widget->visible) return;
+	if (!base_widget->visible) return;
 	if (base_widget->child_widgets.empty())	return;	// We cant do anything without any children
 	
 	// First we need to get how long our buttons are
@@ -26,7 +27,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 	for (CBaseWidget* widget : base_widget->child_widgets) {
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name->c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
+		drawmgr::strings::GetStringLength(widget->name.c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
 		// Get side distance from height and and add to total distance
 		int side_distance = std::max(base_widget->height - height, 3);
 		base_widget->extra_ints[2] += length + side_distance;
@@ -42,7 +43,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 		
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name->c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
+		drawmgr::strings::GetStringLength(widget->name.c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
 		// Get side distance from height
 		int side_distance = std::max(base_widget->height - height, 3);
 		
@@ -88,11 +89,11 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 }
 
 bool ButtonBarHandleUi(CBaseWidget* base_widget) {
-	if (!base_widget || !base_widget->visible) return false;
+	if (!base_widget->visible) return false;
 	if (base_widget->child_widgets.empty())	return false;	// We cant do anything without any children
 	if (base_widget->extra_ints[2] <= base_widget->width) return false;	// If total length is less than our width, then we can fit everything in. Else, we detect mouse for positioning
 	if (CatUserInp.mousex > base_widget->rootx && CatUserInp.mousey > base_widget->rooty && CatUserInp.mousex < base_widget->rootx + base_widget->width && CatUserInp.mousey < base_widget->rooty + base_widget->height) {// check for bounds
-		base_widget->position = (CatUserInp.mousex / base_widget->rootx + base_widget->width); // Find the percnentage of our mouse to scale and move the position
+		base_widget->position = CatUserInp.mousex / (base_widget->rootx + base_widget->width); // Find the percnentage of our mouse to scale and move the position
 	}
 	return false;
 }

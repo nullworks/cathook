@@ -10,3 +10,4 @@
 #include "button.hpp"
 #include "slider.hpp"
 #include "divider.hpp"
+#include "buttonbar.hpp"

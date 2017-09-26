@@ -15,18 +15,19 @@ bool InputFromTree(CBaseWidget* base_widget) {
 	if (base_widget == nullptr) return false;
 	if (!base_widget->visible) return false; // If it isnt visible, we dont check it or anything it owns
 	
-	// If it wants user input, check if widget is accepting user input
-	if (base_widget->usrinput && base_widget->usrinput(base_widget)) return true;
-	
 	// If there are children, we recurse
-	if (base_widget->child_widgets.empty()) return false;
-	
-	// Recurse throught the children and draw them
-	for(CBaseWidget* widget : base_widget->child_widgets) {
-		if (widget == nullptr) continue;
-		// check if something is using user input down the tree
-		if (InputFromTree(widget)) return true;
+	if (!base_widget->child_widgets.empty()) {
+		// Recurse throught the children check if they are accepting ui
+		for(CBaseWidget* widget : base_widget->child_widgets) {
+			if (widget == nullptr) continue;
+			// check if something is using user input down the tree
+			if (InputFromTree(widget)) return true;
+		}
 	}
+	
+	// If it wants user input, check if widget is accepting user input
+	if (base_widget->usrinput != nullptr && base_widget->usrinput(base_widget)) return true;
+	
 	return false;
 }
 	

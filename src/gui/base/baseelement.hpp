@@ -21,31 +21,36 @@ public:
 	~CBaseWidget();
 	
 public:
-	CBaseWidget* root_parent;	// What root does this button belong to, if any at all
+	CBaseWidget* root_parent = nullptr;			// What root does this button belong to, if any at all
+	std::vector<CBaseWidget*> child_widgets;	// Children of the widget
 	int rootx = 0;
 	int rooty = 0;
 	int width = 0;
 	int height = 0;
-	std::string* name;   				// Depends on if its used or not. Be sure to check if its null
+	int root_offsetx = 0;	// Please set to your parents root offset so we can keep track of where stuff is.
+	int root_offsety = 0;	
+	std::string name;					// Depends on if its used or not.
+	std::string description;			// Sometimes we want to describe
 	rgba_t color = rgba_t(0, 0, 0, 0);	// Controls the color of the object and opacity of everything in it.
 	bool performed_last = false; 		// Used by elements to tell if something happened.
 	bool visible = true;				// Used to tell whether drawing and user input should work.
-	int extra_ints[3];					// Extra stuff to use just cuz
+	int extra_ints[4];					// Extra stuff to use just cuz
 	float position;						// Used to keep persice positions on some elements
 		
 	// If a widget needs a pointer to a var for refrence
-	bool* child_bool;
-	int* child_int;
-	float* child_float;	
-	std::string* child_string;
-	rgba_t* child_rgba;	
-	void(*action)(void);	// Sometimes an element might need an action.
+	bool* child_bool = nullptr;
+	int* child_int = nullptr;
+	float* child_float = nullptr;	
+	std::string* child_string = nullptr;
+	rgba_t* child_rgba = nullptr;
 	
-	std::vector<CBaseWidget*> child_widgets;	// Children of the widget
-	
-	void(*draw)(CBaseWidget*);	// We send draw requests to widgets
-	bool(*usrinput)(CBaseWidget*);				// We send out request to the widget to see if its accepting userinp. it returns true if it is
+	void(*draw)(CBaseWidget*);					// We send draw requests to widgets
+	bool(*usrinput)(CBaseWidget*) = nullptr;	// We send out request to the widget to see if its accepting userinp. it returns true if it is
 };
+
+// These carry color to children during draw and input
+void CarryColor(CBaseWidget* base_widget);
+void CarryRootOffset(CBaseWidget* base_widget);
 
 void DeleteWidgetTree(CBaseWidget* base_widget);	// Im giving this to the menu for it to use
 void PushOnTop(CBaseWidget* base_widget);			// Great for controling stacking

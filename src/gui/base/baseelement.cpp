@@ -60,7 +60,7 @@ void PushOnTop(CBaseWidget* base_widget) {
 	
 	// If this has a parent, we send the parent through this function instead.
 	if (base_widget->root_parent != nullptr) {
-		PushOnTop(base_widget);
+		PushOnTop(base_widget->root_parent);
 		return;
 	}
 	
@@ -74,7 +74,22 @@ void PushOnTop(CBaseWidget* base_widget) {
 		}
 	}
 }
-	
+
+// Carries the color from root and sets it onto your widget
+void CarryColor(CBaseWidget* base_widget) {
+	if (!base_widget->root_parent) return;
+	// Carry the color from root
+	base_widget->color.r = base_widget->root_parent->color.r;
+	base_widget->color.g = base_widget->root_parent->color.g;
+	base_widget->color.b = base_widget->root_parent->color.b;
+}
+
+// Carry root-offset
+void CarryRootOffset(CBaseWidget* base_widget) {
+	if (!base_widget->root_parent) return;
+	base_widget->root_offsetx = base_widget->root_parent->root_offsetx + base_widget->root_parent->rootx;
+	base_widget->root_offsety = base_widget->root_parent->root_offsety + base_widget->root_parent->rooty;
+}
 std::vector<CBaseWidget*> CBaseWidgetRoots;
 
 

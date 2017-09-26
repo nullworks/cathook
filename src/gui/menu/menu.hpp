@@ -7,5 +7,6 @@
 
 namespace gui { namespace menu {
 	
+void Draw();
 	
 }}

@@ -5,6 +5,8 @@
  *
  */
 
+#include "../../logging.h"
+
 #include "menutree.hpp"
 
 namespace gui { namespace menu {
@@ -27,8 +29,10 @@ void AddMenuTree(CMenuTree* menu_tree, CatEnum* cat_enum, int recursions, CatVar
 		// Look through the children and if any have the name of one we might want to make, we can reuse the branch.
 		for (CMenuTree* tree_branch : menu_tree->children) {
 			if (tree_branch->name == enum_name) {
+				
 				// We found an already existing branch so we can jsut recurse into it.
 				AddMenuTree(tree_branch, cat_enum, recursions + 1, cat_var);	// Recurse + 1 each time to keep trach of how far we went down the enum
+				return;
 			}
 		}
 	}
@@ -51,8 +55,8 @@ void BuildMenu() {
 		
 		CatEnum* tmp;
 		tmp = cat_var->GetGUIEnum();
-		
 		if (tmp == nullptr) continue;
+		
 		AddMenuTree(CMenuRoot, tmp, 0, cat_var);
 	}
 }

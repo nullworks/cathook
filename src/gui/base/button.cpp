@@ -16,22 +16,30 @@
 namespace gui { namespace element {
 	
 void ButtonDraw(const CBaseWidget* base_widget) {
-	if (!base_widget || !base_widget->visible) return;	// Draw name
-	if (base_widget->child_bool) {
-		drawmgr::RectFilled(base_widget->rootx - 2, base_widget->rooty - 2, base_widget->width - 1, base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
-		drawmgr::Rect(base_widget->rootx - 1, base_widget->rooty - 1, base_widget->width - 1, base_widget->height - 1, base_widget->color);
-	} else
-		drawmgr::Rect(base_widget->rootx, base_widget->rooty, base_widget->width, base_widget->height, base_widget->color);
+	if (!base_widget->visible) return;	// Draw name
+	
+	drawmgr::strings::String(base_widget->name.c_str(), base_widget->root_offsetx + base_widget->rootx, base_widget->root_offsety + base_widget->rooty, base_widget->extra_ints[0], base_widget->extra_ints[1], rgba_t(255, 255, 255, base_widget->color.a));
+		
+	if (base_widget->performed_last) {
+		drawmgr::RectFilled(base_widget->root_offsetx + base_widget->rootx - 2, 
+							base_widget->root_offsety + base_widget->rooty - 2, 
+							base_widget->width - 1, base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
+	}
+	drawmgr::Rect(base_widget->root_offsetx + base_widget->rootx, 
+		base_widget->root_offsety + base_widget->rooty, 
+		base_widget->width, base_widget->height, base_widget->color);
 }
 
 bool ButtonHandleUi(CBaseWidget* base_widget) {
 	if (base_widget == nullptr || !base_widget->visible) return false;
 	if (CatUserInp.IsKeyPressed(CATKEY_MOUSE_1)) {	// Check for m1
 		if (!base_widget->performed_last) {
-			if (!(CatUserInp.mousex > base_widget->rootx && CatUserInp.mousey > base_widget->rooty && CatUserInp.mousex < base_widget->rootx + base_widget->width && CatUserInp.mousey < base_widget->rooty + base_widget->height)) return false;
+			if (!(CatUserInp.mousex > base_widget->root_offsetx + base_widget->rootx && //	Bounds checking
+				  CatUserInp.mousey > base_widget->root_offsety + base_widget->rooty && 
+				  CatUserInp.mousex < base_widget->root_offsetx + base_widget->rootx + base_widget->width && 
+				  CatUserInp.mousey < base_widget->root_offsety + base_widget->rooty + base_widget->height)) return false;
 			base_widget->performed_last = true;
 			PushOnTop(base_widget);
-			if (base_widget->action) base_widget->action(); // Check if the button has a function to go with it, run it if you can.
 		}
 		return true;
 	}

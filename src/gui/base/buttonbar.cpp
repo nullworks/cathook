@@ -62,6 +62,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 		} else {
 			int out_scroll_dist = base_widget->extra_ints[2] - base_widget->width;	// This is how much room we can scroll out of bounds
 			
+			// We place our button
 			widget->rootx = base_widget->rootx + length_used + ((base_widget->position / 0.01) * out_scroll_dist); // Position can be from 0-100 so we ake it scale the percentage of our our bounds
 			widget->rooty = base_widget->rooty;
 			widget->width = length + side_distance;
@@ -92,8 +93,12 @@ bool ButtonBarHandleUi(CBaseWidget* base_widget) {
 	if (!base_widget->visible) return false;
 	if (base_widget->child_widgets.empty())	return false;	// We cant do anything without any children
 	if (base_widget->extra_ints[2] <= base_widget->width) return false;	// If total length is less than our width, then we can fit everything in. Else, we detect mouse for positioning
-	if (CatUserInp.mousex > base_widget->rootx && CatUserInp.mousey > base_widget->rooty && CatUserInp.mousex < base_widget->rootx + base_widget->width && CatUserInp.mousey < base_widget->rooty + base_widget->height) {// check for bounds
-		base_widget->position = CatUserInp.mousex / (base_widget->rootx + base_widget->width); // Find the percnentage of our mouse to scale and move the position
+	if (CatUserInp.mousex > base_widget->GetRealRoot().x && 
+		CatUserInp.mousey > base_widget->GetRealRoot().y && 
+		CatUserInp.mousex < base_widget->GetRealRoot().x + base_widget->width && 
+		CatUserInp.mousey < base_widget->GetRealRoot().y + base_widget->height) {// check for bounds
+		
+		base_widget->position = CatUserInp.mousex / (base_widget->GetRealRoot().x + base_widget->width); // Find the percnentage of our mouse to scale and move the position
 	}
 	return false;
 }

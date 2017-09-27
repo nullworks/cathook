@@ -9,6 +9,7 @@
 #include "sidestrings.hpp"
 #include "../../managers/drawmodulemgr.hpp"
 #include "../gui.hpp"			// guicolor
+#include "../../logging.h"
 
 namespace gui { namespace sidestrings {
 HudStrings side_strings;// Stores side strings
@@ -32,6 +33,7 @@ void DrawSideStrings() {
 }
 
 void DefaultSideStrings() {
-	side_strings.AddString("Cathook", GUIColor());
+	logging::Info("Color: %f, %f, %f, %f", colors::RainbowCurrent().r, colors::RainbowCurrent().g, colors::RainbowCurrent().b, colors::RainbowCurrent().a);
+	side_strings.AddString("Cathook", colors::RainbowCurrent());
 }
 }}

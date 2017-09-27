@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "../../util/mathlib.hpp"
 #include "../../util/colors.hpp"
 
 class CBaseWidget {
@@ -23,20 +24,33 @@ public:
 public:
 	CBaseWidget* root_parent = nullptr;			// What root does this button belong to, if any at all
 	std::vector<CBaseWidget*> child_widgets;	// Children of the widget
+	
 	int rootx = 0;
 	int rooty = 0;
 	int width = 0;
 	int height = 0;
+	
+	CatVector GetRealRoot();
+	bool root_offset_cached = false;
 	int root_offsetx = 0;	// Please set to your parents root offset so we can keep track of where stuff is.
-	int root_offsety = 0;	
+	int root_offsety = 0;
+	
+	rgba_t GetColor();
+	bool color_cached = false;
+	rgba_t color = rgba_t(0, 0, 0, 0);	// Controls the color of the object and opacity of everything in it.
+	
 	std::string name;					// Depends on if its used or not.
 	std::string description;			// Sometimes we want to describe
-	rgba_t color = rgba_t(0, 0, 0, 0);	// Controls the color of the object and opacity of everything in it.
-	bool performed_last = false; 		// Used by elements to tell if something happened.
-	bool visible = true;				// Used to tell whether drawing and user input should work.
-	int extra_ints[4];					// Extra stuff to use just cuz
+	
 	float position;						// Used to keep persice positions on some elements
-		
+	float min_position = 0;				// How far elements are allowed to set things.
+	float max_position = 100;
+	
+	bool visible = true;				// Used to tell whether drawing and user input should work.
+	bool performed_last = false; 		// Used by elements to tell if something happened.
+	int extra_ints[4];					// Extra stuff to use just cuz
+	
+	
 	// If a widget needs a pointer to a var for refrence
 	bool* child_bool = nullptr;
 	int* child_int = nullptr;

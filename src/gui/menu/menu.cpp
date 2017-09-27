@@ -50,6 +50,7 @@ CMenuTree* CreateMenuBar(CMenuTree* menu_tree, int recursions) {
 	if (recursions == 0) {
 		button_bar->height = main_menu->width * 0.077; // 7.7:1 aspect ratio is good for top bar 
 		button_bar->extra_ints[3] = 1;	// Allow the bar to stretch.
+		menu_height_used = 0;
 		
 	// This isnt the top bar so we can do other stuff.
 	} else {
@@ -119,14 +120,22 @@ void ReConstruct() {
 	
 	// Construct Menu bar Tree
 	CMenuTree* menu_tree = GetMenuTree();
-	menu_height_used = 0;
 	CMenuTree* current_branch = CreateMenuBar(menu_tree, 0);
-		
-	// Check if we dont have a position, if so, try to use default
-	/*if (menu_location.empty()) {
-		menu_location.push_back(0);	// Just use the first...
-		
-	}*/
+	
+	// test slider
+	CBaseWidget*  slider = element::SliderCreate(main_menu);
+	slider->name = "Test";
+	slider->extra_ints[0] = 1;	// Set the font
+	slider->extra_ints[1] = 19;	// Set the size
+	slider->rootx = 3;
+	slider->width = (main_menu->width / 3) - 3;
+	slider->height = 100;
+	slider->rooty = menu_height_used * 2;
+	menu_height_used += slider->height * 0.5;
+	slider->child_float = new float();
+	*slider->child_float = 0;
+	slider->color.a = 255;
+	
 	main_menu->color = GUIColor();
 }
 

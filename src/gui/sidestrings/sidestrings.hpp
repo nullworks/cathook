@@ -9,8 +9,9 @@ public:
 	rgba_t color[32];
 	int count;
 	void AddString(const std::string&, const rgba_t&);
-} 
-extern HudStringsside_strings; 
+};
+	
+extern HudStrings side_strings; 
 
 void DefaultSideStrings();
 	

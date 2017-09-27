@@ -48,7 +48,7 @@ constexpr rgba_t Transparent(const rgba_t& in, float multiplier = 0.5f) {
 }
 constexpr rgba_t FromHSL(float h, float s, float v) {
 	if(s <= 0.0) {       // < is bogus, just shuts up warnings
-		return rgba_t { v, v, v, 1.0f };
+		return rgba_t { v, v, v, 255.0f };
 	}
 	float hh = h;
 	if(hh >= 360.0) hh = 0.0;
@@ -61,19 +61,19 @@ constexpr rgba_t FromHSL(float h, float s, float v) {
 
 	switch(i) {
 	case 0:
-		return rgba_t { v, t, p, 1.0f };
+		return rgba_t { v, t, p, 255.0f };
 	case 1:
-		return rgba_t { q, v, p, 1.0f };
+		return rgba_t { q, v, p, 255.0f };
 	case 2:
-		return rgba_t { p, v, t, 1.0f };
+		return rgba_t { p, v, t, 255.0f };
 	case 3:
-		return rgba_t { p, q, v, 1.0f };
+		return rgba_t { p, q, v, 255.0f };
 		break;
 	case 4:
-		return rgba_t { t, p, v, 1.0f };
+		return rgba_t { t, p, v, 255.0f };
 	case 5:
 	default:
-		return rgba_t { v, p, q, 1.0f };
+		return rgba_t { v, p, q, 255.0f };
 	}
 }
 rgba_t RainbowCurrent();

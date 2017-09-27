@@ -43,7 +43,7 @@ RES_DIR=res
 OUT_DIR=bin
 TARGET = $(OUT_DIR)/$(OUT_NAME)
 
-INCLUDES=-isystem/usr/include/c++/6.3.1# -isystem$(SSDK_DIR)/public -isystem$(SSDK_DIR)/mathlib -isystem$(SSDK_DIR)/common -isystem$(SSDK_DIR)/public/tier1 -isystem$(SSDK_DIR)/public/tier0 -isystem$(SSDK_DIR)
+INCLUDES=-isystem/usr/include/c++/6.3.1
 LDLIBS=-l:libc.so.6 -l:libstdc++.so.6 -l:libtier0.so -l:libvstdlib.so
 LDFLAGS=-shared -pg -L$(realpath $(LIB_DIR))
 SOURCES=$(shell find $(SRC_DIR) -name "*.c*" -print)
@@ -71,7 +71,7 @@ COMMON_FLAGS+=-Wno-c++11-narrowing
 endif
 
 ifdef BUILD_DEBUG
-COMMON_FLAGS+=-g3 -ggdb -pg
+COMMON_FLAGS+=-g3 -ggdb
 else
 ifneq ($(NO_LTO),1)
 COMMON_FLAGS+=-flto

@@ -14,8 +14,8 @@ namespace gui {
 void DrawFromTree(CBaseWidget* base_widget) {
 	if (base_widget == nullptr) return;
 	if (!base_widget->visible) return;	// If it isnt visible, we dont want to draw it or anything owned by it.
-	CarryRootOffset(base_widget);		// Put root offset into a child 
-	CarryColor(base_widget);			// Put the roots color into the child
+	base_widget->root_offset_cached = false;		// Invalidate caches
+	base_widget->color_cached = false;
 		
 	base_widget->draw(base_widget);
 	

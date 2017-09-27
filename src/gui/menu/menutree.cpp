@@ -75,16 +75,14 @@ CMenuTree* GetMenuTree() {
 void DeleteTreeTree(CMenuTree* tree) {
 	if (!tree) return;
 	
-	// If there are no children, we our var and return, else we recurse
-	if (tree->children.empty()) {
-		delete tree;
-		return;
-	}
+	// If there are children, we should delete them
+	if (!tree->children.empty()) {
 	
-	// Recurse and delete children
-	for(CMenuTree* sub_tree : tree->children) {
-		if (!sub_tree) continue;
-		DeleteTreeTree(sub_tree);
+		// Recurse and delete children
+		for(CMenuTree* sub_tree : tree->children) {
+			if (!sub_tree) continue;
+			DeleteTreeTree(sub_tree);
+		}
 	}
 	// We are done deleting children, suicide is only option
 	delete tree;

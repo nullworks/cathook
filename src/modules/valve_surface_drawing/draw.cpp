@@ -44,21 +44,21 @@ unsigned long tf2build[32];
 static bool font_init = false;
 void FontInit()	{
 	// One loop per font
-	for (int i = 0; i <= 31; i++) {
+	for (int i = 0; i < 32; i++) {
 		opensans[i] = g_ISurface->CreateFont();
 		g_ISurface->SetFontGlyphSet(opensans[i], "Open Sans", i + 1, 0, 0, 0, 0);
 	}
-	for (int i = 0; i <= 31; i++) {
-		opensans[i] = g_ISurface->CreateFont();
+	for (int i = 0; i < 32; i++) {
+		verasans[i] = g_ISurface->CreateFont();
 		g_ISurface->SetFontGlyphSet(verasans[i], "Bitstream Vera Sans Mono", i + 1, 0, 0, 0, 0);
 	}
-	for (int i = 0; i <= 31; i++) {
-		opensans[i] = g_ISurface->CreateFont();
-		g_ISurface->SetFontGlyphSet(opensans[i], "Unispace", i + 1, 0, 0, 0, 0);
+	for (int i = 0; i < 10; i++) {
+		unispace[i] = g_ISurface->CreateFont();
+		g_ISurface->SetFontGlyphSet(unispace[i], "Unispace", i + 1, 0, 0, 0, 0);
 	}
-	for (int i = 0; i <= 31; i++) {
-		opensans[i] = g_ISurface->CreateFont();
-		g_ISurface->SetFontGlyphSet(opensans[i], "TF2 Build", i + 1, 0, 0, 0, 0);
+	for (int i = 0; i < 10; i++) {
+		tf2build[i] = g_ISurface->CreateFont();
+		g_ISurface->SetFontGlyphSet(tf2build[i], "TF2 Build", i + 1, 0, 0, 0, 0);
 	}
 	font_init = true;
 }
@@ -66,7 +66,7 @@ void FontInit()	{
 // Retrieves one of the fonts generated and saved into
 unsigned long GetSurfaceFont(int font, int size) {
 	if (!font_init) FontInit(); // Init fonts if we havent
-	size = min(31, size); // Clamping as we dont have that many font sizes
+	size = max(min(32, size), 1) - 1; // Clamping as we dont have that many font sizes
 	switch(font) {
 	case 0: 	
 		return 0;
@@ -106,11 +106,11 @@ void String3(const char* text, int x, int y, EFont font, int size, rgba_t color)
 }
 // Shadow processor
 void String2(const char* text, int x, int y, EFont font, int size, rgba_t color) {
-	rgba_t shadow = rgba_t(0, 0, 0, 40);
+	rgba_t shadow = rgba_t(0, 0, 0, 150);
 	
-	String3(text, x, y - 1, font, size, shadow);
-	String3(text, x - 1, y, font, size, shadow);
-	String3(text, x - 1, y - 1, font, size, shadow);
+	String3(text, x, y + 3, font, size, shadow);
+	String3(text, x + 3, y, font, size, shadow);
+	String3(text, x + 3, y + 3, font, size, shadow);
 	
 	String3(text, x, y, font, size, color);	
 	

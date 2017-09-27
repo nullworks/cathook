@@ -74,7 +74,7 @@ void InitRectFilled(void *func(int, int, int, int, rgba_t)) {
 	
 // Outline circle
 void(*StoredCircle)(int, int, float, int, rgba_t) = nullptr;
-void Circle(int x, int y, float radius, int steps, rgba_t &color) {
+void Circle(int x, int y, float radius, int steps, rgba_t color) {
 	if (StoredCircle != nullptr) {
 		StoredCircle(x, y, radius, steps, color);
 		return;
@@ -82,18 +82,18 @@ void Circle(int x, int y, float radius, int steps, rgba_t &color) {
 	if (StoredLine == nullptr) return;
 	
 	// Draw a circle with lines
-	if (radius <= 0 || steps <= 3) return; // cant draw a cirle without specific parameters
+	if (radius < 0 || steps <= 3) return; // cant draw a cirle without specific parameters
 	
 	float px = 0;
 	float py = 0;
 	for (int i = 0; i < steps; i++) {
-		float ang = 2 * PI * (i / steps);
+		float ang = 2 * PI * (float(i) / steps);
 		float dx = x + radius * cos(ang);
 		float dy = y + radius * sin(ang);
 		if (!i) {
-			ang = 2 * PI * ((steps - 1) / steps);
+			ang = 2 * PI * (float(steps - 1) / steps);
 			px = x + radius * cos(ang);
-			py = y / 2 + radius * sin(ang);
+			py = y + radius * sin(ang);
 		}
 		Line(px, py, dx - px, dy - py, color);
 		px = dx;

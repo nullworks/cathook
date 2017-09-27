@@ -6,8 +6,6 @@
  *
  */
 
-#include <string>
-
 #include "../../managers/inputmgr.hpp"		// So we get input
 #include "../../managers/drawmodulemgr.hpp" // So we can draw
 

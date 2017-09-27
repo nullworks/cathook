@@ -78,8 +78,9 @@ bool SliderHandleUi(CBaseWidget* base_widget) {
 		// Check for m1
 		if (CatUserInp.IsKeyPressed(CATKEY_MOUSE_1)) {
 			if (!base_widget->performed_last) {
-														   
-				if (!(CatUserInp.mousex > base_widget->GetRealRoot().x + base_widget->position && //	Bounds checking
+				
+				// Bounds checking
+				if (!(CatUserInp.mousex > base_widget->GetRealRoot().x + base_widget->position && 
 					  CatUserInp.mousey > base_widget->GetRealRoot().y + (base_widget->height / 6) && 
 					  CatUserInp.mousex < base_widget->GetRealRoot().x + base_widget->position  + (base_widget->height / 9) && 
 					  CatUserInp.mousey < base_widget->GetRealRoot().y + (base_widget->height / 6) + (base_widget->height / 6))) return false;

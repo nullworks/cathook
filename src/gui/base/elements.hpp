@@ -7,7 +7,10 @@
 
 #include "baseelement.hpp"
 #include "root.hpp"
+
 #include "button.hpp"
+#include "buttonbar.hpp"
+
 #include "slider.hpp"
 #include "divider.hpp"
-#include "buttonbar.hpp"
+#include "colorpicker.hpp"

@@ -68,19 +68,27 @@ CBaseWidget::~CBaseWidget() {
 void PushOnTop(CBaseWidget* base_widget) {
 	if (!base_widget) return;
 	
-	// If this has a parent, we send the parent through this function instead.
+	// If this has a parent, we want to put our widget to the top of all the lists. So we put our widget to the top then recurse through this function again with the parent.
 	if (base_widget->root_parent != nullptr) {
+		
+		// Find our widget in the parents list and put it on top
+		for(int i = 0; i < base_widget->root_parent->child_widgets.size(); i++) {
+			if (base_widget != base_widget->root_parent->child_widgets[i]) continue;
+			base_widget->root_parent->child_widgets.erase(base_widget->root_parent->child_widgets.begin() + i);
+			base_widget->root_parent->child_widgets.push_back(base_widget);// Place widget on top
+		}
+		// Recurse to the parent
 		PushOnTop(base_widget->root_parent);
-		return;
-	}
+		
+	// This is a root so we search through the main list and attempt to put it on top
+	} else {
 	
-	// Attempt to find the root and remove it, then place it at the top
-	int list_size = CBaseWidgetRoots.size();
-	for(int i = 0; i < list_size; i++) {
-		CBaseWidget* find = CBaseWidgetRoots[i];
-		if (find && base_widget == find) {
+		// Attempt to find the root and remove it, then place it at the top
+		for(int i = 0; i < CBaseWidgetRoots.size(); i++) {
+			if (base_widget != CBaseWidgetRoots[i]) continue;
 			CBaseWidgetRoots.erase(CBaseWidgetRoots.begin() + i);
 			CBaseWidgetRoots.push_back(base_widget);// Place root on top
+			break;
 		}
 	}
 }

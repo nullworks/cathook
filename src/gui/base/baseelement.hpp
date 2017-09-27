@@ -37,7 +37,7 @@ public:
 	
 	rgba_t GetColor();
 	bool color_cached = false;
-	rgba_t color = rgba_t(0, 0, 0, 0);	// Controls the color of the object and opacity of everything in it.
+	rgba_t color = rgba_t(0, 0, 0, 255);	// Controls the color of the object and opacity of everything in it.
 	
 	std::string name;					// Depends on if its used or not.
 	std::string description;			// Sometimes we want to describe
@@ -50,6 +50,8 @@ public:
 	bool performed_last = false; 		// Used by elements to tell if something happened.
 	int extra_ints[4];					// Extra stuff to use just cuz
 	
+	int font;
+	int font_size;
 	
 	// If a widget needs a pointer to a var for refrence
 	bool* child_bool = nullptr;

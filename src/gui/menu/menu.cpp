@@ -22,11 +22,13 @@
 namespace gui { namespace menu {
 
 // User vars
-CatEnum gui_catenum({"Visuals", "Gui"});
+CatEnum gui_catenum({"Visuals", "Menu"});
 CatVarBool menu_enabled(gui_catenum, "menu_visible", true, "Show Menu", "Should menu be visible?");
 CatVarInt menu_x(gui_catenum, "menu_x", -20000, "Menu Location X", "Part of the position of the menu");
 CatVarInt menu_y(gui_catenum, "menu_y", -20000, "Menu Location Y", "Part of the position of the menu");
 CatVarInt menu_scale(gui_catenum, "menu_y", 100, "Menu Scaling", "Allows you to scale the menu.\n100 = 100% Scaling", 250);
+CatVarInt font(gui_catenum, "menu_font", 1, "Menu Font", "Choose the menu font");
+CatVarInt font_size(gui_catenum, "menu_font_size", 19, "Menu Font Size", "Choose a size for the fonts", 40);
 
 // The root of cathooks menu
 CBaseWidget* main_menu = nullptr;
@@ -36,9 +38,6 @@ std::vector<int> menu_location;
 
 // Used as a indicator of how much of the menu was used
 static int menu_height_used = 0;
-	
-// We need a string pointer for top buttons
-static std::string* string_top_ptr = new std::string("Top");
 
 // Creates our top bars and it returns the menu tree it ends off on.
 CMenuTree* CreateMenuBar(CMenuTree* menu_tree, int recursions) {
@@ -51,6 +50,10 @@ CMenuTree* CreateMenuBar(CMenuTree* menu_tree, int recursions) {
 		button_bar->height = main_menu->width * 0.077; // 7.7:1 aspect ratio is good for top bar 
 		button_bar->extra_ints[3] = 1;	// Allow the bar to stretch.
 		menu_height_used = 0;
+		// Make a divider to seperate the top bar of the menu
+		CBaseWidget* divider = element::DividerCreate(main_menu);
+		divider->rooty = button_bar->height - 1;
+		divider->width = main_menu->width;
 		
 	// This isnt the top bar so we can do other stuff.
 	} else {
@@ -63,7 +66,7 @@ CMenuTree* CreateMenuBar(CMenuTree* menu_tree, int recursions) {
 	button_bar->width = main_menu->width;
 	
 	button_bar->rooty = menu_height_used;
-	menu_height_used += button_bar->height * 0.5;	// Add to our used height. Devide by half fixes it somehow...
+	menu_height_used += (button_bar->height * 0.5);	// Add to our used height. Devide by half fixes it somehow...
 	
 	// Add new buttons to the Bar 
 	for (CMenuTree* tree_branch : menu_tree->children) {
@@ -116,6 +119,7 @@ void ReConstruct() {
 		for (CBaseWidget* widget : main_menu->child_widgets) {
 			DeleteWidgetTree(widget);
 		}
+		main_menu->child_widgets.clear();
 	}
 	
 	// Construct Menu bar Tree
@@ -123,19 +127,30 @@ void ReConstruct() {
 	CMenuTree* current_branch = CreateMenuBar(menu_tree, 0);
 	
 	// test slider
-	CBaseWidget*  slider = element::SliderCreate(main_menu);
-	slider->name = "Test";
+	CBaseWidget* slider = element::SliderCreate(main_menu);
+	slider->name = "Test Slider";
 	slider->extra_ints[0] = 1;	// Set the font
 	slider->extra_ints[1] = 19;	// Set the size
-	slider->rootx = 3;
-	slider->width = (main_menu->width / 3) - 3;
+	slider->rootx = 7;
+	slider->width = (main_menu->width / 3) - 7;
 	slider->height = 100;
 	slider->rooty = menu_height_used * 2;
-	menu_height_used += slider->height * 0.5;
 	slider->child_float = new float();
 	*slider->child_float = 0;
-	slider->color.a = 255;
+	//slider->color.a = 255;
 	
+	CBaseWidget* wheel = element::ColorPickerCreate(main_menu);
+	wheel->name = "Test Rgba";
+	wheel->rootx = (main_menu->width / 3) + 7;
+	wheel->width = (main_menu->width / 3) - 15;
+	wheel->height = 100;
+	wheel->rooty = menu_height_used * 2;
+	wheel->child_rgba = new rgba_t(0, 0, 0, 255);
+	wheel->color.a = 255;
+	wheel->font = font;
+	wheel->font_size = font_size;
+	
+	menu_height_used += slider->height * 0.5;
 	main_menu->color = GUIColor();
 }
 

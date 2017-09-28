@@ -28,7 +28,7 @@ void DeleteWidgetTree(CBaseWidget* base_widget) {
 	if (!base_widget) return;
 	
 	// If this is a root, we attempt to find it and remove it from the main root list
-	if (base_widget->root_parent == nullptr || !CBaseWidgetRoots.empty()) {
+	if (base_widget->root_parent == nullptr && !CBaseWidgetRoots.empty()) {
 
 		// Attempt to find the root from the main list and remove it
 		int list_size = CBaseWidgetRoots.size();
@@ -41,13 +41,14 @@ void DeleteWidgetTree(CBaseWidget* base_widget) {
 	}
 	
 	// Check if we have to delete children
-	if (base_widget->child_widgets.empty()) {
+	if (!base_widget->child_widgets.empty()) {
 	
 		// Recurse and delete children
 		for(CBaseWidget* widget : base_widget->child_widgets) {
-			if (!widget) continue;
+			if (widget == nullptr) continue;
 			DeleteWidgetTree(widget);
 		}
+		base_widget->child_widgets.clear();
 	}
 	
 	// We are done deleting children, suicide is only option

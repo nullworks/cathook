@@ -123,6 +123,8 @@ public:
 	rgba_t value_rgba;
 };
 
+// TODO, use virtual functions to link all the catvars together rather than this cruddy ol'object...
+
 class CatVar {
 public:
 	CatVar(CatVar_t type, CatVarBool* cat_bool, CatVarInt* cat_int, CatVarFloat* cat_float, CatVarString* cat_string, CatVarColor* cat_color);
@@ -138,6 +140,7 @@ public:
 	CatVarString* cat_string;
 	CatVarColor* cat_color;
 	CatEnum* GetGUIEnum();
+	std::string GetName();
 };
 
 // Storage for all the catvars! Eventually should use a unordered map

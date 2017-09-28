@@ -83,5 +83,10 @@ public:
 };
 extern CCatUserInp CatUserInp;
 
+namespace CatKeys {
+	
+std::string GetKeyName(int in_key);
+
+}
 
 #endif

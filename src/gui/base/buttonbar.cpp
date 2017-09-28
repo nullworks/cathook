@@ -23,19 +23,19 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 	if (base_widget->child_widgets.empty())	return;	// We cant do anything without any children
 	
 	// First we need to get how long our buttons are
-	base_widget->extra_ints[2] = 0;
+	base_widget->position = 0;
 	for (CBaseWidget* widget : base_widget->child_widgets) {
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name.c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
+		drawmgr::strings::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 		// Get side distance from height and and add to total distance
 		int side_distance = std::max(base_widget->height - height, 3);
-		base_widget->extra_ints[2] += length + side_distance;
+		base_widget->position += length + side_distance;
 	}
 	
 	// We go and size our stuff now
 	int length_used = 0;
-	if (base_widget->extra_ints[2] <= base_widget->width) length_used += (base_widget->width - base_widget->extra_ints[2]) / 2; // Add to our used length if we are centering it, this is what centers them
+	if (base_widget->position <= base_widget->width) length_used += (base_widget->width - base_widget->position) / 2; // Add to our used length if we are centering it, this is what centers them
 	for (CBaseWidget* widget : base_widget->child_widgets) {
 		// Make visible
 		widget->visible = true; // Max
@@ -43,12 +43,12 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 		
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name.c_str(), widget->extra_ints[0], widget->extra_ints[1], length, height);
+		drawmgr::strings::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 		// Get side distance from height
 		int side_distance = std::max(base_widget->height - height, 3);
 		
 		// if we dont need to allow scrolling, center everything
-		if (base_widget->extra_ints[2] <= base_widget->width) {
+		if (base_widget->position <= base_widget->width) {
 			
 			// Set the widgets size
 			widget->rootx = base_widget->rootx + length_used;
@@ -60,7 +60,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 			length_used += length + side_distance;
 		// We need to do some special logic for scrolling here
 		} else {
-			int out_scroll_dist = base_widget->extra_ints[2] - base_widget->width;	// This is how much room we can scroll out of bounds
+			int out_scroll_dist = base_widget->position - base_widget->width;	// This is how much room we can scroll out of bounds
 			
 			// We place our button
 			widget->rootx = base_widget->rootx + length_used + ((base_widget->position / 0.01) * out_scroll_dist); // Position can be from 0-100 so we ake it scale the percentage of our our bounds
@@ -92,7 +92,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 bool ButtonBarHandleUi(CBaseWidget* base_widget) {
 	if (!base_widget->visible) return false;
 	if (base_widget->child_widgets.empty())	return false;	// We cant do anything without any children
-	if (base_widget->extra_ints[2] <= base_widget->width) return false;	// If total length is less than our width, then we can fit everything in. Else, we detect mouse for positioning
+	if (base_widget->position <= base_widget->width) return false;	// If total length is less than our width, then we can fit everything in. Else, we detect mouse for positioning
 	if (CatUserInp.mousex > base_widget->GetRealRoot().x && 
 		CatUserInp.mousey > base_widget->GetRealRoot().y && 
 		CatUserInp.mousex < base_widget->GetRealRoot().x + base_widget->width && 

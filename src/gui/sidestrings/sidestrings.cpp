@@ -33,7 +33,6 @@ void DrawSideStrings() {
 }
 
 void DefaultSideStrings() {
-	logging::Info("Color: %f, %f, %f, %f", colors::RainbowCurrent().r, colors::RainbowCurrent().g, colors::RainbowCurrent().b, colors::RainbowCurrent().a);
 	side_strings.AddString("Cathook", colors::RainbowCurrent());
 }
 }}

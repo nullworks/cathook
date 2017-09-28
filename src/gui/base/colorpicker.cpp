@@ -13,13 +13,15 @@
 
 #include "colorpicker.hpp"
 
+// https://math.stackexchange.com/questions/707673/find-angle-in-degrees-from-one-point-to-another-in-2d-space
+
 namespace gui { namespace element {
 	
 void ColorPickerDraw(CBaseWidget* base_widget) {
 	if (!base_widget->visible) return;	// Draw name
 	
 	// the offset we use to take it away from the edges of our bounds
-	int offcenter = base_widget->width * 0.13; 
+	/*int offcenter = base_widget->width * 0.13; 
 	int height_used = base_widget->height / 6; // To know how much height was already used. We start with a slight amount used.
 	
 	// Draw initial color presentor
@@ -32,7 +34,9 @@ void ColorPickerDraw(CBaseWidget* base_widget) {
 	
 	// Get string length + height so we can know how much to reserve for it
 	int length, height;
-	drawmgr::strings::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);	
+	drawmgr::strings::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);	*/
+	
+	
 	
 	// Push everything to a dialouge element
 	/*if (

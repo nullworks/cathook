@@ -3,7 +3,7 @@
 
 namespace gui { namespace element {
 
-CBaseWidget* SliderCreate(CBaseWidget* root_parent);
-
+CBaseWidget* ButtonToggleCreate(CBaseWidget* root_parent);
+	
 }}
 

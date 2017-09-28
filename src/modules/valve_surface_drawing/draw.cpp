@@ -36,27 +36,27 @@ void RectFilled(int x, int y, int w, int h, rgba_t color) {
 	
 	
 // Font system	
-unsigned long opensans[32];// On int, generate these. 32 are for all the sizes as remaking them is kinda intensive, it at least i think it is.
-unsigned long verasans[32];// I think the 32 per font is really big on memory... Welp, I want to die!
-unsigned long unispace[32];
-unsigned long tf2build[32];
+unsigned long opensans[12];// We only use 12 fonts to save on memory
+unsigned long verasans[12];
+unsigned long unispace[12];
+unsigned long tf2build[12];
 	
 static bool font_init = false;
 void FontInit()	{
 	// One loop per font
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 12; i++) {
 		opensans[i] = g_ISurface->CreateFont();
-		g_ISurface->SetFontGlyphSet(opensans[i], "Open Sans", i + 1, 0, 0, 0, 0);
+		g_ISurface->SetFontGlyphSet(opensans[i], "Open Sans", i + 20, 0, 0, 0, 0);
 	}
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 12; i++) {
 		verasans[i] = g_ISurface->CreateFont();
-		g_ISurface->SetFontGlyphSet(verasans[i], "Bitstream Vera Sans Mono", i + 1, 0, 0, 0, 0);
+		g_ISurface->SetFontGlyphSet(verasans[i], "Bitstream Vera Sans Mono", i + 20, 0, 0, 0, 0);
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 12; i++) {
 		unispace[i] = g_ISurface->CreateFont();
-		g_ISurface->SetFontGlyphSet(unispace[i], "Unispace", i + 1, 0, 0, 0, 0);
+		g_ISurface->SetFontGlyphSet(unispace[i], "Unispace", i + 20, 0, 0, 0, 0);
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 12; i++) {
 		tf2build[i] = g_ISurface->CreateFont();
 		g_ISurface->SetFontGlyphSet(tf2build[i], "TF2 Build", i + 1, 0, 0, 0, 0);
 	}
@@ -66,18 +66,18 @@ void FontInit()	{
 // Retrieves one of the fonts generated and saved into
 unsigned long GetSurfaceFont(int font, int size) {
 	if (!font_init) FontInit(); // Init fonts if we havent
-	size = max(min(32, size), 1) - 1; // Clamping as we dont have that many font sizes
+	size = max(min(32, size), 20) - 1; // Clamping as we dont have that many font sizes
 	switch(font) {
 	case 0: 	
 		return 0;
 	case OPENSANS:	
-		return opensans[size];
+		return opensans[size - 19];
 	case VERASANS:
-		return verasans[size];
+		return verasans[size - 19];
 	case UNISPACE:
-		return unispace[size];
+		return unispace[size - 19];
 	case TF2BUILD:
-		return tf2build[size];
+		return tf2build[size - 10];
 	}
 	return 0;
 }
@@ -113,7 +113,6 @@ void String2(const char* text, int x, int y, EFont font, int size, rgba_t color)
 	String3(text, x + 3, y + 3, font, size, shadow);
 	
 	String3(text, x, y, font, size, color);	
-	
 }
 // String input, fixes newlines
 void String1(const char* text, int x, int y, EFont font, int size, rgba_t color) {

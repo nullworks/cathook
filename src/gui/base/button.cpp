@@ -18,18 +18,20 @@ void ButtonDraw(const CBaseWidget* base_widget) {
 	
 	// Get string length + height so we can center it
 	int length, height;
-	drawmgr::strings::GetStringLength(base_widget->name.c_str(), base_widget->extra_ints[0], base_widget->extra_ints[1], length, height);
-
+	drawmgr::strings::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
+	// Draw centered string
 	drawmgr::strings::String(base_widget->name.c_str(),
 							 base_widget->GetRealRoot().x + ((base_widget->width - length) / 2), 
 							 base_widget->GetRealRoot().y + ((base_widget->height - height) / 2), 
-							 base_widget->extra_ints[0], base_widget->extra_ints[1], rgba_t(255, 255, 255, base_widget->color.a));
-	
+							 base_widget->font, base_widget->font_size, rgba_t(255, 255, 255, base_widget->color.a));
+	// If we have been depressed, we darken the inside of our button
 	if (base_widget->performed_last) {
 		drawmgr::RectFilled(base_widget->GetRealRoot().x + 1, 
 							base_widget->GetRealRoot().y + 1,
-							base_widget->width - 1, base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
+							base_widget->width - 1, 
+							base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
 	}
+	// Draw our ourside rect
 	drawmgr::Rect(base_widget->GetRealRoot().x, 
 				  base_widget->GetRealRoot().y, 
 				  base_widget->width, 
@@ -38,9 +40,11 @@ void ButtonDraw(const CBaseWidget* base_widget) {
 
 bool ButtonHandleUi(CBaseWidget* base_widget) {
 	if (base_widget == nullptr || !base_widget->visible) return false;
-	if (CatUserInp.IsKeyPressed(CATKEY_MOUSE_1)) {	// Check for m1
+	// Check for m1
+	if (CatUserInp.IsKeyPressed(CATKEY_MOUSE_1)) {	
 		if (!base_widget->performed_last) {
-			if (!(CatUserInp.mousex > base_widget->GetRealRoot().x && //	Bounds checking
+			// Bounds checking
+			if (!(CatUserInp.mousex > base_widget->GetRealRoot().x && 
 				  CatUserInp.mousey > base_widget->GetRealRoot().y && 
 				  CatUserInp.mousex < base_widget->GetRealRoot().x + base_widget->width && 
 				  CatUserInp.mousey < base_widget->GetRealRoot().y + base_widget->height)) return false;

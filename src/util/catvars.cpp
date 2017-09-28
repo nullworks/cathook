@@ -122,10 +122,37 @@ CatEnum* CatVar::GetGUIEnum() {
 	}
 	return tmp;	
 }
+std::string CatVar::GetName() {
+	// Make tmp catenum pointer and extract it from the catvar
+	std::string tmp;
+	switch(this->type) {
+	case CV_SWITCH: 
+		tmp = this->cat_bool->name;
+		break;
+	case CV_INT:
+		tmp = this->cat_int->name;
+		break;
+	case CV_ENUM:
+		tmp = this->cat_int->name;
+		break;
+	case CV_KEY:
+		tmp = this->cat_int->name;
+		break;
+	case CV_FLOAT:
+		tmp = this->cat_float->name;
+		break;
+	case CV_STRING:
+		tmp = this->cat_string->name;
+		break;
+	case CV_RGBA:
+		tmp = this->cat_color->name;
+	}
+	return tmp;	
+}
 
 CatEnum::CatEnum(std::vector<std::string> values) : value_names(values) {
 	min_value = 0;
-	max_value = values.size() - 1;
+	max_value = values.size();
 	size = values.size();
 }
 

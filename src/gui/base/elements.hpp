@@ -11,6 +11,7 @@
 #include "button.hpp"
 #include "buttonbar.hpp"
 
-#include "slider.hpp"
+#include "buttontoggle.hpp"
+
 #include "divider.hpp"
 #include "colorpicker.hpp"

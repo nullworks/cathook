@@ -1,1 +1,1 @@
-make -j4 GAME=hl2dm NO_WARNINGS=1
+make -j8 NO_WARNINGS=1

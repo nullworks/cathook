@@ -7,7 +7,6 @@
 
 #include "../../logging.h"
 #include "../../util/iohelper.hpp" 		// For our process name
-#include "../../util/stringhelpers.hpp" // format()
 #include "../../managers/inputmgr.hpp" 	// For our Catkey enums
 
 #include "xlibinput.hpp"
@@ -73,7 +72,7 @@ bool GetXWindow() {
 }
 
 // Stores potential conversions between xlib's keycodes and cathooks catvars. Add more as nessesary! /usr/include/X11/keysymdef.h
-std::unordered_map<int, int> xlibToCatVar = {
+static std::unordered_map<int, int> xlibToCatVar = {
 	{XK_0, CATKEY_0}, {XK_1, CATKEY_1}, {XK_2, CATKEY_2},
 	{XK_3, CATKEY_3}, {XK_4, CATKEY_4}, {XK_5, CATKEY_5}, 
 	{XK_6, CATKEY_6}, {XK_7, CATKEY_7}, {XK_8, CATKEY_8},
@@ -121,7 +120,7 @@ std::unordered_map<int, int> xlibToCatVar = {
 	{XK_F7, CATKEY_F7}, {XK_F8, CATKEY_F8}, {XK_F9, CATKEY_F9},
 	{XK_F10, CATKEY_F10}, {XK_F11, CATKEY_F11}, {XK_F12, CATKEY_F12},
 
-	{XK_Pointer_Button4, CATKEY_MOUSE_4}, {XK_Pointer_Button5, CATKEY_MOUSE_5},
+	//{XK_Pointer_Button4, CATKEY_MOUSE_4}, {XK_Pointer_Button5, CATKEY_MOUSE_5}, // Doesnt work ;/
 	{XK_Pointer_DfltBtnPrev, CATKEY_M_WHEEL_UP}, {XK_Pointer_DfltBtnNext, CATKEY_M_WHEEL_DOWN}
 };
 
@@ -159,19 +158,23 @@ void Refresh(CCatUserInp *input_class) {
 		if (mask_return & (Button1Mask)) input_class->stored_pressed.insert({{CATKEY_MOUSE_1}, {true}});
 		if (mask_return & (Button2Mask)) input_class->stored_pressed.insert({{CATKEY_MOUSE_2}, {true}});
 		if (mask_return & (Button3Mask)) input_class->stored_pressed.insert({{CATKEY_MOUSE_3}, {true}});
-		//if (mask_return & (Button4Mask)) input_class->stored_pressed.insert(CATKEY_MOUSE_4, true); // Doesnt work
-		//if (mask_return & (Button5Mask)) input_class->stored_pressed.insert(CATKEY_MOUSE_5, true); 
+		if (mask_return & (Button4Mask)) input_class->stored_pressed.insert({{CATKEY_MOUSE_4}, {true}}); // Doesnt work, BUT ITS HERE ANYWAY!!!
+		if (mask_return & (Button5Mask)) input_class->stored_pressed.insert({{CATKEY_MOUSE_5}, {true}}); 
 	}
 	
-	// !!!!!TODO!!!!! !!!!!FIX!!!!
-	
 	// Find depressed keys and save them to the stored map
-	/*char keys[32];
+	char keys[32];
 	XQueryKeymap(xAppDisplay, keys);
-	for( const auto& current : xlibToCatVar ) {	// Recurse through the map looking for depressed keys
-		// Sue me i dare you
-		//if (keys & (current.first)) input_class->stored_pressed.insert({{current.second}, {true}}); // Commented so i can compile
-	}*/
+	// Recurse through the map looking for depressed keys
+	for( auto& current : xlibToCatVar ) {	
+		
+		// Get the keycode for the key we are looking for...
+		int current_key = XKeysymToKeycode(xAppDisplay, current.first); 
+		
+		if (keys[current_key / 8] & (1 << (current_key % 8))) {
+			input_class->stored_pressed.insert({{current.second}, {true}});
+		}
+	}
 }
 
 

@@ -36,8 +36,7 @@ void InputMachine() {
 	if (CBaseWidgetRoots.empty()) return; // Cant check nothing
 	
 	// Recurse backwards through to find roots from top down
-	int list_size = CBaseWidgetRoots.size();
-	for (int i = list_size; i > 0; i--) {
+	for (int i = CBaseWidgetRoots.size(); i > 0; i--) {
 		CBaseWidget* base_widget = CBaseWidgetRoots[i - 1];
 		if (base_widget == nullptr) continue;	// To prevent crash
 		

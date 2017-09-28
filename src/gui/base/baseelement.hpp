@@ -50,6 +50,8 @@ public:
 	bool performed_last = false; 		// Used by elements to tell if something happened.
 	int extra_ints[4];					// Extra stuff to use just cuz
 	
+	std::vector<int> menu_identifier;	// Used to notify the menu what this changes to. Im kinda cheating with this...
+	
 	int font;
 	int font_size;
 	

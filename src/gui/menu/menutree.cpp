@@ -17,7 +17,7 @@ CMenuTree* CMenuRoot;
 // Recurses through catenums input into it and maps it into the menu tree
 void AddMenuTree(CMenuTree* menu_tree, CatEnum* cat_enum, int recursions, CatVar* cat_var) {
 	// If we have reached the end of the catenums info, we can deposit our catvar here.
-	if (recursions > cat_enum->size) {
+	if (recursions >= cat_enum->size) {
 		menu_tree->cat_children.push_back(cat_var);
 		return;
 	}

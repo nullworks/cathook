@@ -252,3 +252,7 @@ ModelManifest.xml
 ## Ignore Data Folder symlink
 Data Folder
 /core
+
+## Ignore module and hack folders
+src/modules/*
+src/hacks/*

@@ -1,8 +1,8 @@
+
 /*
- * hack.cpp
+ *	The cheats entry point is in entry.cpp, which creates a thread for cathook to use.
+ *	From there, the init below here is run
  *
- *  Created on: Oct 3, 2016
- *      Author: nullifiedcat
  */
 
 #include <unistd.h> // Unix like headers for read write and stuff like that
@@ -11,21 +11,16 @@
 #include "logging.h"
 #include "shutdown.hpp"
 
-#include "hack.h"
-
 // Game Modules
 #include "modules/tf2/init.hpp"
-
+// Features
+#include "features/features.hpp"
 // GUI
 #include "gui/init.hpp"
 
-/*
- *	The cheats entry point is in entry.cpp, which creates a thread for cathook to use.
- *	From there, the init below here is run
- *
- */
+#include "hack.h"
 
-bool hack::shutdown = false;
+static bool hack::shutdown = false;
 
 void hack::Initialize() {
 	signal(SIGPIPE, SIG_IGN);
@@ -43,9 +38,11 @@ void hack::Initialize() {
 	
 	logging::Info("Modules Done!");
 	
+	logging::Info("Initializing main cheat features...");
+	features::Init();
 	
+	logging::Info("Initializing gui...");
 	gui::Init(); // init the gui
-	
 	
 	logging::Info("Initializing Done!");
 }

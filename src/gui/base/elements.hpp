@@ -13,5 +13,7 @@
 
 #include "buttontoggle.hpp"
 
+#include "organizer.hpp"
+
 #include "divider.hpp"
 #include "colorpicker.hpp"

@@ -8,7 +8,7 @@
  */
 
 
-#include "../managers/drawmgr.hpp"	// So we can get drawmgr to draw our stuff
+#include "../framework/drawmgr.hpp"	// So we can get drawmgr to draw our stuff
 #include "sidestrings/init.hpp"		// Stuff to init
 #include "menu/menu.hpp"
 #include "inputmachine.hpp"
@@ -19,12 +19,12 @@
 namespace gui {
 void Init() {
 	
-	// Initialize the menu
-	drawmgr::RequestDrawOnBefore(menu::Draw);
-	
 	// Setup the draw manager to run gui
 	drawmgr::RequestDrawOnDraw(InputMachine);
-	drawmgr::RequestDrawOnAfter(DrawMachine);
+	drawmgr::RequestDrawOnDraw(DrawMachine);
+	
+	// Initialize the menu
+	drawmgr::RequestDrawOnAfter(menu::Draw);
 	
 	// Other gui elements
 	sidestrings::Init();	

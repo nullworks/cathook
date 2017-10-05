@@ -6,8 +6,8 @@
  *
  */
 
-#include "../../managers/inputmgr.hpp"		// So we get input
-#include "../../managers/drawmodulemgr.hpp" // So we can draw
+#include "../../framework/inputmgr.hpp"		// So we get input
+#include "../../framework/drawing.hpp" // So we can draw
 
 #include "button.hpp"
 
@@ -18,21 +18,21 @@ void ButtonDraw(const CBaseWidget* base_widget) {
 	
 	// Get string length + height so we can center it
 	int length, height;
-	drawmgr::strings::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
+	draw::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 	// Draw centered string
-	drawmgr::strings::String(base_widget->name.c_str(),
+	draw::String(base_widget->name.c_str(),
 							 base_widget->GetRealRoot().x + ((base_widget->width - length) / 2), 
 							 base_widget->GetRealRoot().y + ((base_widget->height - height) / 2), 
 							 base_widget->font, base_widget->font_size, rgba_t(255, 255, 255, base_widget->color.a));
 	// If we have been depressed, we darken the inside of our button
 	if (base_widget->performed_last) {
-		drawmgr::RectFilled(base_widget->GetRealRoot().x + 1, 
+		draw::RectFilled(base_widget->GetRealRoot().x + 1, 
 							base_widget->GetRealRoot().y + 1,
 							base_widget->width - 1, 
 							base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
 	}
 	// Draw our ourside rect
-	drawmgr::Rect(base_widget->GetRealRoot().x, 
+	draw::Rect(base_widget->GetRealRoot().x, 
 				  base_widget->GetRealRoot().y, 
 				  base_widget->width, 
 				  base_widget->height, base_widget->GetColor());

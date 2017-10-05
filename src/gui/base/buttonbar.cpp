@@ -3,16 +3,15 @@
  *
  *	This is an element to contain button elements in a small space.
  *	This element autosizes the buttons given to it based on the height and width parameters given to it.
- *	Please use extra_ints[0] for font and extra_ints[1] for font size of the buttons.
- *	Change extra_ints[3] to a 1 and it will stretch the buttons if it doesnt need to scroll
+ *	Change extra_ints[3] to a 1 and it will stretch the buttons if it doesnt need to scroll.
  *	Please only give it buttons or related
  *
  */
 
 #include <algorithm> // max()
 
-#include "../../managers/inputmgr.hpp"		// So we get input
-#include "../../managers/drawmodulemgr.hpp" // So we can draw
+#include "../../framework/inputmgr.hpp"		// So we get input
+#include "../../framework/drawing.hpp" // So we can draw
 
 #include "buttonbar.hpp"
 
@@ -27,7 +26,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 	for (CBaseWidget* widget : base_widget->child_widgets) {
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
+		draw::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 		// Get side distance from height and and add to total distance
 		int side_distance = std::max(base_widget->height - height, 3);
 		base_widget->position += length + side_distance;
@@ -43,7 +42,7 @@ void ButtonBarDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 		
 		// Get string length + height
 		int length, height;
-		drawmgr::strings::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
+		draw::GetStringLength(widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 		// Get side distance from height
 		int side_distance = std::max(base_widget->height - height, 3);
 		
@@ -103,7 +102,7 @@ bool ButtonBarHandleUi(CBaseWidget* base_widget) {
 	return false;
 }
 	
-CBaseWidget* ButtonBarCreate(CBaseWidget* root_parent) {		// Use when creating a slider. This returns a pointer to the widget
+CBaseWidget* ButtonBarCreate(CBaseWidget* root_parent) {
 	CBaseWidget* tmp = new CBaseWidget(root_parent, ButtonBarDraw);
 	tmp->usrinput = ButtonBarHandleUi;
 	return tmp;

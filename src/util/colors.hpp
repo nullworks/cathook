@@ -8,6 +8,8 @@
 #ifndef COLORS_HPP_
 #define COLORS_HPP_
 
+#include "../framework/entitys.hpp" // We use entitys as an argument for our entity to color
+
 namespace colors {
 
 struct rgba_t {
@@ -85,7 +87,7 @@ constexpr rgba_t black = rgba_t(0, 0, 0, 255);
 
 constexpr rgba_t pink = rgba_t(255, 105, 180, 255);
 
-constexpr rgba_t red = rgba_t(237, 42, 42, 255), blu = rgba_t(28, 108, 237, 255);
+constexpr rgba_t red = rgba_t(237, 42, 42, 255), blue = rgba_t(28, 108, 237, 255);
 constexpr rgba_t red_b = rgba_t(64, 32, 32, 178),  blu_b = rgba_t(32, 32, 64, 178);  // Background
 constexpr rgba_t red_v = rgba_t(196, 102, 108, 255),  blu_v = rgba_t(102, 182, 196, 255);  // Vaccinator
 constexpr rgba_t red_u = rgba_t(216, 34, 186, 255),  blu_u = rgba_t(167, 75, 252, 255);  // Ubercharged
@@ -93,6 +95,9 @@ constexpr rgba_t yellow = rgba_t(255, 255, 0, 255);
 constexpr rgba_t orange = rgba_t(255, 120, 0, 255);
 constexpr rgba_t green = rgba_t(0, 255, 0, 255);
 constexpr rgba_t empty = rgba_t(0, 0, 0, 0);
+
+rgba_t Entity(CatEntity* entity);
+void RegisterCustomColorToEntity(void *func(CatEntity*));
 	
 rgba_t RainbowCurrent();
 }

@@ -4,10 +4,10 @@
  *  Created on: Sep 17, 2016
  *      Author: oneechan
  */
+
 #include <stdlib.h>     // atoi 
 #include <stdio.h>		// vsprintf()
 #include <cctype>		// isdigit
-
 
 #include "stringhelpers.hpp"
 

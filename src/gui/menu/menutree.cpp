@@ -22,6 +22,7 @@ void AddMenuTree(CMenuTree* menu_tree, CatEnum* cat_enum, int recursions, CatVar
 		return;
 	}
 	std::string enum_name = cat_enum->Name(recursions);
+	//logging::Info(format("Menu Builder: ", enum_name).c_str());
 	
 	// If our branch has children, one could already be made that we want to go into
 	// Check if the menu input has any children

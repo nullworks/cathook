@@ -16,4 +16,6 @@ extern HudStrings side_strings;
 void DefaultSideStrings();
 	
 void DrawSideStrings();
+	
+void BuildTopString();
 }}

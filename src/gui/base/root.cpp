@@ -5,8 +5,8 @@
  *
  */
 
-#include "../../managers/inputmgr.hpp"		// So we get input
-#include "../../managers/drawmodulemgr.hpp" // So we can draw
+#include "../../framework/inputmgr.hpp"		// So we get input
+#include "../../framework/drawing.hpp" // So we can draw
 
 #include "root.hpp"
 
@@ -16,8 +16,8 @@ namespace gui { namespace element {
 	
 void RootDraw(const CBaseWidget* base_widget) {
 	if (base_widget == nullptr) return;
-	drawmgr::RectFilled(base_widget->rootx - 1, base_widget->rooty - 1, base_widget->width - 1, base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Nice transparent dark gray inner box, 75% opacity
-	drawmgr::Rect(base_widget->rootx, base_widget->rooty, base_widget->width, base_widget->height, base_widget->color);
+	draw::RectFilled(base_widget->rootx - 1, base_widget->rooty - 1, base_widget->width - 1, base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Nice transparent dark gray inner box, 75% opacity
+	draw::Rect(base_widget->rootx, base_widget->rooty, base_widget->width, base_widget->height, base_widget->color);
 }
 	
 bool RootHandleUi(CBaseWidget* base_widget) {

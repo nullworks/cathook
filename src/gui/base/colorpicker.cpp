@@ -8,8 +8,8 @@
 
 #include <algorithm> // max() min()
 
-#include "../../managers/inputmgr.hpp"		// So we get input
-#include "../../managers/drawmodulemgr.hpp" // So we can draw
+#include "../../framework/inputmgr.hpp"		// So we get input
+#include "../../framework/drawing.hpp" // So we can draw
 
 #include "colorpicker.hpp"
 

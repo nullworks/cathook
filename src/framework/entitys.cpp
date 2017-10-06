@@ -39,14 +39,11 @@ void Invalidate() { // Please invalidate on world tick
 void CatEntity::Reset() {
 	exists = false;
 	dormant = true;
-	//entityName = "unknown"; // Useless and wasteful to set?
-	team = ETEAM_NONE;
 	type = ETYPE_NONE;
 	alive = false;
 	enemy = false;
-	maxHealth = 0;
+	max_health = 100;	// Good base health so we dont need to change if there isnt variable health
 	health = 0;
-	origin = CatVector(0, 0, 0);
 }
 
 // Returns the entity number from the entity array

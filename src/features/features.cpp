@@ -8,6 +8,7 @@
 
 // Stuff to init with
 #include "../framework/drawmgr.hpp"
+#include "../framework/worldtickmgr.hpp"
 // Stuff to init
 #include "esp.hpp"
 
@@ -17,7 +18,9 @@ namespace features {
 	
 void Init() {
 	
+	// Esp
 	drawmgr::RequestDrawOnDraw(esp::Draw);
+	worldtick::RequestBeforeWTick(esp::WorldTick);
 	
 }
 	

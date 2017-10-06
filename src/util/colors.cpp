@@ -61,7 +61,18 @@ rgba_t Entity(CatEntity* entity) {
 void RegisterCustomColorToEntity(void *func(CatEntity*)) {	// The best name evar, I promise ;)
 	StoredColorEntity = func;
 }
+
+// Returns a color based on entity health
+rgba_t Health(CatEntity* entity) {
+	if (entity->health > entity->max_health)	// Health is tuu much, they must be over their normal health so we make them blue
+		return rgba_t(64, 128, 255, 255);
 	
+	// Percentage of health our of max
+	float hf = (float)entity->health / (float)entity->max_health;
+	// Sick logic
+	return rgba_t((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
+}
+
 // Currently broken without a way to get time.
 // on inject make "time injected" chrono and save it. get duration since make and cast to count. use as time for rainbow.
 // have it be in seconds in a float with lesser miliseconds be used as 
@@ -74,5 +85,10 @@ rgba_t RainbowCurrent() {
 	float curtime = std::chrono::duration_cast<std::chrono::milliseconds>(time_point.time_since_epoch()).count() * 0.001f;
 	return colors::FromHSL(fabs(sin(curtime / 2.0f)) * 360.0f, 0.85f, 0.9f);
 }
+
+// Colored string constructors
+ColoredString::ColoredString(std::string string_in, rgba_t color_in) : string(string_in), color(color_in) {}
+ColoredString::ColoredString(std::string string_in) : string(string_in) {}
+ColoredString::ColoredString() {}
 	
 }

@@ -98,8 +98,20 @@ constexpr rgba_t empty = rgba_t(0, 0, 0, 0);
 
 rgba_t Entity(CatEntity* entity);
 void RegisterCustomColorToEntity(void *func(CatEntity*));
+
+rgba_t Health(CatEntity* entity);
 	
 rgba_t RainbowCurrent();
+
+// Strings containing a color
+class ColoredString {
+	public:
+	ColoredString(std::string, rgba_t);
+	ColoredString(std::string);
+	ColoredString();
+	std::string string = "";
+	rgba_t color = colors::white;
+};
 }
 using rgba_t = colors::rgba_t;
 

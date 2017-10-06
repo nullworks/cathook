@@ -14,7 +14,6 @@
 
 #include "../util/mathlib.hpp"
 
-#define MAX_STRINGS 32
 #define MAX_ENTITIES 2048 // Increase as needed
 
 // Nice macros
@@ -52,11 +51,11 @@ public:
 	bool		exists = false; 		// Whether The entity exists in game
 	bool 		dormant = true; 		// Exists but not active
 	
-	std::string entityName = "unknown";	// Name of the entity
+	std::string entity_name = "unknown";	// Name of the entity
 	int  		team = ETEAM_NONE;
 	bool 		alive = false;
 	bool 		enemy = true;
-	int 		maxHealth = 0;
+	int 		max_health = 100;
 	int 		health = 0;
 	
 	int			type = ETYPE_NONE;

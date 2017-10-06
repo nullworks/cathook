@@ -12,26 +12,27 @@
 #include "../../logging.h"
 #include "../../framework/game.hpp"
 
+// TODO, Remake this entire mess
+
 namespace gui { namespace sidestrings {
 	
 HudStrings side_strings;// Stores side strings
 void HudStrings::AddString(const std::string& input_string, const rgba_t& input_color) {
-	if (count >= 32) return; // To prevent overflow 
-	string[count] = input_string;
-	color[count] = input_color;
-	++count;
+	if (string_count >= MAX_SIDESTRINGS) return; // To prevent overflow 
+	strings[string_count] = colors::ColoredString(input_string, input_color);
+	string_count++;
 }
 
 // Draw strings in the object
 void DrawSideStrings() {
 	int y = 8;	// TODO, make this change depending on screen size.
-	int tmp, tmp2;
-	for (int i = 0; i < side_strings.count; i++) {
-		draw::String(side_strings.string[i].c_str(), 8, y, OPENSANS, 20, side_strings.color[i]); // TODO, make gui use user defined font as well as size
-		draw::GetStringLength(side_strings.string[i].c_str(), OPENSANS, 20, tmp2, tmp);
+	static int tmp, tmp2;
+	for (int i = 0; i < side_strings.string_count; i++) {
+		draw::String(side_strings.strings[i].string.c_str(), 8, y, OPENSANS, 20, side_strings.strings[i].color); // TODO, make gui use user defined font as well as size
+		draw::GetStringLength(side_strings.strings[i].string.c_str(), OPENSANS, 20, tmp2, tmp);
 		y += tmp + 1;
 	}
-	side_strings.count = 0; // Clear out the object
+	side_strings.string_count = 0; // Clear out the object
 }
 	
 std::string top_string = "Cathook";

@@ -1,13 +1,16 @@
 
 #include <string>
+
 #include "../../util/colors.hpp"
 
+#define MAX_SIDESTRINGS 32
+
 namespace gui { namespace sidestrings {
+	
 class HudStrings {
 public:
-	std::string string[32];
-	rgba_t color[32];
-	int count;
+	int string_count = 0;
+	colors::ColoredString strings[MAX_SIDESTRINGS];
 	void AddString(const std::string&, const rgba_t&);
 };
 	

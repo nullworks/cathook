@@ -73,6 +73,7 @@ CMenuTree* GetMenuTree() {
 
 
 // Deletes a tree as well as any children
+// Crashes for unknown reason
 void DeleteTreeTree(CMenuTree* tree) {
 	if (!tree) return;
 	

@@ -12,7 +12,6 @@
 
 #include "drawing.hpp" 			// So we can send a draw reset to whatever draw module needs it for
 #include "inputmgr.hpp"			// We reset user input on draw
-#include "worldtoscreen.hpp" 	// World to screen needs a reset
 
 #include "drawmgr.hpp"
 

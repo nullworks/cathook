@@ -25,9 +25,7 @@ namespace gui { namespace menu {
 // User vars
 CatEnum gui_catenum({"Visuals", "Menu"});
 CatVarBool menu_enabled(gui_catenum, "menu_visible", false, "Show Menu", "Should menu be visible?");
-CatVarInt menu_scale(gui_catenum, "menu_y", 100, "Menu Scaling", "Allows you to scale the menu.\n100 = 100% Scaling", 250);
-CatVarInt font(gui_catenum, "menu_font", 1, "Menu Font", "Choose the menu font");
-CatVarInt font_size(gui_catenum, "menu_font_size", 19, "Menu Font Size", "Choose a size for the fonts", 40);
+CatVarInt menu_scale(gui_catenum, "menu_scale", 100, "Menu Scaling", "Allows you to scale the menu.\n100 = 100% Scaling", 250);
 
 // The root of cathooks menu
 CBaseWidget* main_menu = nullptr;
@@ -65,8 +63,8 @@ CMenuTree* CreateMenuBar(CMenuTree* menu_tree, int recursions) {
 	for (CMenuTree* tree_branch : menu_tree->children) {
 		CBaseWidget* button = element::ButtonCreate(button_bar);
 		button->name = tree_branch->name;
-		button->font = 1;	// Set the font
-		button->font_size = 24;	// Set the size
+		button->font = gui_font;	// Set the font
+		button->font_size = gui_font_size;	// Set the size
 		if (recursions > 0) { // Menu intifier builder
 			for (int ii = 0; ii < recursions; ii++) {
 				button->menu_identifier.push_back(menu_location[ii]);
@@ -104,7 +102,7 @@ void ReConstructMenu() {
 	}
 	
 	// Create a good size to the screen
-	main_menu->height = (CatUserInp.boundsy * 0.45F); // Make it 38% of the screen, and scale with scale var
+	main_menu->height = CatUserInp.boundsy * 0.45F; // Make it 38% of the screen, and scale with scale var
 	main_menu->width = (main_menu->height / aspecty) * aspectx;	// Extrapolate with the aspect ratio
 		
 
@@ -142,8 +140,8 @@ void ReConstructMenu() {
 			case CV_SWITCH:
 				CBaseWidget* button = element::ButtonToggleCreate(organizerr);
 				button->name = cat_var->cat_bool->desc_short;
-				button->font = font;
-				button->font_size = font_size;
+				button->font = gui_font;
+				button->font_size = gui_font_size;
 				button->child_bool = &cat_var->cat_bool->value_bool;
 				break;
 			}

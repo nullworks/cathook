@@ -24,11 +24,6 @@ echo Attaching to "$proc"
 
 sudo ./detach $inst bin/libcathook.so
 
-if grep -q "$(realpath bin/libcathook.so)" /proc/"$proc"/maps; then
-  echo already loaded
-  exit
-fi
-
 echo loading "$(realpath bin/libcathook.so)" to "$proc"
 gdb -n -q -batch \
   -ex "attach $proc" \

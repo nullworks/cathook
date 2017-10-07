@@ -5,10 +5,10 @@
  *
  */
 
-#include <unistd.h> // Unix like headers for read write and stuff like that
+
 #include <csignal> // Unknown
 
-#include "logging.h"
+#include "util/logging.h"
 #include "shutdown.hpp"
 
 // Game Modules
@@ -20,36 +20,27 @@
 
 #include "hack.h"
 
-static bool hack::shutdown = false;
+bool hack::shutdown = false;
 
 void hack::Initialize() {
-	signal(SIGPIPE, SIG_IGN);
-	//time_injected = time(nullptr);
+	//signal(SIGPIPE, SIG_IGN);	// Is this needed?
 
-	logging::Info("Initializing...");
+	CatLogging("Initializing...");
 	srand(time(0)); // Setting random seed?
 	
 	// Please put only one GAME module here. Any other type of module can screw with things.
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
-	logging::Info("Loading Modules...");
-	
+	CatLogging("Loading Modules...");
 	modules::tf2::Init();
 	
-	logging::Info("Modules Done!");
-	
-	logging::Info("Initializing main cheat features...");
+	CatLogging("Initializing main cheat features...");
 	features::Init();
 	
-	logging::Info("Initializing gui...");
+	CatLogging("Initializing gui...");
 	gui::Init(); // init the gui
 	
-	logging::Info("Initializing Done!");
-}
-
-// Umm, what??? Does this need to be here?
-void hack::Think() {
-	usleep(250000);
+	CatLogging("Initializing Done!");
 }
 
 // Do we need this???
@@ -59,5 +50,5 @@ void hack::Shutdown() {
 	
 	RunShutdown();
 
-	logging::Info("Shutdown Success..");
+	CatLogging("Shutdown Success..");
 }

@@ -6,8 +6,6 @@
  *
  */
 
-#include "../../logging.h"
-
 #include "organizer.hpp"
 
 namespace gui { namespace element {
@@ -38,7 +36,6 @@ void OrganizerDraw(CBaseWidget* base_widget) {	// We control the positions of ou
 }
 	
 CBaseWidget* OrganizerCreate(CBaseWidget* root_parent) {
-	logging::Info("Making Organizer!");
 	return new CBaseWidget(root_parent, OrganizerDraw);
 }
 	

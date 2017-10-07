@@ -5,17 +5,20 @@
  *      Author: nullifiedcat
  */
 
-#include <pthread.h>
+// TODO!, find out if we need threads
+#include <pthread.h>	// So we can create and give cathook a thread to use
+#include <unistd.h> // Unix like headers for read write and stuff like that
 
+#include "util/logging.h" // To log
 #include "hack.h"
-#include "logging.h"
+
 
 pthread_mutex_t mutex_quit;
 pthread_t thread_main;
 
 bool IsStopping(pthread_mutex_t* mutex_quit_l) {
 	if (!pthread_mutex_trylock(mutex_quit_l)) {
-		logging::Info("Shutting down, unlocking mutex");
+		CatLogging("Shutting down, unlocking mutex");
 		pthread_mutex_unlock(mutex_quit_l);
 		return true;
 	} else {
@@ -27,13 +30,12 @@ bool IsStopping(pthread_mutex_t* mutex_quit_l) {
 void* MainThread(void* arg) {
 	pthread_mutex_t* mutex_quit_l = (pthread_mutex_t*) arg;
 	hack::Initialize();
-	logging::Info("Init done...");
+	CatLogging("Init done...");
 	while (!IsStopping(mutex_quit_l)) {
-		hack::Think();
+		usleep(250000);
 	}
-	logging::Info("Shutting down...");
+	CatLogging("Shutting down...");
 	hack::Shutdown();
-	logging::Shutdown();
 	return 0;
 }
 
@@ -45,7 +47,7 @@ void __attribute__((constructor)) attach() {
 }
 
 void __attribute__((destructor)) detach() {
-	logging::Info("Detaching");
+	CatLogging("Detaching");
 	pthread_mutex_unlock(&mutex_quit);
 	pthread_join(thread_main, 0);
 }

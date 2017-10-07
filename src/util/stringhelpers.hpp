@@ -10,9 +10,8 @@
 
 
 char* strfmt(const char* fmt, ...); 
-bool StrToBool(std::string str);
-rgba_t StrToRgba(const char* text);
-//wchar_t* GetWC(const char* fmt, ...);
+//bool StrToBool(std::string str);
+//rgba_t StrToRgba(const char* text);
 
 void format_internal(std::stringstream& stream);
 template<typename T, typename... Targs>

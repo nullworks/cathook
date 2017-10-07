@@ -25,10 +25,10 @@ enum CatVar_t {
 
 class CatEnum {
 public:
-	CatEnum(std::vector<std::string> values);
-	std::string Name(int value);
+	CatEnum(std::vector<const char*> values);
+	const char* Name(int value);
 public:
-	std::vector<std::string> value_names;
+	std::vector<const char*> value_names;
 	int min_value;
 	int max_value;
 	int size;
@@ -36,14 +36,14 @@ public:
 
 class CatVarBool {
 public:
-	CatVarBool(CatEnum& gui_position, std::string name, bool defaults, std::string desc_short, std::string desc_long);
+	CatVarBool(CatEnum& gui_position, const char* name, bool defaults, const char* desc_short, const char* desc_long);
 	inline operator bool() const 						{ return value_bool; }
 	inline void operator =(const bool& value) 			{ value_bool = value; }
 	inline bool operator ==(const bool& value) const	{ return value_bool == value; }
 public:
-	const std::string name;			// Command name if it needs to be registered into a games console
-	const std::string desc_short;	// Name in gui
-	const std::string desc_long;	// Descripton in gui
+	const char* name;			// Command name if it needs to be registered into a games console
+	const char* desc_short;	// Name in gui
+	const char* desc_long;	// Descripton in gui
 	CatEnum* gui_position;		// Where it would be in the gui, not const in the case we want to add the ability to move it later
 	const bool defaults;
 	bool value_bool;
@@ -51,18 +51,18 @@ public:
 
 class CatVarInt {
 public:
-	CatVarInt(CatEnum& gui_position, std::string name, int defaults, std::string desc_short, std::string desc_long);
-	CatVarInt(CatEnum& gui_position, std::string name, int defaults, std::string desc_short, std::string desc_long, int max_val);
-	CatVarInt(CatEnum& gui_position, std::string name, int defaults, std::string desc_short, std::string desc_long, int min_val, int max_val);
-	CatVarInt(CatEnum& cat_enum, CatEnum& gui_position, std::string name, int defaults, std::string desc_short, std::string desc_long);
-	CatVarInt(CatEnum& gui_position, std::string name, std::string desc_short, std::string desc_long);	// CatKey, cant have defaults.... No need why I would
+	CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long);
+	CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long, int max_val);
+	CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long, int min_val, int max_val);
+	CatVarInt(CatEnum& cat_enum, CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long);
+	CatVarInt(CatEnum& gui_position, const char* name, const char* desc_short, const char* desc_long);	// CatKey, cant have defaults.... No need why I would
 	inline operator int() const 						{ return value_int; }
 	inline void operator =(const int& value) 			{ value_int = value; }
 	inline bool operator ==(const int& value) const		{ return value_int == value; }
 public:
-	const std::string name;			// Command name if it needs to be registered into a games console
-	const std::string desc_short;	// Name in gui
-	const std::string desc_long;	// Descripton in gui
+	const char* name;			// Command name if it needs to be registered into a games console
+	const char* desc_short;	// Name in gui
+	const char* desc_long;	// Descripton in gui
 	CatEnum* gui_position;
 	const int defaults;
 	int value_int;
@@ -73,16 +73,16 @@ public:
 
 class CatVarFloat {
 public:
-	CatVarFloat(CatEnum& gui_position, std::string name, float defaults, std::string desc_short, std::string desc_long);
-	CatVarFloat(CatEnum& gui_position, std::string name, float defaults, std::string desc_short, std::string desc_long, float max_val);
-	CatVarFloat(CatEnum& gui_position, std::string name, float defaults, std::string desc_short, std::string desc_long, float min_val, float max_val);
+	CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long);
+	CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long, float max_val);
+	CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long, float min_val, float max_val);
 	inline operator float() const 						{ return value_float; }
 	inline void operator =(const float& value) 			{ value_float = value; }
 	inline bool operator ==(const float& value) const		{ return value_float == value; }
 public:
-	const std::string name;			// Command name if it needs to be registered into a games console
-	const std::string desc_short;	// Name in gui
-	const std::string desc_long;	// Descripton in gui
+	const char* name;			// Command name if it needs to be registered into a games console
+	const char* desc_short;	// Name in gui
+	const char* desc_long;	// Descripton in gui
 	CatEnum* gui_position;
 	const float defaults;
 	float value_float;
@@ -92,32 +92,32 @@ public:
 
 class CatVarString {
 public:
-	CatVarString(CatEnum& gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long);
-	CatVarString(CatEnum& gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long, int max_val);
-	CatVarString(CatEnum& gui_position, std::string name, std::string defaults, std::string desc_short, std::string desc_long, int min_val, int max_val);
-	inline operator std::string() const 					{ return value_string; }
-	inline void operator =(const std::string& value) 		{ value_string = value; }
-	inline bool operator ==(const std::string& value) const { return value_string == value; }
+	CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long);
+	CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long, int max_val);
+	CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long, int min_val, int max_val);
+	inline operator std::string() const 							{ return value_string; }
+	inline void operator =(const char*& value) 		{ value_string = value; }
+	inline bool operator ==(const char*& value) const { return value_string == value; }
 public:
-	const std::string name;			// Command name if it needs to be registered into a games console
-	const std::string desc_short;	// Name in gui
-	const std::string desc_long;	// Descripton in gui
+	const char* name;			// Command name if it needs to be registered into a games console
+	const char* desc_short;	// Name in gui
+	const char* desc_long;	// Descripton in gui
 	CatEnum* gui_position;
-	const std::string defaults;
-	std::string value_string;
+	const char* defaults;
+	std::string value_string; // Increase if needed
 	float max = 35;	// Do you really want to limit the sizes
 	float min = 0;
 };
 
 class CatVarColor {
 public:
-	CatVarColor(CatEnum& gui_position, std::string name, rgba_t defaults, std::string desc_short, std::string desc_long);
+	CatVarColor(CatEnum& gui_position, const char* name, rgba_t defaults, const char* desc_short, const char* desc_long);
 	inline operator rgba_t() const 				{ return value_rgba; }
 	inline void operator =(const rgba_t& value) { value_rgba = value; }
 public:
-	const std::string name;			// Command name if it needs to be registered into a games console
-	const std::string desc_short;	// Name in gui
-	const std::string desc_long;	// Descripton in gui
+	const char* name;			// Command name if it needs to be registered into a games console
+	const char* desc_short;	// Name in gui
+	const char* desc_long;	// Descripton in gui
 	CatEnum* gui_position;
 	const rgba_t defaults;
 	rgba_t value_rgba;

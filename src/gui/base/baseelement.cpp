@@ -8,8 +8,8 @@
 #include "baseelement.hpp"
 
 // Used by elements for mouse actions
-static int widget_mouseoffsetx;
-static int widget_mouseoffsety;
+int widget_mouseoffsetx;
+int widget_mouseoffsety;
 
 CBaseWidget::CBaseWidget(CBaseWidget* root_parent, void(*draw)(CBaseWidget*)) 
 	: root_parent(root_parent), draw(draw){ 
@@ -111,7 +111,7 @@ rgba_t CBaseWidget::GetColor() {
 
 // Get real root
 CatVector CBaseWidget::GetRealRoot() {
-	if (this->root_parent == nullptr) return;
+	if (this->root_parent == nullptr) return CatVector();
 	
 	// Check if we already have it
 	if (!this->root_offset_cached) { 

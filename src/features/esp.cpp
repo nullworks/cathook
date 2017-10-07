@@ -7,7 +7,7 @@
 
 #include <algorithm> // min() 
 
-#include "../logging.h"						// For debugging purposes
+#include "../util/logging.h"				// For debugging purposes
 #include "../framework/entitys.hpp"			// So we can use entitys
 #include "../framework/localplayers.hpp"	// So we can determine whether to apply esp to local player
 #include "../framework/inputmgr.hpp"		// So we can get screen size
@@ -43,12 +43,6 @@ namespace esp {
 // An array to store our cached esp strings
 static ESPData esp_cache[MAX_ENTITIES];
 	
-// Entity Box state enum
-enum {
-	EBOX_NOT_RAN,
-	EBOX_FAILED,
-	EBOX_SUCCESSFUL
-};
 static int ebox_state = EBOX_NOT_RAN; 	// To store the state of our box cache
 static CatBox ebox;						// To store the cached entity box
 
@@ -93,7 +87,7 @@ void Draw() {
 		if (CE_BAD(entity)) continue;
 
 		// Target checking
-		if (!g_LocalPlayer.cam_in_thirdperson && g_LocalPlayer.CatEntity == entity) continue;// Determine whether to apply esp to local player
+		if (!g_LocalPlayer.cam_in_thirdperson && g_LocalPlayer.entity == entity) continue;// Determine whether to apply esp to local player
 		if (entity->type == ETYPE_PLAYER && !entity->alive) continue; // Dont esp dead players
 		
 		// Reset the entity box state
@@ -185,7 +179,7 @@ void Draw() {
 						int total_height = 0; 
 						int height, width;
 						for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
-							draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), gui::gui_font, gui::gui_font_size, width, height);
+							draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), (int)gui::gui_font, (int)gui::gui_font_size, width, height);
 							total_height += height;
 						}
 						switch ((int)esp_text_position) { // Add more as needed
@@ -214,11 +208,11 @@ void Draw() {
 					
 					// Centered strings
 					if (center_strings) {
-						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x - width / 2, draw_point.y, gui::gui_font, gui::gui_font_size, esp_cache[i].strings[ii].color);
+						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x - width / 2, draw_point.y, (int)gui::gui_font, (int)gui::gui_font_size, esp_cache[i].strings[ii].color);
 						
 					// Not centered
 					} else {
-						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x, draw_point.y, gui::gui_font, gui::gui_font_size, esp_cache[i].strings[ii].color);
+						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x, draw_point.y, (int)gui::gui_font, (int)gui::gui_font_size, esp_cache[i].strings[ii].color);
 					}
 
 					// Lower draw point for recursions

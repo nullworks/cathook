@@ -13,10 +13,10 @@
 namespace entity_cache {
 
 // The main storage for our entity cache
-static CatEntity array[MAX_ENTITIES];
+CatEntity array[MAX_ENTITIES];
 
 // Stores number of highest entity we can use. Please set in your module
-static int HIGHEST_ENTITY = 0;
+int HIGHEST_ENTITY = 0;
 
 // Used to set highest entity usable.
 void SetHighest(int inp) {
@@ -52,8 +52,8 @@ int CatEntity::IDX() {
 }
 
 float CatEntity::Distance() {
-	if (g_LocalPlayer.CatEntity)
-		return origin.DistTo(g_LocalPlayer.CatEntity->origin);
+	if (g_LocalPlayer.entity)
+		return origin.DistTo(g_LocalPlayer.entity->origin);
 	return 0;	
 }
 

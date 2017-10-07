@@ -58,7 +58,7 @@ rgba_t Entity(CatEntity* entity) {
 }
 
 // If you wish to use colors seperate from what the framework has in mind, you may register your func with this
-void RegisterCustomColorToEntity(void *func(CatEntity*)) {	// The best name evar, I promise ;)
+void RegisterCustomColorToEntity(rgba_t(*func)(CatEntity*)) {	// The best name evar, I promise ;)
 	StoredColorEntity = func;
 }
 

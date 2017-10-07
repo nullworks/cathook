@@ -13,7 +13,7 @@
 
 namespace gui { namespace element {
 	
-void ButtonDraw(const CBaseWidget* base_widget) {
+void ButtonDraw(CBaseWidget* base_widget) {
 	if (!base_widget->visible) return;	// Draw name
 	
 	// Get string length + height so we can center it
@@ -21,15 +21,15 @@ void ButtonDraw(const CBaseWidget* base_widget) {
 	draw::GetStringLength(base_widget->name.c_str(), base_widget->font, base_widget->font_size, length, height);
 	// Draw centered string
 	draw::String(base_widget->name.c_str(),
-							 base_widget->GetRealRoot().x + ((base_widget->width - length) / 2), 
-							 base_widget->GetRealRoot().y + ((base_widget->height - height) / 2), 
-							 base_widget->font, base_widget->font_size, rgba_t(255, 255, 255, base_widget->color.a));
+				 base_widget->GetRealRoot().x + ((base_widget->width - length) / 2), 
+				 base_widget->GetRealRoot().y + ((base_widget->height - height) / 2), 
+				 base_widget->font, base_widget->font_size, rgba_t(255, 255, 255, base_widget->color.a));
 	// If we have been depressed, we darken the inside of our button
 	if (base_widget->performed_last) {
 		draw::RectFilled(base_widget->GetRealRoot().x + 1, 
-							base_widget->GetRealRoot().y + 1,
-							base_widget->width - 1, 
-							base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
+						 base_widget->GetRealRoot().y + 1,
+						 base_widget->width - 1, 
+						 base_widget->height - 1, rgba_t(25, 25, 25, base_widget->color.a * 0.75));// Depressed look
 	}
 	// Draw our ourside rect
 	draw::Rect(base_widget->GetRealRoot().x, 

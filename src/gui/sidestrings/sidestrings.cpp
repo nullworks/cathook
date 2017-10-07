@@ -9,7 +9,7 @@
 #include "sidestrings.hpp"
 #include "../../framework/drawing.hpp"
 #include "../gui.hpp"			// guicolor
-#include "../../logging.h"
+#include "../../util/logging.h"
 #include "../../framework/game.hpp"
 
 // TODO, Remake this entire mess
@@ -38,6 +38,9 @@ void DrawSideStrings() {
 std::string top_string = "Cathook";
 void DefaultSideStrings() {
 	side_strings.AddString(top_string, colors::RainbowCurrent());
+#if defined(GIT_COMMIT_HASH) && defined(GIT_COMMIT_DATE)
+	side_strings.AddString("Version: #" GIT_COMMIT_HASH " " GIT_COMMIT_DATE, gui::GUIColor());
+#endif
 }
 
 // Rebuilds the top string with our authors included

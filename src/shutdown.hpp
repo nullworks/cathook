@@ -9,7 +9,7 @@
 #include <stack>
 
 void RunShutdown();
+typedef void(*funcptr)(void);
 
-extern std::stack<void(*)()>& shutdown_stack();
 
-
+void RegisterShutdown(funcptr);

@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "../../logging.h"
+#include "../../util/logging.h"
 #include "../gui.hpp"
 #include "../../framework/inputmgr.hpp"		// So we get input
 #include "../../util/catvars.hpp"	// Obs we need it
@@ -123,7 +123,7 @@ void ReConstructMenu() {
 	// Construct Menu bar Tree
 	CMenuTree* menu_tree = GetMenuTree();	// This gets a fresh tree from the tree generator
 	CMenuTree* current_branch = CreateMenuBar(menu_tree, 0);	// This returns us a menu_branch that contains catvars to put into the menu
-	logging::Info("Menu: %s", current_branch->name.c_str());
+	CatLogging("Menu: %s", current_branch->name.c_str());
 	
 	// We loop through the catvars, building our menu as we go!
 	if (!current_branch->cat_children.empty()) { // Even more CATS!!!!

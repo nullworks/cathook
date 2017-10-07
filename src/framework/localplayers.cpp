@@ -7,11 +7,11 @@
 
 #include "localplayers.hpp"
 
-CLocalPlayer::Reset() {
+void CLocalPlayer::Reset() {
 
 	eye_position = CatVector(0, 0, 0); 
 	attack = false;
 }
 
 // Var for our local player
-static CLocalPlayer g_LocalPlayer;
+CLocalPlayer g_LocalPlayer;

@@ -28,7 +28,7 @@ void Line(int x, int y, int w, int h, rgba_t color) {
 	if (StoredLine == nullptr) return; // Check if module has claimed this yet	
 	StoredLine(x, y, w, h, color);
 }
-void InitLine(void *func(int, int, int, int, rgba_t)) {
+void InitLine(void(*func)(int, int, int, int, rgba_t)) {
 	StoredLine = func;
 }
 
@@ -48,7 +48,7 @@ void Rect(int x, int y, int w, int h, rgba_t color) {
 	Line(x + 1, y + h, w - 1, 0, color); // Botton
 	Line(x + w, y + 1, 0, h - 1, color); // Right
 }
-void InitRect(void *func(int, int, int, int, rgba_t)) {
+void InitRect(void(*func)(int, int, int, int, rgba_t)) {
 	StoredRect = func; 
 }
 	
@@ -67,7 +67,7 @@ void RectFilled(int x, int y, int w, int h, rgba_t color) {
 		Line(x + i, y, 0, h, color);
 	}
 }
-void InitRectFilled(void *func(int, int, int, int, rgba_t)) {
+void InitRectFilled(void(*func)(int, int, int, int, rgba_t)) {
 	StoredRectFilled = func;
 }
 
@@ -100,36 +100,36 @@ void Circle(int x, int y, float radius, int steps, rgba_t color) {
 		py = dy;
 	}	
 }
-void InitCircle(void *func(int, int, float, int, rgba_t)) {
+void InitCircle(void(*func)(int, int, float, int, rgba_t)) {
 	StoredCircle = func;
 }
 
 // String
-void(*StoredString)(const char*, int, int, EFont, int, rgba_t) = nullptr;
-void String(const char* text, int x, int y, EFont font, int size, rgba_t color) {
+void(*StoredString)(const char*, int, int, int, int, rgba_t) = nullptr;
+void String(const char* text, int x, int y, int font, int size, rgba_t color) {
 	if (StoredString != nullptr) {
 		StoredString(text, x, y, font, size, color);
 	}
 	//if (!line_defined) return; // TODO, make shitty font system with drawline
 }
 // Crying, but in spanish
-void String(std::string text, int x, int y, EFont font, int size, rgba_t color) {
+void String(std::string text, int x, int y, int font, int size, rgba_t color) {
 	String(text.c_str(), x, y, font, size, color);
 }
-void InitString(void *func(const char*, int, int, EFont, int, rgba_t)) {
+void InitString(void(*func)(const char*, int, int, int, int, rgba_t)) {
 	StoredString = func;
 }
 
 // String length in pixels
-void(*StoredStringLength)(const char*, EFont, int, int&, int&) = nullptr;
-void GetStringLength(const char* string, EFont font, int size, int& length, int& height) {
+void(*StoredStringLength)(const char*, int, int, int&, int&) = nullptr;
+void GetStringLength(const char* string, int font, int size, int& length, int& height) {
 	if (StoredString != nullptr && StoredStringLength != nullptr) {
 		StoredStringLength(string, font, size, length, height);
 		return;
 	}
 	//if (!string_defined && !line_defined) return; // Use the crappy font rendering workaround
 }
-void InitStringLength(void *func(const char*, EFont, int, int&, int&)) {
+void InitStringLength(void(*func)(const char*, int, int, int&, int&)) {
 	StoredStringLength = func;
 }
 	
@@ -141,7 +141,7 @@ bool WorldToScreen(CatVector& world, CatVector& screen) {
 	}
 	return false; // We cant do this ourself quite yet sadly...
 }
-void InitWorldToScreen(bool *func(CatVector&, CatVector&)) {
+void InitWorldToScreen(bool(*func)(CatVector&, CatVector&)) {
 	StoredWorldToScreen = func;
 }
 	

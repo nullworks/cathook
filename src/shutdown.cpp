@@ -7,18 +7,22 @@
 
 #include <stack>
 
-#include "logging.h"
+#include "util/logging.h"
 
 #include "shutdown.hpp"
 
-
-std::stack<void(*)()>& shutdown_stack();
+// TODO, rework to be easier
+static std::stack<funcptr> shutdown_stack;
 
 void RunShutdown() {
-	logging::Info("Running registered shutdown functions...");
-	while (!shutdown_stack().empty()) {
-		shutdown_stack().top()();
-		shutdown_stack().pop();
+	CatLogging("Running registered shutdown functions...");
+	while (!shutdown_stack.empty()) {
+		shutdown_stack.top()();
+		shutdown_stack.pop();
 	}
-	logging::Info("Finished Running shutdown functions...");
+	CatLogging("Finished Running shutdown functions...");
+}
+
+void RegisterShutdown(funcptr func) {
+	shutdown_stack.push(func);
 }

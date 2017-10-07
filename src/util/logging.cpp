@@ -5,8 +5,6 @@
  *      Author: nullifiedcat
  */
 
-#include "logging.h"
-
 #include <stdarg.h> // Infinit arguments, va_lists
 #include <string.h> // String stuff
 #include <fstream> 	// IO
@@ -16,26 +14,28 @@
 #include <unistd.h> // Gets user info
 #include <pwd.h>	// Struct passwd
 
-#include "util/stringhelpers.hpp"
+#include "../shutdown.hpp"
 
+#include "logging.h"
 
+// TODO, add to registered shutdown functions
 
-//#include "common.h"
-//#include "sdk.h"
+FILE* log_handle = 0;
 
-// TODO, mode to string util file
-
-
-FILE* logging::handle = 0;
-
-void logging::Initialize() {
-	// FIXME other method of naming the file? Currently uses username for it.
-	passwd* pwd = getpwuid(getuid());
-	logging::handle = fopen(strfmt("/tmp/cathook-%s.log", pwd->pw_name), "w");
+void Shutdown() {
+	fclose(log_handle);
+	log_handle = 0;
 }
 
-void logging::Info(const char* fmt, ...) {
-	if (logging::handle == 0) logging::Initialize(); // Check if file is open
+void Initialize() {
+	// FIXME other method of naming the file? Currently uses username for it.
+	passwd* pwd = getpwuid(getuid());
+	log_handle = fopen(strfmt("/tmp/cathook-%s.log", pwd->pw_name), "w");
+	RegisterShutdown(Shutdown);
+}
+
+void CatLogging(const char* fmt, ...) {
+	if (log_handle == 0) Initialize(); // Check if file is open
 	
 	char* buffer = new char[1024];
 	va_list list;
@@ -54,19 +54,9 @@ void logging::Info(const char* fmt, ...) {
 	strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
 	
 	sprintf(result, "%% [%s] %s\n", timeString, buffer);
-	fprintf(logging::handle, "%s", result);
-	fflush(logging::handle);
-/*#if ENABLE_VISUALS == 1
-	if (g_ICvar) {
-		if (console_logging.convar_parent && console_logging)
-			g_ICvar->ConsolePrintf("%s", result);
-	}
-#endif*/
+	fprintf(log_handle, "%s", result);
+	fflush(log_handle);
+	// Push result var to a console here
 	delete [] buffer;
 	delete [] result;
-}
-
-void logging::Shutdown() {
-	fclose(logging::handle);
-	logging::handle = 0;
 }

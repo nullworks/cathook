@@ -9,8 +9,8 @@
 
 class CLocalPlayer {
 public:
-	Reset();
-	CatEntity* CatEntity = nullptr;	// Contains the cat entity of our local player
+	void Reset();
+	CatEntity* entity = nullptr;	// Contains the cat entity of our local player
 	
 	
 	CatVector eye_position = CatVector(0, 0, 0); 	// Point where the users camera is 

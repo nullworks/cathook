@@ -11,7 +11,6 @@
 
 #include "stringhelpers.hpp"
 
-
 char* strfmt(const char* fmt, ...) {
 	char* buf = new char[1024];
 	va_list list;
@@ -21,17 +20,23 @@ char* strfmt(const char* fmt, ...) {
 	return buf;
 }
 
+void format_internal(std::stringstream& stream) {
+	(void)(stream);
+}
+
 // Over simplified string to bool
-bool StrToBool(const std::string* str) {
+// UNUSED
+/*bool StrToBool(const char* str) {
 	if (str == "true" || str == "1") {
 		return true;
 	}
 	return false;
-}
+}*/
 
 
 // Attempts to get a rgba color from a string
-rgba_t StrToRgba(const char* text) {
+// UNUSED
+/*rgba_t StrToRgba(const char* text) {
 	char ch[3];
 	memset(ch, "n", sizeof(char) * 3); // clean out the char
 	rgba_t color = rgba_t(0, 0, 0, 255);
@@ -53,11 +58,8 @@ rgba_t StrToRgba(const char* text) {
 		found_tick++; // We found next number
 	}
 	return color;
-}
+}*/
 
-void format_internal(std::stringstream& stream) {
-	(void)(stream);
-}
 
 
 

@@ -12,7 +12,13 @@
 #include "shutdown.hpp"
 
 // Game Modules
+#if defined(CATHOOK_TF2)
 #include "modules/tf2/init.hpp"
+#elif defined(CATHOOK_FOF)
+#include "modules/fistfulfrags/init.hpp"
+#elif defined(CATHOOK_L4D2)
+#include "modules/l4d2/init.hpp" // Dead
+#endif
 // Features
 #include "features/features.hpp"
 // GUI
@@ -32,7 +38,14 @@ void hack::Initialize() {
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
 	CatLogging("Loading Modules...");
+// defined() used as elif wont work with ifdef
+#if defined(CATHOOK_TF2) 	// Team fortress
 	modules::tf2::Init();
+#elif defined(CATHOOK_FOF) 	// Fistful of frags
+	modules::fof::Init();
+#elif defined(CATHOOK_L4D2)	// Left 4 dead 2
+	modules::l4d2::Init(); 	// Broken
+#endif
 	
 	CatLogging("Initializing main cheat features...");
 	features::Init();

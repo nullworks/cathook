@@ -5,12 +5,15 @@
  *
  */
 
-#include "../util/colors.hpp" // For colors and colored strings
+#include "../util/colors.hpp" 	// For colors and colored strings
+#include "../util/catvars.hpp"	// I would like to use catvars
 
 #define MAX_ESP_STRINGS 32	  // Strings allowed for esp
 
-namespace esp {
+namespace features { namespace esp {
 
+extern CatEnum esp_menu;
+	
 // Entitys strings
 struct ESPData {
 	int string_count = 0;
@@ -34,4 +37,4 @@ void WorldTick();
 void AddEspString(CatEntity* entity, std::string input_string, rgba_t color);
 void AddEspString(CatEntity* entity, std::string input_string);
 
-}
+}}

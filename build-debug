@@ -1,1 +1,1 @@
-make -j8 NO_WARNINGS=1 BUILD_DEBUG=1
+make -j$(nproc) BUILD_DEBUG=1

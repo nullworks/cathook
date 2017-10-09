@@ -76,15 +76,32 @@ SOURCES:=$(filter-out $(shell find $(SRC_DIR)/modules -name "*.c*" -print),$(SOU
 ## Game modules
 # Default game if none listed
 ifndef GAME
-GAME=tf2
-
+GAME=fof
 endif
+
+# Define our game
+DEFINES+=GAME=$(GAME)
 
 # Team Fortress game module
 ifeq ($(GAME), tf2)
 USE_SOURCE_2013_SDK=1
 SOURCES+=$(shell find $(SRC_DIR)/modules/tf2 -name "*.c*" -print) # add our tf2 files
+DEFINES+=CATHOOK_TF2=1
 # Default sub modules for tf2
+ifndef GRAPHICS_MOD
+GRAPHICS_MOD=valve_surface
+endif
+ifndef INPUT_MOD
+INPUT_MOD=xlib
+endif
+endif
+
+# Fistful of Frags game module
+ifeq ($(GAME), fof)
+USE_SOURCE_2013_SDK=1
+SOURCES+=$(shell find $(SRC_DIR)/modules/fistfulfrags -name "*.c*" -print) # add our game files
+DEFINES+=CATHOOK_FOF=1
+# Default sub modules for fof
 ifndef GRAPHICS_MOD
 GRAPHICS_MOD=valve_surface
 endif
@@ -97,6 +114,7 @@ endif
 ifeq ($(GAME), l4d2)
 USE_SOURCE_2013_SDK=1
 SOURCES+=$(shell find $(SRC_DIR)/modules/l4d2 -name "*.c*" -print) # add our game files
+DEFINES+=CATHOOK_L4D2=1
 # Default sub modules for l4d2
 ifndef GRAPHICS_MOD
 GRAPHICS_MOD=valve_surface
@@ -117,6 +135,7 @@ endif
 # Valve surface
 ifeq ($(GRAPHICS_MOD), valve_surface)
 ifdef USE_SOURCE_2013_SDK
+DEFINES+=CATHOOK_GPH_SURFACE=1
 SOURCES+=$(shell find $(SRC_DIR)/modules/Source_2013_SDK/cathook_common/valve_surface_drawing -name "*.c*" -print) # add our tf2 files
 endif
 endif
@@ -124,6 +143,7 @@ endif
 ## Input modules
 # Xlib input
 ifeq ($(INPUT_MOD), xlib)
+DEFINES+=CATHOOK_INP_XLIB=1
 SOURCES+=$(shell find $(SRC_DIR)/modules/xlib_input -name "*.c*" -print) # add our tf2 files
 endif
 

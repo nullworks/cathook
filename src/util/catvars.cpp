@@ -12,7 +12,6 @@
 CatVarBool::CatVarBool(CatEnum& gui_position, const char* name, bool defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_bool = defaults;
-	CatLogging("Sttuuuuufff: %s", name);
 	CatVarList.push_back(new CatVar(CV_SWITCH, this, nullptr, nullptr, nullptr, nullptr));
 }
 // CatInts

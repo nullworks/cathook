@@ -14,10 +14,11 @@
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
 #include "../gui/gui.hpp"					// For fonts
-#include "../util/catvars.hpp"				// I would like to use catvars
 
 #include "esp.hpp"
 
+namespace features { namespace esp {
+	
 // Currently, the gui doesnt reconize these. Just set to the options you wish to use
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
 CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
@@ -37,8 +38,6 @@ CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", "Shows 
 // Tracers
 CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
 CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a line from the player to a position on your screen");
-
-namespace esp {
 
 // An array to store our cached esp strings
 static ESPData esp_cache[MAX_ENTITIES];
@@ -273,4 +272,4 @@ void AddEspString(CatEntity* entity, std::string input_string) {
 	esp_cache[idx].string_count++;
 }
 	
-}
+}}

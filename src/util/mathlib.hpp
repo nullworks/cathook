@@ -6,11 +6,13 @@
  *			-Onee
  *
  */
-#ifndef CATMATHLIB
-#define CATMATHLIB
+
+#pragma once
+
+// gets size of array
+#define GET_ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
 // Struct for point in 3d space
-// I stole it from imgui, but it works too good
 class CatVector { 
 public:
 	float x, y, z; 
@@ -37,5 +39,3 @@ public:
 	CatVector max = CatVector();
 	CatVector center();
 };
-
-#endif

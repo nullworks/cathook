@@ -12,7 +12,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "../util/mathlib.hpp"
+#include <unordered_map> 		// Used to store our bones
+#include "../util/mathlib.hpp"	// CatVectors and CatBoxes
 
 #define MAX_ENTITIES 2048 // Increase as needed
 
@@ -34,14 +35,13 @@ enum {
 
 enum {
 	ETYPE_NONE,			// Idk wut
-	ETYPE_GENERIC,		// Some generic crap
 	ETYPE_PLAYER,		// Hey, a player!
-	ETYPE_OTHER,		// Something not known
 	ETYPE_OTHERHOSTILE, // Not player but still hostile
 	ETYPE_PROJECTILE,	// Bullet projectiles count 
 	ETYPE_PICKUP_HEALTH,// Self explanitory
 	ETYPE_PICKUP_SHEILD,	
-	ETYPE_PICKUP_AMMO
+	ETYPE_PICKUP_AMMO,
+	ETYPE_GENERIC		// Some generic crap
 };
 
 class CatEntity {
@@ -67,7 +67,11 @@ public:
 	
 	// TODO, use for player list + player state
 	unsigned int steam32 = 0;
-			
+	
+	// To store hitbox/bone locations
+	// This is for the bone manager to handle!
+	// Int is the bone from the enum, catbox is the hitbox
+	std::unordered_map<int, CatBox> bones;
 };
 
 namespace entity_cache {

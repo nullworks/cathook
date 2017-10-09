@@ -12,26 +12,26 @@
 CatVarBool::CatVarBool(CatEnum& gui_position, const char* name, bool defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_bool = defaults;
-	CatVarList.push_back(new CatVar(CV_SWITCH, this, nullptr, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_SWITCH, this, nullptr, nullptr, nullptr, nullptr));
 }
 // CatInts
 CatVarInt::CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_int = defaults;
-	CatVarList.push_back(new CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
 }
 CatVarInt::CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long, int max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_int = defaults;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
 }
 CatVarInt::CatVarInt(CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long, int min_val, int max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_int = defaults;
 	min = min_val;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
 }
 // CatEnums
 CatVarInt::CatVarInt(CatEnum& cat_enum, CatEnum& gui_position, const char* name, int defaults, const char* desc_short, const char* desc_long)
@@ -39,58 +39,58 @@ CatVarInt::CatVarInt(CatEnum& cat_enum, CatEnum& gui_position, const char* name,
 	value_int = defaults;
 	min = cat_enum.min_value;
 	max = cat_enum.max_value;
-	CatVarList.push_back(new CatVar(CV_ENUM, nullptr, this, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_ENUM, nullptr, this, nullptr, nullptr, nullptr));
 }
 // CatKeys
 CatVarInt::CatVarInt(CatEnum& gui_position, const char* name, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_int = 0;
-	CatVarList.push_back(new CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_INT, nullptr, this, nullptr, nullptr, nullptr));
 }
 // CatFloats
 CatVarFloat::CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_float = defaults;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
 }
 CatVarFloat::CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long, float max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_float = defaults;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
 }
 CatVarFloat::CatVarFloat(CatEnum& gui_position, const char* name, float defaults, const char* desc_short, const char* desc_long, float min_val, float max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_float = defaults;
 	min = min_val;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, this, nullptr, nullptr));
 }
 // CatStrings
 CatVarString::CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_string = defaults;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
 }
 CatVarString::CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long, int max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_string = defaults;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
 }
 CatVarString::CatVarString(CatEnum& gui_position, const char* name, const char* defaults, const char* desc_short, const char* desc_long, int min_val, int max_val)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_string = defaults;
 	min = min_val;
 	max = max_val;
-	CatVarList.push_back(new CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
+	CatVarList.push_back(CatVar(CV_STRING, nullptr, nullptr, nullptr, this, nullptr));
 }
 // CatColors
 CatVarColor::CatVarColor(CatEnum& gui_position, const char* name, rgba_t defaults, const char* desc_short, const char* desc_long)
 	: gui_position(&gui_position), name(name), defaults(defaults), desc_short(desc_short), desc_long(desc_long) {
 	value_rgba = defaults;
 	
-	CatVarList.push_back(new CatVar(CV_RGBA, nullptr, nullptr, nullptr, nullptr, this));
+	CatVarList.push_back(CatVar(CV_RGBA, nullptr, nullptr, nullptr, nullptr, this));
 }
 // Main CatVar
 CatVar::CatVar(CatVar_t type, CatVarBool* cat_bool, CatVarInt* cat_int, CatVarFloat* cat_float, CatVarString* cat_string, CatVarColor* cat_color)
@@ -123,9 +123,9 @@ CatEnum* CatVar::GetGUIEnum() {
 	}
 	return tmp;	
 }
-std::string CatVar::GetName() {
+const char* CatVar::GetName() {
 	// Make tmp catenum pointer and extract it from the catvar
-	std::string tmp;
+	const char* tmp;
 	switch(this->type) {
 	case CV_SWITCH: 
 		tmp = this->cat_bool->name;
@@ -164,6 +164,6 @@ const char* CatEnum::Name(int value) {
 	return "unknown";
 }
 
-std::vector<CatVar*> CatVarList;
+std::vector<CatVar> CatVarList;
 
 

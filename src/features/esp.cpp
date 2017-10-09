@@ -13,6 +13,7 @@
 #include "../framework/inputmgr.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
+#include "../framework/bones.hpp"			// For bone esp
 #include "../gui/gui.hpp"					// For fonts
 
 #include "esp.hpp"
@@ -35,6 +36,8 @@ CatVarInt show_health(esp_menu, show_health_enum, "esp_health", 3, "Health ESP",
 // Other strings
 CatVarBool show_name(esp_menu, "esp_name", true, "Name ESP", "Shows the entity names of entitys");
 CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", "Shows distance on entitys");
+// Bone esp
+CatVarBool bone_esp(esp_menu, "esp_bones", true, "Bone ESP", "Shows cached bones");
 // Tracers
 CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
 CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a line from the player to a position on your screen");
@@ -107,6 +110,39 @@ void Draw() {
 				}
 			}
 
+			// Bone esp
+			if (bone_esp) {
+				
+				// Loop through the bone sets	
+				for (const int* current_set : framework::bones::bonesets) {
+					
+					// Draw the bones in the bone set
+					for (int ii = 0; ii < GET_ARRAY_SIZE(current_set) - 1; i++) { // We do it like this so we can identify where we are in the loop
+						static CatVector tmp; // Storage vector we use elsewhere
+						
+						// Get our first bone
+						if (framework::bones::GetCatBoneFromEnt(entity, current_set[i], tmp)) {
+							
+							// World to screen it
+							CatVector scn1;
+							if (draw::WorldToScreen(tmp, scn1)) {
+							
+								// Get our second bone 
+								if (framework::bones::GetCatBoneFromEnt(entity, current_set[i + 1], tmp)) {
+									
+									// World to screen that too
+									CatVector scn2;
+									if (draw::WorldToScreen(tmp, scn2)) {
+										// Draw a line connecting the points
+										draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, esp_cache[i].color);
+									}
+								}
+							}
+						}						
+					}
+				}
+			}
+			
 			// Box esp
 			if (box_esp) {
 

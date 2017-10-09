@@ -25,7 +25,7 @@ CCatUserInp	CatUserInp;
 namespace CatKeys {
 	
 // Holds our cat keys string names for easy access
-const static std::unordered_map<int, std::string> KeyNames = {
+const static std::unordered_map<int, char*> KeyNames = {
 		
 	{CATKEY_NONE, " "}, 
 	{CATKEY_0, "0"}, {CATKEY_1, "1"}, {CATKEY_2, "2"}, 
@@ -82,7 +82,7 @@ const static std::unordered_map<int, std::string> KeyNames = {
 };
 	
 // Input a keycode to get the name of it
-const std::string GetKeyName(int keycode) {
+const char* GetKeyName(int keycode) {
 	
 	auto find = KeyNames.find(keycode);		//Search the map for our keycode
 	if(find != KeyNames.end()) return find->second;	// If we found an item, return the name

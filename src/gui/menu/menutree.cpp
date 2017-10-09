@@ -47,18 +47,19 @@ void AddMenuTree(CMenuTree* menu_tree, CatEnum* cat_enum, int recursions, CatVar
 	AddMenuTree(sapling, cat_enum, recursions + 1, cat_var);
 }
 
+// Somewhere to store unknown functions
+CatEnum unknown_menu({"Unknown"});
+	
 // The function that constructs the menu tree
 void BuildMenu() {
-	if (CMenuRoot) delete CMenuRoot; // Delete the menu if we already have it
-	CMenuRoot = new CMenuTree();
-	for (CatVar* cat_var : CatVarList) {
-		if (cat_var == nullptr) continue;
-		
-		CatEnum* tmp;
-		tmp = cat_var->GetGUIEnum();
-		if (tmp == nullptr) continue;
-		
-		AddMenuTree(CMenuRoot, tmp, 0, cat_var);
+	if (!CMenuRoot) CMenuRoot = new CMenuTree();
+	for (CatVar& cat_var : CatVarList) {
+		CatEnum* tmp = nullptr;
+		tmp = cat_var.GetGUIEnum();
+		if (tmp != nullptr)
+			AddMenuTree(CMenuRoot, tmp, 0, &cat_var);
+		else
+			AddMenuTree(CMenuRoot, &unknown_menu, 0, &cat_var);
 	}
 }
 

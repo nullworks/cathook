@@ -1,11 +1,15 @@
 
+/*
+ *
+ *	Header file for the input manager
+ *
+ */
 
-#ifndef INPUTMGR
-#define INPUTMGR
+#pragma once
 
 #include <unordered_map>
 	
-enum ECatKeys {
+enum {
 	CATKEY_NONE,
 	CATKEY_0, CATKEY_1, CATKEY_2,
 	CATKEY_3, CATKEY_4, CATKEY_5,
@@ -85,8 +89,6 @@ extern CCatUserInp CatUserInp;
 
 namespace CatKeys {
 	
-const std::string GetKeyName(int keycode);
+const char* GetKeyName(int keycode);
 
 }
-
-#endif

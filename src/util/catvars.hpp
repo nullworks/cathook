@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#ifndef CVWRAPPER_H_
-#define CVWRAPPER_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -140,10 +139,8 @@ public:
 	CatVarString* cat_string;
 	CatVarColor* cat_color;
 	CatEnum* GetGUIEnum();
-	std::string GetName();
+	const char* GetName();
 };
 
 // Storage for all the catvars! Eventually should use a unordered map
-extern std::vector<CatVar*> CatVarList;
-
-#endif /* CVWRAPPER_H_ */
+extern std::vector<CatVar> CatVarList;

@@ -16,12 +16,7 @@
 namespace framework { namespace bones {
 
 // Sets of bones that are connected
-extern const int boneset_center[];
-extern const int boneset_upper_limbs[];
-extern const int boneset_lower_limbs[];
-
-// Contains the bone sets
-extern const std::vector<const int*> bonesets;
+extern const std::vector<std::vector<int>> bonesets;
 
 bool GetCatBoneFromEnt(CatEntity* entity, int bone, CatVector& vector);
 

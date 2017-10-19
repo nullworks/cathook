@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "entitys.hpp"		// Stuff to reset
-#include "localplayers.hpp"
 
 #include "worldtickmgr.hpp"
 
@@ -26,7 +25,6 @@ void WorldTickRun() {
 	
 	// Reset the entitymgr and local player
 	entity_cache::Invalidate();
-	g_LocalPlayer.Reset();
 	
 	// Used for stuff that refill the entity mgr and related
 	for (const auto& func : before_wtick_functions) {

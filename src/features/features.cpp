@@ -11,6 +11,7 @@
 #include "../framework/worldtickmgr.hpp"
 // Stuff to init
 #include "esp.hpp"
+#include "aimbot.hpp"
 
 #include "features.hpp"
 
@@ -22,6 +23,8 @@ void Init() {
 	drawmgr::RequestDrawOnDraw(esp::Draw);
 	worldtick::RequestBeforeWTick(esp::WorldTick);
 	
+	// Aimbot
+	worldtick::RequestWTick(aimbot::WorldTick);
 }
 	
 	

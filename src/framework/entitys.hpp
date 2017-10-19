@@ -5,8 +5,7 @@
  *
  */
 
-#ifndef ENTITYMGR
-#define ENTITYMGR
+#pragma once
 
 #include <iostream>
 #include <stdexcept>
@@ -87,4 +86,20 @@ void SetHighest(int inp); // Use to set highest entity
 extern int HIGHEST_ENTITY;
 }
 
-#endif
+class CLocalPlayer {
+public:
+	void Reset();
+	
+	CatEntity* entity = nullptr;	// Contains the cat entity of our local player
+	CatVector camera_position = CatVector(); 	// Point where the users camera is 
+	bool cam_in_thirdperson = false;	// Set to true if your camera is in thirdperson
+	
+	// Our player commands
+	bool attack 		   = false;					// Used to control if attacking should happen
+	bool attack_prevent    = false;			// Used for when you wish to prevent attacking
+	CatVector camera_angles = CatVector();	// Angles of what the player sees
+	CatVector real_angles   = CatVector();	// The real angles that the game should be at and keep sync with
+};
+
+extern CLocalPlayer g_LocalPlayer;
+

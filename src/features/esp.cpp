@@ -9,7 +9,6 @@
 
 #include "../util/logging.h"				// For debugging purposes
 #include "../framework/entitys.hpp"			// So we can use entitys
-#include "../framework/localplayers.hpp"	// So we can determine whether to apply esp to local player
 #include "../framework/inputmgr.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
@@ -17,6 +16,8 @@
 #include "../gui/gui.hpp"					// For fonts
 
 #include "esp.hpp"
+
+// TODO, make set entity color change strings that are using the current entity color to another
 
 namespace features { namespace esp {
 	
@@ -44,7 +45,13 @@ CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a 
 
 // An array to store our cached esp strings
 static ESPData esp_cache[MAX_ENTITIES];
-	
+
+// Entity Box state enum
+enum {
+	EBOX_NOT_RAN,
+	EBOX_FAILED,
+	EBOX_SUCCESSFUL
+};
 static int ebox_state = EBOX_NOT_RAN; 	// To store the state of our box cache
 static CatBox ebox;						// To store the cached entity box
 
@@ -113,26 +120,27 @@ void Draw() {
 			// Bone esp
 			if (bone_esp) {
 				
-				// Loop through the bone sets	
-				for (const int* current_set : framework::bones::bonesets) {
+				// Loop through the bone sets
+				for (const std::vector<int> current_set : framework::bones::bonesets) {
 					
 					// Draw the bones in the bone set
-					for (int ii = 0; ii < GET_ARRAY_SIZE(current_set) - 1; i++) { // We do it like this so we can identify where we are in the loop
+					for (int iii = 0; iii < current_set.size() - 1; iii++) { // We do it like this so we can identify where we are in the loop
 						static CatVector tmp; // Storage vector we use elsewhere
 						
 						// Get our first bone
-						if (framework::bones::GetCatBoneFromEnt(entity, current_set[i], tmp)) {
+						if (framework::bones::GetCatBoneFromEnt(entity, current_set[iii], tmp)) {
 							
 							// World to screen it
 							CatVector scn1;
 							if (draw::WorldToScreen(tmp, scn1)) {
-							
+								
 								// Get our second bone 
-								if (framework::bones::GetCatBoneFromEnt(entity, current_set[i + 1], tmp)) {
-									
+								if (framework::bones::GetCatBoneFromEnt(entity, current_set[iii + 1], tmp)) {
+
 									// World to screen that too
 									CatVector scn2;
 									if (draw::WorldToScreen(tmp, scn2)) {
+										
 										// Draw a line connecting the points
 										draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, esp_cache[i].color);
 									}
@@ -294,7 +302,7 @@ void WorldTick() {
 	
 // Please add your esp strings during world tick as it is less intensive than doing this at draw
 // Use to add a string to esp for an entity with a color
-void AddEspString(CatEntity* entity, std::string input_string, rgba_t color) {
+void AddEspString(CatEntity* entity, std::string input_string, const rgba_t& color) {
 	int idx = entity->IDX();
 	if (esp_cache[idx].string_count >= MAX_ESP_STRINGS) return; // Prevent overflow
 	esp_cache[idx].strings[esp_cache[idx].string_count] = colors::ColoredString(input_string, color);
@@ -306,6 +314,10 @@ void AddEspString(CatEntity* entity, std::string input_string) {
 	if (esp_cache[idx].string_count >= MAX_ESP_STRINGS) return; // Prevent overflow
 	esp_cache[idx].strings[esp_cache[idx].string_count] = colors::ColoredString(input_string, colors::white);
 	esp_cache[idx].string_count++;
+}
+
+void SetEspColor(CatEntity* entity, const rgba_t& color) {
+	esp_cache[entity->IDX()].color = color; 
 }
 	
 }}

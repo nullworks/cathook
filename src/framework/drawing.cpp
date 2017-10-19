@@ -4,8 +4,6 @@
  *	Welcome to the draw module manager!
  *	Here is the modular drawing system you can tap into if needed!
  *	It is designed to only require draw line but you may add other specialized functions if needed.
- *	Currently the init functions are unable to save the functions input into them!!!
- *	Drawing will NOT work for the time being.
  *		-Onee
  *
  */
@@ -16,9 +14,9 @@
 #include <math.h>
 #include <stdarg.h>
 
-#include "drawing.hpp"
+#include "../util/mathlib.hpp" // Contains pi defines
 
-#define PI 3.14159265
+#include "drawing.hpp"
 
 namespace draw {
 	

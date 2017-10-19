@@ -25,6 +25,7 @@ CCatUserInp	CatUserInp;
 namespace CatKeys {
 	
 // Holds our cat keys string names for easy access
+// TODO, use an arry for this instead
 const static std::unordered_map<int, char*> KeyNames = {
 		
 	{CATKEY_NONE, " "}, 

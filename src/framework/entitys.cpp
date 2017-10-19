@@ -6,15 +6,13 @@
  *
  */
 
-#include "localplayers.hpp" // Used for distance to local player
-
 #include "entitys.hpp"
 
 namespace entity_cache {
 
 // The main storage for our entity cache
 CatEntity array[MAX_ENTITIES];
-
+	
 // Stores number of highest entity we can use. Please set in your module
 int HIGHEST_ENTITY = 0;
 
@@ -31,6 +29,8 @@ void Invalidate() { // Please invalidate on world tick
 		ent.Reset();
 	}
 	HIGHEST_ENTITY = 0;
+	// Reset our local player
+	g_LocalPlayer.Reset();
 }
 	
 }
@@ -56,4 +56,20 @@ float CatEntity::Distance() {
 		return origin.DistTo(g_LocalPlayer.entity->origin);
 	return 0;	
 }
+
+// Var for our local player
+CLocalPlayer g_LocalPlayer;
+
+void CLocalPlayer::Reset() {
+	// Reset some stuff to defaults
+	camera_position = CatVector();
+	cam_in_thirdperson = false;
+	// Our player commands
+	attack         = false;
+	attack_prevent = false;
+	camera_angles  = CatVector();
+	real_angles    = CatVector();
+}
+
+
 

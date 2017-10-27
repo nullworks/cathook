@@ -14,13 +14,16 @@ namespace gui { namespace menu {
 // Used to store the menu listings
 class CMenuTree {
 public:
-	~CMenuTree();	// Deconstructor to prevent memory leak
-public:
-	std::string name;
-	std::vector<CMenuTree*> children;
-	std::vector<CatVar*> 	cat_children;	// Nyaa~ :3
+	CMenuTree(const char* string = "");
+	~CMenuTree() { for (CMenuTree& tree : children) delete tree; } // Deconstructor to prevent memory leak	
+
+	void AddTree(const CatVar& cat_var, int recursions = 0);
+	const char* name;
+	std::vector<CMenuTree> children;
+	std::vector<const CatVar&> 	cat_children;	// Nyaa~ :3
 };
-	
-CMenuTree* GetMenuTree();
+
+// Use to get our menu data
+const CMenuTree& GetMenuTree();
 	
 }}

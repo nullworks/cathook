@@ -65,4 +65,8 @@ void BuildTopString() {
 	}
 }
 
+void Init() {
+	
+}
+
 }}

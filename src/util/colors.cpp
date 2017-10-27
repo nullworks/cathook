@@ -18,18 +18,17 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-rgba_t(*StoredColorEntity)(CatEntity*) = nullptr;
-rgba_t Entity(CatEntity* entity) {
+CatVector4&(*StoredColorEntity)(const CatEntity*) = nullptr;
+const CatVector4& Entity(const CatEntity* entity) {
 	// If a module has registered a custom color scheme, we apply that here
 	if (StoredColorEntity != nullptr) return StoredColorEntity(entity);
 	
-	// Without a custom scheme, we guess with the information given to the framework
-	
-	// All ents have white by defaults
-	rgba_t ent_color = rgba_t(255, 255, 255, 255); 
+	// Default color
+	static CatVector4& ent_color;
+	ent_color = white;
 	
 	// Different strokes for different folks
-	if (entity->type == ETYPE_PLAYER || entity->type == ETYPE_OTHERHOSTILE || entity->type == ETYPE_PLAYER || entity->type == ETYPE_PROJECTILE) {
+	if (entity->type == ETYPE_PLAYER || entity->type == ETYPE_OTHERHOSTILE || entity->type == ETYPE_PROJECTILE) {
 		switch(entity->team) {
 		case ETEAM_RED:
 			ent_color = red; break;
@@ -42,7 +41,7 @@ rgba_t Entity(CatEntity* entity) {
 		case ETEAM_ALLY:	// Blue good
 			ent_color = blue; break;
 		case ETEAM_ENEMY:	// Red bad
-			ent_color = red; break;
+			ent_color = red;
 		}
 	
 	// Pickups
@@ -51,19 +50,19 @@ rgba_t Entity(CatEntity* entity) {
 		case ETYPE_PICKUP_HEALTH:
 			ent_color = green; break;
 		case ETYPE_PICKUP_SHEILD:
-			ent_color = yellow; break;
+			ent_color = yellow;
 		}
 	}
 	return ent_color;
 }
 
 // If you wish to use colors seperate from what the framework has in mind, you may register your func with this
-void RegisterCustomColorToEntity(rgba_t(*func)(CatEntity*)) {	// The best name evar, I promise ;)
+void RegisterCustomColorToEntity(const CatVector4&(*func)(const CatEntity*)) {	// The best name evar, I promise ;)
 	StoredColorEntity = func;
 }
 
 // Returns a color based on entity health
-rgba_t Health(CatEntity* entity) {
+CatVector4 Health(const CatEntity* entity) {
 	if (entity->health > entity->max_health)	// Health is tuu much, they must be over their normal health so we make them blue
 		return rgba_t(64, 128, 255, 255);
 	
@@ -86,9 +85,4 @@ rgba_t RainbowCurrent() {
 	return colors::FromHSL(fabs(sin(curtime / 2.0f)) * 360.0f, 0.85f, 0.9f);
 }
 
-// Colored string constructors
-ColoredString::ColoredString(std::string string_in, rgba_t color_in) : string(string_in), color(color_in) {}
-ColoredString::ColoredString(std::string string_in) : string(string_in) {}
-ColoredString::ColoredString() {}
-	
 }

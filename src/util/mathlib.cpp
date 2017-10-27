@@ -12,20 +12,6 @@
 
 #include "mathlib.hpp"
 
-// Constructors and the like
-
-// Used to get the distance between 2 vectors
-float CatVector::DistTo(const CatVector& end) {
-	// 3d pythagorean theorem formula, wew
-	return sqrt((pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2)));
-}
-
-// Constructor
-CatBox::CatBox(CatVector min, CatVector max) : min(min), max(max) {}
-
-// Returns the center of a catbox
-CatVector CatBox::center() {return (min + max) * 0.5;}
-
 // Create points for the box based on max and mins
 void CatBox::GetPoints(CatVector* points) {	// Be sure to pass an array with at least 8 values
 	
@@ -83,12 +69,8 @@ CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point) 
 	return ClampAngles_r(CatVector(pitch, yaw));
 }
 
-// A function to get the difference from angles
-CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles) {
-
-	// Clamp our input angles
-	ClampAngles(cur_angles);
-	ClampAngles(dest_angles);
+// A function to get the difference from angles, Please make sure inputs are clamped
+CatVector GetAngleDifference(const CatVector& cur_angles, const CatVector& dest_angles) {
 	
 	// Our output difference
 	CatVector diff;

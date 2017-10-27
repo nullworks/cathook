@@ -35,7 +35,7 @@ TARGET = $(OUT_DIR)/$(OUT_NAME)
 #-o3: Optimizations, -shared: Probs due to this being a shared library that it needs it, -fmessage-length: Compiler message formatting, 
 #-m32: compile for x86_32 programs, -fvisibility: Hides symbols for potential undetection, -fPIC: to allow the librarys machine code to be dynamic in memory, 
 #-march and stuff is to optimise the program for the cpu compiling this
-COMMON_FLAGS=-O3 -shared -fmessage-length=0 -m32 -fvisibility=hidden -fPIC -march=native -mtune=native
+COMMON_FLAGS=-O3 -shared -fmessage-length=0 -m32 -fvisibility=hidden -fPIC -mtune=generic# -march=native 
 ifdef BUILD_DEBUG
 COMMON_FLAGS+=-g3 -ggdb
 endif

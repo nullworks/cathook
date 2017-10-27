@@ -6,8 +6,6 @@
  */
 
 #pragma once
-
-#include <unordered_map>
 	
 enum {
 	CATKEY_NONE,
@@ -60,35 +58,24 @@ enum {
 	CATKEY_MOUSE_1, CATKEY_MOUSE_2, 
 	CATKEY_MOUSE_3, CATKEY_MOUSE_4, 
 	CATKEY_MOUSE_5,
-	CATKEY_M_WHEEL_UP, CATKEY_M_WHEEL_DOWN
+	CATKEY_M_WHEEL_UP, CATKEY_M_WHEEL_DOWN,
+	CATKEY_COUNT
 };
-	
-class CCatUserInp {
-public:
-	// Mouse
-	bool mouse_on_screen = false;
-	int mousex = 0;
-	int mousey = 0;
-	
-	// Screen height and width
-	int boundsx = 0;
-	int boundsy = 0;
-	
-	// Pressed buttons
-	std::unordered_map<int, bool> stored_pressed;
-	bool IsKeyPressed(int keycode);
-	
-	// Update stuff
-	bool refresh_defined = false;
-	void(*StoredRefresh)(CCatUserInp*);
-	void Refresh();
-	void InitRefresh(void (*func)(CCatUserInp*));
-	
-};
-extern CCatUserInp CatUserInp;
 
-namespace CatKeys {
+namespace input {
+
+extern bool stored_pressed[];
 	
-const char* GetKeyName(int keycode);
+// Mouse info
+extern std::pair<int, int> mouse(0, 0);
+	
+// Screen height and width
+extern std::pair<int, int> bounds(0, 0);
+
+// Holds our cat keys string names for easy access
+extern const char* KeyNames[];
 
 }
+
+
+

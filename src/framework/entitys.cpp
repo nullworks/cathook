@@ -41,7 +41,6 @@ void CatEntity::Reset() {
 	dormant = true;
 	type = ETYPE_NONE;
 	alive = false;
-	enemy = false;
 	max_health = 100;	// Good base health so we dont need to change if there isnt variable health
 	health = 0;
 }
@@ -49,6 +48,14 @@ void CatEntity::Reset() {
 // Returns the entity number from the entity array
 int CatEntity::IDX() {
 	return int(((unsigned)this - (unsigned)&entity_cache::array) / sizeof(CatEntity));
+}
+
+bool CatEntity::Enemy() {
+	if (team == ETEAM_ALLY) return true;
+	if (team == ETEAM_ENEMY) return true;
+	if (g_LocalPlayer.entity == this) return false; // Local ents are friendly, duh
+	if (g_LocalPlayer.entity) return g_LocalPlayer.entity->team != team;
+	return true;
 }
 
 float CatEntity::Distance() {

@@ -5,101 +5,49 @@
  *
  */
 
-//#include "../../util/logging.h"
-
 #include "menutree.hpp"
 
 namespace gui { namespace menu {
-	
-// To store the layout of the menu and where everything is located
-CMenuTree* CMenuRoot;
 
-// Recurses through catenums input into it and maps it into the menu tree
-void AddMenuTree(CMenuTree* menu_tree, CatEnum* cat_enum, int recursions, CatVar* cat_var) {
-	// If we have reached the end of the catenums info, we can deposit our catvar here.
-	if (recursions >= cat_enum->size) {
-		menu_tree->cat_children.push_back(cat_var);
-		return;
-	}
-	std::string enum_name = cat_enum->Name(recursions);
-	//logging::Info(format("Menu Builder: ", enum_name).c_str());
+// Constructor
+CMenuTree(const char* string) name(string){}
 	
-	// If our branch has children, one could already be made that we want to go into
-	// Check if the menu input has any children
-	if (!menu_tree->children.empty()) {
-		// Look through the children and if any have the name of one we might want to make, we can reuse the branch.
-		for (CMenuTree* tree_branch : menu_tree->children) {
-			if (tree_branch->name == enum_name) {
-				
-				// We found an already existing branch so we can jsut recurse into it.
-				AddMenuTree(tree_branch, cat_enum, recursions + 1, cat_var);	// Recurse + 1 each time to keep trach of how far we went down the enum
-				return;
-			}
-		}
-	}
+// When you construct with a catvar for the input, it does logic here
+void CMenuTree::AddTree(const CatVar& cat_var, const int& recursions) {
+	// Check if we reached the end if the enum info, if not we can add more to the tree
+	if (cat_var.gui_position.size() > recursions) {
 		
-	// We dont have a branch already so we must make a new one and recurse into it.
-	CMenuTree* sapling = new CMenuTree();
-	sapling->name = enum_name;
-	menu_tree->children.push_back(sapling);
-	
-	// We now have a new branch to map into!
-	AddMenuTree(sapling, cat_enum, recursions + 1, cat_var);
-}
-
-// Somewhere to store unknown functions
-CatEnum unknown_menu({"Unknown"});
-	
-// The function that constructs the menu tree
-void BuildMenu() {
-	if (!CMenuRoot) CMenuRoot = new CMenuTree();
-	for (CatVar& cat_var : CatVarList) {
-		CatEnum* tmp = nullptr;
-		tmp = cat_var.GetGUIEnum();
-		if (tmp != nullptr)
-			AddMenuTree(CMenuRoot, tmp, 0, &cat_var);
-		else
-			AddMenuTree(CMenuRoot, &unknown_menu, 0, &cat_var);
+		// Look through the children and if any have the name of one we might want to make, we can reuse the branch
+		for (CMenuTree& tree_branch : this.children) {
+			// Test if this is an existing branch with matching names
+			if (tree_branch.name != std::string(cat_var.gui_position[recursions])) continue;
+			// We found our branch, recurse into it
+			tree_branch.AddTree(car_var, recursions + 1);
+			return;
+		}
+		
+		// We dont have a branch already so we must make a new one and recurse into it.
+		CMenuTree sapling = CMenuTree(cat_var.gui_position[recursions]);
+		this.children.push_back(sapling);
+	// This is for when we finished recursing
+	} else {
+		menu_tree->cat_children.push_back(cat_var);
 	}
 }
 
 // Use for when you wish to request the menu tree
-CMenuTree* GetMenuTree() {
-		
-	// If we already have a tree, return it
-	if (CMenuRoot) return CMenuRoot;
-	BuildMenu();
-	return CMenuRoot;
-}
-
-
-// Deletes a tree as well as any children
-// Crashes for unknown reason
-void DeleteTreeTree(CMenuTree* tree) {
-	if (!tree) return;
-	
-	// If there are children, we should delete them
-	if (!tree->children.empty()) {
-	
-		// Recurse and delete children
-		for(CMenuTree* sub_tree : tree->children) {
-			if (!sub_tree) continue;
-			DeleteTreeTree(sub_tree);
+const CMenuTree& GetMenuTree() {
+	static CMenuTree menu_root;
+	static menu_built = false;
+	if (!menu_built) {
+		for (const auto& cat_var : CatVarList) {
+			menu_root.AddTree(cat_var.second);
 		}
+		menu_built = true;
 	}
-	// We are done deleting children, suicide is only option
-	delete tree;
-}
-
-// Deconstructor in case of deletion.
-CMenuTree::~CMenuTree() { 	
-	
-	// If something has children, we want to delete them... Recursivly... Fuck children lol
-	if (!children.empty()) {
-		
-		// Delete everything in the tree
-		DeleteTreeTree(this);
-	}
+	// If we already have a tree, return it
+	return menu_root;
 }
 	
 }}
+

@@ -53,19 +53,19 @@ public:
 	std::string entity_name = "unknown";	// Name of the entity
 	int  		team = ETEAM_NONE;
 	bool 		alive = false;
-	bool 		enemy = true;
+	bool 		Enemy();
 	int 		max_health = 100;
 	int 		health = 0;
 	
 	int			type = ETYPE_NONE;
 	
-	CatVector 	origin = CatVector(0, 0, 0);
+	CatVector 	origin = CatVector();
 
 	CatBox 		collision;
 	float 		Distance(); // Distance from origin to local player
 	
 	// TODO, use for player list + player state
-	unsigned int steam32 = 0;
+	int steam32 = 0;
 	
 	// To store hitbox/bone locations
 	// This is for the bone manager to handle!
@@ -90,13 +90,13 @@ class CLocalPlayer {
 public:
 	void Reset();
 	
-	CatEntity* entity = nullptr;	// Contains the cat entity of our local player
+	CatEntity* entity = nullptr;				// Contains the cat entity of our local player
 	CatVector camera_position = CatVector(); 	// Point where the users camera is 
-	bool cam_in_thirdperson = false;	// Set to true if your camera is in thirdperson
+	bool cam_in_thirdperson = false;			// Set to true if your camera is in thirdperson
 	
 	// Our player commands
-	bool attack 		   = false;					// Used to control if attacking should happen
-	bool attack_prevent    = false;			// Used for when you wish to prevent attacking
+	bool attack 		   	= false;		// Used to control if attacking should happen
+	bool attack_prevent   	= false;		// Used for when you wish to prevent attacking
 	CatVector camera_angles = CatVector();	// Angles of what the player sees
 	CatVector real_angles   = CatVector();	// The real angles that the game should be at and keep sync with
 };

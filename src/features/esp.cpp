@@ -24,6 +24,9 @@ namespace features { namespace esp {
 // Currently, the gui doesnt reconize these. Just set to the options you wish to use
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
 CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
+// Target selection
+CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
+CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
 // Box esp + Options
 CatEnum box_esp_enum({ "None", "Normal", "Corners" });
 CatVarInt box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
@@ -47,11 +50,7 @@ CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a 
 static ESPData esp_cache[MAX_ENTITIES];
 
 // Entity Box state enum
-enum {
-	EBOX_NOT_RAN,
-	EBOX_FAILED,
-	EBOX_SUCCESSFUL
-};
+enum {EBOX_NOT_RAN, EBOX_FAILED, EBOX_SUCCESSFUL};
 static int ebox_state = EBOX_NOT_RAN; 	// To store the state of our box cache
 static CatBox ebox;						// To store the cached entity box
 
@@ -103,13 +102,13 @@ void Draw() {
 		ebox_state = EBOX_NOT_RAN;	
 		
 		// Check if main esp features should apply
-		if (entity->type == ETYPE_PLAYER) {
+		if ((esp_players && entity->type == ETYPE_PLAYER) || (esp_other_hostile && entity->type == ETYPE_OTHERHOSTILE)) {
 			
 			// Tracers
 			if (tracers) {
 
 				// Get world to screen
-				CatVector scn;
+				static CatVector scn;
 				if (draw::WorldToScreen(entity->origin, scn)) {
 
 					// Draw a line
@@ -131,14 +130,14 @@ void Draw() {
 						if (framework::bones::GetCatBoneFromEnt(entity, current_set[iii], tmp)) {
 							
 							// World to screen it
-							CatVector scn1;
+							static CatVector scn1;
 							if (draw::WorldToScreen(tmp, scn1)) {
 								
 								// Get our second bone 
 								if (framework::bones::GetCatBoneFromEnt(entity, current_set[iii + 1], tmp)) {
 
 									// World to screen that too
-									CatVector scn2;
+									static CatVector scn2;
 									if (draw::WorldToScreen(tmp, scn2)) {
 										
 										// Draw a line connecting the points
@@ -208,7 +207,7 @@ void Draw() {
 		if (esp_cache[i].string_count) { 
 			
 			// Get world to screen
-			CatVector draw_point;
+			static CatVector draw_point;
 			if (draw::WorldToScreen(entity->origin, draw_point)) {
 				
 				// Change draw point if needed & determine wheter we center the strings
@@ -220,7 +219,7 @@ void Draw() {
 					if ((int)esp_text_position > 3) { // For when we need total height of strings
 						// Get total height
 						int total_height = 0; 
-						int height, width;
+						static int height, width;
 						for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
 							draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), (int)gui::gui_font, (int)gui::gui_font_size, width, height);
 							total_height += height;
@@ -246,7 +245,7 @@ void Draw() {
 				for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
 
 					// Get string sizes
-					int width, height;
+					static int width, height;
 					draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), gui::gui_font, gui::gui_font_size, width, height);
 					
 					// Centered strings
@@ -283,7 +282,7 @@ void WorldTick() {
 		esp_cache[i].string_count = 0;
 		
 		// Add default strings
-		if (entity->type == ETYPE_PLAYER) {
+		if ((esp_players && entity->type == ETYPE_PLAYER) || (esp_other_hostile && entity->type == ETYPE_OTHERHOSTILE)) {
 			
 			// Name esp
 			if (show_name)
@@ -306,13 +305,6 @@ void AddEspString(CatEntity* entity, std::string input_string, const rgba_t& col
 	int idx = entity->IDX();
 	if (esp_cache[idx].string_count >= MAX_ESP_STRINGS) return; // Prevent overflow
 	esp_cache[idx].strings[esp_cache[idx].string_count] = colors::ColoredString(input_string, color);
-	esp_cache[idx].string_count++;
-}
-// If you dont have a color, it jsut uses the entitys cached color
-void AddEspString(CatEntity* entity, std::string input_string) {
-	int idx = entity->IDX();
-	if (esp_cache[idx].string_count >= MAX_ESP_STRINGS) return; // Prevent overflow
-	esp_cache[idx].strings[esp_cache[idx].string_count] = colors::ColoredString(input_string, colors::white);
 	esp_cache[idx].string_count++;
 }
 

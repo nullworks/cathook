@@ -64,9 +64,9 @@ bool IsTargetGood(CatEntity* entity) {
 	// Teammates
 	switch((int)teammates) {
 	case 0:	// Enemy only
-		if (!entity->enemy) return false; break;
+		if (!entity->Enemy()) return false; break;
 	case 1:	// Ally only
-		if (entity->enemy) return false;
+		if (entity->Enemy()) return false;
 	}
 	
 	// Fov check

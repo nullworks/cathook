@@ -1,44 +1,51 @@
 
+/*
+ *
+ *	Header for draw manager
+ *
+ *
+ */
 
-#ifndef DRAWMODMGR
-#define DRAWMODMGR
+#pragma once
 
-#include <string.h> 
-#include <functional>
+#include <functional> // std::pair()
 
-#include "../util/colors.hpp"
-#include "../util/mathlib.hpp"
+#include "../util/mathlib.hpp" // CatVector4
 
+class CDraw {
+public:
+
+// Line
+virtual void Line(const int& x, const int& y, const int& w, const int& h, const CatVector4& color);
+// Outline rect
+virtual void Rect(const int& x, const int& y, const int& w, const int& h, const CatVector4& color);
+// Filled Rect
+virtual void RectFilled(const int& x, const int& y, const int& w, const int& h, const CatVector4& color);
+// Outline circle
+virtual void Circle(const int& x, const int& y, const float& radius, const int& steps, const CatVector4& color);
+
+// String
+virtual void String(const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color);
+// String length in pixels
+virtual std::pair<int, int> GetStringLength(const char* string, const int& font, const int& size);
+
+};
+
+// Font enums
 enum {
-	NONE,
 	OPENSANS,
 	VERASANS,
 	UNISPACE,
-	TF2BUILD	// Le meme
+	TF2BUILD,	// Le meme
+	FONT_COUNT
 };
 
 namespace draw {
-	
-// Drawing Functions
-void Line(int x, int y, int w, int h, rgba_t color);
-void Rect(int x, int y, int w, int h, rgba_t color);
-void RectFilled(int x, int y, int w, int h, rgba_t color);
-void Circle(int x, int y, float radius, int steps, rgba_t color);
-	
-// Init Functions, these are fucked rn!
-void InitLine (void(*func)(int, int, int, int, rgba_t));
-void InitRect (void(*func)(int, int, int, int, rgba_t));
-void InitRectFilled (void(*func)(int, int, int, int, rgba_t));
-void InitCircle (void(*func)(int, int, float, int, rgba_t));
-	
-void String(const char* text, int x, int y, int font, int size, rgba_t color);
-void GetStringLength(const char* string, int font, int size, int& length, int& height);
 
-void InitString (void(*func)(const char*, int, int, int, int, rgba_t));
-void InitStringLength (void(*func)(const char*, int, int, int&, int&));
+// Fonts, first is the pretty name and the second is the real name
+extern const char* Fonts[];
 
-bool WorldToScreen(CatVector& world, CatVector& screen);
-void InitWorldToScreen(bool(*func)(CatVector&, CatVector&));
+// The main world to screen function used by most of the cheats esp features
+bool WorldToScreen(const CatVector&, CatVector&);
+void InitWorldToScreen(bool(*func)(const CatVector&, CatVector&));
 }
-
-#endif

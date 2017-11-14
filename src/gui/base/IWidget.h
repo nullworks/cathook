@@ -86,6 +86,7 @@ public:
 	// Parental + children
 	virtual IWidget* GetParent() = 0;
 	virtual void SetParent(IWidget*) = 0;
+	virtual IWidget* GetRootParent() = 0;
 	virtual std::string GetName() = 0;
 };
 

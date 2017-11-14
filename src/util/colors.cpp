@@ -18,8 +18,8 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-CatVector4&(*StoredColorEntity)(const CatEntity*) = nullptr;
-const CatVector4& Entity(const CatEntity* entity) {
+CatVector4&(*StoredColorEntity)(CatEntity*) = nullptr;
+const CatVector4& Entity(CatEntity* entity) {
 	// If a module has registered a custom color scheme, we apply that here
 	if (StoredColorEntity != nullptr) return StoredColorEntity(entity);
 	
@@ -57,25 +57,25 @@ const CatVector4& Entity(const CatEntity* entity) {
 }
 
 // If you wish to use colors seperate from what the framework has in mind, you may register your func with this
-void RegisterCustomColorToEntity(const CatVector4&(*func)(const CatEntity*)) {	// The best name evar, I promise ;)
+void RegisterCustomColorToEntity(CatVector4&(*func)(CatEntity*)) {	// The best name evar, I promise ;)
 	StoredColorEntity = func;
 }
 
 // Returns a color based on entity health
-CatVector4 Health(const CatEntity* entity) {
+CatVector4 Health(CatEntity* entity) {
 	if (entity->health > entity->max_health)	// Health is tuu much, they must be over their normal health so we make them blue
-		return rgba_t(64, 128, 255, 255);
+		return CatVector4(64, 128, 255, 255);
 	
 	// Percentage of health our of max
 	float hf = (float)entity->health / (float)entity->max_health;
 	// Sick logic
-	return rgba_t((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
+	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }
 
 // Currently broken without a way to get time.
 // on inject make "time injected" chrono and save it. get duration since make and cast to count. use as time for rainbow.
 // have it be in seconds in a float with lesser miliseconds be used as 
-rgba_t RainbowCurrent() {
+CatVector4 RainbowCurrent() {
 	static float tick = 0;
 	tick += 0.003;
 	return colors::FromHSL(fabs(sin(tick / 2.0f)) * 360.0f, 0.85f, 0.9f);	// Remove this once u get it working

@@ -21,7 +21,7 @@ std::pair<int, int> mouse(0, 0);
 std::pair<int, int> bounds(0, 0);
 
 // Holds our cat keys as strings
-const char* KeyNames[] = {
+const char* key_names[] = {
 		
 	" ",  
 	"0", "1", "2",  

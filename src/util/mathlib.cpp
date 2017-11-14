@@ -6,8 +6,6 @@
  *
  */
 
-#include <math.h> // This is a mathlib, did you think we didnt need math?
-
 #include "../framework/entitys.hpp" // For fov, local players angles
 
 #include "mathlib.hpp"

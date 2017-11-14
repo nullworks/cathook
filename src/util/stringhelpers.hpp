@@ -1,28 +1,28 @@
 
-#ifndef STRINGHELPER
-#define STRINGHELPER
+/*
+ *
+ *	String helpers header
+ *
+ */
 
-#include <string.h> // String stuff
-#include <stdarg.h> // Infinit arguments, va_lists
-#include <sstream>	// For formatting to work properly
+#pragma once
 
-#include "colors.hpp"
+#include <stdarg.h> // Infinite arguments, va_lists
+#include <stdio.h>	// vsprintf()
 
-
-char* strfmt(const char* fmt, ...); 
-//bool StrToBool(std::string str);
-//rgba_t StrToRgba(const char* text);
-
-void format_internal(std::stringstream& stream);
-template<typename T, typename... Targs>
-void format_internal(std::stringstream& stream, T value, Targs... args) {
-	stream << value;
-	format_internal(stream, args...);
+// Input a char array to use as buffer, then the format with variables afterwards to fill the buffer with
+inline void strfmt(char* buffer, const char* fmt, ...) {
+	va_list list;
+	va_start(list, fmt);
+	vsprintf(buffer, fmt, list);
+	va_end(list);
 }
-template<typename... Args>
-std::string format(const Args&... args) {
-	std::stringstream stream;
-	format_internal(stream, args...);
-	return stream.str();
+
+// Give it a buffer, the string to pull from, and the bounds to use. Keep in mind, this expects correct bounds and such.
+inline void substr(char* buffer, const char* input, const int& start, const int& end) {
+	int needed_length = end - start;
+	for (int i = 0; i < needed_length; i++) {
+		buffer[i] = input[start + i];
+	}
+	buffer[needed_length] = '\0';
 }
-#endif

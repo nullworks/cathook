@@ -7,11 +7,8 @@
 
 #pragma once
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
+#include <vector> // For bone stuff
 
-#include <unordered_map> 		// Used to store our bones
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
 
 #define MAX_ENTITIES 2048 // Increase as needed
@@ -36,70 +33,126 @@ enum {
 	ETYPE_NONE,			// Idk wut
 	ETYPE_PLAYER,		// Hey, a player!
 	ETYPE_OTHERHOSTILE, // Not player but still hostile
-	ETYPE_PROJECTILE,	// Bullet projectiles count 
+	ETYPE_PROJECTILE,	// Bullet projectiles count
 	ETYPE_PICKUP_HEALTH,// Self explanitory
-	ETYPE_PICKUP_SHEILD,	
+	ETYPE_PICKUP_SHEILD,
 	ETYPE_PICKUP_AMMO,
 	ETYPE_GENERIC		// Some generic crap
 };
 
-class CatEntity {
-public:
-	void 		Reset();				// Resets this entity
-	int 		IDX(); 					// Returns entity number
-	bool		exists = false; 		// Whether The entity exists in game
-	bool 		dormant = true; 		// Exists but not active
-	
-	std::string entity_name = "unknown";	// Name of the entity
-	int  		team = ETEAM_NONE;
-	bool 		alive = false;
-	bool 		Enemy();
-	int 		max_health = 100;
-	int 		health = 0;
-	
-	int			type = ETYPE_NONE;
-	
-	CatVector 	origin = CatVector();
-
-	CatBox 		collision;
-	float 		Distance(); // Distance from origin to local player
-	
-	// TODO, use for player list + player state
-	int steam32 = 0;
-	
-	// To store hitbox/bone locations
-	// This is for the bone manager to handle!
-	// Int is the bone from the enum, catbox is the hitbox
-	std::unordered_map<int, CatBox> bones;
+// Bone position enum, Add bones as needed!
+enum {
+	EBone_head,			// Middle section
+	EBone_top_spine,
+	EBone_upper_spine,
+	EBone_middle_spine,
+	EBone_bottom_spine,
+	EBone_pelvis,
+	EBone_upper_arm_l,	// Upper limbs
+	EBone_upper_arm_r,
+	EBone_middle_arm_l,
+	EBone_middle_arm_r,
+	EBone_lower_arm_l,
+	EBone_lower_arm_r,
+	EBone_upper_leg_l,	// Lower limbs
+	EBone_upper_leg_r,
+	EBone_middle_leg_l,
+	EBone_middle_leg_r,
+	EBone_lower_leg_l,
+	EBone_lower_leg_r,
+	EBone_count
 };
 
-namespace entity_cache {
-
-extern CatEntity array[MAX_ENTITIES]; // b1g fat array in
-// Used for getting our cached entity from an idx
-inline CatEntity* Get(int IDX) {
-	return &array[IDX];
-}
-void Invalidate(); // Use in world tick
-void SetHighest(int inp); // Use to set highest entity
-//CachedEntity* GetEntity(int IDX); // Returns ent from array
-extern int HIGHEST_ENTITY;
-}
-
-class CLocalPlayer {
+// Class to contain entity information
+class CatEntity {
 public:
-	void Reset();
-	
-	CatEntity* entity = nullptr;				// Contains the cat entity of our local player
-	CatVector camera_position = CatVector(); 	// Point where the users camera is 
-	bool cam_in_thirdperson = false;			// Set to true if your camera is in thirdperson
-	
+	// Generic entity functions
+	inline void Reset() {
+		exists = false;
+		dormant = true;
+		alive = false;
+		type = ETYPE_NONE;
+		health = 100;
+		max_health = 100;
+	}
+	// Cant inline these for... uhh... reasons...
+	int IDX(); // Returns entity number in the array
+	float Distance();
+	bool Enemy();
+	// Generic entity states
+	bool exists = false; 	// Whether The entity exists in game
+	bool dormant = true; 	// Exists but not active
+	bool alive = false;
+	int health = 0;
+	int max_health = 100;
+	int team = ETEAM_NONE;
+	int	type = ETYPE_NONE;
+
+	// Other usefull info
+	char entity_name[50] = "unknown";// Name of the entity
+	CatVector origin = CatVector();
+	CatBox collision = CatBox();
+	int steam32 = 0;
+
+	// To store hitbox/bone location, This is for the bone manager and related to handle!
+	std::pair<bool, CatBox> bones[EBone_count];
+};
+
+class CatLocalPlayer {
+public:
+	inline void Reset() {
+		// Reset some stuff to defaults
+		camera_position = CatVector();
+		InThirdperson = false;
+		// Our player commands
+		attack         = false;
+		attack_prevent = false;
+		camera_angles  = CatVector();
+		real_angles    = CatVector();
+	}
+
+	CatEntity* entity = nullptr;		// Contains the cat entity of our local player
+	CatVector camera_position = CatVector(); 	// Point where the users camera is
+	bool InThirdperson = false;			// Set to true if your camera is in thirdperson
+
 	// Our player commands
-	bool attack 		   	= false;		// Used to control if attacking should happen
+	bool attack 		   			= false;		// Used to control if attacking should happen
 	bool attack_prevent   	= false;		// Used for when you wish to prevent attacking
 	CatVector camera_angles = CatVector();	// Angles of what the player sees
 	CatVector real_angles   = CatVector();	// The real angles that the game should be at and keep sync with
 };
 
-extern CLocalPlayer g_LocalPlayer;
+// Global entity info
+extern CatEntity g_CatEntitys[];
+extern CatLocalPlayer g_LocalPlayer;
+inline CatEntity& GetEntity(const int& IDX) { return g_CatEntitys[IDX]; }
 
+// Bone stuff
+namespace bones {
+
+// Sets of bones that are connected
+extern const std::vector<int> bonesets[];
+
+// Returns a reference to a catbone if it exists
+bool GetBone(CatEntity* entity, const int& bone, CatVector& input) {
+	// Ensure we have a bone
+	if (bone < 0 || bone >= EBone_count) return false;
+	if (!entity->bones[bone].first) return false;
+	// Change input and return
+	input = entity->bones[bone].second.center();
+	return true;
+}
+
+bool GetBone(CatEntity* entity, const int& bone, CatBox& input) {
+	// Ensure we have a bone
+	if (bone < 0 || bone >= EBone_count) return false;
+	if (!entity->bones[bone].first) return false;
+	// Change input and return
+	input = entity->bones[bone].second;
+	return true;
+}
+
+// Use to reset bones
+void ResetBones(CatEntity* entity) { for (auto& box : entity->bones) box.first = false; }
+
+}

@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include "elements/CBaseWindow.h"
+#include "base/CBaseContainer.h"
 
 namespace gui {
 	
-class CatGUI : public base::CBaseWindow {
+class CatGUI : public base::CBaseContainer {
 public:
 	CatGUI();
 	
-	// We override draw as we dont want to draw the entire gui space
-	virtual void Draw() override;
+	virtual void Update() override;
+	virtual void DrawBounds() override;
 	
 	// used to store what frame we are on
 	int frame_count = 0;
@@ -26,6 +26,6 @@ public:
 };
 
 // Use to get the gui
-CatGUI& g_pGUI();
+extern CatGUI g_pGUI;
  
 }

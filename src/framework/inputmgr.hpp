@@ -67,13 +67,13 @@ namespace input {
 extern bool stored_pressed[];
 	
 // Mouse info
-extern std::pair<int, int> mouse(0, 0);
+extern std::pair<int, int> mouse;
 	
 // Screen height and width
-extern std::pair<int, int> bounds(0, 0);
+extern std::pair<int, int> bounds;
 
 // Holds our cat keys string names for easy access
-extern const char* KeyNames[];
+extern const char* key_names[];
 
 }
 

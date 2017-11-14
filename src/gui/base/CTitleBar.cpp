@@ -6,7 +6,8 @@
  *      Author: nullifiedcat
  */
 
-#include "../../../framework/inputmgr.hpp" // We use mouse stuff here
+#include "../../framework/inputmgr.hpp" // We use mouse stuff here
+#include "../../framework/drawing.hpp"  // We use mouse stuff here
 
 #include "CTitleBar.h"
 

@@ -7,11 +7,9 @@
  *		-Onee
  *
  */
+
 #include <mutex>
 #include <vector>
-
-#include "drawing.hpp" 			// So we can send a draw reset to whatever draw module needs it for
-#include "inputmgr.hpp"			// We reset user input on draw
 
 #include "drawmgr.hpp"
 
@@ -25,12 +23,10 @@ std::vector<funcptr> draw_functions;
 std::vector<funcptr> after_draw_functions;
 	
 // This should be run on drawtick
-void DrawTick(){
+void DrawTick() {
 	std::lock_guard<std::mutex> draw_lock(drawing_mutex);	// multithreadding fix?
 	
 	// Reset things. We prepare drawing stuff for other input asked from request
-	// TODO, automaticly add to the below func
-	CatUserInp.Refresh(); 	// Ask for another poll, this also deserves to be done anyways as if a input module wasnt used, this would do nothing. GUI also needs this to be done first! 
 	for (const auto& func : before_draw_functions) {
 		func();
 	}
@@ -40,7 +36,7 @@ void DrawTick(){
 		func();
 	}
 	
-	// After Draw, finalizing and stuff. GUI and other hud elements should be done here!
+	// After Draw, finalizing and stuff.
 	for (const auto& func : after_draw_functions) {
 		func();
 	}

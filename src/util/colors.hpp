@@ -12,10 +12,11 @@
 namespace colors {
 
 // Color utils
-constexpr CatVector4 FromRGBA8(const CatVector4& color) { return color / 255; }
-constexpr CatVector4   ToRGBA8(const CatVector4& color) { return color * 255; }
-constexpr CatVector4 Transparent(const CatVector4& color, const float& multiplier = 0.5f) { return CatVector4(color.r, color.g, color.b, color.a * multiplier); }
-constexpr CatVector4 FromHSL(const float& h, const float& s, const float& v) {
+inline CatVector4 FromRGBA8(const CatVector4& color) { return color / 255; }
+inline CatVector4   ToRGBA8(const CatVector4& color) { return color * 255; }
+inline CatVector4   ToRGBA8(const float& r, const float& g, const float& b, const float& a) { return CatVector4(r, g, b, a); }
+inline CatVector4 Transparent(const CatVector4& color, const float& multiplier = 0.5f) { return CatVector4(color.x, color.y, color.z, color.a * multiplier); }
+inline CatVector4 FromHSL(const float& h, const float& s, const float& v) {
 	if (s <= 0.0) return ToRGBA8(v, v, v, 1.0f);
 	float hh = h;
 	if (hh >= 360.0) hh = 0.0;
@@ -42,29 +43,20 @@ constexpr CatVector4 FromHSL(const float& h, const float& s, const float& v) {
 }
 
 // Colors
-constexpr CatVector4 white 	= CatVector4(255, 255, 255, 255);
-constexpr CatVector4 black 	= CatVector4(0, 0, 0, 255);
-constexpr CatVector4 pink 	= CatVector4(255, 105, 180, 255);
-constexpr CatVector4 red 	= CatVector4(237, 42, 42, 255)
-constexpr CatVector4 blue 	= CatVector4(28, 108, 237, 255);
-constexpr CatVector4 yellow = CatVector4(255, 255, 0, 255);
-constexpr CatVector4 orange = CatVector4(255, 120, 0, 255);
-constexpr CatVector4 green 	= CatVector4(0, 255, 0, 255);
-constexpr CatVector4 empty 	= CatVector4(0, 0, 0, 0);
+const CatVector4 white 	= CatVector4(255, 255, 255, 255);
+const CatVector4 black 	= CatVector4(0, 0, 0, 255);
+const CatVector4 pink 	= CatVector4(255, 105, 180, 255);
+const CatVector4 red 		= CatVector4(237, 42, 42, 255);
+const CatVector4 blue 	= CatVector4(28, 108, 237, 255);
+const CatVector4 yellow = CatVector4(255, 255, 0, 255);
+const CatVector4 orange = CatVector4(255, 120, 0, 255);
+const CatVector4 green 	= CatVector4(0, 255, 0, 255);
+const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 
 // Color functions
-const CatVector4& Entity(const CatEntity* entity);
-void RegisterCustomColorToEntity(const CatVector4&(*func)(const CatEntity*));
-CatVector4 Health(const CatEntity* entity);
+const CatVector4& Entity(CatEntity* entity);
+void RegisterCustomColorToEntity(CatVector4&(*func)(CatEntity*));
+CatVector4 Health(CatEntity* entity);
 CatVector4 RainbowCurrent();
 
-// Strings containing a color
-class ColoredString {
-public:
-	ColoredString(const std::string& _string = "", const CatVector4& _color = colors::white) : string(_string), color(_color);
-	std::string string;
-	rgba_t color;
-};
 }
-
-

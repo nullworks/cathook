@@ -1,4 +1,4 @@
- 
+
 /*
  *
  *	Welcome to the draw module manager!
@@ -18,70 +18,35 @@
 
 #include "drawing.hpp"
 
-namespace draw {
-	
 // Line
-void(*StoredLine)(int, int, int, int, rgba_t) = nullptr;
-void Line(int x, int y, int w, int h, rgba_t color) {
-	if (StoredLine == nullptr) return; // Check if module has claimed this yet	
-	StoredLine(x, y, w, h, color);
-}
-void InitLine(void(*func)(int, int, int, int, rgba_t)) {
-	StoredLine = func;
-}
+void CDraw::Line(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {}
 
-	
 // Outline rect
-void(*StoredRect)(int, int, int, int, rgba_t) = nullptr;
-void Rect(int x, int y, int w, int h, rgba_t color) {
-	if (StoredRect != nullptr) { // Check if module has claimed this yet	
-		StoredRect(x, y, w, h, color);
-		return;	// We dont want it being drawn again
-	}
-	if (StoredLine == nullptr) return; // We cant use a work-around it if line isnt even defined...
-	
+void CDraw::Rect(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {
+
 	// Make outline rect with draw line
 	Line(x, y, w, 0, color); // Top
 	Line(x, y + 1, 0, h, color); // Left
 	Line(x + 1, y + h, w - 1, 0, color); // Botton
 	Line(x + w, y + 1, 0, h - 1, color); // Right
 }
-void InitRect(void(*func)(int, int, int, int, rgba_t)) {
-	StoredRect = func; 
-}
-	
-	
+
 // Filled Rect
-void(*StoredRectFilled)(int, int, int, int, rgba_t) = nullptr;
-void RectFilled(int x, int y, int w, int h, rgba_t color) {
-	if (StoredRectFilled != nullptr) {
-		StoredRectFilled(x, y, w, h, color);
-		return;
-	}
-	if (StoredLine == nullptr) return;
-	
+void CDraw::RectFilled(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {
+
 	// Make filled rect with lines
 	for (int i = 0; i < w; i++) {
 		Line(x + i, y, 0, h, color);
 	}
 }
-void InitRectFilled(void(*func)(int, int, int, int, rgba_t)) {
-	StoredRectFilled = func;
-}
 
-	
+
 // Outline circle
-void(*StoredCircle)(int, int, float, int, rgba_t) = nullptr;
-void Circle(int x, int y, float radius, int steps, rgba_t color) {
-	if (StoredCircle != nullptr) {
-		StoredCircle(x, y, radius, steps, color);
-		return;
-	}
-	if (StoredLine == nullptr) return;
-	
+void CDraw::Circle(const int& x, const int& y, const float& radius, const int& steps, const CatVector4& color) {
+
 	// Draw a circle with lines
 	if (radius < 0 || steps <= 3) return; // cant draw a cirle without specific parameters
-	
+
 	float px = 0;
 	float py = 0;
 	for (int i = 0; i < steps; i++) {
@@ -96,58 +61,36 @@ void Circle(int x, int y, float radius, int steps, rgba_t color) {
 		Line(px, py, dx - px, dy - py, color);
 		px = dx;
 		py = dy;
-	}	
-}
-void InitCircle(void(*func)(int, int, float, int, rgba_t)) {
-	StoredCircle = func;
+	}
 }
 
 // String
-void(*StoredString)(const char*, int, int, int, int, rgba_t) = nullptr;
-void String(const char* text, int x, int y, int font, int size, rgba_t color) {
-	if (StoredString != nullptr) {
-		StoredString(text, x, y, font, size, color);
-	}
-	//if (!line_defined) return; // TODO, make shitty font system with drawline
-}
-// Crying, but in spanish
-void String(std::string text, int x, int y, int font, int size, rgba_t color) {
-	String(text.c_str(), x, y, font, size, color);
-}
-void InitString(void(*func)(const char*, int, int, int, int, rgba_t)) {
-	StoredString = func;
-}
+void CDraw::String(const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color) {}
 
 // String length in pixels
-void(*StoredStringLength)(const char*, int, int, int&, int&) = nullptr;
-void GetStringLength(const char* string, int font, int size, int& length, int& height) {
-	if (StoredString != nullptr && StoredStringLength != nullptr) {
-		StoredStringLength(string, font, size, length, height);
-		return;
-	}
-	//if (!string_defined && !line_defined) return; // Use the crappy font rendering workaround
-}
-void InitStringLength(void(*func)(const char*, int, int, int&, int&)) {
-	StoredStringLength = func;
-}
-	
-// The main world to screen function used by most of the cheats esp features
-bool(*StoredWorldToScreen)(CatVector&, CatVector&) = nullptr;
-bool WorldToScreen(CatVector& world, CatVector& screen) {
-	if (StoredWorldToScreen != nullptr) {	
+std::pair<int, int> CDraw::GetStringLength(const char* string, const int& font, const int& size) { return std::make_pair(0, 0); }
+
+namespace draw {
+
+// The main world to screen function used by most of the cheats esp features, sadly, this isnt going to be included into the draw object due to it being seperate
+bool(*StoredWorldToScreen)(const CatVector&, CatVector&) = nullptr;
+bool WorldToScreen(const CatVector& world, CatVector& screen) {
+	if (StoredWorldToScreen != nullptr)
 		return StoredWorldToScreen(world, screen);
-	}
 	return false; // We cant do this ourself quite yet sadly...
 }
-void InitWorldToScreen(bool(*func)(CatVector&, CatVector&)) {
+void InitWorldToScreen(bool(*func)(const CatVector&, CatVector&)) {
 	StoredWorldToScreen = func;
 }
-	
+
+const char* Fonts[] = {
+	"Open Sans",
+	"Bitstream Vera Sans Mono",
+	"Unispace",
+	"TF2 Build"
+};
+
 }
-
-
-
-
 
 
 
@@ -163,7 +106,7 @@ void InitWorldToScreen(bool(*func)(CatVector&, CatVector&)) {
 // need pViewToProjection and pWorldToView
 
 // pWorldToView
-//	
+//
 
 
 
@@ -281,7 +224,7 @@ float ComputeViewMatrices( VMatrix *pWorldToView, VMatrix *pViewToProjection, VM
 
 	// Get aspect ratio here from height and width
 	flAspectRatio = (viewSetup.height != 0) ? ( (float)viewSetup.width / (float)viewSetup.height ) : 1.0f;
-	
+
 	MatrixBuildPerspectiveX( *pViewToProjection, viewSetup.fov, flAspectRatio, viewSetup.zNear, viewSetup.zFar );
 
 	//			    have from build per								Need
@@ -305,5 +248,3 @@ void ComputeWorldToScreenMatrix( VMatrix *pWorldToScreen, const VMatrix &worldTo
 	MatrixMultiply( projectionToPixels, worldToProjection, *pWorldToScreen );
 }
 */
-
-

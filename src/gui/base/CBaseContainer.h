@@ -15,7 +15,7 @@
 class CBaseContainer : public CBaseWidget, public virtual IWidget {
 public:
 	CBaseContainer(std::string _name = "unnamed", IWidget* _parent = nullptr);
-	~CBaseContainer();
+	inline virtual ~CBaseContainer();
 	
 	virtual void Update();
 	virtual void Draw();

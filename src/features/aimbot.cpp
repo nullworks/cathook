@@ -2,12 +2,12 @@
 /*
  *
  *	The cheats main aimbot system.
- *	
+ *
  *
  *
  */
 
-#include "../framework/bones.hpp"	// So we can aim at bones
+#include "../framework/entitys.hpp"	// Contains entity and bone info
 #include "esp.hpp"	// SetEspColor()
 
 #include "aimbot.hpp"
@@ -28,35 +28,35 @@ CatEnum hitbox_enum({ // Update this as needed
 	"UPPER LEG L", "UPPER LEG R", "MIDDLE LEG L", "MIDDLE LEG R", "LOWER LEG L", "LOWER LEG R",
 });
 CatVarInt hitbox(aimbot_menu, hitbox_enum, "aimbot_hitbox", 0, "Hitbox", "Hitbox to use if mode is set to static");
-	
+
 // A function to find a place to aim for on the target
 CatVector RetriveAimpoint(CatEntity* entity) {
 	if (CE_BAD(entity)) return CatVector();
-	
+
 	// Check if we can use bones
 	if (!entity->bones.empty()) {
-		
+
 		// Get our best bone
 		static CatVector tmp;
 		if (framework::bones::GetCatBoneFromEnt(entity, (int)hitbox, tmp))
 			return tmp;
 	}
-			
+
 	// Check for collision
 	if (entity->collision != CatBox())
 		// We can use the center collision for an aimpoint
 		return entity->collision.center();
-			
+
 	// Without anything else, all we can use is the origin
 	return entity->origin;
 }
 
 // Target Selection
-	
+
 // A second check to determine whether a target is good enough to be aimed at
 bool IsTargetGood(CatEntity* entity) {
 	if (CE_BAD(entity)) return false;
-			
+
 	// Local player check
 	if (g_LocalPlayer.entity == entity) return false;
 	// Dead
@@ -68,16 +68,16 @@ bool IsTargetGood(CatEntity* entity) {
 	case 1:	// Ally only
 		if (entity->Enemy()) return false;
 	}
-	
+
 	// Fov check
 	if ((float)fov > 0.0f && util::GetFov(RetriveAimpoint(entity)) > (float)fov) return false;
-	
+
 	// Hey look! Target passed all checks
 	return true;
 }
 // Function to find a suitable target
 CatEntity* RetrieveBestTarget() {
-	
+
 	// Book keepers for highest target
 	CatEntity* highest_ent = nullptr;
 	float highest_score = -1024;
@@ -87,7 +87,7 @@ CatEntity* RetrieveBestTarget() {
 		// Get our ent and ensure its okay to use
 		CatEntity* entity = entity_cache::Get(i);
 		if (CE_BAD(entity)) continue;
-		
+
 		// Check whether or not we can target the ent
 		if (!IsTargetGood(entity)) continue;
 
@@ -110,17 +110,17 @@ CatEntity* RetrieveBestTarget() {
 			highest_ent = entity;
 		}
 	}
-	
+
 	return highest_ent;
 }
 // A check to determine whether the local player should aimbot
-bool ShouldAim() {	
+bool ShouldAim() {
 
 	// Good check
 	if (CE_BAD(g_LocalPlayer.entity)) return false;
 	// Alive check
 	if (!g_LocalPlayer.entity->alive) return false;
-	
+
 	return true;
 }
 
@@ -133,25 +133,22 @@ void AimAt(CatEntity* entity) {
 	if (CE_BAD(entity)) return;
 	AimAt(RetriveAimpoint(entity));
 }
-	
+
 // The main "loop" of the aimbot.
 void WorldTick() {
 	if (!enabled) return; // Main enabled check
-	
+
 	// Get our best target
 	CatEntity* target = RetrieveBestTarget();
 	if (CE_BAD(target)) return; 			// Check whether we found a target
-		
+
 	// Check if our local player is ready to aimbot
 	if (!ShouldAim()) return;
-			
+
 	// Set targets color
 	esp::SetEspColor(target, colors::pink);	// Colors are cool
-	
+
 	AimAt(target);
 }
 
 }}
-	
-
-	

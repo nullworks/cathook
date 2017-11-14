@@ -6,77 +6,36 @@
  *
  */
 
+// Stuff to init with
+
 #include "entitys.hpp"
 
-namespace entity_cache {
-
-// The main storage for our entity cache
-CatEntity array[MAX_ENTITIES];
-	
-// Stores number of highest entity we can use. Please set in your module
-int HIGHEST_ENTITY = 0;
-
-// Used to set highest entity usable.
-void SetHighest(int inp) {
-	if (inp >= MAX_ENTITIES) inp = MAX_ENTITIES - 1;
-	HIGHEST_ENTITY = inp;
-}
-	
-// Invalidates cache
-void Invalidate() { // Please invalidate on world tick
-	// Reset all
-	for (CatEntity& ent : array) {
-		ent.Reset();
-	}
-	HIGHEST_ENTITY = 0;
-	// Reset our local player
-	g_LocalPlayer.Reset();
-}
-	
-}
-
-// Reset this entity
-void CatEntity::Reset() {
-	exists = false;
-	dormant = true;
-	type = ETYPE_NONE;
-	alive = false;
-	max_health = 100;	// Good base health so we dont need to change if there isnt variable health
-	health = 0;
-}
-
-// Returns the entity number from the entity array
-int CatEntity::IDX() {
-	return int(((unsigned)this - (unsigned)&entity_cache::array) / sizeof(CatEntity));
-}
+// Globals to control how entitys work
+CatEntity g_CatEntitys[MAX_ENTITIES];
+CatLocalPlayer g_LocalPlayer;
 
 bool CatEntity::Enemy() {
-	if (team == ETEAM_ALLY) return true;
+	if (team == ETEAM_ALLY) return false;
 	if (team == ETEAM_ENEMY) return true;
 	if (g_LocalPlayer.entity == this) return false; // Local ents are friendly, duh
 	if (g_LocalPlayer.entity) return g_LocalPlayer.entity->team != team;
 	return true;
 }
 
-float CatEntity::Distance() {
-	if (g_LocalPlayer.entity)
-		return origin.DistTo(g_LocalPlayer.entity->origin);
-	return 0;	
+// Were inlined, but realized I cant due to the entitys
+int IDX() {
+	return int(((unsigned)this - (unsigned)&g_CatEntitys) / sizeof(CatEntity));
 }
 
-// Var for our local player
-CLocalPlayer g_LocalPlayer;
-
-void CLocalPlayer::Reset() {
-	// Reset some stuff to defaults
-	camera_position = CatVector();
-	cam_in_thirdperson = false;
-	// Our player commands
-	attack         = false;
-	attack_prevent = false;
-	camera_angles  = CatVector();
-	real_angles    = CatVector();
+float Distance() {
+	return (g_LocalPlayer.entity) ? origin.DistTo(g_LocalPlayer.entity->origin) : 0;
 }
 
-
-
+// Bone stuff
+// This is how the bones are layed out
+// Use bonesets[0] for center line
+const std::vector<int> bonesets[] = {
+	{EBone_head, EBone_top_spine, EBone_upper_spine, EBone_middle_spine, EBone_bottom_spine, EBone_pelvis}, // Center
+	{EBone_lower_arm_l, EBone_middle_arm_l, EBone_upper_arm_l, EBone_top_spine, EBone_upper_arm_r, EBone_middle_arm_r, EBone_lower_arm_r}, // Upper limbs
+	{EBone_lower_leg_l, EBone_middle_leg_l, EBone_upper_leg_l, EBone_pelvis,    EBone_upper_leg_r, EBone_middle_leg_r, EBone_lower_leg_r}  // Lower limbs
+};

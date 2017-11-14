@@ -6,18 +6,9 @@
  *
  */
 
-// has a idget class that we build apon
-#include "IWidget.h"
+#pragma once
 
-#include <memory>
-#include <vector>
-#include <cstring>
-#include <algorithm>
-#include "../aftercheaders.h"
-
-#include "../logging.h"
-
-#include <KeyValues.h>
+#include "IWidget.h" // has a widget class that we build apon
 
 class CBaseWidget : public virtual IWidget {
 public:
@@ -50,7 +41,7 @@ public:
 	inline virtual bool IsPressed() { return press; }
 
 	// Sizing
-	inline 		   void SetSize(int x, int y) 	 { if (x >= 0) size.first = x; if (y >= 0) size_y.second = y; }
+	inline 		   void SetSize(int x, int y) 	 { if (x >= 0) size.first = x;   if (y >= 0) size_y.second = y; }
 	inline virtual void SetOffset(int x, int y)  { if (x >= 0) offset.first = x; if (y >= 0) offset.second = y; }
 	inline virtual void SetMaxSize(int x, int y) { if (x >= 0) max.first = x; 	 if (y >= 0) max.second = y; }
 	inline virtual std::pair<int, int> GetOffset() { return offset; }
@@ -67,13 +58,11 @@ public:
 	inline virtual void SetPositionMode(int mode) { positionmode = mode; };
 
 	// Parental + children
-	inline virtual IWidget* GetParent() { return m_pParent; }
-	inline virtual void SetParent(IWidget* parent) { m_pParent = parent; }
-	inline virtual std::string GetName() { return std::string(m_KeyValues->GetString("name")); }
+	inline virtual IWidget* GetParent() { return parent; }
+	inline virtual void SetParent(IWidget* _parent) { parent = _parent; }
+	inline virtual std::string GetName() { return name; }
 
 	// Widget specific
 	virtual std::pair<int, int> AbsolutePosition();
 };
 
-
-#endif /* CBASEWIDGET_H_ */

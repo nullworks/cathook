@@ -1,9 +1,0 @@
-[submodule "source-sdk-2013"]
-	path = source-sdk-2013
-	url = https://github.com/ValveSoftware/source-sdk-2013
-[submodule "simple-ipc"]
-	path = simple-ipc
-	url = https://github.com/nullifiedcat/simple-ipc
-[submodule "ucccccp"]
-	path = ucccccp
-	url = https://github.com/nullifiedcat/ucccccp

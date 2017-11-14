@@ -1,0 +1,1 @@
+make -j$(nproc) NO_WARNINGS=1

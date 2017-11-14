@@ -1,1 +1,0 @@
-make -j4 GAME=hl2dm BUILD_DEBUG=1

@@ -241,7 +241,6 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
-
 ## Ignore .o and .d files (objects and dependencies)
 *.o
 *.d
@@ -252,3 +251,17 @@ ModelManifest.xml
 ## Ignore Data Folder symlink
 Data Folder
 /core
+
+## Ignore our closed source files
+src/modules/*
+src/hacks/*
+src/drm/*
+
+## Allow some modules to be open
+!src/modules/xlib/*
+
+## Cmake is eh
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+Makefile

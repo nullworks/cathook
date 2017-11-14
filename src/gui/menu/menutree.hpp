@@ -1,4 +1,4 @@
- 
+
 /*
  *
  *	This file helps with the menu tree
@@ -14,8 +14,8 @@ namespace gui { namespace menu {
 // Used to store the menu listings
 class CMenuTree {
 public:
-	CMenuTree(const char* string = "");
-	~CMenuTree() { for (CMenuTree& tree : children) delete tree; } // Deconstructor to prevent memory leak	
+	CMenuTree(const char* string = "") name(string) {}
+	~CMenuTree() { for (CMenuTree& tree : children) delete tree; } // Deconstructor to prevent memory leak
 
 	void AddTree(const CatVar& cat_var, int recursions = 0);
 	const char* name;
@@ -25,5 +25,5 @@ public:
 
 // Use to get our menu data
 const CMenuTree& GetMenuTree();
-	
+
 }}

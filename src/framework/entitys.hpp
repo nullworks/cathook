@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <utility> // Pair
 #include <vector> // For bone stuff
 
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
@@ -14,8 +15,8 @@
 #define MAX_ENTITIES 2048 // Increase as needed
 
 // Nice macros
-#define CE_GOOD(a) (a && a->exists && !a->dormant)
-#define CE_BAD(a) (!a || !a->exists || a->dormant)
+#define CE_GOOD(a) (a.exists && !a.dormant)
+#define CE_BAD(a) (!a.exists || a.dormant)
 
 // Just throw a bunch of possible teams in here. Increase as needed
 enum {
@@ -134,21 +135,21 @@ namespace bones {
 extern const std::vector<int> bonesets[];
 
 // Returns a reference to a catbone if it exists
-bool GetBone(CatEntity* entity, const int& bone, CatVector& input) {
+inline bool GetBone(const CatEntity& entity, const int& bone, CatVector& input) {
 	// Ensure we have a bone
 	if (bone < 0 || bone >= EBone_count) return false;
-	if (!entity->bones[bone].first) return false;
+	if (!entity.bones[bone].first) return false;
 	// Change input and return
-	input = entity->bones[bone].second.center();
+	input = entity.bones[bone].second.center();
 	return true;
 }
 
-bool GetBone(CatEntity* entity, const int& bone, CatBox& input) {
+inline bool GetBone(const CatEntity& entity, const int& bone, CatBox& input) {
 	// Ensure we have a bone
 	if (bone < 0 || bone >= EBone_count) return false;
-	if (!entity->bones[bone].first) return false;
+	if (!entity.bones[bone].first) return false;
 	// Change input and return
-	input = entity->bones[bone].second;
+	input = entity.bones[bone].second;
 	return true;
 }
 

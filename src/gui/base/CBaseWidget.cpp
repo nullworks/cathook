@@ -6,7 +6,7 @@
  *
  */
 
-#include "CBaseWidget.h"
+#include "CBaseWidget.hpp"
 
 CBaseWidget::CBaseWidget(std::string _name, IWidget* _parent) {
 	parent = _parent;
@@ -47,7 +47,7 @@ std::pair<int, int> CBaseWidget::AbsolutePosition() {
 
 IWidget* GetRootParent() {
 	auto pParent = GetParent();
-	while (pParent) 
+	while (pParent)
 		pParent = pParent->GetParent();
 	return pParent;
 }

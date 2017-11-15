@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "CBaseContainer.h"
+#include "CBaseContainer.hpp"
 
 class CBaseWindow : public CBaseContainer {
 public:
@@ -17,11 +17,11 @@ public:
 
 	// General functions
 	virtual void Draw() override;
-	
+
 	// User Input
 	virtual void OnFocusGain() override;
 	virtual void OnFocusLose() override;
-	
+
 	// Child related util
 	virtual void MoveChildren() override;
 };

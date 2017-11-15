@@ -10,56 +10,35 @@
 cmake_minimum_required (VERSION 2.6)
 project (libnekohook)
 
-## User options can be set with cmake -D"NAME OF OPTION HERE"="VARIABLE", e.g. "cmake -DCGAME=csgo"
-# Defaults
-if(NOT CGAME)
-  set(CGAME "tf2")
-  message(STATUS "Defaulting game to: ${CGAME}")
-endif()
-if(NOT CGFX)
-  set(CGFX "valve_surface")
-  message(STATUS "Defaulting gfx to: ${CGFX}")
-endif()
-if(NOT CINP)
-  set(CINP "xlib")
-  message(STATUS "Defaulting inp to: ${CINP}")
-endif()
-if(NOT CUSERNAME)
-  set(CUSERNAME "DEVELOPMENT_BUILD")
-  message(STATUS "Defaulting usrname to: ${CUSERNAME}")
-endif()
-if(NOT CUSERID)
-  set(CUSERID "0")
-  message(STATUS "Defaulting usrid to: ${CUSERID}")
-endif()
-if(NOT CForceClang)
-  set(CForceClang false)
-  message(STATUS "Defaulting CForceClang to: ${CForceClang}")
-endif()
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE RELEASE)
-  message(STATUS "No build type selected, default to ${CMAKE_BUILD_TYPE}")
-endif()
-
-# Flags we use for every build type
-set(CCOMMON_FLAGS "-O3 -fpic -shared -mtune=generic ")
+## Defaults
+# User options can be set with cmake -D"NAME OF OPTION HERE"="VARIABLE", e.g. "cmake -DCGAME=csgo"
+set(CGAME tf2 CACHE STRING "Game to build with")
+set(CGFX valve_surface CACHE STRING "Graphics module to use")
+set(CINP xlib CACHE STRING "Input module to use")
+set(CUSERNAME UNREGISTERED CACHE STRING "Register a username")
+set(CUSERID 0 CACHE STRING "Register a id")
+set(CForceClang false CACHE STRING "Should cmake force compilation with cmake?")
+set(CMAKE_BUILD_TYPE RELEASE CACHE STRING "Cmake build type")
 
 # Function to remove source files from a directory, ripped from aimtux fuzion <3
-FUNCTION (EXCLUDE_FILES_FROM_DIR_IN_LIST _InFileList _excludeDirName)
-  foreach (ITR ${_InFileList})
-    if ("${ITR}" MATCHES "(.*)${_excludeDirName}(.*)") # Check if the item matches the directory name in _excludeDirName
-      if (CMAKE_BUILD_TYPE MATCHES DEBUG)
+FUNCTION(EXCLUDE_FILES_FROM_DIR_IN_LIST _InFileList _excludeDirName)
+  foreach(ITR ${_InFileList})
+    if("${ITR}" MATCHES "(.*)${_excludeDirName}(.*)") # Check if the item matches the directory name in _excludeDirName
+      if(CMAKE_BUILD_TYPE MATCHES DEBUG)
         message(STATUS "Remove Item from List:${ITR}")
       endif()
-      list (REMOVE_ITEM _InFileList ${ITR}) # Remove the item from the list
-    endif ()
+      list(REMOVE_ITEM _InFileList ${ITR}) # Remove the item from the list
+    endif()
   endforeach()
   set(SOURCE_FILES ${_InFileList} PARENT_SCOPE) # Return the SOURCE_FILES variable to the calling parent
-ENDFUNCTION ()
+ENDFUNCTION()
 
 # Add cathooks source files except the modules, we add those selectivly
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
+
+# Flags we use for every build type, cpp 17 standard is nice
+set(CCOMMON_FLAGS "-std=gnu++17 -O3 -fpic -shared -mtune=generic ")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -97,9 +76,15 @@ if(CBASE STREQUAL "SOURCE_2013_SDK")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
 endif()
 
-foreach (ITR ${SOURCE_FILES})
-  message(STATUS "Building with:${ITR}")
-endforeach()
+# Debug info
+if (CMAKE_BUILD_TYPE MATCHES DEBUG)
+  foreach (ITR ${SOURCE_FILES})
+    message(STATUS "Building with:${ITR}")
+  endforeach()
+endif()
+
+# Set system version
+add_definitions("-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 
 # Set git hash and date if possible
 find_package(Git)
@@ -118,12 +103,7 @@ if(GIT_FOUND)
 	  OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
 	add_definitions("-DGIT_COMMIT_DATE=${GIT_COMMIT_DATE}")
-endif(GIT_FOUND)
-
-
-
-
-
+endif()
 
 
 # Default compiler flags
@@ -134,4 +114,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 include_directories(${INCLUDE_DIRS})
 
 add_library(libnekohook SHARED ${SOURCE_FILES})
-target_link_libraries(libnekohook SDL2 GL dl xdo)
+target_link_libraries(libnekohook dl)

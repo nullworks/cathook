@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "CBaseWidget.h"
+#include "CBaseWidget.hpp"
 
 class CTitleBar : public CBaseWidget {
 public:
@@ -21,4 +21,3 @@ public:
 	int drag_stage = 0;
 	std::pair<int, int> last_mouse(0, 0);
 };
-

@@ -1,9 +1,8 @@
 
 /*
- * cvwrapper.h
  *
- *  Created on: Dec 17, 2016
- *      Author: nullifiedcat
+ *	This is the catvars header file! For more info, read header comment info in .cpp :D
+ *
  */
 
 #pragma once
@@ -14,99 +13,104 @@
 
 #include "../util/colors.hpp"
 
-// Map to be used for commands, TODO, move to own file and make CatCommands again with an interpeter
-extern std::unordered_map<std::string, CatVar&> CatCommandMap;
-
 // Makes things easy
-typedef const std::vector<const char*> CatEnum;
+typedef std::vector<const char*> CatEnum;
 
-enum {
-	CV_SWITCH,
-	CV_INT,
-	CV_KEY,
-	CV_FLOAT,
-	CV_ENUM,
-	CV_STRING,
-	CV_COLOR
-}
-
+// Catvar base
 class CatVar {
 public:
-	// bool, int, float, key, string
-	CatVar(const int& _type, const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long = "Unknown", const int& _max = 100)
-		: type(_type), gui_position(_gui_position), name(_name), default_s(_defaults), desc_short(_desc_short), desc_long(_desc_long), max(_max) {
-			Init();
-	};
-	CatVar(const int& _type, const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long, const int& _min, const int& _max)
-		: type(_type), gui_position(_gui_position), name(_name), default_s(_defaults), desc_short(_desc_short), desc_long(_desc_long), min(_min), max(_max) {
-			Init();
-	};
-	// Color
-	CatVar(const int& _type, const CatEnum& _gui_position, const char* _name, const CatVector4& _defaults, const char* _desc_short, const char* _desc_long = "Unknown")
-		: type(_type), gui_position(_gui_position), name(_name), default_v(_defaults), desc_short(_desc_short), desc_long(_desc_long) {
-			Init();
-	};
-	// CatEnum
-	CatVar(const CatEnum& _cat_enum, const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long = "Unknown")
-		: cat_enum(_cat_enum), type(CV_ENUM), gui_position(_gui_position), name(_name), default_v(_defaults), desc_short(_desc_short), desc_long(_desc_long) {
-			Init();
-	};
-	// Operators
-	inline operator bool() const 			{ return value_i; }
-	inline operator int() const 			{ return value_i; }
-	inline operator float() const 		{ return value_v.x; }
-	inline operator char*() const			{ return value_s.c_str(); }
-	inline operator CatVector4() const 	{ return value_v; }
-	inline void operator  =(const bool& in_value) 			{ value_i = in_value; }
-	inline void operator  =(const int& in_value) 				{ value_i = in_value; }
-	inline void operator  =(const float& in_value) 			{ value_v.x = in_value; }
-	inline void operator  =(const std::string& in_value) 	{ value_s = in_value; }
-	inline void operator  =(const CatVector4& in_value) 	{ value_v = in_value; }
-	inline bool operator ==(const bool& in_value) const			{ return bool(value_i) == in_value; }
-	inline bool operator ==(const int& in_value) const			{ return value_i == in_value; }
-	inline bool operator ==(const float& in_value) const		{ return value_v.x == in_value; }
-	inline bool operator ==(const std::string& in_value) const	{ return value_s == in_value; }
-	inline bool operator ==(const CatVector4& in_value) const		{ return value_v == in_value; }
-
-	// Catvar info
-	const int type;
-	const CatEnum& gui_position;
-	const char* name;		// Command name if it needs to be registered into a games console
-	const char* desc_short;	// Name in gui
-	const char* desc_long;	// Descripton in gui
-	const CatEnum* cat_enum = nullptr;
-	// Defaults
-	const CatVector4 default_v;
-	const char* default_s = "";
-	// Min max
-	const int min = 0;
-	const int max = 32;
-
-protected:
-	void Init() {
-		// Set our default value
-		SetDefault();
-		// Add ourself to the command map
-		CatCommandMap.insert({name, this});
-		// Add ourself to the menu tree
-
-	}
-	void SetDefault() {
-		switch(type) {
-		case CV_SWITCH:
-		case CV_INT:
-		case CV_KEY:
-		case CV_ENUM:
-			value_i = atoi(default_s); break;
-		case CV_FLOAT:
-			value_v.x = atof(default_s); break;
-		case CV_COLOR:
-			value_v = default_v; break;
-		default:
-			value_s = default_s;
-		}
-	}
-  int value_i;
-	CatVector4 value_v;
-	std::string value_s; // Uhhhhhh, meme?
+	const CatEnum& gui_position;	// Where to place in menu tree
+	const char* name;							// Command name if it needs to be registered into a games console
+	const char* desc_short;				// Name in gui
+	const char* desc_long;				// Descripton in gui
+private:
+	void Init();
 };
+// CatVar varients
+class CatVarBool : public CatVar {
+public:
+	CatVarBool(const CatEnum& _gui_position, const char* _name, const bool& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator bool() const { return value; }
+	inline void operator= (const bool& in_value) { value = in_value; }
+	inline bool operator==(const bool& in_value) const { return value == in_value; }
+	const bool& defaults;
+	bool value;
+};
+class CatVarInt : public CatVar {
+public:
+	CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown", const int& _max = 100);
+	CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long, const int& _min, const int& _max);
+	inline operator int() const { return value; }
+	inline void operator= (const int& in_value) { value = in_value; }
+	inline bool operator==(const int& in_value) const { return value == in_value; }
+	const int& defaults;
+	int value;
+	const int& min;
+	const int& max;
+};
+class CatVarFloat : public CatVar {
+public:
+	CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long = "Unknown", const float& _max = 100);
+	CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long, const float& _min, const float& _max);
+	inline operator float() const { return value; }
+	inline void operator= (const float& in_value) { value = in_value; }
+	inline bool operator==(const float& in_value) const { return value == in_value; }
+	const float& defaults;
+	float value;
+	const float& min;
+	const float& max;
+};
+class CatVarKey : public CatVar {
+public:
+	CatVarKey(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator int() const { return value; }
+	inline void operator= (const int& in_value) { value = in_value; }
+	inline bool operator==(const int& in_value) const { return value == in_value; }
+	const int& defaults;
+	int value;
+};
+class CatVarString : public CatVar {
+public:
+	CatVarString(const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator std::string() const { return value; }
+	inline void operator= (const std::string& in_value) { value = in_value; }
+	inline bool operator==(const std::string& in_value) const { return value == in_value; }
+	const char* defaults;
+	std::string value;	// std::string is perfectly acceptible due to the fact that its mostly static and its extra features are nice
+};
+class CatVarColor : public CatVar {
+public:
+	CatVarColor(const CatEnum& _gui_position, const char* _name, const CatVector4& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator CatVector4() const { return value; }
+	inline void operator= (const CatVector4& in_value) { value = in_value; }
+	inline bool operator==(const CatVector4& in_value) const { return value == in_value; }
+	const CatVector4* defaults;
+	CatVector4 value;
+};
+class CatVarEnum : public CatVar {
+public:
+	CatVarEnum(const CatEnum& _cat_enum, const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator int() const { return value; }
+	inline void operator= (const int& in_value) { value = in_value; }
+	inline bool operator==(const int& in_value) const { return value == in_value; }
+	const int& defaults;
+	int value;
+	const int min;
+	const int max;
+};
+
+// Class to store how the menu is layed out
+class CatMenuTree {
+public:
+	CatMenuTree(const char* string = "") : name(string) {}
+
+	void AddTree(const CatVar& cat_var, int recursions = 0);
+	const char* name;
+	std::vector<CatMenuTree> children;
+	std::vector<CatVar*> cat_children;	// Nyaa~ :3
+};
+
+// Map to be used for commands, TODO, move to own file and make CatCommands again with an interpeter
+extern std::unordered_map<std::string, CatVar&> CatCommandMap;
+// Uhh, look in cpp
+extern CatMenuTree CatMenuRoot;

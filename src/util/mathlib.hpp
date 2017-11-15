@@ -43,7 +43,7 @@ public:
 	void GetPoints(CatVector* points); // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
 	CatVector min, max;
 
-	inline CatVector center() { return (min + max) * 0.5; }
+	inline CatVector center() const { return (min + max) * 0.5; }
 	inline bool operator==(const CatBox& value) const { return value.min == min && value.max == max; }
 	inline bool operator!=(const CatBox& value) const { return value.min != min || value.max != max; }
 };

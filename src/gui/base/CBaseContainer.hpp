@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-#include "CBaseWidget.h"
+#include "CBaseWidget.hpp"
 
 class CBaseContainer : public CBaseWidget, public virtual IWidget {
 public:

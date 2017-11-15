@@ -6,7 +6,7 @@
  *
  */
 
-#include "CBaseWindow.h"
+#include "CBaseWindow.hpp"
 
 // General functions
 void CBaseWindow::Draw() {
@@ -49,7 +49,3 @@ void CBaseWindow::MoveChildren() { // TODO, Reverse!!!
 		SetSize(mx + 4, my + 2);
 	}
 }
-
-
-
-

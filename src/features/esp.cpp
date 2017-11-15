@@ -48,7 +48,7 @@ CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a 
 // Entitys strings
 struct ESPData {
 	int string_count = 0;
-	std::pair<char[40], CatVector4> strings[MAX_ESP_STRINGS];
+	std::pair<char[64], CatVector4> strings[MAX_ESP_STRINGS];
 	CatVector4 color = colors::white;
 };
 
@@ -58,7 +58,7 @@ ESPData esp_cache[MAX_ENTITIES];
 // Entity Box state enum
 enum {EBOX_NOT_RAN, EBOX_FAILED, EBOX_SUCCESSFUL};
 int ebox_state = EBOX_NOT_RAN; 	// To store the state of our box cache
-CatBox ebox;					// To store the cached entity box
+CatBox ebox; // To store the cached entity box
 
 // Sets the screenbox for an entity
 bool GetEntityBox(CatEntity* entity) {
@@ -273,14 +273,16 @@ void WorldTick() {
 
 // Please add your esp strings during world tick as it is less intensive than doing this at draw
 // Use to add a string to esp for an entity with a color
-void AddEspString(CatEntity* entity,  std::string input_string, const rgba_t& color) {
+void AddEspString(CatEntity* entity, const char* input_string, const CatVector4& color) {
 	int idx = entity->IDX();
-	if (esp_cache[idx].string_count >= MAX_ESP_STRINGS) return; // Prevent overflow
-	esp_cache[idx].strings[esp_cache[idx].string_count] = std::make_pair(input_string, color);
+	// Copy our values
+	strcpy(esp_cache[idx].strings[esp_cache[idx].string_count].first, input_string);
+	esp_cache[idx].strings[esp_cache[idx].string_count].second = color;
+	// Incriment count
 	esp_cache[idx].string_count++;
 }
 
-void SetEspColor(CatEntity* entity, const rgba_t& color) {
+void SetEspColor(CatEntity* entity, const CatVector4& color) {
 	esp_cache[entity->IDX()].color = color;
 }
 

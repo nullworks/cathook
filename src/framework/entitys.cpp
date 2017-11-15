@@ -23,11 +23,11 @@ bool CatEntity::Enemy() {
 }
 
 // Were inlined, but realized I cant due to the entitys
-int IDX() {
+int CatEntity::IDX() {
 	return int(((unsigned)this - (unsigned)&g_CatEntitys) / sizeof(CatEntity));
 }
 
-float Distance() {
+float CatEntity::Distance() {
 	return (g_LocalPlayer.entity) ? origin.DistTo(g_LocalPlayer.entity->origin) : 0;
 }
 

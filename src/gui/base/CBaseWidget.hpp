@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IWidget.h" // has a widget class that we build apon
+#include "IWidget.hpp" // has a widget class that we build apon
 
 class CBaseWidget : public virtual IWidget {
 public:
@@ -34,7 +34,7 @@ public:
 	inline virtual void Show() { visible = true; }
 	inline virtual void Hide() { visible = false; }
 	inline virtual bool IsVisible() { return ((GetParent()) ? (GetParent()->visible && visible) : visible) || always_visible; }
-	
+
 	// General checking
 	inline virtual bool IsHovered() { return hover; }
 	inline virtual bool IsFocused() { return focus; }
@@ -65,4 +65,3 @@ public:
 	// Widget specific
 	virtual std::pair<int, int> AbsolutePosition();
 };
-

@@ -7,7 +7,7 @@
 
 #include "../../framework/inputmgr.hpp"
 
-#include "CBaseContainer.h"
+#include "CBaseContainer.hpp"
 
 // Constructor & destructor
 CBaseContainer::CBaseContainer(std::string _name, IWidget* _parent) : CBaseWidget(_name, _parent) {}
@@ -60,9 +60,9 @@ void CBaseContainer::OnKeyPress(int key, bool repeat) {
 void CBaseContainer::OnKeyRelease(int key) {
 	if (GetFocusedChild()) GetFocusedChild()->OnKeyRelease(key);
 }
-bool CBaseContainer::ConsumesKey(int key) { 
-	if (GetFocusedChild()) return GetFocusedChild()->ConsumesKey(key); 
-	return false; 
+bool CBaseContainer::ConsumesKey(int key) {
+	if (GetFocusedChild()) return GetFocusedChild()->ConsumesKey(key);
+	return false;
 }
 
 // Visiblity
@@ -80,9 +80,9 @@ void CBaseContainer::AddChild(IWidget* child) {
 }
 
 // Children util
-IWidget* CBaseContainer::ChildByIndex(int idx) { 
-	if (idx < 0 || idx >= ChildCount()) return nullptr; 
-	return children.at(idx); 
+IWidget* CBaseContainer::ChildByIndex(int idx) {
+	if (idx < 0 || idx >= ChildCount()) return nullptr;
+	return children.at(idx);
 }
 IWidget* CBaseContainer::ChildByName(std::string name) {
 	for (auto child : children) {
@@ -110,18 +110,18 @@ int CBaseContainer::ChildCount() {
 }
 
 // Child related update functions
-void CBaseContainer::SortByZIndex() { 
-	std::sort(children.begin(), children.end(), [](IWidget* a, IWidget* b) -> bool { 
-		return a->GetZIndex() < b->GetZIndex(); 
-	}); 
+void CBaseContainer::SortByZIndex() {
+	std::sort(children.begin(), children.end(), [](IWidget* a, IWidget* b) -> bool {
+		return a->GetZIndex() < b->GetZIndex();
+	});
 }
 void CBaseContainer::UpdateHovers() {
 	auto hovered = ChildByPoint(input::mouse.first, input::mouse.second);
-	if (hovered != GetHoveredChild()) 
-		HoverOn(hovered); 
+	if (hovered != GetHoveredChild())
+		HoverOn(hovered);
 }
-void CBaseContainer::MoveChildren() { 
-	return; 
+void CBaseContainer::MoveChildren() {
+	return;
 }
 
 // Child info related to the container
@@ -148,5 +148,3 @@ void CBaseContainer::PressOn(IWidget* child) {
 			FocusOn(child);
 	} else FocusOn(0);
 }
-
-

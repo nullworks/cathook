@@ -10,6 +10,8 @@
 
 #include "IWidget.hpp" // has a widget class that we build apon
 
+namespace gui { namespace base {
+
 class CBaseWidget : public virtual IWidget {
 public:
 	CBaseWidget(std::string _name = "unnamed", IWidget* _parent = nullptr);
@@ -41,7 +43,7 @@ public:
 	inline virtual bool IsPressed() { return press; }
 
 	// Sizing
-	inline 		   void SetSize(int x, int y) 	 { if (x >= 0) size.first = x;   if (y >= 0) size_y.second = y; }
+	inline 		     void SetSize(int x, int y) 	 { if (x >= 0) size.first = x;   if (y >= 0) size.second = y; }
 	inline virtual void SetOffset(int x, int y)  { if (x >= 0) offset.first = x; if (y >= 0) offset.second = y; }
 	inline virtual void SetMaxSize(int x, int y) { if (x >= 0) max.first = x; 	 if (y >= 0) max.second = y; }
 	inline virtual std::pair<int, int> GetOffset() { return offset; }
@@ -54,8 +56,8 @@ public:
 	inline virtual std::string GetTooltip() { return tooltip; }
 
 	// Used to get/set position
-	inline virtual int GetPositionMode() { return positionmode; }
-	inline virtual void SetPositionMode(int mode) { positionmode = mode; };
+	inline virtual int GetPositionMode() { return position_mode; }
+	inline virtual void SetPositionMode(int mode) { position_mode = mode; };
 
 	// Parental + children
 	inline virtual IWidget* GetParent() { return parent; }
@@ -65,3 +67,5 @@ public:
 	// Widget specific
 	virtual std::pair<int, int> AbsolutePosition();
 };
+
+}}

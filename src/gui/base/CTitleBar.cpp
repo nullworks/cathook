@@ -14,6 +14,8 @@
 #define TITLEBAR_PADDING_W 2
 #define TITLEBAR_PADDING_H 1
 
+namespace gui { namespace base {
+
 enum {
 	EDRAG_START,
 	EDRAG_CONT
@@ -55,3 +57,5 @@ void CTitleBar::Draw() {
 	draw::GetStringLength(title.c_str(), 1, 9, l, h);
 	draw::String(title.c_str(), x + (size.first - l) / 2, y + TITLEBAR_PADDING_H, 1, 9, colors::white);
 }
+
+}}

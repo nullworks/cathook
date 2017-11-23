@@ -12,15 +12,17 @@
 
 #include "CBaseWidget.hpp"
 
+namespace gui { namespace base {
+
 class CBaseContainer : public CBaseWidget, public virtual IWidget {
 public:
 	CBaseContainer(std::string _name = "unnamed", IWidget* _parent = nullptr);
 	inline virtual ~CBaseContainer();
-	
+
 	virtual void Update();
 	virtual void Draw();
 	virtual void DrawBounds();
-	
+
 	// User input functions
 	virtual void OnMouseLeave();
 	virtual void OnMousePress();
@@ -29,20 +31,20 @@ public:
 	virtual void OnKeyPress(int key, bool repeat);
 	virtual void OnKeyRelease(int key);
 	virtual bool ConsumesKey(int key);
-	
+
 	// Visibility
 	virtual void Hide();
-	
+
 	// Children
 	std::vector<IWidget*> children;
 	void AddChild(IWidget* child);
-	
+
 	// Get Child/info
 	IWidget* ChildByIndex(int idx);
 	IWidget* ChildByName(std::string name);
 	IWidget* ChildByPoint(int x, int y);
 	int ChildCount();
-	
+
 	// Child related util
 	virtual void SortByZIndex();
 	void UpdateHovers();
@@ -58,6 +60,6 @@ public:
 	IWidget* hovered_child = nullptr;
 	IWidget* focused_child = nullptr;
 	IWidget* pressed_child = nullptr;
-
-	
 };
+
+}}

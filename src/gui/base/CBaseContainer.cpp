@@ -9,6 +9,8 @@
 
 #include "CBaseContainer.hpp"
 
+namespace gui { namespace base {
+
 // Constructor & destructor
 CBaseContainer::CBaseContainer(std::string _name, IWidget* _parent) : CBaseWidget(_name, _parent) {}
 CBaseContainer::~CBaseContainer() { for (auto child : children) delete child; }
@@ -148,3 +150,5 @@ void CBaseContainer::PressOn(IWidget* child) {
 			FocusOn(child);
 	} else FocusOn(0);
 }
+
+}}

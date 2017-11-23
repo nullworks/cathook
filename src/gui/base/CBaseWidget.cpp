@@ -8,6 +8,8 @@
 
 #include "CBaseWidget.hpp"
 
+namespace gui { namespace base {
+
 CBaseWidget::CBaseWidget(std::string _name, IWidget* _parent) {
 	parent = _parent;
 	name = _name;
@@ -51,3 +53,5 @@ IWidget* GetRootParent() {
 		pParent = pParent->GetParent();
 	return pParent;
 }
+
+}}

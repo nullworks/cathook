@@ -35,7 +35,7 @@ CatVector RetriveAimpoint(const CatEntity& entity) {
 
 	// Check if we can use bones
 	// Get our best bone
-	static CatVector tmp;
+	CatVector tmp;
 	if (bones::GetBone(entity, (int)hitbox, tmp))
 		return tmp;
 
@@ -80,7 +80,8 @@ CatEntity* RetrieveBestTarget() {
 	float highest_score = -1024;
 
 	// Loop through all entitys
-	for (CatEntity& entity : g_CatEntitys) {
+	for (int i = 0; i < MAX_ENTITIES; i++) {
+		auto& entity = g_CatEntitys[i];
 		// Ensure ent is okay to use
 		if (CE_BAD(entity)) continue;
 
@@ -103,7 +104,7 @@ CatEntity* RetrieveBestTarget() {
 		// Compare the top score to our current ents score
 		if (score > highest_score) {
 			highest_score = score;
-			highest_ent = entity;
+			highest_ent = &entity;
 		}
 	}
 
@@ -115,7 +116,7 @@ bool ShouldAim() {
 	// It would be prefered to have a local ent before we shoot
 	if (!g_LocalPlayer.entity) return false;
 	// Good check
-	if (CE_BAD(g_LocalPlayer.entity)) return false;
+	if (!g_LocalPlayer.entity->exists || g_LocalPlayer.entity->dormant) return false;
 	// Alive check
 	if (!g_LocalPlayer.entity->alive) return false;
 
@@ -146,7 +147,7 @@ void WorldTick() {
 	// Set targets color
 	esp::SetEspColor(target, colors::pink);	// Colors are cool
 
-	AimAt(target);
+	AimAt(*target);
 }
 
 }}

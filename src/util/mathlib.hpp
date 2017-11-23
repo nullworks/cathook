@@ -40,9 +40,22 @@ public:
 class CatBox {
 public:
 	CatBox(const CatVector& min = CatVector(), const CatVector& max = CatVector()) : min(min), max(max) {};
-	void GetPoints(CatVector* points); // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
 	CatVector min, max;
 
+	inline void GetPoints(CatVector* points) { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
+		float x, y, z;
+		x = max.x - min.x;
+		y = max.y - min.y;
+		z = max.z - min.z;
+		points[0] = min;
+		points[1] = min + CatVector(x, 0, 0);
+		points[2] = min + CatVector(x, y, 0);
+		points[3] = min + CatVector(0, y, 0);
+		points[4] = min + CatVector(0, 0, z);
+		points[5] = min + CatVector(x, 0, z);
+		points[6] = min + CatVector(0, y, z);
+		points[7] = min + CatVector(x, y, z);
+	}
 	inline CatVector center() const { return (min + max) * 0.5; }
 	inline bool operator==(const CatBox& value) const { return value.min == min && value.max == max; }
 	inline bool operator!=(const CatBox& value) const { return value.min != min || value.max != max; }

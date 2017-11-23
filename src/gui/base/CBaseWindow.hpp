@@ -9,6 +9,8 @@
 
 #include "CBaseContainer.hpp"
 
+namespace gui { namespace base {
+
 class CBaseWindow : public CBaseContainer {
 public:
 	// Constructors & Deconstructors
@@ -25,3 +27,5 @@ public:
 	// Child related util
 	virtual void MoveChildren() override;
 };
+
+}}

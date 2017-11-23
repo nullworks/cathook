@@ -1,12 +1,14 @@
 
 /*
- * 
+ *
  *	This is a base class for the gui to build apon.
  *
  *
  */
 
 #pragma once
+
+namespace gui { namespace base {
 
 enum {
 	ABSOLUTE,
@@ -17,28 +19,28 @@ enum {
 class IWidget {
 public:
 	IWidget* parent;
-	
+
 	// values to replace keyvalues, they are self explanitory
 	bool hover = false;
 	bool press = false;
 	bool focus = false;
-	
+
 	bool visible = true;
 	bool always_visible = false;
-	
-	std::pair<int, int> offset(0, 0);
-	std::pair<int, int> size(0, 0);
-	std::pair<int, int> max(0, 0);
+
+	std::pair<int, int> offset = std::make_pair(0, 0);
+	std::pair<int, int> size = std::make_pair(0, 0);
+	std::pair<int, int> max = std::make_pair(0, 0);
 	int zindex = 0;
-	
+
 	std::string tooltip = "";
-	
+
 	int position_mode = 0;
-	
+
 	std::string name;
-	
+
 	CatVector4 bounds_color = CatVector4();
-	
+
 public:
 
 	// General functions
@@ -90,6 +92,4 @@ public:
 	virtual std::string GetName() = 0;
 };
 
-
-
-
+}}

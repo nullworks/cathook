@@ -8,6 +8,8 @@
 
 #include "CBaseWindow.hpp"
 
+namespace gui { namespace base {
+
 // General functions
 void CBaseWindow::Draw() {
 	auto abs = AbsolutePosition();
@@ -49,3 +51,5 @@ void CBaseWindow::MoveChildren() { // TODO, Reverse!!!
 		SetSize(mx + 4, my + 2);
 	}
 }
+
+}}

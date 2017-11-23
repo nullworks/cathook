@@ -10,6 +10,8 @@
 
 #include "CBaseWidget.hpp"
 
+namespace gui { namespace base {
+
 class CTitleBar : public CBaseWidget {
 public:
 	CTitleBar(std::string title, IWidget* parent);
@@ -21,3 +23,5 @@ public:
 	int drag_stage = 0;
 	std::pair<int, int> last_mouse(0, 0);
 };
+
+}}

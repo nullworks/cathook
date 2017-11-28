@@ -14,15 +14,14 @@ namespace colors {
 // Color utils
 inline CatVector4 FromRGBA8(const CatVector4& color) { return color / 255; }
 inline CatVector4   ToRGBA8(const CatVector4& color) { return color * 255; }
-inline CatVector4   ToRGBA8(const float& r, const float& g, const float& b, const float& a) { return CatVector4(r, g, b, a); }
+inline CatVector4   ToRGBA8(const float& r, const float& g, const float& b, const float& a) { return CatVector4(r * 255, g * 255, b * 255, a * 255); }
 inline CatVector4 Transparent(const CatVector4& color, const float& multiplier = 0.5f) { return CatVector4(color.x, color.y, color.z, color.a * multiplier); }
-inline CatVector4 FromHSL(const float& h, const float& s, const float& v) {
+inline CatVector4 FromHSL(float h, const float& s, const float& v) {
 	if (s <= 0.0) return ToRGBA8(v, v, v, 1.0f);
-	float hh = h;
-	if (hh >= 360.0) hh = 0.0;
-	hh /= 60.0;
-	long i = long(hh);
-	float ff = hh - i;
+	if (h >= 360.0) h = 0.0;
+	h /= 60.0;
+	long i = long(h);
+	float ff = h - i;
 	float p = v * (1.0 - s);
 	float q = v * (1.0 - (s * ff));
 	float t = v * (1.0 - (s * (1.0 - ff)));
@@ -54,9 +53,9 @@ const CatVector4 green 	= CatVector4(0, 255, 0, 255);
 const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 
 // Color functions
-const CatVector4& Entity(CatEntity* entity);
-void RegisterCustomColorToEntity(CatVector4&(*func)(CatEntity*));
-CatVector4 Health(CatEntity* entity);
+const CatVector4& Entity(const CatEntity& entity);
+void RegisterCustomColorToEntity(CatVector4(*func)(const CatEntity&));
+CatVector4 Health(const CatEntity& entity);
 CatVector4 RainbowCurrent();
 
 }

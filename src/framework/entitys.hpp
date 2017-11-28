@@ -81,8 +81,8 @@ public:
 	}
 	// Cant inline these for... uhh... reasons...
 	const int IDX; // Returns entity number in the array
-	float Distance();
-	bool Enemy();
+	float Distance() const;
+	bool Enemy() const;
 	// Generic entity states
 	bool exists = false; 	// Whether The entity exists in game
 	bool dormant = true; 	// Exists but not active

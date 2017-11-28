@@ -21,7 +21,7 @@
 // Struct for point in 3d space
 class CatVector {
 public:
-	CatVector(const float& _x = 0.0f, const float& _y = 0.0f, const float& _z = 0.0f) { x = _x; y = _y; z = _z; }
+	CatVector(const float& _x = 0.0f, const float& _y = 0.0f, const float& _z = 0.0f) : x(_x), y(_y), z(_z) {}
 	float x, y, z;
 	// So we can do math with our catvectors easily
 	inline CatVector operator+(const CatVector& value) const { return CatVector(x + value.x, y + value.y, z + value.z); }
@@ -33,7 +33,7 @@ public:
 	inline bool 	operator==(const CatVector& value) const { return value.x == x && value.y == y && value.z == z; }
 	inline bool 	operator!=(const CatVector& value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors
-	inline float DistTo(const CatVector& end) { return sqrt((pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2))); }
+	inline float DistTo(const CatVector& end) const { return sqrt((pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2))); }
 };
 
 // Used to store points in a box
@@ -42,7 +42,7 @@ public:
 	CatBox(const CatVector& min = CatVector(), const CatVector& max = CatVector()) : min(min), max(max) {};
 	CatVector min, max;
 
-	inline void GetPoints(CatVector* points) const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
+	inline void GetPoints(CatVector(&points)[8]) const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
 		float x, y, z;
 		x = max.x - min.x;
 		y = max.y - min.y;
@@ -64,7 +64,7 @@ public:
 // Struct for point in 4d space
 class CatVector4 {
 public:
-	CatVector4(const float& _x = 0.0f, const float& _y = 0.0f, const float& _z = 0.0f, const float& _a = 0.0f) { x = _x; y = _y; z = _z; a = _a; }
+	CatVector4(const float& _x = 0.0f, const float& _y = 0.0f, const float& _z = 0.0f, const float& _a = 0.0f) : x(_x), y(_y), z(_z), a(_a) {}
 	float x, y, z, a;
 
 	// So we can do math with our catvectors easily

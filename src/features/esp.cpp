@@ -6,6 +6,7 @@
  */
 
 #include <algorithm> // min()
+#include <string.h>  // strcpy()
 
 #include "../util/logging.h"				// For debugging purposes
 #include "../framework/entitys.hpp"			// So we can use entitys
@@ -177,7 +178,7 @@ void Draw() {
 
 			// Get world to screen
 			CatVector draw_point;
-			if (draw::WorldToScreen(entity->origin, draw_point)) {
+			if (draw::WorldToScreen(entity.origin, draw_point)) {
 
 				// Change draw point if needed & determine wheter we center the strings
 				bool center_strings = true;
@@ -189,9 +190,8 @@ void Draw() {
 						// Get total height
 						int total_height = 0;
 						for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
-							int height, width;
-							draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), (int)gui::gui_font, (int)gui::gui_font_size, width, height);
-							total_height += height;
+							auto size = draw::GetStringLength(esp_cache[i].strings[ii].first, 1, 28);
+							total_height += size.second;
 						}
 						switch ((int)esp_text_position) { // Add more as needed
 						case 4: // ABOVE
@@ -214,16 +214,15 @@ void Draw() {
 				for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
 
 					// Get string sizes
-					int width, height;
-					draw::GetStringLength(esp_cache[i].strings[ii].string.c_str(), gui::gui_font, gui::gui_font_size, width, height);
+					auto size = draw::GetStringLength(esp_cache[i].strings[ii].first, 1, 28);
 
 					if (center_strings) // Centered strings
-						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x - width / 2, draw_point.y, (int)gui::gui_font, (int)gui::gui_font_size, esp_cache[i].strings[ii].color)
+						draw::String(esp_cache[i].strings[ii].first, draw_point.x - size.first / 2, draw_point.y, 1, 28, esp_cache[i].strings[ii].second);
 					else // Not centered
-						draw::String(esp_cache[i].strings[ii].string.c_str(), draw_point.x, draw_point.y, (int)gui::gui_font, (int)gui::gui_font_size, esp_cache[i].strings[ii].color);
+						draw::String(esp_cache[i].strings[ii].first, draw_point.x, draw_point.y, 1, 28, esp_cache[i].strings[ii].second);
 
 					// Lower draw point for recursions
-					draw_point.y += height;
+					draw_point.y += size.second;
 				}
 			}
 		}
@@ -271,7 +270,7 @@ void WorldTick() {
 // Please add your esp strings during world tick as it is less intensive than doing this at draw
 // Use to add a string to esp for an entity with a color
 void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color) {
-	int idx = entity.IDX();
+	int idx = entity.IDX;
 	// Copy our values
 	strcpy(esp_cache[idx].strings[esp_cache[idx].string_count].first, input_string);
 	esp_cache[idx].strings[esp_cache[idx].string_count].second = color;
@@ -280,7 +279,7 @@ void AddEspString(const CatEntity& entity, const char* input_string, const CatVe
 }
 
 void SetEspColor(const CatEntity& entity, const CatVector4& color) {
-	int idx = entity.IDX();
+	int idx = entity.IDX;
 	// change any strings with entity color to the new one
 	for (int i = 0; i < esp_cache[idx].string_count; i++) {
 		if (esp_cache[idx].strings[i].second == esp_cache[idx].color)

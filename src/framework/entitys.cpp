@@ -19,7 +19,7 @@ CatEntity::CatEntity() IDX(int(((unsigned)this - (unsigned)&g_CatEntitys) / size
 
 }
 
-bool CatEntity::Enemy() {
+bool CatEntity::Enemy() const {
 	if (team == ETEAM_ALLY) return false;
 	if (team == ETEAM_ENEMY) return true;
 	if (g_LocalPlayer.entity == this) return false; // Local ents are friendly, duh
@@ -27,7 +27,7 @@ bool CatEntity::Enemy() {
 	return true;
 }
 
-float CatEntity::Distance() {
+float CatEntity::Distance() const {
 	return (g_LocalPlayer.entity) ? origin.DistTo(g_LocalPlayer.entity->origin) : 0;
 }
 

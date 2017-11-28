@@ -145,7 +145,7 @@ void WorldTick() {
 	if (!ShouldAim()) return;
 
 	// Set targets color
-	esp::SetEspColor(target, colors::pink);	// Colors are cool
+	esp::SetEspColor(*target, colors::pink);	// Colors are cool
 
 	AimAt(*target);
 }

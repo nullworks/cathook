@@ -17,8 +17,8 @@ void Draw();
 void WorldTick();
 
 // Use in world tick to add a string to an entity
-void AddEspString(CatEntity* entity, const char* input_string, const CatVector4& color = colors::white);
+void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color = colors::white);
 // Use in world tick to set esp color
-void SetEspColor(CatEntity* entity, const CatVector4& color);
+void SetEspColor(const CatEntity& entity, const CatVector4& color);
 
 }}

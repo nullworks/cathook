@@ -26,14 +26,14 @@ static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whe
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
 // Box esp + Options
 static CatEnum box_esp_enum({ "None", "Normal", "Corners" });
-static CatVarInt box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
+static CatVarEnum box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
 static CatVarInt box_corner_size(esp_menu, "esp_box_corner_size", 10, "Corner Size", "Controls corner box size");
 // Strings
 static CatEnum esp_text_position_enum({"TOP RIGHT", "CENTER", "BELOW", "ABOVE", "BOTTOM RIGHT"}); // Aranged in a way to make things easier below
-static CatVarInt esp_text_position(esp_menu, esp_text_position_enum, "esp_text_position", 0, "Text position", "Defines text position");
+static CatVarEnum esp_text_position(esp_menu, esp_text_position_enum, "esp_text_position", 0, "Text position", "Defines text position");
 // Health Esp
 static CatEnum show_health_enum({ "None", "Text", "Healthbar", "Both" });
-static CatVarInt show_health(esp_menu, show_health_enum, "esp_health", 3, "Health ESP", "Show health");
+static CatVarEnum show_health(esp_menu, show_health_enum, "esp_health", 3, "Health ESP", "Show health");
 // Other strings
 static CatVarBool show_name(esp_menu, "esp_name", true, "Name ESP", "Shows the entity names of entitys");
 static CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", "Shows distance on entitys");
@@ -41,7 +41,7 @@ static CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", 
 static CatVarBool bone_esp(esp_menu, "esp_bones", true, "Bone ESP", "Shows cached bones");
 // Tracers
 static CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
-static CatVarInt tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a line from the player to a position on your screen");
+static CatVarEnum tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a line from the player to a position on your screen");
 
 // Entitys strings
 struct ESPData {
@@ -55,7 +55,7 @@ static ESPData esp_cache[MAX_ENTITIES];
 
 // Entity Box state enum
 enum {EBOX_NOT_RAN, EBOX_FAILED, EBOX_SUCCESSFUL};
-static std::pair<int, CatBox> sbox; // For storing the world to screen box
+static std::pair<int, CatBox> screenbox; // For storing the world to screen box
 
 // Sets the screenbox for an entity
 static bool GetEntityBox(const CatEntity& entity) {
@@ -96,7 +96,7 @@ void Draw() {
 		if (CE_BAD(entity)) continue;
 
 		// Target checking
-		if (!g_LocalPlayer.cam_in_thirdperson && g_LocalPlayer.entity == entity) continue;// Determine whether to apply esp to local player
+		if (!g_LocalPlayer.InThirdperson && *g_LocalPlayer.entity == entity) continue;// Determine whether to apply esp to local player
 		if (entity.type == ETYPE_PLAYER && !entity.alive) continue; // Dont esp dead players
 
 		// Reset the entity box state
@@ -121,18 +121,18 @@ void Draw() {
 			if (bone_esp) {
 
 				// Loop through the bone sets
-				for (const auto& current_set : framework::bones::bonesets) {
+				for (const auto& current_set : bones::bonesets) {
 
 					// Draw the bones in the bone set
 					for (int i = 0; i < current_set.size() - 1; i++) { // We do it like this so we can identify where we are in the loop
 
 						// Get our 2 bones to connect
 						CatVector bone1, bone2;
-						if (bones::GetCatBone(entity, current_set[i], bone1) && bones::GetCatBone(entity, current_set[i + 1], bone2)) {
+						if (bones::GetBone(entity, current_set[i], bone1) && bones::GetBone(entity, current_set[i + 1], bone2)) {
 
 							// World to screen them
 							CatVector scn1, scn2;
-							if (draw::WorldToScreen(bone1, scn1) && draw::WorldToScreen(bone2, scn2))) {
+							if (draw::WorldToScreen(bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
 
 								// Draw a line connecting the points
 								draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, esp_cache[i].color);
@@ -162,7 +162,7 @@ void Draw() {
 				if (GetEntityBox(entity)) {
 
 					// Get in bar height
-					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min((float)entity->health / (float)entity->max_health, 1.0f);
+					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min((float)entity.health / (float)entity.max_health, 1.0f);
 
 					// Draw
 					draw::Rect(screenbox.second.min.x - 7, screenbox.second.min.y, 7, screenbox.second.max.y - screenbox.second.min.y, colors::black);

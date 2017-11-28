@@ -14,17 +14,17 @@
 CatEntity g_CatEntitys[MAX_ENTITIES];
 CatLocalPlayer g_LocalPlayer;
 
+// We need a constructor to get the idx
+CatEntity::CatEntity() IDX(int(((unsigned)this - (unsigned)&g_CatEntitys) / sizeof(CatEntity)) {
+
+}
+
 bool CatEntity::Enemy() {
 	if (team == ETEAM_ALLY) return false;
 	if (team == ETEAM_ENEMY) return true;
 	if (g_LocalPlayer.entity == this) return false; // Local ents are friendly, duh
 	if (g_LocalPlayer.entity) return g_LocalPlayer.entity->team != team;
 	return true;
-}
-
-// Were inlined, but realized I cant due to the entitys
-int CatEntity::IDX() {
-	return int(((unsigned)this - (unsigned)&g_CatEntitys) / sizeof(CatEntity));
 }
 
 float CatEntity::Distance() {

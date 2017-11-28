@@ -42,6 +42,16 @@ enum {
 
 namespace draw {
 
+// Object that we use to draw with
+extern CDraw drawmachine;
+// Functions that act like defines to make things clean
+inline void Line(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { drawmachine.Line(x, y, w, h, color); }
+inline void Rect(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { drawmachine.Rect(x, y, w, h, color); }
+inline void RectFilled(const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { drawmachine.RectFilled(x, y, w, h, color); }
+inline void Circle(const int& x, const int& y, const float& radius, const int& steps, const CatVector4& color) { drawmachine.Circle(x, y, radius, steps, color); }
+inline void String(const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color) { drawmachine.String(text, x, y, font, size, color); }
+inline std::pair<int, int> GetStringLength(const char* string, const int& font, const int& size) { return drawmachine.GetStringLength(string, font, size); }
+
 // Fonts, first is the pretty name and the second is the real name
 extern const char* Fonts[];
 

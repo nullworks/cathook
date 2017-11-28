@@ -14,8 +14,8 @@ namespace gui { namespace base {
 class CBaseWindow : public CBaseContainer {
 public:
 	// Constructors & Deconstructors
-	inline CBaseWindow(std::string name = "unnamed", IWidget* parent = nullptr) : CBaseContainer(name, parent) {}
-	inline virtual ~CBaseWindow() {};
+	CBaseWindow(std::string name = "unnamed", IWidget* parent = nullptr) : CBaseContainer(name, parent) {}
+	virtual ~CBaseWindow() {};
 
 	// General functions
 	virtual void Draw() override;

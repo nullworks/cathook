@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <string>
+#include <utility> // Pair
+
 namespace gui { namespace base {
 
 enum {

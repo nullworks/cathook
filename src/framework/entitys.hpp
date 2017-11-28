@@ -67,6 +67,9 @@ enum {
 // Class to contain entity information
 class CatEntity {
 public:
+	CatEntity();
+	inline bool operator==(const CatEntity& in_ent) const { return IDX == in_ent.IDX; }
+
 	// Generic entity functions
 	inline void Reset() {
 		exists = false;
@@ -77,7 +80,7 @@ public:
 		max_health = 100;
 	}
 	// Cant inline these for... uhh... reasons...
-	int IDX(); // Returns entity number in the array
+	const int IDX; // Returns entity number in the array
 	float Distance();
 	bool Enemy();
 	// Generic entity states

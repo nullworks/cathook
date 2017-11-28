@@ -14,10 +14,10 @@
 
 namespace gui { namespace base {
 
-class CBaseContainer : public CBaseWidget, public virtual IWidget {
+class CBaseContainer : public CBaseWidget {
 public:
 	CBaseContainer(std::string _name = "unnamed", IWidget* _parent = nullptr);
-	inline virtual ~CBaseContainer();
+	virtual ~CBaseContainer(); // required to be virtual to prevent destructor override
 
 	virtual void Update();
 	virtual void Draw();

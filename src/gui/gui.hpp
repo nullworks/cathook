@@ -9,8 +9,8 @@
 
 #include "base/CBaseContainer.hpp"
 
-namespace gui {
-
+namespace gui { namespace base {
+	
 class CatGUI : public base::CBaseContainer {
 public:
 	CatGUI();
@@ -25,7 +25,9 @@ public:
 	int  pressed_frame[CATKEY_COUNT];
 };
 
+}
+
 // Use to get the gui
-extern CatGUI g_pGUI;
+extern base::CatGUI g_pGUI;
 
 }

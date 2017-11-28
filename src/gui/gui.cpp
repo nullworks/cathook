@@ -12,12 +12,10 @@
 
 namespace gui {
 
-CatVar gui_visible(CV_SWITCH, "gui_visible", "0", "GUI Active", "GUI switch");
-CatVar gui_draw_bounds(CV_SWITCH, "gui_bounds", "0", "Draw Bounds", "Draw GUI elements' bounding boxes");
-
 // We use a base window to contain our root windows and to make managing them simple
 CatGUI g_pGUI;
 
+namespace base {
 // An init for our catgui
 CatGUI::CatGUI() {}
 
@@ -80,4 +78,4 @@ void CatGUI::Update() {
 // This would draw the entire screen so we override
 void GatGUI::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
 
-}
+}}

@@ -135,7 +135,7 @@ inline CatEntity& GetEntity(const int& IDX) { return g_CatEntitys[IDX]; }
 namespace bones {
 
 // Sets of bones that are connected
-extern const std::vector<int> bonesets[];
+extern const std::vector<int> bonesets[3];
 
 // Returns a reference to a catbone if it exists
 inline bool GetBone(const CatEntity& entity, const int& bone, CatVector& input) {
@@ -157,6 +157,6 @@ inline bool GetBone(const CatEntity& entity, const int& bone, CatBox& input) {
 }
 
 // Use to reset bones
-void ResetBones(CatEntity* entity) { for (auto& box : entity->bones) box.first = false; }
+void ResetBones(CatEntity& entity) { for (auto& box : entity.bones) box.first = false; }
 
 }

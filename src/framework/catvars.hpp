@@ -19,6 +19,8 @@ typedef std::vector<const char*> CatEnum;
 // Catvar base
 class CatVar {
 public:
+	CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
+		: gui_position(_gui_position), name(_name), desc_short(_desc_short), desc_long(_desc_long) { Init(); }
 	const CatEnum& gui_position;	// Where to place in menu tree
 	const char* name;							// Command name if it needs to be registered into a games console
 	const char* desc_short;				// Name in gui
@@ -84,7 +86,7 @@ public:
 	inline operator CatVector4() const { return value; }
 	inline void operator= (const CatVector4& in_value) { value = in_value; }
 	inline bool operator==(const CatVector4& in_value) const { return value == in_value; }
-	const CatVector4* defaults;
+	const CatVector4& defaults;
 	CatVector4 value;
 };
 class CatVarEnum : public CatVar {
@@ -95,6 +97,7 @@ public:
 	inline bool operator==(const int& in_value) const { return value == in_value; }
 	const int& defaults;
 	int value;
+	const CatEnum& cat_enum;
 	const int min;
 	const int max;
 };
@@ -104,13 +107,13 @@ class CatMenuTree {
 public:
 	CatMenuTree(const char* string = "") : name(string) {}
 
-	void AddTree(const CatVar& cat_var, int recursions = 0);
+	void AddTree(CatVar* cat_var, int recursions = 0);
 	const char* name;
 	std::vector<CatMenuTree> children;
 	std::vector<CatVar*> cat_children;	// Nyaa~ :3
 };
 
 // Map to be used for commands, TODO, move to own file and make CatCommands again with an interpeter
-extern std::unordered_map<std::string, CatVar&> CatCommandMap;
+extern std::unordered_map<std::string, CatVar*> CatCommandMap;
 // Uhh, look in cpp
 extern CatMenuTree CatMenuRoot;

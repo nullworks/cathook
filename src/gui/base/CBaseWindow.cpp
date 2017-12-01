@@ -6,6 +6,9 @@
  *
  */
 
+#include "../../framework/drawing.hpp" // Draw stuff
+#include "../../util/colors.hpp" // Draw stuff
+
 #include "CBaseWindow.hpp"
 
 namespace gui { namespace base {

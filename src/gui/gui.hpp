@@ -8,9 +8,10 @@
 #pragma once
 
 #include "base/CBaseContainer.hpp"
+#include "../framework/inputmgr.hpp" // So we can update our gui & know
 
-namespace gui { namespace base {
-	
+namespace gui {
+
 class CatGUI : public base::CBaseContainer {
 public:
 	CatGUI();
@@ -25,9 +26,9 @@ public:
 	int  pressed_frame[CATKEY_COUNT];
 };
 
-}
-
 // Use to get the gui
-extern base::CatGUI g_pGUI;
+extern CatGUI g_pGUI;
+
+void Update();
 
 }

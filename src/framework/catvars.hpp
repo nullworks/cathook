@@ -19,14 +19,11 @@ typedef std::vector<const char*> CatEnum;
 // Catvar base
 class CatVar {
 public:
-	CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
-		: gui_position(_gui_position), name(_name), desc_short(_desc_short), desc_long(_desc_long) { Init(); }
+	CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long);
 	const CatEnum& gui_position;	// Where to place in menu tree
 	const char* name;							// Command name if it needs to be registered into a games console
 	const char* desc_short;				// Name in gui
 	const char* desc_long;				// Descripton in gui
-private:
-	void Init();
 };
 // CatVar varients
 class CatVarBool : public CatVar {

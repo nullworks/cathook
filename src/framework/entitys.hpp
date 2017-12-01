@@ -127,10 +127,19 @@ public:
 };
 
 // Global entity info
-extern CatEntity g_CatEntitys[];
+extern CatEntity g_CatEntitys[MAX_ENTITIES];
 extern CatLocalPlayer g_LocalPlayer;
-inline CatEntity& GetEntity(const int& IDX) { return g_CatEntitys[IDX]; }
 
+// Entity utility functions
+namespace entity_cache {
+
+inline void InvalEntCache() {
+	for (auto& entity : g_CatEntitys) {
+		entity.Reset();
+	}
+}
+
+}
 // Bone stuff
 namespace bones {
 

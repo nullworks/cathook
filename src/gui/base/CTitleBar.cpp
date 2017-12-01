@@ -7,7 +7,8 @@
  */
 
 #include "../../framework/inputmgr.hpp" // We use mouse stuff here
-#include "../../framework/drawing.hpp"  // We use mouse stuff here
+#include "../../framework/drawing.hpp" // Draw stuff
+#include "../../util/colors.hpp" // Draw stuff
 
 #include "CTitleBar.hpp"
 
@@ -19,22 +20,17 @@ namespace gui { namespace base {
 enum {
 	EDRAG_START,
 	EDRAG_CONT
-}
+};
 
 // Constructor
-CTitleBar::CTitleBar(std::string _title, IWidget* _parent) : CBaseWidget("titlebar", parent) {
-	title = _title;
-	m_iDraggingStage = 0;
-	m_nLastX = 0;
-	m_nLastY = 0;
+CTitleBar::CTitleBar(std::string _title, IWidget* _parent) : CBaseWidget("titlebar", parent), title(_title) {
 	SetPositionMode(ABSOLUTE);
 }
 
 void CTitleBar::Update() {
 	auto psize = GetParent()->GetSize();
-	int l, h;
-	draw::GetStringLength(title.c_str(), 1, 9, l, h);
-	SetSize(psize.first, 2 * TITLEBAR_PADDING_H + h);
+	auto str_size = draw::GetStringLength(title.c_str(), 1, 9);
+	SetSize(psize.first, 2 * TITLEBAR_PADDING_H + str_size.first);
 	if (!IsPressed()) {
 		drag_stage = EDRAG_START;
 		return;
@@ -42,8 +38,8 @@ void CTitleBar::Update() {
 	if (drag_stage == EDRAG_START) {
 		drag_stage = EDRAG_CONT;
 	} else {
-		int dx = input::mouse.first  - m_nLastX;
-		int dy = input::mouse.second - m_nLastY;
+		int dx = input::mouse.first - last_mouse.first;
+		int dy = input::mouse.second - last_mouse.second;
 		auto offset = GetParent()->GetOffset();
 		GetParent()->SetOffset(offset.first + dx, offset.second + dy);
 	}
@@ -51,11 +47,11 @@ void CTitleBar::Update() {
 }
 
 void CTitleBar::Draw() {
+	auto abs = AbsolutePosition();
 	auto size = GetSize();
-	draw::Rect(x, y, size.first, size.second, colors::pink);
-	int l, h;
-	draw::GetStringLength(title.c_str(), 1, 9, l, h);
-	draw::String(title.c_str(), x + (size.first - l) / 2, y + TITLEBAR_PADDING_H, 1, 9, colors::white);
+	draw::Rect(abs.first, abs.second, size.first, size.second, colors::pink);
+	auto str_size = draw::GetStringLength(title.c_str(), 1, 9);
+	draw::String(title.c_str(), abs.first + (size.first - str_size.first) / 2, abs.second + TITLEBAR_PADDING_H, 1, 9, colors::white);
 }
 
 }}

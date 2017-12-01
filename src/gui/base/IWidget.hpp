@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include <string>
+#include <string>	 // std::string
 #include <utility> // Pair
+
+#include "../../util/mathlib.hpp" // Colors
 
 namespace gui { namespace base {
 
@@ -56,6 +58,8 @@ public:
 	virtual void OnMouseLeave() = 0;
 	virtual void OnMousePress() = 0;
 	virtual void OnMouseRelease() = 0;
+	virtual void OnFocusGain() = 0;
+	virtual void OnFocusLose() = 0;
 	virtual void OnKeyPress(int key, bool repeat) = 0;
 	virtual void OnKeyRelease(int key) = 0;
 	virtual bool ConsumesKey(int key) = 0;

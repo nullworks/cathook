@@ -9,8 +9,12 @@
 
 #pragma once
 
+#include <vector>
+
+#include "../../util/colors.hpp" // Draw stuff
+
 namespace gui {
-	
+
 class HudString {
 public:
 	// Constructor

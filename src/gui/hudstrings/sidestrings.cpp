@@ -2,7 +2,7 @@
 /*
  *
  *	This is what draws the strings on the top left of the screen!
- *	
+ *
  *
  */
 
@@ -14,9 +14,10 @@
 #include "sidestrings.hpp"
 
 namespace gui { namespace sidestrings {
-	
+
 HudString SideStrings(8, 8);// Stores side strings
 
+void Draw() { SideStrings.Draw(); }
 // The main string to use at the top
 std::string top_string = "Cathook";
 
@@ -25,10 +26,10 @@ void AddDefault() {
 	// Init strings
 	static bool init = false;
 	if (!init) {
-		
+
 		// Default to cathook
 		top_string = "Cathook";
-		
+
 		// Check if we have authors
 		if (!g_GameInfo.authors.empty()) {
 			top_string += " by ";
@@ -46,7 +47,7 @@ void AddDefault() {
 		// Suqqe
 		init = true;
 	}
-	
+
 	// Our default strings
 	SideStrings.AddString(top_string, colors::RainbowCurrent());
 #if defined(GIT_COMMIT_HASH) && defined(GIT_COMMIT_DATE)
@@ -56,12 +57,9 @@ void AddDefault() {
 
 void Init() {
 	// To Get our default strings up there
-	drawmgr::RequestDrawBeforeDraw(AddDefault);
+	drawmgr::RequestDrawOnBefore(AddDefault);
 	// To draw our strings
-	drawmgr::RequestDrawAfterDraw(SideStrings.Draw());
+	drawmgr::RequestDrawOnAfter(Draw);
 }
 
 }}
-
-
-

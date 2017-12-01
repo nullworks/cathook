@@ -92,8 +92,7 @@ void Draw() {
 	if (!esp_enabled || !g_GameInfo.in_game) return;
 
 	// Loop through all entitys
-	for (int i = 0; i < MAX_ENTITIES; i++) {
-		const CatEntity& entity = g_CatEntitys[i];
+	for (const auto& entity: g_CatEntitys) {
 		if (CE_BAD(entity)) continue;
 
 		// Target checking
@@ -114,7 +113,7 @@ void Draw() {
 				if (draw::WorldToScreen(entity.origin, scn)) {
 
 					// Draw a line
-					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((int)tracers == 2) ? input::bounds.second : input::bounds.second / 2 - scn.y, esp_cache[i].color);
+					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((int)tracers == 2) ? input::bounds.second : input::bounds.second / 2 - scn.y, esp_cache[entity.IDX].color);
 				}
 			}
 
@@ -151,7 +150,7 @@ void Draw() {
 
 					// Simple box esp
 					draw::Rect(screenbox.second.min.x, screenbox.second.min.y, screenbox.second.max.x - screenbox.second.min.x, screenbox.second.max.y - screenbox.second.min.y, colors::black);
-					draw::Rect(screenbox.second.min.x + 1, screenbox.second.min.y + 1, screenbox.second.max.x - screenbox.second.min.x - 2, screenbox.second.max.y - screenbox.second.min.y - 2, esp_cache[i].color);
+					draw::Rect(screenbox.second.min.x + 1, screenbox.second.min.y + 1, screenbox.second.max.x - screenbox.second.min.x - 2, screenbox.second.max.y - screenbox.second.min.y - 2, esp_cache[entity.IDX].color);
 					draw::Rect(screenbox.second.min.x + 2, screenbox.second.min.y + 2, screenbox.second.max.x - screenbox.second.min.x - 4, screenbox.second.max.y - screenbox.second.min.y - 4, colors::black);
 				}
 			}
@@ -174,7 +173,7 @@ void Draw() {
 
 		// Strings
 		// Check if there is strings to draw
-		if (esp_cache[i].string_count) {
+		if (esp_cache[entity.IDX].string_count) {
 
 			// Get world to screen
 			CatVector draw_point;
@@ -189,8 +188,8 @@ void Draw() {
 					if ((int)esp_text_position > 3) { // For when we need total height of strings
 						// Get total height
 						int total_height = 0;
-						for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
-							auto size = draw::GetStringLength(esp_cache[i].strings[ii].first, 1, 28);
+						for (int ii = 0; ii < esp_cache[entity.IDX].string_count; ii++) {
+							auto size = draw::GetStringLength(esp_cache[entity.IDX].strings[ii].first, 1, 28);
 							total_height += size.second;
 						}
 						switch ((int)esp_text_position) { // Add more as needed
@@ -211,15 +210,15 @@ void Draw() {
 
 				// Draw our strings
 				// Loop through strings
-				for (int ii = 0; ii < esp_cache[i].string_count; ii++) {
+				for (int i = 0; i < esp_cache[entity.IDX].string_count; i++) {
 
 					// Get string sizes
-					auto size = draw::GetStringLength(esp_cache[i].strings[ii].first, 1, 28);
+					auto size = draw::GetStringLength(esp_cache[entity.IDX].strings[i].first, 1, 28);
 
 					if (center_strings) // Centered strings
-						draw::String(esp_cache[i].strings[ii].first, draw_point.x - size.first / 2, draw_point.y, 1, 28, esp_cache[i].strings[ii].second);
+						draw::String(esp_cache[entity.IDX].strings[i].first, draw_point.x - size.first / 2, draw_point.y, 1, 28, esp_cache[entity.IDX].strings[i].second);
 					else // Not centered
-						draw::String(esp_cache[i].strings[ii].first, draw_point.x, draw_point.y, 1, 28, esp_cache[i].strings[ii].second);
+						draw::String(esp_cache[entity.IDX].strings[i].first, draw_point.x, draw_point.y, 1, 28, esp_cache[entity.IDX].strings[i].second);
 
 					// Lower draw point for recursions
 					draw_point.y += size.second;
@@ -235,14 +234,13 @@ void WorldTick() {
 	if (!esp_enabled || !g_GameInfo.in_game) return;
 
 	// Loop through all entitys
-	for (int i = 0; i < MAX_ENTITIES; i++) {
-		const CatEntity& entity = g_CatEntitys[i];
+	for (const auto& entity : g_CatEntitys) {
 		if (CE_BAD(entity)) continue;
 
 		// Update the entitys color
-		esp_cache[i].color = colors::Entity(entity);
+		esp_cache[entity.IDX].color = colors::Entity(entity);
 		// Reset strings
-		esp_cache[i].string_count = 0;
+		esp_cache[entity.IDX].string_count = 0;
 
 		// Add default strings
 		if ((esp_players && entity.type == ETYPE_PLAYER) || (esp_other_hostile && entity.type == ETYPE_OTHERHOSTILE)) {
@@ -250,7 +248,7 @@ void WorldTick() {
 
 			// Name esp
 			if (show_name)
-				AddEspString(entity, entity.entity_name, esp_cache[i].color);
+				AddEspString(entity, entity.entity_name, esp_cache[entity.IDX].color);
 
 			// Health esp
 			if ((int)show_health == 1 || (int)show_health == 3) {
@@ -270,23 +268,21 @@ void WorldTick() {
 // Please add your esp strings during world tick as it is less intensive than doing this at draw
 // Use to add a string to esp for an entity with a color
 void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color) {
-	int idx = entity.IDX;
 	// Copy our values
-	strcpy(esp_cache[idx].strings[esp_cache[idx].string_count].first, input_string);
-	esp_cache[idx].strings[esp_cache[idx].string_count].second = color;
+	strcpy(esp_cache[entity.IDX].strings[esp_cache[entity.IDX].string_count].first, input_string);
+	esp_cache[entity.IDX].strings[esp_cache[entity.IDX].string_count].second = color;
 	// Incriment count
-	esp_cache[idx].string_count++;
+	esp_cache[entity.IDX].string_count++;
 }
 
 void SetEspColor(const CatEntity& entity, const CatVector4& color) {
-	int idx = entity.IDX;
 	// change any strings with entity color to the new one
-	for (int i = 0; i < esp_cache[idx].string_count; i++) {
-		if (esp_cache[idx].strings[i].second == esp_cache[idx].color)
-			esp_cache[idx].strings[i].second = color;
+	for (int i = 0; i < esp_cache[entity.IDX].string_count; i++) {
+		if (esp_cache[entity.IDX].strings[i].second == esp_cache[entity.IDX].color)
+			esp_cache[entity.IDX].strings[i].second = color;
 	}
 	// Change the main entity color
-	esp_cache[idx].color = color;
+	esp_cache[entity.IDX].color = color;
 }
 
 }}

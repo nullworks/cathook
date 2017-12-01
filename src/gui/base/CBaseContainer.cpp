@@ -20,7 +20,7 @@ void CBaseContainer::Update() {
 	SortByZIndex();
 	MoveChildren();
 	UpdateHovers();
-	for (auto child : m_children) {
+	for (auto child : children) {
 		child->Update();
 	}
 	CBaseWidget::Update();
@@ -145,9 +145,8 @@ void CBaseContainer::FocusOn(IWidget* child) {
 void CBaseContainer::PressOn(IWidget* child) {
 	pressed_child = child;
 	if (child) {
+		FocusOn(child);
 		child->OnMousePress();
-		if (child->DoesStealFocus())
-			FocusOn(child);
 	} else FocusOn(0);
 }
 

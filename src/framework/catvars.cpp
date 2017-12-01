@@ -38,8 +38,9 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
   sapling.AddTree(cat_var, recursions + 1);
 }
 // General catvar constructor
-void CatVar::Init() {
-  // Add the catvar to the command map
+CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
+	: gui_position(_gui_position), name(_name), desc_short(_desc_short), desc_long(_desc_long) {
+	// Add the catvar to the command map
   CatCommandMap.insert({name, this});
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);

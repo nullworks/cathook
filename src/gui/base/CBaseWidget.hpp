@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <algorithm> // std::sort
+
 #include "IWidget.hpp" // has a widget class that we build apon
 
 namespace gui { namespace base {

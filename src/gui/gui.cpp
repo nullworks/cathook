@@ -6,16 +6,15 @@
  *      Author: nullifiedcat
  */
 
-#include "../framework/inputmgr.hpp" // So we can update our gui
-
 #include "gui.hpp"
+
+bool gui_visible = false;
 
 namespace gui {
 
 // We use a base window to contain our root windows and to make managing them simple
 CatGUI g_pGUI;
 
-namespace base {
 // An init for our catgui
 CatGUI::CatGUI() {}
 
@@ -36,16 +35,16 @@ void CatGUI::Update() {
 		if (changed) {
 			// Send out a keypress to the gui
 			if (down) {
-				if (i = CATKEY_MOUSE_1)
+				if (i == CATKEY_MOUSE_1)
 					OnMousePress();
-				else if (i = CATKEY_INSERT || i = CATKEY_F11)
+				else if (i == CATKEY_INSERT || i == CATKEY_F11)
 					gui_visible = !gui_visible;
 				else
 					OnKeyPress(i, false);
 
 			// For releases of keypresses
 			} else {
-				if (i = CATKEY_MOUSE_1)
+				if (i == CATKEY_MOUSE_1)
 					OnMouseRelease();
 				else
 					OnKeyRelease(i);
@@ -76,6 +75,9 @@ void CatGUI::Update() {
 }
 
 // This would draw the entire screen so we override
-void GatGUI::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
+void CatGUI::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
 
-}}
+// So we can pass it as a function to drawmgr
+void Update() { g_pGUI.Update(); }
+
+}

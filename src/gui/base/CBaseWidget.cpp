@@ -6,6 +6,9 @@
  *
  */
 
+#include "../../framework/drawing.hpp" // Draw stuff
+#include "../../util/colors.hpp" // Draw stuff
+
 #include "CBaseWidget.hpp"
 
 namespace gui { namespace base {
@@ -23,13 +26,13 @@ CBaseWidget::CBaseWidget(std::string _name, IWidget* _parent) {
 void CBaseWidget::Update() {
 	// Shows our tooltip
 	if (IsHovered() && IsVisible() && tooltip != "") {
-		auto pRoot = GetRootParent()
+		auto pRoot = GetRootParent();
 		pRoot->tooltip = tooltip;
 	}
 }
 void CBaseWidget::Draw() {}
 void CBaseWidget::DrawBounds() {
-	if (!bounds_color) {
+	if (bounds_color != CatVector4()) {
 		bounds_color = CatVector4(rand() % 255, rand() % 255, rand() % 255, 255);
 	}
 	auto pRoot = AbsolutePosition();

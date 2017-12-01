@@ -6,7 +6,9 @@
  */
 
 
-#include <csignal> // Unknown
+//#include <csignal> // Unknown
+#include <ctime> // time()
+#include <stdlib.h> // srand()
 
 #include "util/logging.h"
 #include "shutdown.hpp"
@@ -29,7 +31,7 @@ void hack::Initialize() {
 
 	CatLogging("Initializing...");
 	srand(time(0)); // Setting random seed?
-	
+
 	// Please put only one GAME module here. Any other type of module can screw with things.
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
@@ -37,13 +39,13 @@ void hack::Initialize() {
 #if defined(CATHOOK_SOURCE_2013) 	// Any source 2013 game
 	modules::source::Init();
 #endif
-	
+
 	CatLogging("Initializing main cheat features...");
 	features::Init();
-	
+
 	CatLogging("Initializing gui...");
 	gui::Init(); // init the gui
-	
+
 	CatLogging("Initializing Done!");
 }
 
@@ -51,7 +53,7 @@ void hack::Initialize() {
 void hack::Shutdown() {
 	if (hack::shutdown) return;
 	hack::shutdown = true;
-	
+
 	RunShutdown();
 
 	CatLogging("Shutdown Success..");

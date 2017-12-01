@@ -1,4 +1,4 @@
- 
+
 /*
  *
  *	This init find initializes all of the gui!
@@ -17,14 +17,14 @@
 #include "init.hpp"
 
 namespace gui {
-	
+
 void Init() {
-	
+
 	// Setup the draw manager to run gui
-	drawmgr::RequestDrawOnDraw(g_pGUI()->Update());
-	
+	drawmgr::RequestDrawOnDraw(Update);
+
 	// Other gui elements
-	sidestrings::Init();	
+	sidestrings::Init();
 }
-	
+
 }

@@ -5,9 +5,10 @@
  *      Author: nullifiedcat
  */
 
-#include "../copypasted/CSignature.h"
-#include "TFGCClientSystem.hpp"
-#include "../logging.h"
+#include "copypasted/CSignature.h"
+#include "sdk/TFGCClientSystem.hpp"
+
+#include <logging.hpp>
 
 
 int TFGCClientSystem::RequestSelectWizardStep(int type) {

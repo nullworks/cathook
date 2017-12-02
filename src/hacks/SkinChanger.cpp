@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "SkinChanger.hpp"
-#include "../copypasted/CSignature.h"
+#include "common.hpp"
 
 #include <sys/dir.h>
 #include <sys/stat.h>
@@ -14,8 +13,8 @@
 namespace hacks { namespace tf2 { namespace skinchanger {
 
 // Because fuck you, that's why.
-const char* sig_GetAttributeDefinition = "55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6 45 AA 00 8B BE B0 01 00 00 C6 45 AB 00 C6 45 B4 00 C7 45 B8 00 00 00 00 C7 45 BC 02 00 00 00 83 FF FF C7 45 C0 00 00 00 00 C7 45 C4 00 00 00 00 C7 45 C8 00 00 00 00 C7 45 CC 00 00 00 00 C7 45 D0 00 00 00 00 C6 45 D4 00 C6 45 D5 00 C7 45 D8 FF FF FF FF C7 45 DC 00 00 00 00 89 45 98 0F 84 86 01 00 00 8B 86 A4 01 00 00 EB 21";
-const char* sig_SetRuntimeAttributeValue = "55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33 8B 75 0C 8B 43 04 0F B7 7E 04 66 3B 78 04 0F 84 CA 00 00 00 83 C0 10 31 D2 EB 11 66 90 89 C6 83 C0 10 66 39 78 F4 0F 84 B9 00 00 00";
+const char* sig_GetAttributeDefinition = "55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6";
+const char* sig_SetRuntimeAttributeValue = "55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33";
 const char* sig_GetItemSchema = "55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3";
 
 ItemSystem_t ItemSystem { nullptr };
@@ -165,7 +164,7 @@ void FrameStageNotify(int stage) {
 	my_weapon = CE_INT(g_pLocalPlayer->entity, netvar.hActiveWeapon);
 	my_weapon_ptr = g_IEntityList->GetClientEntity(my_weapon & 0xFFF);
 	if (!my_weapon_ptr) return;
-	if (!vfunc<bool(*)(IClientEntity*)>(my_weapon_ptr, 190, 0)(my_weapon_ptr)) return;
+	if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(my_weapon_ptr)) return;
 	for (int i = 0; i < 4; i++) {
 		handle = weapon_list[i];
 		eid = handle & 0xFFF;
@@ -175,7 +174,7 @@ void FrameStageNotify(int stage) {
 		if (!entity) continue;
 		// TODO IsBaseCombatWeapon
 		// or TODO PlatformOffset
-		if (!vfunc<bool(*)(IClientEntity*)>(entity, 190, 0)(entity)) continue;
+		if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity)) continue;
 		if ((my_weapon_ptr != last_weapon_out) || !cookie.Check()) {
 			GetModifier(NET_INT(entity, netvar.iItemDefinitionIndex)).Apply(eid);
 		}
@@ -350,7 +349,7 @@ void def_attribute_modifier::Apply(int entity) {
 
 	ent = g_IEntityList->GetClientEntity(entity);
 	if (!ent) return;
-	if (!vfunc<bool(*)(IClientEntity*)>(ent, 190, 0)(ent)) return;
+	if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(ent)) return;
 	if (defidx_redirect && NET_INT(ent, netvar.iItemDefinitionIndex) != defidx_redirect) {
 		NET_INT(ent, netvar.iItemDefinitionIndex) = defidx_redirect;
 		if (show_debug_info)

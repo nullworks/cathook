@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
+#include "common.hpp"
 
 namespace hitbox_cache {
 
@@ -82,6 +82,8 @@ bool EntityHitboxCache::VisibilityCheck(int id) {
 static CatEnum setupbones_time_enum({ "ZERO",  "CURTIME", "LP SERVERTIME", "SIMTIME" });
 static CatVar setupbones_time(setupbones_time_enum, "setupbones_time", "3", "Setupbones", "Defines setupbones 4th argument, change it if your aimbot misses, idk!!");
 
+std::mutex setupbones_mutex;
+
 matrix3x4_t* EntityHitboxCache::GetBones() {
 	static float bones_setup_time = 0.0f;
 	switch ((int)setupbones_time) {
@@ -97,7 +99,9 @@ matrix3x4_t* EntityHitboxCache::GetBones() {
 			bones_setup_time = CE_FLOAT(parent_ref, netvar.m_flSimulationTime);
 	}
 	if (!bones_setup) {
-		bones_setup = RAW_ENT(parent_ref)->SetupBones(bones, MAXSTUDIOBONES, 0x100, bones_setup_time);
+	        //std::lock_guard<std::mutex> lock(setupbones_mutex);
+		if (g_Settings.is_create_move)
+	            bones_setup = RAW_ENT(parent_ref)->SetupBones(bones, MAXSTUDIOBONES, 0x100, bones_setup_time);
 	}
 	return bones;
 }

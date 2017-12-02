@@ -5,60 +5,20 @@
  *      Author: nullifiedcat
  */
 
-#include "hack.h"
-
-#include "beforecheaders.h"
-#include <vector>
-#include <map>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sys/prctl.h>
-//#include <cstring>
-#include <unistd.h>
-#include <link.h>
-#include <unordered_map>
-#include <cstring>
-#include <memory>
-#include "segvcatch/segvcatch.h"
-#include <csignal>
-#include <sys/sysinfo.h>
-#include "aftercheaders.h"
-
-#include <steam/isteamuser.h>
-#include <dbg.h>
-// All Hacks
-#include "hacks/hacklist.h"
-
-#include "common.h"
-#include "sharedobj.h"
-#include "hooks.h"
-#include "netmessage.h"
-#include "profiler.h"
-#include "cvwrapper.h"
+#include "hack.hpp"
+#include "common.hpp"
 
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
 
-#if ENABLE_VISUALS == 1
-#include "ftrender.hpp"
-#endif
-
-#include "hooks/hookedmethods.h"
-#include "init.hpp"
-
-#include "sdk.h"
-#include "vfunc.h"
-#include "copypasted/CSignature.h"
-#include "copypasted/Netvar.h"
-#include "CDumper.h"
-#include <KeyValues.h>
+#include "CDumper.hpp"
 
 /*
  *  Credits to josh33901 aka F1ssi0N for butifel F1Public and Darkstorm 2015 Linux
  */
 
 bool hack::shutdown = false;
+bool hack::initialized = false;
 
 const std::string& hack::GetVersion() {
 	static std::string version("Unknown Version");
@@ -186,7 +146,6 @@ void hack::Initialize() {
 
 	logging::Info("Initializing...");
 	srand(time(0));
-	prctl(PR_SET_DUMPABLE,0,42,42,42);
 	sharedobj::LoadAllSharedObjects();
 	CreateInterfaces();
 	CDumper dumper;
@@ -201,13 +160,14 @@ void hack::Initialize() {
 #if ENABLE_VISUALS == 1 /* We don't need medal to flip 100% when running textmode */
 
 	IF_GAME (IsTF2()) {
+	        /*
 		uintptr_t mmmf = (gSignatures.GetClientSignature("C7 44 24 04 09 00 00 00 BB ? ? ? ? C7 04 24 00 00 00 00 E8 ? ? ? ? BA ? ? ? ? 85 C0 B8 ? ? ? ? 0F 44 DA") + 37);
 		if (mmmf) {
 			unsigned char patch1[] = { 0x89, 0xD3, 0x90 };
 			unsigned char patch2[] = { 0x89, 0xC2, 0x90 };
 			Patch((void*)mmmf, (void*)patch1, 3);
 			Patch((void*)(mmmf + 8), (void*)patch2, 3);
-		}
+		}*/
 		/*uintptr_t canInspectSig = (gSignatures.GetClientSignature("55 0F 57 C0 89 E5 83 EC 48 8B 45 08 F3 0F 11 04 24 F3 0F 11 45 E8 C7 44 24 10 01 00 00 00 C7 44 24 0C 00 00 00 00 89 44 24 08 C7 44 24 ? ? ? ? ? E8 ? ? ? ? F3 0F 10 45 E8 D9 5D E4 F3 0F 10 4D E4 C9 0F 2F C8 0F 95 C0 C3") + 72);
 		if (canInspectSig) {
 			unsigned char patch[] = { 0xB0, 0x01, 0x90 };
@@ -226,8 +186,10 @@ void hack::Initialize() {
 
 	draw::Initialize();
 #if ENABLE_GUI
+	/*
 	g_pGUI = new CatGUI();
 	g_pGUI->Setup();
+	*/
 #endif
 
 #endif /* TEXTMODE */
@@ -251,7 +213,7 @@ void hack::Initialize() {
 	hooks::clientmode.HookMethod((void*)CreateMove_hook, offsets::CreateMove());
 #if ENABLE_VISUALS == 1
 	hooks::clientmode.HookMethod((void*)OverrideView_hook, offsets::OverrideView());
-#endif /* TEXTMODE */
+#endif
 	hooks::clientmode.HookMethod((void*)LevelInit_hook, offsets::LevelInit());
 	hooks::clientmode.HookMethod((void*)LevelShutdown_hook, offsets::LevelShutdown());
 	hooks::clientmode.Apply();
@@ -282,16 +244,18 @@ void hack::Initialize() {
 #endif
 #if ENABLE_VISUALS == 1
 	hooks::client.HookMethod((void*)IN_KeyEvent_hook, offsets::IN_KeyEvent());
-#endif /* TEXTMODE */
+#endif
 	hooks::client.Apply();
 	hooks::input.Set(g_IInput);
 	hooks::input.HookMethod((void*)GetUserCmd_hook, offsets::GetUserCmd());
 	hooks::input.Apply();
+#ifndef HOOK_DME_DISABLED
 #if ENABLE_VISUALS == 1
 	hooks::modelrender.Set(g_IVModelRender);
 	hooks::modelrender.HookMethod((void*)DrawModelExecute_hook, offsets::DrawModelExecute());
 	hooks::modelrender.Apply();
-#endif /* TEXTMODE */
+#endif
+#endif
 	hooks::steamfriends.Set(g_ISteamFriends);
 	hooks::steamfriends.HookMethod((void*)GetFriendPersonaName_hook, offsets::GetFriendPersonaName());
 	hooks::steamfriends.Apply();
@@ -309,6 +273,8 @@ void hack::Initialize() {
 
 	// FIXME [MP]
 	hacks::shared::killsay::Init();
+	hacks::shared::announcer::init();
+	hacks::tf2::killstreak::init();
 	logging::Info("Hooked!");
 	velocity::Init();
 	playerlist::Load();
@@ -320,6 +286,7 @@ void hack::Initialize() {
 	// cat_reloadscheme to load imgui
 	hack::command_stack().push("cat_reloadscheme");
 #endif
+#ifndef FEATURE_EFFECTS_DISABLED
 	if (g_ppScreenSpaceRegistrationHead && g_pScreenSpaceEffects) {
 		effect_chams::g_pEffectChams = new CScreenSpaceEffectRegistration("_cathook_chams", &effect_chams::g_EffectChams);
 		g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_chams");
@@ -327,7 +294,8 @@ void hack::Initialize() {
 		effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration("_cathook_glow", &effect_glow::g_EffectGlow);
 		g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_glow");
 	}
-	logging::Info("SSE enabled..");
+        logging::Info("SSE enabled..");
+#endif
 	DoSDLHooking();
 	logging::Info("SDL hooking done");
 	g_IGameEventManager->AddListener(&adv_event_listener, false);
@@ -338,8 +306,10 @@ void hack::Initialize() {
 	hacks::tf2::healarrow::Init();
 
 #if ENABLE_VISUALS == 1
+#ifndef FEATURE_FIDGET_SPINNER_DISABLED
 	InitSpinner();
 	logging::Info("Initialized Fidget Spinner");
+#endif
 	hacks::shared::spam::Init();
 	backpacktf::init();
 	logging::Info("Initialized Backpack.TF integration");
@@ -360,6 +330,7 @@ void hack::Initialize() {
 	hack::command_stack().push("exec cat_autoexec");
 	hack::command_stack().push("cat_killsay_reload");
 	hack::command_stack().push("cat_spam_reload");
+	hack::initialized = true;
 }
 
 void hack::Think() {
@@ -375,5 +346,6 @@ void hack::Shutdown() {
 	ConVar_Unregister();
 	logging::Info("Shutting down killsay...");
 	hacks::shared::killsay::Shutdown();
+        hacks::shared::announcer::shutdown();
 	logging::Info("Success..");
 }

@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "bhop.hpp"
-#include "../../common.h"
+#include "common.hpp"
 
 namespace ac { namespace bhop {
 

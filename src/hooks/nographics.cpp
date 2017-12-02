@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "../common.h"
+#include "common.hpp"
 
 /*// 81
 ITexture *FindTexture_null_hook(void* this_, char const* pTextureName, const char *pTextureGroupName, bool complain, int nAdditionalCreationFlags) {

@@ -5,15 +5,8 @@
  *      Author: nullifiedcat
  */
 
-#include "AntiCheat.hpp"
-#include "../common.h"
-
-#include "../hack.h"
-
-#include "ac/aimbot.hpp"
-#include "ac/antiaim.hpp"
-#include "ac/removecond.hpp"
-#include "ac/bhop.hpp"
+#include "common.hpp"
+#include "hack.hpp"
 
 namespace hacks { namespace shared { namespace anticheat {
 
@@ -46,7 +39,6 @@ void CreateMove() {
 				ac::bhop::Update(ent);
 			}
 		}
-		ac::removecond::Update(ent);
 	}
 }
 
@@ -54,14 +46,12 @@ void ResetPlayer(int index) {
 	ac::aimbot::ResetPlayer(index);
 	ac::antiaim::ResetPlayer(index);
 	ac::bhop::ResetPlayer(index);
-	ac::removecond::ResetPlayer(index);
 }
 
 void ResetEverything() {
 	ac::aimbot::ResetEverything();
 	ac::antiaim::ResetEverything();
 	ac::bhop::ResetEverything();
-	ac::removecond::ResetEverything();
 }
 
 class ACListener : public IGameEventListener {

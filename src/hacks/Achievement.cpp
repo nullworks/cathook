@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "Achievement.h"
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace tf2 { namespace achievement {
 

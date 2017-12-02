@@ -236,9 +236,9 @@ void MD5Final(unsigned char digest[MD5_DIGEST_LENGTH], MD5Context_t *ctx)
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *hash - 
-//			hashlen - 
+// Purpose:
+// Input  : *hash -
+//			hashlen -
 // Output : char
 //-----------------------------------------------------------------------------
 char *MD5_Print( unsigned char *hash, int hashlen )

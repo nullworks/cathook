@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "hooks.h"
-
-#include "logging.h"
+#include "common.hpp"
 
 #include <stdlib.h>
 #include <string.h>

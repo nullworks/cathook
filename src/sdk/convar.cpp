@@ -6,7 +6,8 @@
 //
 //===========================================================================//
 
-#include "../fixsdk.h"
+#include "fixsdk.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,10 +31,9 @@
 #define ALLOW_DEVELOPMENT_CVARS
 #endif
 
-/* URAN */
 #define Q_snprintf snprintf
-#include "../logging.h"
-#include "../interfaces.h"
+#include <logging.hpp>
+#include <interfaces.hpp>
 
 
 //-----------------------------------------------------------------------------

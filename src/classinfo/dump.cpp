@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "dump.hpp"
-#include "../common.h"
-
-static CatCommand do_dump("debug_dump_classes", "Dump classes", PerformClassDump);
+#include "common.hpp"
 
 void PerformClassDump() {
 	ClientClass* cc = g_IBaseClient->GetAllClasses();
@@ -21,6 +18,8 @@ void PerformClassDump() {
 		fclose(cd);
 	}
 }
+
+static CatCommand do_dump("debug_dump_classes", "Dump classes", PerformClassDump);
 
 static CatCommand populate_dynamic("debug_populate_dynamic", "Populate dynamic class table", []() {
 	client_classes::dynamic_list.Populate();

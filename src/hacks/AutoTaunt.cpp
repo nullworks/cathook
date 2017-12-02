@@ -5,9 +5,8 @@
  *      Author: nullifiedcat
  */
 
-#include "../common.h"
-#include "../init.hpp"
-#include "../hack.h"
+#include "common.hpp"
+#include "hack.hpp"
 
 namespace hacks { namespace tf { namespace autotaunt {
 

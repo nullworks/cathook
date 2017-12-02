@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "classinfo.hpp"
+#include "classinfo/classinfo.hpp"
 
 client_classes::dummy* client_class_list = nullptr;
 

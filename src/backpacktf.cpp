@@ -9,9 +9,7 @@
 #include "json.hpp"
 #include "https_request.hpp"
 
-#include "common.h"
-
-#include "cvwrapper.h"
+#include "common.hpp"
 
 #include <thread>
 #include <queue>

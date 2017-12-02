@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "hooks.h"
-#include "sdk.h"
-#include "profiler.h"
+#include "common.hpp"
 
 #include <sys/mman.h>
 
@@ -335,6 +332,9 @@ bool IsEntityVisible(CachedEntity* entity, int hb) {
 
 }
 
+CatVar tcm(CV_SWITCH, "debug_tcm", "1", "TCM");
+
+std::mutex trace_lock;
 bool IsEntityVectorVisible(CachedEntity* entity, Vector endpos) {
 	trace_t trace_object;
 	Ray_t ray;
@@ -347,7 +347,9 @@ bool IsEntityVectorVisible(CachedEntity* entity, Vector endpos) {
 	ray.Init(g_pLocalPlayer->v_Eye, endpos);
 	{
 		PROF_SECTION(IEVV_TraceRay);
-		g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace_object);
+		std::lock_guard<std::mutex> lock(trace_lock);
+		if (!tcm || g_Settings.is_create_move)
+		    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace_object);
 	}
 	return (trace_object.fraction >= 0.99f || (((IClientEntity*)trace_object.m_pEnt)) == RAW_ENT(entity));
 }
@@ -465,7 +467,7 @@ weaponmode GetWeaponMode() {
 	}
 	weapon = (ENTITY(weapon_handle & 0xFFF));
 	if (CE_BAD(weapon)) return weaponmode::weapon_invalid;
-	slot = vfunc<int(*)(IClientEntity*)>(RAW_ENT(g_pLocalPlayer->weapon()), 395, 0)(RAW_ENT(g_pLocalPlayer->weapon()));
+	slot = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(weapon));
 	if (slot == 2) return weaponmode::weapon_melee;
 	if (slot > 2) {
 		return weaponmode::weapon_pda;
@@ -524,7 +526,7 @@ bool GetProjectileData(CachedEntity* weapon, float& speed, float& gravity) {
 		rspeed = 1100.0f;
 	} else if (weapon->m_iClassID == CL_CLASS(CTFGrenadeLauncher)) {
 		IF_GAME (IsTF2()) {
-			rspeed = vfunc<GetProjectileData*>(RAW_ENT(weapon), 527)(RAW_ENT(weapon));
+		    rspeed = re::C_TFWeaponBaseGun::GetProjectileSpeed(RAW_ENT(g_pLocalPlayer->weapon()));
 			// TODO Wrong grenade launcher gravity
 			rgrav = 0.5f;
 		} else IF_GAME (IsTF2C()) {
@@ -532,8 +534,8 @@ bool GetProjectileData(CachedEntity* weapon, float& speed, float& gravity) {
 			rgrav = 0.5f;
 		}
 	} else if (weapon->m_iClassID == CL_CLASS(CTFCompoundBow)) {
-		rspeed = vfunc<GetProjectileData*>(RAW_ENT(weapon), 527)(RAW_ENT(weapon));
-		rgrav = vfunc<GetProjectileData*>(RAW_ENT(weapon), 528)(RAW_ENT(weapon));
+            rspeed = re::C_TFWeaponBaseGun::GetProjectileSpeed(RAW_ENT(g_pLocalPlayer->weapon()));
+            rgrav = re::C_TFWeaponBaseGun::GetProjectileGravity(RAW_ENT(g_pLocalPlayer->weapon()));
 	} else if (weapon->m_iClassID == CL_CLASS(CTFBat_Wood)) {
 		rspeed = 3000.0f;
 		rgrav = 0.5f;
@@ -551,6 +553,10 @@ bool GetProjectileData(CachedEntity* weapon, float& speed, float& gravity) {
 		rspeed = 2400.0f;
 	} else if (weapon->m_iClassID == CL_CLASS(CTFDRGPomson)) {
 		rspeed = 1200.0f;
+	} else if (weapon->m_iClassID == CL_CLASS(CTFWeaponFlameBall))
+	{
+	    // ??
+	    rspeed = 2500.0f;
 	}
 	speed = rspeed;
 	gravity = rgrav;

@@ -5,9 +5,10 @@
  *      Author: nullifiedcat
  */
 
-#include "HUD.h"
-#include "../logging.h"
-#include "../copypasted/CSignature.h"
+#include <logging.hpp>
+#include "sdk/HUD.h"
+
+#include "copypasted/CSignature.h"
 
 #include <string.h>
 

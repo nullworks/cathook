@@ -5,14 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "sharedobj.h"
-#include "logging.h"
-#include "helpers.h"
-#include "copypasted/CSignature.h"
-
-#include <unistd.h>
-#include <link.h>
-#include <dlfcn.h>
+#include "common.hpp"
 
 namespace sharedobj {
 

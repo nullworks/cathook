@@ -6,7 +6,7 @@
  */
 
 #include "ucccccp.hpp"
-#include "common.h"
+#include "common.hpp"
 #include "ucccccp_cmds.hpp"
 
 CatCommand utfccp_encrypt("ucccccp_encrypt", "Encrypt a message", [](const CCommand& args) {

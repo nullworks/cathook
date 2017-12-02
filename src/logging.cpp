@@ -10,8 +10,7 @@
 
 #include <pwd.h>
 
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 FILE* logging::handle = 0;
 

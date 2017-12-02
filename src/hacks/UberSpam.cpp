@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "UberSpam.hpp"
+#include "common.hpp"
 
 namespace hacks { namespace tf { namespace uberspam {
 

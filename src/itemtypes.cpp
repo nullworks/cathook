@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "itemtypes.h"
-
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 ItemManager::ItemManager() : mapper() {
 	// == MEDKITS

@@ -5,9 +5,8 @@
  *      Author: nullifiedcat
  */
 
+#include <logging.hpp>
 #include "https_request.hpp"
-
-#include "logging.h"
 
 #include <string.h>
 #include <netdb.h>

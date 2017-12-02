@@ -5,12 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "trace.h"
-#include "logging.h"
-
-#include <cstdint>
-
-#include "sdk.h"
+#include "common.hpp"
 
 // This file is a mess. I need to fix it. TODO
 

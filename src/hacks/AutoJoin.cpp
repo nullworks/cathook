@@ -5,9 +5,8 @@
  *      Author: nullifiedcat
  */
 
-#include "../common.h"
-#include "../hack.h"
-#include "../copypasted/CSignature.h"
+#include "common.hpp"
+#include "hack.hpp"
 
 namespace hacks { namespace shared { namespace autojoin {
 
@@ -25,7 +24,7 @@ const std::string classnames[] = {
 	"scout", "sniper", "soldier", "demoman", "medic", "heavyweapons", "pyro", "spy", "engineer"
 };
 
-CatCommand debug_startsearch("debug_startsearch", "DEBUG StartSearch", []() {
+/*CatCommand debug_startsearch("debug_startsearch", "DEBUG StartSearch", []() {
 	logging::Info("%d", g_TFGCClientSystem->RequestSelectWizardStep(4));
 });
 CatCommand debug_casual("debug_casual", "DEBUG Casual", []() {
@@ -33,13 +32,12 @@ CatCommand debug_casual("debug_casual", "DEBUG Casual", []() {
 	g_TFGCClientSystem->LoadSearchCriteria();
 	//logging::Info("%d", g_TFGCClientSystem->RequestSelectWizardStep(6));
 });
-
 CatCommand debug_readytosearch("debug_gcstate", "DEBUG GCState", []() {
 	logging::Info("%d", g_TFGCClientSystem->GetState());
 });
 CatCommand debug_abandon("debug_abandon", "DEBUG Abandon", []() {
 	g_TFGCClientSystem->SendExitMatchmaking(true);
-});
+});*/
 bool UnassignedTeam() {
 	return !g_pLocalPlayer->team or (g_pLocalPlayer->team == TEAM_SPEC);
 }
@@ -49,7 +47,7 @@ bool UnassignedClass() {
 }
 
 void UpdateSearch() {
-	if (!auto_queue) return;
+	/*if (!auto_queue) return;
 	if (g_IEngine->IsInGame()) return;
 	static auto last_check = std::chrono::system_clock::now();
 	auto s = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_check).count();
@@ -64,7 +62,7 @@ void UpdateSearch() {
 		//logging::Info("%d", g_TFGCClientSystem->RequestSelectWizardStep(6));
 	}
 
-	last_check = std::chrono::system_clock::now();
+	last_check = std::chrono::system_clock::now();*/
 }
 
 void Update() {

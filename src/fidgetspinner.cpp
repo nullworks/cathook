@@ -7,6 +7,8 @@
 
 #include "fidgetspinner.hpp"
 
+#ifndef FEATURE_FIDGET_SPINNER_DISABLED
+
 CatVar enable_spinner(CV_SWITCH, "fidgetspinner", "0", "Fidget Spinner", "Part of Cathook Autism Awareness program");
 std::vector<textures::AtlasTexture> spinner_states {};
 
@@ -77,7 +79,7 @@ void DrawSpinner() {
 	}
 	int state = min(3, spinning_speed / 250.0f);
 
-	// Paste from drawgl::
+	// Paste from draw_api::
 	using namespace drawgl;
 	using namespace ftgl;
 
@@ -96,3 +98,5 @@ void DrawSpinner() {
 	if (angle > PI * 4) angle -= PI * 4;
 
 }
+
+#endif

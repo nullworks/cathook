@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
+#include "common.hpp"
 
 static bool hoovy_list[32] = { 0 };
 

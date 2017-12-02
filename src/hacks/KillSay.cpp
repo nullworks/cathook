@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "KillSay.h"
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace killsay {
 
@@ -132,6 +130,6 @@ void KillSayEventListener::FireGameEvent(IGameEvent* event) {
 	if (!hacks::shared::killsay::killsay_mode) return;
 	std::string message = hacks::shared::killsay::ComposeKillSay(event);
 	if (message.size()) {
-		chat_stack::Say(message);
+		chat_stack::Say(message, false);
 	}
 }

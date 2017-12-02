@@ -5,11 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "Noisemaker.h"
-
-#include "../copypasted/CSignature.h"
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace tf2 { namespace noisemaker {
 

@@ -5,15 +5,10 @@
  *      Author: nullifiedcat
  */
 
-#include "CreateMove.h"
+#include "common.hpp"
+#include "hack.hpp"
 
-#include "../hooks.h"
-#include "../hack.h"
-#include "../common.h"
-#include "hookedmethods.h"
 #include <link.h>
-
-#include "../profiler.h"
 
 static CatVar minigun_jump(CV_SWITCH, "minigun_jump", "0", "TF2C minigun jump", "Allows jumping while shooting with minigun");
 
@@ -102,8 +97,10 @@ static CatVar engine_pred(CV_SWITCH, "engine_prediction", "0", "Engine Predictio
 static CatVar debug_projectiles(CV_SWITCH, "debug_projectiles", "0", "Debug Projectiles");
 
 static CatVar fakelag_amount(CV_INT, "fakelag", "0", "Bad Fakelag");
+CatVar semiauto(CV_INT, "semiauto", "0", "Semiauto");
 
 bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
+        g_Settings.is_create_move = true;
 	static CreateMove_t original_method = (CreateMove_t)hooks::clientmode.GetMethod(offsets::CreateMove());
 	bool time_replaced, ret, speedapplied;
 	float curtime_old, servertime, speed, yaw;
@@ -125,15 +122,18 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	PROF_SECTION(CreateMove);
 
 	if (!cmd) {
+	        g_Settings.is_create_move = false;
 		return ret;
 	}
 
 	if (!cathook) {
+                g_Settings.is_create_move = false;
 		return ret;
 	}
 
 	if (!g_IEngine->IsInGame()) {
 		g_Settings.bInvalid = true;
+                g_Settings.is_create_move = false;
 		return true;
 	}
 
@@ -208,7 +208,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	}
 	g_Settings.bInvalid = false;
 
-	hacks::shared::autojoin::Update();
+//	hacks::shared::autojoin::Update();
 
 #if ENABLE_IPC == 1
 	static int team_joining_state = 0;
@@ -263,7 +263,6 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 	}
 #endif
 	if (CE_GOOD(g_pLocalPlayer->entity)) {
-		ResetCritHack();
 		IF_GAME (IsTF2()) {
 			SAFE_CALL(UpdateHoovyList());
 		}
@@ -281,6 +280,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 			}
 			// Walkbot can leave game.
 			if (!g_IEngine->IsInGame()) {
+		                g_Settings.is_create_move = false;
 				return ret;
 			}
 			IF_GAME (IsTF()) {
@@ -304,6 +304,21 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 				PROF_SECTION(CM_aimbot);
 				SAFE_CALL(hacks::shared::aimbot::CreateMove());
 			}
+			static int attackticks = 0;
+			if (g_pUserCmd->buttons & IN_ATTACK)
+			    ++attackticks;
+			else
+			    attackticks = 0;
+                        if (semiauto)
+                        {
+                            if (g_pUserCmd->buttons & IN_ATTACK)
+                            {
+                                if (attackticks % int(semiauto) < int(semiauto) - 1)
+                                {
+                                    g_pUserCmd->buttons &= ~IN_ATTACK;
+                                }
+                            }
+                        }
 			{
 				PROF_SECTION(CM_antiaim);
 				SAFE_CALL(hacks::shared::antiaim::ProcessUserCmd(cmd));
@@ -335,6 +350,10 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 		{
 			PROF_SECTION(CM_misc);
 			SAFE_CALL(hacks::shared::misc::CreateMove());
+		}
+		{
+		    PROF_SECTION(CM_crits);
+		    criticals::create_move();
 		}
 		{
 			PROF_SECTION(CM_spam);
@@ -427,6 +446,7 @@ bool CreateMove_hook(void* thisptr, float inputSample, CUserCmd* cmd) {
 		//LoadSavedState();
 	}
 	g_pLocalPlayer->bAttackLastTick = (cmd->buttons & IN_ATTACK);
+        g_Settings.is_create_move = false;
 	return ret;
 
 	SEGV_END;

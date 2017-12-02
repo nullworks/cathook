@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "sdk.h"
-#include "copypasted/CSignature.h"
+#include "common.hpp"
 
 time_t time_injected { 0 };
 
@@ -36,13 +34,13 @@ bool* bSendPackets; // i'd probably want to hook it, idk.
 //CatVar send_packets(CV_SWITCH, "sendpackets", "1", "Send packets", "Internal use");
 CatVar show_antiaim(CV_SWITCH, "thirdperson_angles", "1", "Real TP angles", "You can see your own AA/Aimbot angles in thirdperson");
 CatVar force_thirdperson(CV_SWITCH, "thirdperson", "0", "Thirdperson", "Enable thirdperson view");
-CatVar console_logging(CV_SWITCH, "log", "1", "Debug Log", "Disable this if you don't need cathook messages in your console");
+CatVar console_logging(CV_SWITCH, "log", "0", "Debug Log", "Disable this if you don't need cathook messages in your console");
 //CatVar fast_outline(CV_SWITCH, "fastoutline", "0", "Low quality outline", "Might increase performance when there is a lot of ESP text to draw");
 CatVar roll_speedhack(CV_KEY, "rollspeedhack", "0", "Roll Speedhack", "Roll speedhack key");
 char* disconnect_reason_newlined = new char[256] { 0 };
 CatVar disconnect_reason(CV_STRING, "disconnect_reason", "", "Disconnect reason", "A custom disconnect reason");
 
-CatVar event_log(CV_SWITCH, "events", "1", "Advanced Events");
+CatVar event_log(CV_SWITCH, "events", "0", "Advanced Events");
 void GlobalSettings::Init() {
 	sv_client_min_interp_ratio = g_ICvar->FindVar("sv_client_min_interp_ratio");
 	cl_interp_ratio = g_ICvar->FindVar("cl_interp_ratio");

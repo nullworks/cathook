@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "cvwrapper.h"
-
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 int CatVar::last_id { 0 };
 

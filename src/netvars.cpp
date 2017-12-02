@@ -6,7 +6,7 @@ a * entity.cpp
  */
 
 #include "copypasted/Netvar.h"
-#include "common.h"
+#include "common.hpp"
 
 NetVars netvar;
 
@@ -76,6 +76,8 @@ void NetVars::Init() {
 		this->iWeaponState = gNetvars.get_offset("DT_WeaponMinigun", "m_iWeaponState");
 		this->flChargeLevel = gNetvars.get_offset("DT_WeaponMedigun", "NonLocalTFWeaponMedigunData", "m_flChargeLevel");
 		this->bChargeRelease = gNetvars.get_offset("DT_WeaponMedigun", "m_bChargeRelease");
+		this->m_nStreaks_Player = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nStreaks");
+		this->m_nStreaks_Resource = gNetvars.get_offset("DT_TFPlayerResource", "m_iStreaks");
 	}
 	IF_GAME (IsTF2C()) {
 		this->iCritMult = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_iCritMult");

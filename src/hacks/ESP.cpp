@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "ESP.h"
-
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace esp {
 	
@@ -22,11 +19,13 @@ CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10", "Corner Size");
 CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
 CatVar tracers(tracers_enum, "esp_tracers", "0", "Tracers", "SDraws a line from the player to a position on your screen");
 // Emoji Esp
+#ifndef FEATURE_EMOJI_ESP_DISABLED
 CatEnum emoji_esp_enum({ "None", "Joy", "Thinking" });
 CatVar emoji_esp(emoji_esp_enum, "esp_emoji", "0", "Emoji ESP", "Draw emoji on peopels head");
 CatVar emoji_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size");
 CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1", "Emoji ESP Scaling");
 CatVar emoji_min_size(CV_INT, "esp_emoji_min_size", "20", "Emoji ESP min size", "Minimum size for an emoji when you use auto scaling");
+#endif
 // Other esp options
 CatEnum show_health_enum({ "None", "Text", "Healthbar", "Both" });
 CatVar show_health(show_health_enum, "esp_health", "3", "Health ESP", "Show enemy health");
@@ -146,7 +145,7 @@ struct bonelist_s {
 				return;
 			}
 			if (i > 0) {
-				drawgl::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color);
+				draw_api::draw_line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, 0.5f);
 			}
 			last_screen = current_screen;
 		}
@@ -220,7 +219,7 @@ void CreateMove() {
 	
 	// If not using any other special esp, we lower the min to the max clients
 	if (!buildings && !proj_esp && !item_esp)
-		limit = min(max_clients, HIGHEST_ENTITY);
+		limit = std::min(max_clients, HIGHEST_ENTITY);
 	
 	{ // I still dont understand the purpose of prof_section and surrounding in brackets
 		PROF_SECTION(CM_ESP_EntityLoop);
@@ -300,7 +299,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 		draw::WorldToScreen(ent->m_vecOrigin, scn);
 		
 		// Draw a line
-		drawgl::Line(scn.x, scn.y, width - scn.x, height - scn.y, fg);
+		draw_api::draw_line(scn.x, scn.y, width - scn.x, height - scn.y, fg, 0.5f);
 	}
 	
 	// Sightline esp
@@ -379,12 +378,12 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 				}
 				// We have both vectors, draw
 				if (found_scn1) {
-					drawgl::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg);
+					draw_api::draw_line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg, 0.5f);
 				}
 			}
 		}
 	}
-	
+#ifndef FEATURE_EMOJI_ESP_DISABLED
 	// Emoji esp
 	if (emoji_esp) {
 		if (ent->m_Type == ENTITY_PLAYER) {
@@ -405,12 +404,12 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 					if (int(emoji_esp) == 1) tx = &joy_texture;
 					if (int(emoji_esp) == 2) tx = &thinking_texture;
 					if (tx)
-						tx->Draw(head_scr.x - size / 2, head_scr.y - size / 2, size, size);
+						tx->Draw(head_scr.x - size / 2, head_scr.y - size / 2, colors::white, size, size);
 				}
 			}
 		}
 	}
-
+#endif
 	// Box esp
 	if (box_esp) {
 		switch (ent->m_Type) {
@@ -463,11 +462,11 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 				rgba_t hp = colors::Transparent(colors::Health(health, healthmax), fg.a);
 				rgba_t border = ((ent->m_iClassID == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
 				// Get bar height
-				int hbh = (max_y - min_y - 2) * min((float)health / (float)healthmax, 1.0f);
+				int hbh = (max_y - min_y - 2) * std::min((float)health / (float)healthmax, 1.0f);
 
 				// Draw
-				drawgl::Rect(min_x - 7, min_y, 7, max_y - min_y, border);
-				drawgl::FilledRect(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
+				draw_api::draw_rect_outlined(min_x - 7, min_y, 7, max_y - min_y, border, 0.5f);
+				draw_api::draw_rect(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
 			}
 		}
 	}
@@ -501,13 +500,13 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 					draw_point = Vector(max_x + 2, min_y, 0);
 				} break;
 				case 1: { // BOTTOM RIGHT
-					draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * ((int)fonts::font_main->height), 0);
+					draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * /*((int)fonts::font_main->height)*/ 14, 0);
 				} break;
 				case 2: { // CENTER
 					origin_is_zero = true; // origin is still zero so we set to true
 				} break;
 				case 3: { // ABOVE
-					draw_point = Vector(min_x, min_y - data.at(ent->m_IDX).string_count * ((int)fonts::font_main->height), 0);
+					draw_point = Vector(min_x, min_y - data.at(ent->m_IDX).string_count * /*((int)fonts::font_main->height)*/ 14, 0);
 				} break;
 				case 4: { // BELOW
 					draw_point = Vector(min_x, max_y, 0);
@@ -530,16 +529,16 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 			if (transparent) color = colors::Transparent(color); // Apply transparency if needed 
 			
 			// If the origin is centered, we use one method. if not, the other
-			if (!origin_is_zero) {
-				FTGL_Draw(string.data, draw_point.x, draw_point.y, fonts::font_main, color);
-			} else {
+			if (!origin_is_zero || true) {
+				draw_api::draw_string_with_outline(draw_point.x, draw_point.y, string.data.c_str(), fonts::main_font, color, colors::black, 1.5f);
+			} else {/*
 				int size_x;
 				FTGL_StringLength(string.data, fonts::font_main, &size_x);
 				FTGL_Draw(string.data, draw_point.x - size_x / 2, draw_point.y, fonts::font_main, color);
-			}
+			*/}
 			
 			// Add to the y due to their being text in that spot
-			draw_point.y += (int)fonts::font_main->height - 1;
+			draw_point.y += /*((int)fonts::font_main->height)*/ 15 - 1;
 		}
 	}
 	
@@ -583,7 +582,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity* ent) {
 					if (!draw::WorldToScreen(box_points[iii], scn2)) continue;
 					
 					// Draw between points
-					drawgl::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg);
+					draw_api::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg);
 				}
 			}
 		}
@@ -867,7 +866,7 @@ void _FASTCALL ProcessEntity(CachedEntity* ent) {
 				CachedEntity* weapon = ENTITY(widx);
 				if (CE_GOOD(weapon)) {
 					if (show_weapon) {
-						const char* weapon_name = vfunc<const char*(*)(IClientEntity*)>(RAW_ENT(weapon), 398, 0)(RAW_ENT(weapon));
+						const char* weapon_name = re::C_BaseCombatWeapon::GetPrintName(RAW_ENT(weapon));
 						if (weapon_name) AddEntityString(ent, std::string(weapon_name));
 					}
 				}
@@ -905,9 +904,9 @@ void _FASTCALL DrawBox(CachedEntity* ent, const rgba_t& clr) {
 		BoxCorners(min_x, min_y, max_x, max_y, clr, (clr.a != 1.0f));
 	// Otherwise, we just do simple draw funcs
 	else {
-		drawgl::Rect(min_x, min_y, max_x - min_x, max_y - min_y, border);
-		drawgl::Rect(min_x + 1, min_y + 1, max_x - min_x - 2, max_y - min_y - 2, clr);
-		drawgl::Rect(min_x + 2, min_y + 2, max_x - min_x - 4, max_y - min_y - 4, border);
+		draw_api::draw_rect_outlined(min_x, min_y, max_x - min_x, max_y - min_y, border, 0.5f);
+		draw_api::draw_rect_outlined(min_x + 1, min_y + 1, max_x - min_x - 2, max_y - min_y - 2, clr, 0.5f);
+		draw_api::draw_rect_outlined(min_x + 2, min_y + 2, max_x - min_x - 4, max_y - min_y - 4, border, 0.5f);
 	}
 }
 	
@@ -918,31 +917,31 @@ void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t& color, boo
 	
 	// Black corners
 	// Top Left
-	drawgl::FilledRect(minx, miny, size, 3, black);
-	drawgl::FilledRect(minx, miny + 3, 3, size - 3, black);
+	draw_api::draw_rect(minx, miny, size, 3, black);
+	draw_api::draw_rect(minx, miny + 3, 3, size - 3, black);
 	// Top Right
-	drawgl::FilledRect(maxx - size + 1, miny, size, 3, black);
-	drawgl::FilledRect(maxx - 3 + 1, miny + 3, 3, size - 3, black);
+	draw_api::draw_rect(maxx - size + 1, miny, size, 3, black);
+	draw_api::draw_rect(maxx - 3 + 1, miny + 3, 3, size - 3, black);
 	// Bottom Left
-	drawgl::FilledRect(minx, maxy - 3, size, 3, black);
-	drawgl::FilledRect(minx, maxy - size, 3, size - 3, black);
+	draw_api::draw_rect(minx, maxy - 3, size, 3, black);
+	draw_api::draw_rect(minx, maxy - size, 3, size - 3, black);
 	// Bottom Right
-	drawgl::FilledRect(maxx - size + 1, maxy - 3, size, 3, black);
-	drawgl::FilledRect(maxx - 2, maxy - size, 3, size - 3, black);
+	draw_api::draw_rect(maxx - size + 1, maxy - 3, size, 3, black);
+	draw_api::draw_rect(maxx - 2, maxy - size, 3, size - 3, black);
 
 	// Colored corners
 	// Top Left
-	drawgl::Line(minx + 1, miny + 1, size - 2, 0, color);
-	drawgl::Line(minx + 1, miny + 1, 0, size - 2, color);
+	draw_api::draw_line(minx + 1, miny + 1, size - 2, 0, color, 0.5f);
+	draw_api::draw_line(minx + 1, miny + 1, 0, size - 2, color, 0.5f);
 	// Top Right
-	drawgl::Line(maxx - 1, miny + 1, -(size - 2), 0, color);
-	drawgl::Line(maxx - 1, miny + 1, 0, size - 2, color);
+	draw_api::draw_line(maxx - 1, miny + 1, -(size - 2), 0, color, 0.5f);
+	draw_api::draw_line(maxx - 1, miny + 1, 0, size - 2, color, 0.5f);
 	// Bottom Left
-	drawgl::Line(minx + 1, maxy - 2, size - 2, 0, color);
-	drawgl::Line(minx + 1, maxy - 2, 0, -(size - 2), color);
+	draw_api::draw_line(minx + 1, maxy - 2, size - 2, 0, color, 0.5f);
+	draw_api::draw_line(minx + 1, maxy - 2, 0, -(size - 2), color, 0.5f);
 	// Bottom Right
-	drawgl::Line(maxx - 1, maxy - 2, -(size - 2), 0, color);
-	drawgl::Line(maxx - 1, maxy - 2, 0, -(size - 2), color);
+	draw_api::draw_line(maxx - 1, maxy - 2, -(size - 2), 0, color, 0.5f);
+	draw_api::draw_line(maxx - 1, maxy - 2, 0, -(size - 2), color, 0.5f);
 }
 
 // Used for caching collidable bounds

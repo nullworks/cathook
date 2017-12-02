@@ -6,7 +6,7 @@
  */
 
 #include "playerlist.hpp"
-#include "common.h"
+#include "common.hpp"
 
 #include <stdint.h>
 #include <dirent.h>

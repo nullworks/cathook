@@ -1,13 +1,4 @@
-#include "Netvar.h"
-
-#include "../interfaces.h"
-#include "../logging.h"
-#include <memory>
-
-#include "../fixsdk.h"
-#include <dt_recv.h>
-#include <client_class.h>
-#include <cdll_int.h>
+#include "common.hpp"
 
 /**
 * netvar_tree - Constructor

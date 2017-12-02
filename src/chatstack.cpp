@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "chatstack.h"
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 namespace chat_stack {
 

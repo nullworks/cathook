@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "SpyAlert.h"
-
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace tf { namespace spyalert {
 

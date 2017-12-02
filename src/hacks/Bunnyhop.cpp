@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "Bunnyhop.h"
-
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace bunnyhop {
 

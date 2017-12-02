@@ -5,13 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "textfile.h"
-
-#include "common.h"
-
-#include "beforecheaders.h"
-#include <fstream>
-#include "aftercheaders.h"
+#include "common.hpp"
 
 #include <stdio.h>
 

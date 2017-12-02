@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "FollowBot.h"
-
-#include "../common.h"
+#include "common.hpp"
 
 #if ENABLE_IPC == 1
 
@@ -238,12 +236,12 @@ void DoWalking() {
 		if (owner_weapon && CE_GOOD(g_pLocalPlayer->weapon())) {
 			
 			// IsBaseCombatWeapon()
-			if (vfunc<bool(*)(IClientEntity*)>(RAW_ENT(g_pLocalPlayer->weapon()), 190, 0)(RAW_ENT(g_pLocalPlayer->weapon())) &&
-			    vfunc<bool(*)(IClientEntity*)>(owner_weapon, 190, 0)(owner_weapon)) {
+			if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(RAW_ENT(g_pLocalPlayer->weapon())) &&
+			    re::C_BaseCombatWeapon::IsBaseCombatWeapon(owner_weapon)) {
 				
 				// Get the players slot numbers and store in some vars
-				int my_slot = vfunc<int(*)(IClientEntity*)>(RAW_ENT(g_pLocalPlayer->weapon()), 395, 0)(RAW_ENT(g_pLocalPlayer->weapon()));
-				int owner_slot = vfunc<int(*)(IClientEntity*)>(owner_weapon, 395, 0)(owner_weapon);
+				int my_slot = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(g_pLocalPlayer->weapon()));
+				int owner_slot = re::C_BaseCombatWeapon::GetSlot(owner_weapon);
 				
 				// If the local player is a medic and user settings allow, then keep the medigun out
 				if (g_pLocalPlayer->clazz == tf_medic && always_medigun) {
@@ -727,7 +725,7 @@ void DrawFollowbot() {
 		// Create a vector for the screen, run world to screen to bring the world vector into the screen vector, then draw a rect at the point
 		Vector scn;	
 		draw::WorldToScreen(destination_point, scn);
-		drawgl::FilledRect(scn.x - 3, scn.y - 3, 6, 6);	
+		draw_api::FilledRect(scn.x - 3, scn.y - 3, 6, 6);	
 		// Return as we are finished
 		break;
 			
@@ -742,7 +740,7 @@ void DrawFollowbot() {
 				// Get the entity vector to screen and draw a rect on it
 				Vector scn;	
 				draw::WorldToScreen(breadcrumbs[crumbBottom], scn);
-				drawgl::FilledRect(scn.x - 3, scn.y - 3, 6, 6);	
+				draw_api::FilledRect(scn.x - 3, scn.y - 3, 6, 6);	
 			}
 			
 			// Return as we have nothing else to do
@@ -771,11 +769,11 @@ void DrawFollowbot() {
 			draw::WorldToScreen(breadcrumbs[tmpCrumb2], scnEnd);
 
 			// Draw a line from one crumb to the other
-			drawgl::Line(scnSrt.x, scnSrt.y, scnEnd.x - scnSrt.x, scnEnd.y - scnSrt.y, colors::white);	
+			draw_api::Line(scnSrt.x, scnSrt.y, scnEnd.x - scnSrt.x, scnEnd.y - scnSrt.y, colors::white);	
 
 			// If this is our first iteration, draw a box on 1
 			if (i == 1)
-				drawgl::FilledRect(scnSrt.x - 3, scnSrt.y - 3, 6, 6);	
+				draw_api::FilledRect(scnSrt.x - 3, scnSrt.y - 3, 6, 6);	
 		}
 		break;
 	}*/
@@ -790,7 +788,7 @@ void DrawFollowbot() {
 			// Get the entity vector to screen and draw a rect on it
 			Vector scn;	
 			draw::WorldToScreen(breadcrumbs[crumbBottom], scn);
-			drawgl::FilledRect(scn.x - 3, scn.y - 3, 6, 6);	
+			draw_api::draw_rect(scn.x - 3, scn.y - 3, 6, 6, colors::white);
 		}
 		
 		// Return as we have nothing else to do
@@ -819,11 +817,11 @@ void DrawFollowbot() {
 		draw::WorldToScreen(breadcrumbs[tmpCrumb2], scnEnd);
 
 		// Draw a line from one crumb to the other
-		drawgl::Line(scnSrt.x, scnSrt.y, scnEnd.x - scnSrt.x, scnEnd.y - scnSrt.y, colors::white);	
+		draw_api::draw_line(scnSrt.x, scnSrt.y, scnEnd.x - scnSrt.x, scnEnd.y - scnSrt.y, colors::white, 0.5f);
 
 		// If this is our first iteration, draw a box on 1
 		if (i == 0)
-			drawgl::FilledRect(scnSrt.x - 3, scnSrt.y - 3, 6, 6);	
+			draw_api::draw_rect(scnSrt.x - 3, scnSrt.y - 3, 6, 6, colors::white);
 	}
 	return;
 }

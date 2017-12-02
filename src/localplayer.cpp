@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 void LocalPlayer::Update() {
 	CachedEntity *wep;

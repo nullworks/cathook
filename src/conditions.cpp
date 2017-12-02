@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "conditions.h"
-#include "common.h"
+#include "common.hpp"
 
 static CatCommand dump_conditions("debug_conditions", "Shows conditions for entity #", [](const CCommand& args) {
 	int id = atoi(args.Arg(1));

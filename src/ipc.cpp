@@ -6,10 +6,10 @@
  */
 
 
-#include "ipc.h"
+#include "ipc.hpp"
 
-#include "common.h"
-#include "hack.h"
+#include "common.hpp"
+#include "hack.hpp"
 #include "hitrate.hpp"
 
 #if ENABLE_IPC == 1

@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "profiler.h"
-#include "cvwrapper.h"
-#include "logging.h"
+#include "common.hpp"
 
 unsigned g_spewcount { 0 };
 

@@ -1,14 +1,8 @@
-# IMPORTANT - UNMAINTAINED
-
-## This project is no longer maintained. Do not contact me about bugs in the software, don't open pull requests, make a fork instead (or find a maintained one)
-
 # Cathook Training Software
 ![banner](http://i.imgur.com/w96wdtE.png)
 
 ## Discord Server
-The discord server is depreciated due to discord taking action.    
 Please use the new [Official Telegram Group](https://t.me/nullifiedcat).    
-[Official Discord Server](https://discord.gg/kvNVNSX)
 
 cathook is a training software designed for Team Fortress 2 for Linux. cathook includes some joke features like
 

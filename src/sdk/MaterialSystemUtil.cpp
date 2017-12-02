@@ -12,7 +12,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "tier1/KeyValues.h"
 
-#include "../common.h"
+#include "common.hpp"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

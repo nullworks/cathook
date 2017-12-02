@@ -5,9 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "Spam.h"
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace spam {
 static CatEnum spam_enum({"DISABLED", "CUSTOM", "DEFAULT", "LENNYFACES", "BLANKS", "NULLCORE", "LMAOBOX", "LITHIUM"});
@@ -262,7 +260,7 @@ void CreateMove() {
 			if (random_order) current_index = rand() % source->size();
 			std::string spamString = source->at(current_index);
 			if (FormatSpamMessage(spamString))
-				chat_stack::Say(spamString);
+				chat_stack::Say(spamString, false);
 			current_index++;
 		}
 		last_spam_point = std::chrono::system_clock::now();

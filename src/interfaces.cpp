@@ -5,17 +5,15 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "sharedobj.h"
-#include "copypasted/CSignature.h"
-#include "sdk.h"
+#include "common.hpp"
+#include "sharedobj.hpp"
 
 #include <unistd.h>
 
-#include "beforecheaders.h"
+#include "beforecheaders.hpp"
 #include <string>
 #include <sstream>
-#include "aftercheaders.h"
+#include "aftercheaders.hpp"
 
 #include <steam/isteamclient.h>
 
@@ -51,6 +49,7 @@ CBaseClientState* g_IBaseClientState = nullptr;
 IGameEventManager* g_IGameEventManager = nullptr;
 TFGCClientSystem* g_TFGCClientSystem = nullptr;
 CHud* g_CHUD = nullptr;
+CGameRules *g_pGameRules = nullptr;
 
 template<typename T>
 T* BruteforceInterface(std::string name, sharedobj::SharedObject& object, int start = 0) {
@@ -117,10 +116,14 @@ void CreateInterfaces() {
 	g_IAchievementMgr = g_IEngine->GetAchievementMgr();
 	g_ISteamUserStats = g_ISteamClient->GetISteamUserStats(su, sp, "STEAMUSERSTATS_INTERFACE_VERSION011");
 	IF_GAME (IsTF2()) {
-		uintptr_t sig = gSignatures.GetClientSignature("89 1C 24 D9 5D D4 FF 90 3C 01 00 00 89 C7 8B 06 89 34 24 C1 E7 08 FF 90 3C 01 00 00 09 C7 33 3D ? ? ? ? 39 BB 34 0B 00 00 74 0E 89 BB 34 0B 00 00 89 3C 24 E8 ? ? ? ? C7 44 24 04 0F 27 00 00");
-		g_PredictionRandomSeed = *reinterpret_cast<int**>(sig + (uintptr_t)32);
+		uintptr_t sig = gSignatures.GetClientSignature("A3 ? ? ? ? C3 8D 74 26 00 B8 FF FF FF FF 5D A3 ? ? ? ? C3");
+		g_PredictionRandomSeed = *reinterpret_cast<int**>(sig + (uintptr_t)1);
+
+		uintptr_t g_pGameRules_sig = gSignatures.GetClientSignature("C7 03 ? ? ? ? 89 1D ? ? ? ? 83 C4 14 5B 5D C3");
+		g_pGameRules = *reinterpret_cast<CGameRules **>(g_pGameRules_sig + 8);
 	}
 	IF_GAME (IsTF2()) {
+		/*
 		uintptr_t gcsystem_sig = gSignatures.GetClientSignature("E8 ? ? ? ? C7 44 24 04 04 00 00 00 89 04 24 E8 ? ? ? ? E9 17 FF FF FF") + 1;
 		typedef TFGCClientSystem*(*func_t)(void);
 		logging::Info("GCSystem = 0x%08x", gcsystem_sig);
@@ -128,6 +131,7 @@ void CreateInterfaces() {
 		func_t get_gc = (gcc_p + gcsystem_sig + 4);
 		logging::Info("GTFGCClientSystem() = 0x%08x", get_gc);
 		g_TFGCClientSystem = get_gc();
+		*/
 	}
 	g_IMaterialSystem = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
 

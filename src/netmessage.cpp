@@ -5,9 +5,9 @@
  *      Author: nullifiedcat
  */
 
-#include "netmessage.h"
-#include "logging.h"
-#include "common.h"
+#include <logging.hpp>
+#include <netmessage.hpp>
+#include "common.hpp"
 
 bf_write::bf_write()
 {

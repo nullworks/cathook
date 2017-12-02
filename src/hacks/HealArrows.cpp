@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "../common.h"
+#include "common.hpp"
 
 namespace hacks { namespace tf2 { namespace healarrow {
 
@@ -41,7 +41,7 @@ public:
 						ReplaceString(msg, "##", std::to_string(health));
 						ReplaceString(msg, "@@", std::to_string(health + damageamount));
 						ReplaceString(msg, "%%", pinfo.name);
-						chat_stack::Say(msg);
+						chat_stack::Say(msg, false);
 					}
 				}
 			}
@@ -80,7 +80,7 @@ void Draw() {
 #if ENABLE_VISUALS == 1
 	if (healarrow) {
 		if ((g_GlobalVars->curtime - healarrow_time) < float(healarrow_timeout)) {
-			AddCenterString(format("Heal arrow charge: ", int(min(100.0f, (g_GlobalVars->curtime - healarrow_time) / float(healarrow_timeout)) * 100.0f), '%'), colors::yellow);
+			AddCenterString(format("Heal arrow charge: ", int(std::min(100.0f, (g_GlobalVars->curtime - healarrow_time) / float(healarrow_timeout)) * 100.0f), '%'), colors::yellow);
 //			AddCenterString(format("Heal arrow time: ", healarrow_time));
 		} else {
 			AddCenterString("Heal arrow ready", colors::green);

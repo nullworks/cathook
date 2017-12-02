@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "AntiDisguise.h"
-
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace tf2 { namespace antidisguise {
 

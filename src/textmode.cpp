@@ -5,10 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "init.hpp"
-#include "copypasted/CSignature.h"
-#include "cvwrapper.h"
+#include "common.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>

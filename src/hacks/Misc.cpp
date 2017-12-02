@@ -5,28 +5,17 @@
  *      Author: nullifiedcat
  */
 
-#include "Misc.h"
-
 #include <unistd.h>
-
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include "../beforecheaders.h"
-#include <fstream>
-#include "../aftercheaders.h"
-
 #include <link.h>
-#include "../sharedobj.h"
 
-#include "../hack.h"
-#include "../common.h"
-#include "../sdk.h"
-#include "../hooks/hookedmethods.h"
-#include "../netmessage.h"
-#include "../copypasted/CSignature.h"
+#include "sharedobj.hpp"
+
+#include "hack.hpp"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace misc {
 
@@ -37,18 +26,11 @@ CatVar anti_afk(CV_SWITCH, "anti_afk", "0", "Anti-AFK", "Sends random commands t
 CatVar auto_strafe(CV_SWITCH, "auto_strafe", "0", "Auto-Strafe", "Automaticly airstrafes for you.");
 CatVar render_zoomed(CV_SWITCH, "render_zoomed", "0", "Render model when zoomed-in", "Renders player model while being zoomed in as Sniper");
 CatVar nopush_enabled(CV_SWITCH, "nopush_enabled", "0", "No Push", "Prevents other players from pushing you around.");
+
 //CatVar no_homo(CV_SWITCH, "no_homo", "1", "No Homo", "read if gay");
 // Taunting stuff
-CatEnum spycrab_mode_enum({"DISABLED", "FORCE CRAB", "FORCE NON-CRAB"});
-CatVar spycrab_mode(spycrab_mode_enum, "spycrab", "0", "Spycrab", "Defines spycrab taunting mode");
 CatVar tauntslide(CV_SWITCH, "tauntslide", "0", "TF2C tauntslide", "Allows moving and shooting while taunting");
 CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide", "Allows free movement while taunting with movable taunts\nOnly works in tf2");	
-// Crithack
-CatVar crit_hack_next(CV_SWITCH, "crit_hack_next", "0", "Next crit info");	
-CatVar crit_info(CV_SWITCH, "crit_info", "0", "Show crit info"); // TODO separate
-CatVar crit_hack(CV_KEY, "crit_hack", "0", "Crit Key");
-CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits");
-CatVar crit_suppress(CV_SWITCH, "crit_suppress", "0", "Disable random crits", "Can help saving crit bucket for forced crits");
 
 void* C_TFPlayer__ShouldDraw_original = nullptr;
 
@@ -63,35 +45,7 @@ bool C_TFPlayer__ShouldDraw_hook(IClientEntity* thisptr) {
 	}
 }
 
-IClientEntity* found_crit_weapon = nullptr;
-int found_crit_number = 0;
 int last_number = 0;
-
-// SUPER SECRET CODE DONOT STEEL
-	
-int no_taunt_ticks = 0;
-
-typedef int(*StartSceneEvent_t)(IClientEntity* _this, int, int, void*, void*, IClientEntity*);
-StartSceneEvent_t StartSceneEvent_original = nullptr;
-int StartSceneEvent_hooked(IClientEntity* _this, int sceneInfo, int choreoScene, void* choreoEvent, void* choreoActor, IClientEntity* unknown) {
-	const char* str = (const char*)((unsigned)choreoScene + 396);
-	if (_this == g_IEntityList->GetClientEntity(g_IEngine->GetLocalPlayer()) && spycrab_mode && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID == CL_CLASS(CTFWeaponPDA_Spy)) {
-		if (!strcmp(str, "scenes/player/spy/low/taunt05.vcd")) {
-			if ((int)spycrab_mode == 2) {
-				RemoveCondition<TFCond_Taunting>(LOCAL_E);
-				no_taunt_ticks = 6;
-				hacks::shared::lagexploit::AddExploitTicks(15);
-			}
-		} else if (strstr(str, "scenes/player/spy/low/taunt")) {
-			if ((int)spycrab_mode == 1) {
-				RemoveCondition<TFCond_Taunting>(LOCAL_E);
-				no_taunt_ticks = 6;
-				hacks::shared::lagexploit::AddExploitTicks(15);
-			}
-		}
-	}
-	return StartSceneEvent_original(_this, sceneInfo, choreoScene, choreoEvent, choreoActor, unknown);
-}
 
 float last_bucket = 0;
 
@@ -125,14 +79,13 @@ void CreateMove() {
 	static crithack_saved_state state;
 	static bool chc;
 	static bool changed = false;
-	
-	if (g_pUserCmd->command_number && found_crit_number > g_pUserCmd->command_number + 66 * 20) found_crit_number = 0;
+
 	if (g_pUserCmd->command_number) last_number = g_pUserCmd->command_number;
 
 	static int last_checked_command_number = 0;
 	static IClientEntity* last_checked_weapon = nullptr;
 
-	IF_GAME (IsTF2()) {
+	/*IF_GAME (IsTF2()) {
 		if (crit_hack_next && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && WeaponCanCrit() && RandomCrits()) {
 			PROF_SECTION(CM_misc_crit_hack_prediction);
 			weapon = RAW_ENT(LOCAL_W);
@@ -148,7 +101,7 @@ void CreateMove() {
 						}
 						g_pUserCmd->buttons &= ~(IN_ATTACK);
 					}
-				}*/
+				}*//*
 				if (g_pUserCmd->command_number && (last_checked_weapon != weapon || last_checked_command_number < g_pUserCmd->command_number)) {
 					tries = 0;
 					cmdn = g_pUserCmd->command_number;
@@ -188,52 +141,18 @@ void CreateMove() {
 				}
 			}
 		}
-	}
-
+	}*/
+	/*
 	{
 		PROF_SECTION(CM_misc_crit_hack_apply);
 		if (!AllowAttacking()) g_pUserCmd->buttons &= ~IN_ATTACK;
-	}
-
-	if (WeaponCanCrit()) {
-		PROF_SECTION(CM_misc_crit_hack_bucket_fixing);
-		weapon = RAW_ENT(LOCAL_W);
-		float& bucket = *(float*)((uintptr_t)(weapon) + 2612);
-		if (g_pUserCmd->command_number) {
-			changed = false;
-		}
-		if (bucket != last_bucket) {
-			if (changed && weapon == last_weapon) {
-				bucket = last_bucket;
-			} else {
-				//logging::Info("db: %.2f", g_pUserCmd->command_number, bucket - last_bucket);
-			}
-			changed = true;
-		}
-		last_weapon = weapon;
-		last_bucket = bucket;
-	}
-	
+	}*/
 	// Spycrab stuff
 	// TODO FIXME this should be moved out of here
-	if (no_taunt_ticks && CE_GOOD(LOCAL_E)) {
-		RemoveCondition<TFCond_Taunting>(LOCAL_E);
-		no_taunt_ticks--;
-	}
 	IF_GAME (IsTF2()) {
 		PROF_SECTION(CM_misc_hook_checks);
 		static IClientEntity *localplayer = nullptr;
 		localplayer = g_IEntityList->GetClientEntity(g_IEngine->GetLocalPlayer());
-		if (localplayer && spycrab_mode) {
-			void** vtable = *(void***)(localplayer);
-			if (vtable[0x111] != StartSceneEvent_hooked) {
-				StartSceneEvent_original = (StartSceneEvent_t)vtable[0x111];
-				void* page = (void*)((uintptr_t)vtable &~ 0xFFF);
-				mprotect(page, 0xFFF, PROT_READ | PROT_WRITE | PROT_EXEC);
-				vtable[0x111] = (void*)StartSceneEvent_hooked;
-				mprotect(page, 0xFFF, PROT_READ | PROT_EXEC);
-			}
-		}
 		if (render_zoomed && localplayer) {
 			// Patchking local player
 			void** vtable = *(void***)(localplayer);
@@ -351,28 +270,6 @@ void CreateMove() {
 #if ENABLE_VISUALS == 1
 
 void DrawText() {
-	// Crithack info
-	if (crit_info && CE_GOOD(LOCAL_W)) {
-		if (CritKeyDown() || experimental_crit_hack.KeyDown()) {
-			AddCenterString("FORCED CRITS!", colors::red);
-		}
-		IF_GAME (IsTF2()) {
-			if (!vfunc<bool(*)(IClientEntity*)>(RAW_ENT(LOCAL_W), 465, 0)(RAW_ENT(LOCAL_W)))
-				AddCenterString("Random crits are disabled", colors::yellow);
-			else {
-				if (!WeaponCanCrit())
-					AddCenterString("Weapon can't randomly crit", colors::yellow);
-				else
-					AddCenterString("Weapon can randomly crit");
-			}
-			AddCenterString(format("Bucket: ", *(float*)((uintptr_t)RAW_ENT(LOCAL_W) + 2612u)));
-			if (crit_hack_next && found_crit_number > last_number && found_crit_weapon == RAW_ENT(LOCAL_W)) {
-				AddCenterString(format("Next crit in: ", roundf(((found_crit_number - last_number) / 66.0f) * 10.0f) / 10.0f, 's'));
-			}
-			//AddCenterString(format("Time: ", *(float*)((uintptr_t)RAW_ENT(LOCAL_W) + 2872u)));
-		}
-	}
-
 	/*if (!no_homo) {
 		int width, height;
 		g_IEngine->GetScreenSize(width, height);
@@ -386,7 +283,7 @@ void DrawText() {
 			rgba_t gaybow = colors::FromHSL(fabs(sin((g_GlobalVars->curtime / 2.0f) + (i / 2))) * 360.0f, 0.85f, 0.9f);
 			gaybow.a = .5;
 			// Draw next step
-			drawgl::FilledRect(0, step * (i - 1), width, (step * i) - (step * (i - 1)), gaybow);
+			draw_api::FilledRect(0, step * (i - 1), width, (step * i) - (step * (i - 1)), gaybow);
 		}
 											
 		//int size_x;
@@ -397,7 +294,7 @@ void DrawText() {
 	
 	if (!debug_info) return;
 		if (CE_GOOD(g_pLocalPlayer->weapon())) {
-			AddSideString(format("Slot: ", vfunc<int(*)(IClientEntity*)>(RAW_ENT(g_pLocalPlayer->weapon()), 395, 0)(RAW_ENT(g_pLocalPlayer->weapon()))));
+			AddSideString(format("Slot: ", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(g_pLocalPlayer->weapon()))));
 			AddSideString(format("Taunt Concept: ", CE_INT(LOCAL_E, netvar.m_iTauntConcept)));
 			AddSideString(format("Taunt Index: ", CE_INT(LOCAL_E, netvar.m_iTauntIndex)));
 			AddSideString(format("Sequence: ", CE_INT(LOCAL_E, netvar.m_nSequence)));

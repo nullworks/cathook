@@ -6,14 +6,7 @@
  *      Author: nullifiedcat
  */
 
-#include "../beforecheaders.h"
-#include <memory> // std::unique_ptr
-#include "../aftercheaders.h"
-
-#include "Trigger.h"
-
-#include "../common.h"
-#include "../sdk.h"
+#include "common.hpp"
 
 namespace hacks { namespace shared { namespace triggerbot {
 
@@ -148,11 +141,6 @@ bool ShouldShoot() {
 			}
 		}
 	}
-	IF_GAME (IsTF()) {
-		// Check if crithack allows attacking
-		if (!AllowAttacking())
-			return false;
-	}
 	return true;
 }
 	
@@ -211,8 +199,8 @@ bool IsTargetStateGood(CachedEntity* entity) {
 			if (hb) {
 				
 				// Get the min and max for the hitbox
-				Vector minz(min(hb->min.x, hb->max.x), min(hb->min.y, hb->max.y), min(hb->min.z, hb->max.z));
-				Vector maxz(max(hb->min.x, hb->max.x), max(hb->min.y, hb->max.y), max(hb->min.z, hb->max.z));
+				Vector minz(std::min(hb->min.x, hb->max.x), std::min(hb->min.y, hb->max.y), std::min(hb->min.z, hb->max.z));
+				Vector maxz(std::max(hb->min.x, hb->max.x), std::max(hb->min.y, hb->max.y), std::max(hb->min.z, hb->max.z));
 
 				// Shrink the hitbox here
 				Vector size = maxz - minz;

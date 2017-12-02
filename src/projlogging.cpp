@@ -6,7 +6,7 @@
  */
 
 #include "projlogging.hpp"
-#include "common.h"
+#include "common.hpp"
 
 namespace projectile_logging {
 

@@ -5,8 +5,8 @@
  *      Author: nullifiedcat
  */
 
-#include "../common.h"
-#include "../hack.h"
+#include "common.hpp"
+#include "hack.hpp"
 
 #include <sys/dir.h>
 #include <sys/stat.h>
@@ -189,18 +189,15 @@ using state::nodes;
 using state::node_good;
 
 bool HasLowAmmo() {
-	// 0x13D = CBaseCombatWeapon::HasPrimaryAmmo()
-	// 190 = IsBaseCombatWeapon
-	// 1C1 = C_TFWeaponBase::UsesPrimaryAmmo()
 	int *weapon_list = (int*)((unsigned)(RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
 	for (int i = 0; weapon_list[i]; i++) {
 		int handle = weapon_list[i];
 		int eid = handle & 0xFFF;
 		if (eid >= 32 && eid <= HIGHEST_ENTITY) {
 			IClientEntity* weapon = g_IEntityList->GetClientEntity(eid);
-			if (weapon and vfunc<bool(*)(IClientEntity*)>(weapon, 190, 0)(weapon) and
-					   vfunc<bool(*)(IClientEntity*)>(weapon, 0x1C1, 0)(weapon) and
-				   not vfunc<bool(*)(IClientEntity*)>(weapon, 0x13D, 0)(weapon)) {
+			if (weapon and re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon) and
+			               re::C_TFWeaponBase::UsesPrimaryAmmo(weapon) and
+				   not re::C_TFWeaponBase::HasPrimaryAmmo(weapon)) {
 				return true;
 			}
 		}
@@ -704,8 +701,8 @@ void UpdateSlot() {
 	if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && !g_pLocalPlayer->life_state && ms > 1000) {
 		IClientEntity* weapon = RAW_ENT(LOCAL_W);
 		// IsBaseCombatWeapon()
-		if (vfunc<bool(*)(IClientEntity*)>(weapon, 190, 0)(weapon)) {
-			int slot = vfunc<int(*)(IClientEntity*)>(weapon, 395, 0)(weapon);
+		if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon)) {
+			int slot = re::C_BaseCombatWeapon::GetSlot(weapon);
 			if (slot != int(force_slot) - 1) {
 				hack::ExecuteCommand(format("slot", int(force_slot)));
 			}
@@ -824,19 +821,19 @@ void DrawConnection(index_t a, connection_s& b) {
 	if (not (draw::WorldToScreen(a_.xyz(), wts_a) and draw::WorldToScreen(center, wts_c) and draw::WorldToScreen(center_connection, wts_cc)))
 		return;
 
-	rgba_t* color = &colors::white;
+	const rgba_t* color = &colors::white;
 	if 		((a_.flags & b_.flags) & NF_JUMP) color = &colors::yellow;
 	else if ((a_.flags & b_.flags) & NF_DUCK) color = &colors::green;
 
-	drawgl::Line(wts_a.x, wts_a.y, wts_c.x - wts_a.x, wts_c.y - wts_a.y, color->rgba);
+	draw_api::draw_line(wts_a.x, wts_a.y, wts_c.x - wts_a.x, wts_c.y - wts_a.y, *color, 0.5f);
 
 	if (draw_connection_flags && b.flags != CF_GOOD) {
 		std::string flags;
 		if (b.flags & CF_LOW_AMMO) flags += "A";
 		if (b.flags & CF_LOW_HEALTH) flags += "H";
-		int size_x = 0, size_y = 0;
-		FTGL_StringLength(flags, fonts::font_main, &size_x, &size_y);
-		FTGL_Draw(flags, wts_cc.x - size_x / 2, wts_cc.y - size_y - 4, fonts::font_main);
+		//int size_x = 0, size_y = 0;
+		//FTGL_StringLength(flags, fonts::font_main, &size_x, &size_y);
+		draw_api::draw_string(wts_cc.x, wts_cc.y - 4, flags.c_str(), fonts::main_font, colors::white);
 	}
 }
 
@@ -852,7 +849,7 @@ void DrawNode(index_t node, bool draw_back) {
 	}
 
 	if (draw_nodes) {
-		rgba_t* color = &colors::white;
+		const rgba_t* color = &colors::white;
 		if 		(n.flags & NF_JUMP) color = &colors::yellow;
 		else if (n.flags & NF_DUCK) color = &colors::green;
 
@@ -868,11 +865,11 @@ void DrawNode(index_t node, bool draw_back) {
 		if (node == state::active_node)
 			color = &colors::red;
 
-		drawgl::FilledRect(wts.x - node_size, wts.y - node_size, 2 * node_size, 2 * node_size, color->rgba);
+		draw_api::draw_rect(wts.x - node_size, wts.y - node_size, 2 * node_size, 2 * node_size, *color);
 	}
 
 	if (draw_indices) {
-		rgba_t* color = &colors::white;
+		const rgba_t* color = &colors::white;
 		if 		(n.flags & NF_JUMP) color = &colors::yellow;
 		else if (n.flags & NF_DUCK) color = &colors::green;
 
@@ -880,7 +877,7 @@ void DrawNode(index_t node, bool draw_back) {
 		if (not draw::WorldToScreen(n.xyz(), wts))
 			return;
 
-		FTGL_Draw(std::to_string(node), wts.x, wts.y, fonts::font_main, *color);
+		draw_api::draw_string_with_outline(wts.x, wts.y, std::to_string(node).c_str(), fonts::main_font, *color, colors::black, 1.5f);
 	}
 }
 
@@ -959,6 +956,7 @@ void CheckLivingSpace() {
 				}
 			}
 		}
+		/*
 		if (ipc::peer->client_id == highest && count > int(wb_abandon_too_many_bots)) {
 			static Timer timer {};
 			if (timer.test_and_set(1000 * 5)) {
@@ -969,6 +967,7 @@ void CheckLivingSpace() {
 				g_TFGCClientSystem->SendExitMatchmaking(true);
 			}
 		}
+		*/
 	}
 #endif
 }
@@ -996,8 +995,10 @@ void Move() {
 					if (s < 3) {
 						return;
 					}
-					logging::Info("No map file, shutting down");
+					/*
+				        logging::Info("No map file, shutting down");
 					g_TFGCClientSystem->SendExitMatchmaking(true);
+					*/
 					last_abandon = std::chrono::system_clock::now();
 				}
 			}

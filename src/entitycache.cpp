@@ -5,11 +5,9 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
-#include "sdk.h"
+#include "common.hpp"
 
 #include <time.h>
-#include "profiler.h"
 
 // This method of const'ing the index is weird.
 CachedEntity::CachedEntity() :
@@ -138,6 +136,7 @@ void CachedEntity::Update() {
 			   m_iClassID == CL_CLASS(CTFProjectile_HealingBolt) ||
 			   m_iClassID == CL_CLASS(CTFProjectile_Rocket) ||
 			   m_iClassID == CL_CLASS(CTFProjectile_SentryRocket) ||
+			   m_iClassID == CL_CLASS(CTFProjectile_BallOfFire) ||
 			   m_iClassID == CL_CLASS(CTFProjectile_Flare)) {
 		m_Type = EntityType::ENTITY_PROJECTILE;
 	} else {

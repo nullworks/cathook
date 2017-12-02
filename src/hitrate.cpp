@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "common.h"
+#include "common.hpp"
 #include "init.hpp"
 
 namespace hitrate {

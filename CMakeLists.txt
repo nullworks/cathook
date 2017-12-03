@@ -38,7 +38,7 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 
 # Flags we use for every build type, cpp 17 standard is nice
-set(CCOMMON_FLAGS "-std=gnu++17 -O3 -fpic -shared -mtune=generic ")
+set(CCOMMON_FLAGS "-std=gnu++17 -fpic -shared -mtune=generic")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -107,9 +107,11 @@ endif()
 
 
 # Default compiler flags
-# use -std=gnu++14 for source 2013
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 
 include_directories(${INCLUDE_DIRS})
 

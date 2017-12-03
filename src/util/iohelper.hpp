@@ -1,4 +1,4 @@
- 
+
 #include <string>
 
 const char* GetProcessName();
@@ -11,11 +11,11 @@ const char* GetProcessName();
 class PackedFile {
 public:
 	// To construct this, include a file with a char array of your file in binary and input it here
-	PackedFile(const char* name, const char* packed_file);
+	PackedFile(const char* _name, const char* _packed_file);
 	~PackedFile();
-	
+
 private:
 	const char* name;
 	const char* packed_file;
 	FILE* handle;
-}
+};

@@ -6,22 +6,21 @@
  *      Author: nullifiedcat
  */
 
-#include "util/logging.h" // To log
+#include "util/logging.hpp" // To log
 #include "hack.h"					// Contains init and shutdown
 
 // Attach and detach to use independant of platform
 void Attach() {
 	static bool did_do = false;
 	if (did_do) return;
-	CatLogging("Attaching...");
+	g_CatLogging.log("Attaching...");
 	hack::Initialize();
-	CatLogging("Init done...");
+	g_CatLogging.log("Init done...");
 }
 void Detach() {
 	static bool did_do = false;
 	if (did_do) return;
-	CatLogging("Detaching");
-	hack::Shutdown();
+	g_CatLogging.log("Detaching");
 }
 
 #if !defined(CMAKE_SYSTEM_NAME) || CMAKE_SYSTEM_NAME == Linux

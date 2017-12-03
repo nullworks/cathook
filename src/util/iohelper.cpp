@@ -23,10 +23,10 @@ const char* GetProcessName() {
 	static char str[30];
 	read_stream.getline(str, 30, '\n'); // Stop at newline, also char is gay
 	substr(str, str, 6, 24); // Get rid of "Name: " from the string
-	return buf;
+	return str;
 }
 
 // Uhhhhh, TODO!!!!
-PackedFile::PackedFile(const char* _name, const char* _packed_file) name(_name), packed_file(_packed_file) {
+PackedFile::PackedFile(const char* _name, const char* _packed_file) : name(_name), packed_file(_packed_file) {
 
 }

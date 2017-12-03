@@ -1,3 +1,4 @@
+
 /*
  * logging.cpp
  *
@@ -10,53 +11,40 @@
 #include <fstream> 	// IO
 #include <iostream> // IO
 #include <time.h> 	// Time
-#include <sys/types.h>	// Time stuff 
-#include <unistd.h> // Gets user info
-#include <pwd.h>	// Struct passwd
 
-#include "../shutdown.hpp"
+#include "logging.hpp"
 
-#include "logging.h"
+// Cathooks main logging util
+CatLogger g_CatLogging("/tmp/cathook.log");
 
-// TODO, add to registered shutdown functions
+CatLogger::CatLogger(const char* file_path) : log_handle(fopen(file_path, "w")) {}
+CatLogger::~CatLogger() {	fclose(log_handle); }
 
-FILE* log_handle = 0;
+void CatLogger::log(const char* fmt, ...) {
 
-void Shutdown() {
-	fclose(log_handle);
-	log_handle = 0;
-}
-
-void Initialize() {
-	// FIXME other method of naming the file? Currently uses username for it.
-	passwd* pwd = getpwuid(getuid());
-	log_handle = fopen(strfmt("/tmp/cathook-%s.log", pwd->pw_name), "w");
-	RegisterShutdown(Shutdown);
-}
-
-void CatLogging(const char* fmt, ...) {
-	if (log_handle == 0) Initialize(); // Check if file is open
-	
-	char* buffer = new char[1024];
+	// Get the string we want to log
+	char buffer[1024];
 	va_list list;
 	va_start(list, fmt);
 	vsprintf(buffer, fmt, list);
 	va_end(list);
-	
-	size_t length = strlen(buffer);
-	char* result = new char[length + 24];
-	
+
+	// Get our time
 	time_t current_time;
-	struct tm * time_info = nullptr;
-	char timeString[10];
 	time(&current_time);
+	struct tm* time_info;
 	time_info = localtime(&current_time);
+	// print it to a string
+	char timeString[10];
 	strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
-	
+
+	// Format the time into the log string
+	char result[strlen(buffer) + strlen(timeString)];
 	sprintf(result, "%% [%s] %s\n", timeString, buffer);
+
+	// Write our log to the file
 	fprintf(log_handle, "%s", result);
 	fflush(log_handle);
-	// Push result var to a console here
-	delete [] buffer;
-	delete [] result;
+
+	// Push result var to a console here, if i ever make a console api
 }

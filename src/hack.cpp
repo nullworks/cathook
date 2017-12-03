@@ -10,13 +10,10 @@
 #include <ctime> // time()
 #include <stdlib.h> // srand()
 
-#include "util/logging.h"
-#include "shutdown.hpp"
+#include "util/logging.hpp"
 
 // Game Modules
-#if defined(CATHOOK_SOURCE_2013)
 #include "modules/Source_2013/init.hpp"
-#endif
 // Features
 #include "features/features.hpp"
 // GUI
@@ -24,37 +21,25 @@
 
 #include "hack.h"
 
-bool hack::shutdown = false;
-
 void hack::Initialize() {
 	//signal(SIGPIPE, SIG_IGN);	// Is this needed?
 
-	CatLogging("Initializing...");
+	g_CatLogging.log("Initializing...");
 	srand(time(0)); // Setting random seed?
 
 	// Please put only one GAME module here. Any other type of module can screw with things.
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
-	CatLogging("Loading Modules...");
+	g_CatLogging.log("Loading Modules...");
 #if defined(CATHOOK_SOURCE_2013) 	// Any source 2013 game
 	modules::source::Init();
 #endif
 
-	CatLogging("Initializing main cheat features...");
+	g_CatLogging.log("Initializing main cheat features...");
 	features::Init();
 
-	CatLogging("Initializing gui...");
+	g_CatLogging.log("Initializing gui...");
 	gui::Init(); // init the gui
 
-	CatLogging("Initializing Done!");
-}
-
-// Do we need this???
-void hack::Shutdown() {
-	if (hack::shutdown) return;
-	hack::shutdown = true;
-
-	RunShutdown();
-
-	CatLogging("Shutdown Success..");
+	g_CatLogging.log("Initializing Done!");
 }

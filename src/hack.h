@@ -8,9 +8,7 @@
 #pragma once
 
 namespace hack {
-	
+
 void Initialize();
-void Shutdown();
-extern bool shutdown;
 
 }

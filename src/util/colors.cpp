@@ -18,11 +18,8 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-CatVector4(*StoredColorEntity)(const CatEntity&) = nullptr;
-CatVector4 Entity(const CatEntity& entity) {
-	// If a module has registered a custom color scheme, we apply that here
-	if (StoredColorEntity != nullptr) return StoredColorEntity(entity);
-
+std::function<CatVector4(const CatEntity&)> EntityColor =
+	[](const CatEntity& entity) {
 	// Default color
 	CatVector4 ent_color = white;
 
@@ -53,12 +50,7 @@ CatVector4 Entity(const CatEntity& entity) {
 		}
 	}
 	return ent_color;
-}
-
-// If you wish to use colors seperate from what the framework has in mind, you may register your func with this
-void RegisterCustomColorToEntity(CatVector4(*func)(const CatEntity&)) {	// The best name evar, I promise ;)
-	StoredColorEntity = func;
-}
+};
 
 // Returns a color based on entity health
 CatVector4 Health(const CatEntity& entity) {

@@ -254,7 +254,6 @@ Data Folder
 
 ## Ignore our closed source files
 src/modules/*
-src/hacks/*
 src/drm/*
 
 ## Allow some modules to be open

@@ -8,7 +8,7 @@
 #include <algorithm> // min()
 #include <string.h>  // strcpy()
 
-#include "../util/logging.h"				// For debugging purposes
+#include "../util/logging.hpp"				// For debugging purposes
 #include "../framework/entitys.hpp"			// So we can use entitys
 #include "../framework/inputmgr.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
@@ -238,7 +238,7 @@ void WorldTick() {
 		if (CE_BAD(entity)) continue;
 
 		// Update the entitys color
-		esp_cache[entity.IDX].color = colors::Entity(entity);
+		esp_cache[entity.IDX].color = colors::EntityColor(entity);
 		// Reset strings
 		esp_cache[entity.IDX].string_count = 0;
 
@@ -252,13 +252,13 @@ void WorldTick() {
 
 			// Health esp
 			if ((int)show_health == 1 || (int)show_health == 3) {
-				strfmt(buf, "%i/%iHP", entity.health, entity.max_health);
+				sprintf(buf, "%i/%iHP", entity.health, entity.max_health);
 				AddEspString(entity, buf, colors::Health(entity));
 			}
 
 			// Distance esp
 			if (show_distance) {
-				strfmt(buf, "%im", (int)entity.Distance());
+				sprintf(buf, "%im", (int)entity.Distance());
 				AddEspString(entity, buf);
 			}
 		}

@@ -25,4 +25,12 @@ git clone --recursive https://github.com/oneechanhax/nekohook && cd nekohook && 
 ```
 
 ## Injecting
-TODO
+### Normal
+```bash
+./attach
+```
+
+### Backtrace
+```bash
+./attach-backtrace
+```

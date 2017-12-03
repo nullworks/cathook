@@ -14,16 +14,15 @@ This nekohook fork is currently a work in progress but you may request a persona
 
 Nekohook is currently VAC undetected!
 
-# INSTALLATION
-Uhh, Install scripts :b:roke
-
-Nekohook installation script:
+# Installation
 ```bash
-Uhh, TODO!!!
+git clone --recursive https://github.com/oneechanhax/nekohook && cd nekohook && ./build
 ```
 
-## Updating nekohook
-Uhh, TODO
+## Updating
+```bash
+./update
+```
 
-## Injection
-Uhh, REMAKE INJECT STUFF
+## Injecting
+TODO

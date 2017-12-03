@@ -81,10 +81,7 @@ CatEntity* RetrieveBestTarget() {
 
 	// Loop through all entitys
 	for (int i = 0; i < MAX_ENTITIES; i++) {
-		auto& entity = g_CatEntitys[i];
-		// Ensure ent is okay to use
-		if (CE_BAD(entity)) continue;
-
+		auto& entity = g_CatEntitys[i];	
 		// Check whether or not we can target the ent
 		if (!IsTargetGood(entity)) continue;
 

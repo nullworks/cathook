@@ -8,18 +8,16 @@
 #include <algorithm> // min()
 #include <string.h>  // strcpy()
 
-#include "../util/logging.hpp"				// For debugging purposes
+#include "../framework/gameticks.hpp"			// So we can run things in draw and world tick
 #include "../framework/entitys.hpp"			// So we can use entitys
-#include "../framework/inputmgr.hpp"		// So we can get screen size
+#include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
-#include "../gui/gui.hpp"					// For fonts
 
 #include "esp.hpp"
 
 namespace features { namespace esp {
 
-// Currently, the gui doesnt reconize these. Just set to the options you wish to use
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
 static CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
@@ -86,7 +84,7 @@ static bool GetEntityBox(const CatEntity& entity) {
 }
 
 // Esp draw func to be ran at draw
-void Draw() {
+static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
 	if (!esp_enabled || !g_GameInfo.in_game) return;
@@ -96,7 +94,7 @@ void Draw() {
 		if (CE_BAD(entity)) continue;
 
 		// Target checking
-		if (!g_LocalPlayer.InThirdperson && *g_LocalPlayer.entity == entity) continue;// Determine whether to apply esp to local player
+		if (!g_LocalPlayer.InThirdperson && g_LocalPlayer.entity == &entity) continue; // Determine whether to apply esp to local player
 		if (entity.type == ETYPE_PLAYER && !entity.alive) continue; // Dont esp dead players
 
 		// Reset the entity box state
@@ -208,7 +206,7 @@ void Draw() {
 					}
 				}
 
-				// Draw our strings
+				// Draw our stringsDraw
 				// Loop through strings
 				for (int i = 0; i < esp_cache[entity.IDX].string_count; i++) {
 
@@ -228,8 +226,8 @@ void Draw() {
 	}
 }
 
-// Esp Function to
-void WorldTick() {
+// Tick to be run at world tick for cache purposes
+static void WorldTick() {
 	// We dont want esp if its disabled, or while not ingame
 	if (!esp_enabled || !g_GameInfo.in_game) return;
 
@@ -283,6 +281,11 @@ void SetEspColor(const CatEntity& entity, const CatVector4& color) {
 	}
 	// Change the main entity color
 	esp_cache[entity.IDX].color = color;
+}
+
+void Init() {
+	drawmgr[1] + Draw;
+	wtickmgr[0] + WorldTick;
 }
 
 }}

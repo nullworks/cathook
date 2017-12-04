@@ -14,8 +14,8 @@
 
 #include "../../util/logging.hpp"			// Logging is always cool!
 #include "../../util/iohelper.hpp" 		// For our process name
-#include "../../framework/inputmgr.hpp" // To manipulate the input framework ofc
-#include "../../framework/drawmgr.hpp" 	// For init
+#include "../../framework/input.hpp" // To manipulate the input framework ofc
+#include "../../framework/gameticks.hpp" 	// For init
 
 #include "input.hpp"
 
@@ -178,7 +178,7 @@ void RefreshState() {
 
 // Simple init function to enable xlib input functionality
 void InitInput() {
-	drawmgr::RequestDrawOnBefore(RefreshState);
+	drawmgr_before(RefreshState);
 }
 
 }}

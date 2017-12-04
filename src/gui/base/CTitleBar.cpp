@@ -6,7 +6,7 @@
  *      Author: nullifiedcat
  */
 
-#include "../../framework/inputmgr.hpp" // We use mouse stuff here
+#include "../../framework/input.hpp" // We use mouse stuff here
 #include "../../framework/drawing.hpp" // Draw stuff
 #include "../../util/colors.hpp" // Draw stuff
 

@@ -12,9 +12,9 @@
 
 namespace features { namespace esp {
 
-// Main esp func to be called on draw
-void Draw();
-void WorldTick();
+extern CatEnum esp_menu;
+
+void Init(); // Call to init esp
 
 // Use in world tick to add a string to an entity
 void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color = colors::white);

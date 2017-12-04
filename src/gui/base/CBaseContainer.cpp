@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "../../framework/inputmgr.hpp"
+#include "../../framework/input.hpp"
 
 #include "CBaseContainer.hpp"
 

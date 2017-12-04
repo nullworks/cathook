@@ -80,8 +80,7 @@ CatEntity* RetrieveBestTarget() {
 	float highest_score = -1024;
 
 	// Loop through all entitys
-	for (int i = 0; i < MAX_ENTITIES; i++) {
-		auto& entity = g_CatEntitys[i];	
+	for (const auto& entity: g_CatEntitys) {
 		// Check whether or not we can target the ent
 		if (!IsTargetGood(entity)) continue;
 

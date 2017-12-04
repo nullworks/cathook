@@ -52,6 +52,7 @@ const CatVector4 blue 	= CatVector4(28, 108, 237, 255);
 const CatVector4 yellow = CatVector4(255, 255, 0, 255);
 const CatVector4 orange = CatVector4(255, 120, 0, 255);
 const CatVector4 green 	= CatVector4(0, 255, 0, 255);
+const CatVector4 gray   = CatVector4(100, 100, 100, 255);
 const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 
 // Color functions

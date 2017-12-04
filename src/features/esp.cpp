@@ -29,6 +29,7 @@ static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Ot
 static CatEnum box_esp_enum({ "None", "Normal", "Corners" });
 static CatVarEnum box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
 static CatVarInt box_corner_size(esp_menu, "esp_box_corner_size", 10, "Corner Size", "Controls corner box size");
+static CatVarBool esp_dormant(esp_menu, "esp_dormant", false, "Dormant", "Whether to draw dormant players");
 // Strings
 static CatEnum esp_text_position_enum({"TOP RIGHT", "CENTER", "BELOW", "ABOVE", "BOTTOM RIGHT"}); // Aranged in a way to make things easier below
 static CatVarEnum esp_text_position(esp_menu, esp_text_position_enum, "esp_text_position", 0, "Text position", "Defines text position");
@@ -93,7 +94,12 @@ void Draw() {
 
 	// Loop through all entitys
 	for (const auto& entity: g_CatEntitys) {
-		if (CE_BAD(entity)) continue;
+		if (CE_BAD_LIGHT(entity)) continue;
+
+		if (entity.dormant && !esp_dormant) continue;
+
+		if (entity.dormant)
+			esp_cache[entity.IDX].color = colors::gray;
 
 		// Target checking
 		if (!g_LocalPlayer.InThirdperson && *g_LocalPlayer.entity == entity) continue;// Determine whether to apply esp to local player

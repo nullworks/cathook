@@ -8,7 +8,7 @@
  */
 
 // Stuff to init with
-#include "../framework/drawmgr.hpp"		// So we can get drawmgr to draw our stuff
+#include "../framework/gameticks.hpp"		// So we can get drawmgr to draw our stuff
 
 // Stuff to init
 #include "gui.hpp"
@@ -21,7 +21,7 @@ namespace gui {
 void Init() {
 
 	// Setup the draw manager to run gui
-	drawmgr::RequestDrawOnDraw(Update);
+	drawmgr_on(Update);
 
 	// Other gui elements
 	sidestrings::Init();

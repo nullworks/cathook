@@ -8,38 +8,32 @@
 
 #pragma once
 
-#include <functional> // std::function
+#include <vector>
+
+// Useful
+using void_func = void(*)(void);
 
 // Use when you have a function that you wish to be modular
-// Give it a type of a function return type, then the function return parameters
-// ex: CMFunction<CatEntity, const int&, const CatVector&> example_function
-/*template <typename return_type, typename input_types> // add more as needed
-class CMFunction {
+// The point of this is to be faster than std::function but retain its usability
+// Credits to fission, thanks bby <3
+template<typename>
+class CMFunction;
+
+template <typename ret, typename... args>
+class CMFunction <ret(args...)> {
+  using func_type = ret(*)(args...);
 public:
-  CMFunction(std::function<)
-    : fallback_function(_fallback), normal_function(_normal) {}
-  inline return_type Run(input_type1 i1, input_type2 i2, input_type3 i3, input_type4 i4, input_type5 i5 = void) {
-    return (normal_function != nullptr) ? normal_function(i1, i2, i3, i4, i5) : fallback_function(i1, i2, i3, i4, i5);
-  }
+  CMFunction(func_type _func) : func(_func) {}
+  inline auto operator()(args... a) { return func(a...); }
+  inline void operator=(func_type _func) { func = _func; }
 private:
-  return_type(*normal_function)(input_type1, input_type2, input_type3, input_type4, input_type5) = nullptr;         // When run is called, this will be run if it isnt nullptr
-  const std::function<return_type()> fallback_func; // if normal_function is nullptr, this is the fallback function to be run instead
-};*/
+  func_type func = nullptr;
+};
 
-/*class CMFunction <void> {
-public:
-  CMFunction() {}
-  void Run
-  void Fallback;
+class CMFunctionGroup {
 private:
-  void function = nullptr;
-
-};*/
-
-/*class CMFunctionGroup {
+  std::vector<void_func> func_pool;
 public:
-  void RunFunctions() {
-
-  }
-  void AddFunction()
-}*/
+  inline void operator()() { for (const auto& func : func_pool) func(); }
+  void operator+(void_func in) { func_pool.push_back(in); }
+};

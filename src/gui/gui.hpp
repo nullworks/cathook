@@ -8,7 +8,7 @@
 #pragma once
 
 #include "base/CBaseContainer.hpp"
-#include "../framework/inputmgr.hpp" // So we can update our gui & know
+#include "../framework/input.hpp" // So we can update our gui & know
 
 namespace gui {
 

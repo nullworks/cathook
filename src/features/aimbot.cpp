@@ -7,6 +7,7 @@
  *
  */
 
+#include "../framework/gameticks.hpp"
 #include "../framework/entitys.hpp"	// Contains entity and bone info
 #include "esp.hpp"	// SetEspColor()
 
@@ -14,23 +15,23 @@
 
 namespace features { namespace aimbot {
 
-CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
-CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
+static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
+static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
 // Main preferences
-CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
-CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
-CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
-CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
-CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
-CatEnum hitbox_enum({ // Update this as needed
+static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
+static CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
+static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
+static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
+static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
+static CatEnum hitbox_enum({ // Update this as needed
 	"HEAD", "TOP SPINE", "UPPER SPINE", "MIDDLE SPINE", "BOTTOM SPINE", "PELVIS",
 	"UPPER ARM L", "UPPER ARM R", "MIDDLE ARM L", "MIDDLE ARM R", "LOWER ARM L", "LOWER ARM R",
 	"UPPER LEG L", "UPPER LEG R", "MIDDLE LEG L", "MIDDLE LEG R", "LOWER LEG L", "LOWER LEG R",
 });
-CatVarEnum hitbox(aimbot_menu, hitbox_enum, "aimbot_hitbox", 0, "Hitbox", "Hitbox to use if mode is set to static");
+static CatVarEnum hitbox(aimbot_menu, hitbox_enum, "aimbot_hitbox", 0, "Hitbox", "Hitbox to use if mode is set to static");
 
 // A function to find a place to aim for on the target
-CatVector RetriveAimpoint(const CatEntity& entity) {
+static CatVector RetriveAimpoint(const CatEntity& entity) {
 	if (CE_BAD(entity)) return CatVector();
 
 	// Check if we can use bones
@@ -51,7 +52,7 @@ CatVector RetriveAimpoint(const CatEntity& entity) {
 // Target Selection
 
 // A second check to determine whether a target is good enough to be aimed at
-bool IsTargetGood(CatEntity& entity) {
+static bool IsTargetGood(const CatEntity& entity) {
 	if (CE_BAD(entity)) return false;
 
 	// Local player check
@@ -73,21 +74,22 @@ bool IsTargetGood(CatEntity& entity) {
 	return true;
 }
 // Function to find a suitable target
-CatEntity* RetrieveBestTarget() {
+static const CatEntity* RetrieveBestTarget() {
 
 	// Book keepers for highest target
-	CatEntity* highest_ent = nullptr;
+	const CatEntity* highest_ent = nullptr;
 	float highest_score = -1024;
 
 	// Loop through all entitys
-	for (const auto& entity: g_CatEntitys) {
+	for (const auto& entity : g_CatEntitys) {
+		// Ensure ent is okay to use
 		if (CE_BAD(entity)) continue;
 
 		// Check whether or not we can target the ent
 		if (!IsTargetGood(entity)) continue;
 
 		// Get score based on priority mode
-		float score;
+		float score = 0;
 		switch ((int)priority_mode) {
 		case 0: // SMART Priority
 			score = 0; break; // TODO, fix
@@ -109,7 +111,7 @@ CatEntity* RetrieveBestTarget() {
 	return highest_ent;
 }
 // A check to determine whether the local player should aimbot
-bool ShouldAim() {
+static bool ShouldAim() {
 
 	// It would be prefered to have a local ent before we shoot
 	if (!g_LocalPlayer.entity) return false;
@@ -132,11 +134,11 @@ void AimAt(const CatEntity& entity) {
 }
 
 // The main "loop" of the aimbot.
-void WorldTick() {
+static void WorldTick() {
 	if (!enabled) return; // Main enabled check
 
 	// Get our best target
-	CatEntity* target = RetrieveBestTarget();
+	const CatEntity* target = RetrieveBestTarget();
 	if (!target) return; // Check whether we found a target
 
 	// Check if our local player is ready to aimbot
@@ -146,6 +148,10 @@ void WorldTick() {
 	esp::SetEspColor(*target, colors::pink);	// Colors are cool
 
 	AimAt(*target);
+}
+
+void Init() {
+	wtickmgr[1] + WorldTick;
 }
 
 }}

@@ -30,10 +30,8 @@ void CatLogger::log(const char* fmt, ...) {
 	va_end(list);
 
 	// Get our time
-	time_t current_time;
-	time(&current_time);
-	struct tm* time_info;
-	time_info = localtime(&current_time);
+	time_t current_time = time(0);
+	struct tm* time_info = localtime(&current_time);
 	// print it to a string
 	char timeString[10];
 	strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);

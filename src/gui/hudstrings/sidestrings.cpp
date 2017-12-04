@@ -6,7 +6,7 @@
  *
  */
 
-#include "../../framework/drawmgr.hpp"	// To init our sidestrings
+#include "../../framework/gameticks.hpp"	// To init our sidestrings
 #include "../../framework/game.hpp"		// Module authors
 #include "../gui.hpp"					// guicolor
 #include "hudstring.hpp"				// uhhhh
@@ -57,9 +57,9 @@ void AddDefault() {
 
 void Init() {
 	// To Get our default strings up there
-	drawmgr::RequestDrawOnBefore(AddDefault);
+	drawmgr_before(AddDefault);
 	// To draw our strings
-	drawmgr::RequestDrawOnAfter(Draw);
+	drawmgr_after(Draw);
 }
 
 }}

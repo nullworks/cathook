@@ -17,7 +17,6 @@
 // Nice macros
 #define CE_GOOD(a) (a.exists && !a.dormant)
 #define CE_BAD(a) (!a.exists || a.dormant)
-#define CE_BAD_LIGHT(a) (!a.exists)
 
 // Just throw a bunch of possible teams in here. Increase as needed
 enum {

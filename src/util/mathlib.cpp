@@ -31,30 +31,30 @@ void ClampAngles(CatVector& angles) {
 }
 // Does clamping, but returns the result instead of changing the input
 CatVector ClampAngles_r(const CatVector& angles) {
-	static CatVector tmp;
-	tmp = angles;
+	CatVector tmp = angles;
 	ClampAngles(tmp);
 	return tmp;
 }
 
 // Returns angles to a point in space
 CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point) {
-	static CatVector aim_point;
-	aim_point = dest_point - src_point;
+	CatVector aim_point = dest_point - src_point;
 
-	static float tmp, yaw, pitch;
-	yaw = atan2(aim_point.y, aim_point.x) * 180 / PI;
-	tmp = sqrt(aim_point.x * aim_point.x + aim_point.y * aim_point.y);
-	pitch = atan2(-aim_point.z, tmp) * 180 / PI;
+	// Get angles
+	CatVector out;
+	out.y = atan2(aim_point.y, aim_point.x) * 180 / PI;
+	out.x pitch = atan2(-aim_point.z, sqrt(aim_point.x * aim_point.x + aim_point.y * aim_point.y)) * 180 / PI;
 
-	return ClampAngles_r(CatVector(pitch, yaw));
+	// Clamp and return
+	ClampAngles(out)
+	return out;
 }
 
 // A function to get the difference from angles, Please make sure inputs are clamped
 CatVector GetAngleDifference(const CatVector& cur_angles, const CatVector& dest_angles) {
 
 	// Our output difference
-	CatVector diff;
+	CatVector diff = CatVector();
 
 	// Yaw
 	if (cur_angles.y != dest_angles.y) {
@@ -74,11 +74,11 @@ CatVector GetAngleDifference(const CatVector& cur_angles, const CatVector& dest_
 }
 // Use input angles and our eye position to get fov to a destination point
 float GetFov(const CatVector& orig_angle, const CatVector& eye_position, const CatVector& dest_point) {
-	static CatVector aim_angles, delta;
+
 	// Get the aimbots angles
-	aim_angles = VectorAngles(eye_position, dest_point);
+	CatVector aim_angles = VectorAngles(eye_position, dest_point);
 	// Get the delta from the current and aimbots angles
-	delta = GetAngleDifference(orig_angle, aim_angles);
+	CatVector delta = GetAngleDifference(orig_angle, aim_angles);
 	// Return our fov
 	return std::max(delta.x, delta.y);
 }

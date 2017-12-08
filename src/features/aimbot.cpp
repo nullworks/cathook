@@ -82,7 +82,6 @@ static const CatEntity* RetrieveBestTarget() {
 
 	// Loop through all entitys
 	for (const auto& entity : g_CatEntitys) {
-
 		// Ensure ent is okay to use
 		if (CE_BAD(entity)) continue;
 

@@ -11,15 +11,11 @@
 
 // Attach and detach to use independant of platform
 void Attach() {
-	static bool did_do = false;
-	if (did_do) return;
 	g_CatLogging.log("Attaching...");
 	hack::Initialize();
 	g_CatLogging.log("Init done...");
 }
 void Detach() {
-	static bool did_do = false;
-	if (did_do) return;
 	g_CatLogging.log("Detaching");
 }
 

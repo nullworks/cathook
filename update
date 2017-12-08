@@ -1,2 +1,3 @@
-bash ./update-nobuild
-./build-tf2
+git pull
+git submodule update --init --recursive --remote
+./build

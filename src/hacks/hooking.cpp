@@ -13,8 +13,6 @@
 
 #include "hooking.hpp"
 
-namespace hacks {
-
 // Guard to tell when we have a hooked table
 #define GUARD (void*)0xD34DC477 // :thonkfire:
 
@@ -57,6 +55,4 @@ void VMTHook::Release() {
 	if (*vtable_ptr[-1] == GUARD) *vtable_ptr = vtable_original;
 	// Free our vtables memory that we allocated earlier
 	free(vtable_hooked[-2]);
-}
-
 }

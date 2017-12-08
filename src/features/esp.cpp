@@ -19,7 +19,7 @@
 namespace features { namespace esp {
 
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
-static CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
+CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
 static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");

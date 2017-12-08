@@ -12,14 +12,6 @@
 
 #pragma once
 
-namespace hacks {
-
-// Ease of life typedefs
-typedef void* 			method_t;
-typedef method_t* 		method_table_t;
-typedef method_table_t* table_ptr_t;
-typedef method_table_t& table_ref_t;
-
 // Class used to hook functions in objects with virtual functions
 class VMTHook {
 public:
@@ -30,9 +22,7 @@ public:
 	void Release(); // To release this hook
 	inline void* GetMethod(size_t idx) const { return vtable_original[idx]; }
 
-	table_ptr_t vtable_ptr = nullptr; 		 // location to the pointer in the object that contains its vtable
-	method_table_t vtable_original = nullptr; // location of the objects original vtable
-	method_table_t vtable_hooked = nullptr;   // location of our vtable replacement
+	void*** vtable_ptr = nullptr; 		 // location to the pointer in the object that contains its vtable
+	void** vtable_original = nullptr; // location of the objects original vtable
+	void** vtable_hooked = nullptr;   // location of our vtable replacement
 };
-
-}

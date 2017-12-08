@@ -18,7 +18,10 @@ set(CINP xlib CACHE STRING "Input module to use")
 set(CUSERNAME UNREGISTERED CACHE STRING "Register a username")
 set(CUSERID 0 CACHE STRING "Register a id")
 set(CForceClang false CACHE STRING "Should cmake force compilation with cmake?")
-set(CMAKE_BUILD_TYPE RELEASE CACHE STRING "Cmake build type")
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type selected, default to Release")
+    set(CMAKE_BUILD_TYPE RELEASE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 # Function to remove source files from a directory, ripped from aimtux fuzion <3
 FUNCTION(EXCLUDE_FILES_FROM_DIR_IN_LIST _InFileList _excludeDirName)
@@ -38,7 +41,7 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 
 # Flags we use for every build type, cpp 17 standard is nice
-set(CCOMMON_FLAGS "-std=gnu++17 -fpic -shared -mtune=generic")
+set(CCOMMON_FLAGS "-std=gnu++17 -shared -mtune=generic")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -71,7 +74,7 @@ endif()
 # The source sdk that everyone loves
 if(CBASE STREQUAL "SOURCE_2013_SDK")
 	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
-	add_definitions("-DCATHOOK_SOURCE_2013=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 RAD_TELEMETRY_DISABLED=1 -DLINUX=1 -DUSE_SDL=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1")
+	add_definitions(-DCATHOOK_SOURCE_2013=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 -DRAD_TELEMETRY_DISABLED=1 -DLINUX=1 -DUSE_SDL=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1)
 	file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
 endif()

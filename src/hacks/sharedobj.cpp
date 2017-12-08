@@ -34,9 +34,11 @@ static bool LocateSharedObject(const char* name, std::string& out_full_path) {
 	return false;
 }
 
+}
+
 SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 	// Get the full path of our opened object
-	while (!LocateSharedObject(file_name, path)) {
+	while (!hacks::LocateSharedObject(file_name, path)) {
 		sleep(1);
 	}
 	// dlopen that sucker and give us a linkmap to use
@@ -45,6 +47,4 @@ SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 		char* error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);
 	}
-}
-
 }

@@ -11,8 +11,6 @@
 #include <link.h> // link maps
 #include <string>	// std::string
 
-namespace hacks {
-
 // Create a shared object with the name of the shared object, then it attempts to find its path and allows access to the linkmap
 class SharedObject {
 public:
@@ -22,5 +20,3 @@ public:
  	std::string path = "unassigned"; // The full path of the shared library we are looking for
 	link_map* lmap = nullptr; // Link map returned from dllopen
 };
-
-}

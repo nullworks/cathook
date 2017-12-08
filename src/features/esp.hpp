@@ -13,6 +13,7 @@
 namespace features { namespace esp {
 
 extern CatEnum esp_menu;
+extern CatVarBool esp_enabled;
 
 void Init(); // Call to init esp
 

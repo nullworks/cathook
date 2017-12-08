@@ -11,8 +11,9 @@
 
 class CatLogger {
 public:
-  CatLogger(const char*);
+  CatLogger(const char* file_path, bool _ptime = false);
   ~CatLogger();
+  const bool ptime;
   void log(const char* fmt, ...);
 private:
   FILE* log_handle;

@@ -15,7 +15,7 @@ CatEntity g_CatEntitys[MAX_ENTITIES];
 CatLocalPlayer g_LocalPlayer;
 
 // We need a constructor to get the idx, we use size_t as it really depends on archetecture for how it works
-CatEntity::CatEntity() : IDX(int(((size_t)this - (size_t)&g_CatEntitys) / sizeof(CatEntity))) {
+CatEntity::CatEntity() : IDX(int(((uintptr_t)this - (uintptr_t)&g_CatEntitys) / sizeof(CatEntity))) {
 
 }
 

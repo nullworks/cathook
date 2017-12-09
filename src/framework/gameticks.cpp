@@ -18,7 +18,7 @@ CMFunctionGroup drawmgr[3];
 static std::mutex drawing_mutex;
 
 // This should be run on drawtick
-void DrawTick() {
+void drawmgr_run() {
 	std::lock_guard<std::mutex> draw_lock(drawing_mutex);	// multithreadding fix?
 
 	// Reset things. We prepare drawing stuff for other input asked from request
@@ -34,8 +34,8 @@ void DrawTick() {
 // Stored pointers of functions to run on world tick
 CMFunctionGroup wtickmgr[3];
 
-// Please call this while the game is in a level.
-void WTick() {
+// Please call this while the game is in a level. Hopefully...
+void wtickmgr_run() {
 
 	// Used for stuff that refill the entity mgr and related
 	wtickmgr[0]();

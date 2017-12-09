@@ -6,7 +6,7 @@
  *
  */
 
-// Stuff to init with
+#include <cstdint> // uintptr_t
 
 #include "entitys.hpp"
 

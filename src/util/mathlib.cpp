@@ -43,10 +43,10 @@ CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point) 
 	// Get angles
 	CatVector out;
 	out.y = atan2(aim_point.y, aim_point.x) * 180 / PI;
-	out.x pitch = atan2(-aim_point.z, sqrt(aim_point.x * aim_point.x + aim_point.y * aim_point.y)) * 180 / PI;
+	out.x = atan2(-aim_point.z, sqrt(aim_point.x * aim_point.x + aim_point.y * aim_point.y)) * 180 / PI;
 
 	// Clamp and return
-	ClampAngles(out)
+	ClampAngles(out);
 	return out;
 }
 

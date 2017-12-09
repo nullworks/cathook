@@ -111,12 +111,12 @@ endif()
 
 # Default compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 
-include_directories(${INCLUDE_DIRS})
-
-add_library(libnekohook SHARED ${SOURCE_FILES})
-target_link_libraries(libnekohook dl)
+#include_directories(${INCLUDE_DIRS})
+add_library(nekohook SHARED ${SOURCE_FILES})
+set_target_properties(nekohook PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+target_link_libraries(nekohook)

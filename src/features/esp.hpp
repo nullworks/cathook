@@ -5,6 +5,7 @@
  *
  */
 
+#pragma once 
 #include "../util/colors.hpp" 	// For colors and colored strings
 #include "../framework/catvars.hpp"	// I would like to use catvars
 

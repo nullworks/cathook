@@ -6,27 +6,32 @@
  *      Author: nullifiedcat
  */
 
-#include <stdarg.h> // Infinit arguments, va_lists
+#include <assert.h>
 #include <string.h> // String stuff
-#include <fstream> 	// IO
-#include <iostream> // IO
 #include <time.h> 	// Time
 
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger g_CatLogging("/tmp/cathook.log", true);
+CatLogger g_CatLogging("/tmp/nekohook.log", true);
 
-CatLogger::CatLogger(const char* file_path, bool _ptime) : log_handle(fopen(file_path, "w")), ptime(_ptime) {}
+CatLogger::CatLogger(const char* _file_path, bool _ptime) : file_path(_file_path), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }
 
 void CatLogger::log(const char* fmt, ...) {
+
+	// Basicly an init, because this cant be done on construct
+	if (log_handle == 0) {
+		log_handle = fopen(file_path, "w");
+		assert(log_handle != 0);
+	}
 
 	// Print our time if needed
 	if (ptime) {
 		// Get our time
 		time_t current_time = time(0);
 		struct tm* time_info = localtime(&current_time);
+
 		// print it to a string
 		char timeString[10];
 		strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);

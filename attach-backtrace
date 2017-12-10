@@ -22,13 +22,13 @@ proc=${arr[$inst]}
 echo Running instances: "${arr[@]}"
 echo Attaching to "$proc"
 
-sudo ./detach $inst bin/libcathook.so
+sudo ./detach $inst libcathook.so
 
-echo loading "$(realpath bin/libcathook.so)" to "$proc"
+echo loading "$(realpath libcathook.so)" to "$proc"
 gdb -n -q -batch \
   -ex "attach $proc" \
   -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
-  -ex "call \$dlopen(\"$(realpath bin/libcathook.so)\", 1)" \
+  -ex "call \$dlopen(\"$(realpath libnekohook.so)\", 1)" \
   -ex "call dlerror()" \
   -ex 'print (char *) $2' \
   -ex "catch syscall exit exit_group" \

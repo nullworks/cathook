@@ -36,7 +36,12 @@ static bool LocateSharedObject(const char* name, std::string& out_full_path) {
 
 }
 
-SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
+SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {}
+
+link_map* SharedObject::GetLmap() {
+
+	if (lmap != nullptr) return lmap;
+
 	// Get the full path of our opened object
 	while (!hacks::LocateSharedObject(file_name, path)) {
 		sleep(1);

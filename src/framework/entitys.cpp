@@ -31,6 +31,7 @@ float CatEntity::Distance() const {
 	return (g_LocalPlayer.entity) ? origin.DistTo(g_LocalPlayer.entity->origin) : 0;
 }
 
+namespace bones {
 // Bone stuff
 // This is how the bones are layed out
 // Use bonesets[0] for center line
@@ -39,3 +40,5 @@ const std::vector<int> bonesets[] = {
 	{EBone_lower_arm_l, EBone_middle_arm_l, EBone_upper_arm_l, EBone_top_spine, EBone_upper_arm_r, EBone_middle_arm_r, EBone_lower_arm_r}, // Upper limbs
 	{EBone_lower_leg_l, EBone_middle_leg_l, EBone_upper_leg_l, EBone_pelvis,    EBone_upper_leg_r, EBone_middle_leg_r, EBone_lower_leg_r}  // Lower limbs
 };
+
+}

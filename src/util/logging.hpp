@@ -7,16 +7,18 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <stdarg.h> // ... arg
+#include <stdio.h> // fopen(), fprint(), fputs()
 
 class CatLogger {
 public:
-  CatLogger(const char* file_path, bool _ptime = false);
+  CatLogger(const char* _file_path, bool _ptime = false);
   ~CatLogger();
-  const bool ptime;
-  void log(const char* fmt, ...);
+  void log(const char* fmt, ...); // Use to log with
 private:
-  FILE* log_handle;
+  FILE* log_handle = 0; // Handle used to log to files with
+  const char* file_path; // Path to log file
+  const bool ptime; // Whether to print time
 };
 
 // Use this to log

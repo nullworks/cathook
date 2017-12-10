@@ -6,6 +6,8 @@
  *      Author: nullifiedcat
  */
 
+
+
 #include "util/logging.hpp" // To log
 #include "hack.h"					// Contains init and shutdown
 
@@ -21,11 +23,17 @@ void Detach() {
 
 #if !defined(CMAKE_SYSTEM_NAME) || CMAKE_SYSTEM_NAME == Linux
 
+#include <pthread.h>
+
 void __attribute__((constructor)) attach() {
-	Attach();
+	// We need a thread to make things not fail
+	pthread_t init_thread;
+	pthread_create(&init_thread, 0, [](void*) -> void* { Attach(); }, 0);
 }
 void __attribute__((destructor)) detach() {
-	Detach();
+	// Same with the destructor
+	pthread_t kill_thread;
+	pthread_create(&kill_thread, 0, [](void*) -> void* { Detach(); }, 0);
 }
 
 #elif CMAKE_SYSTEM_NAME == Windows

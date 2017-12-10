@@ -13,17 +13,19 @@
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger g_CatLogging("/tmp/nekohook.log", true);
+CatLogger g_CatLogging("/tmp/nekohook.log");
+//CatLogger g_CatLogging;
 
-CatLogger::CatLogger(const char* _file_path, bool _ptime) : file_path(_file_path), ptime(_ptime) {}
+CatLogger::CatLogger(const char* _file_path, bool _ptime) : ptime(_ptime) {
+	 file_path = _file_path;
+}
 CatLogger::~CatLogger() {	fclose(log_handle); }
 
 void CatLogger::log(const char* fmt, ...) {
 
 	// Basicly an init, because this cant be done on construct
-	if (log_handle == 0) {
+	if (log_handle == nullptr) {
 		log_handle = fopen(file_path, "w");
-		assert(log_handle != 0);
 	}
 
 	// Print our time if needed
@@ -48,7 +50,7 @@ void CatLogger::log(const char* fmt, ...) {
 	va_end(list);
 
 	// Write our log to the file
-	fprintf(log_handle, "%s\n", buffer);
+	fprintf(log_handle, "%s\n", file_path, buffer);
 	fflush(log_handle);
 
 	// Push result var to a console here, if i ever make a console api

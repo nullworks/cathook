@@ -901,12 +901,19 @@ bool CanHeadshot()
 
 bool CanShoot()
 {
-
-    float servertime, nextattack;
-
-    servertime = (float) (CE_INT(g_pLocalPlayer->entity, netvar.nTickBase)) *
-                 g_GlobalVars->interval_per_tick;
+  static float servertime, lastfire, nextattack;
+    
+  float currfire = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flLastFireTime);
+    
+  if (lastFire != currfire)
+  {
+    lastfire = currfire;
     nextattack = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flNextPrimaryAttack);
+  }
+
+    float servertime = (float) (CE_INT(g_pLocalPlayer->entity, netvar.nTickBase)) *
+                 g_GlobalVars->interval_per_tick;
+    
     return nextattack <= servertime;
 }
 

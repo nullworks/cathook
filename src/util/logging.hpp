@@ -18,7 +18,6 @@ public:
   void log(const char* fmt, ...); // Use to log with
 private:
   FILE* log_handle = nullptr; // Handle used to log to files with
-  const char* file_path; // Path to log file, needs to be fixed
   const bool ptime;
 };
 

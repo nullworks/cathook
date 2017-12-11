@@ -5,12 +5,10 @@
  *
  */
 
-
-//#include <csignal> // Unknown
 #include <ctime> // time()
 #include <stdlib.h> // srand()
 
-#include "util/logging.hpp"
+#include "util/logging.hpp" // To log progress
 
 // Game Modules
 #include "modules/Source_2013/init.hpp"

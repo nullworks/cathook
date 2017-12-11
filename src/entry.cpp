@@ -9,7 +9,7 @@
 
 
 #include "util/logging.hpp" // To log
-#include "hack.h"					// Contains init and shutdown
+#include "hack.h"	// Contains main init
 
 // Attach and detach to use independant of platform
 void Attach() {
@@ -23,17 +23,17 @@ void Detach() {
 
 #if !defined(CMAKE_SYSTEM_NAME) || CMAKE_SYSTEM_NAME == Linux
 
-#include <pthread.h>
+#include <pthread.h> // So we can make our unix thread
 
 void __attribute__((constructor)) attach() {
 	// We need a thread to make things not fail
 	pthread_t init_thread;
-	pthread_create(&init_thread, 0, [](void*) -> void* { Attach(); }, 0);
+	pthread_create(&init_thread, 0, [](void*) -> void* { Attach(); return 0; }, 0); // sleep(1) is need to allow the constructors to do their things
 }
 void __attribute__((destructor)) detach() {
 	// Same with the destructor
 	pthread_t kill_thread;
-	pthread_create(&kill_thread, 0, [](void*) -> void* { Detach(); }, 0);
+	pthread_create(&kill_thread, 0, [](void*) -> void* { Detach(); return 0; }, 0);
 }
 
 #elif CMAKE_SYSTEM_NAME == Windows

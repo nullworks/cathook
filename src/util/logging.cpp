@@ -6,27 +6,21 @@
  *      Author: nullifiedcat
  */
 
-#include <assert.h>
+#include <errno.h>
 #include <string.h> // String stuff
 #include <time.h> 	// Time
+
+#include <iostream>
 
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger g_CatLogging("/tmp/nekohook.log");
-//CatLogger g_CatLogging;
+CatLogger __attribute__ ((init_priority (101))) g_CatLogging("/tmp/nekohook.log", true); // We want this to be init fast
 
-CatLogger::CatLogger(const char* _file_path, bool _ptime) : ptime(_ptime) {
-	 file_path = _file_path;
-}
+CatLogger::CatLogger(const char* _file_path, bool _ptime) : log_handle(fopen(_file_path, "w")), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }
 
 void CatLogger::log(const char* fmt, ...) {
-
-	// Basicly an init, because this cant be done on construct
-	if (log_handle == nullptr) {
-		log_handle = fopen(file_path, "w");
-	}
 
 	// Print our time if needed
 	if (ptime) {
@@ -50,8 +44,13 @@ void CatLogger::log(const char* fmt, ...) {
 	va_end(list);
 
 	// Write our log to the file
-	fprintf(log_handle, "%s\n", file_path, buffer);
+	fprintf(log_handle, "%s\n", buffer);
 	fflush(log_handle);
 
 	// Push result var to a console here, if i ever make a console api
 }
+/*
+replace launch options with
+%command% >/tmp/tf2.log
+literally
+*/

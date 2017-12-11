@@ -76,7 +76,7 @@ static uintptr_t dwFindPattern(const uintptr_t& dwAddress, const uintptr_t& dwLe
 	return NULL;
 }
 
-uintptr_t GetObjectSignature(SharedObject& shared_obj, const char* chPattern) {
+uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPattern) {
 
 	// We do our modules im memory differently from darkstorm due to the need of modularity. Shouldnt hurt anything as long as this isnt called too much
 	const void* module = nullptr;
@@ -102,7 +102,7 @@ uintptr_t GetObjectSignature(SharedObject& shared_obj, const char* chPattern) {
 
 	// we need to remap the address that we got from the pattern search from our mapped file to the actual memory
 	// we do this by rebasing the address (subbing the mmapped one and replacing it with the dlopened one.
-	return dwFindPattern((uintptr_t)module + textOffset, (uintptr_t)module + textOffset + textSize, chPattern) - (uintptr_t)module + shared_obj.GetLmap()->l_addr;
+	return dwFindPattern((uintptr_t)module + textOffset, (uintptr_t)module + textOffset + textSize, chPattern) - (uintptr_t)module + shared_obj.lmap->l_addr;
 }
 
 }

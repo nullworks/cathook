@@ -17,7 +17,7 @@
 namespace hacks {
 
 // Input a shared objects name and it attemts to save the full path to the string, returns false if fails.
-bool LocateSharedObject(const char* name, std::string& out_full_path) {
+static bool LocateSharedObject(const char* name, std::string& out_full_path) {
 	FILE* proc_maps = fopen("/proc/self/maps", "r");
 	if (proc_maps == nullptr) return false;
 	char buffer[512];
@@ -36,14 +36,9 @@ bool LocateSharedObject(const char* name, std::string& out_full_path) {
 
 }
 
-SharedObject::SharedObject(const char* _file_name) { file_name = _file_name;}
-
-link_map* SharedObject::GetLmap() {
-
-	if (lmap != nullptr) return lmap;
-
+SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 	// Get the full path of our opened object
-	while (!hacks::LocateSharedObject(file_name, path)) {
+	while (!hacks::LocateSharedObject(_file_name, path)) {
 		sleep(1);
 	}
 	// dlopen that sucker and give us a linkmap to use

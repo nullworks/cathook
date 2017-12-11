@@ -13,7 +13,7 @@
 #include "catvars.hpp"
 
 // The CatCommand map
-std::unordered_map<std::string, CatVar*> CatCommandMap;
+std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) CatCommandMap; // Need to init this before other catvars are inited 
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
@@ -41,7 +41,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
 CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
 	: gui_position(_gui_position), name(_name), desc_short(_desc_short), desc_long(_desc_long) {
 	// Add the catvar to the command map
-  // CatCommandMap.insert({name, this}); // Broken
+  CatCommandMap.insert({name, this}); // Broken
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
 }

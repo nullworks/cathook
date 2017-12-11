@@ -16,23 +16,31 @@
 // Guard to tell when we have a hooked table
 #define GUARD (void*)0xD34DC477 // :thonkfire:
 
+static unsigned CountMethods(void** table) {
+	unsigned int i = -1;
+	do ++i; while (table[i]);
+	return i;
+}
+
 void VMTHook::Set(void* inst, size_t offset) {
 	// Release any hooks currently in place
 	Release();
+	g_CatLogging.log("release");
 	// Get our vtable from out base pointer and offset
-	vtable_ptr = reinterpret_cast<void***>((size_t)inst + offset);
+	vtable_ptr = reinterpret_cast<void***>((uintptr_t)inst + (uintptr_t)offset);
 	vtable_original = *vtable_ptr; // save original for release
-	// Count how many functions aviable
-	int func_count = 0;
-	while (vtable_ptr[func_count]) func_count++;
+	g_CatLogging.log("Got vtableptr and orig");
+	// Count how many functions aviable6
+	int func_count = CountMethods(vtable_original);
+	// Make a log of what we have so far
+	g_CatLogging.log("Hooking vtable 0x%08x with %i methods", vtable_ptr, func_count);
 	// Create a copy of the current vtable
 	vtable_hooked = &static_cast<void**>(calloc(func_count + 2, sizeof(void*)))[2]; // add 2 to the count and make the pointer 2 of the alloc to give room for the guards
-	memcpy(vtable_hooked, vtable_ptr, sizeof(void*) * func_count);
+	memcpy(vtable_hooked, *vtable_ptr, sizeof(void*) * func_count);
+
 	// Set hook information into the hook vtable
 	vtable_hooked[-2] = this;
 	vtable_hooked[-1] = GUARD;
-	// Log stuff
-	g_CatLogging.log("Hooking vtable 0x%08x with %i methods", vtable_ptr, func_count);
 }
 
 void VMTHook::HookMethod(void* func, size_t idx) {

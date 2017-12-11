@@ -6,16 +6,13 @@
  *      Author: nullifiedcat
  */
 
-#include <errno.h>
 #include <string.h> // String stuff
 #include <time.h> 	// Time
-
-#include <iostream>
 
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger __attribute__ ((init_priority (101))) g_CatLogging("/tmp/nekohook.log", true); // We want this to be init fast
+CatLogger __attribute__ ((init_priority (101))) g_CatLogging("/tmp/nekohook.log", true); // We want this to be init fast so we can log other inits!
 
 CatLogger::CatLogger(const char* _file_path, bool _ptime) : log_handle(fopen(_file_path, "w")), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }
@@ -33,7 +30,7 @@ void CatLogger::log(const char* fmt, ...) {
 		strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
 
 		// Print the time into the log
-		fprintf(log_handle, "%% [%s] ", timeString);
+		fprintf(log_handle, "[Neko] [%s] ", timeString);
 	}
 
 	// Get the string we want to log

@@ -93,7 +93,7 @@ static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
 	if (!esp_enabled || !g_GameInfo.in_game) return;
-	g_CatLogging.log("uhh: %i, %i", input::bounds.first, input::bounds.second);
+	
 	// Loop through all entitys
 	for (const auto& entity: g_CatEntitys) {
 		if (CE_BAD(entity)) continue;

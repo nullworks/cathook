@@ -5,13 +5,8 @@
  *
  */
 
-/*
-#include "../../util/logging.h"
-#include "../gui.hpp"
-#include "../../framework/inputmgr.hpp"		// So we get input
 #include "../../util/catvars.hpp"	// Obs we need it
-#include "../base/elements.hpp"		// Include elements for building a gui
-#include "menutree.hpp"				// This holds our menu information for us to build from*/
+#include "../gui.hpp"
 
 #include "menu.hpp"
 
@@ -20,5 +15,9 @@
 #define aspecty 7
 
 namespace gui { namespace menu {
-	
+
+void Init() {
+  
+}
+
 }}

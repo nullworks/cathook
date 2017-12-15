@@ -5,9 +5,9 @@
  *
  */
 
-#pragma once 
+#pragma once
 #include "../util/colors.hpp" 	// For colors and colored strings
-#include "../framework/catvars.hpp"	// I would like to use catvars
+#include "../util/catvars.hpp"	// I would like to use catvars
 
 #define MAX_ESP_STRINGS 32	  // Strings allowed for esp
 

@@ -104,7 +104,7 @@ class CatMenuTree {
 public:
 	CatMenuTree(const char* string = "") : name(string) {}
 
-	void AddTree(CatVar* cat_var, int recursions = 0);
+	void AddTree(CatVar& cat_var, int recursions = 0);
 	const char* name;
 	std::vector<CatMenuTree> children;
 	std::vector<CatVar*> cat_children;	// Nyaa~ :3

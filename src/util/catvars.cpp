@@ -18,23 +18,23 @@ std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) C
 CatMenuTree CatMenuRoot;
 
 // Menu tree
-void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
+void CatMenuTree::AddTree(CatVar& cat_var, int recursions) {
 	// Check if we reached the end if the enum info, if not we can add more to the tree
-	if (cat_var->gui_position.size() <= recursions) {
-    cat_children.push_back(cat_var); // We finished recursing
+	if (cat_var.gui_position.size() <= recursions) {
+    cat_children.push_back(&cat_var); // We finished recursing
     return;
   }
-	
+
   // Look through the children and if any have the name of one we might want to make, we can reuse the branch
   for (auto& tree_branch : children) {
     // Test if this is an existing branch with matching names
-    if (strcmp(tree_branch.name, cat_var->gui_position[recursions])) continue;
+    if (!strcmp(tree_branch.name, cat_var.gui_position[recursions])) continue;
     // We found our branch, recurse into it
     tree_branch.AddTree(cat_var, recursions + 1);
     return;
   }
   // We dont have a branch already so we must make a new one and recurse into it.
-  auto sapling = CatMenuTree(cat_var->gui_position[recursions]);
+  auto sapling = CatMenuTree(cat_var.gui_position[recursions]);
   children.push_back(sapling);
   sapling.AddTree(cat_var, recursions + 1);
 }
@@ -44,7 +44,7 @@ CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _des
 	// Add the catvar to the command map
   CatCommandMap.insert({name, this}); // Broken
   // Add the catvar to the menu tree
-  CatMenuRoot.AddTree(this);
+  CatMenuRoot.AddTree(*this);
 }
 // Catvar Constructors
 CatVarBool::CatVarBool(const CatEnum& _gui_position, const char* _name, const bool& _defaults, const char* _desc_short, const char* _desc_long)

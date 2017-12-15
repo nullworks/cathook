@@ -83,7 +83,7 @@ static void RefreshState() {
 	if (!GetXWindow()) return;
 
 	// Reset current pressed
-	for (bool& tmp : input::stored_pressed) {
+	for (bool& tmp : input::pressed_buttons) {
 		tmp = false;
 	}
 
@@ -100,9 +100,9 @@ static void RefreshState() {
 			input::mouse = std::make_pair(mousex, mousey);
 		}
 		// We did a pointer query so check our buttons too!
-		if (mask_return & (Button1Mask)) input::stored_pressed[CATKEY_MOUSE_1] = true;
-		if (mask_return & (Button2Mask)) input::stored_pressed[CATKEY_MOUSE_2] = true;
-		if (mask_return & (Button3Mask)) input::stored_pressed[CATKEY_MOUSE_3] = true;
+		if (mask_return & (Button1Mask)) input::pressed_buttons[CATKEY_MOUSE_1] = true;
+		if (mask_return & (Button2Mask)) input::pressed_buttons[CATKEY_MOUSE_2] = true;
+		if (mask_return & (Button3Mask)) input::pressed_buttons[CATKEY_MOUSE_3] = true;
 	}
 
 	// Find depressed keys and save them to the stored map
@@ -115,7 +115,7 @@ static void RefreshState() {
 		int current_key = XKeysymToKeycode(xAppDisplay, current.first);
 
 		// Use the keymap with bitwise logic to get state, oof this took forever to make
-		if (keys[current_key / 8] & (1 << (current_key % 8))) input::stored_pressed[current.second] = true;
+		if (keys[current_key / 8] & (1 << (current_key % 8))) input::pressed_buttons[current.second] = true;
 	}
 }
 

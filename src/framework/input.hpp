@@ -66,7 +66,7 @@ enum {
 
 namespace input {
 
-extern bool stored_pressed[CATKEY_COUNT];
+extern bool pressed_buttons[CATKEY_COUNT];
 
 // Mouse info
 extern std::pair<int, int> mouse;

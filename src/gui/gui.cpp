@@ -25,7 +25,7 @@ void CatGUI::Update() {
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 
 		// Get whether key is down and whether key state changed from last tick
-		const bool& down = input::stored_pressed[i];
+		const bool& down = input::pressed_buttons[i];
 		const bool changed = (i == CATKEY_M_WHEEL_DOWN || i == CATKEY_M_WHEEL_UP) ? down : pressed_state[i] != down; // If its a mouse wheel, we dont care about last state
 		// Update last state and Tick key was pressed
 		pressed_state[i] = down;

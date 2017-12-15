@@ -12,7 +12,7 @@
 namespace input {
 
 // Used to store depressed keys
-bool stored_pressed[CATKEY_COUNT];
+bool pressed_buttons[CATKEY_COUNT];
 
 // Mouse info
 std::pair<int, int> mouse(0, 0);

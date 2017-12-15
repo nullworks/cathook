@@ -9,6 +9,7 @@
 
 #include "../framework/gameticks.hpp" // To run our stuff
 #include "../framework/entitys.hpp"	// Contains entity and bone info
+#include "../framework/input.hpp" // to get userinput for aimkeys
 #include "../gui/hudstrings/sidestrings.hpp"
 #include "esp.hpp"	// SetEspColor()
 
@@ -18,12 +19,14 @@ namespace features { namespace aimbot {
 
 static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
 static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
-// Main preferences
+// Target Selection
 static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
 static CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
 static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
 static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
 static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
+// Other
+static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_MOUSE_1, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatEnum hitbox_enum({ // Update this as needed
 	"HEAD", "TOP SPINE", "UPPER SPINE", "MIDDLE SPINE", "BOTTOM SPINE", "PELVIS",
 	"UPPER ARM L", "UPPER ARM R", "MIDDLE ARM L", "MIDDLE ARM R", "LOWER ARM L", "LOWER ARM R",
@@ -121,6 +124,8 @@ static bool ShouldAim() {
 	if (!g_LocalPlayer.entity->exists || g_LocalPlayer.entity->dormant) return false;
 	// Alive check
 	if (!g_LocalPlayer.entity->alive) return false;
+	// aimkey
+	if (aimkey && !input::pressed_buttons[aimkey]) return false;
 
 	return true;
 }
@@ -143,11 +148,11 @@ static void WorldTick() {
 	const CatEntity* target = RetrieveBestTarget();
 	if (!target) return; // Check whether we found a target
 
-	// Check if our local player is ready to aimbot
-	if (!ShouldAim()) return;
-
 	// Set targets color
 	esp::SetEspColor(*target, colors::pink);	// Colors are cool
+
+	// Check if our local player is ready to aimbot
+	if (!ShouldAim()) return;
 
 	AimAt(*target);
 }

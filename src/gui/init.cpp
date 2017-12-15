@@ -21,7 +21,7 @@ namespace gui {
 void Init() {
 
 	// Setup the draw manager to run gui
-	drawmgr_on(Update);
+	drawmgr_on([](){g_pGUI.Update();});
 
 	// Other gui elements
 	sidestrings::Init();

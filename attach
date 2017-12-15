@@ -22,9 +22,9 @@ proc=${arr[$inst]}
 echo Running instances: "${arr[@]}"
 echo Attaching to "$proc"
 
-#sudo ./detach $inst bin/libcathook.so
+#sudo ./detach $inst bin/libnekhook.so
 
-#if grep -q "$(realpath bin/libcathook.so)" /proc/"$proc"/maps; then
+#if grep -q "$(realpath bin/libnekohook.so)" /proc/"$proc"/maps; then
 #  echo already loaded
 #  exit
 #fi
@@ -37,7 +37,7 @@ sudo chmod 000 /tmp/dumps # No permissions
 
 FILENAME="/tmp/.gl$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
 
-cp "libcathook.so" "$FILENAME"
+cp "libnekohook.so" "$FILENAME"
 
 echo loading "$FILENAME" to "$proc"
 

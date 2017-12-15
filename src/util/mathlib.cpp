@@ -39,7 +39,6 @@ CatVector ClampAngles_r(const CatVector& angles) {
 // Returns angles to a point in space
 CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point) {
 	CatVector aim_point = dest_point - src_point;
-
 	// Get angles
 	CatVector out;
 	out.y = atan2(aim_point.y, aim_point.x) * 180 / PI;
@@ -84,7 +83,7 @@ float GetFov(const CatVector& orig_angle, const CatVector& eye_position, const C
 }
 // Used to get fov without the need to input camera angles or eye position by using the local player.
 float GetFov (const CatVector& dest_point) {
-	return GetFov(g_LocalPlayer.camera_angles, g_LocalPlayer.camera_position, dest_point);
+	return GetFov(g_LocalPlayer.GetCameraAngle(), g_LocalPlayer.GetCamera(), dest_point);
 }
 
 }

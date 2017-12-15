@@ -16,7 +16,7 @@
 // Guard to tell when we have a hooked table
 #define GUARD (void*)0xD34DC477 // :thonkfire:
 
-static unsigned CountMethods(void** table) {
+static unsigned CountMethods(void** table) { // Idk how to fully remove this...
 	unsigned int i = -1;
 	do ++i; while (table[i]);
 	return i;
@@ -25,12 +25,10 @@ static unsigned CountMethods(void** table) {
 void VMTHook::Set(void* inst, size_t offset) {
 	// Release any hooks currently in place
 	Release();
-	g_CatLogging.log("release");
 	// Get our vtable from out base pointer and offset
 	vtable_ptr = reinterpret_cast<void***>((uintptr_t)inst + (uintptr_t)offset);
 	vtable_original = *vtable_ptr; // save original for release
-	g_CatLogging.log("Got vtableptr and orig");
-	// Count how many functions aviable6
+	// Count how many functions avaible
 	int func_count = CountMethods(vtable_original);
 	// Make a log of what we have so far
 	g_CatLogging.log("Hooking vtable 0x%08x with %i methods", vtable_ptr, func_count);

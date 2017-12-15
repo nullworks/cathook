@@ -13,6 +13,7 @@
 #include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
+#include "../util/logging.hpp"			// So we can stop esp if not ingame
 
 #include "esp.hpp"
 
@@ -23,6 +24,8 @@ CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
 static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
+static CatEnum esp_team_enum({"Enemy", "Friendly", "Both"});
+static CatVarEnum esp_team(esp_menu, esp_team_enum, "esp_team", 0, "Team", "Select which team to show esp on.");
 // Box esp + Options
 static CatEnum box_esp_enum({ "None", "Normal", "Corners" });
 static CatVarEnum box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
@@ -37,10 +40,11 @@ static CatVarEnum show_health(esp_menu, show_health_enum, "esp_health", 3, "Heal
 static CatVarBool show_name(esp_menu, "esp_name", true, "Name ESP", "Shows the entity names of entitys");
 static CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", "Shows distance on entitys");
 // Bone esp
-static CatVarBool bone_esp(esp_menu, "esp_bones", true, "Bone ESP", "Shows cached bones");
+static CatVarBool esp_bone(esp_menu, "esp_bones", true, "Bone ESP", "Shows cached bones");
+static CatVarBool esp_bone_debug(esp_menu, "esp_bones_debug", false, "Bone ESP debug", "Shows debug info about bones");
 // Tracers
 static CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
-static CatVarEnum tracers(esp_menu, tracers_enum, "esp_tracers", 0, "Tracers", "Draws a line from the player to a position on your screen");
+static CatVarEnum tracers(esp_menu, tracers_enum, "esp_tracers", 2, "Tracers", "Draws a line from the player to a position on your screen");
 
 // Entitys strings
 struct ESPData {
@@ -54,13 +58,14 @@ static ESPData esp_cache[MAX_ENTITIES];
 
 // Entity Box state enum
 enum {EBOX_NOT_RAN, EBOX_FAILED, EBOX_SUCCESSFUL};
+// TODO, replace catbox with something that uses int instead of floats to save cycles
 static std::pair<int, CatBox> screenbox; // For storing the world to screen box
 
 // Sets the screenbox for an entity
 static bool GetEntityBox(const CatEntity& entity) {
 	if (screenbox.first != EBOX_NOT_RAN) return screenbox.first == EBOX_SUCCESSFUL; // If we already have the screenbox.second, we return true
 	screenbox.first = EBOX_FAILED; // Pre-set this so we can return false at any time without worry
-	screenbox.second = CatBox(CatVector(65536, 65536), CatVector(-1, -1)); // Reset our cached screen box
+	screenbox.second = CatBox(CatVector(65536, 65536), CatVector(-65536, -65536)); // Reset our cached screen box
 
 	// Get our 8 points of our box
 	CatVector points_w[8];
@@ -88,14 +93,15 @@ static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
 	if (!esp_enabled || !g_GameInfo.in_game) return;
-
+	g_CatLogging.log("uhh: %i, %i", input::bounds.first, input::bounds.second);
 	// Loop through all entitys
 	for (const auto& entity: g_CatEntitys) {
 		if (CE_BAD(entity)) continue;
 
 		// Target checking
-		if (!g_LocalPlayer.InThirdperson && g_LocalPlayer.entity == &entity) continue; // Determine whether to apply esp to local player
-		if (entity.type == ETYPE_PLAYER && !entity.alive) continue; // Dont esp dead players
+		if (!g_LocalPlayer.InThirdperson() && g_LocalPlayer.entity == &entity) continue; // Determine whether to apply esp to local player
+		if ((entity.type == ETYPE_PLAYER || entity.type == ETYPE_OTHERHOSTILE) && !entity.alive) continue; // Dont esp dead players
+		if (!(esp_team == 2 || (esp_team == 0) ? entity.Enemy() : !entity.Enemy())) continue;
 
 		// Reset the entity box state
 		screenbox.first = EBOX_NOT_RAN;
@@ -116,7 +122,7 @@ static void Draw() {
 			}
 
 			// Bone esp
-			if (bone_esp) {
+			if (esp_bone) {
 
 				// Loop through the bone sets
 				for (const auto& current_set : bones::bonesets) {
@@ -133,9 +139,26 @@ static void Draw() {
 							if (draw::WorldToScreen(bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
 
 								// Draw a line connecting the points
-								draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, esp_cache[i].color);
+								draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, esp_cache[entity.IDX].color);
 							}
 						}
+					}
+				}
+
+				// Debug for bone esp, prints strings on screen of what bone is being represented
+				if (esp_bone_debug) {
+					int tmp = -1;
+					for (const auto& bone : entity.bones) {
+						tmp++; // Increment bone
+						// Check if bone is good
+						if (!bone.first) continue;
+						// Get wts
+						CatVector scn;
+						if (!draw::WorldToScreen(bone.second.center(), scn)) continue;
+						// Draw
+						char buf[8];
+						sprintf(buf, "B:%i", tmp);
+						draw::String(buf, scn.x, scn.y, 0, 20, colors::white);
 					}
 				}
 			}
@@ -160,7 +183,7 @@ static void Draw() {
 				if (GetEntityBox(entity)) {
 
 					// Get in bar height
-					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min((float)entity.health / (float)entity.max_health, 1.0f);
+					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min(entity.health / entity.max_health, 1);
 
 					// Draw
 					draw::Rect(screenbox.second.min.x - 7, screenbox.second.min.y, 7, screenbox.second.max.y - screenbox.second.min.y, colors::black);
@@ -242,7 +265,7 @@ static void WorldTick() {
 
 		// Add default strings
 		if ((esp_players && entity.type == ETYPE_PLAYER) || (esp_other_hostile && entity.type == ETYPE_OTHERHOSTILE)) {
-			char buf[64];
+			char buf[64]; // for sprintf
 
 			// Name esp
 			if (show_name)
@@ -284,8 +307,8 @@ void SetEspColor(const CatEntity& entity, const CatVector4& color) {
 }
 
 void Init() {
-	drawmgr[1] + Draw;
-	wtickmgr[0] + WorldTick;
+	drawmgr_on(Draw);
+	wtickmgr_before(WorldTick);
 }
 
 }}

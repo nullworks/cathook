@@ -11,6 +11,7 @@
 #include <vector> // For bone stuff
 
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
+#include "../util/functions.hpp" // CMFunction()
 
 #define MAX_ENTITIES 2048 // Increase as needed
 
@@ -93,7 +94,7 @@ public:
 	int	type = ETYPE_NONE;
 
 	// Other usefull info
-	char entity_name[50] = "unknown";// Name of the entity
+	char entity_name[64] = "unknown";// Name of the entity
 	CatVector origin = CatVector();
 	CatBox collision = CatBox();
 	int steam32 = 0;
@@ -104,26 +105,16 @@ public:
 
 class CatLocalPlayer {
 public:
-	inline void Reset() {
-		// Reset some stuff to defaults
-		camera_position = CatVector();
-		InThirdperson = false;
-		// Our player commands
-		attack         = false;
-		attack_prevent = false;
-		camera_angles  = CatVector();
-		real_angles    = CatVector();
-	}
-
 	CatEntity* entity = nullptr;		// Contains the cat entity of our local player
-	CatVector camera_position = CatVector(); 	// Point where the users camera is
-	bool InThirdperson = false;			// Set to true if your camera is in thirdperson
+
+	CMFunction<bool()> InThirdperson {[](){return false;}};	// Set to true if your camera is in thirdperson
 
 	// Our player commands
-	bool attack 		   			= false;		// Used to control if attacking should happen
-	bool attack_prevent   	= false;		// Used for when you wish to prevent attacking
-	CatVector camera_angles = CatVector();	// Angles of what the player sees
-	CatVector real_angles   = CatVector();	// The real angles that the game should be at and keep sync with
+	CMFunction<void()> Attack {[](){}};					// Call to make player attack
+	CMFunction<void()> AttackPrevent {[](){}};	// Call to prevent the player from attacking
+	CMFunction<CatVector()> GetCamera {[]() -> CatVector {return CatVector();}}; 	// Get point where the users camera is
+	CMFunction<CatVector()> GetCameraAngle {[]() -> CatVector {return CatVector();}};
+	CMFunction<void(const CatVector&)> SetCameraAngle {[](const CatVector&){}};
 };
 
 // Global entity info

@@ -8,81 +8,24 @@
  *
  */
 
-#include <X11/keysymdef.h>	// We use this to get our keycodes
-#include <X11/Xlib.h>		// X11 lib for interacting with our session
-#include <X11/Xutil.h>		// So we can see process names, and geometry of windows
+#include <X11/Xutil.h> // For xlibs keycodes, window geometry
 
-#include "../../util/logging.hpp"			// Logging is always cool!
-#include "../../util/iohelper.hpp" 		// For our process name
 #include "../../framework/input.hpp" // To manipulate the input framework ofc
 #include "../../framework/gameticks.hpp" 	// For init
+#include "xlib.hpp" // so we can get window and display
 
 #include "input.hpp"
 
-// These arent defined by default so i do that here
+// These arent defined by default so I do that here
 #define XK_leftarrow                     0x08fb
 #define XK_uparrow                       0x08fc
 #define XK_rightarrow                    0x08fd
 #define XK_downarrow                     0x08fe
 
-namespace modules { namespace xlib {
+namespace xlib {
 
-Display* xAppDisplay;
-Window xAppWindow;
-
-bool GetXDisplay() {
-
-	// If we dont have a display, attempt to get one.
-	if (!xAppDisplay){
-		xAppDisplay = XOpenDisplay(nullptr); // Use the "DISPLAY" enviroment var for our display. This may not always be the case but its close enough!
-		if (!xAppDisplay) return false; // check if we recieved a display
-		g_CatLogging.log("Xlib Input: Recieved XDisplay!");
-	}
-	return true;
-}
-
-// Searches for windows with a pid
-bool SearchForWindow(Window w, std::string process_name) {
-	if (!GetXDisplay()) return false; // Make sure we have a display
-
-    // Get the process name for the current window
-	XClassHint classhint;
-	if (XGetClassHint(xAppDisplay, w, &classhint)) {
-		if (classhint.res_class) {
-			if (classhint.res_class == process_name) {
-				xAppWindow = w;
-				return true;
-			}
-		}
-	}
-
-    // Recurse into child windows.
-	Window wRoot, wParent; Window* wChild; unsigned nChildren;
-	if (0 != XQueryTree(xAppDisplay, w, &wRoot, &wParent, &wChild, &nChildren)) {
-		for (unsigned i = 0; i < nChildren; i++) {
-			if (SearchForWindow(wChild[i], process_name)) return true; // Since a child returned true, we return true to go up the chain
-		}
-	}
-	return false;
-}
-
-bool GetXWindow() {
-	if (!GetXDisplay()) return false;
-
-	// If we dont have the game window, we try to find it here!
-	if (!xAppWindow){
-
-		// Attempt to get our window
-		if (!SearchForWindow(XDefaultRootWindow(xAppDisplay), GetProcessName())) return false;
-
-		if (!xAppWindow) return false;// Do we have game window?
-		g_CatLogging.log("Xlib Input: Recieved XWindow: 0x0%x", xAppWindow);
-	}
-	return true;
-}
-
-// Stores potential conversions between xlib's keycodes and cathooks catvars. Add more as nessesary! /usr/include/X11/keysymdef.h
-const std::pair<int, int> xlibToCatVar[] = {
+// Stores potential conversions between xlib's keycodes and cathooks catkeyss. Add more as nessesary! /usr/include/X11/keysymdef.h
+static const std::pair<int, int> xlibToCatVar[] = {
 	{XK_0, CATKEY_0}, {XK_1, CATKEY_1}, {XK_2, CATKEY_2},
 	{XK_3, CATKEY_3}, {XK_4, CATKEY_4}, {XK_5, CATKEY_5},
 	{XK_6, CATKEY_6}, {XK_7, CATKEY_7}, {XK_8, CATKEY_8},
@@ -134,7 +77,7 @@ const std::pair<int, int> xlibToCatVar[] = {
 };
 
 // Request this to update the input system on button, mouse, and window info
-void RefreshState() {
+static void RefreshState() {
 
 	// Ensure we have a window
 	if (!GetXWindow()) return;
@@ -181,4 +124,4 @@ void InitInput() {
 	drawmgr_before(RefreshState);
 }
 
-}}
+}

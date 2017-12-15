@@ -58,7 +58,7 @@ endif()
 ## Graphics modules
 message(STATUS "Graphics module: ${CGFX}")
 # Valve surface
-if(CGFX STREQUAL "tf2")
+if(CGFX STREQUAL "valve_surface")
 	add_definitions("-DCATHOOK_GFX_SURFACE=1")
 endif()
 
@@ -66,8 +66,9 @@ endif()
 message(STATUS "Input module: ${CINP}")
 # Valve surface
 if(CINP STREQUAL "xlib")
-	add_definitions("-DCATHOOK_GFX_SURFACE=1")
+	add_definitions("-DCATHOOK_INP_XLIB=1")
   list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/input.cpp")
+  set(USE_XLIB true)
 endif()
 
 ## SDK/Bases if needed
@@ -77,6 +78,11 @@ if(CBASE STREQUAL "SOURCE_2013_SDK")
 	add_definitions(-DCATHOOK_SOURCE_2013=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 -DRAD_TELEMETRY_DISABLED=1 -DLINUX=1 -DUSE_SDL=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1)
 	file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
+endif()
+
+# If anything uses xlib, we need the main file
+if(USE_XLIB)
+  list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/xlib.cpp")
 endif()
 
 # Debug info
@@ -121,4 +127,4 @@ message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 #include_directories(${INCLUDE_DIRS})
 add_library(nekohook SHARED ${SOURCE_FILES})
 
-target_link_libraries(nekohook c stdc++ pthread)
+target_link_libraries(nekohook c stdc++)

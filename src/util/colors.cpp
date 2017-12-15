@@ -18,7 +18,7 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-std::function<CatVector4(const CatEntity&)> EntityColor =
+CMFunction<CatVector4(const CatEntity&)> EntityColor {
 	[](const CatEntity& entity) {
 	// Default color
 	CatVector4 ent_color = white;
@@ -41,7 +41,7 @@ std::function<CatVector4(const CatEntity&)> EntityColor =
 		}
 
 	// Pickups
-} else if (entity.type == ETYPE_PICKUP_HEALTH || entity.type == ETYPE_PICKUP_SHEILD) {
+	} else if (entity.type == ETYPE_PICKUP_HEALTH || entity.type == ETYPE_PICKUP_SHEILD) {
 		switch(entity.type) {
 		case ETYPE_PICKUP_HEALTH:
 			ent_color = green; break;
@@ -50,7 +50,7 @@ std::function<CatVector4(const CatEntity&)> EntityColor =
 		}
 	}
 	return ent_color;
-};
+}};
 
 // Returns a color based on entity health
 CatVector4 Health(const CatEntity& entity) {
@@ -58,7 +58,7 @@ CatVector4 Health(const CatEntity& entity) {
 		return CatVector4(64, 128, 255, 255);
 
 	// Percentage of health our of max
-	float hf = (float)entity.health / (float)entity.max_health;
+	float hf = entity.health / entity.max_health;
 	// Sick logic
 	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }

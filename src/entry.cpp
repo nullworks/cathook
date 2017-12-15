@@ -6,7 +6,7 @@
  *      Author: nullifiedcat
  */
 
-
+// #include <thread>
 
 #include "util/logging.hpp" // To log
 #include "hack.h"	// Contains main init
@@ -15,7 +15,9 @@
 void Attach() {
 	g_CatLogging.log("Attaching...");
 	hack::Initialize();
-	g_CatLogging.log("Init done...");
+	// Freezes on inject so its commented
+	/*std::thread init_thread(hack::Initialize)
+	init_thread.join();*/
 }
 void Detach() {
 	g_CatLogging.log("Detaching");

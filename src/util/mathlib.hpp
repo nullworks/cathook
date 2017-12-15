@@ -11,7 +11,7 @@
 
 #include <math.h> // This is a mathlib, did you think we didnt need math?
 
-// Macro for getting the size of an array, Uses the size of first element then compares it to the size of the entire array.
+// Macro for getting the size of an array, Uses the size of first element then compares it to the size of the entire array. This is optimised out.
 #define GET_ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
 // Pi stuff

@@ -77,7 +77,4 @@ void CatGUI::Update() {
 // This would draw the entire screen so we override
 void CatGUI::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
 
-// So we can pass it as a function to drawmgr
-void Update() { g_pGUI.Update(); }
-
 }

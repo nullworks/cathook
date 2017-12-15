@@ -6,9 +6,9 @@
  *
  */
 
-namespace modules { namespace xlib {
+namespace xlib {
 
 // Init this to enable xlib input
 void InitInput();
-	
-}}
+
+}

@@ -7,8 +7,9 @@
  *
  */
 
-#include "../framework/gameticks.hpp"
+#include "../framework/gameticks.hpp" // To run our stuff
 #include "../framework/entitys.hpp"	// Contains entity and bone info
+#include "../gui/hudstrings/sidestrings.hpp"
 #include "esp.hpp"	// SetEspColor()
 
 #include "aimbot.hpp"
@@ -29,6 +30,7 @@ static CatEnum hitbox_enum({ // Update this as needed
 	"UPPER LEG L", "UPPER LEG R", "MIDDLE LEG L", "MIDDLE LEG R", "LOWER LEG L", "LOWER LEG R",
 });
 static CatVarEnum hitbox(aimbot_menu, hitbox_enum, "aimbot_hitbox", 0, "Hitbox", "Hitbox to use if mode is set to static");
+static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug info about aimbot");
 
 // A function to find a place to aim for on the target
 static CatVector RetriveAimpoint(const CatEntity& entity) {
@@ -37,7 +39,7 @@ static CatVector RetriveAimpoint(const CatEntity& entity) {
 	// Check if we can use bones
 	// Get our best bone
 	CatVector tmp;
-	if (bones::GetBone(entity, (int)hitbox, tmp))
+	if (bones::GetBone(entity, hitbox, tmp))
 		return tmp;
 
 	// Check for collision
@@ -60,7 +62,7 @@ static bool IsTargetGood(const CatEntity& entity) {
 	// Dead
 	if (!entity.alive) return false;
 	// Teammates
-	switch((int)teammates) {
+	switch(teammates) {
 	case 0:	// Enemy only
 		if (!entity.Enemy()) return false; break;
 	case 1:	// Ally only
@@ -68,7 +70,7 @@ static bool IsTargetGood(const CatEntity& entity) {
 	}
 
 	// Fov check
-	if ((float)fov > 0.0f && util::GetFov(RetriveAimpoint(entity)) > (float)fov) return false;
+	if (fov > 0.0f && util::GetFov(RetriveAimpoint(entity)) > (float)fov) return false;
 
 	// Hey look! Target passed all checks
 	return true;
@@ -90,7 +92,7 @@ static const CatEntity* RetrieveBestTarget() {
 
 		// Get score based on priority mode
 		float score = 0;
-		switch ((int)priority_mode) {
+		switch (priority_mode) {
 		case 0: // SMART Priority
 			score = 0; break; // TODO, fix
 		case 1: // Fov Priority
@@ -125,7 +127,7 @@ static bool ShouldAim() {
 
 // Input a vector to aim at it
 void AimAt(const CatVector& point) {
-	g_LocalPlayer.real_angles = util::VectorAngles(g_LocalPlayer.camera_position, point);
+	g_LocalPlayer.SetCameraAngle(util::VectorAngles(g_LocalPlayer.GetCamera(), point));
 }
 // Input an entity to aim at it
 void AimAt(const CatEntity& entity) {
@@ -150,8 +152,19 @@ static void WorldTick() {
 	AimAt(*target);
 }
 
+static void DrawTick() {
+	if (debug) {
+		char buf[128];
+		sprintf(buf, "Camera Angle: %f, %f", g_LocalPlayer.GetCameraAngle().x, g_LocalPlayer.GetCameraAngle().y);
+		gui::sidestrings::SideStrings.AddString(buf);
+		sprintf(buf, "Camera Position: %f, %f, %f", g_LocalPlayer.GetCamera().x, g_LocalPlayer.GetCamera().y, g_LocalPlayer.GetCamera().z);
+		gui::sidestrings::SideStrings.AddString(buf);
+	}
+}
+
 void Init() {
-	wtickmgr[1] + WorldTick;
+	wtickmgr_on(WorldTick);
+	drawmgr_on(DrawTick);
 }
 
 }}

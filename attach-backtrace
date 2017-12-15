@@ -22,9 +22,9 @@ proc=${arr[$inst]}
 echo Running instances: "${arr[@]}"
 echo Attaching to "$proc"
 
-sudo ./detach $inst libcathook.so
+sudo ./detach $inst libnekohook.so
 
-echo loading "$(realpath libcathook.so)" to "$proc"
+echo loading "$(realpath libnekohook.so)" to "$proc"
 gdb -n -q -batch \
   -ex "attach $proc" \
   -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \

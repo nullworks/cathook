@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <functional> // std::function
-
+#include "functions.hpp" // CMFunction
 #include "../framework/entitys.hpp" // We use entitys as an argument for our entity to color
 
 namespace colors {
@@ -56,7 +55,7 @@ const CatVector4 gray   = CatVector4(100, 100, 100, 255);
 const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 
 // Color functions
-extern std::function<CatVector4(const CatEntity& entity)> EntityColor;
+extern CMFunction<CatVector4(const CatEntity&)> EntityColor;
 
 CatVector4 Health(const CatEntity& entity);
 CatVector4 RainbowCurrent();

@@ -29,6 +29,4 @@ public:
 // Use to get the gui
 extern CatGUI g_pGUI;
 
-void Update();
-
 }

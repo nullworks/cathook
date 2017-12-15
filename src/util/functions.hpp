@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <thread>
 #include <vector>
 
 // Useful
@@ -21,7 +22,7 @@ class CMFunction;
 
 template <typename ret, typename... args>
 class CMFunction <ret(args...)> {
-  using func_type = ret(*)(args...);
+  using func_type = ret(*)(args...); // For std::function template like use
 public:
   CMFunction(func_type _func) : func(_func) {}
   inline auto operator()(args... a) { return func(a...); }
@@ -31,9 +32,29 @@ private:
 };
 
 class CMFunctionGroup {
-private:
-  std::vector<void_func> func_pool;
+  std::vector<void_func> func_pool; // to store added functions
 public:
-  inline void operator()() { for (const auto& func : func_pool) func(); }
+  // TODO, threading
+  inline void  operator()(const bool& do_multithreading = false) {
+
+    // If run requests not to do multithreading, we just run all the functions in order
+    if (!do_multithreading) {
+      for (const auto& func : func_pool) func();
+      return;
+    }
+
+    // Note: It shouldnt matter how many cores the system has as the operating system can determine on its own(in theroy), which thread should be run at a time, but eventually everything should finish.
+    // Make enough threads for as many functions as we have.
+    int tmp = func_pool.size();
+    std::thread func_threads[tmp];
+    // Start all threads with all our functions
+    for (int i = 0; i < tmp; i++) {
+      func_threads[i] = std::thread(func_pool[i]);
+    }
+    // Wait for the threads to finish
+    for (auto& thread : func_threads)
+      thread.join();
+  }
+
   void operator+(void_func in) { func_pool.push_back(in); }
 };

@@ -13,7 +13,7 @@
 #include "catvars.hpp"
 
 // The CatCommand map
-std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) CatCommandMap; // Need to init this before other catvars are inited 
+std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) CatCommandMap; // Need to init this before other catvars are inited
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
@@ -24,6 +24,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
     cat_children.push_back(cat_var); // We finished recursing
     return;
   }
+	
   // Look through the children and if any have the name of one we might want to make, we can reuse the branch
   for (auto& tree_branch : children) {
     // Test if this is an existing branch with matching names
@@ -47,20 +48,20 @@ CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _des
 }
 // Catvar Constructors
 CatVarBool::CatVarBool(const CatEnum& _gui_position, const char* _name, const bool& _defaults, const char* _desc_short, const char* _desc_long)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
 CatVarInt::CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long, const int& _max)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), min(0), max(_max) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(0), max(_max) {}
 CatVarInt::CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long, const int& _min, const int& _max)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), min(_min), max(_max) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(_min), max(_max) {}
 CatVarFloat::CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long, const float& _max)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), min(0), max(_max) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(0), max(_max) {}
 CatVarFloat::CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long, const float& _min, const float& _max)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), min(_min), max(_max) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(_min), max(_max) {}
 CatVarKey::CatVarKey(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
 CatVarString::CatVarString(const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
 CatVarColor::CatVarColor(const CatEnum& _gui_position, const char* _name, const CatVector4& _defaults, const char* _desc_short, const char* _desc_long)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
 CatVarEnum::CatVarEnum(const CatEnum& _cat_enum, const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long)
-  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), min(0), max(_cat_enum.size() - 1), cat_enum(_cat_enum) {}
+  : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(0), max(_cat_enum.size() - 1), cat_enum(_cat_enum) {}

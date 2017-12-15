@@ -9,7 +9,6 @@
 #include "../../framework/gameticks.hpp"	// To init our sidestrings
 #include "../../framework/game.hpp"		// Module authors
 #include "../gui.hpp"					// guicolor
-#include "hudstring.hpp"				// uhhhh
 
 #include "sidestrings.hpp"
 
@@ -17,12 +16,11 @@ namespace gui { namespace sidestrings {
 
 HudString SideStrings(8, 8);// Stores side strings
 
-void Draw() { SideStrings.Draw(); }
 // The main string to use at the top
 std::string top_string = "Cathook";
 
 // Adds default strings
-void AddDefault() {
+static void AddDefault() {
 	// Init strings
 	static bool init = false;
 	if (!init) {
@@ -39,7 +37,8 @@ void AddDefault() {
 				if (i > 0) {
 					if (i - 2 >= g_GameInfo.authors.size())
 						top_string += " and ";
-					else top_string += ", ";
+					else
+						top_string += ", ";
 				}
 				top_string += tmp; // Add our author
 			}
@@ -59,7 +58,7 @@ void Init() {
 	// To Get our default strings up there
 	drawmgr_before(AddDefault);
 	// To draw our strings
-	drawmgr_after(Draw);
+	drawmgr_after([](){SideStrings.Draw();});
 }
 
 }}

@@ -58,7 +58,7 @@ CatVector4 Health(const CatEntity& entity) {
 		return CatVector4(64, 128, 255, 255);
 
 	// Percentage of health our of max
-	float hf = entity.health / entity.max_health;
+	float hf = (float)entity.health / (float)entity.max_health;
 	// Sick logic
 	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }

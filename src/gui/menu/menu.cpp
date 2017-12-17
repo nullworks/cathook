@@ -19,9 +19,9 @@ namespace gui { namespace menu {
 CMenu pMenu;
 
 void Init() {
-  pMenu.position_mode = base::FLOATING;
+/*  pMenu.position_mode = base::FLOATING;
   pMenu.size = std::make_pair(600, 400);
-  g_pGUI.AddChild(&pMenu);
+  g_pGUI.AddChild(&pMenu);*/
 }
 
 }}

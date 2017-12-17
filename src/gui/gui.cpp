@@ -74,9 +74,9 @@ void CatGUI::Update() {
 
 	// Draw
 	Draw();
-	char tmp[1024];
+	/*char tmp[1024];
 	sprintf(tmp, "Uhhhh: %i", children[0]->position_mode);
-	sidestrings::SideStrings.AddString(tmp);
+	sidestrings::SideStrings.AddString(tmp);*/
 }
 
 // This would draw the entire screen so we override

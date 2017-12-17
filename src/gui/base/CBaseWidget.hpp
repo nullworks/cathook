@@ -38,11 +38,6 @@ public:
 	virtual void Show();
 	virtual void Hide();
 
-	// General checking
-	virtual bool IsHovered();
-	virtual bool IsFocused();
-	virtual bool IsPressed();
-
 	// Sizing
 	virtual std::pair<int, int> AbsolutePosition();
 

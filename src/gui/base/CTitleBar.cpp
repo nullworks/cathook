@@ -27,14 +27,14 @@ enum {
 // Constructor
 CTitleBar::CTitleBar(const char* _title, IWidget* _parent) : CBaseWidget("titlebar", parent) {
 	strcpy(title, _title);
-	position_mode = ABSOLUTE_TOP;
+	position_mode = ABSOLUTE;
 }
 
 void CTitleBar::Update() {
 	auto psize = parent->size;
 	auto str_size = draw::GetStringLength(title, 1, 9);
 	size = std::make_pair(psize.first, 2 * TITLEBAR_PADDING_H + str_size.first);
-	if (!IsPressed()) {
+	if (!press) {
 		drag_stage = EDRAG_START;
 		return;
 	}

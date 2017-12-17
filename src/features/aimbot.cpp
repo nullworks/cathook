@@ -10,6 +10,7 @@
 #include "../framework/gameticks.hpp" // To run our stuff
 #include "../framework/entitys.hpp"	// Contains entity and bone info
 #include "../framework/input.hpp" // to get userinput for aimkeys
+#include "../framework/trace.hpp" // so we can vis check
 #include "../gui/hudstrings/sidestrings.hpp"
 #include "esp.hpp"	// SetEspColor()
 
@@ -26,7 +27,7 @@ static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range fo
 static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
 static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
 // Other
-static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_MOUSE_1, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
+static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatEnum hitbox_enum({ // Update this as needed
 	"HEAD", "TOP SPINE", "UPPER SPINE", "MIDDLE SPINE", "BOTTOM SPINE", "PELVIS",
 	"UPPER ARM L", "UPPER ARM R", "MIDDLE ARM L", "MIDDLE ARM R", "LOWER ARM L", "LOWER ARM R",
@@ -74,6 +75,9 @@ static bool IsTargetGood(const CatEntity& entity) {
 
 	// Fov check
 	if (fov > 0.0f && util::GetFov(RetriveAimpoint(entity)) > (float)fov) return false;
+
+	// Vis check
+	if (!trace::TraceEnt(entity, g_LocalPlayer.GetCamera(), RetriveAimpoint(entity))) return false;
 
 	// Hey look! Target passed all checks
 	return true;

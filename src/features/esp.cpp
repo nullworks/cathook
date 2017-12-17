@@ -129,7 +129,7 @@ static void Draw() {
 					// Draw the bones in the bone set
 					for (int i = 0; i < current_set.size() - 1; i++) { // We do it like this so we can identify where we are in the loop
 
-						// Get our 2 bones to connecthttps://github.com/oneechanhax/nekohook
+						// Get our 2 bones to connect
 						CatVector bone1, bone2;
 						if (bones::GetBone(entity, current_set[i], bone1) && bones::GetBone(entity, current_set[i + 1], bone2)) {
 

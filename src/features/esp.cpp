@@ -13,7 +13,6 @@
 #include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
-#include "../util/logging.hpp"			// So we can stop esp if not ingame
 
 #include "esp.hpp"
 
@@ -93,7 +92,7 @@ static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
 	if (!esp_enabled || !g_GameInfo.in_game) return;
-	
+
 	// Loop through all entitys
 	for (const auto& entity: g_CatEntitys) {
 		if (CE_BAD(entity)) continue;
@@ -117,7 +116,7 @@ static void Draw() {
 				if (draw::WorldToScreen(entity.origin, scn)) {
 
 					// Draw a line
-					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((int)tracers == 2) ? input::bounds.second : input::bounds.second / 2 - scn.y, esp_cache[entity.IDX].color);
+					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((tracers == 2) ? input::bounds.second : input::bounds.second / 2) - scn.y, esp_cache[entity.IDX].color);
 				}
 			}
 
@@ -130,7 +129,7 @@ static void Draw() {
 					// Draw the bones in the bone set
 					for (int i = 0; i < current_set.size() - 1; i++) { // We do it like this so we can identify where we are in the loop
 
-						// Get our 2 bones to connect
+						// Get our 2 bones to connecthttps://github.com/oneechanhax/nekohook
 						CatVector bone1, bone2;
 						if (bones::GetBone(entity, current_set[i], bone1) && bones::GetBone(entity, current_set[i + 1], bone2)) {
 
@@ -183,7 +182,7 @@ static void Draw() {
 				if (GetEntityBox(entity)) {
 
 					// Get in bar height
-					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min(entity.health / entity.max_health, 1);
+					int hbh = (screenbox.second.max.y - screenbox.second.min.y - 2) * std::min((float)entity.health / (float)entity.max_health, 1.0f);
 
 					// Draw
 					draw::Rect(screenbox.second.min.x - 7, screenbox.second.min.y, 7, screenbox.second.max.y - screenbox.second.min.y, colors::black);

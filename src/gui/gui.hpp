@@ -16,6 +16,7 @@ class CatGUI : public base::CBaseContainer {
 public:
 	CatGUI();
 
+	virtual void MoveChildren() override {}
 	virtual void Update() override;
 	virtual void DrawBounds() override;
 

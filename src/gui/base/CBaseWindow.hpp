@@ -14,7 +14,9 @@ namespace gui { namespace base {
 class CBaseWindow : public CBaseContainer {
 public:
 	// Constructors & Deconstructors
-	CBaseWindow(std::string name = "unnamed", IWidget* parent = nullptr) : CBaseContainer(name, parent) {}
+	CBaseWindow(const char* _name = "unnamed", IWidget* _parent = nullptr) : CBaseContainer(name, parent) {
+		position_mode = FLOATING;
+	}
 	virtual ~CBaseWindow() {};
 
 	// General functions

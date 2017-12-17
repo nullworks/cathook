@@ -6,6 +6,8 @@
  *      Author: nullifiedcat
  */
 
+#include <cstring>
+
 #include "../../framework/input.hpp" // We use mouse stuff here
 #include "../../framework/drawing.hpp" // Draw stuff
 #include "../../util/colors.hpp" // Draw stuff
@@ -23,14 +25,15 @@ enum {
 };
 
 // Constructor
-CTitleBar::CTitleBar(std::string _title, IWidget* _parent) : CBaseWidget("titlebar", parent), title(_title) {
-	SetPositionMode(ABSOLUTE);
+CTitleBar::CTitleBar(const char* _title, IWidget* _parent) : CBaseWidget("titlebar", parent) {
+	strcpy(title, _title);
+	position_mode = ABSOLUTE_TOP;
 }
 
 void CTitleBar::Update() {
-	auto psize = GetParent()->GetSize();
-	auto str_size = draw::GetStringLength(title.c_str(), 1, 9);
-	SetSize(psize.first, 2 * TITLEBAR_PADDING_H + str_size.first);
+	auto psize = parent->size;
+	auto str_size = draw::GetStringLength(title, 1, 9);
+	size = std::make_pair(psize.first, 2 * TITLEBAR_PADDING_H + str_size.first);
 	if (!IsPressed()) {
 		drag_stage = EDRAG_START;
 		return;
@@ -40,18 +43,17 @@ void CTitleBar::Update() {
 	} else {
 		int dx = input::mouse.first - last_mouse.first;
 		int dy = input::mouse.second - last_mouse.second;
-		auto offset = GetParent()->GetOffset();
-		GetParent()->SetOffset(offset.first + dx, offset.second + dy);
+		auto offset = parent->offset;
+		parent->offset = std::make_pair(offset.first + dx, offset.second + dy);
 	}
 	last_mouse = input::mouse;
 }
 
 void CTitleBar::Draw() {
 	auto abs = AbsolutePosition();
-	auto size = GetSize();
 	draw::Rect(abs.first, abs.second, size.first, size.second, colors::pink);
-	auto str_size = draw::GetStringLength(title.c_str(), 1, 9);
-	draw::String(title.c_str(), abs.first + (size.first - str_size.first) / 2, abs.second + TITLEBAR_PADDING_H, 1, 9, colors::white);
+	auto str_size = draw::GetStringLength(title, 1, 9);
+	draw::String(title, abs.first + (size.first - str_size.first) / 2, abs.second + TITLEBAR_PADDING_H, 1, 9, colors::white);
 }
 
 }}

@@ -38,6 +38,6 @@ constexpr int PlatformOffset(int offset_linux = -1, int offset_windows = -1, int
 #else
 	return -1;
 #endif
-
 }
+
 }

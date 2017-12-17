@@ -5,9 +5,18 @@
  *
  */
 
+#include "../base/CBaseWindow.hpp"
+#include "../gui.hpp"
+
 namespace gui { namespace menu {
 
-// Here we build our menu
+class CMenu : public base::CBaseWindow {
+public:
+  std::vector<int> menu_position = {0};
+  //virtual void OnMousePress();
+};
+
+extern CMenu pMenu;
 void Init();
 
 }}

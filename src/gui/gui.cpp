@@ -6,6 +6,8 @@
  *      Author: nullifiedcat
  */
 
+#include "hudstrings/sidestrings.hpp"
+
 #include "gui.hpp"
 
 bool gui_visible = false;
@@ -72,6 +74,9 @@ void CatGUI::Update() {
 
 	// Draw
 	Draw();
+	char tmp[1024];
+	sprintf(tmp, "Uhhhh: %i", children[0]->position_mode);
+	sidestrings::SideStrings.AddString(tmp);
 }
 
 // This would draw the entire screen so we override

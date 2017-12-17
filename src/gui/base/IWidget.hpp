@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <string>	 // std::string
 #include <utility> // Pair
 
 #include "../../util/mathlib.hpp" // Colors
@@ -16,37 +15,36 @@
 namespace gui { namespace base {
 
 enum {
-	ABSOLUTE,
-	INLINE,
-	FLOATING
+	FLOATING, // Widget handles own positions
+	ABSOLUTE, // Absolutes are positions that are static, and depends on the side they are on. Absobutes are for things supposed to be at the top
+	INLINE // Automatic mamagement of widget requested
 };
 
 class IWidget {
 public:
 	IWidget* parent;
 
-	// values to replace keyvalues, they are self explanitory
+	// States
 	bool hover = false;
 	bool press = false;
 	bool focus = false;
 
+	// Visibility
 	bool visible = true;
 	bool always_visible = false;
 
-	std::pair<int, int> offset = std::make_pair(0, 0);
-	std::pair<int, int> size = std::make_pair(0, 0);
-	std::pair<int, int> max = std::make_pair(0, 0);
+	// Positioning
+	int position_mode = FLOATING;
+	std::pair<int, int> offset;
+	std::pair<int, int> size;
 	int zindex = 0;
 
-	std::string tooltip = "";
+	// Naming
+	char name[64];
+	char tooltip[256] = "";
 
-	int position_mode = 0;
-
-	std::string name;
-
-	CatVector4 bounds_color = CatVector4();
-
-public:
+	// For use in show bounds
+	CatVector4 bounds_color;
 
 	// General functions
 	virtual void Update() = 0;
@@ -64,39 +62,24 @@ public:
 	virtual void OnKeyRelease(int key) = 0;
 	virtual bool ConsumesKey(int key) = 0;
 
-	// visibility
+	// Visibility
 	virtual void Show() = 0;
 	virtual void Hide() = 0;
-	virtual bool IsVisible() = 0;
-
-	// General checking
-	virtual bool IsHovered() = 0;
-	virtual bool IsFocused() = 0;
-	virtual bool IsPressed() = 0;
+	bool IsVisible() { return always_visible || parent ? parent->visible && visible : visible; }
 
 	// Sizing
-	virtual void SetOffset(int x, int y) = 0;
-	virtual void SetMaxSize(int x, int y) = 0;
-	virtual void SetSize(int x, int y) = 0;
-	virtual void SetZIndex(int idx) = 0;
-	virtual std::pair<int, int> GetOffset() = 0;
-	virtual std::pair<int, int> GetSize() = 0;
-	virtual std::pair<int, int> GetMaxSize() = 0;
-	virtual int GetZIndex() = 0;
 	virtual std::pair<int, int> AbsolutePosition() = 0;
 
-	// Hmm
-	virtual std::string GetTooltip() = 0;
-
-	// used to set position
-	virtual int GetPositionMode() = 0;
-	virtual void SetPositionMode(int mode) = 0;
+	// Naming
+	virtual const char* GetTooltip() = 0;
 
 	// Parental + children
-	virtual IWidget* GetParent() = 0;
-	virtual void SetParent(IWidget*) = 0;
-	virtual IWidget* GetRootParent() = 0;
-	virtual std::string GetName() = 0;
+	IWidget* GetRoot() {
+		auto pParent = parent;
+		while (pParent)
+			pParent = pParent->parent;
+		return pParent;
+	}
 };
 
 }}

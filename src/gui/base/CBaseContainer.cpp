@@ -5,6 +5,8 @@
  *      Author: nullifiedcat
  */
 
+#include <cstring> // strcmp()
+
 #include "../../framework/input.hpp"
 
 #include "CBaseContainer.hpp"
@@ -12,7 +14,7 @@
 namespace gui { namespace base {
 
 // Constructor & destructor
-CBaseContainer::CBaseContainer(std::string _name, IWidget* _parent) : CBaseWidget(_name, _parent) {}
+CBaseContainer::CBaseContainer(const char* _name, IWidget* _parent) : CBaseWidget(_name, _parent) {}
 CBaseContainer::~CBaseContainer() { for (auto child : children) delete child; }
 
 // General functions
@@ -50,56 +52,62 @@ void CBaseContainer::OnMousePress() {
 	PressOn(ChildByPoint(input::mouse.first, input::mouse.second));
 }
 void CBaseContainer::OnMouseRelease() {
-	if (GetPressedChild()) GetPressedChild()->OnMouseRelease();
+	if (pressed_child) pressed_child->OnMouseRelease();
 }
 void CBaseContainer::OnFocusLose() {
 	FocusOn(0);
 	CBaseWidget::OnFocusLose();
 }
 void CBaseContainer::OnKeyPress(int key, bool repeat) {
-	if (GetFocusedChild()) GetFocusedChild()->OnKeyPress(key, repeat);
+	if (focused_child) focused_child->OnKeyPress(key, repeat);
 }
 void CBaseContainer::OnKeyRelease(int key) {
-	if (GetFocusedChild()) GetFocusedChild()->OnKeyRelease(key);
+	if (focused_child) focused_child->OnKeyRelease(key);
 }
 bool CBaseContainer::ConsumesKey(int key) {
-	if (GetFocusedChild()) return GetFocusedChild()->ConsumesKey(key);
+	if (focused_child) return focused_child->ConsumesKey(key);
 	return false;
 }
 
 // Visiblity
 void CBaseContainer::Hide() {
 	CBaseWidget::Hide();
-	if (GetHoveredChild()) GetHoveredChild()->OnMouseLeave();
-	if (GetFocusedChild()) GetFocusedChild()->OnFocusLose();
-	if (GetPressedChild()) GetPressedChild()->OnMouseRelease();
+	if (hovered_child) hovered_child->OnMouseLeave();
+	if (focused_child) focused_child->OnFocusLose();
+	if (pressed_child) pressed_child->OnMouseRelease();
+}
+
+// Tooltips
+const char* CBaseContainer::GetTooltip() {
+	if (hovered_child) return hovered_child->GetTooltip();
+	return nullptr;
 }
 
 // Children
 void CBaseContainer::AddChild(IWidget* child) {
 	children.push_back(child);
-	child->SetParent(this);
+	child->parent = this;
 }
 
 // Children util
 IWidget* CBaseContainer::ChildByIndex(int idx) {
-	if (idx < 0 || idx >= ChildCount()) return nullptr;
+	if (idx < 0 || idx >= children.size()) return nullptr;
 	return children.at(idx);
 }
-IWidget* CBaseContainer::ChildByName(std::string name) {
+IWidget* CBaseContainer::ChildByName(const char* name) {
 	for (auto child : children) {
-		if (!child->GetName().compare(name)) {
+		if (!strcmp(child->name, name)) {
 			return child;
 		}
 	}
 	return nullptr;
 }
 IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space to return a child within it
-	for (int i = ChildCount() - 1; i >= 0; i--) {
+	for (int i = children.size() - 1; i >= 0; i--) {
 		auto child = ChildByIndex(i);
 		if (!child->IsVisible()) continue;
 		auto abs = child->AbsolutePosition();
-		auto cs = child->GetSize();
+		auto cs = child->size;
 		if (x >= abs.first && x <= abs.first + cs.first &&
 			y >= abs.second && y <= abs.second + cs.second) {
 			return child;
@@ -107,37 +115,62 @@ IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space 
 	}
 	return nullptr;
 }
-int CBaseContainer::ChildCount() {
-	return children.size();
-}
 
 // Child related update functions
 void CBaseContainer::SortByZIndex() {
 	std::sort(children.begin(), children.end(), [](IWidget* a, IWidget* b) -> bool {
-		return a->GetZIndex() < b->GetZIndex();
+		return a->zindex < b->zindex;
 	});
 }
 void CBaseContainer::UpdateHovers() {
 	auto hovered = ChildByPoint(input::mouse.first, input::mouse.second);
-	if (hovered != GetHoveredChild())
+	if (hovered != hovered_child)
 		HoverOn(hovered);
 }
 void CBaseContainer::MoveChildren() {
-	return;
+	// Used space
+	int mx = 0, my = 0, mox = size.first, moy = size.second;
+	// Get our absolutes down
+	/*for (auto c : children) {
+		// Check if not absolute
+		if (c->position_mode != ABSOLUTE)
+			return;
+		// Add the amount of space it takes to our used amount
+		std::pair<int, int> space_taken;
+		space_taken.first = c->offset.second + c->size.second
+
+			space_taken =  + 2
+			if
+
+			break;
+		case ABSOLUTE_LEFT:
+			mx -= c->offset.first + c->size.second + 2;
+			break;
+		}
+	}
+	// Organize our inlines
+	for (auto c : children) {
+		if (!c->IsVisible()) continue;
+		auto off = c->GetOffset();
+		auto size = c->GetSize();
+
+		c->SetOffset(2, my);
+		if (size.first > mx) mx = size.first;
+		size.first += off.first;
+		size.second += off.second;
+		}
+	}*/
 }
 
 // Child info related to the container
-IWidget* CBaseContainer::GetFocusedChild() { return focused_child; }
-IWidget* CBaseContainer::GetHoveredChild() { return hovered_child; }
-IWidget* CBaseContainer::GetPressedChild() { return pressed_child; }
 void CBaseContainer::HoverOn(IWidget* child) {
-	if (GetHoveredChild()) GetHoveredChild()->OnMouseLeave();
+	if (hovered_child) hovered_child->OnMouseLeave();
 	if (child) child->OnMouseEnter();
 	hovered_child = child;
 }
 void CBaseContainer::FocusOn(IWidget* child) {
-	if (GetFocusedChild() != child) {
-		if (GetFocusedChild()) GetFocusedChild()->OnFocusLose();
+	if (focused_child != child) {
+		if (focused_child) focused_child->OnFocusLose();
 		if (child) child->OnFocusGain();
 		focused_child = child;
 	}

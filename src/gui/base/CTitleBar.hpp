@@ -14,14 +14,14 @@ namespace gui { namespace base {
 
 class CTitleBar : public CBaseWidget {
 public:
-	CTitleBar(std::string _title, IWidget* _parent);
+	CTitleBar(const char* _title, IWidget* _parent);
 
 	virtual void Draw();
 	virtual void Update();
 
-	std::string title;
+	char title[64];
 	int drag_stage = 0;
-	std::pair<int, int> last_mouse = std::make_pair(0, 0);
+	std::pair<int, int> last_mouse;
 };
 
 }}

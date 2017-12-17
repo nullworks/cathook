@@ -12,6 +12,7 @@
 
 // Stuff to init
 #include "gui.hpp"
+#include "menu/menu.hpp"
 #include "hudstrings/sidestrings.hpp"
 
 #include "init.hpp"
@@ -22,6 +23,8 @@ void Init() {
 
 	// Setup the draw manager to run gui
 	drawmgr_on([](){g_pGUI.Update();});
+
+	menu::Init();
 
 	// Other gui elements
 	sidestrings::Init();

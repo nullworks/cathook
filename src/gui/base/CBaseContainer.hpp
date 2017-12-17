@@ -8,7 +8,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
 
 #include "CBaseWidget.hpp"
 
@@ -16,8 +15,8 @@ namespace gui { namespace base {
 
 class CBaseContainer : public CBaseWidget {
 public:
-	CBaseContainer(std::string _name = "unnamed", IWidget* _parent = nullptr);
-	virtual ~CBaseContainer(); // required to be virtual to prevent destructor override
+	CBaseContainer(const char* _name = "unnamed", IWidget* _parent = nullptr);
+	~CBaseContainer();
 
 	virtual void Update();
 	virtual void Draw();
@@ -35,15 +34,17 @@ public:
 	// Visibility
 	virtual void Hide();
 
+	// Tooltips
+	virtual const char* GetTooltip();
+
 	// Children
 	std::vector<IWidget*> children;
 	void AddChild(IWidget* child);
 
 	// Get Child/info
 	IWidget* ChildByIndex(int idx);
-	IWidget* ChildByName(std::string name);
+	IWidget* ChildByName(const char* name);
 	IWidget* ChildByPoint(int x, int y);
-	int ChildCount();
 
 	// Child related util
 	virtual void SortByZIndex();
@@ -51,9 +52,6 @@ public:
 	virtual void MoveChildren();
 
 	// Child info related to the container
-	IWidget* GetHoveredChild();
-	IWidget* GetFocusedChild();
-	IWidget* GetPressedChild();
 	void HoverOn(IWidget* child);
 	void FocusOn(IWidget* child);
 	void PressOn(IWidget* child);

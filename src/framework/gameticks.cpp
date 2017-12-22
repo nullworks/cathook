@@ -14,6 +14,7 @@
 
 // Stores functions that request to be called at times during draw
 CMFunctionGroup drawmgr[3];
+
 // Help prevent multithreadding call this multiple times
 static std::mutex drawing_mutex;
 

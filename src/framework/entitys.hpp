@@ -111,7 +111,6 @@ public:
 
 	// Our player commands
 	CMFunction<void()> Attack {[](){}};					// Call to make player attack
-	CMFunction<void()> AttackPrevent {[](){}};	// Call to prevent the player from attacking
 	CMFunction<CatVector()> GetCamera {[]() -> CatVector {return CatVector();}}; 	// Get point where the users camera is
 	CMFunction<CatVector()> GetCameraAngle {[]() -> CatVector {return CatVector();}};
 	CMFunction<void(const CatVector&)> SetCameraAngle {[](const CatVector&){}};
@@ -138,7 +137,7 @@ namespace bones {
 extern const std::vector<int> bonesets[3];
 
 // Returns a reference to a catbone if it exists
-inline bool GetBone(const CatEntity& entity, const int& bone, CatVector& input) {
+inline bool GetBone(const CatEntity& entity, int bone, CatVector& input) {
 	// Ensure we have a bone
 	if (bone < 0 || bone >= EBone_count) return false;
 	if (!entity.bones[bone].first) return false;
@@ -147,7 +146,7 @@ inline bool GetBone(const CatEntity& entity, const int& bone, CatVector& input) 
 	return true;
 }
 
-inline bool GetBone(const CatEntity& entity, const int& bone, CatBox& input) {
+inline bool GetBone(const CatEntity& entity, int bone, CatBox& input) {
 	// Ensure we have a bone
 	if (bone < 0 || bone >= EBone_count) return false;
 	if (!entity.bones[bone].first) return false;

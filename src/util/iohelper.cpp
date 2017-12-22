@@ -21,12 +21,20 @@ const char* GetProcessName() {
 	read_stream.seekg(0);
 
 	static char str[30];
-	read_stream.getline(str, 30, '\n'); // Stop at newline, also char is gay
+	read_stream.getline(str, sizeof(str), '\n'); // Stop at newline, also char is gay
 	substr(str, str, 6, 24); // Get rid of "Name: " from the string
 	return str;
 }
 
 // Uhhhhh, TODO!!!!
-PackedFile::PackedFile(const char* _name, const char* _packed_file) : name(_name), packed_file(_packed_file) {
-
+PackedFile::PackedFile(const char* _packed_file) : packed_file(_packed_file) {
+	/*
+	// Make a temp file to store the file
+	char tmp[] = P_tmpdir "/neko.XXXXXX";
+	mkdtemp(tmp);
+	name = tmp;
+	// Write our packed info to the tmp file
+	fopen(tmp, "w");
+	fputs(packed_file);
+	*/
 }

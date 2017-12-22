@@ -24,13 +24,13 @@ enum {
 
 namespace draw {
 
-extern CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4&)> Line;
-extern CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4&)> Rect;
-extern CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4&)> RectFilled;
-extern CMFunction<void(const int&, const int&, const float&, const int&, const CatVector4&)> Circle;
+extern CMFunction<void(int, int, int, int, const CatVector4&)> Line;
+extern CMFunction<void(int, int, int, int, const CatVector4&)> Rect;
+extern CMFunction<void(int, int, int, int, const CatVector4&)> RectFilled;
+extern CMFunction<void(int, int, float, int, const CatVector4&)> Circle;
 
-extern CMFunction<void(const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color)> String;
-extern CMFunction<std::pair<int, int>(const char* string, const int& font, const int& size)> GetStringLength;
+extern CMFunction<void(const char* text, int x, int y, int font, int size, const CatVector4& color)> String;
+extern CMFunction<std::pair<int, int>(const char* string, int font, int size)> GetStringLength;
 
 extern CMFunction<bool(const CatVector&, CatVector&)> WorldToScreen;
 

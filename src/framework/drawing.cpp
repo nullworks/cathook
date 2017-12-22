@@ -21,13 +21,13 @@
 namespace draw {
 
 // Line
-CMFunction<void(const int& x, const int& y, const int& w, const int& h, const CatVector4& color)> Line {
-	[](const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {}
+CMFunction<void(int, int, int, int, const CatVector4&)> Line {
+	[](int x, int y, int w, int h, const CatVector4& color) {}
 };
 
 // Outline rect
-CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4&)> Rect {
-	[] (const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {
+CMFunction<void(int, int, int, int, const CatVector4&)> Rect {
+	[] (int x, int y, int w, int h, const CatVector4& color) {
 	// Make outline rect with draw line
 	Line(x, y, w, 0, color); // Top
 	Line(x, y + 1, 0, h, color); // Left
@@ -36,8 +36,8 @@ CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4
 }};
 
 // Filled Rect
-CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4&)> RectFilled {
-	[] (const int& x, const int& y, const int& w, const int& h, const CatVector4& color) {
+CMFunction<void(int, int, int, int, const CatVector4&)> RectFilled {
+	[] (int x, int y, int w, int h, const CatVector4& color) {
 	// Make filled rect with lines
 	for (int i = 0; i < w; i++) {
 		Line(x + i, y, 0, h, color);
@@ -45,8 +45,8 @@ CMFunction<void(const int&, const int&, const int&, const int&, const CatVector4
 }};
 
 // Outline circle
-CMFunction<void(const int&, const int&, const float&, const int&, const CatVector4&)> Circle {
-	[](const int& x, const int& y, const float& radius, const int& steps, const CatVector4& color) {
+CMFunction<void(int, int, float, int, const CatVector4&)> Circle {
+	[](int x, int y, float radius, int steps, const CatVector4& color) {
 	if (radius < 0 || steps <= 3) return; // cant draw a cirle without specific parameters
 	float px = 0;
 	float py = 0;
@@ -66,12 +66,12 @@ CMFunction<void(const int&, const int&, const float&, const int&, const CatVecto
 }};
 
 // String
-CMFunction<void(const char*, const int&, const int&, const int&, const int&, const CatVector4&)> String {
-	[](const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color) {}};
+CMFunction<void(const char*, int, int, int, int, const CatVector4&)> String {
+	[](const char* text, int x, int y, int font, int size, const CatVector4& color) {}};
 
 // String length in pixels
-CMFunction<std::pair<int, int>(const char*, const int&, const int&)> GetStringLength {
-	[](const char* string, const int& font, const int& size) { return std::make_pair(0, 0); }};
+CMFunction<std::pair<int, int>(const char*, int, int)> GetStringLength {
+	[](const char* string, int font, int size) { return std::make_pair(0, 0); }};
 
 // The main world to screen function used by most of the cheats esp features, sadly, this isnt going to be included into the draw object due to it being seperate
 CMFunction<bool(const CatVector&, CatVector&)> WorldToScreen {

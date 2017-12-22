@@ -7,7 +7,6 @@
 
 #include <ctime> // time()
 #include <stdlib.h> // srand()
-
 #include "util/logging.hpp" // To log progress
 
 // Game Modules

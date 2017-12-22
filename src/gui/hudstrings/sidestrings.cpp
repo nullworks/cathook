@@ -17,7 +17,7 @@ namespace gui { namespace sidestrings {
 HudString SideStrings(8, 8);// Stores side strings
 
 // The main string to use at the top
-std::string top_string = "Cathook";
+std::string top_string = "Nekohook";
 
 // Adds default strings
 static void AddDefault() {
@@ -26,7 +26,7 @@ static void AddDefault() {
 	if (!init) {
 
 		// Default to cathook
-		top_string = "Cathook";
+		top_string = "Nekohook";
 
 		// Check if we have authors
 		if (!g_GameInfo.authors.empty()) {

@@ -15,9 +15,9 @@ namespace colors {
 // Color utils
 inline CatVector4 FromRGBA8(const CatVector4& color) { return color / 255; }
 inline CatVector4   ToRGBA8(const CatVector4& color) { return color * 255; }
-inline CatVector4   ToRGBA8(const float& r, const float& g, const float& b, const float& a) { return CatVector4(r * 255, g * 255, b * 255, a * 255); }
-inline CatVector4 Transparent(const CatVector4& color, const float& multiplier = 0.5f) { return CatVector4(color.x, color.y, color.z, color.a * multiplier); }
-inline CatVector4 FromHSL(float h, const float& s, const float& v) {
+inline CatVector4   ToRGBA8(float r, float g, float b, float a) { return CatVector4(r * 255, g * 255, b * 255, a * 255); }
+inline CatVector4 Transparent(const CatVector4& color, float multiplier = 0.5f) { return CatVector4(color.x, color.y, color.z, color.a * multiplier); }
+inline CatVector4 FromHSL(float h, float s, float v) {
 	if (s <= 0.0) return ToRGBA8(v, v, v, 1.0f);
 	if (h >= 360.0) h = 0.0;
 	h /= 60.0;

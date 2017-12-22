@@ -21,15 +21,15 @@
 // Struct for point in 3d space
 class CatVector {
 public:
-	CatVector(const float& _x = 0.0f, const float& _y = 0.0f, const float& _z = 0.0f) : x(_x), y(_y), z(_z) {}
+	CatVector(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {}
 	float x, y, z;
 	// So we can do math with our catvectors easily
 	inline CatVector operator+(const CatVector& value) const { return CatVector(x + value.x, y + value.y, z + value.z); }
 	inline CatVector operator-(const CatVector& value) const { return CatVector(x - value.x, y - value.y, z - value.z); }
 	inline CatVector operator*(const CatVector& value) const { return CatVector(x * value.x, y * value.y, z * value.z); }
 	inline CatVector operator/(const CatVector& value) const { return CatVector(x / value.x, y / value.y, z / value.z); }
-	inline CatVector operator*(const float& value) 	   const { return CatVector(x * value, y * value, z * value); }
-	inline CatVector operator/(const float& value)	   const { return CatVector(x / value, y / value, z / value); }
+	inline CatVector operator*(float value) 	   const { return CatVector(x * value, y * value, z * value); }
+	inline CatVector operator/(float value)	   const { return CatVector(x / value, y / value, z / value); }
 	inline bool 	operator==(const CatVector& value) const { return value.x == x && value.y == y && value.z == z; }
 	inline bool 	operator!=(const CatVector& value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors
@@ -68,8 +68,8 @@ public:
 	float x, y, z, a;
 
 	// So we can do math with our catvectors easily
-  inline CatVector4 operator*(const float& value)	const { return CatVector4(x * value, y * value, z * value, a * value); }
-  inline CatVector4 operator/(const float& value)	const { return CatVector4(x / value, y / value, z / value, a / value); }
+  inline CatVector4 operator*(float value)	const { return CatVector4(x * value, y * value, z * value, a * value); }
+  inline CatVector4 operator/(float value)	const { return CatVector4(x / value, y / value, z / value, a / value); }
 	inline bool operator==(const CatVector4& value) const { return value.x == x && value.y == y && value.z == z && value.a == a; }
 	inline bool operator!=(const CatVector4& value) const { return value.x != x || value.y != y || value.z != z || value.a != a; }
 };

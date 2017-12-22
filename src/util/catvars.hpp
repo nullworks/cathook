@@ -40,8 +40,8 @@ public:
 	CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown", const int& _max = 100);
 	CatVarInt(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long, const int& _min, const int& _max);
 	inline operator int() const { return value; }
-	inline void operator= (const int& in_value) { value = in_value; }
-	inline bool operator==(const int& in_value) const { return value == in_value; }
+	inline void operator= (int in_value) { value = in_value; }
+	inline bool operator==(int in_value) const { return value == in_value; }
 	const int& defaults;
 	int value;
 	const int& min;
@@ -52,8 +52,8 @@ public:
 	CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long = "Unknown", const float& _max = 100);
 	CatVarFloat(const CatEnum& _gui_position, const char* _name, const float& _defaults, const char* _desc_short, const char* _desc_long, const float& _min, const float& _max);
 	inline operator float() const { return value; }
-	inline void operator= (const float& in_value) { value = in_value; }
-	inline bool operator==(const float& in_value) const { return value == in_value; }
+	inline void operator= (float in_value) { value = in_value; }
+	inline bool operator==(float in_value) const { return value == in_value; }
 	const float& defaults;
 	float value;
 	const float& min;
@@ -63,8 +63,8 @@ class CatVarKey : public CatVar {
 public:
 	CatVarKey(const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
 	inline operator int() const { return value; }
-	inline void operator= (const int& in_value) { value = in_value; }
-	inline bool operator==(const int& in_value) const { return value == in_value; }
+	inline void operator= (int in_value) { value = in_value; }
+	inline bool operator==(int in_value) const { return value == in_value; }
 	const int& defaults;
 	int value;
 };
@@ -90,8 +90,8 @@ class CatVarEnum : public CatVar {
 public:
 	CatVarEnum(const CatEnum& _cat_enum, const CatEnum& _gui_position, const char* _name, const int& _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
 	inline operator int() const { return value; }
-	inline void operator= (const int& in_value) { value = in_value; }
-	inline bool operator==(const int& in_value) const { return value == in_value; }
+	inline void operator= (int in_value) { value = in_value; }
+	inline bool operator==(int in_value) const { return value == in_value; }
 	const int& defaults;
 	int value;
 	const CatEnum& cat_enum;

@@ -65,9 +65,9 @@ float idle_time = 0;
 // Vars for breadcrumb followbot
 
 // An array for storing the breadcrumbs
-static Vector breadcrumbs[256];
+static Vector breadcrumbs[128];
 // Int for storing length of array
-constexpr int MAX_CRUMBS = 256;
+constexpr int MAX_CRUMBS = 128;
 // Array Bookkeeping vars
 int crumbBottom      = 0;
 int crumbTop         = 0;

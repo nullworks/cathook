@@ -65,9 +65,9 @@ float idle_time = 0;
 // Vars for breadcrumb followbot
 
 // An array for storing the breadcrumbs
-static Vector breadcrumbs[64];
+static Vector breadcrumbs[256];
 // Int for storing length of array
-constexpr int MAX_CRUMBS = 64;
+constexpr int MAX_CRUMBS = 256;
 // Array Bookkeeping vars
 int crumbBottom      = 0;
 int crumbTop         = 0;
@@ -855,9 +855,9 @@ void CrumbTopAdd(Vector crumbToAdd)
 
     // Once the crumbs have hit the limit of the array, loop around and over
     // write unused spots
-    if (crumbTop == MAX_CRUMBS)
+    if (crumbTop + 20 >= MAX_CRUMBS)
     {
-        crumbTop = 0;
+        CrumbReset();
     }
     else
     {

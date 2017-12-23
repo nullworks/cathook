@@ -42,6 +42,7 @@ EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/module
 
 # Flags we use for every build type, cpp 17 standard is nice
 set(CCOMMON_FLAGS "-mtune=generic")
+set(CCOMMON_LINKER_FLAGS " ")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -53,6 +54,10 @@ if(CGAME STREQUAL "tf2")
 elseif(CGAME STREQUAL "fof")
 	add_definitions("-DCATHOOK_FOF=1")
 	set(CBASE "SOURCE_2013_SDK")
+elseif(CGAME STREQUAL "csgo")
+	add_definitions("-DCATHOOK_CSGO=1")
+  file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/csgo/*.c*")
+	list(APPEND SOURCE_FILES ${TMP_SOURCES})
 endif()
 
 ## Graphics modules
@@ -75,6 +80,7 @@ endif()
 # The source sdk that everyone loves
 if(CBASE STREQUAL "SOURCE_2013_SDK")
 	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
+  set(CCOMMON_LINKER_FLAGS "${CCOMMON_LINKER_FLAGS} -m32")
 	add_definitions(-DCATHOOK_SOURCE_2013=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 -DRAD_TELEMETRY_DISABLED=1 -DLINUX=1 -DUSE_SDL=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1)
 	file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
@@ -120,9 +126,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g -ggdb")
 set(CMAKE_C_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O3")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CCOMMON_LINKER_FLAGS}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "Linker Flags: ${CMAKE_SHARED_LINKER_FLAGS} ${CCOMMON_LINKER_FLAGS}")
 
 #include_directories(${INCLUDE_DIRS})
 add_library(nekohook SHARED ${SOURCE_FILES})

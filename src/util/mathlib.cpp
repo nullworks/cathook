@@ -86,4 +86,20 @@ float GetFov (const CatVector& dest_point) {
 	return GetFov(g_LocalPlayer.GetCameraAngle(), g_LocalPlayer.GetCamera(), dest_point);
 }
 
+CatVector ExtendLine(const CatVector& src_pos, const CatVector& src_angles, float extend_amt) {
+
+	// Math I dont understand
+	float sp = sinf(src_angles.x * PI / 180.f);
+	float cp = cosf(src_angles.x * PI / 180.f);
+	float sy = sinf(src_angles.y * PI / 180.f);
+	float cy = cosf(src_angles.y * PI / 180.f);
+
+	CatVector ret;
+	ret.x = cp * cy;
+	ret.y = cp * sy;
+	ret.z = -sp;
+	ret = ret * extend_amt + src_pos;
+	return ret;
+}
+
 }

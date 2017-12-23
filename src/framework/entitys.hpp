@@ -156,6 +156,6 @@ inline bool GetBone(const CatEntity& entity, int bone, CatBox& input) {
 }
 
 // Use to reset bones
-inline void ResetBones(CatEntity& entity) { for (auto& box : entity.bones) box.first = false; }
+inline void ResetBones() { for (auto& entity : g_CatEntitys) for (auto& box : entity.bones) box.first = false; }
 
 }

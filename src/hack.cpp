@@ -7,10 +7,12 @@
 
 #include <ctime> // time()
 #include <stdlib.h> // srand()
+
 #include "util/logging.hpp" // To log progress
 
 // Game Modules
 #include "modules/Source_2013/init.hpp"
+#include "modules/csgo/init.hpp"
 // Features
 #include "features/features.hpp"
 // GUI
@@ -31,7 +33,9 @@ void hack::Initialize() {
 #if defined(CATHOOK_SOURCE_2013) 	// Any source 2013 game
 	modules::source::Init();
 #endif
-
+#if defined(CATHOOK_CSGO) 	// CSGO
+	modules::csgo::Init();
+#endif
 	g_CatLogging.log("Initializing main cheat features...");
 	features::Init();
 

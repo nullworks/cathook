@@ -81,5 +81,7 @@ float GetFov(const CatVector&, const CatVector&, const CatVector&);
 float GetFov(const CatVector&);
 // Returns angles used to aim at an object from a point, to another
 CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point);
+// Give it a position, angles to go in, and how far to extend, then it returns a vector in that direction
+CatVector ExtendLine(const CatVector& src_pos, const CatVector& src_angles, float extend_amt);
 
 }

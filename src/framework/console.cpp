@@ -11,8 +11,8 @@
 #include "../util/stringhelpers.hpp" // sepstr()
 #include "../util/logging.hpp"
 
-/*// The main list to store cat commands
-static std::unordered_map<std::string, CatCommand*> CatCommandList;
+// The main list to store cat commands
+/*static std::unordered_map<std::string, CatCommand*> CatCommandList;
 
 
 CatCommand::CatCommand(const char* _command_name, void(*_callback)(std::vector<std::string>))
@@ -43,4 +43,5 @@ void CallCommand(std::string input) {
   // We have our command, pop it out of the vector and pass it as arguments
   tmp.erase(0);
   find_com.second->callback(tmp);
-}*/
+}
+*/

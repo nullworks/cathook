@@ -42,7 +42,7 @@ SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 		sleep(1);
 	}
 	// dlopen that sucker and give us a linkmap to use
-	while (!(lmap = (link_map*)dlopen(path.c_str(), RTLD_NOLOAD))) {
+	while (!(lmap = (link_map*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
 		sleep(1);
 		char* error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);

@@ -28,6 +28,7 @@ static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
 static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
 // Other
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
+static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
 static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
 																																																		 "AUTO: Automaticly chooses best hitbox\n"
@@ -45,7 +46,7 @@ static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug
 CMFunction<CatVector(const CatEntity&)> GetAutoHitbox {[](auto){ return CatVector(); }};
 
 // A function to find a place to aim for on the target
-static CatVector RetriveAimpoint(const CatEntity& entity, int mode = hitbox_mode) {
+CatVector RetriveAimpoint(const CatEntity& entity, int mode = hitbox_mode) {
 
 	// Check if we can use bones
 	// Get our best bone
@@ -109,7 +110,7 @@ static CatVector RetriveAimpoint(const CatEntity& entity, int mode = hitbox_mode
 }
 
 
-// Target SelectiongToggleGui
+// Target Selection
 
 // For modules to add their target selection stuff
 std::vector<bool(*)(const CatEntity&)> TargetSelectionModule;

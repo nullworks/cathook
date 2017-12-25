@@ -16,7 +16,7 @@
 
 namespace gui { namespace menu {
 
-CMenu pMenu;
+//CMenu pMenu;
 
 void Init() {
 /*  pMenu.position_mode = base::FLOATING;

@@ -13,6 +13,11 @@
 
 namespace gui { namespace base {
 
+// Constructor
+CBaseWindow::CBaseWindow(const char* _name) : CBaseContainer(_name) {
+	position_mode = FLOATING;
+}
+
 // General functions
 void CBaseWindow::Draw() {
 	auto abs = AbsolutePosition();
@@ -23,11 +28,11 @@ void CBaseWindow::Draw() {
 
 // User Input
 void CBaseWindow::OnFocusGain() {
-	zindex = zindex + 1;
+	zindex = -1;
 	CBaseContainer::OnFocusGain();
 }
 void CBaseWindow::OnFocusLose() {
-	zindex = zindex - 1;
+	zindex = 4000;
 	CBaseContainer::OnFocusLose();
 }
 

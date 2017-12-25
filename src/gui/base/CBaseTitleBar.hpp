@@ -14,7 +14,7 @@ namespace gui { namespace base {
 
 class CTitleBar : public CBaseWidget {
 public:
-	CTitleBar(const char* _title, IWidget* _parent);
+	CTitleBar(const char* _title);
 
 	virtual void Draw();
 	virtual void Update();

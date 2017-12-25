@@ -17,5 +17,6 @@ class CExampleWindow {
 CExampleWindow* example_window = nullptr;
 
 void Init() {
-  
+  if (example_window) return;
+  example_window = new CExampleWindow("Example Window", g_pGui);
 }

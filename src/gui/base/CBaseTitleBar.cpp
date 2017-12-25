@@ -10,12 +10,12 @@
 #include "../../framework/drawing.hpp" // Draw stuff
 #include "../../util/colors.hpp" // Draw stuff
 
-#include "CTitleBar.hpp"
+#include "CBaseTitleBar.hpp"
 
 namespace gui { namespace base {
 
 // Constructor
-CTitleBar::CTitleBar(const char* _title, IWidget* _parent) : title(_title), CBaseWidget("titlebar", parent) {
+CTitleBar::CTitleBar(const char* _title) : title(_title), CBaseWidget("titlebar") {
 	position_mode = ABSOLUTE;
 }
 

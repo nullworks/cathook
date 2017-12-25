@@ -6,8 +6,8 @@
  *
  */
 
- namespace features { namespace followbot {
+namespace features { namespace followbot {
 
 void Init();
 
- }}
+}}

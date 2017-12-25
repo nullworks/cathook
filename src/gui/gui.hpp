@@ -8,26 +8,24 @@
 #pragma once
 
 #include "base/CBaseContainer.hpp"
-#include "../framework/input.hpp" // So we can update our gui & know
+#include "../framework/input.hpp" // So we can update our gui & know, its included here for CATKEY_COUNT
 
-namespace gui {
+namespace gui { namespace base {
 
-class CatGUI : public base::CBaseContainer {
+class CBaseRoot: public CBaseContainer {
 public:
-	CatGUI();
+	CBaseRoot();
 
-	virtual void MoveChildren() override {}
-	virtual void Update() override;
-	virtual void DrawBounds() override;
+	void DisplayTooltip();
+	void MoveChildren(){};
+	void Update();
+	void DrawBounds();
 
 	// used to store what frame we are on
-	int frame_count = 0;
+	unsigned long frame_count = 0;
 	// Used to store our previous presses and times they were pressed
 	bool pressed_state[CATKEY_COUNT];
 	int  pressed_frame[CATKEY_COUNT];
 };
 
-// Use to get the gui
-extern CatGUI g_pGUI;
-
-}
+}}

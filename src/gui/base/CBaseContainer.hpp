@@ -15,7 +15,7 @@ namespace gui { namespace base {
 
 class CBaseContainer : public CBaseWidget {
 public:
-	CBaseContainer(const char* _name = "unnamed", IWidget* _parent = nullptr);
+	CBaseContainer(const char* _name);
 	~CBaseContainer();
 
 	virtual void Update();
@@ -35,7 +35,7 @@ public:
 	virtual void Hide();
 
 	// Tooltips
-	virtual const char* GetTooltip();
+	virtual const std::string& GetTooltip();
 
 	// Children
 	std::vector<IWidget*> children;

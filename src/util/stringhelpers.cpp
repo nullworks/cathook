@@ -20,7 +20,7 @@ std::vector<std::string> sepstr(std::string input) {
   bool found = false; // When we start to read something, we need to know that we arent within a bunch of spaces
   for (int i = 0; i < input.size(); i++) {
     // If we havent found anything and our char is a space and there isnt a backslash behind it, just continue on
-    if (input[i] == ' ') {
+    if (input[i] == ' ' || input[i] == '\n') {
       // If we havent found anything and its a space char, continue
       if(!found) continue;
       // If we found something and we hit a space char, make sure there isnt a backslash. If we dont have one, we will push the string we have into the vector and continue on.

@@ -14,9 +14,9 @@
 
 namespace gui { namespace base {
 
-class CBaseWidget : public IWidget {
+class CBaseWidget : virtual public IWidget {
 public:
-	CBaseWidget(const char* _name = "unnamed", IWidget* _parent = nullptr);
+	CBaseWidget(const char* _name);
 
 	// General functions
 	virtual void Update();
@@ -42,7 +42,7 @@ public:
 	virtual std::pair<int, int> AbsolutePosition();
 
 	// Naming
-	virtual const char* GetTooltip();
+	virtual const std::string& GetTooltip();
 };
 
 }}

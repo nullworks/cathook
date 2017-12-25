@@ -74,7 +74,7 @@ public:
 	virtual std::pair<int, int> AbsolutePosition() = 0;
 
 	// Naming
-	virtual const char* GetTooltip() = 0;
+	virtual const std::string& GetTooltip() = 0;
 
 	// Parental + children
 	IWidget* GetRoot() {

@@ -14,7 +14,7 @@
 namespace gui { namespace base {
 
 // Constructor & destructor
-CBaseContainer::CBaseContainer(const char* _name, IWidget* _parent) : CBaseWidget(_name, _parent) {}
+CBaseContainer::CBaseContainer(const char* _name) : CBaseWidget(_name) {}
 CBaseContainer::~CBaseContainer() { for (auto child : children) delete child; }
 
 // General functions
@@ -78,9 +78,9 @@ void CBaseContainer::Hide() {
 }
 
 // Tooltips
-const char* CBaseContainer::GetTooltip() {
+const std::string& CBaseContainer::GetTooltip() {
 	if (hovered_child) return hovered_child->GetTooltip();
-	return nullptr;
+	return tooltip;
 }
 
 // Children
@@ -107,9 +107,8 @@ IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space 
 		auto child = ChildByIndex(i);
 		if (!child->IsVisible()) continue;
 		auto abs = child->AbsolutePosition();
-		auto cs = child->size;
-		if (x >= abs.first && x <= abs.first + cs.first &&
-			y >= abs.second && y <= abs.second + cs.second) {
+		if (x >= abs.first && x <= abs.first + child->size.first &&
+			y >= abs.second && y <= abs.second + child->size.second) {
 			return child;
 		}
 	}
@@ -118,9 +117,13 @@ IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space 
 
 // Child related update functions
 void CBaseContainer::SortByZIndex() {
+	// Sort everything
 	std::sort(children.begin(), children.end(), [](IWidget* a, IWidget* b) -> bool {
 		return a->zindex < b->zindex;
 	});
+	// Make everything have a linear number... For delicious stacking
+	for (int i = 0; i < children.size(); i++)
+		children[i]->zindex = i;
 }
 void CBaseContainer::UpdateHovers() {
 	auto hovered = ChildByPoint(input::mouse.first, input::mouse.second);

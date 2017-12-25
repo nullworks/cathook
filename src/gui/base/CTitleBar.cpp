@@ -6,54 +6,52 @@
  *      Author: nullifiedcat
  */
 
-#include <cstring>
-
 #include "../../framework/input.hpp" // We use mouse stuff here
 #include "../../framework/drawing.hpp" // Draw stuff
 #include "../../util/colors.hpp" // Draw stuff
 
 #include "CTitleBar.hpp"
 
-#define TITLEBAR_PADDING_W 2
-#define TITLEBAR_PADDING_H 1
-
 namespace gui { namespace base {
 
-enum {
-	EDRAG_START,
-	EDRAG_CONT
-};
-
 // Constructor
-CTitleBar::CTitleBar(const char* _title, IWidget* _parent) : CBaseWidget("titlebar", parent) {
-	strcpy(title, _title);
+CTitleBar::CTitleBar(const char* _title, IWidget* _parent) : title(_title), CBaseWidget("titlebar", parent) {
 	position_mode = ABSOLUTE;
 }
 
 void CTitleBar::Update() {
-	auto psize = parent->size;
-	auto str_size = draw::GetStringLength(title, 1, 9);
-	size = std::make_pair(psize.first, 2 * TITLEBAR_PADDING_H + str_size.first);
+	if (!parent) return;
+
+	// Set our size
+	auto title_size = draw::GetStringLength(title.c_str(), 1, 9);
+	size = std::make_pair(parent->size.first, title_size.second + 2);
+
+	// If we arent depressed, reset dragging
 	if (!press) {
-		drag_stage = EDRAG_START;
+		dragging = false;
 		return;
 	}
-	if (drag_stage == EDRAG_START) {
-		drag_stage = EDRAG_CONT;
-	} else {
-		int dx = input::mouse.first - last_mouse.first;
-		int dy = input::mouse.second - last_mouse.second;
-		auto offset = parent->offset;
-		parent->offset = std::make_pair(offset.first + dx, offset.second + dy);
+	// If we arent dragging already, we need to skip move so we can get a delta
+	if (!dragging)
+		dragging = true;
+	// If we already have a delta, we can move here
+	else {
+		// Get the delta change
+		auto delta = std::make_pair(input::mouse.first - last_mouse.first, input::mouse.second - last_mouse.second);
+		// Apply the delta
+		parent->offset = std::make_pair(offset.first + delta.first, offset.second + delta.second);
 	}
+	// Save the mouse location for delta use later
 	last_mouse = input::mouse;
 }
 
 void CTitleBar::Draw() {
+	// Draw a nice rect
 	auto abs = AbsolutePosition();
 	draw::Rect(abs.first, abs.second, size.first, size.second, colors::pink);
-	auto str_size = draw::GetStringLength(title, 1, 9);
-	draw::String(title, abs.first + (size.first - str_size.first) / 2, abs.second + TITLEBAR_PADDING_H, 1, 9, colors::white);
+	// Draw our string
+	auto title_size = draw::GetStringLength(title.c_str(), 1, 9);
+	draw::String(title.c_str(), abs.first + (size.first - title_size.first) / 2, abs.second + (size.second - title_size.second) / 2, 1, 9, colors::white);
 }
 
 }}

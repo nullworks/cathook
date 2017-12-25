@@ -96,7 +96,7 @@ IWidget* CBaseContainer::ChildByIndex(int idx) {
 }
 IWidget* CBaseContainer::ChildByName(const char* name) {
 	for (auto child : children) {
-		if (!strcmp(child->name, name)) {
+		if (child->name == name) {
 			return child;
 		}
 	}
@@ -129,37 +129,57 @@ void CBaseContainer::UpdateHovers() {
 }
 void CBaseContainer::MoveChildren() {
 	// Used space
-	int mx = 0, my = 0, mox = size.first, moy = size.second;
+	std::pair<int, int> space = std::make_pair(-1, -1);
 	// Get our absolutes down
-	/*for (auto c : children) {
-		// Check if not absolute
-		if (c->position_mode != ABSOLUTE)
-			return;
-		// Add the amount of space it takes to our used amount
-		std::pair<int, int> space_taken;
-		space_taken.first = c->offset.second + c->size.second
-
-			space_taken =  + 2
-			if
-
-			break;
-		case ABSOLUTE_LEFT:
-			mx -= c->offset.first + c->size.second + 2;
-			break;
-		}
-	}
-	// Organize our inlines
 	for (auto c : children) {
 		if (!c->IsVisible()) continue;
-		auto off = c->GetOffset();
-		auto size = c->GetSize();
+		// Check if not absolute
+		if (c->position_mode != ABSOLUTE)
+			continue;
+		// Add the amount of space it takes to our used amount
+		std::pair<int, int> space_taken;
+		space_taken.first = c->offset.first + c->size.first;
+		space_taken.second = c->offset.second + c->size.second;
 
-		c->SetOffset(2, my);
-		if (size.first > mx) mx = size.first;
-		size.first += off.first;
-		size.second += off.second;
+		// If some our used space is less than the space taken by the widget, add it to used space.
+		if (space.first < space_taken.first)
+			space.first = space_taken.first;
+		if (space.second < space_taken.second)
+			space.second = space_taken.second;
+	}
+
+	// Get our size for the container and set it
+	std::pair<int, int> tmp_max = (max_size == std::make_pair(-1, -1)) ? space : max_size;
+	size = tmp_max;
+
+	// Organize our inlines
+	std::pair<int, int> cur_pos = std::make_pair(2, 2);
+	int lane_height = 0;
+	for (auto c : children) {
+		if (!c->IsVisible()) continue;
+
+		// Check if inline
+		if (c->position_mode != INLINE)
+			continue;
+
+		// Get whether widget width would overlap max size, make widget go in new lane if true
+		if (cur_pos.first + c->size.first + 2 > tmp_max.first) {
+
+			// Put the widget on a new line
+			cur_pos = std::make_pair(2, cur_pos.second + lane_height + 2);
+			lane_height = 0;
 		}
-	}*/
+
+		// If our widget height is more than the lane size, add to it
+		if (c->size.second > lane_height)
+			lane_height = c->size.second;
+
+		// Set the inline widgets position
+		c->offset = cur_pos;
+
+		// Add to the length used
+		cur_pos.first += c->size.first + 2;
+	}
 }
 
 // Child info related to the container

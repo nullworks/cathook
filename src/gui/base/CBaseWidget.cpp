@@ -17,7 +17,7 @@ namespace gui { namespace base {
 
 // Constructors
 CBaseWidget::CBaseWidget(const char* _name, IWidget* _parent) {
-	strcpy(name, _name);
+	name = _name;
 	parent = _parent;
 	position_mode = INLINE;
 	Show();
@@ -64,6 +64,6 @@ std::pair<int, int> CBaseWidget::AbsolutePosition() {
 }
 
 // Get our tooltip
-const char* CBaseWidget::GetTooltip() { return tooltip; }
+const char* CBaseWidget::GetTooltip() { return tooltip.c_str(); }
 
 }}

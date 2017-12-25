@@ -9,6 +9,7 @@
 #pragma once
 
 #include <utility> // Pair
+#include <string>
 
 #include "../../util/mathlib.hpp" // Colors
 
@@ -37,11 +38,13 @@ public:
 	int position_mode = FLOATING;
 	std::pair<int, int> offset;
 	std::pair<int, int> size;
+	std::pair<int, int> max_size = std::make_pair(-1, -1);
+
 	int zindex = 0;
 
 	// Naming
-	char name[64];
-	char tooltip[256] = "";
+	std::string name;
+	std::string tooltip;
 
 	// For use in show bounds
 	CatVector4 bounds_color;

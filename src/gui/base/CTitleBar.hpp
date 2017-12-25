@@ -19,8 +19,8 @@ public:
 	virtual void Draw();
 	virtual void Update();
 
-	char title[64];
-	int drag_stage = 0;
+	const std::string title;
+	bool dragging = false;
 	std::pair<int, int> last_mouse;
 };
 

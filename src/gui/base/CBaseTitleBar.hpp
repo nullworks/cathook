@@ -12,15 +12,15 @@
 
 namespace gui { namespace base {
 
-class CTitleBar : public CBaseWidget {
+class CBaseTitleBar : public CBaseWidget {
 public:
-	CTitleBar(const char* _title);
+	CBaseTitleBar(const char* _title);
 
 	virtual void Draw();
 	virtual void Update();
+	virtual void OnMousePress();
 
 	const std::string title;
-	bool dragging = false;
 	std::pair<int, int> last_mouse;
 };
 

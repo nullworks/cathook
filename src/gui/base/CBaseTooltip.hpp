@@ -16,6 +16,7 @@ namespace gui { namespace base {
 class CBaseTooltip : public CBaseWidget {
 public:
   CBaseTooltip(const char* _name);
+  virtual void Update();
   virtual void Draw();
 };
 

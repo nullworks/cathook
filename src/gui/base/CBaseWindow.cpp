@@ -27,12 +27,13 @@ void CBaseWindow::Draw() {
 }
 
 // User Input
+// We set our index to -2 for so that windows that loose focus can be put under us, which should have -1 index
 void CBaseWindow::OnFocusGain() {
-	zindex = -1;
+	zindex = -2;
 	CBaseContainer::OnFocusGain();
 }
 void CBaseWindow::OnFocusLose() {
-	zindex = 4000;
+	zindex = -1;
 	CBaseContainer::OnFocusLose();
 }
 

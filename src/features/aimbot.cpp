@@ -30,7 +30,7 @@ static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, 
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
-static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
+CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 3, "Hitbox Mode", "Hitbox selection mode\n"
 																																																		 "AUTO: Automaticly chooses best hitbox\n"
 																																																		 "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																		 "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
@@ -52,24 +52,20 @@ CatVector RetriveAimpoint(const CatEntity& entity, int mode = hitbox_mode) {
 	// Get our best bone
 	switch(mode) {
 	case 0: { // AUTO
-		CatVector tmp;
-		tmp = GetAutoHitbox(entity);
-		if (tmp != CatVector()) return tmp;
-		break;
+		return GetAutoHitbox(entity);
 	}
-	case 1: // AUTO-HEAD
+	case 1: { // AUTO-HEAD
 		// Head is first bone, should be fine to iterate through them
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
 			if (!bones::GetBone(entity, i, tmp)) continue;
-			// FOV Check
-			if (fov > 0 && fov > util::GetFov(tmp)) continue;
 			// Vis check
 			if (!trace::TraceEnt(entity, g_LocalPlayer.GetCamera(), tmp)) continue;
 			return tmp;
 		}
 		break;
+	}
 	case 2: { // AUTO-CLOSEST
 		// Book-keepers for the best one we have found
 		CatVector closest;
@@ -81,14 +77,16 @@ CatVector RetriveAimpoint(const CatEntity& entity, int mode = hitbox_mode) {
 			// Get FOV
 			int fov = util::GetFov(tmp);
 			// Check if fov is lower than our current best
-			if (fov < closest_fov) {
-				// Set the new current best
-				closest = tmp;
-				closest_fov = fov;
-			}
+			if (fov > closest_fov) continue;
+			// Vis check
+			if (!trace::TraceEnt(entity, g_LocalPlayer.GetCamera(), tmp)) continue;
+			// Set the new current best
+			closest = tmp;
+			closest_fov = fov;
 		}
 		// Check if we have anything set, then return if true
-		if (closest != CatVector()) return closest;
+		if (closest != CatVector())
+			return closest;
 		break;
 	}
 	case 3: { // HEAD

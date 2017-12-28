@@ -14,8 +14,8 @@ CBaseInfoBox::CBaseInfoBox(const char* _name) : CBaseWidget(_name) {
   position_mode = ABSOLUTE;
 }
 
-CBaseInfoBox::Draw() {
-  
+void CBaseInfoBox::Draw() {
+
 }
 
 }}

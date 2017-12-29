@@ -14,10 +14,10 @@ namespace gui { namespace base {
 
 // An init for our catgui
 CBaseRoot::CBaseRoot() : CBaseContainer("Root") {
-	tooltip_widget = new CBaseInfoBox("tooltip");
+	/*tooltip_widget = new CBaseInfoBox("tooltip");
 	tooltip_widget->position_mode = FLOATING;
 	tooltip_widget->max_size = std::make_pair(200, 180);
-	AddChild(tooltip_widget);
+	AddChild(tooltip_widget);*/
 }
 
 // An update engine for the gui
@@ -69,8 +69,9 @@ void CBaseRoot::Update() {
   // Increse our framecount
   frame_count++;
 
+	// TODO, move this to a menu instead of ROOT
 	// Tooltip handler
-	if (tooltip_widget) { // Sanity check
+	/*if (tooltip_widget) { // Sanity check
 		// Get and check if we have a tooltip
 		auto tooltip_str = GetTooltip();
 		if (!tooltip_str.empty()) {
@@ -80,7 +81,7 @@ void CBaseRoot::Update() {
 			tooltip_widget->infostring = tooltip_str;
 		} else
 			tooltip_widget->Hide();
-	}
+	}*/
 
   // Update tick to elements
   CBaseContainer::Update();

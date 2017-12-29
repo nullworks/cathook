@@ -27,19 +27,10 @@ void CBaseWindow::Draw() {
 }
 
 // User Input
-// We set our index to -2 for so that windows that loose focus can be put under us, which should have -1 index
+// We set our index to -1 to put us in front of other windows
 void CBaseWindow::OnFocusGain() {
-	zindex = -2;
-	CBaseContainer::OnFocusGain();
-}
-void CBaseWindow::OnFocusLose() {
 	zindex = -1;
-	CBaseContainer::OnFocusLose();
-}
-
-// Child related util
-void CBaseWindow::MoveChildren() { // TODO, Reverse!!!
-
+	CBaseContainer::OnFocusGain();
 }
 
 }}

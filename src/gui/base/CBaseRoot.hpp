@@ -14,8 +14,7 @@
 namespace gui { namespace base {
 
 class CBaseRoot : public CBaseContainer {
-private:
-  CBaseInfoBox* tooltip_widget; // So we can use tooltips
+  //CBaseInfoBox* tooltip_widget; // So we can use tooltips
 public:
 	CBaseRoot();
 

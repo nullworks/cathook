@@ -14,7 +14,7 @@ namespace gui { namespace base {
 class CBaseWindow : public CBaseContainer {
 public:
 	// Constructors & Deconstructors
-	CBaseWindow(const char* _name);
+	CBaseWindow(const char*);
 	virtual ~CBaseWindow() {};
 
 	// General functions
@@ -22,10 +22,6 @@ public:
 
 	// User Input
 	virtual void OnFocusGain() override;
-	virtual void OnFocusLose() override;
-
-	// Child related util
-	virtual void MoveChildren() override;
 };
 
 }}

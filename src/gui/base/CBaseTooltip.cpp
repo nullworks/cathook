@@ -6,7 +6,10 @@
  *
  */
 
+#include "../../util/stringhelpers.hpp"
+#include "../../util/colors.hpp"
 #include "../../framework/input.hpp" // For mouse location
+#include "../../framework/drawing.hpp"
 
 #include "CBaseTooltip.hpp"
 
@@ -27,7 +30,10 @@ void CBaseTooltip::Update() {
 }
 
 void CBaseTooltip::Draw() {
-  /*//input::mouse;
+
+  // We cant draw an empty string
+  if (!parent || parent->GetTooltip().empty()) return;
+  tooltip = parent->GetTooltip();
 
   // Get tooltip size
   auto tooltip_size = draw::GetStringLength(tooltip.c_str(), 1, 20);
@@ -35,39 +41,38 @@ void CBaseTooltip::Draw() {
   // Check if we need to wrap
   if (tooltip_size.first > max_size.first) {
 
-    // A place to store the wrapped string, with the size ;)
-    std::pair<std::pair<int, int>, std::string> wrapped_str;
-
-    // Our current line
-    std::pair<std::pair<int, int>, std::string> cur_line;
+    std::string wrapped_str; // A place to store the wrapped string, with the size ;)
+    std::string cur_line; // Our current line
 
     // Seperate our strings to make things easy
-    auto tmp = sepstr(tooltip);
+    auto sep_strs = sepstr(tooltip);
 
-    // Iterate and wrap text
-    for (const auto& cur_str : tmp) {
-      // Get size
-      auto cur_line_size = draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20);
-      // Check if it goes over our width
-      if (cur_line_size.first > max_size.first) {
-        // Add the current line with newline
-        wrapped_str.second += cur_str + '\n';
-        wrapped_str.first = std::max
+    // Here we take each word and make it fit in our box.
+    for (const auto& cur_str : sep_strs) {
+
+      // If it goes over max width, we add the current line to the ourput, then return
+      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20).first > max_size.first) {
+        // Add the current line
+        wrapped_str += cur_line + '\n';
+
         // Set the new line to our current string
-        cur_line = std::make_pair(cur_line_size, cur_str);
+        cur_line = cur_str;
+
+        // continue to the next string
+        continue;
       }
 
       // Add the current string to the line
       cur_line += ' ' + cur_str;
     }
-
-
-    return;
+    // Here we can set the new size and stuff.
+    tooltip_size = draw::GetStringLength(wrapped_str.c_str(), 1, 20);
+    tooltip = wrapped_str;
   }
-  // Draw unwrapped string
-  draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, Transparent(colors::black));
+  // Draw string
+  draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::Transparent(colors::black));
   draw::Rect(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::pink);
-  draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);*/
+  draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);
 }
 
 }}

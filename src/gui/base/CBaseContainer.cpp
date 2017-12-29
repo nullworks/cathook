@@ -105,7 +105,7 @@ IWidget* CBaseContainer::ChildByName(const char* name) {
 IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space to return a child within it
 	for (int i = children.size() - 1; i >= 0; i--) {
 		auto child = ChildByIndex(i);
-		if (!child->IsVisible()) continue;
+		if (!child->visible) continue; // We dont care about always visible, we just want visible
 		auto abs = child->AbsolutePosition();
 		if (x >= abs.first && x <= abs.first + child->size.first &&
 			y >= abs.second && y <= abs.second + child->size.second) {

@@ -63,6 +63,6 @@ std::pair<int, int> CBaseWidget::AbsolutePosition() {
 }
 
 // Get our tooltip
-const std::string& CBaseWidget::GetTooltip() { return tooltip.c_str(); }
+const std::string& CBaseWidget::GetTooltip() { return tooltip; }
 
 }}

@@ -10,6 +10,6 @@
 
 namespace gui {
 
-base::CBaseRoot g_pGUI;
+base::CBaseRoot g_pGui;
 
 }

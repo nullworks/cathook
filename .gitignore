@@ -258,6 +258,7 @@ src/drm/*
 
 ## Allow some modules to be open
 !src/modules/xlib/*
+!src/modules/gl_draw/*
 
 ## Cmake is eh
 CMakeFiles/*

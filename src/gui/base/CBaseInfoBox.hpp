@@ -15,7 +15,7 @@ namespace gui { namespace base {
 
 class CBaseInfoBox : public CBaseWidget {
 public:
-  CBaseInfoBox(const char* _name);
+  CBaseInfoBox(const char* _name, const char* info = "unset");
   virtual void Draw();
   std::string infostring;
 };

@@ -14,6 +14,7 @@
 #include "gui.hpp"
 #include "menu/menu.hpp"
 #include "hudstrings/sidestrings.hpp"
+#include "base/examples/test_window.hpp"
 
 #include "init.hpp"
 
@@ -22,12 +23,13 @@ namespace gui {
 void Init() {
 
 	// Setup the draw manager to run gui
-	drawmgr_on([](){g_pGUI.Update();});
+	drawmgr_on([](){g_pGui.Update();});
 
 	menu::Init();
 
 	// Other gui elements
 	sidestrings::Init();
+	ShowTestWindow();
 }
 
 }

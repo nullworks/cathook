@@ -12,6 +12,6 @@
 
 namespace gui {
 
-extern base::CBaseRoot g_pGUI;
+extern base::CBaseRoot g_pGui;
 
 }

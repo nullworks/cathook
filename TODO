@@ -1,3 +1,11 @@
+// TODO - MUST do before merging into master (unless removed).
+
+1. Bring back some sort of GUI (at least ImGUI)
+2. Proper `scripts/menu`
+3. Re-add radar and emoji esp
+4. Locate most of the crashes
+5. Make it catbot compatible
+
 //==================================================================================================//
 //Big TODO list for cathook																			//	
 //Organized by Julianacat																			//

@@ -1,0 +1,1 @@
+aux_source_directory (. SOURCES)

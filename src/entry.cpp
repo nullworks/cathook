@@ -5,49 +5,55 @@
  *      Author: nullifiedcat
  */
 
+#include <logging.hpp>
 #include <pthread.h>
 
-#include "hack.h"
-#include "logging.h"
+#include "hack.hpp"
 
 pthread_mutex_t mutex_quit;
 pthread_t thread_main;
 
-bool IsStopping(pthread_mutex_t* mutex_quit_l) {
-	if (!pthread_mutex_trylock(mutex_quit_l)) {
-		logging::Info("Shutting down, unlocking mutex");
-		pthread_mutex_unlock(mutex_quit_l);
-		return true;
-	} else {
-		return false;
-	}
-	return true;
+bool IsStopping(pthread_mutex_t *mutex_quit_l)
+{
+    if (!pthread_mutex_trylock(mutex_quit_l))
+    {
+        logging::Info("Shutting down, unlocking mutex");
+        pthread_mutex_unlock(mutex_quit_l);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }
 
-void* MainThread(void* arg) {
-	pthread_mutex_t* mutex_quit_l = (pthread_mutex_t*) arg;
-	hack::Initialize();
-	logging::Info("Init done...");
-	while (!IsStopping(mutex_quit_l)) {
-		hack::Think();
-	}
-	logging::Info("Shutting down...");
-	hack::Shutdown();
-	logging::Shutdown();
-	return 0;
+void *MainThread(void *arg)
+{
+    pthread_mutex_t *mutex_quit_l = (pthread_mutex_t *) arg;
+    hack::Initialize();
+    logging::Info("Init done...");
+    while (!IsStopping(mutex_quit_l))
+    {
+        hack::Think();
+    }
+    logging::Info("Shutting down...");
+    hack::Shutdown();
+    logging::Shutdown();
+    return 0;
 }
 
-void __attribute__((constructor)) attach() {
-	//std::string test_str = "test";
-	pthread_mutex_init(&mutex_quit, 0);
-	pthread_mutex_lock(&mutex_quit);
-	pthread_create(&thread_main, 0, MainThread, &mutex_quit);
+void __attribute__((constructor)) attach()
+{
+    // std::string test_str = "test";
+    pthread_mutex_init(&mutex_quit, 0);
+    pthread_mutex_lock(&mutex_quit);
+    pthread_create(&thread_main, 0, MainThread, &mutex_quit);
 }
 
-void __attribute__((destructor)) detach() {
-	logging::Info("Detaching");
-	pthread_mutex_unlock(&mutex_quit);
-	pthread_join(thread_main, 0);
+void __attribute__((destructor)) detach()
+{
+    logging::Info("Detaching");
+    pthread_mutex_unlock(&mutex_quit);
+    pthread_join(thread_main, 0);
 }
-
-

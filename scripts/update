@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+. common
+
+update()
+{
+    git fetch >update.log
+    if ! git pull origin $(git rev-parse --abbrev-ref HEAD) >>update.log; then
+        $DIALOG --title "Error" --backtitle "Updating"  --msgbox "An error occured while updating cathook, check update.log for details. It might have been caused by changes in local files - in that case try resetting local repo." 8 78
+        exit
+    fi
+    if ! git submodule update --remote --recursive >>update.log; then
+        $DIALOG --title "Error" --backtitle "Updating"  --msgbox "An error occured while updating cathook, check update.log for details. It might have been caused by changes in local files - in that case try resetting local repo." 8 78
+        exit
+    fi
+    make clean
+}
+
+$DIALOG --title "Update?" --backtitle "Updating" --yesno "Warning: this will erase your current build of cathook, you will have to build it again after updating." 8 78
+if [ $? == 1 ]; then exit; fi
+
+echo "Please wait while cathook is updating"
+
+cd ..
+update
+
+$DIALOG --title "Done" --backtitle "Updating"  --msgbox "Updating process is done. You have to build cathook again now." 8 78

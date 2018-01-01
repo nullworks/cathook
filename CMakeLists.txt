@@ -64,6 +64,9 @@ message(STATUS "Graphics module: ${CGFX}")
 # Valve surface
 if(CGFX STREQUAL "valve_surface")
 	add_definitions("-DCATHOOK_GFX_SURFACE=1")
+elseif(CGFX STREQUAL "gl_draw")
+  add_definitions("-DCATHOOK_GFX_GL=1")
+  list(APPEND SOURCE_FILES "src/modules/gl_draw/gl_draw.cpp")
 endif()
 
 ## Input modules
@@ -122,12 +125,8 @@ endif()
 # Default compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
-set(CMAKE_C_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CCOMMON_LINKER_FLAGS} -O3")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "Linker Flags: ${CMAKE_SHARED_LINKER_FLAGS}")
 
 #include_directories(${INCLUDE_DIRS})
 add_library(nekohook SHARED ${SOURCE_FILES})

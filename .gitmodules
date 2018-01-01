@@ -1,0 +1,3 @@
+[submodule "src/modules/gl_draw/libglez"]
+	path = src/modules/gl_draw/libglez
+	url = https://github.com/nullifiedcat/libglez

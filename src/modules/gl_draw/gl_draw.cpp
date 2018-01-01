@@ -8,8 +8,11 @@
  */
 
 #include "../../frameworks/gameticks.hpp" // Run on draw
-#include "../../f"
+#include "../../frameworks/drawing.hpp" // To
 #include "../../frameworks/input.hpp" // For bounds
+#include "libglez/include/glez.h" // Include the lib_glez for easy open gl drawing ;)
+
+#include "gl_draw.hpp"
 
 namespace modules { namespace gl_draw {
 
@@ -18,23 +21,12 @@ static inline glez_rgba_t convert(const CatVector4& in) {
   return glez_rgba_t(in.x, in.y, in.z, in.a);
 }
 
-// a fast way to convert float to int... is le paste but im not letting slow hurt me >_>
-static inline int float2int(double d) {
-   union Cast {
-      double d;
-      long l;
-    };
-   volatile Cast c;
-   c.d = d + 6755399441055744.0;
-   return c.l;
-}
-
 // Font system, We only use 12 fonts to save on memory
 //static glez_rgba_t glez_fonts[FONT_COUNT][12];
 
 // Retrieves one of the fonts generated and saved into
 // TODO fix
-/*static const glez_rgba_t& GetGlezFont(const int& font, const int& size) {
+/*static const glez_rgba_t& GetGlezFont(int font, int size) {
 	// Init fonts if we havent
 	static bool font_init = false;
 	if (!font_init) {
@@ -76,20 +68,20 @@ void Init() {
   drawmgr_after(glez_after);
 
   // Give the drawmgr our glez draw functions
-  draw::Line = [](const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { glez_line(x, y, w, h, convert(color), 1); };
-  draw::Rect = [](const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { glez_rect_outline(x, y, w, h, convert(color), 1); };
-  draw::RectFilled = [](const int& x, const int& y, const int& w, const int& h, const CatVector4& color) { glez_rect(x, y, w, h, convert(color)); };
+  draw::Line = [](int x, int y, int w, int h, const CatVector4& color) { glez_line(x, y, w, h, convert(color), 1); };
+  draw::Rect = [](int x, int y, int w, int h, const CatVector4& color) { glez_rect_outline(x, y, w, h, convert(color), 1); };
+  draw::RectFilled = [](int x, int y, int w, int h, const CatVector4& color) { glez_rect(x, y, w, h, convert(color)); };
 
-  draw::Circle = [](const int& x, const int& y, const float& radius, const int& steps, const CatVector4& color){ glez_circle(x, y, radius, convert(color), 1, steps); };
+  draw::Circle = [](int x, int y, const float& radius, int steps, const CatVector4& color){ glez_circle(x, y, radius, convert(color), 1, steps); };
 
-  /*draw::String = [](const char* text, const int& x, const int& y, const int& font, const int& size, const CatVector4& color) {
+  /*draw::String = [](const char* text, int x, int y, int font, int size, const CatVector4& color) {
     float tmp1, tmp2;
     glez_string_with_outline(x, y, text, font, convert(color), convert(colors::black), 2, 100, tmp1, tmp2);
   };
-  draw::GetStringLength = [](const char* string, const int& font, const int& size) {
+  draw::GetStringLength = [](const char* string, int font, int size) -> std::pair<int, int> {
     float tmp1, tmp2;
     glez_font_string_size(font, string, tmp1, tmp2);
-    return std::make_pair(float2int(tmp1) + 2, float2int(tmp2) + 2);
+    return std::make_pair(tmp1 + 2, tmp2 + 2);
   };*/
 }
 

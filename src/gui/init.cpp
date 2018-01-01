@@ -29,7 +29,7 @@ void Init() {
 
 	// Other gui elements
 	sidestrings::Init();
-	ShowTestWindow();
+	//ShowTestWindow();
 }
 
 }

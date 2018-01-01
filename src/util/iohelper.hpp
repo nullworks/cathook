@@ -1,4 +1,13 @@
 
+/*
+ *
+ *	Stuff to interact with the filesystem goes here!
+ *
+ */
+
+#pragma once
+
+#include <cstdio> // FILE*, fopen()
 #include <string>
 
 const char* GetProcessName();
@@ -11,10 +20,11 @@ const char* GetProcessName();
 class PackedFile {
 public:
 	// To construct this, include a file with a char array of your file in binary and input it here
-	PackedFile(const char* _packed_file);
+	PackedFile(const void* _file_start, size_t _file_size);
 	~PackedFile();
 
-private:
-	std::string name = ""; // path to the file
-	const char* packed_file; // File in binary to be unpacked
+	std::string name = ""; // path to the unpackedfile
+	FILE* file_handle = nullptr; // File handle to the temperary file
+	const void* file_start; // Starting point for file in binary
+	const size_t file_size;
 };

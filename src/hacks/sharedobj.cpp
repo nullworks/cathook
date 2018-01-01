@@ -6,45 +6,63 @@
  *      Author: nullifiedcat
  */
 
-#include <unistd.h>	// sleep()
 #include <dlfcn.h>	// dlopen, libary stuff
-#include <string.h>	// char string utils
+#include <cstring>	// char string utils
+#include <fstream> // std::ifstream
+#include <regex> // Regular expressions
+#include <chrono> // For time so we can sleep
+#include <thread> // Sleep in thread ^
 
 #include "../util/logging.hpp"			// Logging
 
 #include "sharedobj.hpp"
 
-namespace hacks {
-
 // Input a shared objects name and it attemts to save the full path to the string, returns false if fails.
-static bool LocateSharedObject(const char* name, std::string& out_full_path) {
-	FILE* proc_maps = fopen("/proc/self/maps", "r");
-	if (proc_maps == nullptr) return false;
-	char buffer[512];
-	while (fgets(buffer, 511, proc_maps)) {
-		char* path = strchr(buffer, '/');
-		char* filename = strrchr(buffer, '/') + 1;
-		if (!path || !filename) continue;
-		if (!strncmp(name, filename, strlen(name))) {
-			out_full_path.assign(path);
-			out_full_path.resize(out_full_path.size() - 1);
-			return true;
-		}
-	}
-	return false;
-}
+static std::string LocateSharedObject(const char* name) {
+	// Open /proc/maps to get a list of libraries being used currently
+	std::ifstream proc_maps("/proc/self/maps");
+	if (!proc_maps.is_open())
+		return std::string();
 
+	// Recurse through the lines of the file
+	while (!proc_maps.eof()) {
+		// Get our line
+		char buffer[512];
+		proc_maps.getline(buffer, sizeof(buffer));
+
+		// Test if it contains our library
+		if (!strstr(buffer, name))
+			continue;
+
+		// Extract our objects path
+		std::cmatch reg_result;
+		if (!std::regex_search(buffer, reg_result, std::regex("\\/([\\s\\w-]+\\/)+" + std::string(name)))) // regex is really slow and adds alot to file size, but is really convienient for this purpose
+			continue;
+		// Return the path
+		return reg_result[0];
+	}
+	// We havent found our lib
+	return std::string();
 }
 
 SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
+
 	// Get the full path of our opened object
-	while (!hacks::LocateSharedObject(_file_name, path)) {
-		sleep(1);
+	auto path = LocateSharedObject(_file_name);
+	// Check if we didnt get anything from above, if so retry the above untill we get something
+	while (path.empty()) {
+		g_CatLogging.log("Didnt find shared object: %s, Retrying!", _file_name);
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		path = LocateSharedObject(_file_name);
 	}
+
+	g_CatLogging.log("Shared object Path: %s -> \"%s\"", _file_name, path.c_str());
+
 	// dlopen that sucker and give us a linkmap to use
 	while (!(lmap = (link_map*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
-		sleep(1);
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		char* error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);
 	}
+	g_CatLogging.log("Linkmap: %s -> 0x%x", _file_name, lmap);
 }

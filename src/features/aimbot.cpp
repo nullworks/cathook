@@ -23,14 +23,14 @@ static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main ai
 // Target Selection
 static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
 static CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
-static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
+static CatVarFloat fov(aimbot_menu, "aimbot_fov", 2, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
 static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
 static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
 // Other
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
-CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 4, "Hitbox Mode", "Hitbox selection mode\n"
+CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
 																																																		 "AUTO: Automaticly chooses best hitbox\n"
 																																																		 "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																		 "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
@@ -146,8 +146,6 @@ static std::pair<const CatEntity*, CatVector> RetrieveBestTarget() {
 
 	// Loop through all entitys
 	for (const auto& entity : g_CatEntitys) {
-		// Ensure ent is okay to use
-		if (CE_BAD(entity)) continue;
 
 		// Check whether or not we can target the ent
 		auto tmp = IsTargetGood(entity);

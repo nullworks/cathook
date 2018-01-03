@@ -8,7 +8,7 @@ if [ $# == 0 ]; then
 fi
 
 if [ ${#arr[@]} == 0 ]; then
-  echo TF2 isn\'t running!
+  echo CSGO isn\'t running!
   exit
 fi
 

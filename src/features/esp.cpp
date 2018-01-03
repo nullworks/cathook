@@ -287,7 +287,7 @@ static void WorldTick() {
 
 // Please add your esp strings during world tick as it is less intensive than doing this at draw
 // Use to add a string to esp for an entity with a color
-void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color) {
+void AddEspString(const CatEntity& entity, const char* input_string, CatVector4 color) {
 	// Copy our values
 	strcpy(esp_cache[entity.IDX].strings[esp_cache[entity.IDX].string_count].first, input_string);
 	esp_cache[entity.IDX].strings[esp_cache[entity.IDX].string_count].second = color;
@@ -295,7 +295,7 @@ void AddEspString(const CatEntity& entity, const char* input_string, const CatVe
 	esp_cache[entity.IDX].string_count++;
 }
 
-void SetEspColor(const CatEntity& entity, const CatVector4& color) {
+void SetEspColor(const CatEntity& entity, CatVector4 color) {
 	// change any strings with entity color to the new one
 	for (int i = 0; i < esp_cache[entity.IDX].string_count; i++) {
 		if (esp_cache[entity.IDX].strings[i].second == esp_cache[entity.IDX].color)

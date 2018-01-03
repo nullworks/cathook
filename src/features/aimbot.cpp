@@ -30,7 +30,7 @@ static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, 
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
-CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
+static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
 																																																		 "AUTO: Automaticly chooses best hitbox\n"
 																																																		 "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																		 "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"

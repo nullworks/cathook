@@ -17,6 +17,35 @@
 
 #include "sharedobj.hpp"
 
+// Credits to Fission, but idk if Im gonna impliment it...
+/*char found[1024];
+auto search_directory = [](const char *to_find, const char *dirname, char *out) -> bool {
+		auto d = opendir(dirname);
+		assert(d);
+		defer(closedir(d));
+
+		auto dir = readdir(d);
+		while (dir != nullptr) {
+				if (dir->d_type == DT_REG && strstr(dir->d_name, to_find) != nullptr && strstr(dir->d_name, ".so") != nullptr) {
+						sprintf(out, "%s/%s", dirname, dir->d_name);
+						return true;
+				}
+				dir = readdir(d);
+		}
+		return false;
+};
+
+if (search_directory(name, ".", found) ||
+		search_directory(name, "./tf/bin", found) ||
+		search_directory(name, "./bin", found)) {
+		auto handle = dlopen(found, RTLD_NOLOAD);
+		if (handle == nullptr) {
+				printf("force loading library %s\n", name);
+				handle = dlopen(found, RTLD_NOW);
+		}
+		return handle;
+}*/
+
 // Input a shared objects name and it attemts to save the full path to the string, returns false if fails.
 static std::string LocateSharedObject(const char* name) {
 	// Open /proc/maps to get a list of libraries being used currently

@@ -35,20 +35,19 @@ class CMFunctionGroup {
   std::vector<void_func> func_pool; // to store added functions
 public:
   // TODO, threading
-  inline void  operator()(const bool& do_multithreading = false) {
+  inline void operator()(bool do_multithreading = false) {
 
     // If run requests not to do multithreading, we just run all the functions in order
     if (!do_multithreading) {
-      for (const auto& func : func_pool) func();
+      for (auto func : func_pool) func();
       return;
     }
 
     // Note: It shouldnt matter how many cores the system has as the operating system can determine on its own(in theroy), which thread should be run at a time, but eventually everything should finish.
     // Make enough threads for as many functions as we have.
-    int tmp = func_pool.size();
-    std::thread func_threads[tmp];
+    std::thread func_threads[func_pool.size()];
     // Start all threads with all our functions
-    for (int i = 0; i < tmp; i++) {
+    for (int i = 0; i < func_pool.size(); i++) {
       func_threads[i] = std::thread(func_pool[i]);
     }
     // Wait for the threads to finish

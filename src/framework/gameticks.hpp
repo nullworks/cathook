@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <functional> // std::tuple
-
 #include "../util/functions.hpp" // CMFunction
 
 extern CMFunctionGroup drawmgr[3];

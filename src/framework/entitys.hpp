@@ -69,13 +69,13 @@ enum {
 class CatEntity {
 public:
 	CatEntity();
-	inline bool operator==(const CatEntity& in_ent) const { return IDX == in_ent.IDX; }
+	inline bool operator==(CatEntity in_ent) const { return IDX == in_ent.IDX; }
 
 	// Generic entity functions
 	inline void Reset() {
 		exists = false;
 		dormant = true;
-		alive = false;
+		alive = true;
 		type = ETYPE_NONE;
 		health = 100;
 		max_health = 100;

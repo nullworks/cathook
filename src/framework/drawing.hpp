@@ -34,7 +34,7 @@ extern CMFunction<void(int, int, float, int, CatVector4)> Circle;
 extern CMFunction<void(int, int, float, int, CatVector4)> CircleFilled;
 
 extern CMFunction<void(const char*, int, int, int, int, CatVector4)> String;
-extern CMFunction<std::pair<int, int>(const char*, int, int)> GetStringLength;
+extern CMFunction<std::pair<int, int>(const char*, int , int)> GetStringLength;
 
 extern CMFunction<bool(CatVector, CatVector&)> WorldToScreen;
 

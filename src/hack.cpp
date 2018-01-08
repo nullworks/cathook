@@ -26,6 +26,12 @@ void hack::Initialize() {
 	g_CatLogging.log("Initializing...");
 	srand(time(0)); // Setting random seed?
 
+	g_CatLogging.log("Initializing main cheat features...");
+	features::Init();
+
+	g_CatLogging.log("Initializing gui...");
+	gui::Init(); // init the gui
+	
 	// Please put only one GAME module here. Any other type of module can screw with things.
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
@@ -36,11 +42,7 @@ void hack::Initialize() {
 #if defined(CATHOOK_CSGO) 	// CSGO
 	modules::csgo::Init();
 #endif
-	g_CatLogging.log("Initializing main cheat features...");
-	features::Init();
 
-	g_CatLogging.log("Initializing gui...");
-	gui::Init(); // init the gui
 
 	g_CatLogging.log("Initializing Done!");
 }

@@ -35,8 +35,10 @@ class CMFunctionGroup {
   std::vector<void_func> func_pool; // to store added functions
 public:
   // TODO, threading
-  inline void operator()(bool do_multithreading = false) {
+  inline void operator()(/*bool do_multithreading = false*/) {
 
+    for (auto& func : func_pool) func();
+    /*
     // If run requests not to do multithreading, we just run all the functions in order
     if (!do_multithreading) {
       for (auto func : func_pool) func();
@@ -52,7 +54,7 @@ public:
     }
     // Wait for the threads to finish
     for (auto& thread : func_threads)
-      thread.join();
+      thread.join();*/
   }
 
   void operator+(void_func in) { func_pool.push_back(in); }

@@ -6,27 +6,24 @@
  *
  */
 
-#include <cstdint> // uintptr_t
-
 #include "entitys.hpp"
 
-// Globals to control how entitys work
-CatEntity g_CatEntitys[MAX_ENTITIES];
-CatLocalPlayer g_LocalPlayer;
-
-// We need a constructor to get the idx
-CatEntity::CatEntity() : IDX(int(((uintptr_t)this - (uintptr_t)&g_CatEntitys) / sizeof(CatEntity))) {}
-
-bool CatEntity::Enemy() const {
-	if (team == ETEAM_ALLY) return false;
-	if (team == ETEAM_ENEMY) return true;
-	if (g_LocalPlayer.entity == this) return false; // Local ents are friendly, duh
-	if (g_LocalPlayer.entity) return g_LocalPlayer.entity->team != team;
-	return true;
-}
-
-float CatEntity::Distance() const {
-	return (g_LocalPlayer.entity) ? origin.DistTo(g_LocalPlayer.entity->origin) : 0;
+bool CatEntity::GetDormant() { return true; }
+bool CatEntity::GetAlive() { return false; }
+int CatEntity::GetHealth() { return 100; }
+int CatEntity::GetMaxHealth() { return 100; }
+int CatEntity::GetTeam() { return ETEAM_NONE; }
+int CatEntity::GetType() { return ETYPE_NONE; }
+const char* CatEntity::GetName() { return "unknown"; }
+CatVector CatEntity::GetOrigin() { return CatVector(); }
+CatBox CatEntity::GetCollision() { return CatBox(); }
+int CatEntity::GetSteamId() { return -1; }
+bool CatEntity::GetBone(int bone, CatBox& input) { return false; }
+bool CatEntity::GetBone(int bone, CatVector& input) {
+	CatBox tmp_box;
+	auto ret = GetBone(bone, tmp_box);
+	if (ret) input = tmp_box.center();
+	return ret;
 }
 
 namespace bones {

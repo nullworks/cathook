@@ -12,12 +12,12 @@
 namespace trace {
 
 // Trace line to get whether it hit the end of the line
-extern CMFunction<bool(const CatVector&, const CatVector&)> TraceLine;
+extern CMFunction<bool(CatVector, CatVector)> TraceLine;
 
 // Trace line to get entity
-extern CMFunction<const CatEntity*(const CatVector&, const CatVector&)> TraceLineToEnt;
+extern CMFunction<CatEntity*(CatVector, CatVector)> TraceLineToEnt;
 
 // Trace a line, returns true if end of line or entity are hit
-extern CMFunction<bool(const CatEntity&, const CatVector&, const CatVector&)> TraceEnt;
+extern CMFunction<bool(CatEntity*, CatVector, CatVector)> TraceEnt;
 
 }

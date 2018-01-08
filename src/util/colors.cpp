@@ -18,14 +18,15 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-CMFunction<CatVector4(const CatEntity&)> EntityColor {
-	[](const CatEntity& entity) {
+CMFunction<CatVector4(CatEntity*)> EntityColor {
+	[](CatEntity* entity) {
 	// Default color
 	CatVector4 ent_color = white;
 
 	// Different strokes for different folks
-	if (entity.type == ETYPE_PLAYER || entity.type == ETYPE_OTHERHOSTILE || entity.type == ETYPE_PROJECTILE) {
-		switch(entity.team) {
+	auto ent_type = entity->GetType();
+	if (ent_type == ETYPE_PLAYER || ent_type == ETYPE_OTHERHOSTILE || ent_type == ETYPE_PROJECTILE) {
+		switch(entity->GetTeam()) {
 		case ETEAM_RED:
 			ent_color = red; break;
 		case ETEAM_BLUE:
@@ -39,26 +40,26 @@ CMFunction<CatVector4(const CatEntity&)> EntityColor {
 		case ETEAM_ENEMY:	// Red bad
 			ent_color = red;
 		}
-
+	}
 	// Pickups
-	} else if (entity.type == ETYPE_PICKUP_HEALTH || entity.type == ETYPE_PICKUP_SHEILD) {
-		switch(entity.type) {
-		case ETYPE_PICKUP_HEALTH:
-			ent_color = green; break;
-		case ETYPE_PICKUP_SHEILD:
-			ent_color = yellow;
-		}
+	switch(ent_type) {
+	case ETYPE_PICKUP_HEALTH:
+		ent_color = green; break;
+	case ETYPE_PICKUP_SHEILD:
+		ent_color = yellow; break;
+	default:
+	}
 	}
 	return ent_color;
 }};
 
 // Returns a color based on entity health
-CatVector4 Health(const CatEntity& entity) {
-	if (entity.health > entity.max_health)	// Health is tuu much, they must be over their normal health so we make them blue
+CatVector4 Health(CatEntity* entity) {
+	if (entity->GetHealth() > entity->GetMaxHealth())	// If health is too much, they must be over their normal health so we make them blue
 		return CatVector4(64, 128, 255, 255);
 
 	// Percentage of health our of max
-	float hf = (float)entity.health / (float)entity.max_health;
+	float hf = (float)entity->GetHealth() / (float)entity->GetMaxHealth();
 	// Sick logic
 	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }

@@ -18,6 +18,6 @@ CMFunction<bool(CatVector, CatVector)> TraceLine {[](CatVector, CatVector) -> bo
 CMFunction<CatEntity*(CatVector, CatVector)> TraceLineToEnt {[](CatVector, CatVector) -> CatEntity* {return nullptr;}};
 
 // Trace a line, returns true if end of line or entity are hit
-CMFunction<bool(CatEntity*, CatVector, CatVector)> TraceEnt {[](CatEntity, CatVector, CatVector) -> bool {return true;}};
+CMFunction<bool(CatEntity*, CatVector, CatVector)> TraceEnt {[](CatEntity*, CatVector, CatVector) -> bool {return true;}};
 
 }

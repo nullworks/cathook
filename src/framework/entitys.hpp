@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <utility> // Pair
-#include <vector> // For bone stuff
+#include <memory> // std::unique_ptr
 
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
 #include "../util/functions.hpp" // CMFunction()
@@ -60,33 +59,39 @@ enum {
 	EBone_count
 };
 
-class CatEntity {
-public:
-	virtual bool GetDormant() = 0;
-	virtual bool GetAlive() = 0;
-	virtual int GetHealth();
-	virtual int GetMaxHealth();
-	virtual int GetTeam() = 0;
-	virtual int GetType() = 0;
-	virtual const char* GetName();
-	virtual CatVector GetOrigin() = 0;
-	virtual CatBox GetCollision();
-	virtual int GetSteamId();
-	virtual bool GetBone(int bone, CatBox& input);
-	virtual bool GetBone(int bone, CatVector& input);
-};
-class CatLocalPlayer : public CatEntity {
-public:
-	virtual bool InThirdperson() {}
-	virtual void Attack() {}
-	virtual CatVector GetCamera() { return CatVector(); } 	// Get point where the users camera is
-	virtual CatVector GetCameraAngle() { return CatVector(); }
-	virtual void SetCameraAngle(CatVector) {}
-};
+class CatEntity;
 
-CMFunction<int()> GetEntityCount {[](){ return 0; }};
-CMFunction<CatEntity*(int)> GetEntity {[](int) -> CatEntity* { return nullptr; }};
-CMFunction<CatLocalPlayer*()> GetLocalPlayer {[]() -> CatLocalPlayer* { return nullptr; }};
+extern CMFunction<bool(CatEntity*)> GetDormant;
+extern CMFunction<bool(CatEntity*)> GetAlive;
+extern CMFunction<int(CatEntity*)> GetHealth;
+extern CMFunction<int(CatEntity*)> GetMaxHealth;
+extern CMFunction<int(CatEntity*)> GetTeam;
+extern CMFunction<int(CatEntity*)> GetType;
+extern CMFunction<const char*(CatEntity*)> GetName;
+extern CMFunction<CatVector(CatEntity*)> GetOrigin;
+extern CMFunction<CatBox(CatEntity*)> GetCollision;
+extern CMFunction<int(CatEntity*)> GetSteamId;
+extern CMFunction<bool(CatEntity*, int, CatBox&)> GetBone;
+inline bool GetBoneCenter(CatEntity* this_ptr, int hb, CatVector& bone) {
+	CatBox tmp;
+	auto ret = GetBone(this_ptr, hb, tmp);
+	bone = tmp.GetCenter();
+	return ret;
+}
+float GetDistance(CatEntity*);
+bool GetEnemy(CatEntity*);
+
+class CatLocalPlayer;
+
+extern CMFunction<bool(CatLocalPlayer*)> InThirdperson;
+extern CMFunction<void(CatLocalPlayer*)> Attack;
+extern CMFunction<CatVector(CatLocalPlayer*)> GetCamera;
+extern CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle;
+extern CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle;
+
+extern CMFunction<int()> GetEntityCount;
+extern CMFunction<CatEntity*(int)> GetEntity;
+extern CMFunction<CatLocalPlayer*()> GetLocalPlayer;
 
 // Bone stuff
 namespace bones {

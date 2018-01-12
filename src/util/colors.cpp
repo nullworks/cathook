@@ -24,9 +24,9 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 	CatVector4 ent_color = white;
 
 	// Different strokes for different folks
-	auto ent_type = entity->GetType();
+	auto ent_type = GetType(entity);
 	if (ent_type == ETYPE_PLAYER || ent_type == ETYPE_OTHERHOSTILE || ent_type == ETYPE_PROJECTILE) {
-		switch(entity->GetTeam()) {
+		switch(GetTeam(entity)) {
 		case ETEAM_RED:
 			ent_color = red; break;
 		case ETEAM_BLUE:
@@ -47,19 +47,18 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 		ent_color = green; break;
 	case ETYPE_PICKUP_SHEILD:
 		ent_color = yellow; break;
-	default:
-	}
+	default:{}
 	}
 	return ent_color;
 }};
 
 // Returns a color based on entity health
 CatVector4 Health(CatEntity* entity) {
-	if (entity->GetHealth() > entity->GetMaxHealth())	// If health is too much, they must be over their normal health so we make them blue
+	if (GetHealth(entity) > GetMaxHealth(entity))	// If health is too much, they must be over their normal health so we make them blue
 		return CatVector4(64, 128, 255, 255);
 
 	// Percentage of health our of max
-	float hf = (float)entity->GetHealth() / (float)entity->GetMaxHealth();
+	float hf = (float)GetHealth(entity) / (float)GetMaxHealth(entity);
 	// Sick logic
 	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }

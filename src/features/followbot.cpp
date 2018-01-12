@@ -25,7 +25,7 @@ static CatVarInt follow_activation(followbot_menu, "fb_activation", 175, "Activa
 static std::vector<CatVector> breadcrumbs;
 
 // Followed entity
-static const CatEntity* follow_target = nullptr;
+static CatEntity* follow_target = nullptr;
 
 // Followbot state
 enum {
@@ -40,7 +40,8 @@ static void WorldTick(){
   if (!followbot) return;
 
   // We need a local player to control
-  if (!g_LocalPlayer.entity || !g_LocalPlayer.entity->alive) {
+  auto local_ent = GetLocalPlayer();
+  if (!local_ent || !GetAlive((CatEntity*)local_ent)) {
     followbot_state = FB_STATE_IDLE;
     return;
   }
@@ -53,38 +54,38 @@ static void WorldTick(){
     breadcrumbs.clear();
 
     // Try to get a new target
-    for (const auto& entity : g_CatEntitys) {
-
+    for (int i = 0; i < GetEntityCount(); i++) {
+      auto entity = GetEntity(i);
       // Test the entity if its good enough to follow
-      if (CE_BAD(entity)) continue; // Exist + dormant
-      if (&entity == g_LocalPlayer.entity) continue; // Follow self lol
-      if (!entity.alive) continue; // Dont follow dead players
-      if (entity.Enemy()) continue; // Dont follow enemys
+      if (GetDormant(entity)) continue; // Exist + dormant
+      if (entity == (CatEntity*)local_ent) continue; // Follow self lol
+      if (!GetAlive(entity)) continue; // Dont follow dead players`
+      if (GetEnemy(entity)) continue; // Dont follow enemys
       // Check user setting and distance stuff
-      if (entity.Distance() > follow_activation) continue;
+      if (GetDistance(entity) > follow_activation) continue;
       // Vis check
-      if (!trace::TraceEnt(entity, g_LocalPlayer.GetCamera(), (entity.collision != CatBox()) ? entity.collision.center() : entity.origin)) continue;
+    if (!trace::TraceEnt(entity, GetCamera(local_ent), (GetCollision((CatEntity*)local_ent) != CatBox()) ? GetCollision((CatEntity*)local_ent).GetCenter() : GetOrigin(entity))) continue;
 
       // Update follow_target if nessesary
-      if (!follow_target || follow_target->Distance() > entity.Distance()) {
-        follow_target = &entity;
+      if (!follow_target || GetDistance(follow_target) > GetDistance(entity)) {
+        follow_target = entity;
         followbot_state = FB_STATE_NEW_TARGET;
       }
     }
   }
 
   // Generate new crumbs, whether we dont have any crumbs, or we player is too far from last crumb
-	if ((breadcrumbs.empty() || follow_target->origin.DistTo(breadcrumbs[breadcrumbs.size()]) > 40.0F)) { //&& DistanceToGround(found_entity) < 40) {
+	if ((breadcrumbs.empty() || GetOrigin(follow_target).DistTo(breadcrumbs[breadcrumbs.size()]) > 40.0F)) { //&& DistanceToGround(found_entity) < 40) {
 
 		// Add to the crumb.
-		breadcrumbs.push_back(follow_target->origin);
+		breadcrumbs.push_back(GetOrigin(follow_target));
 	}
 
   // Prune old and close crumbs that we wont need anymore
   for (const auto& crumb : breadcrumbs) {
 
     // Dont prune this crumb if we already have a little amount of them, or its too far away
-    if (breadcrumbs.size() < 2 || g_LocalPlayer.entity->origin.DistTo(crumb) > 60.f) break;
+    if (breadcrumbs.size() < 2 || GetOrigin((CatEntity*)local_ent).DistTo(crumb) > 60.f) break;
 
     // Crumb is too close, remove it
     breadcrumbs.erase(breadcrumbs.begin());
@@ -95,7 +96,7 @@ static void WorldTick(){
   }
 
   // Follow the crumbs when too far away, or just starting to follow
-	if (!breadcrumbs.empty() && (followbot_state == FB_STATE_NEW_TARGET || g_LocalPlayer.entity->origin.DistTo(follow_target->origin) > follow_distance)) {
+	if (!breadcrumbs.empty() && (followbot_state == FB_STATE_NEW_TARGET || GetOrigin((CatEntity*)local_ent).DistTo(GetOrigin(follow_target)) > follow_distance)) {
 
     // TODO, make walk to CMFunction
     // WalkTo();

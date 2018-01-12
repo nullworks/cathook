@@ -28,7 +28,7 @@ static CatVarBool target_lock(aimbot_menu, "aimbot_targetlock", false, "Target l
 // Aiming
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
-static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 1, "Hitbox Mode", "Hitbox selection mode\n"
+static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 3, "Hitbox Mode", "Hitbox selection mode\n"
 																																																																			 		  "AUTO: Automaticly chooses best hitbox\n"
 																																																																					  "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																																					  "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
@@ -59,30 +59,33 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
-			if (!entity->GetBone(i, tmp)) continue;
+			if (!GetBoneCenter(entity, i, tmp)) continue;
 			// Vis check
 			if (auto local_ent = GetLocalPlayer())
-				if (!trace::TraceEnt(entity, local_ent->GetCamera(), tmp))
+				if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
 					continue;
 			return tmp;
 		}
 		break;
 	}
 	case 2: { // AUTO-CLOSEST
+		// We need this for fov checks
+		auto local_ent = GetLocalPlayer();
+		if (!local_ent) break;
 		// Book-keepers for the best one we have found
 		CatVector closest;
 		float closest_fov = 360;
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
-			if (!entity->GetBone(i, tmp)) continue;
+			if (!GetBoneCenter(entity, i, tmp)) continue;
 			// Get FOV
-			int fov = util::GetFov(tmp);
+			float fov = util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), tmp);
 			// Check if fov is lower than our current best
 			if (fov > closest_fov) continue;
 			// Vis check
-			if (auto* local_ent = GetLocalPlayer())
-				if (!trace::TraceEnt(entity, local_ent->GetCamera(), tmp))
+			if (auto local_ent = GetLocalPlayer())
+				if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
 					continue;
 			// Set the new current best
 			closest = tmp;
@@ -95,7 +98,7 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 	}
 	case 3: { // HEAD
 		CatVector tmp;
-		if (entity->GetBone(EBone_head, tmp)) return tmp;
+		if (GetBoneCenter(entity, EBone_head, tmp)) return tmp;
 		break;
 	}
 	}
@@ -103,12 +106,13 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 	// Center fallback, uses center of collision box
 
 	// Check if collision box is set
-	if (entity->GetCollision() != CatBox())
+	auto coll = GetCollision(entity);
+	if (coll != CatBox())
 		// We can use the center collision for an aimpoint
-		return entity->GetCollision().center();
+		return coll.GetCenter();
 
 	// Without anything else, all we can use is the origin
-	return entity->GetOrigin();
+	return GetOrigin(entity);
 }
 
 // Target Selection
@@ -118,29 +122,34 @@ std::vector<bool(*)(CatEntity*)> TargetSelectionModule;
 
 // A second check to determine whether a target is good enough to be aimed at
 static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
-	if (entity->GetDormant()) return std::make_pair(false, CatVector());
+	auto ret = std::make_pair(false, CatVector());
+	if (!entity || GetDormant(entity)) return ret;
 
 	// Local player check
-	if (GetLocalPlayer() == entity) return std::make_pair(false, CatVector());
+	auto local_ent = GetLocalPlayer(); // we use this below
+	if (!local_ent || (CatEntity*)local_ent == entity) return ret;
+	// Type
+	auto type = GetType(entity);
+	if (type != ETYPE_PLAYER || type != ETYPE_OTHERHOSTILE) return ret;
 	// Dead
-	if (!entity->GetAlive()) return std::make_pair(false, CatVector());
+	if (!GetAlive(entity)) return ret;
 	// Teammates
-	//if (!(teammates == 2 || (teammates == 0) ? entity.Enemy() : !entity.Enemy())) return std::make_pair(false, CatVector());
+	auto team = GetEnemy(entity);
+	if (!(teammates == 2 || (teammates == 0) ? team : !team)) return ret;
 
 	// Do the custom stuff
 	for (auto tmp : TargetSelectionModule)
-		if (!tmp(entity)) return std::make_pair(false, CatVector());
+		if (!tmp(entity)) return ret;
 
 	// Get our best Aimpoint
 	CatVector aimpoint = RetriveAimpoint(entity);
 
 	// Fov check
-	if (fov > 0.0f && util::GetFov(aimpoint) > (float)fov) return std::make_pair(false, aimpoint);
+	if (fov > 0.0f && util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), aimpoint) > fov) return std::make_pair(false, aimpoint);
 
 	// Vis check
-	if (auto  local_ent = GetLocalPlayer())
-		if (!trace::TraceEnt(entity, local_ent->GetCamera(), aimpoint))
-			return std::make_pair(false, aimpoint);
+	if (!trace::TraceEnt(entity, GetCamera(local_ent), aimpoint))
+		return std::make_pair(false, aimpoint);
 
 	// Hey look! Target passed all checks
 	return std::make_pair(true, aimpoint);
@@ -154,18 +163,17 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 	if (target_lock && last_target) {
 		auto tmp = IsTargetGood(last_target);
 		if (tmp.first)
-			return tmp;
+			return std::make_pair(last_target, tmp.second);
 		last_target = nullptr;
 	}
 
 	// Book keepers for highest target
-	CatEntity* highest_ent = nullptr;
-	CatVector highest_aimpoint;
+	std::pair<CatEntity*, CatVector> ret;
 	float highest_score = -1024;
 
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {
-		CatEntity* entity = GetEntity(i);
+		auto entity = GetEntity(i);
 		if (!entity) continue;
 
 		// Check whether or not we can target the ent
@@ -177,32 +185,34 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 		switch (priority_mode) {
 		case 0: // SMART Priority
 			//score = 0; break; // TODO, fix
-		case 1: // Fov Priority
-			score = 360.0f - util::GetFov(tmp.second); break;
+		case 1: {// Fov Priority
+			auto local_ent = GetLocalPlayer();
+			if (!local_ent) return ret;
+			score = 180.0f - util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), tmp.second); break;
+		}
 		case 2: // Distance priority
 			//score = 4096.0f - entity.Distance(); break;
 		case 3: // Health Priority
-			score = 1024.0f - entity->GetHealth();
+			score = 1024.0f - GetHealth(entity);
 		}
 
 		// Compare the top score to our current ents score
 		if (score > highest_score) {
+			ret = std::make_pair(entity, tmp.second);
 			highest_score = score;
-			highest_ent = entity;
-			highest_aimpoint = tmp.second;
 		}
 	}
 
-	return std::make_pair(highest_ent, highest_aimpoint);
+	return ret;
 }
 // A check to determine whether the local player should aimbot
 static bool ShouldAim() {
 
 	// It would be prefered to have a local ent before we shoot
-	auto local_ent = GetLocalPlayer();
-	if (!local_ent || local_ent->GetDormant()) return false;
+	auto local_ent = (CatEntity*)GetLocalPlayer();
+	if (!local_ent || GetDormant(local_ent)) return false;
 	// Alive check
-	if (!local_ent->GetAlive()) return false;
+	if (!GetAlive(local_ent)) return false;
 	// aimkey
 	if (aimkey && !input::pressed_buttons[aimkey]) return false;
 
@@ -237,15 +247,16 @@ static void WorldTick() {
 	auto local_ent = GetLocalPlayer();
 
 	// Autoshoot
-	if (autoshoot) local_ent->Attack();
+	if (autoshoot) Attack(local_ent);
 
 	// Aim at player
 	switch(silent_aim){
 	case 0: // OFF
-	local_ent->SetCameraAngle(util::VectorAngles(local_ent->GetCamera(), target.second)); break;
-	case 1: // SNAPBACK
-
-	case 2: // MODULE
+	SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
+	//case 1: // SNAPBACK
+	// TODO!!
+	//case 2: // MODULE
+	// TODO!!
 	}
 }
 

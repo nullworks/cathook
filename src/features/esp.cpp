@@ -62,7 +62,7 @@ static bool GetEntityBox(CatEntity* entity) {
 
 	// Get our 8 points of our box
 	CatVector points_w[8];
-	entity->GetCollision().GetPoints(points_w);
+	GetCollision(entity).GetPoints(points_w);
 
 	// Go through the points getting world to screen and create our screenbox with them
 	for (auto& point : points_w) {
@@ -89,27 +89,29 @@ static void Draw() {
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {
 		CatEntity* entity = GetEntity(i);
-		if (!entity || entity->GetDormant()) continue;
+		if (!entity || GetDormant(entity)) continue;
 
 		// Target checking
 		auto local_ent = GetLocalPlayer();
-		if (local_ent && !local_ent->InThirdperson() && local_ent == entity) continue; // Determine whether to apply esp to local player
-		if ((entity->GetType() == ETYPE_PLAYER || entity->GetType() == ETYPE_OTHERHOSTILE) && !entity->GetAlive()) continue; // Dont esp dead players
-		//if (!(esp_team == 2 || (esp_team == 0) ? entity.Enemy() : !entity.Enemy())) continue;
+		if (local_ent && !InThirdperson(local_ent) && (CatEntity*)local_ent == entity) continue; // Determine whether to apply esp to local player
+		auto type = GetType(entity);
+		if ((type == ETYPE_PLAYER || type == ETYPE_OTHERHOSTILE) && !GetAlive(entity)) continue; // Dont esp dead players
+		auto enemy = GetEnemy(entity);
+		if (!(esp_team == 2 || (esp_team == 0) ? enemy : !enemy)) continue;
 
 		// Reset the entity box state
 		sbox.state = EBOX_NOT_RAN;
 		// Get our color
 		auto ent_color = colors::EntityColor(entity);
 		// Check if main esp features should apply
-		if ((esp_players && entity->GetType() == ETYPE_PLAYER) || (esp_other_hostile && entity->GetType() == ETYPE_OTHERHOSTILE)) {
+		if ((esp_players && type == ETYPE_PLAYER) || (esp_other_hostile && type == ETYPE_OTHERHOSTILE)) {
 
 			// Tracers
 			if (tracers) {
 
 				// Get world to screen
 				CatVector scn;
-				if (draw::WorldToScreen(entity->GetOrigin(), scn)) {
+				if (draw::WorldToScreen(GetOrigin(entity), scn)) {
 
 					// Draw a line
 					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((tracers == 2) ? input::bounds.second : input::bounds.second / 2) - scn.y, ent_color);
@@ -127,13 +129,13 @@ static void Draw() {
 
 						// Get our 2 bones to connect
 						CatVector bone1, bone2;
-						if (entity->GetBone(current_set[ii], bone1) && entity->GetBone(current_set[ii + 1], bone2)) {
+						if (GetBoneCenter(entity, current_set[ii], bone1) && GetBoneCenter(entity, current_set[ii + 1], bone2)) {
 
 							// World to screen them
-							if (draw::WorldToScreen(bone1, bone1) && draw::WorldToScreen(bone2, bone2)) {
+							if (draw::WorldToScreen(bone1, bone1) && draw::WorldToScreen(bone1, bone1)) {
 
 								// Draw a line connecting the points
-								draw::Line(bone1.x, bone1.y, bone2.x - bone1.x, bone2.y - bone1.y, ent_color);
+								draw::Line(bone1.x, bone1.y, bone1.x - bone1.x, bone1.y - bone1.y, ent_color);
 							}
 						}
 					}
@@ -144,7 +146,7 @@ static void Draw() {
 					for (int ii = 0; ii < EBone_count; ii++) {
 						// Check if bone is good
 						CatVector tmp;
-						if (!entity->GetBone(ii, tmp)) continue;
+						if (!GetBoneCenter(entity, ii, tmp)) continue;
 						// Get wts
 						if (!draw::WorldToScreen(tmp, tmp)) continue;
 						// Draw
@@ -175,7 +177,7 @@ static void Draw() {
 				if (GetEntityBox(entity)) {
 
 					// Get in bar height
-					int hbh = (sbox.max.second - sbox.min.second - 2) * std::min((float)entity->GetHealth() / (float)entity->GetMaxHealth(), 1.0f);
+					int hbh = (sbox.max.second - sbox.min.second - 2) * std::min((float)GetHealth(entity) / (float)GetMaxHealth(entity), 1.0f);
 
 					// Draw
 					draw::Rect(sbox.min.first - 7, sbox.min.second, 7, sbox.max.second - sbox.min.second, colors::black);
@@ -189,13 +191,32 @@ static void Draw() {
 		// Get our strings
 		std::vector<std::pair<const char*, CatVector4>> str_cache;
 
+		if ((esp_players && type == ETYPE_PLAYER) || (esp_other_hostile && type == ETYPE_OTHERHOSTILE)) {
+			// Name esp
+			if (show_name) {
+				str_cache.push_back(std::make_pair(GetName(entity), ent_color));
+			}
+
+			// Health esp
+			if (show_health == 1 || show_health == 3) {
+				static char buf[12];
+				sprintf(buf, "%i/%iHP", GetHealth(entity), GetMaxHealth(entity));
+				str_cache.push_back(std::make_pair(buf, colors::Health(entity)));
+			}
+
+			// Distance esp
+			if (show_distance) {
+				static char buf[12];
+				sprintf(buf, "%im", (int)GetDistance(entity));
+				str_cache.push_back(std::make_pair(buf, colors::white));
+			}
+		}
 		// Check if there is strings to draw
 		if (!str_cache.empty()) {
 
 			// Get world to screen
 			CatVector draw_point;
-			if (draw::WorldToScreen(entity->GetOrigin(), draw_point)) {
-
+			if (draw::WorldToScreen(GetOrigin(entity), draw_point)) {
 
 				// Change draw point if needed & determine wheter we center the strings
 				bool center_strings = true;
@@ -211,7 +232,7 @@ static void Draw() {
 					case 2: { // ABOVE
 						// Get our height
 						int total_height = 0;
-						for (auto str : str_cache) {
+						for (const auto& str : str_cache) {
 							auto size = draw::GetStringLength(str.first, 1, 28);
 							total_height += size.second;
 						}
@@ -225,32 +246,22 @@ static void Draw() {
 
 				// Draw our stringsDraw
 				// Loop through strings
-				for (auto str : str_cache) {
+				for (const auto& str : str_cache) {
 
 					// Get string sizes
-					auto size = draw::GetStringLength(str.first, 1, 28);
+					auto size = draw::GetStringLength(str.first, 0, 28);
 
-					if (center_strings) // Centered strings
+					if (center_strings) { // Centered strings
 						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, 0, 28, str.second);
-					else // Not centered
+					} else { // Not centered
 						draw::String(str.first, draw_point.x, draw_point.y, 0, 28, str.second);
-
+					}
 					// Lower draw point for recursions
 					draw_point.y += size.second;
 				}
 			}
 		}
 	}
-}
-
-void SetEspColor(CatEntity* entity, CatVector4 color) {
-	// change any strings with entity color to the new one
-	for (int i = 0; i < esp_cache[entity.IDX].string_count; i++) {
-		if (esp_cache[entity.IDX].strings[i].second == esp_cache[entity.IDX].color)
-			esp_cache[entity.IDX].strings[i].second = color;
-	}
-	// Change the main entity color
-	esp_cache[entity.IDX].color = color;
 }
 
 void Init() {

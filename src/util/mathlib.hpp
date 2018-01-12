@@ -56,9 +56,9 @@ public:
 		points[6] = min + CatVector(0, y, z);
 		points[7] = min + CatVector(x, y, z);
 	}
-	inline CatVector center() const { return (min + max) * 0.5; }
-	inline bool operator==(const CatBox& value) const { return value.min == min && value.max == max; }
-	inline bool operator!=(const CatBox& value) const { return value.min != min || value.max != max; }
+	inline CatVector GetCenter() const { return (min + max) * 0.5; }
+	inline bool operator==(CatBox value) const { return value.min == min && value.max == max; }
+	inline bool operator!=(CatBox value) const { return value.min != min || value.max != max; }
 };
 
 // Struct for point in 4d space
@@ -70,18 +70,17 @@ public:
 	// So we can do math with our catvectors easily
   inline CatVector4 operator*(float value)	const { return CatVector4(x * value, y * value, z * value, a * value); }
   inline CatVector4 operator/(float value)	const { return CatVector4(x / value, y / value, z / value, a / value); }
-	inline bool operator==(const CatVector4& value) const { return value.x == x && value.y == y && value.z == z && value.a == a; }
-	inline bool operator!=(const CatVector4& value) const { return value.x != x || value.y != y || value.z != z || value.a != a; }
+	inline bool operator==(CatVector4 value) const { return value.x == x && value.y == y && value.z == z && value.a == a; }
+	inline bool operator!=(CatVector4 value) const { return value.x != x || value.y != y || value.z != z || value.a != a; }
 };
 
 namespace util {
 
 // Input the angles of your player, the vector position of your camera, and the destination point and it returns fov value
-float GetFov(const CatVector&, const CatVector&, const CatVector&);
-float GetFov(const CatVector&);
+float GetFov(CatVector orig_angle, CatVector eye_position, CatVector dest_point);
 // Returns angles used to aim at an object from a point, to another
-CatVector VectorAngles(const CatVector& src_point, const CatVector& dest_point);
+CatVector VectorAngles(CatVector src_point, CatVector dest_point);
 // Give it a position, angles to go in, and how far to extend, then it returns a vector in that direction
-CatVector ExtendLine(const CatVector& src_pos, const CatVector& src_angles, float extend_amt);
+CatVector ExtendLine(CatVector src_pos, CatVector src_angles, float extend_amt);
 
 }

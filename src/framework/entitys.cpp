@@ -8,22 +8,40 @@
 
 #include "entitys.hpp"
 
-bool CatEntity::GetDormant() { return true; }
-bool CatEntity::GetAlive() { return false; }
-int CatEntity::GetHealth() { return 100; }
-int CatEntity::GetMaxHealth() { return 100; }
-int CatEntity::GetTeam() { return ETEAM_NONE; }
-int CatEntity::GetType() { return ETYPE_NONE; }
-const char* CatEntity::GetName() { return "unknown"; }
-CatVector CatEntity::GetOrigin() { return CatVector(); }
-CatBox CatEntity::GetCollision() { return CatBox(); }
-int CatEntity::GetSteamId() { return -1; }
-bool CatEntity::GetBone(int bone, CatBox& input) { return false; }
-bool CatEntity::GetBone(int bone, CatVector& input) {
-	CatBox tmp_box;
-	auto ret = GetBone(bone, tmp_box);
-	if (ret) input = tmp_box.center();
-	return ret;
+CMFunction<bool(CatEntity*)> GetDormant {[](auto) -> auto { return true; }};
+CMFunction<bool(CatEntity*)> GetAlive {[](auto) -> auto { return true; }};
+CMFunction<int(CatEntity*)> GetHealth {[](auto) -> auto { return 100; }};
+CMFunction<int(CatEntity*)> GetMaxHealth {[](auto) -> auto { return 100; }};
+CMFunction<int(CatEntity*)> GetTeam {[](auto) -> int { return ETEAM_NONE; }};
+CMFunction<int(CatEntity*)> GetType {[](auto) -> int { return ETYPE_NONE; }};
+CMFunction<const char*(CatEntity*)> GetName {[](auto) -> auto { return "unknown"; }};
+CMFunction<CatVector(CatEntity*)> GetOrigin {[](auto) -> auto { return CatVector(); }};
+CMFunction<CatBox(CatEntity*)> GetCollision {[](auto) -> auto { return CatBox(); }};
+CMFunction<int(CatEntity*)> GetSteamId {[](auto) -> auto { return -1; }};
+CMFunction<bool(CatEntity*, int, CatBox&)> GetBone {[](CatEntity*, int, CatBox&) -> auto { return false; }};
+
+CMFunction<bool(CatLocalPlayer*)> InThirdperson {[](auto) -> auto { return false; }};
+CMFunction<void(CatLocalPlayer*)> Attack {[](auto){}};
+CMFunction<CatVector(CatLocalPlayer*)> GetCamera {[](auto) -> auto { return CatVector(); }};
+CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle {[](auto) -> auto { return CatVector(); }};
+CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle {[](CatLocalPlayer*, CatVector){}};
+
+CMFunction<int()> GetEntityCount {[]() -> auto { return 0; }};
+CMFunction<CatEntity*(int)> GetEntity {[](auto) -> CatEntity* { return nullptr; }};
+CMFunction<CatLocalPlayer*()> GetLocalPlayer {[]() -> CatLocalPlayer* { return nullptr; }};
+
+float GetDistance(CatEntity* this_ptr) {
+	auto local_ent = GetLocalPlayer();
+	return (local_ent) ? GetOrigin(this_ptr).DistTo(GetOrigin((CatEntity*)local_ent)) : 0;
+};
+bool GetEnemy(CatEntity* this_ptr) {
+	auto team = GetTeam(this_ptr);
+	if (team == ETEAM_ALLY) return false;
+	if (team == ETEAM_ENEMY) return true;
+	auto local_ent = (CatEntity*)GetLocalPlayer();
+	if (local_ent == this_ptr) return false; // Local ents are friendly, duh
+	if (local_ent) return GetTeam(local_ent) != team;
+	return true;
 }
 
 namespace bones {

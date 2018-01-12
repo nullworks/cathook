@@ -18,9 +18,4 @@ extern CatVarBool esp_enabled;
 
 void Init(); // Call to init esp
 
-// Use in world tick to add a string to an entity
-void AddEspString(const CatEntity& entity, const char* input_string, const CatVector4& color = colors::white);
-// Use in world tick to set esp color
-void SetEspColor(const CatEntity& entity, CatVector4 color);
-
 }}

@@ -100,7 +100,7 @@ if (CMAKE_BUILD_TYPE MATCHES DEBUG)
 endif()
 
 # Set system version
-add_definitions("-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+add_definitions(-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME})
 
 # Set git hash and date if possible
 find_package(Git)

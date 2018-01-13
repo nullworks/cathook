@@ -266,3 +266,6 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 *libnekohook*
+
+bin/lin*
+bin/win*

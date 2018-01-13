@@ -6,13 +6,12 @@
  *      Author: nullifiedcat
  */
 
-#include <chrono> // For time so we can sleep
-#include <thread>
+#include <pthread.h> // So we can make our unix thread, works in mingw for windows too!
 
 #include "util/logging.hpp" // To log
 #include "hack.h"	// Contains main init
 
-#if !defined(CMAKE_SYSTEM_NAME) || CMAKE_SYSTEM_NAME == Linux
+#if defined(__linux__)
 
 #include <pthread.h> // So we can make our unix thread
 
@@ -20,19 +19,25 @@ void __attribute__((constructor)) entry() {
 	// A thread so we can attach and let the cheat handle the rest
 	pthread_t init_thread;
 	pthread_create(&init_thread, 0, [](void*) -> void* {
-		// We wait to allow the constructors to finish before we initialize
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		hack::Initialize();
 		return 0;
 	}, 0);
 }
 
-#elif CMAKE_SYSTEM_NAME == Windows
+#elif defined(_WIN32)
+
+#include <windows.h>
 
 // Uhhh, meme?
 BOOL WINAPI DllMain(HMODULE hInstance, DWORD dwReason, LPVOID lpReserved) {
-	if (dwReason == DLL_PROCESS_ATTACH)
-		hack::Initialize(); // TODO, thread this with windows
+	if (dwReason == DLL_PROCESS_ATTACH) {
+		// Create a thread
+		pthread_t init_thread;
+		pthread_create(&init_thread, 0, [](void*) -> void* {
+			hack::Initialize();
+			return 0;
+		}, 0);
+	}
 
 	return true;
 }

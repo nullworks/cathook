@@ -9,12 +9,13 @@
  */
 
 #include <unistd.h> // uintptr_t def
+#if not CMAKE_SYSTEM_NAME == Windows // TMP!!!
 #include <elf.h> // linux related thing about so files, needs more explanation
 #include <fcntl.h> // open()
 #include <sys/mman.h> // linux related tool to map a file into memory
 #include <string.h> // char string utils
 #include <unordered_map>
-
+#endif
 #include "../util/logging.hpp" // logging is cool
 
 #include "signature.hpp"
@@ -23,6 +24,7 @@
 
 namespace hacks {
 
+#if not CMAKE_SYSTEM_NAME == Windows // TMP!!!
 // Not sure how entirely this works, google doesnt help so ill just leave it for now...
 static Elf32_Shdr* getSectionHeader(const void* module, const char* sectionName) {
 
@@ -75,8 +77,9 @@ static uintptr_t dwFindPattern(const uintptr_t& dwAddress, const uintptr_t& dwLe
 	}
 	return NULL;
 }
-
+#endif
 uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPattern) {
+	#if not CMAKE_SYSTEM_NAME == Windows // TMP!!
 
 	// We do our modules im memory differently from darkstorm due to the need of modularity. Shouldnt hurt anything as long as this isnt called too much
 	const void* module = nullptr;
@@ -103,6 +106,9 @@ uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPatte
 	// we need to remap the address that we got from the pattern search from our mapped file to the actual memory
 	// we do this by rebasing the address (subbing the mmapped one and replacing it with the dlopened one.
 	return dwFindPattern((uintptr_t)module + textOffset, (uintptr_t)module + textOffset + textSize, chPattern) - (uintptr_t)module + shared_obj.lmap->l_addr;
+	#else
+	return 0;
+	#endif
 }
 
 }

@@ -132,10 +132,11 @@ static void Draw() {
 						if (GetBoneCenter(entity, current_set[ii], bone1) && GetBoneCenter(entity, current_set[ii + 1], bone2)) {
 
 							// World to screen them
-							if (draw::WorldToScreen(bone1, bone1) && draw::WorldToScreen(bone1, bone1)) {
+							CatVector scn1, scn2;
+							if (draw::WorldToScreen(bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
 
 								// Draw a line connecting the points
-								draw::Line(bone1.x, bone1.y, bone1.x - bone1.x, bone1.y - bone1.y, ent_color);
+								draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, ent_color);
 							}
 						}
 					}

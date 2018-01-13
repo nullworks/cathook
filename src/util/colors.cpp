@@ -13,6 +13,8 @@
 #include <math.h>	// fabs() sin()
 #include <chrono>	// For time keeping
 
+#include "../features/aimbot.hpp"
+
 #include "colors.hpp"
 
 namespace colors {
@@ -20,8 +22,13 @@ namespace colors {
 // Use this to get a color from an entity!
 CMFunction<CatVector4(CatEntity*)> EntityColor {
 	[](CatEntity* entity) {
+
 	// Default color
 	CatVector4 ent_color = white;
+
+	// Aimbot Color
+	if (entity == features::aimbot::last_target)
+		return colors::pink;
 
 	// Different strokes for different folks
 	auto ent_type = GetType(entity);

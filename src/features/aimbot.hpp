@@ -6,6 +6,8 @@
  *
  */
 
+#include "../framework/entitys.hpp"	// Contains entity and bone info
+
 namespace features { namespace aimbot {
 
 // Auto hitbox function
@@ -16,6 +18,8 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode);
 
 // For modules to add their target selection stuff, return true if target is acceptable
 extern std::vector<bool(*)(CatEntity*)> TargetSelectionModule;
+
+extern CatEntity* last_target;
 
 void Init();
 

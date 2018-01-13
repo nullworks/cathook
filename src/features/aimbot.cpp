@@ -8,7 +8,6 @@
  */
 
 #include "../framework/gameticks.hpp" // To run our stuff
-#include "../framework/entitys.hpp"	// Contains entity and bone info
 #include "../framework/input.hpp" // to get userinput for aimkeys
 #include "../framework/trace.hpp" // so we can vis check
 #include "../gui/hudstrings/sidestrings.hpp"
@@ -22,13 +21,13 @@ static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
 static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
 // Target Selection
 static CatVarEnum priority_mode(aimbot_menu, {"SMART", "FOV", "DISTANCE", "HEALTH"}, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
-static CatVarFloat fov(aimbot_menu, "aimbot_fov", 2, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
+static CatVarFloat fov(aimbot_menu, "aimbot_fov", 40, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
 static CatVarEnum teammates(aimbot_menu, {"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"}, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
 static CatVarBool target_lock(aimbot_menu, "aimbot_targetlock", false, "Target lock", "Once aimbot finds a target, it will continue to use that target untill that target is no longer valid");
 // Aiming
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
-static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 3, "Hitbox Mode", "Hitbox selection mode\n"
+static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 4, "Hitbox Mode", "Hitbox selection mode\n"
 																																																																			 		  "AUTO: Automaticly chooses best hitbox\n"
 																																																																					  "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																																					  "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
@@ -84,9 +83,8 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 			// Check if fov is lower than our current best
 			if (fov > closest_fov) continue;
 			// Vis check
-			if (auto local_ent = GetLocalPlayer())
-				if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
-					continue;
+			if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
+				continue;
 			// Set the new current best
 			closest = tmp;
 			closest_fov = fov;
@@ -128,11 +126,14 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 	// Local player check
 	auto local_ent = GetLocalPlayer(); // we use this below
 	if (!local_ent || (CatEntity*)local_ent == entity) return ret;
+
 	// Type
 	auto type = GetType(entity);
-	if (type != ETYPE_PLAYER || type != ETYPE_OTHERHOSTILE) return ret;
+	if (type != ETYPE_PLAYER && type != ETYPE_OTHERHOSTILE) return ret;
+
 	// Dead
 	if (!GetAlive(entity)) return ret;
+
 	// Teammates
 	auto team = GetEnemy(entity);
 	if (!(teammates == 2 || (teammates == 0) ? team : !team)) return ret;
@@ -171,6 +172,9 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 	std::pair<CatEntity*, CatVector> ret;
 	float highest_score = -1024;
 
+	auto local_ent = GetLocalPlayer();
+	if (!local_ent) return ret;
+
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {
 		auto entity = GetEntity(i);
@@ -186,8 +190,7 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 		case 0: // SMART Priority
 			//score = 0; break; // TODO, fix
 		case 1: {// Fov Priority
-			auto local_ent = GetLocalPlayer();
-			if (!local_ent) return ret;
+
 			score = 180.0f - util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), tmp.second); break;
 		}
 		case 2: // Distance priority

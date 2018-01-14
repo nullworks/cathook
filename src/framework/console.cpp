@@ -11,22 +11,23 @@
 #include "../util/stringhelpers.hpp" // sepstr()
 #include "../util/logging.hpp"
 
+#include "console.hpp"
+
 // The main list to store cat commands
-/*static std::unordered_map<std::string, CatCommand*> CatCommandList;
+static std::unordered_map<std::string, CatComBase*> CatCommandList;
 
-
-CatCommand::CatCommand(const char* _command_name, void(*_callback)(std::vector<std::string>))
-  : command_name(_command_name), callback(_callback) {
-  CatCommandList.insert({command_name, this});
+CatComBase::CatComBase(std::string _command_name)
+  : command_name(_command_name) {
+  //CatCommandList.insert({command_name, this});
 }
 
-CatCommand::~CatCommand() {
-  CatCommandList.erase(command_name);
+CatComBase::~CatComBase() {
+  //CatCommandList.erase(command_name);
 }
 
 void CallCommand(std::string input) {
 
-  // Seperate everything in the string to components
+  /*// Seperate everything in the string to components
   auto tmp = sepstr(input);
   if (tmp.empty()) {
     g_CatLogging.log("Catcommand empty.");
@@ -42,6 +43,5 @@ void CallCommand(std::string input) {
 
   // We have our command, pop it out of the vector and pass it as arguments
   tmp.erase(0);
-  find_com.second->callback(tmp);
+  find_com.second->callback(tmp);*/
 }
-*/

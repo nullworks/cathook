@@ -13,8 +13,6 @@
 
 #if defined(__linux__)
 
-#include <pthread.h> // So we can make our unix thread
-
 void __attribute__((constructor)) entry() {
 	// A thread so we can attach and let the cheat handle the rest
 	pthread_t init_thread;

@@ -44,10 +44,5 @@ void CatLogger::log(const char* fmt, ...) {
 	fprintf(log_handle, "%s\n", buffer);
 	fflush(log_handle);
 
-	// Push result var to a console here, if i ever make a console api
+	// Push result var to a console here
 }
-/*
-replace launch options with
-%command% >/tmp/tf2.log
-literally
-*/

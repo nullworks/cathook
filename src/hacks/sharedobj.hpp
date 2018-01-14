@@ -12,7 +12,8 @@
 #include <link.h> // link maps
 typedef link_map CatLinkMap;
 #elif defined(_WIN32)
-
+#include <windows.h> // loadlibrary
+typedef HMODULE CatLinkMap;
 #endif
 #include <string>	// std::string
 

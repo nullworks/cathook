@@ -7,9 +7,7 @@
  */
 
 #if defined(__linux__)
-#include <dlfcn.h>	// dlopen, libary stuff
-#elif defined(_WIN32)
-#include <windows.h> // loadlibrary
+#include <dlfcn.h>	// dlopen, libary stuffa
 #endif
 #include <cstring>	// char string utils
 #include <fstream> // std::ifstream
@@ -72,12 +70,12 @@ SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 
 	// dlopen that sucker and give us a linkmap to use
 #if defined(__linux__)
-	while (!lmap = (CatLinkMap*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL)) {
+	while (!(lmap = (CatLinkMap*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
 		auto error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);
 	}
 #elif defined(_WIN32)
-	
+
 #endif
 
 	g_CatLogging.log("Linkmap: %s -> 0x%x", _file_name, lmap);

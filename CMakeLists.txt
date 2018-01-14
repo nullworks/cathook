@@ -82,8 +82,8 @@ endif()
 # The source sdk that everyone loves
 if(CBASE STREQUAL "SOURCE_2013_SDK")
 	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
-	add_definitions(-DCATHOOK_SOURCE_2013=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 -DRAD_TELEMETRY_DISABLED=1 -DLINUX=1 -DUSE_SDL=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1)
-	file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
+  add_definitions(-DCATHOOK_SOURCE_2013=1)
+  file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
 endif()
 
@@ -98,9 +98,6 @@ if (CMAKE_BUILD_TYPE MATCHES DEBUG)
     message(STATUS "Building with:${ITR}")
   endforeach()
 endif()
-
-# Set system version
-add_definitions(-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME})
 
 # Set git hash and date if possible
 find_package(Git)

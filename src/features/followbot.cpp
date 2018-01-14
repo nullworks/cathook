@@ -21,8 +21,12 @@ static CatVarBool followbot(followbot_menu, "fb_bot", false, "Master Followbot S
 static CatVarInt follow_distance(followbot_menu, "fb_distance", 175, "Follow Distance", "How close the bots should stay to the target");
 static CatVarInt follow_activation(followbot_menu, "fb_activation", 175, "Activation Distance", "How close a player should be until the followbot will pick them as a target");
 
+// The limit for the crumbs
+static const int crumb_limit = 64;
+
 // Something to store breadcrumbs created by followed players
 static std::vector<CatVector> breadcrumbs;
+//breadcrumbs.reserve(crumb_limit);
 
 // Followed entity
 static CatEntity* follow_target = nullptr;
@@ -47,7 +51,7 @@ static void WorldTick(){
   }
 
   // If we are idle, we need a new target
-  if (!follow_target || followbot_state == FB_STATE_IDLE) {
+  if (!follow_target || followbot_state == FB_STATE_IDLE || breadcrumbs.size() > crumb_limit) {
 
     // Reset follow target and crumbs
     follow_target = nullptr;

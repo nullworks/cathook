@@ -39,7 +39,7 @@ static std::string LocateSharedObject(const char* name) {
 
 		// Extract our objects path
 		std::cmatch reg_result;
-		if (!std::regex_search(buffer, reg_result, std::regex("\\/([\\s\\w-]+\\/)+" + std::string(name)))) // regex is really slow and adds alot to file size, but is really convienient for this purpose
+		if (!std::regex_search(buffer, reg_result, std::regex("\\/([\\s\\w-\\.]+\\/)+" + std::string(name)))) // regex is really slow and adds alot to file size, but is really convienient for this purpose
 			continue;
 		// Return the path
 		return reg_result[0];
@@ -73,6 +73,7 @@ SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 	while (!(lmap = (CatLinkMap*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
 		auto error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 #elif defined(_WIN32)
 

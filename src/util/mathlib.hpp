@@ -76,6 +76,10 @@ public:
 
 namespace util {
 
+// Clamps angles to be "normal" values
+void ClampAngles(CatVector& angles);
+// Input 2 angles to get the delta of difference
+CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles);
 // Input the angles of your player, the vector position of your camera, and the destination point and it returns fov value
 float GetFov(CatVector orig_angle, CatVector eye_position, CatVector dest_point);
 // Returns angles used to aim at an object from a point, to another

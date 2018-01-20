@@ -8,6 +8,8 @@
 
 #include "stringhelpers.hpp"
 
+// https://regex101.com/r/W60sMQ/1
+
 // Seperates multiple strings from one string, seperated by spaces
 std::vector<std::string> sepstr(std::string input) {
 

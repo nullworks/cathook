@@ -33,6 +33,7 @@ static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST",
 																																																																					  "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
 																																																																					  "HEAD: Head only\n"
 																																																																					  "CENTER: Aims directly in the center of the entity");
+static CatVarInt smooth_aim(aimbot_menu, "aimbot_smooth", 0, "Smooth Aim", "Smooths the aimbot");
 static CatVarEnum silent_aim(aimbot_menu, {"OFF", "SNAPBACK", "MODULE"}, "aimbot_silent", 0, "Silent aimbot", "SNAPBACK: Snaps the aimbot back after aiming\n"
 																																																							"MODULE: Uses the modules own version of silent, if any");
 static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug info about aimbot");
@@ -165,7 +166,6 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 		auto tmp = IsTargetGood(last_target);
 		if (tmp.first)
 			return std::make_pair(last_target, tmp.second);
-		last_target = nullptr;
 	}
 
 	// Book keepers for highest target
@@ -190,11 +190,10 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 		case 0: // SMART Priority
 			//score = 0; break; // TODO, fix
 		case 1: {// Fov Priority
-
 			score = 180.0f - util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), tmp.second); break;
 		}
 		case 2: // Distance priority
-			//score = 4096.0f - entity.Distance(); break;
+			score = 4096.0f - GetDistance(entity); break;
 		case 3: // Health Priority
 			score = 1024.0f - GetHealth(entity);
 		}
@@ -216,14 +215,17 @@ static bool ShouldAim() {
 	if (!local_ent || GetDormant(local_ent)) return false;
 	// Alive check
 	if (!GetAlive(local_ent)) return false;
-	// aimkey
-	if (aimkey && !input::pressed_buttons[aimkey]) return false;
 
 	return true;
 }
 
 // The main "loop" of the aimbot.
 static void WorldTick() {
+
+	// Snapback Silent State
+	//enum {SNAP_START, SNAP_CONT, SNAP_OVERTIME};
+	//static std::pair<int, std::chrono snapback_state = SNAP_START;
+	// Check is we are over or time
 	// Main enabled check
 	if (!enabled) {
 		last_target = nullptr;
@@ -235,6 +237,7 @@ static void WorldTick() {
 	if (!target.first) { // Check whether we found a target
 		last_target = nullptr;
 		return;
+		// reset asnap back here, add checks toi everything if (silent_aim == 1) {}
 	}
 
 	// Check if our local player is ready to aimbot
@@ -243,23 +246,59 @@ static void WorldTick() {
 		return;
 	}
 
+	// Aimkey done here as its different from what we do with it
+	if (aimkey && !input::pressed_buttons[aimkey]) {
+		last_target = nullptr;
+		return;
+	}
 	// Set our last target
 	last_target = target.first;
 
 	// Get local ent for use below
 	auto local_ent = GetLocalPlayer();
 
-	// Autoshoot
-	if (autoshoot) Attack(local_ent);
+	// Do smoothaim
+	if (smooth_aim > 0) {
+		// Get camera
+		auto camera = GetCameraAngle(local_ent);
+		// Get the difference
+		auto delta = util::GetAngleDifference(camera, target.second);
 
-	// Aim at player
-	switch(silent_aim){
-	case 0: // OFF
-	SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
-	//case 1: // SNAPBACK
-	// TODO!!
-	//case 2: // MODULE
-	// TODO!!
+		// Pitch, If our camera pitch is more than our target pitch, we should add to lower that value, and vise versa for camera being lower
+		auto p_move_ammt = delta.x / smooth_aim;
+		target.second.x = (camera.x > target.second.x) ? camera.x + p_move_ammt : camera.x - p_move_ammt;
+
+		// Yaw, same as above but If we go across -180 to 180, we do some changes
+		auto y_move_ammt = delta.y / smooth_aim;
+		target.second.y = (camera.y > target.second.y || camera.y < -90 && target.second.y > 90) ?
+			camera.y - y_move_ammt : camera.y + y_move_ammt;
+
+		// Clamp as we changed some values
+		util::ClampAngles(target.second);
+
+		// Aim here as silent wont work with smooth
+		SetCameraAngle(local_ent, camera, target.second));
+	}
+  else {
+		// Aim at player
+		switch(silent_aim){
+		case 0: // OFF
+		SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
+		case 1: { // SNAPBACK
+		 //static CatVector original_angles;
+		 //
+		 //std::chrono::steady_clock::now
+	 	}
+		//case 2: // MODULE
+		// TODO!!
+		}
+	}
+	// Autoshoot
+	if (autoshoot) {
+		/*if (smooth_aim > 0) {
+
+		}*/
+		Attack(local_ent);
 	}
 }
 

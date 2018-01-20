@@ -40,7 +40,7 @@ ENDFUNCTION()
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 
-# Flags we use for every build type, cpp 17 standard is nice
+# Flags we use for every build type
 set(CCOMMON_FLAGS "-mtune=generic -O3")
 
 ## Game modules
@@ -120,8 +120,8 @@ endif()
 
 
 # Default compiler flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g3 -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 

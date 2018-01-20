@@ -24,6 +24,7 @@ enum {
 class IWidget {
 public:
 	IWidget* parent;
+	virtual ~IWidget() = 0;
 
 	// States
 	bool hover = false;

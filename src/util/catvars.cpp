@@ -43,7 +43,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
 
 // General catvar constructor
 CatVar::CatVar(const CatEnum& _gui_position, std::string _name, std::string _desc_short, std::string _desc_long)
-	: gui_position(_gui_position), name(_name), desc_short(_desc_short), desc_long(_desc_long), CatComBase("cat_" + _name) {
+	: gui_position(_gui_position), name("neko_" + _name), desc_short(_desc_short), desc_long(_desc_long), CatComBase("neko_" + _name) {
 	CatVarMap.insert({name, this}); // Broken
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
@@ -107,7 +107,7 @@ void CatVarEnum::callback(std::vector<std::string> args) {
 				return;
 			}
 		}
-		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0]);
+		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
 	}
 }
 void CatVarKey::callback(std::vector<std::string> args) {
@@ -128,7 +128,7 @@ void CatVarKey::callback(std::vector<std::string> args) {
 				return;
 			}
 		}*/
-		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0]);
+		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
 	}
 }
 void CatVarFloat::callback(std::vector<std::string> args) {

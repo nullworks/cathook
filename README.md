@@ -1,11 +1,11 @@
 
 # Nekohook Modular Fork
-![banner](http://i.imgur.com/w96wdtE.png)
+![banner](https://cdn.discordapp.com/attachments/371237920545439745/403928612887068692/nekohook-banner.png)
 Not just for tf2 >_>
 
 ## Discord Server
 [NekoHook Discord Server](https://discord.gg/Jp8SKtG)
-If catbot is down, just wait untill it comes online to register. Make sure to read the rules!
+If catbot is down, just wait until it comes online to register. Make sure to read the rules!
 
 ## About
 Nekohook is an extremely modular training software framework designed to work with many games, even games not using the source engine!   

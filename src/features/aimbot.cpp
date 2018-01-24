@@ -21,13 +21,13 @@ static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
 static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
 // Target Selection
 static CatVarEnum priority_mode(aimbot_menu, {"SMART", "FOV", "DISTANCE", "HEALTH"}, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
-static CatVarFloat fov(aimbot_menu, "aimbot_fov", 40, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
+static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
 static CatVarEnum teammates(aimbot_menu, {"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"}, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
 static CatVarBool target_lock(aimbot_menu, "aimbot_targetlock", false, "Target lock", "Once aimbot finds a target, it will continue to use that target untill that target is no longer valid");
 // Aiming
 static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
-static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 4, "Hitbox Mode", "Hitbox selection mode\n"
+static CatVarEnum hitbox_mode(aimbot_menu, {"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"}, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode\n"
 																																																																			 		  "AUTO: Automaticly chooses best hitbox\n"
 																																																																					  "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																																					  "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
@@ -137,7 +137,7 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 
 	// Teammates
 	auto team = GetEnemy(entity);
-	if (!(teammates == 2 || (teammates == 0) ? team : !team)) return ret;
+	if (teammates != 2 && (teammates == 0) ? !team : team) return ret;
 
 	// Do the custom stuff
 	for (auto tmp : TargetSelectionModule)
@@ -257,7 +257,7 @@ static void WorldTick() {
 	// Get local ent for use below
 	auto local_ent = GetLocalPlayer();
 
-	// Do smoothaim
+	// Do smoothaim, TODO  fix
 	if (smooth_aim > 0) {
 		// Get camera
 		auto camera = GetCameraAngle(local_ent);
@@ -277,7 +277,7 @@ static void WorldTick() {
 		util::ClampAngles(target.second);
 
 		// Aim here as silent wont work with smooth
-		SetCameraAngle(local_ent, camera, target.second));
+		SetCameraAngle(local_ent, target.second);
 	}
   else {
 		// Aim at player

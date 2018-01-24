@@ -12,6 +12,7 @@
 
 #include <math.h>	// fabs() sin()
 #include <chrono>	// For time keeping
+#include <ratio> // above
 
 #include "../features/aimbot.hpp"
 
@@ -53,8 +54,7 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 	case ETYPE_PICKUP_HEALTH:
 		ent_color = green; break;
 	case ETYPE_PICKUP_SHEILD:
-		ent_color = yellow; break;
-	default:{}
+		ent_color = yellow;
 	}
 	return ent_color;
 }};
@@ -70,17 +70,11 @@ CatVector4 Health(CatEntity* entity) {
 	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
 }
 
-// Currently broken without a way to get time.
-// on inject make "time injected" chrono and save it. get duration since make and cast to count. use as time for rainbow.
-// have it be in seconds in a float with lesser miliseconds be used as
+// Returns a rainbow color based on time
 CatVector4 RainbowCurrent() {
-	static float tick = 0;
-	tick += 0.003;
-	return colors::FromHSL(fabs(sin(tick / 2.0f)) * 360.0f, 0.85f, 0.9f);	// Remove this once u get it working
-
-	static std::chrono::steady_clock::time_point time_point = std::chrono::steady_clock::now();
-	float curtime = std::chrono::duration_cast<std::chrono::milliseconds>(time_point.time_since_epoch()).count() * 0.001f;
-	return colors::FromHSL(fabs(sin(curtime / 2.0f)) * 360.0f, 0.85f, 0.9f);
+	static auto start_time = std::chrono::steady_clock::now();
+	std::chrono::duration<float, std::deca> curtime = std::chrono::steady_clock::now() - start_time;
+	return colors::FromHSL(fabs(sin(curtime.count())) * 360.0f, 0.85f, 0.9f);
 }
 
 }

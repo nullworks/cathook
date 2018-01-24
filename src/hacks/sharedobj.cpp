@@ -22,6 +22,7 @@
 // Input a shared objects name and it attemts to save the full path to the string, returns false if fails.
 static std::string LocateSharedObject(const char* name) {
 #if defined(__linux__) // This is linux specific
+
 	// Open /proc/maps to get a list of libraries being used currently
 	std::ifstream proc_maps("/proc/self/maps");
 	if (!proc_maps.is_open())
@@ -44,6 +45,22 @@ static std::string LocateSharedObject(const char* name) {
 		// Return the path
 		return reg_result[0];
 	}
+	/* Broken as lambda wont edit tmp
+	// Book keeper
+	std::string tmp;
+	// This loops through dlls loaded
+	if (dl_iterate_phdr([](struct dl_phdr_info* info, size_t, void* data) {
+
+		// Test if it contains our library
+		if (!!strcasestr(info->dlpi_name, name)) {
+			// Set tmp var
+			tmp = info->dlpi_name;
+			return 1;
+		}
+		return 0;
+	}, (void*)&tmp))
+		return tmp;*/
+
 #elif defined(_WIN32)
 	// TODO, needs better way to do this so that modules dont already need to be loaded
 	auto module_handle = GetModuleHandle(name);

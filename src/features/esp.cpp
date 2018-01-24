@@ -25,7 +25,7 @@ CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
 static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
-static CatVarEnum esp_team(esp_menu, {"Enemy", "Friendly", "Both"}, "esp_team", 0, "Team", "Select which team to show esp on.");
+static CatVarEnum esp_team(esp_menu, {"Enemy", "Friendly", "Both"}, "esp_team", 2, "Team", "Select which team to show esp on.");
 // Box esp + Options
 static CatVarEnum box_esp(esp_menu, {"None", "Normal", "Corners"}, "esp_box", 1, "Box", "Draw a 2D box");
 static CatVarInt box_corner_size(esp_menu, "esp_box_corner_size", 10, "Corner Size", "Controls corner box size");
@@ -97,7 +97,7 @@ static void Draw() {
 		auto type = GetType(entity);
 		if ((type == ETYPE_PLAYER || type == ETYPE_OTHERHOSTILE) && !GetAlive(entity)) continue; // Dont esp dead players
 		auto enemy = GetEnemy(entity);
-		if (!(esp_team == 2 || (esp_team == 0) ? enemy : !enemy)) continue;
+		if (esp_team != 2 && (esp_team == 0) ? !enemy : enemy) continue;
 
 		// Reset the entity box state
 		sbox.state = EBOX_NOT_RAN;

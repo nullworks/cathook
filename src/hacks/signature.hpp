@@ -16,6 +16,6 @@
 
 namespace hacks {
 
-uintptr_t GetObjectSignature(SharedObject& shared_obj, const char* chPattern);
+uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPattern);
 
 }

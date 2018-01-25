@@ -97,7 +97,7 @@ static void Draw() {
 		auto type = GetType(entity);
 		if ((type == ETYPE_PLAYER || type == ETYPE_OTHERHOSTILE) && !GetAlive(entity)) continue; // Dont esp dead players
 		auto enemy = GetEnemy(entity);
-		if (esp_team != 2 && (esp_team == 0) ? !enemy : enemy) continue;
+		if (esp_team != 2 && ((esp_team == 0) ? !enemy : enemy)) continue;
 
 		// Reset the entity box state
 		sbox.state = EBOX_NOT_RAN;

@@ -137,7 +137,7 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 
 	// Teammates
 	auto team = GetEnemy(entity);
-	if (teammates != 2 && (teammates == 0) ? !team : team) return ret;
+	if (teammates != 2 && ((teammates == 0) ? !team : team)) return ret;
 
 	// Do the custom stuff
 	for (auto tmp : TargetSelectionModule)
@@ -215,6 +215,9 @@ static bool ShouldAim() {
 	if (!local_ent || GetDormant(local_ent)) return false;
 	// Alive check
 	if (!GetAlive(local_ent)) return false;
+	// Aimkey
+	if (aimkey && !input::pressed_buttons[aimkey]) return false;
+
 
 	return true;
 }
@@ -222,77 +225,85 @@ static bool ShouldAim() {
 // The main "loop" of the aimbot.
 static void WorldTick() {
 
-	// Snapback Silent State
-	//enum {SNAP_START, SNAP_CONT, SNAP_OVERTIME};
-	//static std::pair<int, std::chrono snapback_state = SNAP_START;
-	// Check is we are over or time
 	// Main enabled check
-	if (!enabled) {
-		last_target = nullptr;
-		return;
-	}
-
-	// Get our best target
-	auto target = RetrieveBestTarget();
-	if (!target.first) { // Check whether we found a target
-		last_target = nullptr;
-		return;
-		// reset asnap back here, add checks toi everything if (silent_aim == 1) {}
-	}
-
-	// Check if our local player is ready to aimbot
-	if (!ShouldAim()) {
-		last_target = nullptr;
-		return;
-	}
-
-	// Aimkey done here as its different from what we do with it
-	if (aimkey && !input::pressed_buttons[aimkey]) {
-		last_target = nullptr;
-		return;
-	}
-	// Set our last target
-	last_target = target.first;
+	if (!enabled) { last_target = nullptr; return;	}
 
 	// Get local ent for use below
 	auto local_ent = GetLocalPlayer();
+	if (!local_ent) return;
+
+	// Snapback Silent Info
+	static std::tuple<int, CatVector, std::chrono::time_point<std::chrono::steady_clock>> snap_info;
+	// Return for snapback
+	auto preRet = [local_ent](){
+		if (silent_aim == 1) {
+			if (std::get<0>(snap_info))
+				SetCameraAngle(local_ent, std::get<1>(snap_info));
+			std::get<0>(snap_info) = false;
+		}
+		last_target = nullptr;
+	};
+
+	// Attempt to get a target and test if it exist
+	auto target = RetrieveBestTarget();
+	if (!target.first) { preRet(); return; }
+
+	// Check if our local player is ready to aimbot
+	if (!ShouldAim()) { preRet(); return; }
+
+	// Snapback Time Reset
+	if (silent_aim == 1 && std::get<0>(snap_info)) {
+		if (std::get<0>(snap_info) == 1 && std::chrono::steady_clock::now() - std::get<2>(snap_info) > std::chrono::milliseconds(50)) {
+			SetCameraAngle(local_ent, std::get<1>(snap_info));
+			std::get<0>(snap_info) = 2;
+		}
+		return;
+	}
+
+	// Set our last target
+	last_target = target.first;
 
 	// Do smoothaim, TODO  fix
 	if (smooth_aim > 0) {
 		// Get camera
 		auto camera = GetCameraAngle(local_ent);
+		// Get angles
+		auto angles = util::VectorAngles(camera, target.second);
 		// Get the difference
-		auto delta = util::GetAngleDifference(camera, target.second);
+		auto delta = util::GetAngleDifference(camera, angles);
 
 		// Pitch, If our camera pitch is more than our target pitch, we should add to lower that value, and vise versa for camera being lower
 		auto p_move_ammt = delta.x / smooth_aim;
-		target.second.x = (camera.x > target.second.x) ? camera.x + p_move_ammt : camera.x - p_move_ammt;
+		angles.x = (camera.x > angles.x) ? (camera.x - p_move_ammt) : (camera.x + p_move_ammt);
 
 		// Yaw, same as above but If we go across -180 to 180, we do some changes
 		auto y_move_ammt = delta.y / smooth_aim;
-		target.second.y = (camera.y > target.second.y || camera.y < -90 && target.second.y > 90) ?
-			camera.y - y_move_ammt : camera.y + y_move_ammt;
+		angles.y = (camera.y > angles.y || (camera.y < -90 && angles.y > 90)) ?
+			(camera.y - y_move_ammt) : (camera.y + y_move_ammt);
 
 		// Clamp as we changed some values
-		util::ClampAngles(target.second);
+		util::ClampAngles(angles);
 
 		// Aim here as silent wont work with smooth
-		SetCameraAngle(local_ent, target.second);
+		SetCameraAngle(local_ent, angles);
 	}
-  else {
+	else {
 		// Aim at player
 		switch(silent_aim){
 		case 0: // OFF
-		SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
+			SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
 		case 1: { // SNAPBACK
-		 //static CatVector original_angles;
-		 //
-		 //std::chrono::steady_clock::now
-	 	}
+			// Setup the snap
+			if (!std::get<0>(snap_info))
+				snap_info = std::make_tuple(true, GetCameraAngle(local_ent),	std::chrono::steady_clock::now());
+			// Set angles
+			SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second));
+		}
 		//case 2: // MODULE
-		// TODO!!
+			// TODO!!
 		}
 	}
+
 	// Autoshoot
 	if (autoshoot) {
 		/*if (smooth_aim > 0) {

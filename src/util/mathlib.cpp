@@ -60,9 +60,9 @@ CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles) {
 			diff.y = std::abs(cur_angles.y - dest_angles.y);
 	}
 	// Pitch
-	if (cur_angles.x != dest_angles.x) {
+	if (cur_angles.x != dest_angles.x)
 		diff.x = std::abs(cur_angles.x - dest_angles.x);
-	}
+		
 	return diff;
 }
 // Use input angles and our eye position to get fov to a destination point

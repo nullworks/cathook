@@ -12,6 +12,9 @@
 
 const char* GetProcessName();
 
+// Creates directory for a file
+void CreateDirectorys(std::string path);
+
 // A packed file is a group of chars that make up an object that can be unpacked to be used in cathook
 // First convert your file to a char array, then input it into the constructor.
 // When you want to use it, it will unpack the file into a tmp directory.

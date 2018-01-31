@@ -7,15 +7,10 @@
  */
 
 #include <fstream> // to read/write to files
-#ifdef __linux__
-  #include <cstring> // strcpy()
-  #include <sys/stat.h> // mkdir()
-  #include <sys/types.h>
-  #include <libgen.h> // dirname()
-  #include <errno.h>
-#endif
+
 #include "../util/logging.hpp"
 #include "../util/catvars.hpp"
+#include "../util/iohelper.hpp"
 #include "game.hpp" // to get ingame state
 #include "gameticks.hpp"
 #include "console.hpp"
@@ -82,20 +77,7 @@ CatCommand SaveConfig("save", [](std::vector<std::string> args) {
   cfg_name = std::string(SAVE_LOC()) + "cfg/cat" + cfg_name;
 
   // Make directories if needed
-  #ifdef __linux__
-    char path[512];
-    strcpy(path, cfg_name.c_str());
-    dirname(path);
-    try { if (!!mkdir(path, 666)) { throw -1; } }
-    catch (int errorno) {
-      if (errorno != EEXIST) {
-        char error_str[1024];
-        strerror_r(errorno, error_str, sizeof(error_str));
-        g_CatLogging.log("Couldnt Create directory %s: %s", path, error_str);
-        return;
-      }
-    }
-  #endif
+  CreateDirectorys(cfg_name);
 
   try {
     // Create the file stream

@@ -7,7 +7,13 @@
  */
 
 #include <fstream> // ifstream
+#ifdef __linux__
+  #include <sys/stat.h> // mkdir()
+  #include <libgen.h> // dirname()
+  #include <errno.h> // errors
+#endif
 
+#include "logging.hpp"
 #include "strings.hpp" // substr()
 
 #include "iohelper.hpp"
@@ -46,4 +52,31 @@ PackedFile::PackedFile(const void* _file_start, size_t _file_size) : file_start(
 
 PackedFile::~PackedFile() {
 	fclose(file_handle);
+}
+
+void CreateDirectorys(std::string path) {
+	#ifdef __linux__
+		auto CutPath = [&](){
+			// Since the lambda returned false, we cut the string
+			char cut_path[512];
+			strcpy(cut_path, path.c_str());
+			dirname(cut_path);
+			path = cut_path;
+		};
+		auto MakeDirLam = [&]() -> bool {
+			g_CatLogging.log("Making: %s", path.c_str());
+			if (mkdir(path.c_str(), 666)) {
+				if (errno == ENOENT) return false; // If it doesnt exist, we need to recursivly do it
+				if (errno != EEXIST) {
+					char error_str[1024];
+					g_CatLogging.log("Couldnt Create directory %s: %s", path.c_str(), strerror_r(errno, error_str, sizeof(error_str)));
+				}
+			}
+			return true;
+		};
+		CutPath();
+		while (!MakeDirLam())
+			CutPath();
+	#endif
+	return;
 }

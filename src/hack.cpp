@@ -12,14 +12,18 @@
 
 #include "util/logging.hpp" // To log progress
 
+// Framework stuff
+#include "framework/config.hpp"
+#include "features/features.hpp"
+#include "gui/init.hpp"
+
 // TODO, ifdef this to shutup errors
 // Game Modules
+#if defined(CATHOOK_SOURCE_2013)
 #include "modules/Source_2013/init.hpp"
+#elif defined(CATHOOK_CSGO)
 #include "modules/csgo/init.hpp"
-// Features
-#include "features/features.hpp"
-// GUI
-#include "gui/init.hpp"
+#endif
 
 #include "hack.h"
 
@@ -43,11 +47,12 @@ void hack::Initialize() {
 	g_CatLogging.log("Loading Modules...");
 #if defined(CATHOOK_SOURCE_2013) 	// Any source 2013 game
 	modules::source::Init();
-#endif
-#if defined(CATHOOK_CSGO) 	// CSGO
+#elif defined(CATHOOK_CSGO) 	// CSGO
 	modules::csgo::Init();
 #endif
 
+	// Load configs
+	configs::Init();
 
 	g_CatLogging.log("Initializing Done!");
 }

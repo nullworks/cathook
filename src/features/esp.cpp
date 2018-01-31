@@ -153,7 +153,7 @@ static void Draw() {
 						// Draw
 						char buf[8];
 						sprintf(buf, "B:%i", ii);
-						draw::String(buf, tmp.x, tmp.y, 0, 20, colors::white);
+						draw::String(buf, tmp.x, tmp.y, draw::default_font, draw::default_font_size, colors::white);
 					}
 				}
 			}
@@ -234,7 +234,7 @@ static void Draw() {
 						// Get our height
 						int total_height = 0;
 						for (const auto& str : str_cache) {
-							auto size = draw::GetStringLength(str.first, 1, 28);
+							auto size = draw::GetStringLength(str.first, draw::default_font, draw::default_font_size);
 							total_height += size.second;
 						}
 						if (esp_text_position == 1) // BOTTOM RIGHT
@@ -253,9 +253,9 @@ static void Draw() {
 					auto size = draw::GetStringLength(str.first, 0, 28);
 
 					if (center_strings) { // Centered strings
-						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, 0, 28, str.second);
+						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, draw::default_font, draw::default_font_size, str.second);
 					} else { // Not centered
-						draw::String(str.first, draw_point.x, draw_point.y, 0, 28, str.second);
+						draw::String(str.first, draw_point.x, draw_point.y, draw::default_font, draw::default_font_size, str.second);
 					}
 					// Lower draw point for recursions
 					draw_point.y += size.second;
@@ -266,7 +266,7 @@ static void Draw() {
 }
 
 void Init() {
-	drawmgr_on(Draw);
+	drawmgr.REventDuring(Draw);
 }
 
 }}

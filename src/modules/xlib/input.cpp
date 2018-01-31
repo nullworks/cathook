@@ -121,7 +121,7 @@ static void RefreshState() {
 
 // Simple init function to enable xlib input functionality
 void InitInput() {
-	drawmgr_before(RefreshState);
+	drawmgr.REventBefore(RefreshState);
 }
 
 }

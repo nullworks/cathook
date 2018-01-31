@@ -6,7 +6,7 @@
  *
  */
 
-#include "../../util/stringhelpers.hpp"
+#include "../../util/strings.hpp"
 #include "../../util/colors.hpp"
 #include "../../framework/input.hpp" // For mouse location
 #include "../../framework/drawing.hpp"

@@ -31,21 +31,13 @@ private:
   func_type func = nullptr;
 };
 
-class CMFunctionGroup {
+// To handle calling of events
+class CMEvent {
   std::vector<void_func> func_pool; // to store added functions
 public:
-  // TODO, threading
   inline void operator()(/*bool do_multithreading = false*/) {
-
-    for (auto& func : func_pool) func();
-    /*
-    // If run requests not to do multithreading, we just run all the functions in order
-    if (!do_multithreading) {
-      for (auto func : func_pool) func();
-      return;
-    }
-
-    // Note: It shouldnt matter how many cores the system has as the operating system can determine on its own(in theroy), which thread should be run at a time, but eventually everything should finish.
+    for (const auto& func : func_pool) func();
+    /* TODO, FIX THREADING
     // Make enough threads for as many functions as we have.
     std::thread func_threads[func_pool.size()];
     // Start all threads with all our functions
@@ -56,6 +48,32 @@ public:
     for (auto& thread : func_threads)
       thread.join();*/
   }
+  void add(void_func in) { func_pool.push_back(in); }
+  void remove(void_func in) {
+    for(int i = 0; i < func_pool.size(); i++) {
+      if (func_pool[i] == in) {
+        // Remove function from pool
+        func_pool.erase(func_pool.begin() + i);
+        // size has changed, need to recurse
+        remove(in);
+        return;
+      }
+    }
+  }
+};
 
-  void operator+(void_func in) { func_pool.push_back(in); }
+// This is to handle before and after events happen
+class CMEventGroup {
+  CMEvent before_event;
+  CMEvent during_event;
+  CMEvent after_event;
+public:
+  inline void operator()() {
+    before_event();
+    during_event();
+    after_event();
+  }
+  void REventBefore(void_func in) {before_event.add(in);};
+  void REventDuring(void_func in) {during_event.add(in);};
+  void REventAfter(void_func in) {after_event.add(in);};
 };

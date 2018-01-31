@@ -7,6 +7,7 @@
  */
 
 #include <cstring>
+#include <algorithm> // std::sort
 
 #include "../../framework/drawing.hpp" // Draw stuff
 #include "../../util/colors.hpp" // Draw stuff

@@ -23,7 +23,7 @@ namespace gui {
 void Init() {
 
 	// Setup the draw manager to run gui
-	drawmgr_on([](){g_pGui.Update();});
+	drawmgr.REventDuring([](){g_pGui.Update();});
 
 	menu::Init();
 

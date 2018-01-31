@@ -25,6 +25,7 @@ public:
 	std::string name;							// Command name if it needs to be registered into a games console
 	std::string desc_short;				// Name in gui
 	std::string desc_long;				// Descripton in gui
+	virtual std::string GetValue() = 0; // Used by cfg mgr and other things
 };
 // CatVar varients
 class CatVarBool : public CatVar {
@@ -36,6 +37,7 @@ public:
 	const bool defaults;
 	bool value;
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarInt : public CatVar {
 public:
@@ -50,12 +52,14 @@ public:
 	const int min;
 	const int max;
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarKey : public CatVarInt {
 public:
 	CatVarKey(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long) {}
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarEnum : public CatVarInt {
 public:
@@ -63,6 +67,7 @@ public:
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long, 0, _cat_enum.size() - 1), cat_enum(_cat_enum) {}
 	const CatEnum& cat_enum;
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarFloat : public CatVar {
 public:
@@ -77,6 +82,7 @@ public:
 	const float min;
 	const float max;
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarString : public CatVar {
 public:
@@ -87,6 +93,7 @@ public:
 	const std::string defaults;
 	std::string value;	// std::string is perfectly acceptible due to the fact that its mostly static and its extra features are nice
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 class CatVarColor : public CatVar {
 public:
@@ -97,6 +104,7 @@ public:
 	const CatVector4 defaults;
 	CatVector4 value;
 	virtual void callback(std::vector<std::string>);
+	virtual std::string GetValue();
 };
 
 

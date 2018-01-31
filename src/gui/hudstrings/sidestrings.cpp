@@ -56,9 +56,9 @@ static void AddDefault() {
 
 void Init() {
 	// To Get our default strings up there
-	drawmgr_before(AddDefault);
+	drawmgr.REventBefore(AddDefault);
 	// To draw our strings
-	drawmgr_after([](){SideStrings.Draw();});
+	drawmgr.REventDuring([](){SideStrings.Draw();});
 }
 
 }}

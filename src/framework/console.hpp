@@ -6,17 +6,31 @@
  *
  */
 
- #include <string>
- #include <vector>
+#pragma once
+
+#include <unordered_map>
+#include <string>
+#include <vector>
+
+#include "../util/functions.hpp"
+
+#define COM_PREFIX "neko_"
 
 // The base command class
 class CatComBase {
 public:
-   // Constructor, with name of your command and a callback to a function with a vector of strings to use as command arguments
-   CatComBase(std::string _command_name);
-   ~CatComBase();
-   std::string command_name;
-   virtual void callback(std::vector<std::string>) = 0;
- };
+  virtual void callback(std::vector<std::string>) = 0;
+};
 
- void CallCommand(std::string input);
+class CatCommand : public CatComBase {
+public:
+  CatCommand(std::string _name, void(*_com_callback)(std::vector<std::string>));
+  virtual void callback(std::vector<std::string> args) { com_callback(args); };
+  std::string name;
+  CMFunction<void(std::vector<std::string>)> com_callback = nullptr;
+  inline void operator()(std::vector<std::string> args) { com_callback(args); }
+};
+
+void CallCommand(std::string input);
+
+extern std::unordered_map<std::string, CatCommand*> CatCommandMap;

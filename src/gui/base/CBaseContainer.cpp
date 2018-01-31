@@ -6,6 +6,7 @@
  */
 
 #include <cstring> // strcmp()
+#include <algorithm> // std::sort
 
 #include "../../framework/input.hpp"
 

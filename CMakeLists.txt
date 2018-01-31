@@ -41,7 +41,7 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 
 # Flags we use for every build type
-set(CCOMMON_FLAGS "-mtune=generic -O3")
+set(CCOMMON_FLAGS "-std=gnu++17 -mtune=generic -O3")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")

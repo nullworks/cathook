@@ -7,11 +7,11 @@
  */
 
 #if defined(__linux__)
-#include <dlfcn.h>	// dlopen, libary stuffa
+#include <dlfcn.h> // dlopen, libary stuffs
 #endif
-#include <cstring>	// char string utils
+#include <cstring> // char string utils
 #include <fstream> // std::ifstream
-#include <regex> // Regular expressions
+#include <regex> 	// Regular expressions
 #include <chrono> // For time so we can sleep
 #include <thread> // Sleep in thread ^
 
@@ -45,21 +45,24 @@ static std::string LocateSharedObject(const char* name) {
 		// Return the path
 		return reg_result[0];
 	}
-	/* Broken as lambda wont edit tmp
+
+	/* This works but the regex is better at making sure its the correct so, EX: with Team Fortress, if you try to find client.so, it would find steamclient.so instead
 	// Book keeper
-	std::string tmp;
+	auto tmp = std::make_pair(name, std::string());
+
 	// This loops through dlls loaded
 	if (dl_iterate_phdr([](struct dl_phdr_info* info, size_t, void* data) {
-
+		// Cast our tmp var back
+		auto tmp_var = (std::pair<const char*, std::string>*)data;
 		// Test if it contains our library
-		if (!!strcasestr(info->dlpi_name, name)) {
+		if (!!strcasestr(info->dlpi_name, tmp_var->first)) {
 			// Set tmp var
-			tmp = info->dlpi_name;
+			tmp_var->second = info->dlpi_name;
 			return 1;
 		}
 		return 0;
 	}, (void*)&tmp))
-		return tmp;*/
+		return tmp.second;*/
 
 #elif defined(_WIN32)
 	// TODO, needs better way to do this so that modules dont already need to be loaded

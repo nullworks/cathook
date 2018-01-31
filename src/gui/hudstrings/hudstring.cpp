@@ -21,12 +21,12 @@ void HudString::Draw() {
 	int y = draw_point.second;
 	for (const auto& str : strings) {
 
-		auto str_size = draw::GetStringLength(str.first.c_str(), OPENSANS, 20);
+		auto str_size = draw::GetStringLength(str.first.c_str(), draw::default_font, draw::default_font_size);
 
 		if (!center)
-			draw::String(str.first.c_str(), draw_point.first, y, OPENSANS, 20, str.second); // TODO, make gui use user defined font as well as size
+			draw::String(str.first.c_str(), draw_point.first, y, draw::default_font, draw::default_font_size, str.second); // TODO, make gui use user defined font as well as size
 		else
-			draw::String(str.first.c_str(), draw_point.first - (str_size.first / 2), y, OPENSANS, 20, str.second);
+			draw::String(str.first.c_str(), draw_point.first - (str_size.first / 2), y, draw::default_font, draw::default_font_size, str.second);
 
 		y += str_size.second + 1;
 	}

@@ -45,4 +45,5 @@ void CatLogger::log(const char* fmt, ...) {
 	fflush(log_handle);
 
 	// Push result var to a console here
+	console_tap(buffer);
 }

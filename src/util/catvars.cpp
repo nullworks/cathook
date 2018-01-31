@@ -10,6 +10,7 @@
 
 #include <exception>
 
+#include "../framework/input.hpp" // CatVarKey uses it to look for catkeys
 #include "logging.hpp"
 
 #include "catvars.hpp"
@@ -43,7 +44,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
 
 // General catvar constructor
 CatVar::CatVar(const CatEnum& _gui_position, std::string _name, std::string _desc_short, std::string _desc_long)
-	: gui_position(_gui_position), name("neko_" + _name), desc_short(_desc_short), desc_long(_desc_long), CatComBase("neko_" + _name) {
+	: gui_position(_gui_position), name(COM_PREFIX + _name), desc_short(_desc_short), desc_long(_desc_long) {
 	CatVarMap.insert({name, this}); // Broken
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
@@ -64,7 +65,7 @@ CatVarColor::CatVarColor(const CatEnum& _gui_position, std::string _name, CatVec
 void CatVarBool::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
-		g_CatLogging.log("%s: %s", name.c_str(), (value) ? "true" : "false");
+		g_CatLogging.log("%s: %s", name.c_str(), GetValue().c_str());
 		return;
 	}
 	// Number
@@ -78,6 +79,9 @@ void CatVarBool::callback(std::vector<std::string> args) {
 			value = false;
 	}
 }
+std::string CatVarBool::GetValue() {
+	return (value) ? "true" : "false";
+}
 void CatVarInt::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
@@ -90,25 +94,33 @@ void CatVarInt::callback(std::vector<std::string> args) {
 		g_CatLogging.log("Exception: %s", e.what());
 	}
 }
+std::string CatVarInt::GetValue() {
+	return std::to_string(value);
+}
 void CatVarEnum::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
 		g_CatLogging.log("%s: %f", name.c_str(), value);
 		return;
 	}
+	// Text
+	for (int i = 0; i < cat_enum.size(); i++) {
+		if (args[0] == cat_enum[i]) {
+			value = i;
+			return;
+		}
+	}
 	// int input
 	try {
 		value = std::stoi(args[0]);
-	// Text
-	} catch (std::exception& e){
-		for (int i = 0; i < cat_enum.size(); i++) {
-			if (cat_enum[i] == args[0]) {
-				value = i;
-				return;
-			}
-		}
-		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
-	}
+		return;
+	} catch (std::exception& e){}
+	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+}
+std::string CatVarEnum::GetValue() {
+	if (value >= cat_enum.size() || value < 0)
+		return "";
+	return cat_enum.at(value);
 }
 void CatVarKey::callback(std::vector<std::string> args) {
 	// Empty args
@@ -116,25 +128,27 @@ void CatVarKey::callback(std::vector<std::string> args) {
 		g_CatLogging.log("%s: %i", name.c_str(), value);
 		return;
 	}
+	// Text input
+	for (int i = 0; i < CATKEY_COUNT; i++) {
+		if (args[0] == std::string("CATKEY_") + input::key_names[i] || args[0] == input::key_names[i]) {
+			value = i;
+			return;
+		}
+	}
 	// int input
 	try {
 		value = std::stoi(args[0]);
-	// Text
-	} catch (std::exception& e){
-		// TODO, look for catkey names
-		/*for (int i = 0; i < cat_enum.size(); i++) {
-			if (cat_enum[i] == args[0]) {
-				value = i;
-				return;
-			}
-		}*/
-		g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
-	}
+		return;
+	} catch (std::exception& e){}
+	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+}
+std::string CatVarKey::GetValue() {
+	return std::string("CATKEY_") + input::key_names[value];
 }
 void CatVarFloat::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
-		g_CatLogging.log("%s: %f", name, value);
+		g_CatLogging.log("%s: %f", name.c_str(), value);
 		return;
 	}
 	try {
@@ -143,6 +157,9 @@ void CatVarFloat::callback(std::vector<std::string> args) {
 		g_CatLogging.log("Exception: %s", e.what());
 	}
 }
+std::string CatVarFloat::GetValue() {
+	return std::to_string(value);
+}
 void CatVarString::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
@@ -150,6 +167,9 @@ void CatVarString::callback(std::vector<std::string> args) {
 		return;
 	}
 	value = args[0];
+}
+std::string CatVarString::GetValue() {
+	return value;
 }
 void CatVarColor::callback(std::vector<std::string> args) {
 	// Empty args
@@ -172,4 +192,11 @@ void CatVarColor::callback(std::vector<std::string> args) {
 	} catch (std::exception& e) {
 		g_CatLogging.log("Exception: %s", e.what());
 	}
+}
+std::string CatVarColor::GetValue() {
+	return
+	std::to_string(value.x) + ' ' +
+	std::to_string(value.y) + ' ' +
+	std::to_string(value.z) + ' ' +
+	std::to_string(value.a);
 }

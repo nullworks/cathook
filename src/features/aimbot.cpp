@@ -253,7 +253,7 @@ static void WorldTick() {
 
 	// Snapback Time Reset
 	if (silent_aim == 1 && std::get<0>(snap_info)) {
-		if (std::get<0>(snap_info) == 1 && std::chrono::steady_clock::now() - std::get<2>(snap_info) > std::chrono::milliseconds(50)) {
+		if (std::get<0>(snap_info) == 1 && std::chrono::steady_clock::now() - std::get<2>(snap_info) > std::chrono::milliseconds(75)) {
 			SetCameraAngle(local_ent, std::get<1>(snap_info));
 			std::get<0>(snap_info) = 2;
 		}
@@ -318,8 +318,8 @@ static void DrawTick() {
 }
 
 void Init() {
-	wtickmgr_on(WorldTick);
-	drawmgr_on(DrawTick);
+	wtickmgr.REventDuring(WorldTick);
+	drawmgr.REventDuring(DrawTick);
 }
 
 }}

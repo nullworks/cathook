@@ -8,7 +8,7 @@
 
 #include <fstream> // ifstream
 
-#include "stringhelpers.hpp" // substr()
+#include "strings.hpp" // substr()
 
 #include "iohelper.hpp"
 
@@ -25,9 +25,6 @@ const char* GetProcessName() {
 
 	// Seperate "Name: " from our string
 	substr(proc_name, proc_name, 6, sizeof(proc_name) - 6); // this isnt as reliable as regex but it gets the job done and quick
-	/*std::cmatch reg_result;
-	if (!std::regex_search(line, reg_result, "(?<=Name:[\s]*)([\w]+[\s]*)*")) return "unknown";
-	strcpy(proc_name, sm[0]);*/
 
 	// Return the static char array with the process name in it
 	return proc_name;

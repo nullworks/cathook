@@ -21,7 +21,7 @@ namespace configs {
 
 constexpr const char* SAVE_LOC() {
   #if defined(__linux__)
-    return "~/.config/nekohook/";
+    return "/home/julianacat/.config/nekohook/";
   #endif
 }
 
@@ -77,7 +77,7 @@ CatCommand SaveConfig("save", [](std::vector<std::string> args) {
   cfg_name = std::string(SAVE_LOC()) + "cfg/cat" + cfg_name;
 
   // Make directories if needed
-  CreateDirectorys(cfg_name);
+  CreateDirectorys(std::string(SAVE_LOC()) + "cfg");
 
   try {
     // Create the file stream

@@ -103,24 +103,30 @@ void CatVarEnum::callback(std::vector<std::string> args) {
 		g_CatLogging.log("%s: %f", name.c_str(), value);
 		return;
 	}
-	// Text
-	for (int i = 0; i < cat_enum.size(); i++) {
-		if (args[0] == cat_enum[i]) {
-			value = i;
-			return;
-		}
-	}
+
 	// int input
 	try {
 		value = std::stoi(args[0]);
 		return;
-	} catch (std::exception& e){}
+	} catch (std::exception& e) {
+		// Text
+		for (int i = 0; i < cat_enum.size(); i++) {
+			if (args[0] == cat_enum.at(i)) {
+				value = i;
+				return;
+			}
+		}
+	}
 	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
 }
 std::string CatVarEnum::GetValue() {
-	if (value >= cat_enum.size() || value < 0)
-		return "";
-	return cat_enum.at(value);
+	// Try catch still doesnt fix error :/
+	return std::to_string(value);
+	try {
+		return cat_enum.at(value);
+	} catch (int i) {
+		return std::to_string(value);
+	}
 }
 void CatVarKey::callback(std::vector<std::string> args) {
 	// Empty args

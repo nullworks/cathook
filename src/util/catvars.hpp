@@ -63,12 +63,12 @@ public:
 };
 class CatVarEnum : public CatVarInt {
 public:
-	CatVarEnum(const CatEnum& _cat_enum, const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
+	CatVarEnum(const CatEnum& _gui_position, const CatEnum& _cat_enum, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long, 0, _cat_enum.size() - 1), cat_enum(_cat_enum) {}
 	const CatEnum& cat_enum;
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
-};
+}; 
 class CatVarFloat : public CatVar {
 public:
 	CatVarFloat(const CatEnum& _gui_position, std::string _name, float _defaults, std::string _desc_short, std::string _desc_long, float _min, float _max);

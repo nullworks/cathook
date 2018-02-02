@@ -8,6 +8,7 @@
 
 #include <fstream> // ifstream
 #ifdef __linux__
+  #include <stack>
   #include <sys/stat.h> // mkdir()
   #include <libgen.h> // dirname()
   #include <errno.h> // errors
@@ -56,27 +57,27 @@ PackedFile::~PackedFile() {
 
 void CreateDirectorys(std::string path) {
 	#ifdef __linux__
-		auto CutPath = [&](){
-			// Since the lambda returned false, we cut the string
+    // Stack to store parent directories
+    std::stack<std::string> dir_stack;
+    // Get our directories
+		while (path != "." && path != "/") {
+      dir_stack.push(path);
 			char cut_path[512];
 			strcpy(cut_path, path.c_str());
 			dirname(cut_path);
 			path = cut_path;
-		};
-		auto MakeDirLam = [&]() -> bool {
-			g_CatLogging.log("Making: %s", path.c_str());
-			if (mkdir(path.c_str(), 666)) {
-				if (errno == ENOENT) return false; // If it doesnt exist, we need to recursivly do it
-				if (errno != EEXIST) {
+		}
+    // Make the directories
+    while (!dir_stack.empty()) {
+			if (mkdir(dir_stack.top().c_str(), S_IRWXU | S_IRWXG | S_IRWXO)) {
+				if (errno != EEXIST && errno != ENOENT) {
 					char error_str[1024];
-					g_CatLogging.log("Couldnt Create directory %s: %s", path.c_str(), strerror_r(errno, error_str, sizeof(error_str)));
+					g_CatLogging.log("Couldnt Create directory %s: %s", dir_stack.top().c_str(), strerror_r(errno, error_str, sizeof(error_str)));
 				}
-			}
-			return true;
-		};
-		CutPath();
-		while (!MakeDirLam())
-			CutPath();
+			} else
+        g_CatLogging.log("Made Dir: \"%s\"", dir_stack.top().c_str());
+      dir_stack.pop();
+    }
 	#endif
 	return;
 }

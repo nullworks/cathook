@@ -51,10 +51,10 @@ void hkSwapWindow(SDL_Window* window) {
 
 			ImGui::Begin("kewl window");
             static int counter = 0;
-            ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-            ImGui::Checkbox("Enable Capture", &useless);      // Edit bools storing our windows open/close state
+            ImGui::Text("Hello, world!");                         
+            ImGui::Checkbox("Enable Capture", &useless);      
             ImGui::Checkbox("Another Window", &show_another_window);
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+            if (ImGui::Button("Button"))                            
                 counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);

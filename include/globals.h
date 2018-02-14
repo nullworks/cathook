@@ -14,6 +14,10 @@ class Vector;
 class ConVar;
 class CatVar;
 
+// custom
+extern CatVar GUI;
+extern bool gui_visible;
+
 extern int g_AppID;
 extern unsigned long tickcount;
 

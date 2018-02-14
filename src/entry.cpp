@@ -43,7 +43,7 @@ void *MainThread(void *arg)
     return 0;
 }
 
-void __attribute__((constructor)) attach()
+void __attribute__((constructor)) attach2()
 {
     // std::string test_str = "test";
     pthread_mutex_init(&mutex_quit, 0);
@@ -51,7 +51,7 @@ void __attribute__((constructor)) attach()
     pthread_create(&thread_main, 0, MainThread, &mutex_quit);
 }
 
-void __attribute__((destructor)) detach()
+void __attribute__((destructor)) detach2()
 {
     logging::Info("Detaching");
     pthread_mutex_unlock(&mutex_quit);

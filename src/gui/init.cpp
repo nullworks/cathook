@@ -14,10 +14,6 @@
 
 extern CatVar info_text;
 
-bool useless = false;
-bool show_another_window = false;
-static float f = 0.0f;
-
 // Pointer to 'SDL_GL_SwapWindow' in the jump table.
 uintptr_t* swapwindow_ptr;
 
@@ -47,28 +43,8 @@ void hkSwapWindow(SDL_Window* window) {
 	ImGui_ImplSdl_NewFrame(window);
         if (gui_visible) // This will be modified later on, it is just an example as of now to get most of it working.
 		{
-			ImGui::GetIO().MouseDrawCursor = 1;
-
-			ImGui::Begin("kewl window");
-            static int counter = 0;
-            ImGui::Text("Hello, world!");                         
-            ImGui::Checkbox("Enable Capture", &useless);      
-            ImGui::Checkbox("Another Window", &show_another_window);
-            if (ImGui::Button("Button"))                            
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
-	
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
+            ImGui::GetIO().MouseDrawCursor = 1;
+			menu();
 		}
 		else
 		{

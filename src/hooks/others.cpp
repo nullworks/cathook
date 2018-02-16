@@ -723,8 +723,7 @@ void LevelInit_hook(void *_this, const char *newmap)
         (LevelInit_t) hooks::clientmode.GetMethod(offsets::LevelInit());
     playerlist::Save();
     g_IEngine->ClientCmd_Unrestricted("exec cat_matchexec");
-    // for some reason if this is uncommented, tf2 crashes when you enable aimbot.
-    // hacks::shared::aimbot::Reset();
+    hacks::shared::aimbot::Reset();
     chat_stack::Reset();
     hacks::shared::anticheat::ResetEverything();
     original(_this, newmap);

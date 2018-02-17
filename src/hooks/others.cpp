@@ -761,7 +761,7 @@ bool DispatchUserMessage_hook(void *_this, int type, bf_read &buf)
                                                      "kick", claz };
                     for (auto i : name2)
                     {
-                    	boost::to_lower(i);
+                        boost::to_lower(i);
                         res.push_back(i);
                     }
                     std::string message2 = message;
@@ -772,13 +772,10 @@ bool DispatchUserMessage_hook(void *_this, int type, bf_read &buf)
                     boost::replace_all(message2, "6", "g");
                     boost::replace_all(message2, "5", "s");
                     boost::replace_all(message2, "7", "t");
-                    logging::Info("message2: %s", message2.c_str());
                     for (auto filter : res)
                     {
-                        logging::Info("res: %s", filter.c_str());
                         if (boost::contains(message2, filter))
                         {
-                            logging::Info("k");
                             chat_stack::Say(". "
                                             "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
                                             "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"

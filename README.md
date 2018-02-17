@@ -47,7 +47,7 @@ sudo apt update && sudo apt install build-essential software-properties-common -
 Ubuntu other dependencies installation:
 
 ```bash
-sudo apt update && sudo apt install git libssl-dev:i386 libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libfreetype6-dev:i386 -y 
+sudo apt update && sudo apt install git libssl-dev:i386 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libfreetype6-dev:i386 -y 
 ```
 
 
@@ -69,6 +69,7 @@ If you don't use Ubuntu or Arch (or if Arch script gets outdated), here's the li
 * `libsdl2-dev`
 * `libglew-dev:i386`
 * `libfreetype6-dev:i386`
+* `libboost-all-dev`
 * `rsync` (used for copying shaders/fonts to tf2 data directory, `check-data` script)
 
 

@@ -7,12 +7,12 @@
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
-
+#include "gui/menu.hpp"
 #include "common.hpp"
-
 #include "sdk.hpp"
 
-extern CatVar info_text;
+CatVar GUI(CV_SWITCH, "gui_visible", "1", "GUI Active", "GUI switch (bind it to a key!)");
+bool gui_visible = false;
 
 // Pointer to 'SDL_GL_SwapWindow' in the jump table.
 uintptr_t* swapwindow_ptr;
@@ -60,7 +60,7 @@ void hkSwapWindow(SDL_Window* window) {
 	oSDL_GL_SwapWindow(window);
 }
 
-void __attribute__((constructor)) attach() {
+void __attribute__((constructor)) attach2() {
 	// Get the symbol address of 'SDL_GL_SwapWindow'.
 	Dl_info sdl_libinfo = {};
 	dladdr(dlsym(RTLD_NEXT, "SDL_GL_SwapWindow"), &sdl_libinfo);
@@ -75,7 +75,7 @@ void __attribute__((constructor)) attach() {
 	*swapwindow_ptr = reinterpret_cast<uintptr_t>(&hkSwapWindow);
 }
 
-void __attribute__((destructor)) detach() {
+void __attribute__((destructor)) detach2() {
 	// Restore the original address.
 	*swapwindow_ptr = swapwindow_original;
 }

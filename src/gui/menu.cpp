@@ -52,8 +52,8 @@ float aimbot_miss_chance = 0;
 float aimbot_miss_chance_check = 0;
 int aimbot_proj_speed = 0;
 int aimbot_proj_speed_check = 0;
-int aimbot_slow = 0;
-int aimbot_slow_check = 0;
+float aimbot_slow = 0;
+float aimbot_slow_check = 0;
 int autoheal_uber_health = 30;
 int autoheal_uber_health_check = 30;
 int aimbot_hitbox = 0;
@@ -172,8 +172,134 @@ int enable_2var23 = 0;
 int enable_2var24 = 0;
 int enable_2var25 = 0;
 
-int topkek = 0;
-int eh = 0;
+// Visual/ESP
+bool esp_enabled = false;
+int esp_box = 2;
+int esp_box_check = 2;
+int esp_expand = 0;
+int esp_expand_check = 0;
+int esp_box_corner_size = 10;
+int esp_box_corner_size_check = 10;
+int esp_health = 3;
+int esp_health_check = 3;
+int esp_tracers = 0;
+int esp_tracers_check = 0;
+int esp_text_position = 0;
+int esp_text_position_check = 0;
+bool esp_legit = false;
+bool esp_vischeck = true;
+bool esp_bones = false;
+bool esp_buildings = true;
+bool esp_teammates = false;
+bool esp_name = true;
+bool esp_class = true;
+bool esp_distance = true;
+bool esp_conds = true;
+bool esp_ubercharge = true;
+bool esp_weapon = false;
+bool esp_powerups = true;
+bool esp_show_tank = true;
+bool esp_weapon_spawners = true;
+bool esp_followbot_id = true;
+bool esp_local = true;
+int esp_sightlines = 0;
+int esp_sightlines_check = 0;
+bool esp_entity = false;
+bool esp_model_name = false;
+bool esp_entity_id = true;
+bool esp_spellbooks = true;
+
+int enable_3var = 0;
+int enable_3var1 = 0;
+int enable_3var2 = 0;
+int enable_3var3 = 0;
+int enable_3var4 = 0;
+int enable_3var5 = 0;
+int enable_3var6 = 0;
+int enable_3var7 = 0;
+int enable_3var8 = 0;
+int enable_3var9 = 0;
+int enable_3var10 = 0;
+int enable_3var11 = 0;
+int enable_3var12 = 0;
+int enable_3var13 = 0;
+int enable_3var14 = 0;
+int enable_3var15 = 0;
+int enable_3var16 = 0;
+int enable_3var17 = 0;
+int enable_3var18 = 0;
+int enable_3var19 = 0;
+int enable_3var20 = 0;
+
+int esp_color_red_r = 0;
+int esp_color_red_g = 0;
+int esp_color_red_b = 0;
+int esp_color_blue_r = 0;
+int esp_color_blue_g = 0;
+int esp_color_blue_b = 0;
+
+bool esp_item = true;
+bool esp_item_adrenaline = false;
+bool esp_item_powerups = true;
+bool esp_item_health = true;
+bool esp_item_ammo = false; 
+bool esp_item_weapons = false;
+bool esp_money_red = true;
+bool esp_money = true;
+
+int enable_4var = 0;
+int enable_4var1 = 0;
+int enable_4var2 = 0;
+int enable_4var3 = 0;
+int enable_4var4 = 0;
+int enable_4var5 = 0;
+int enable_4var6 = 0;
+int enable_4var7 = 0;
+int enable_4var8 = 0;
+
+bool esp_proj = true;
+bool esp_proj_enemy = true;
+int esp_proj_stickies = 1;
+int esp_proj_stickies_check = 1;
+int esp_proj_pipes = 1;
+int esp_proj_pipes_check = 1;
+int esp_proj_arrows = 1;
+int esp_proj_arrows_check = 1;
+int esp_proj_rockets = 1;
+int esp_proj_rockets_check = 1;
+
+int enable_5var = 0;
+int enable_5var1 = 0;
+
+bool chams_enable = false;
+bool chams_legit = false;
+bool chams_singlepass = false;
+bool chams_health = false;
+bool chams_players = true;
+bool chams_teammates = false;
+bool chams_buildings = false;
+bool chams_teammate_buildings = false;
+bool chams_flat = false;
+bool chams_recursive = true;
+bool chams_weapons_white = true;
+bool chams_medkits = false;
+bool chams_ammo = false;
+bool chams_stickies = false;
+
+int enable_6var = 0;
+int enable_6var1 = 0;
+int enable_6var2 = 0;
+int enable_6var3 = 0;
+int enable_6var4 = 0;
+int enable_6var5 = 0;
+int enable_6var6 = 0;
+int enable_6var7 = 0;
+int enable_6var8 = 0;
+int enable_6var9 = 0;
+int enable_6var10 = 0;
+int enable_6var11 = 0;
+int enable_6var12 = 0;
+int enable_6var13 = 0;
 
 void menu()
 {
@@ -205,7 +331,20 @@ void menu()
     trigger_maxrange_check = trigger_maxrange;
     trigger_key_mode_check = trigger_key_mode;
 
-	ImGui::Begin("Config Menu");
+    esp_expand_check = esp_expand;
+    esp_box_check = esp_box;
+    esp_box_corner_size_check = esp_box_corner_size;
+    esp_health_check = esp_health;
+    esp_tracers_check = esp_tracers;
+    esp_text_position_check = esp_text_position;
+    esp_sightlines_check = esp_sightlines;
+
+    esp_proj_stickies_check = esp_proj_stickies;
+    esp_proj_pipes_check = esp_proj_pipes;
+    esp_proj_arrows_check = esp_proj_arrows;
+    esp_proj_rockets_check = esp_proj_rockets;
+
+	ImGui::Begin("Config Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoTitleBar);
     if (ImGui::Button("Aimbot##tab"))
     {
         tabs = 1;
@@ -373,7 +512,7 @@ void menu()
                 ImGui::Text("Hitbox");
                 ImGui::Combo("##Hitboxuh", &aimbot_hitbox, "HEAD\0PELVIS\0SPINE 0\0SPINE 1\0SPINE 2\0SPINE 3\0UPPER ARM L\0LOWER ARM L\0HAND L\0UPPER ARM R\0LOWER ARM R\0HAND R\0HIP L\0KNEE L\0FOOT L\0HIP R\0KNEE R\0FOOT R\0");
                 ImGui::Text("Slow Aim");
-                ImGui::SliderInt("##slowaim", &aimbot_slow, 0, 50);
+                ImGui::DragFloat("##slowaim", &aimbot_slow, 0.1, 0, 10);
                 if (ImGui::IsItemHovered())
                     ImGui::SetTooltip("Slowly moves your crosshair onto the target for more legit play\nDisables silent aimbot");
                 ImGui::EndChild();
@@ -547,9 +686,204 @@ void menu()
 
         case 3:
         {
-            ImGui::Columns(3, "##ESPstuff", false); 
-            ImGui::DragInt("Randomness", &topkek, 1, 0, 4);
-            ImGui::SliderInt("morerandom", &eh, 1, 50);
+            if (ImGui::TreeNode("ESP"))
+            {
+                ImGui::BeginChild(10, ImVec2(0, 265));
+                ImGui::Columns(3, "##ESPstuff", false); 
+                ImGui::Checkbox("Enable ESP", &esp_enabled);
+                ImGui::Text("Box");
+                ImGui::Combo("##espobox", &esp_box, "NONE\0NORMAL\0CORNERS\0");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Draw a 2D box");
+                ImGui::Text("Corner Size");
+                ImGui::DragInt("##espboxcornersize", &esp_box_corner_size, 1, 0, 50);
+                ImGui::Text("Health ESP");
+                ImGui::Combo("##esphealth", &esp_health, "NONE\0TEXT\0HEALTHBAR\0BOTH\0");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show enemy health");
+                ImGui::Text("Expand Esp");
+                ImGui::DragInt("##expandesp", &esp_expand, 1, 0, 200);
+                ImGui::Text("Tracers");
+                ImGui::Combo("##esptracers", &esp_tracers, "OFF\0CENTER\0BOTTOM\0");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Draws a line from the player to a position on your screen");
+                ImGui::Text("Text position");
+                ImGui::Combo("##esptextposition", &esp_text_position, "TOP RIGHT\0BOTTOM RIGHT\0CENTER\0ABOVE\0BELOW\0");
+                ImGui::NextColumn();                
+                ImGui::Checkbox("Legit Mode", &esp_legit);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Don't show invisible enemies\nHides invisable enemies with visibility enabled");
+                ImGui::Checkbox("VisCheck", &esp_vischeck);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("ESP visibility check - makes enemy info behind walls darker, disable this if you get FPS drops");
+                ImGui::Checkbox("Draw Bones", &esp_bones);
+                ImGui::Checkbox("Building ESP", &esp_buildings);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show buildings");
+                ImGui::Checkbox("ESP Teammates", &esp_teammates);
+                ImGui::Checkbox("Name ESP", &esp_name);
+                ImGui::Checkbox("Class ESP", &esp_class);
+                ImGui::Checkbox("Distance ESP", &esp_distance);
+                ImGui::Checkbox("Conditions ESP", &esp_conds);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show conditions");
+                ImGui::Checkbox("Ubercharge ESP", &esp_ubercharge);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show ubercharge percentage while players medigun is out");
+                ImGui::Checkbox("Show weapon name", &esp_weapon);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show which weapon the enemy is using");
+                ImGui::NextColumn();
+                ImGui::Checkbox("Powerup ESP", &esp_powerups);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Shows powerups a player is using");
+                ImGui::Checkbox("Show tank", &esp_show_tank);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show tanks in mvm");
+                ImGui::Checkbox("Show weapon spawners", &esp_weapon_spawners);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("TF2C deathmatch weapon spawners");
+                ImGui::Checkbox("Followbot ESP", &esp_followbot_id);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show followbot ID");
+                ImGui::Checkbox("ESP Local Player", &esp_local);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Shows local player ESP in thirdperson");
+                ImGui::Text("Show sightlines");
+                ImGui::Combo("##showsightlines", &esp_sightlines, "NONE\0SNIPER ONLY\0ALL\0");
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Displays a line of where players are looking");
+                ImGui::Checkbox("Entity ESP", &esp_entity);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Show entity info (debug)");
+                ImGui::Checkbox("Model name ESP", &esp_model_name);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Model name esp (DEBUG ONLY)");
+                ImGui::Checkbox("Entity ID", &esp_entity_id);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Used with Entity ESP. Shows entityID");
+                ImGui::Checkbox("Spellbooks", &esp_spellbooks);
+                ImGui::EndChild();
+                if (ImGui::TreeNode("Colors"))
+                {
+                    ImGui::BeginChild(11, ImVec2(0, 50));
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("##redred", &esp_color_red_r, 1, 0, 255, "R:%.0f"); ImGui::SameLine();
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("##redgreen", &esp_color_red_g, 1, 0, 255, "G:%.0f"); ImGui::SameLine();
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("Color for red team", &esp_color_red_b, 1, 0, 255, "B:%.0f");
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("##blured", &esp_color_blue_r, 1, 0, 255, "R:%.0f"); ImGui::SameLine();
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("##blugreen", &esp_color_blue_g, 1, 0, 255, "G:%.0f"); ImGui::SameLine();
+                    ImGui::PushItemWidth(150);
+                    ImGui::DragInt("Color for blue team", &esp_color_blue_b, 1, 0, 255, "B:%.0f");
+                    ImGui::EndChild();
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Item ESP"))
+                {
+                    ImGui::BeginChild(12, ImVec2(0, 50));
+                    ImGui::Columns(3, "##itemesp", false);
+                    ImGui::Checkbox("Item ESP", &esp_item);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Master Item ESP switch (health packs, etc.)");
+                    ImGui::Checkbox("Show Adrenaline", &esp_item_adrenaline);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("TF2C adrenaline pills");
+                    ImGui::Checkbox("Ammo packs", &esp_item_powerups);
+                    ImGui::NextColumn();
+                    ImGui::Checkbox("Health packs", &esp_item_health);
+                    ImGui::Checkbox("Powerups", &esp_item_ammo);
+                    ImGui::Checkbox("Dropped weapons", &esp_item_weapons);
+                    ImGui::NextColumn();
+                    ImGui::Checkbox("MvM money", &esp_money_red);
+                    ImGui::Checkbox("Red MvM money", &esp_money);
+                    ImGui::EndChild();
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Projectile ESP"))
+                {
+                    ImGui::BeginChild(13, ImVec2(0, 50));
+                    ImGui::Columns(3, "##projesp", false);
+                    ImGui::Checkbox("Projectile ESP", &esp_proj);
+                    ImGui::Checkbox("Only enemy projectiles", &esp_proj_enemy);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Don't show friendly projectiles");
+                    ImGui::NextColumn();
+                    ImGui::Text("Stickies");
+                    ImGui::Combo("##projstickies", &esp_proj_stickies, "OFF\0ALL\0CRIT\0");
+                    ImGui::Text("Pipes");
+                    ImGui::Combo("##projstickies", &esp_proj_pipes, "OFF\0ALL\0CRIT\0");
+                    ImGui::NextColumn();
+                    ImGui::Text("Arrows");
+                    ImGui::Combo("##projstickies", &esp_proj_arrows, "OFF\0ALL\0CRIT\0");
+                    ImGui::Text("Rockets");
+                    ImGui::Combo("##projstickies", &esp_proj_rockets, "OFF\0ALL\0CRIT\0");
+                    ImGui::EndChild();
+                    ImGui::TreePop();
+                }
+                //there should be radar here but it's broken and disabled, will be added in the future if needed
+                if (ImGui::TreeNode("Chams"))
+                {
+                    ImGui::BeginChild(14, ImVec2(0,100));
+                    ImGui::Columns(3, "##chamslol", false);
+                    ImGui::Checkbox("Enable Chams", &chams_enable);
+                    ImGui::Checkbox("Legit chams", &chams_legit);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Don't show chams through walls");
+                    ImGui::Checkbox("Single-pass", &chams_singlepass);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams only once (this disables 'darker' chams on invisible parts of player");
+                    ImGui::Checkbox("Health", &chams_health);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Change chams color based on their health");
+                    ImGui::Checkbox("Players", &chams_players);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on player models");
+                    ImGui::NextColumn();
+                    ImGui::Checkbox("Teammates", &chams_teammates);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on teammates");
+                    ImGui::Checkbox("Buildings", &chams_buildings);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on buildings");
+                    ImGui::Checkbox("Teammate Buildings", &chams_teammate_buildings);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on teammates buildings");
+                    ImGui::Checkbox("Flat", &chams_flat);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Makes chams brighter and more full");
+                    ImGui::Checkbox("Recursive", &chams_recursive);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on weapons and cosmetics");
+                    ImGui::NextColumn();
+                    ImGui::Checkbox("White Weapons", &chams_weapons_white);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Should chams on weapons be white");
+                    ImGui::Checkbox("Medkits", &chams_medkits);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on medkits");
+                    ImGui::Checkbox("Ammoboxes", &chams_ammo);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on ammoboxes");
+                    ImGui::Checkbox("Stickies", &chams_stickies);
+                    if (ImGui::IsItemHovered())
+                        ImGui::SetTooltip("Render chams on stickybombs");
+                    ImGui::EndChild();
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Glow"))
+                {
+                    ImGui::BeginChild(15, ImVec2(0, 100));
+                    ImGui::Columns(3, "##glowlol", false);
+                    ImGui::EndChild();
+                    ImGui::TreePop();
+                }
+                ImGui::TreePop();
+            }
+
 
         }
         break;
@@ -617,10 +951,10 @@ void setvalues()
     changeint("cat_aimbot_fov", aimbot_fov, aimbot_fov_check);
     changeint("cat_aimbot_maxrange", aimbot_maxrange, aimbot_maxrange_check);
     changeint("cat_aimbot_proj_speed", aimbot_proj_speed, aimbot_proj_speed_check);
-    changeint("cat_aimbot_slow", aimbot_slow, aimbot_slow_check);
     changeint("cat_autoheal_uber_health", autoheal_uber_health, autoheal_uber_health_check);
             //floats
     changefloat("cat_aimbot_fov_draw_opacity", aimbot_fov_draw_opacity, aimbot_fov_draw_opacity_check);
+    changefloat("cat_aimbot_slow", aimbot_slow, aimbot_slow_check);
     changefloat("cat_aimbot_huntsman_charge", aimbot_huntsman_charge, aimbot_huntsman_charge_check);
     changefloat("cat_aimbot_miss_chance", aimbot_miss_chance, aimbot_miss_chance_check);
     //triggerbot
@@ -667,6 +1001,37 @@ void setvalues()
     changeint("cat_trigger_maxrange", trigger_maxrange, trigger_maxrange_check);
             //floats
     changefloat("cat_trigger_delay", trigger_delay, trigger_delay_check);
+    //visual/esp
+            //checkboxes
+    checkbox("cat_esp_enabled", esp_enabled, enable_3var);
+    checkbox("cat_esp_legit", esp_legit, enable_3var1);
+    checkbox("cat_esp_vischeck", esp_vischeck, enable_3var2);
+    checkbox("cat_esp_bones", esp_bones, enable_3var3);
+    checkbox("cat_esp_buildings", esp_buildings, enable_3var4);
+    checkbox("cat_esp_teammates", esp_teammates, enable_3var5);
+    checkbox("cat_esp_name", esp_name, enable_3var6);
+    checkbox("cat_esp_class", esp_class, enable_3var7);
+    checkbox("cat_esp_distance", esp_distance, enable_3var8);
+    checkbox("cat_esp_conds", esp_conds, enable_3var9);
+    checkbox("cat_esp_ubercharge", esp_ubercharge, enable_3var10);
+    checkbox("cat_esp_weapon", esp_weapon, enable_3var11);
+    checkbox("cat_esp_powerups", esp_powerups, enable_3var12);
+    checkbox("cat_esp_show_tank", esp_show_tank, enable_3var13);
+    checkbox("cat_esp_weapon_spawners", esp_weapon_spawners, enable_3var14);
+    checkbox("cat_esp_followbot_id", esp_followbot_id, enable_3var15);
+    checkbox("cat_esp_local", esp_local, enable_3var16);
+    checkbox("cat_esp_entity", esp_entity, enable_3var17);
+    checkbox("cat_esp_model_name", esp_model_name, enable_3var18);
+    checkbox("cat_esp_entity_id", esp_entity_id, enable_3var19);
+    checkbox("cat_esp_spellbooks", autobackstab, enable_3var20);
+            //combos/ints
+    changeint("cat_esp_box", esp_box, esp_box_check);
+    changeint("cat_esp_box_corner_size", esp_box_corner_size, esp_box_corner_size_check);
+    changeint("cat_esp_health", esp_health, esp_health_check);
+    changeint("cat_esp_tracers", esp_tracers, esp_tracers_check);
+    changeint("cat_esp_text_position", esp_text_position, esp_text_position_check);
+    changeint("cat_esp_sightlines", esp_sightlines, esp_sightlines_check);
+    changeint("cat_esp_expand", esp_expand, esp_expand_check);
 }
 
 void checkbox (const char* varname, bool &variable, int &enable_var)

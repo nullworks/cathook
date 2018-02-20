@@ -39,9 +39,10 @@ void CatLogger::log(const char* fmt, ...) {
 	va_start(list, fmt);
 	vsprintf(buffer, fmt, list);
 	va_end(list);
+	strcat(buffer, "\n");
 
 	// Write our log to the file
-	fprintf(log_handle, "%s\n", buffer);
+	fputs(buffer, log_handle);
 	fflush(log_handle);
 
 	// Push result var to a console here

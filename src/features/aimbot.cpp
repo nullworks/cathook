@@ -253,7 +253,7 @@ static void WorldTick() {
 
 	// Snapback Time Reset
 	if (silent_aim == 1 && std::get<0>(snap_info)) {
-		if (std::get<0>(snap_info) == 1 && std::chrono::steady_clock::now() - std::get<2>(snap_info) > std::chrono::milliseconds(75)) {
+		if (std::get<0>(snap_info) == 1 && std::chrono::steady_clock::now() - std::get<2>(snap_info) > std::chrono::milliseconds(100)) {
 			SetCameraAngle(local_ent, std::get<1>(snap_info));
 			std::get<0>(snap_info) = 2;
 		}
@@ -299,8 +299,8 @@ static void WorldTick() {
 			// Set angles
 			SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second));
 		}
-		//case 2: // MODULE
-			// TODO!!
+		case 2: // MODULE
+			 SetSilentCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;
 		}
 	}
 

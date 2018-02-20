@@ -43,6 +43,7 @@ static uintptr_t findPattern(const uintptr_t rangeStart, const uintptr_t rangeEn
 
 // This is just a temp function to get info our of our shared object
 uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPattern) {
+	#ifdef __linux__
 	std::tuple<const SharedObject&, uintptr_t, size_t> tmp = {shared_obj, 0, 0};
 	// Find a nicer way to not do this every time we need a sig
 	if (!dl_iterate_phdr([](struct dl_phdr_info* info, size_t, void* data) {
@@ -52,8 +53,8 @@ uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPatte
 		std::get<2>(tmp_ptr) = info->dlpi_phdr[0].p_memsz;
 		return 1;
 	}, (void*)&tmp))
-		return findPattern(std::get<1>(tmp), std::get<2>(tmp), chPattern);
-
+		return findPattern(std::get<1>(tmp), std::get<1>(tmp) + std::get<2>(tmp), chPattern);
+	#endif
 	g_CatLogging.log("Couldnt find signature for \"%s\" at \"%s\"",shared_obj.file_name, chPattern);
 	return 0;
 }

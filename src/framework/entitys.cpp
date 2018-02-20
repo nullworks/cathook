@@ -25,6 +25,7 @@ CMFunction<void(CatLocalPlayer*)> Attack {[](auto){}};
 CMFunction<CatVector(CatLocalPlayer*)> GetCamera {[](auto) -> auto { return CatVector(); }};
 CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle {[](auto) -> auto { return CatVector(); }};
 CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle {[](CatLocalPlayer*, CatVector){}};
+CMFunction<void(CatLocalPlayer*, CatVector)> SetSilentCameraAngle {[](CatLocalPlayer*, CatVector){}};
 
 CMFunction<int()> GetEntityCount {[]() -> auto { return 0; }};
 CMFunction<CatEntity*(int)> GetEntity {[](auto) -> CatEntity* { return nullptr; }};

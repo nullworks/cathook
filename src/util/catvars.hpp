@@ -68,7 +68,7 @@ public:
 	const CatEnum& cat_enum;
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
-}; 
+};
 class CatVarFloat : public CatVar {
 public:
 	CatVarFloat(const CatEnum& _gui_position, std::string _name, float _defaults, std::string _desc_short, std::string _desc_long, float _min, float _max);

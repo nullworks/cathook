@@ -20,7 +20,7 @@
 #include "sharedobj.hpp"
 
 // Input a shared objects name and it attemts to save the full path to the string, returns false if fails.
-static std::string LocateSharedObject(const char* name) {
+static std::string LocateSharedObject(const std::string& name) {
 #if defined(__linux__) // This is linux specific
 
 	// Open /proc/maps to get a list of libraries being used currently
@@ -35,7 +35,7 @@ static std::string LocateSharedObject(const char* name) {
 		proc_maps.getline(buffer, sizeof(buffer));
 
 		// Test if it contains our library
-		if (!strstr(buffer, name))
+		if (!strstr(buffer, name.c_str()))
 			continue;
 
 		// Extract our objects path
@@ -43,26 +43,10 @@ static std::string LocateSharedObject(const char* name) {
 		if (!std::regex_search(buffer, reg_result, std::regex("\\/([\\s\\w-\\.]+\\/)+" + std::string(name)))) // regex is really slow and adds alot to file size, but is really convienient for this purpose
 			continue;
 		// Return the path
+		proc_maps.close();
 		return reg_result[0];
 	}
-
-	/* This works but the regex is better at making sure its the correct so, EX: with Team Fortress, if you try to find client.so, it would find steamclient.so instead
-	// Book keeper
-	auto tmp = std::make_pair(name, std::string());
-
-	// This loops through dlls loaded
-	if (dl_iterate_phdr([](struct dl_phdr_info* info, size_t, void* data) {
-		// Cast our tmp var back
-		auto tmp_var = (std::pair<const char*, std::string>*)data;
-		// Test if it contains our library
-		if (!!strcasestr(info->dlpi_name, tmp_var->first)) {
-			// Set tmp var
-			tmp_var->second = info->dlpi_name;
-			return 1;
-		}
-		return 0;
-	}, (void*)&tmp))
-		return tmp.second;*/
+	proc_maps.close();
 
 #elif defined(_WIN32)
 	// TODO, needs better way to do this so that modules dont already need to be loaded

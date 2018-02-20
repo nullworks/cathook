@@ -86,5 +86,7 @@ float GetFov(CatVector orig_angle, CatVector eye_position, CatVector dest_point)
 CatVector VectorAngles(CatVector src_point, CatVector dest_point);
 // Give it a position, angles to go in, and how far to extend, then it returns a vector in that direction
 CatVector ExtendLine(CatVector src_pos, CatVector src_angles, float extend_amt);
+// Useful random float gen
+float RandFloatRange(float min, float max);
 
 }

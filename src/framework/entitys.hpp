@@ -88,6 +88,7 @@ extern CMFunction<void(CatLocalPlayer*)> Attack;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCamera;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle;
 extern CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle;
+extern CMFunction<void(CatLocalPlayer*, CatVector)> SetSilentCameraAngle;
 
 extern CMFunction<int()> GetEntityCount;
 extern CMFunction<CatEntity*(int)> GetEntity;

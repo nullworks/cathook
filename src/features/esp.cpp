@@ -103,6 +103,7 @@ static void Draw() {
 		sbox.state = EBOX_NOT_RAN;
 		// Get our color
 		auto ent_color = colors::EntityColor(entity);
+
 		// Check if main esp features should apply
 		if ((esp_players && type == ETYPE_PLAYER) || (esp_other_hostile && type == ETYPE_OTHERHOSTILE)) {
 

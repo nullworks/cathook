@@ -9,6 +9,7 @@
 // Stuff to init
 #include "esp.hpp"
 #include "aimbot.hpp"
+#include "antiaim.hpp"
 
 #include "features.hpp"
 
@@ -19,6 +20,9 @@ void Init() {
 	// Esp
 	esp::Init();
 
+	// Antiaim, Must be before anything that changes angles!!!
+	antiaim::Init();
+	
 	// Aimbot
 	aimbot::Init();
 }

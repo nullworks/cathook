@@ -6,7 +6,12 @@
  *
  */
 
+#include <cstring>
 #include <fstream> // to read/write to files
+#ifdef __linux__
+  #include <unistd.h>
+  #include <pwd.h>
+#endif
 
 #include "../util/logging.hpp"
 #include "../util/catvars.hpp"
@@ -19,10 +24,13 @@
 
 namespace configs {
 
-constexpr const char* SAVE_LOC() {
+// Save location
+std::string SAVE_LOC() {
+  std::string ret;
   #if defined(__linux__)
-    return "/home/julianacat/.config/nekohook/";
+    ret = std::string(getpwuid(getuid())->pw_dir) + "/.config/nekohook/";
   #endif
+  return ret;
 }
 
 CatCommand LoadConfig("load", [](std::vector<std::string> args) {
@@ -38,9 +46,11 @@ CatCommand LoadConfig("load", [](std::vector<std::string> args) {
   if (cfg_name.find(".cfg") == std::string::npos)
     cfg_name += ".cfg";
 
+  cfg_name = SAVE_LOC() + "cfg/cat" + cfg_name;
+
   try {
     // Open the file
-  	std::ifstream cfg_stream(std::string(SAVE_LOC()) + "cfg/cat" + cfg_name);
+  	std::ifstream cfg_stream(cfg_name.c_str());
     if (!cfg_stream.is_open()) {
       g_CatLogging.log("Couldnt Open %s", cfg_name.c_str());
       return;
@@ -51,6 +61,10 @@ CatCommand LoadConfig("load", [](std::vector<std::string> args) {
   		// Get our line
   		char buffer[256];
   		cfg_stream.getline(buffer, sizeof(buffer));
+
+      // Dont run empty commands
+      if (strlen(buffer) == 0) continue;
+
       // Execute it
       CallCommand(buffer);
     }
@@ -108,13 +122,13 @@ void WorldTick() {
   // Recreation of match exec
   static bool last_ingame = false;
   if (last_ingame && last_ingame != g_GameInfo.in_game)
-    CallCommand(COM_PREFIX "load catmatchexec.cfg");
+    LoadConfig({"matchexec"});
   last_ingame = g_GameInfo.in_game;
 }
 
 void Init() {
   wtickmgr.REventBefore(WorldTick);
-  CallCommand(COM_PREFIX "load catautoexec.cfg");
+  LoadConfig({"autoexec"});
 }
 
 }

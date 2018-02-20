@@ -69,20 +69,6 @@ void CBaseRoot::Update() {
   // Increse our framecount
   frame_count++;
 
-	// TODO, move this to a menu instead of ROOT
-	// Tooltip handler
-	/*if (tooltip_widget) { // Sanity check
-		// Get and check if we have a tooltip
-		auto tooltip_str = GetTooltip();
-		if (!tooltip_str.empty()) {
-			// Since we have a tooltip to display, we setup the widget to work
-			tooltip_widget->Show();
-			tooltip_widget->offset = input::mouse;
-			tooltip_widget->infostring = tooltip_str;
-		} else
-			tooltip_widget->Hide();
-	}*/
-
   // Update tick to elements
   CBaseContainer::Update();
 

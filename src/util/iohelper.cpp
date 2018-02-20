@@ -29,7 +29,7 @@ const char* GetProcessName() {
 	// Get the first line
 	static char proc_name[32];
 	proc_status.getline(proc_name, sizeof(proc_name), '\n'); // We should only need the first line as unix keeps "Name: " on first
-
+  proc_status.close();
 	// Seperate "Name: " from our string
 	substr(proc_name, proc_name, 6, sizeof(proc_name) - 6); // this isnt as reliable as regex but it gets the job done and quick
 

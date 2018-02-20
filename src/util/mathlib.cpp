@@ -6,6 +6,8 @@
  *
  */
 
+#include <cstdlib> // rand()
+
 #include "../framework/entitys.hpp" // For fov, local players angles
 
 #include "mathlib.hpp"
@@ -62,7 +64,7 @@ CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles) {
 	// Pitch
 	if (cur_angles.x != dest_angles.x)
 		diff.x = std::abs(cur_angles.x - dest_angles.x);
-		
+
 	return diff;
 }
 // Use input angles and our eye position to get fov to a destination point
@@ -76,6 +78,7 @@ float GetFov(CatVector orig_angle, CatVector eye_position, CatVector dest_point)
 	return std::max<float>(delta.x, delta.y);
 }
 
+// Give it a starting position, the direction to go in and how far!
 CatVector ExtendLine(CatVector src_pos, CatVector src_angles, float extend_amt) {
 
 	// Math I dont understand
@@ -90,6 +93,11 @@ CatVector ExtendLine(CatVector src_pos, CatVector src_angles, float extend_amt) 
 	ret.z = -sp;
 	ret = ret * extend_amt + src_pos;
 	return ret;
+}
+
+// Paste from cathhok
+float RandFloatRange(float min, float max) {
+    return (min + 1) + ((float)rand() / (float)RAND_MAX) * (max - (min + 1));
 }
 
 }

@@ -9,7 +9,7 @@
 #include <fstream> // ifstream
 #ifdef __linux__
   #include <stack>
-  #include <sys/stat.h> // mkdir()
+  #include <sys/stat.h> // mkdir()S_IRWXU | S_IRWXG | S_IRWXO
   #include <libgen.h> // dirname()
   #include <errno.h> // errors
 #endif
@@ -81,3 +81,31 @@ void CreateDirectorys(std::string path) {
 	#endif
 	return;
 }
+
+// Trail code that i dont want to get rid of, messy but useful
+/*
+// Get end of file
+while (!ipc_stream.eof()) {ipc_stream.get();}
+ipc_stream.clear();
+auto cur_pos = ipc_stream.tellg();
+ipc_stream.close();
+
+auto last_ping = std::chrono::steady_clock::now();
+std::string ipc_name;
+
+// Main loop
+while (!shutdown) {
+
+  // Try to read from ipc file
+  ipc_stream.close();
+  ipc_stream.open(ipc_file_path);//std::cout << "IPC: state: " << cur_pos << ", " << ipc_stream.tellg() << "\n";
+  ipc_stream.seekg(cur_pos);
+  ipc_stream.clear();
+  char buffer[2048];
+  ipc_stream.getline(buffer, sizeof(buffer));
+  if (!ipc_stream.fail() && strlen(buffer) > 0) {
+    queued_commands.push(buffer);
+    cur_pos = ipc_stream.tellg();
+    std::this_thread::sleep_for(std::chrono::milliseconds(75));
+    continue;
+  }*/

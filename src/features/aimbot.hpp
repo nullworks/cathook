@@ -14,12 +14,12 @@ namespace features { namespace aimbot {
 extern CMFunction<CatVector(CatEntity*)> GetAutoHitbox;
 
 // A function to find a place to aim for on the target
-CatVector RetriveAimpoint(CatEntity* entity, int mode);
+CatVector RetrieveAimpoint(CatEntity* entity, int mode);
 
 // For modules to add their target selection stuff, return true if target is acceptable
 extern std::vector<bool(*)(CatEntity*)> TargetSelectionModule;
 
-extern CatEntity* last_target;
+extern CatEntity* highlight_target;
 
 void Init();
 

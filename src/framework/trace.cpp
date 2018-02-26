@@ -11,13 +11,15 @@
 
 namespace trace {
 
-// Trace line to get whether it hit the end of the line
-CMFunction<bool(CatVector, CatVector)> TraceLine {[](CatVector, CatVector) -> bool { return true; }};
+// Trace line, returns end of trace
+CMFunction<CatVector(CatVector, CatVector)> trace_terrain {
+  [](CatVector, CatVector) -> auto {return CatVector();}
+};
 
-// Trace line to get entity
-CMFunction<CatEntity*(CatVector, CatVector)> TraceLineToEnt {[](CatVector, CatVector) -> CatEntity* {return nullptr;}};
-
-// Trace a line, returns true if end of line or entity are hit
-CMFunction<bool(CatEntity*, CatVector, CatVector)> TraceEnt {[](CatEntity*, CatVector, CatVector) -> bool {return true;}};
+// Trace a line, returns entity hit or end of trace
+CMFunction<std::pair<CatEntity*, CatVector>(CatVector, CatVector)> trace_sight {
+  [](CatVector, CatVector dest) -> std::pair<CatEntity*, CatVector> {
+    return {nullptr, dest};} // Return dest to make everything think vis check worked
+};
 
 }

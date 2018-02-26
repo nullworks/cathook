@@ -28,7 +28,7 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 	CatVector4 ent_color = white;
 
 	// Aimbot Color
-	if (entity == features::aimbot::last_target)
+	if (entity == features::aimbot::highlight_target)
 		return colors::pink;
 
 	// Different strokes for different folks

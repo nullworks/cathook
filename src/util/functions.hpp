@@ -64,10 +64,10 @@ public:
 
 // This is to handle before and after events happen
 class CMEventGroup {
+public:
   CMEvent before_event;
   CMEvent during_event;
   CMEvent after_event;
-public:
   inline void operator()() {
     before_event();
     during_event();

@@ -11,13 +11,16 @@
 
 namespace trace {
 
-// Trace line to get whether it hit the end of the line
-extern CMFunction<bool(CatVector, CatVector)> TraceLine;
+// Trace line, returns end of trace
+extern CMFunction<CatVector(CatVector, CatVector)> trace_terrain;
 
-// Trace line to get entity
-extern CMFunction<CatEntity*(CatVector, CatVector)> TraceLineToEnt;
+// Trace a line, returns entity hit or end of trace
+extern CMFunction<std::pair<CatEntity*, CatVector>(CatVector, CatVector)> trace_sight;
 
-// Trace a line, returns true if end of line or entity are hit
-extern CMFunction<bool(CatEntity*, CatVector, CatVector)> TraceEnt;
+// Check if line hits entity, this is for convienience
+inline bool trace_entity(CatEntity* entity, CatVector src, CatVector dest) {
+  auto trace_result = trace_sight(src, dest);
+	return trace_result.first == entity || trace_result.second.DistTo(dest) < 1;
+}
 
 }

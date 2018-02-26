@@ -68,8 +68,7 @@ static void WorldTick(){
       // Check user setting and distance stuff
       if (GetDistance(entity) > follow_activation) continue;
       // Vis check
-    if (!trace::TraceEnt(entity, GetCamera(local_ent), (GetCollision((CatEntity*)local_ent) != CatBox()) ? GetCollision((CatEntity*)local_ent).GetCenter() : GetOrigin(entity))) continue;
-
+    if (!trace::trace_entity(entity, GetCamera(local_ent), (GetCollision((CatEntity*)local_ent) != CatBox()) ? GetCollision((CatEntity*)local_ent).GetCenter() : GetOrigin(entity))) continue;
       // Update follow_target if nessesary
       if (!follow_target || GetDistance(follow_target) > GetDistance(entity)) {
         follow_target = entity;

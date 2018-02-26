@@ -21,7 +21,7 @@
 // Struct for point in 3d space
 class CatVector {
 public:
-	CatVector(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {}
+	inline CatVector(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {}
 	float x, y, z;
 	// So we can do math with our catvectors easily
 	inline CatVector operator+(CatVector value) const { return CatVector(x + value.x, y + value.y, z + value.z); }
@@ -39,7 +39,7 @@ public:
 // Used to store points in a box
 class CatBox {
 public:
-	CatBox(CatVector min = CatVector(), CatVector max = CatVector()) : min(min), max(max) {};
+	inline CatBox(CatVector min = CatVector(), CatVector max = CatVector()) : min(min), max(max) {};
 	CatVector min, max;
 
 	inline void GetPoints(CatVector(&points)[8]) const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
@@ -64,7 +64,7 @@ public:
 // Struct for point in 4d space
 class CatVector4 {
 public:
-	CatVector4(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f, float _a = 0.0f) : x(_x), y(_y), z(_z), a(_a) {}
+	inline CatVector4(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f, float _a = 0.0f) : x(_x), y(_y), z(_z), a(_a) {}
 	float x, y, z, a;
 
 	// So we can do math with our catvectors easily

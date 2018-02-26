@@ -46,7 +46,7 @@ static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug
 CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](auto){ return CatVector(); }};
 
 // A function to find a place to aim for on the target
-CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
+CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 
 	// Check if we can use bones
 	// Get our best bone
@@ -55,15 +55,18 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 		return GetAutoHitbox(entity);
 	}
 	case 1: { // AUTO-HEAD
+		// We need this for vis checks
+		auto local_ent = GetLocalPlayer();
 		// Head is first bone, should be fine to iterate through them
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
 			if (!GetBoneCenter(entity, i, tmp)) continue;
 			// Vis check
-			if (auto local_ent = GetLocalPlayer())
-				if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
+			if (auto local_ent = GetLocalPlayer()) {
+				if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
 					continue;
+			}
 			return tmp;
 		}
 		break;
@@ -84,7 +87,7 @@ CatVector RetriveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 			// Check if fov is lower than our current best
 			if (fov > closest_fov) continue;
 			// Vis check
-			if (!trace::TraceEnt(entity, GetCamera(local_ent), tmp))
+			if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
 				continue;
 			// Set the new current best
 			closest = tmp;
@@ -144,20 +147,20 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 		if (!tmp(entity)) return ret;
 
 	// Get our best Aimpoint
-	CatVector aimpoint = RetriveAimpoint(entity);
+	CatVector aimpoint = RetrieveAimpoint(entity);
 
 	// Fov check
 	if (fov > 0.0f && util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), aimpoint) > fov) return std::make_pair(false, aimpoint);
 
 	// Vis check
-	if (!trace::TraceEnt(entity, GetCamera(local_ent), aimpoint))
+	if (!trace::trace_entity(entity, GetCamera(local_ent), aimpoint))
 		return std::make_pair(false, aimpoint);
 
 	// Hey look! Target passed all checks
 	return std::make_pair(true, aimpoint);
 }
 
-CatEntity* last_target = nullptr;
+static CatEntity* last_target = nullptr;
 // Function to find a suitable target
 static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 
@@ -222,20 +225,23 @@ static bool ShouldAim() {
 	return true;
 }
 
+// Externed entity to highlight
+CatEntity* highlight_target = nullptr;
+
 // The main "loop" of the aimbot.
 static void WorldTick() {
 
 	// Main enabled check
-	if (!enabled) { last_target = nullptr; return;	}
+	if (!enabled) { last_target = nullptr; highlight_target = nullptr; return; }
 
 	// Get local ent for use below
 	auto local_ent = GetLocalPlayer();
-	if (!local_ent) return;
+	if (!local_ent) { last_target = nullptr; highlight_target = nullptr; return; }
 
 	// Snapback Silent Info
 	static std::tuple<int, CatVector, std::chrono::time_point<std::chrono::steady_clock>> snap_info;
 	// Return for snapback
-	auto preRet = [local_ent](){
+	auto preRet = [=](){
 		if (silent_aim == 1) {
 			if (std::get<0>(snap_info))
 				SetCameraAngle(local_ent, std::get<1>(snap_info));
@@ -246,6 +252,7 @@ static void WorldTick() {
 
 	// Attempt to get a target and test if it exist
 	auto target = RetrieveBestTarget();
+	highlight_target = target.first;
 	if (!target.first) { preRet(); return; }
 
 	// Check if our local player is ready to aimbot
@@ -298,6 +305,7 @@ static void WorldTick() {
 				snap_info = std::make_tuple(true, GetCameraAngle(local_ent),	std::chrono::steady_clock::now());
 			// Set angles
 			SetCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second));
+			break;
 		}
 		case 2: // MODULE
 			 SetSilentCameraAngle(local_ent, util::VectorAngles(GetCamera(local_ent), target.second)); break;

@@ -11,6 +11,7 @@
 
 #include "../util/catvars.hpp"
 #include "../framework/gameticks.hpp"
+#include "../framework/trace.hpp"
 
 #include "antiaim.hpp"
 
@@ -101,8 +102,50 @@ static void WorldTick() {
       cur_yaw += 360;
     angles.y = cur_yaw;
     break;
-  //case 7: // EDGE
-    // TODO BOIIIIISSSS
+  case 7: { // EDGE
+    // TODO, fix the psudo code!
+    // With edge, we need to trace until we hit walls basicly
+    // Here we use a lambda to make getting the result angle easy!
+    enum { EDGE_NONE, EDGE_LEFT, EDGE_RIGHT };
+    auto edge_angle = []() -> auto {
+      // Get our camera info
+      auto local_ent = GetLocalPlayer();
+      if (!local_ent || GetDormant((CatEntity*)local_ent) || !GetAlive((CatEntity*)local_ent))
+        return EDGE_NONE;
+      auto camera_ang = GetCameraAngle(local_ent);
+      auto camera_pos = GetCamera(local_ent);
+      // Get some angles facing different directions
+      auto left = CatVector(0, camera_ang.y + 90);
+      auto right = CatVector(0, camera_ang.y - 90);
+      util::ClampAngles(left);
+      util::ClampAngles(right);
+      // First we go out to the left and right
+      left = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, left, 64));
+      right = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, right, 64));
+      // Check if we hit a wall, if we have, return closer
+      auto distto_left = camera_pos.DistTo(left);
+      auto distto_right = camera_pos.DistTo(right);
+      if (std::abs(distto_left - distto_right) > 2)
+        return (distto_left > distto_right) ? EDGE_RIGHT : EDGE_LEFT;
+      // Now we go forward and check if we hit something there
+      distto_left = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(left, CatVector(0, camera_ang.y), 128)));
+      distto_right = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(right, CatVector(0, camera_ang.y), 128)));
+      if (std::abs(distto_left - distto_right) > 4)
+        return (distto_left > distto_right) ? EDGE_RIGHT : EDGE_LEFT;
+      // If we havent hit anything, then we return none
+      return EDGE_NONE;
+    }();
+    // Check if we are edging
+    if (edge_angle != EDGE_NONE) {
+      //auto flip =
+      // If we use a pitch option that would be better with a flipped yaw, then we apply that now
+      if (edge_angle == EDGE_LEFT) {// || (edge_angle != EDGE_LEFT && )) {
+        angles.y += 90;
+      } else if (edge_angle == EDGE_RIGHT) {
+        angles.y -= 90;
+      }
+    }
+  }
   }
 
   // Clamp Finished angles

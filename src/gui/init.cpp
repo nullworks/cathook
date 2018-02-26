@@ -11,25 +11,30 @@
 #include "../framework/gameticks.hpp"		// So we can get drawmgr to draw our stuff
 
 // Stuff to init
-#include "gui.hpp"
+//#include "gui.hpp"
 #include "menu/menu.hpp"
 #include "hudstrings/sidestrings.hpp"
 #include "base/examples/test_window.hpp"
 
 #include "init.hpp"
 
+// tmp
+#include "tmp-base/GUI.h"
+
 namespace gui {
 
 void Init() {
 
 	// Setup the draw manager to run gui
-	drawmgr.REventDuring([](){g_pGui.Update();});
+	//drawmgr.REventDuring([](){g_pGui.Update();});
 
-	menu::Init();
+	//menu::Init();
 
 	// Other gui elements
 	sidestrings::Init();
 	//ShowTestWindow();
+	g_pGUI = new CatGUI();
+	drawmgr.REventDuring([](){g_pGui.Update();});
 }
 
 }

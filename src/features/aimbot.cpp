@@ -63,10 +63,8 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 			CatVector tmp;
 			if (!GetBoneCenter(entity, i, tmp)) continue;
 			// Vis check
-			if (auto local_ent = GetLocalPlayer()) {
-				if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
-					continue;
-			}
+			if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
+				continue;
 			return tmp;
 		}
 		break;

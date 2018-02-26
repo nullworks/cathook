@@ -13,7 +13,7 @@ namespace trace {
 
 // Trace line, returns end of trace
 CMFunction<CatVector(CatVector, CatVector)> trace_terrain {
-  [](CatVector, CatVector) -> auto {return CatVector();}
+  [](CatVector, CatVector dest) -> auto {return dest;}
 };
 
 // Trace a line, returns entity hit or end of trace

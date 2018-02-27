@@ -120,30 +120,26 @@ static void WorldTick() {
       util::ClampAngles(left);
       util::ClampAngles(right);
       // First we go out to the left and right
-      left = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, left, 64));
-      right = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, right, 64));
+      left = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, left, 128));
+      right = trace::trace_terrain(camera_pos, util::ExtendLine(camera_pos, right, 128));
       // Check if we hit a wall, if we have, return closer
       auto distto_left = camera_pos.DistTo(left);
       auto distto_right = camera_pos.DistTo(right);
       if (std::abs(distto_left - distto_right) > 2)
         return (distto_left > distto_right) ? EDGE_RIGHT : EDGE_LEFT;
       // Now we go forward and check if we hit something there
-      distto_left = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(left, CatVector(0, camera_ang.y), 128)));
-      distto_right = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(right, CatVector(0, camera_ang.y), 128)));
+      distto_left = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(left, CatVector(0, camera_ang.y), 256)));
+      distto_right = camera_pos.DistTo(trace::trace_terrain(camera_pos, util::ExtendLine(right, CatVector(0, camera_ang.y), 256)));
       if (std::abs(distto_left - distto_right) > 4)
         return (distto_left > distto_right) ? EDGE_RIGHT : EDGE_LEFT;
       // If we havent hit anything, then we return none
       return EDGE_NONE;
     }();
-    // Check if we are edging
-    if (edge_angle != EDGE_NONE) {
-      //auto flip =
-      // If we use a pitch option that would be better with a flipped yaw, then we apply that now
-      if (edge_angle == EDGE_LEFT) {// || (edge_angle != EDGE_LEFT && )) {
-        angles.y += 90;
-      } else if (edge_angle == EDGE_RIGHT) {
-        angles.y -= 90;
-      }
+    // Do the edge dance
+    if (edge_angle == EDGE_LEFT || angles.p < 0) // Pitch can affect how our head is behind walls, so we fix that here
+      angles.y += 90;
+    else if (edge_angle == EDGE_RIGHT)
+      angles.y -= 90;
     }
   }
   }

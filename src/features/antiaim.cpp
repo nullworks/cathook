@@ -136,11 +136,10 @@ static void WorldTick() {
       return EDGE_NONE;
     }();
     // Do the edge dance
-    if (edge_angle == EDGE_LEFT || angles.p < 0) // Pitch can affect how our head is behind walls, so we fix that here
+    if (edge_angle == EDGE_LEFT || angles.x < 0) // Pitch can affect how our head is behind walls, so we fix that here
       angles.y += 90;
     else if (edge_angle == EDGE_RIGHT)
       angles.y -= 90;
-    }
   }
   }
 

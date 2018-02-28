@@ -10,7 +10,7 @@
 
 #include "triggerbot.hpp"
 
-namespace features { namespace trigger {
+namespace features::trigger {
 
 static CatEnum trigger_menu({"TriggerBot"});
 static CatVarBool enabled(trigger_menu, "trigger", false, "Enable TriggerBot", "Master TriggerBot switch");
@@ -53,4 +53,4 @@ void Init() {
 
 }
 
-}}
+}

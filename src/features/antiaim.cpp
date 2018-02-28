@@ -15,7 +15,7 @@
 
 #include "antiaim.hpp"
 
-namespace features { namespace antiaim {
+namespace features::antiaim {
 
 static CatEnum antiaim_menu({"Anti-Aim"});
 static CatVarBool enabled(antiaim_menu, "antiaim", false, "Enable Anti-Aim", "Master Anti-Aim switch");
@@ -135,11 +135,20 @@ static void WorldTick() {
       // If we havent hit anything, then we return none
       return EDGE_NONE;
     }();
-    // Do the edge dance
-    if (edge_angle == EDGE_LEFT || angles.x < 0) // Pitch can affect how our head is behind walls, so we fix that here
-      angles.y += 90;
-    else if (edge_angle == EDGE_RIGHT)
-      angles.y -= 90;
+    if (edge_angle != EDGE_NONE) {
+      // Pitch can affect how our head is behind walls, so we fix that here
+      if (angles.x < 0) {
+        if (edge_angle == EDGE_LEFT)
+          edge_angle = EDGE_RIGHT;
+        else
+          edge_angle = EDGE_LEFT;
+      }
+      // Do the edge dance
+      if (edge_angle == EDGE_LEFT)
+        angles.y += 90;
+      else
+        angles.y -= 90;
+    }
   }
   }
 
@@ -162,4 +171,4 @@ void Init() {
 
 }
 
-}}
+}

@@ -8,7 +8,7 @@
 
 #include "../framework/entitys.hpp"	// Contains entity and bone info
 
-namespace features { namespace aimbot {
+namespace features::aimbot {
 
 // Auto hitbox function
 extern CMFunction<CatVector(CatEntity*)> GetAutoHitbox;
@@ -23,4 +23,4 @@ extern CatEntity* highlight_target;
 
 void Init();
 
-}}
+}

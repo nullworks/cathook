@@ -11,11 +11,11 @@
 
 #define MAX_ESP_STRINGS 32	  // Strings allowed for esp
 
-namespace features { namespace esp {
+namespace features::esp {
 
 extern CatEnum esp_menu;
 extern CatVarBool esp_enabled;
 
 void Init(); // Call to init esp
 
-}}
+}

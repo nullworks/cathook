@@ -18,7 +18,7 @@
 
 // TODO, phase out esp cache
 
-namespace features { namespace esp {
+namespace features::esp {
 
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
 CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
@@ -270,4 +270,4 @@ void Init() {
 	drawmgr.REventDuring(Draw);
 }
 
-}}
+}

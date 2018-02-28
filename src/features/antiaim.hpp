@@ -5,8 +5,8 @@
  *
  */
 
-namespace features { namespace antiaim {
+namespace features :: antiaim {
 
 void Init();
 
-}}
+}

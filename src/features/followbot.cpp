@@ -14,7 +14,7 @@
 
 #include "followbot.hpp"
 
-namespace features { namespace followbot {
+namespace features::followbot {
 
 static CatEnum followbot_menu({"Autonomy", "Followbot"});
 static CatVarBool followbot(followbot_menu, "fb_bot", false, "Master Followbot Switch", "Set to 1 in followbots' configs");
@@ -113,4 +113,4 @@ void Init(){
 
 }
 
-}}
+}

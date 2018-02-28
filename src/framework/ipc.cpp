@@ -44,7 +44,6 @@ struct IpcContent {
 // Ipc stream class
 class IpcStream {
 public:
-  const char* pool_name;
   IpcStream(const char* _pool_name) : pool_name(_pool_name) {
     // Try to get access to the memory pool
     int shm_res = shm_open(pool_name, O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -84,16 +83,33 @@ public:
     std::thread ipc_thread(&IpcStream::thread_loop, this);
     ipc_thread.detach();
   }
+  const char* pool_name;
+  std::string ipc_name;
   IpcContent* shared_mem_addr = nullptr;
+  std::vector<std::string> GetMembers() {
+    std::vector<std::string> ret;
+    // Saftey net
+    if (!shared_mem_addr)
+      return ret;
+
+    for (auto i: shared_mem_addr->members)
+      ret.push_back(i);
+
+    return ret;
+  }
 private:
   bool shutdown = false;
   void thread_loop() {
 
     // Main loop
-    //while (!shutdown) {
+    /*while (!shutdown) {
+
+      // Ping keeper
+      auto member_list = GetMembers();
+      //for (auto& i : )
       // Loop sleep
       std::this_thread::sleep_for(std::chrono::milliseconds(75));
-    //}
+    }*/
     // Shutdown
     g_CatLogging.log("IPC: Thread shutting down!");
   }

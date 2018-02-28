@@ -15,7 +15,7 @@
 
 #include "aimbot.hpp"
 
-namespace features { namespace aimbot {
+namespace features::aimbot {
 
 static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
 static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
@@ -328,4 +328,4 @@ void Init() {
 	drawmgr.REventDuring(DrawTick);
 }
 
-}}
+}

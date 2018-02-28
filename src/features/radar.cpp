@@ -9,7 +9,8 @@
 #include "../gui/base/CBaseWindow.hpp"
 #include "radar.hpp"
 
-namespace features { namespace radar {
+namespace features::radar {
+
 static CatEnum radar_menu({"Visuals", "Radar"});
 static CatVarBool enabled(radar_menu, "radar", false, "Enable Radar");
 static CatVarInt radar_size(radar_menu, "radar_size", 200, "Radar Size");
@@ -34,4 +35,4 @@ void CRadar::Draw() {
 
 void Init() {}
 
-}}
+}

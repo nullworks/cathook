@@ -6,8 +6,8 @@
  *
  */
 
-namespace features { namespace followbot {
+namespace features::followbot {
 
 void Init();
 
-}}
+}

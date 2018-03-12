@@ -264,12 +264,12 @@ static void WorldTick() {
 	if (!ShouldAim()) { preRet(); return; }
 
 	// Get camera so we wont need to again
-	auto camera = GetCameraAngle(local_ent);
+	const auto camera_ang = GetCameraAngle(local_ent);
 
 	// Snapback Time Reset
 	if (silent_aim == 1 && std::get<0>(snap_info)) {
 		if (std::get<0>(snap_info) == 1 && std::get<2>(snap_info).ResetAfter(std::chrono::milliseconds(100))) {
-			auto delta = camera + std::get<1>(snap_info);
+			auto delta = camera_ang + std::get<1>(snap_info);
 			SetCameraAngle(local_ent, util::ClampAngles(delta));
 			std::get<0>(snap_info) = 2;
 		}
@@ -279,22 +279,24 @@ static void WorldTick() {
 	// Set our last target
 	last_target = target.first;
 
-	// Do smoothaim, TODO  fix
+	// Do smoothaim
 	if (smooth_aim > 0) {
 
+		// TODO, Smooth is only somewhat fixed, it still needs a change to fix the crossing of the y axis (-180, 180)
+
 		// Get angles
-		auto angles = util::VectorAngles(camera, target.second);
+		auto angles = util::VectorAngles(GetCamera(local_ent), target.second);
 		// Get the difference
-		auto delta = util::GetAngleDifference(camera, angles);
+		auto delta = util::GetAngleDifference(camera_ang, angles);
 
 		// Pitch, If our camera pitch is more than our target pitch, we should add to lower that value, and vise versa for camera being lower
 		auto p_move_ammt = delta.x / smooth_aim;
-		angles.x = (camera.x > angles.x) ? (camera.x - p_move_ammt) : (camera.x + p_move_ammt);
+		angles.x = (camera_ang.x > angles.x) ? (camera_ang.x - p_move_ammt) : (camera_ang.x + p_move_ammt);
 
 		// Yaw, same as above but If we go across -180 to 180, we do some changes
 		auto y_move_ammt = delta.y / smooth_aim;
-		angles.y = (camera.y > angles.y || (camera.y < -90 && angles.y > 90)) ?
-			(camera.y - y_move_ammt) : (camera.y + y_move_ammt);
+		angles.y = (camera_ang.y > angles.y || (camera_ang.y < -90 && angles.y > 90)) ?
+			(camera_ang.y - y_move_ammt) : (camera_ang.y + y_move_ammt);
 
 		// Clamp as we changed some values
 		util::ClampAngles(angles);
@@ -304,7 +306,7 @@ static void WorldTick() {
 	}
 	else {
 		//  Get angles and Aim at player
-		auto aim_angles = util::VectorAngles(camera, target.second);
+		auto aim_angles = util::VectorAngles(GetCamera(local_ent), target.second);
 		switch(silent_aim){
 		case 0: // OFF
 			SetCameraAngle(local_ent, aim_angles); break;
@@ -312,7 +314,7 @@ static void WorldTick() {
 			// Setup the snap
 			if (!std::get<0>(snap_info)) {
 				std::get<0>(snap_info) = true;
-				std::get<1>(snap_info) = camera - aim_angles; // we use a delta in case player looks around
+				std::get<1>(snap_info) = camera_ang - aim_angles; // we use a delta in case player looks around
 				std::get<2>(snap_info).Reset();
 			}
 			// Set angles

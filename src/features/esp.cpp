@@ -57,7 +57,7 @@ static CatVarEnum box_mode(esp_menu, box_mode_enum, "esp_box_mode", 0, "Box mode
 static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
-	if (!esp_enabled || !gameinfo::IsInGame()) return;
+	if (!esp_enabled || !game::GetInGame()) return;
 
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {

@@ -8,10 +8,10 @@
 
 #include "game.hpp"
 
-namespace gameinfo {
+namespace game {
 
 // To identify if the game is ingame
-CMFunction<bool()> IsInGame {[](){return true;}};
+CMFunction<bool()> GetInGame {[](){return true;}};
 
 // Add to this when you create your module to get credit
 std::vector<std::string> authors = {"Onee-chan", "nullifiedcat", "F1ssi0N"};

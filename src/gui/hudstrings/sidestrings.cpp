@@ -18,7 +18,7 @@ HudString SideStrings(8, 8);// Stores side strings
 
 // The main string to use at the top
 inline const std::string top_string(){
-	using namespace gameinfo;
+	using namespace game;
 	std::string ret = "Nekohook";
 
 	// Check if we have authors
@@ -28,8 +28,8 @@ inline const std::string top_string(){
 	ret += " by ";
 	for (int i = 0; i < authors.size(); i++) {
 		ret += authors.at(i);
-		if (i != gameinfo::authors.size() - 1)
-			ret += (i == gameinfo::authors.size() - 2) ? " and " : ", ";
+		if (i != authors.size() - 1)
+			ret += (i == authors.size() - 2) ? " and " : ", ";
 	}
 	return ret;
 }

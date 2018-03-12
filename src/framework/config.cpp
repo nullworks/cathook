@@ -84,7 +84,7 @@ static void WorldTick() {
 
   // Recreation of match exec
   static bool last_ingame = false;
-  auto ingame = gameinfo::IsInGame();
+  auto ingame = game::GetInGame();
   if (last_ingame && last_ingame != ingame)
     LoadConfig({"matchexec"});
   last_ingame = ingame;

@@ -10,7 +10,7 @@
 
 #if defined(__linux__)
 #include <link.h> // link maps
-typedef link_map CatLinkMap;
+typedef link_map* CatLinkMap;
 #elif defined(_WIN32)
 #include <windows.h> // loadlibrary
 typedef HMODULE CatLinkMap;
@@ -23,5 +23,8 @@ public:
 	SharedObject(const char* _file_name);
 	const char* file_name;	// The name of the library we want
  	std::string path = "unassigned"; // The full path of the shared library we are looking for
-	CatLinkMap* lmap = nullptr; // Link map returned from dllopen
+	CatLinkMap lmap = nullptr; // Link map returned from dllopen
+private:
+	void RefreshPath(); // Used by the class to set or refresh the path
+	void RefreshLmap();
 };

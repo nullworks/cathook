@@ -11,6 +11,7 @@
 #include "aimbot.hpp"
 #include "antiaim.hpp"
 #include "followbot.hpp"
+#include "spam.hpp"
 
 #include "features.hpp"
 
@@ -29,6 +30,9 @@ void Init() {
 
 	// Followbot
 	followbot::Init();
+
+	// Chat Spam
+	spam::Init();
 }
 
 

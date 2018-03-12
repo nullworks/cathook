@@ -60,19 +60,20 @@ public:
 		points[7] = min + CatVector(x, y, z);
 		return points;
 	}
-	inline auto GetBottom() const { // this is literally the same as above, but im doing this just in case the above changes so that this will stay
-		float x, y, z;
-		x = max.x - min.x;
-		y = max.y - min.y;
-		z = max.z - min.z;
-		std::array<CatVector, 4> points;
-		points[0] = min;
-		points[1] = min + CatVector(x, 0, 0);
-		points[2] = min + CatVector(x, y, 0);
-		points[3] = min + CatVector(0, y, 0);
-	}
+	// Credits to cathook
 	inline bool LineIntersects(CatVector src, CatVector dst) const {
-		// TODO
+    if (dst.x < min.x && src.x < min.x)
+        return false;
+    if (dst.y < min.y && src.y < min.y)
+        return false;
+    if (dst.z < min.z && src.z < min.z)
+        return false;
+    if (dst.x > max.x && src.x > max.x)
+        return false;
+    if (dst.y > max.y && src.y > max.y)
+        return false;
+		if (dst.z > max.z && src.z > max.z)
+			return false;
 		return true;
 	}
 	inline CatVector GetCenter() const { return (min + max) * 0.5; }

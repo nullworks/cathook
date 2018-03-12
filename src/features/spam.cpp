@@ -74,11 +74,20 @@ static std::vector<std::string> custom_spam;
 
 // This is a cat command so you can forcibly reload it
 static CatCommand spam_reload("spam_reload", [](std::vector<std::string>){
-  auto custom_spam = io::ReadFile(io::GetSaveLocation() + "spam/" + (std::string)spam_file);
+  custom_spam = io::ReadFile(io::GetSaveLocation() + "spam/" + (std::string)spam_file);
   g_CatLogging.log("Reloaded Custom Spam!");
 });
 
-std::string GetSpamString(){
+static CatCommand spam_add("spam_add", [](std::vector<std::string> args){
+  if (args.empty()) {
+    g_CatLogging.log("Nothing to add to custom spam!");
+    return;
+  }
+
+  g_CatLogging.log("Reloaded Custom Spam!");
+});
+
+static std::string GetSpamString(){
 
   // First we need to get the type of spam
   const std::vector<std::string>* spam_group = nullptr;
@@ -111,25 +120,28 @@ std::string GetSpamString(){
   return spam_group->at(last_spam);
 }
 
+// Externed, please set in your module to enable chat spam features
+CMFunction<void(const char*)> SayChat {[](auto){}};
+
 // TODO, thread
 static void SpamLoop() {
   if (!spam_type || !spam_time) return;
 
   // Check if its time to spam
   static CatTimer last_spam;
-  if (!last_spam.CheckTime(std::chrono::seconds(spam_time)))
-    return;
-  last_spam.Reset();
+  if (last_spam.ResetAfter(std::chrono::seconds(spam_time))) {
 
-  auto spam_string = GetSpamString();
-  if (!spam_string.empty())
-    return;
+    auto spam_string = GetSpamString();
+    if (!spam_string.empty())
+      return;
 
-  // TODO, HOW DO I MODULARIZE FUCKING CHAT AHHHHHH
-  // gameinfo::SayChat(spam_string); ????!???!?!?!??
+    SayChat(spam_string.c_str());
+  }
 }
 
 void Init(){
+
+  wtickmgr.REventDuring(SpamLoop);
 
 }
 

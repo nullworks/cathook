@@ -15,12 +15,12 @@
   #include <errno.h>
   #include <string.h> // error string
   #include <sys/mman.h> // mmap
-#elif
-  #error "IPC ISNT MULTIPLAT"
 #endif
 #include "../util/logging.hpp"
 
 namespace ipc {
+
+#ifdef __linux__
 
 enum ipc_message_state {
   OPEN, // Message is open for writing
@@ -120,5 +120,7 @@ public:
     shm_unlink(pool_name);
   }
 };
-
+#else
+  #warning "IPC DISABLED"
+#endif
 }

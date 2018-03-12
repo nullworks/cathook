@@ -30,29 +30,3 @@ CMFunction<void(CatLocalPlayer*, CatVector)> SetSilentCameraAngle {[](CatLocalPl
 CMFunction<int()> GetEntityCount {[]() -> auto { return 0; }};
 CMFunction<CatEntity*(int)> GetEntity {[](auto) -> CatEntity* { return nullptr; }};
 CMFunction<CatLocalPlayer*()> GetLocalPlayer {[]() -> CatLocalPlayer* { return nullptr; }};
-
-float GetDistance(CatEntity* this_ptr) {
-	auto local_ent = GetLocalPlayer();
-	return (local_ent) ? GetOrigin(this_ptr).DistTo(GetOrigin((CatEntity*)local_ent)) : 0;
-};
-bool GetEnemy(CatEntity* this_ptr) {
-	auto team = GetTeam(this_ptr);
-	if (team == ETEAM_ALLY) return false;
-	if (team == ETEAM_ENEMY) return true;
-	auto local_ent = (CatEntity*)GetLocalPlayer();
-	if (local_ent == this_ptr) return false; // Local ents are friendly, duh
-	if (local_ent) return GetTeam(local_ent) != team;
-	return true;
-}
-
-namespace bones {
-// Bone stuff
-// This is how the bones are layed out
-// Use bonesets[0] for center line
-const std::vector<int> bonesets[] = {
-	{EBone_head, EBone_top_spine, EBone_upper_spine, EBone_middle_spine, EBone_bottom_spine, EBone_pelvis}, // Center
-	{EBone_lower_arm_l, EBone_middle_arm_l, EBone_upper_arm_l, EBone_top_spine, EBone_upper_arm_r, EBone_middle_arm_r, EBone_lower_arm_r}, // Upper limbs
-	{EBone_lower_leg_l, EBone_middle_leg_l, EBone_upper_leg_l, EBone_pelvis,    EBone_upper_leg_r, EBone_middle_leg_r, EBone_lower_leg_r}  // Lower limbs
-};
-
-}

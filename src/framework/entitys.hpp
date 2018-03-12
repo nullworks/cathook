@@ -7,13 +7,11 @@
 
 #pragma once
 
-#include <memory> // std::unique_ptr
-
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
 #include "../util/functions.hpp" // CMFunction()
 
-// Entity Team
-enum {
+// Enums, yay!
+enum { // Entity Team
 	ETEAM_NONE,
 	ETEAM_UNKNOWN,
 	ETEAM_ENEMY,
@@ -23,9 +21,7 @@ enum {
 	ETEAM_YELLOW,
 	ETEAM_GREEN
 };
-
-// Entity Type
-enum {
+enum { // Entity Type
 	ETYPE_NONE,			// Idk wut
 	ETYPE_PLAYER,		// Hey, a player!
 	ETYPE_OTHERHOSTILE, // Not player but still hostile
@@ -35,9 +31,7 @@ enum {
 	ETYPE_PICKUP_AMMO,
 	ETYPE_GENERIC		// Some generic crap
 };
-
-// Bone position enum, Add bones as needed!
-enum {
+enum { // Bone position enum, Add bones as needed, position shouldnt matter if everything is made right...
 	EBone_head,			// Middle section
 	EBone_top_spine,
 	EBone_upper_spine,
@@ -59,8 +53,8 @@ enum {
 	EBone_count
 };
 
-class CatEntity;
-
+class CatEntity; // incomplete class, basicly void*, cast to and from your games entity pointers
+// main functions to get info out of entities
 extern CMFunction<bool(CatEntity*)> GetDormant;
 extern CMFunction<bool(CatEntity*)> GetAlive;
 extern CMFunction<int(CatEntity*)> GetHealth;
@@ -72,32 +66,35 @@ extern CMFunction<CatVector(CatEntity*)> GetOrigin;
 extern CMFunction<CatBox(CatEntity*)> GetCollision;
 extern CMFunction<int(CatEntity*)> GetSteamId;
 extern CMFunction<bool(CatEntity*, int, CatBox&)> GetBone;
-inline bool GetBoneCenter(CatEntity* this_ptr, int hb, CatVector& bone) {
-	CatBox tmp;
-	auto ret = GetBone(this_ptr, hb, tmp);
-	bone = tmp.GetCenter();
-	return ret;
-}
-float GetDistance(CatEntity*);
-bool GetEnemy(CatEntity*);
 
-class CatLocalPlayer;
-
+class CatLocalPlayer; // same as above
+// Local player specific
 extern CMFunction<bool(CatLocalPlayer*)> InThirdperson;
 extern CMFunction<void(CatLocalPlayer*)> Attack;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCamera;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle;
 extern CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle;
 extern CMFunction<void(CatLocalPlayer*, CatVector)> SetSilentCameraAngle;
-
+// Entity manager stuff
 extern CMFunction<int()> GetEntityCount;
 extern CMFunction<CatEntity*(int)> GetEntity;
 extern CMFunction<CatLocalPlayer*()> GetLocalPlayer;
 
-// Bone stuff
-namespace bones {
-
-// Sets of bones that are connected
-extern const std::vector<int> bonesets[3];
-
+// "Make life easy"
+inline bool GetBoneCenter(CatEntity* this_ptr, int hb, CatVector& bone) {
+	CatBox tmp; auto ret = GetBone(this_ptr, hb, tmp);
+	bone = tmp.GetCenter(); return ret;
+}
+inline float GetDistance(CatEntity* this_ptr) {
+	auto local_ent = GetLocalPlayer();
+	return (local_ent) ? GetOrigin(this_ptr).DistTo(GetOrigin((CatEntity*)local_ent)) : 0;
+};
+inline bool GetEnemy(CatEntity* this_ptr) {
+	auto team = GetTeam(this_ptr);
+	if (team == ETEAM_ALLY) return false;
+	if (team == ETEAM_ENEMY) return true;
+	auto local_ent = (CatEntity*)GetLocalPlayer();
+	if (local_ent == this_ptr) return false; // Local ents are friendly, duh
+	if (local_ent) return GetTeam(local_ent) != team;
+	return true;
 }

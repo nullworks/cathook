@@ -21,6 +21,9 @@ std::string top_string = "Nekohook";
 
 // Adds default strings
 static void AddDefault() {
+
+	// TODO Make init not shit and make this better as a whole
+
 	// Init strings
 	static bool init = false;
 	if (!init) {
@@ -29,13 +32,13 @@ static void AddDefault() {
 		top_string = "Nekohook";
 
 		// Check if we have authors
-		if (!g_GameInfo.authors.empty()) {
+		if (!gameinfo::authors.empty()) {
 			top_string += " by ";
-			for (int i = 0; i < g_GameInfo.authors.size(); i++) {
-				const std::string& tmp = g_GameInfo.authors.at(i);
+			for (int i = 0; i < gameinfo::authors.size(); i++) {
+				const std::string& tmp = gameinfo::authors.at(i);
 				// Determine whether we should add a comma
 				if (i > 0) {
-					if (i - 2 >= g_GameInfo.authors.size())
+					if (i - 2 >= gameinfo::authors.size())
 						top_string += " and ";
 					else
 						top_string += ", ";

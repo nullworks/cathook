@@ -137,7 +137,13 @@ static void WorldTick() {
     }();
     if (edge_angle != EDGE_NONE) {
       // Pitch can affect how our head is behind walls, so we fix that here
-      if (angles.x < 0) {
+      // we also clamp so we edge where our real head is
+      float pitch = angles.x;
+      while (pitch > 89) // Clamping :joy:
+        pitch -= 180;
+      while (pitch < -89)
+        pitch += 180;
+      if (pitch < 0) {
         if (edge_angle == EDGE_LEFT)
           edge_angle = EDGE_RIGHT;
         else

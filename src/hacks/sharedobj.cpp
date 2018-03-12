@@ -63,25 +63,25 @@ static std::string LocateSharedObject(const std::string& name) {
 SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 
 	// Get the full path of our opened object
-	auto path = LocateSharedObject(_file_name);
+	this->path = LocateSharedObject(_file_name);
 	// Check if we didnt get anything from above, if so retry the above untill we get something
-	while (path.empty()) {
+	while (this->path.empty()) {
 		g_CatLogging.log("Didnt find shared object: %s, Retrying!", _file_name);
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		path = LocateSharedObject(_file_name);
+		this->path = LocateSharedObject(_file_name);
 	}
-	g_CatLogging.log("Shared object Path: %s -> \"%s\"", _file_name, path.c_str());
+	g_CatLogging.log("Shared object Path: %s -> \"%s\"", _file_name, this->path.c_str());
 
 	// dlopen that sucker and give us a linkmap to use
 #if defined(__linux__)
-	while (!(lmap = (CatLinkMap*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
+	while (!(this->lmap = (CatLinkMap*)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
 		auto error = dlerror();
 		if (error) g_CatLogging.log("DLERROR: %s", error);
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 #elif defined(_WIN32)
-
+	#error "Setup dll loading"
 #endif
 
-	g_CatLogging.log("Linkmap: %s -> 0x%x", _file_name, lmap);
+	g_CatLogging.log("Linkmap: %s -> 0x%x", _file_name, this->lmap);
 }

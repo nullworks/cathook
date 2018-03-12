@@ -27,8 +27,9 @@ public:
   CatCommand(std::string _name, void(*_com_callback)(std::vector<std::string>));
   virtual void callback(std::vector<std::string> args) { com_callback(args); };
   std::string name;
-  CMFunction<void(std::vector<std::string>)> com_callback = nullptr;
   inline void operator()(std::vector<std::string> args) { com_callback(args); }
+private:
+  CMFunction<void(std::vector<std::string>)> com_callback;
 };
 
 void CallCommand(std::string input);

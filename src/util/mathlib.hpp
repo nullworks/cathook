@@ -10,7 +10,7 @@
 #pragma once
 
 #include <math.h> // This is a mathlib, did you think we didnt need math?
-
+#include <array> // std::array<>
 // Macro for getting the size of an array, Uses the size of first element then compares it to the size of the entire array. This is optimised out.
 #define GET_ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -42,11 +42,14 @@ public:
 	inline CatBox(CatVector min = CatVector(), CatVector max = CatVector()) : min(min), max(max) {};
 	CatVector min, max;
 
-	inline void GetPoints(CatVector(&points)[8]) const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
+	inline auto GetPoints() const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
+		// Get deltas
 		float x, y, z;
 		x = max.x - min.x;
 		y = max.y - min.y;
 		z = max.z - min.z;
+		// Expand deltas into 8 points for box
+		std::array<CatVector, 8> points;
 		points[0] = min;
 		points[1] = min + CatVector(x, 0, 0);
 		points[2] = min + CatVector(x, y, 0);
@@ -55,6 +58,7 @@ public:
 		points[5] = min + CatVector(x, 0, z);
 		points[6] = min + CatVector(0, y, z);
 		points[7] = min + CatVector(x, y, z);
+		return points;
 	}
 	inline CatVector GetCenter() const { return (min + max) * 0.5; }
 	inline bool operator==(CatBox value) const { return value.min == min && value.max == max; }
@@ -76,8 +80,23 @@ public:
 
 namespace util {
 
-// Clamps angles to be "normal" values
-void ClampAngles(CatVector& angles);
+// Clamps angles to prevent them from going out of bounds, this is simple and should be inlined
+inline CatVector& ClampAngles(CatVector& angles) {
+	// Pitch
+	while(angles.x > 89)
+		angles.x -= 180;
+	while(angles.x < -89)
+		angles.x += 180;
+	// Yaw
+	while(angles.y > 180)
+		angles.y -= 360;
+	while(angles.y < -180)
+		angles.y += 360;
+	// Roll
+	angles.z = 0;
+	return angles;
+}
+
 // Input 2 angles to get the delta of difference
 CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles);
 // Input the angles of your player, the vector position of your camera, and the destination point and it returns fov value

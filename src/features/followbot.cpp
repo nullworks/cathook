@@ -7,12 +7,11 @@
  */
 
 #include <vector>
-#include <chrono> // idle timer
 
+#include "../util/chrono.hpp"
 #include "../util/logging.hpp"
 #include "../util/catvars.hpp"
 #include "../framework/gameticks.hpp" // So we can run things in draw and world tick
-#include "../framework/entitys.hpp"
 #include "../framework/trace.hpp"
 #include "../framework/drawing.hpp"	// draw some crumbs
 
@@ -117,9 +116,9 @@ static void WorldTick() {
     breadcrumbs.clear();
 
   // Update timer on new target
-  static std::chrono::time_point<std::chrono::steady_clock> idle_time;
+  static CatTimer idle_time;
   if (breadcrumbs.empty())
-    idle_time = std::chrono::steady_clock::now();
+    idle_time.Reset();
 
   // New crumbs, we add one if its empty so we have something to follow
 	if (breadcrumbs.empty() || tar_orig.DistTo(breadcrumbs.at(breadcrumbs.size() - 1)) > 40.0F) //&& DistanceToGround(found_entity) < 40) {
@@ -127,7 +126,7 @@ static void WorldTick() {
 
   // Prune old and close crumbs that we wont need anymore, update idle timer too
   while (breadcrumbs.size() > 2 && loc_orig.DistTo(breadcrumbs.at(0)) < 60.f) {
-    idle_time = std::chrono::steady_clock::now();
+    idle_time.Reset();
     breadcrumbs.erase(breadcrumbs.begin());
   }
 
@@ -135,14 +134,14 @@ static void WorldTick() {
 	if (dist_to_target > follow_distance) {
 
     // Check for idle
-    if (std::chrono::steady_clock::now() - idle_time > std::chrono::seconds(3)) {
+    if (idle_time.CheckTime(std::chrono::seconds(3))) {
       follow_target = nullptr;
       return;
     }
     // TODO, make walk to CMFunction in entitys framework
     // WalkTo(breadcrumbs.at(0));
 	} else
-      idle_time = std::chrono::steady_clock::now();
+    idle_time.Reset();
 }
 
 static void DrawTick(){

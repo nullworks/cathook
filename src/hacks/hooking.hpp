@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+
 // Class used to hook functions in objects with virtual functions
 class VMTHook {
 public:
@@ -24,20 +26,5 @@ public:
 
 	void*** vtable_ptr = nullptr; 		 // location to the pointer in the object that contains its vtable
 	void** vtable_original = nullptr; // location of the objects original vtable
-	void** vtable_hooked = nullptr;   // location of our vtable replacement
+	void** vtable_replacement = nullptr;   // location of our vtable replacement
 };
-
-namespace offsets {
-
-// This is for offsets to functions in vtable on multiple platforms.
-constexpr int PlatformOffset(int offset_linux = -1, int offset_windows = -1, int offset_osx = -1) {
-#if CMAKE_SYSTEM_NAME == Linux
-	return offset_linux;
-#elif CMAKE_SYSTEM_NAME == Windows
-	return offset_windows;
-#else
-	return -1;
-#endif
-}
-
-}

@@ -20,6 +20,26 @@ std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) C
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
+CatCommand list_vars("list", [](std::vector<std::string>){
+	g_CatLogging.log("Current list of CatVars--");
+	for (const auto& i : CatVarMap) {
+		// if we are writing an enum, we should display the enums with it
+		if (auto cvar_enum = dynamic_cast<CatVarEnum*>(i.second)) {\
+			g_CatLogging.log("Command: %s", cvar_enum->name.c_str());
+			// generate the enum string
+			std::string enum_str;
+			for (const auto& tmp : cvar_enum->cat_enum) {
+				enum_str += (enum_str.empty()) ? tmp : ", " + tmp;
+			}
+			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"\n\t\tEnums: %s",
+											 cvar_enum->name.c_str(), cvar_enum->desc_short.c_str(), cvar_enum->desc_long.c_str(), enum_str.c_str());
+		} else
+			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"",
+											 i.second->name.c_str(), i.second->desc_short.c_str(), i.second->desc_long.c_str());
+	}
+	g_CatLogging.log("End of list--");
+});
+
 // Menu tree
 void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
 	// Check if we reached the end if the enum info, if not we can add more to the tree

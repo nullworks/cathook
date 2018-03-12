@@ -31,7 +31,7 @@ bool GetXDisplay() {
 }
 
  // Searches for windows with a pid
-static bool SearchForWindow(Window w, const char* process_name) {
+static bool SearchForWindow(Window w = XDefaultRootWindow(xAppDisplay), const char* process_name = io::GetProcessName().c_str()) {
   if (!GetXDisplay()) return false; // Make sure we have a display
 
   // Get the process name for the current window
@@ -63,7 +63,7 @@ bool GetXWindow() {
  	// If we dont have the game window, we try to find it here!
  	if (!xAppWindow) {
  		// Attempt to get our window
- 		if (!SearchForWindow(XDefaultRootWindow(xAppDisplay), GetProcessName())) return false;
+ 		if (!SearchForWindow()) return false;
  		g_CatLogging.log("Xlib Input: Recieved XWindow: 0x%x", xAppWindow);
  	}
  	return true;

@@ -5,3 +5,132 @@
  *
  *
  */
+
+#include <vector>
+
+#include "../util/chrono.hpp"
+#include "../util/catvars.hpp"
+#include "../util/iohelper.hpp"
+#include "../util/logging.hpp"
+#include "../framework/gameticks.hpp"
+
+#include "spam.hpp"
+
+namespace features::spam {
+
+const static CatEnum spam_menu({"Spam"});
+static CatEnum spam_type_enum({"OFF", "NEKOHOOK", "CATHOOK", "LMAOBOX", "LITHIUM", "NULLCORE", "CUSTOM"});
+static CatVarEnum spam_type(spam_menu, spam_type_enum, "spam", 0, "Spam", "Choose your type of spam!");
+static CatVarString spam_file(spam_menu, "spam_file", "default.txt", "Spam File", "Put in a file to use with custom spam");
+static CatVarFloat spam_time(spam_menu, "spam_time", 3, "Spam Time", "Time to wait between each spam!");
+
+const static std::vector<std::string> nekohook_spam({
+  "Uhh, ur bad",
+  "Why are you even here?",
+  "Do you like staring at my temporary spam?",
+  "Do something better with your life...",
+  "Oh wait, why cant I do something better with my life ;(",
+  "I guess I'll just go kill myself because I'm so useless:/"
+  "Now to the real spam suggestions...",
+
+  "Nekohook - Did I mention that I run arch!",
+  "Nekohook - Only real gamers use linux!",
+  "Nekohook - the only true multi-hack!",
+  "Nekohook - supporting over 2 games!" // I need more games :/
+});
+const static std::vector<std::string> cathook_spam({
+    "cathook - more fun than a ball of yarn!",
+    "GNU/Linux is the best OS!",
+    "visit youtube.com/c/nullifiedcat for more information!",
+    "cathook - free tf2 cheat!",
+    "cathook - ca(n)t stop me meow!"
+});
+const static std::vector<std::string> lmaobox_spam({
+    "GET GOOD, GET LMAOBOX!",
+    "LMAOBOX - WAY TO THE TOP",
+    "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!"
+});
+const static std::vector<std::string> lithium_spam({
+    "CHECK OUT www.YouTube.com/c/DurRud FOR MORE INFORMATION!",
+    "PWNING AIMBOTS WITH OP ANTI-AIMS SINCE 2015 - LITHIUMCHEAT",
+    "STOP GETTING MAD AND STABILIZE YOUR MOOD WITH LITHIUMCHEAT!",
+    "SAVE YOUR MONEY AND GET LITHIUMCHEAT! IT IS FREE!",
+    "GOT ROLLED BY LITHIUM? HEY, THAT MEANS IT'S TIME TO GET LITHIUMCHEAT!!"
+});
+const static std::vector<std::string> nullcrap_spam({
+    "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!",
+    "NULL CORE - WAY TO THE TOP!",
+    "NULL CORE - BEST TF2 CHEAT!",
+    "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!",
+    "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!",
+    "NULL CORE - WHOLE SERVER OBSERVING!",
+    "NULL CORE - GET BACK TO PWNING!",
+    "NULL CORE - WHEN PVP IS TOO HARDCORE!",
+    "NULL CORE - CAN CAUSE KIDS TO RAGE!",
+    "NULL CORE - F2P NOOBS WILL BE 100% NERFED!"
+});
+
+static std::vector<std::string> custom_spam;
+
+// This is a cat command so you can forcibly reload it
+static CatCommand spam_reload("spam_reload", [](std::vector<std::string>){
+  auto custom_spam = io::ReadFile(io::GetSaveLocation() + "spam/" + (std::string)spam_file);
+  g_CatLogging.log("Reloaded Custom Spam!");
+});
+
+std::string GetSpamString(){
+
+  // First we need to get the type of spam
+  const std::vector<std::string>* spam_group = nullptr;
+  switch(spam_type) {
+  case 1: spam_group = &nekohook_spam; break;
+  case 2: spam_group = &cathook_spam; break;
+  case 3: spam_group = &lmaobox_spam; break;
+  case 4: spam_group = &lithium_spam; break;
+  case 5: spam_group = &nullcrap_spam; break;
+  case 6: {
+    spam_group = &custom_spam;
+    // Here we make sure the custom spam is updated and that we have something
+    static std::string last_string = spam_file;
+    if (last_string != (std::string)spam_file || custom_spam.empty()) {
+      spam_reload({});
+      last_string = spam_file;
+    }
+  }}
+
+  // In case some idiot sets the spam_type var too high or low
+  if (!spam_group)
+    return std::string();
+
+  // Spam number
+  static int last_spam = -1; // last line spammed
+  last_spam++;
+  if (last_spam >= spam_group->size()) // clamp around
+    last_spam = 0;
+
+  return spam_group->at(last_spam);
+}
+
+// TODO, thread
+static void SpamLoop() {
+  if (!spam_type || !spam_time) return;
+
+  // Check if its time to spam
+  static CatTimer last_spam;
+  if (!last_spam.CheckTime(std::chrono::seconds(spam_time)))
+    return;
+  last_spam.Reset();
+
+  auto spam_string = GetSpamString();
+  if (!spam_string.empty())
+    return;
+
+  // TODO, HOW DO I MODULARIZE FUCKING CHAT AHHHHHH
+  // gameinfo::SayChat(spam_string); ????!???!?!?!??
+}
+
+void Init(){
+
+}
+
+}

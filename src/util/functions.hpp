@@ -9,6 +9,7 @@
 #pragma once
 
 #include <thread>
+#include <chrono>
 #include <vector>
 
 // Useful
@@ -76,4 +77,29 @@ public:
   void REventBefore(void_func in) {before_event.add(in);};
   void REventDuring(void_func in) {during_event.add(in);};
   void REventAfter(void_func in) {after_event.add(in);};
+};
+
+// a class to make loop threading easier
+// TODO, make threading from objects possible
+class ThreadedLoop {
+public:
+  ThreadedLoop(CMFunction<void()> _thread_loop) : thread_loop(_thread_loop) {
+    // This is the loop
+    std::thread thread_construct([&](){
+      while (state != STOP) // We loop while stop isnt true
+        thread_loop();
+      state = HALTED;
+    });
+    thread_construct.detach();
+  }
+  ~ThreadedLoop(){
+    state = STOP;
+    // We hang the thread deconstructing this until the loop thread ends to prevent segfaulting
+    while(state != HALTED)
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+private:
+  enum {RUNNING, STOP, HALTED};
+  CMFunction<void()> thread_loop;
+  int state = RUNNING;
 };

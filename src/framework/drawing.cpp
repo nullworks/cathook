@@ -98,7 +98,8 @@ const char* Fonts[] = {
 	"Unispace"
 };
 static CatEnum gui_menu({"GUI"});
-CatVarEnum default_font(gui_menu, {"Open Sans", "Bitstream Vera Sans Mono", "Unispace"}, "gui_font", 0, "Gui font", "The main font setting");
+static CatEnum default_font_enum({Fonts[0], Fonts[1], Fonts[2]});
+CatVarEnum default_font(gui_menu, default_font_enum, "gui_font", 0, "Gui font", "The main font setting");
 CatVarInt default_font_size(gui_menu, "gui_font_size", 13, "Gui font size", "The main font size");
 
 }

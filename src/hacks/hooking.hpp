@@ -22,9 +22,16 @@ public:
 	void HookMethod(void* func, size_t idx); // Give it the function you are replacing with and the number position of the function to replace
 	void Apply();	// To finish your hook
 	void Release(); // To release this hook
-	inline void* GetMethod(size_t idx) const { return vtable_original[idx]; }
+	// Change parameter to something longer if needed
+	inline void* GetMethod(short idx) const { return vtable_original[idx]; }
 
 	void*** vtable_ptr = nullptr; 		 // location to the pointer in the object that contains its vtable
 	void** vtable_original = nullptr; // location of the objects original vtable
 	void** vtable_replacement = nullptr;   // location of our vtable replacement
+};
+
+// This is for hooking non-virtual function
+class ASMHook {
+public:
+
 };

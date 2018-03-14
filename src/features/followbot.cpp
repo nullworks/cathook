@@ -147,7 +147,7 @@ static void WorldTick() {
 static void DrawTick(){
   if (!followbot || !draw_crumb) return;
   if (breadcrumbs.size() < 2) return;
-  for (int i = 0; i < breadcrumbs.size() - 1; i++) {
+  for (size_t i = 0; i < breadcrumbs.size() - 1; i++) {
     CatVector wts1, wts2;
     if (draw::WorldToScreen(breadcrumbs.at(i), wts1) && draw::WorldToScreen(breadcrumbs.at(i + 1), wts2)) {
       draw::Line(wts1.x, wts1.y, wts2.x - wts1.x, wts2.y - wts1.y, colors::white);

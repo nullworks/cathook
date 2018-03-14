@@ -26,7 +26,7 @@ inline const std::string top_string(){
 		return ret;
 
 	ret += " by ";
-	for (int i = 0; i < authors.size(); i++) {
+	for (size_t i = 0; i < authors.size(); i++) {
 		ret += authors.at(i);
 		if (i != authors.size() - 1)
 			ret += (i == authors.size() - 2) ? " and " : ", ";

@@ -138,7 +138,7 @@ void WriteFile(const std::string& path, std::vector<std::string> to_write) {
       return;
     }
     // We dont use an iterator so we can tell where we are in the loop
-    for (int i = 0; i < to_write.size(); i++) {
+    for (size_t i = 0; i < to_write.size(); i++) {
       if (i != to_write.size() - 1)
         to_write.at(i) += "\n";
       write_stream.write(to_write.at(i).c_str(), to_write.at(i).size());

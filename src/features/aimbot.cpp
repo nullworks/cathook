@@ -284,18 +284,17 @@ static void WorldTick() {
 
 		// TODO, Smooth is only somewhat fixed, it still needs a change to fix the crossing of the y axis (-180, 180)
 
-		// Get angles
-		auto angles = util::VectorAngles(GetCamera(local_ent), target.second);
-		// Get the difference
+		auto camera = GetCamera(local_ent);
+		auto angles = util::VectorAngles(camera, target.second);
 		auto delta = util::GetAngleDifference(camera_ang, angles);
 
 		// Pitch, If our camera pitch is more than our target pitch, we should add to lower that value, and vise versa for camera being lower
-		auto p_move_ammt = delta.x / smooth_aim;
+		float p_move_ammt = delta.x / pow(smooth_aim, 1.5);
 		angles.x = (camera_ang.x > angles.x) ? (camera_ang.x - p_move_ammt) : (camera_ang.x + p_move_ammt);
 
 		// Yaw, same as above but If we go across -180 to 180, we do some changes
-		auto y_move_ammt = delta.y / smooth_aim;
-		angles.y = (camera_ang.y > angles.y || (camera_ang.y < -90 && angles.y > 90)) ?
+		float y_move_ammt = delta.y / pow(smooth_aim, 1.5);
+		angles.y = (camera_ang.y > angles.y || (camera_ang.y > 90 && angles.y < -90)) ?
 			(camera_ang.y - y_move_ammt) : (camera_ang.y + y_move_ammt);
 
 		// Clamp as we changed some values
@@ -303,8 +302,18 @@ static void WorldTick() {
 
 		// Aim here as silent wont work with smooth
 		SetCameraAngle(local_ent, angles);
+
+		// Slowaim Autoshoot, basicly we recreate an extremly simple triggerbot here
+		if (autoshoot) {
+			// The further the terget gets from us, we want to make the allowed fov lower
+			if (util::GetFov(camera_ang, camera, target.second) - camera.DistTo(target.second) / 32 < 5)
+				Attack(local_ent);
+		}
 	}
 	else {
+		// Autoshoot
+		if (autoshoot)
+			Attack(local_ent);
 		//  Get angles and Aim at player
 		auto aim_angles = util::VectorAngles(GetCamera(local_ent), target.second);
 		switch(silent_aim){
@@ -324,14 +333,6 @@ static void WorldTick() {
 		case 2: // MODULE
 			 SetSilentCameraAngle(local_ent, aim_angles); break;
 		}
-	}
-
-	// Autoshoot
-	if (autoshoot) {
-		/*if (smooth_aim > 0) {
-
-		}*/
-		Attack(local_ent);
 	}
 }
 

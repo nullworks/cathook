@@ -51,7 +51,7 @@ public:
   }
   void add(void_func in) { func_pool.push_back(in); }
   void remove(void_func in) {
-    for(int i = 0; i < func_pool.size(); i++) {
+    for(size_t i = 0; i < func_pool.size(); i++) {
       if (func_pool[i] == in) {
         // Remove function from pool
         func_pool.erase(func_pool.begin() + i);

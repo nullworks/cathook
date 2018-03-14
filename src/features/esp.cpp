@@ -169,7 +169,7 @@ static void Draw() {
 				for (const auto& current_set : bonesets) {
 
 					// Draw the bones in the bone set
-					for (int ii = 0; ii < current_set.size() - 1; ii++) { // We do it like this so we can identify where we are in the loop
+					for (size_t ii = 0; ii < current_set.size() - 1; ii++) { // We do it like this so we can identify where we are in the loop
 
 						// Get our 2 bones to connect
 						CatVector bone1, bone2;

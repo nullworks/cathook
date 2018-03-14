@@ -49,7 +49,7 @@ static bool SearchForWindow(Window w = XDefaultRootWindow(xAppDisplay), const ch
   // Recurse into child windows.
  	Window wRoot, wParent; Window* wChild; unsigned nChildren;
  	if (XQueryTree(xAppDisplay, w, &wRoot, &wParent, &wChild, &nChildren) != 0) {
- 		for (int i = 0; i < nChildren; i++) {
+ 		for (unsigned i = 0; i < nChildren; i++) {
  			if (SearchForWindow(wChild[i], process_name)) return true; // Since a child returned true, we return true to go up the chain
  		}
  	}

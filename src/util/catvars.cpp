@@ -41,7 +41,7 @@ CatCommand list_vars("list", [](std::vector<std::string>){
 });
 
 // Menu tree
-void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
+void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
 	// Check if we reached the end if the enum info, if not we can add more to the tree
 	if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing
@@ -130,7 +130,7 @@ void CatVarEnum::callback(std::vector<std::string> args) {
 		return;
 	} catch (std::exception& e) {
 		// Text
-		for (int i = 0; i < cat_enum.size(); i++) {
+		for (size_t i = 0; i < cat_enum.size(); i++) {
 			if (args[0] == cat_enum.at(i)) {
 				value = i;
 				return;

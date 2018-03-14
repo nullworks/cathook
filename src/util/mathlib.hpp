@@ -30,10 +30,10 @@ public:
 	inline CatVector operator/(CatVector value) const { return CatVector(x / value.x, y / value.y, z / value.z); }
 	inline CatVector operator*(float value) 	   const { return CatVector(x * value, y * value, z * value); }
 	inline CatVector operator/(float value)	   const { return CatVector(x / value, y / value, z / value); }
-	inline bool 	operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
-	inline bool 	operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
+	inline bool operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
+	inline bool operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors
-	inline float DistTo(CatVector end) const { return sqrt((pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2))); }
+	inline float DistTo(CatVector end) const { return sqrt(pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2)); }
 };
 
 // Used to store points in a box
@@ -44,20 +44,17 @@ public:
 
 	inline auto GetPoints() const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
 		// Get deltas
-		float x, y, z;
-		x = max.x - min.x;
-		y = max.y - min.y;
-		z = max.z - min.z;
+		auto delta = this->GetDelta();
 		// Expand deltas into 8 points for box
 		std::array<CatVector, 8> points;
 		points[0] = min;
-		points[1] = min + CatVector(x, 0, 0);
-		points[2] = min + CatVector(x, y, 0);
-		points[3] = min + CatVector(0, y, 0);
-		points[4] = min + CatVector(0, 0, z);
-		points[5] = min + CatVector(x, 0, z);
-		points[6] = min + CatVector(0, y, z);
-		points[7] = min + CatVector(x, y, z);
+		points[1] = min + CatVector(delta.x, 0,       0);
+		points[2] = min + CatVector(delta.x, delta.y, 0);
+		points[3] = min + CatVector(0,       delta.y, 0);
+		points[4] = min + CatVector(0,       0,       delta.z);
+		points[5] = min + CatVector(delta.x, 0,       delta.z);
+		points[6] = min + CatVector(0,       delta.y, delta.z);
+		points[7] = min + CatVector(delta.x, delta.y, delta.z);
 		return points;
 	}
 	// Credits to cathook
@@ -77,8 +74,25 @@ public:
 		return true;
 	}
 	inline CatVector GetCenter() const { return (min + max) * 0.5; }
+	inline CatVector GetDelta() const { return max - min; }
 	inline bool operator==(CatBox value) const { return value.min == min && value.max == max; }
 	inline bool operator!=(CatBox value) const { return value.min != min || value.max != max; }
+	inline CatBox operator*(float value) const { // for expanding relative to center
+		// Take the center so we can operate on the delta later
+		CatVector center = this->GetCenter();
+		// Take the delta and do the operation on our box, devide by 2 after so we can add to center
+		CatVector delta = (this->GetDelta() * value) * 0.5;
+		// Recreate the box with the new delta and return
+		return CatBox(center - delta, center + delta);
+	}
+	inline CatBox operator/(float value) const { // for shrinking relative to center
+		// Take the center so we can operate on the delta later
+		CatVector center = this->GetCenter();
+		// Take the delta and do the operation on our box, devide by 2 after so we can add to center
+		CatVector delta = (this->GetDelta() / value) * 0.5;
+		// Recreate the box with the new delta and return
+    return CatBox(center - delta, center + delta);
+	}
 };
 
 // Struct for point in 4d space

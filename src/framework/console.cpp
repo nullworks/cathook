@@ -25,21 +25,21 @@ void CallCommand(std::string input) {
   // Seperate everything in the string to components
   auto tmp = sepstr(input);
   if (tmp.empty()) {
-    g_CatLogging.log("Catcommand empty.");
+    g_CatLogging.log("Catcommand empty: \"%s\"", input.c_str());
     return;
   }
 
   // Try to find command from command list
   CatComBase* command = nullptr;
-  auto find_com = CatCommandMap.find(tmp[0]);
+  auto find_com = CatCommandMap.find(tmp.at(0));
   if (find_com != CatCommandMap.end())
     command = find_com->second;
 
   // Find a CatVar instead
   if (!command) {
-    auto find_var = CatVarMap.find(tmp[0]);
+    auto find_var = CatVarMap.find(tmp.at(0));
     if (find_var == CatVarMap.end()) {
-      g_CatLogging.log("Cannot find command.");
+      g_CatLogging.log("Cannot find command: \"%s\"", tmp.at(0).c_str());
       return;
     }
     command = find_var->second;

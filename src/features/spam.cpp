@@ -36,7 +36,14 @@ const static std::vector<std::string> nekohook_spam({
   "Nekohook - Did I mention that I run arch!",
   "Nekohook - Only real gamers use linux!",
   "Nekohook - the only true multi-hack!",
-  "Nekohook - supporting over 2 games!" // I need more games :/
+  "Nekohook - supporting over 2 games!", // I need more games :/
+
+  // Credits to Nopey Nopey
+  "Nekohook - Minecraft W10 Edition Support coming soon!",
+  "Nekohook - The father is not the son",
+  "Nekohook - I crashed GDB. Do I get a cookie?",
+  "Nekohook - my cheat works",
+  "Nekohook - :thk:"
 });
 const static std::vector<std::string> cathook_spam({
     "cathook - more fun than a ball of yarn!",
@@ -112,7 +119,7 @@ static std::string GetSpamString(){
     return std::string();
 
   // Spam number
-  static int last_spam = -1; // last line spammed
+  static size_t last_spam = 0; // last line spammed
   last_spam++;
   if (last_spam >= spam_group->size()) // clamp around
     last_spam = 0;

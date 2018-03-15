@@ -19,8 +19,10 @@ namespace features::antiaim {
 
 static CatEnum antiaim_menu({"Anti-Aim"});
 static CatVarBool enabled(antiaim_menu, "antiaim", false, "Enable Anti-Aim", "Master Anti-Aim switch");
-static CatVarEnum aa_pitch(antiaim_menu, {"OFF", "FIXED", "UP", "DOWN", "FAKEUP", "FAKEDOWN", "FAKECENTER", "RANDOM", "BIGRANDOM", "FLIP", "FAKEFLIP"}, "antiaim_pitch", 0, "AA Pitch Type", "Type of anti-aim to use for pitch");
-static CatVarEnum aa_yaw(antiaim_menu, {"OFF", "FIXED", "FIXEDOFFSET", "RANDOM", "BIGRANDOM", "FLIP", "SPIN", "EDGE"}, "antiaim_yaw", 0, "AA Yaw Type", "Type of anti-aim to use for yaw");
+static CatEnum aa_pitch_enum({"OFF", "FIXED", "UP", "DOWN", "FAKEUP", "FAKEDOWN", "FAKECENTER", "RANDOM", "BIGRANDOM", "FLIP", "FAKEFLIP"});
+static CatVarEnum aa_pitch(antiaim_menu, aa_pitch_enum, "antiaim_pitch", 0, "AA Pitch Type", "Type of anti-aim to use for pitch");
+static CatEnum aa_yaw_enum({"OFF", "FIXED", "FIXEDOFFSET", "RANDOM", "BIGRANDOM", "FLIP", "SPIN", "EDGE"});
+static CatVarEnum aa_yaw(antiaim_menu, aa_yaw_enum, "antiaim_yaw", 0, "AA Yaw Type", "Type of anti-aim to use for yaw");
 static CatVarFloat aa_pitch_amt(antiaim_menu, "antiaim_pitch_fixed", 0, "AA Pitch Fixed", "Value for fixed anti-aim");
 static CatVarFloat aa_yaw_amt(antiaim_menu, "antiaim_yaw_fixed", 0, "AA Yaw Fixed", "Value for fixed anti-aim");
 static CatVarFloat aa_spin_amt(antiaim_menu, "antiaim_spin_amt", 2.5f, "AA Spin Speed", "How fast to spin to win");

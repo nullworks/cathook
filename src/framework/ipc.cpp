@@ -121,6 +121,6 @@ public:
   }
 };
 #else
-  #warning "IPC DISABLED"
+  #pragma message ("IPC DISABLED")
 #endif
 }

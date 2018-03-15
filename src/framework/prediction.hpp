@@ -28,6 +28,17 @@ inline float DistanceToGround(CatEntity* entity) {
     auto orig = GetOrigin(entity);
     ret = orig.DistTo(trace::trace_terrain(orig, util::ExtendLine(orig, CatVector(89), 8192.0f)));
   }
-
   return ret;
+}
+
+extern CMFunction<bool(CatEntity*)> OnGround;
+
+namespace pred {
+
+// Gives the downward acceleration that a player recieves every worldtick
+extern CMFunction<float(CatEntity*)> GetGravity;
+
+// Gives velocity of an object
+CatVector GetVelocity(CatEntity* entity);
+
 }

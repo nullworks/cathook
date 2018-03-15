@@ -55,7 +55,7 @@ uintptr_t GetObjectSignature(const SharedObject& shared_obj, const char* chPatte
 		}, (void*)&tmp))
 			return findPattern(std::get<1>(tmp), std::get<1>(tmp) + std::get<2>(tmp), chPattern);
 	#else
-		#warning "Unable to get signatures for this platform"
+		#pragma message ("Unable to get signatures for this platform")
 	#endif
 	g_CatLogging.log("Couldnt find signature for \"%s\" at \"%s\"",shared_obj.file_name, chPattern);
 	return 0;

@@ -54,7 +54,7 @@ public:
 		points[4] = min + CatVector(0,       0,       delta.z);
 		points[5] = min + CatVector(delta.x, 0,       delta.z);
 		points[6] = min + CatVector(0,       delta.y, delta.z);
-		points[7] = min + CatVector(delta.x, delta.y, delta.z);
+		points[7] = max;
 		return points;
 	}
 	// Credits to cathook

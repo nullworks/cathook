@@ -16,7 +16,11 @@
 #include "catvars.hpp"
 
 // The CatCommand map
-std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) CatVarMap; // Need to init this before other catvars are inited
+std::unordered_map<std::string, CatVar*>
+#ifdef __GNUC__
+ 	__attribute__ ((init_priority (102)))// Need to init this before other catvars are inited
+#endif
+CatVarMap;
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 

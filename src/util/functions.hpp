@@ -70,13 +70,18 @@ public:
   CMEvent during_event;
   CMEvent after_event;
   inline void operator()() {
+    in_event = true;
     before_event();
     during_event();
     after_event();
+    in_event = false;
   }
-  void REventBefore(void_func in) {before_event.add(in);};
-  void REventDuring(void_func in) {during_event.add(in);};
-  void REventAfter(void_func in) {after_event.add(in);};
+  inline void REventBefore(void_func in) {before_event.add(in);}
+  inline void REventDuring(void_func in) {during_event.add(in);}
+  inline void REventAfter(void_func in) {after_event.add(in);}
+  inline bool GetInEvent(){return in_event;}
+private:
+  bool in_event;
 };
 
 // a class to make loop threading easier

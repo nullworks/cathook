@@ -52,7 +52,7 @@ void SharedObject::RefreshLmap(){
 	if (this->lmap)
 		return;
 	#if defined(__linux__)
-		while (!(this->lmap = (CatLinkMap)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
+		while (!(this->lmap = (CatLinkMap_t)dlopen(path.c_str(), RTLD_NOLOAD | RTLD_NOW | RTLD_LOCAL))) {
 			auto error = dlerror();
 			if (error) g_CatLogging.log("DLERROR: %s", error);
 			std::this_thread::sleep_for(std::chrono::milliseconds(250));

@@ -13,8 +13,9 @@ private:
   // We use steady as it is constant and cant be changed
   std::chrono::time_point<std::chrono::steady_clock> last_time;
 public:
-  inline void Reset() {
+  inline CatTimer& Reset() { // A reference in case of Init
     last_time = std::chrono::steady_clock::now();
+    return *this;
   }
   inline bool CheckTime(std::chrono::steady_clock::duration dur) {
     return std::chrono::steady_clock::now() - last_time > dur;

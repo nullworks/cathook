@@ -21,18 +21,12 @@ namespace features::spam {
 const static CatEnum spam_menu({"Spam"});
 static CatEnum spam_type_enum({"OFF", "NEKOHOOK", "CATHOOK", "LMAOBOX", "LITHIUM", "NULLCORE", "CUSTOM"});
 static CatVarEnum spam_type(spam_menu, spam_type_enum, "spam", 0, "Spam", "Choose your type of spam!");
+static CatVarBool spam_random(spam_menu, "spam_random", false, "Spam Random", "Randomly use a line to spam!");
 static CatVarString spam_file(spam_menu, "spam_file", "default.txt", "Spam File", "Put in a file to use with custom spam");
-static CatVarFloat spam_time(spam_menu, "spam_time", 3, "Spam Time", "Time to wait between each spam!");
+static CatVarFloat spam_time(spam_menu, "spam_time", 2, "Spam Time", "Time to wait between each spam!");
 
 const static std::vector<std::string> nekohook_spam({
-  "Uhh, ur bad",
-  "Why are you even here?",
-  "Do you like staring at my temporary spam?",
-  "Do something better with your life...",
-  "Oh wait, why cant I do something better with my life ;(",
-  "I guess I'll just go kill myself because I'm so useless:/"
-  "Now to the real spam suggestions...",
-
+  // Onee-chan's
   "Nekohook - Did I mention that I run arch!",
   "Nekohook - Only real gamers use linux!",
   "Nekohook - the only true multi-hack!",
@@ -44,6 +38,8 @@ const static std::vector<std::string> nekohook_spam({
   "Nekohook - I crashed GDB. Do I get a cookie?",
   "Nekohook - my cheat works",
   "Nekohook - :thk:"
+
+  // More?
 });
 const static std::vector<std::string> cathook_spam({
     "cathook - more fun than a ball of yarn!",
@@ -90,8 +86,19 @@ static CatCommand spam_add("spam_add", [](std::vector<std::string> args){
     g_CatLogging.log("Nothing to add to custom spam!");
     return;
   }
+  custom_spam.push_back(args.at(0));
+  g_CatLogging.log("Added \"%s\" to custom spam!");
+});
 
-  g_CatLogging.log("Reloaded Custom Spam!");
+static CatCommand spam_remove("spam_remove", [](std::vector<std::string> args){
+  g_CatLogging.log("Feature TODO, set custom spam to something that doesnt exist and reload to clear all!");
+  return;
+  if (args.empty()) {
+    g_CatLogging.log("Nothing to remove from custom spam!");
+    return;
+  }
+  custom_spam.push_back(args.at(0));
+  g_CatLogging.log("Removed all instances of \"%s\" from custom spam!");
 });
 
 static std::string GetSpamString(){
@@ -124,7 +131,7 @@ static std::string GetSpamString(){
   if (last_spam >= spam_group->size()) // clamp around
     last_spam = 0;
 
-  return spam_group->at(last_spam);
+  return spam_group->at(spam_random ? rand() % spam_group->size() : last_spam);
 }
 
 // Externed, please set in your module to enable chat spam features
@@ -139,7 +146,7 @@ static void SpamLoop() {
   if (last_spam.ResetAfter(std::chrono::seconds(spam_time))) {
 
     auto spam_string = GetSpamString();
-    if (!spam_string.empty())
+    if (spam_string.empty())
       return;
 
     SayChat(spam_string.c_str());

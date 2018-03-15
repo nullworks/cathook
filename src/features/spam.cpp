@@ -21,7 +21,7 @@ namespace features::spam {
 const static CatEnum spam_menu({"Spam"});
 static CatEnum spam_type_enum({"OFF", "NEKOHOOK", "CATHOOK", "LMAOBOX", "LITHIUM", "NULLCORE", "CUSTOM"});
 static CatVarEnum spam_type(spam_menu, spam_type_enum, "spam", 0, "Spam", "Choose your type of spam!");
-static CatVarBool spam_random(spam_menu, "spam_random", false, "Spam Random", "Randomly use a line to spam!");
+static CatVarBool spam_random(spam_menu, "spam_random", true, "Spam Random", "Randomly use a line to spam!");
 static CatVarString spam_file(spam_menu, "spam_file", "default.txt", "Spam File", "Put in a file to use with custom spam");
 static CatVarFloat spam_time(spam_menu, "spam_time", 2, "Spam Time", "Time to wait between each spam!");
 
@@ -31,7 +31,8 @@ const static std::vector<std::string> nekohook_spam({
   "Nekohook - Only real gamers use linux!",
   "Nekohook - the only true multi-hack!",
   "Nekohook - supporting over 2 games!", // I need more games :/
-
+  "Nekohook - Get it at https://github.com/oneechanhax/nekohook", // Why not advertise while were at it!
+  "Nekohook - Get it at https://github.com/oneechanhax/nekohook",
   // Credits to Nopey Nopey
   "Nekohook - Minecraft W10 Edition Support coming soon!",
   "Nekohook - The father is not the son",

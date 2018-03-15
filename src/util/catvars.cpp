@@ -10,7 +10,8 @@
 
 #include <exception>
 
-#include "../framework/input.hpp" // CatVarKey uses it to look for catkeys
+#include "../framework/input.hpp" // CatVarKey uses it to look for catkeys as well as its Depressed Function
+#include "strings.hpp"
 #include "logging.hpp"
 
 #include "catvars.hpp"
@@ -127,21 +128,19 @@ void CatVarEnum::callback(std::vector<std::string> args) {
 		g_CatLogging.log("%s: %f", name.c_str(), value);
 		return;
 	}
-
-	// int input
-	try {
-		value = std::stoi(args[0]);
-		return;
-	} catch (std::exception& e) {
-		// Text
-		for (size_t i = 0; i < cat_enum.size(); i++) {
-			if (args[0] == cat_enum.at(i)) {
-				value = i;
-				return;
-			}
+	// Text
+	for (size_t i = 0; i < cat_enum.size(); i++) {
+		if (fuzstrcmp(args[0], cat_enum.at(i))) {
+			value = i;
+			return;
 		}
 	}
-	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+  // int input
+  try {
+    value = std::stoi(args[0]);
+  } catch (std::exception& e) {
+	   g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+  }
 }
 std::string CatVarEnum::GetValue() {
 	// Try catch still doesnt fix error :/
@@ -152,6 +151,7 @@ std::string CatVarEnum::GetValue() {
 		return std::to_string(value);
 	}
 }
+inline bool CatVarKey::Depressed() const { return input::pressed_buttons[this->value];}
 void CatVarKey::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
@@ -160,8 +160,8 @@ void CatVarKey::callback(std::vector<std::string> args) {
 	}
 	// Text input
 	for (int i = 0; i < CATKEY_COUNT; i++) {
-		if (args[0] == std::string("CATKEY_") + input::key_names[i] || args[0] == input::key_names[i]) {
-			value = i;
+		if (fuzstrcmp(args[0], std::string("CATKEY_") + input::key_names[i]) || fuzstrcmp(args[0], input::key_names[i])) {
+			this->value = i;
 			return;
 		}
 	}

@@ -31,6 +31,6 @@ gdb -n -q -batch \
   -ex "call \$dlopen(\"$(realpath libnekohook.so)\", 1)" \
   -ex "call dlerror()" \
   -ex 'print (char *) $2' \
-  -ex "catch exit" \
+  -ex "catch throw" \
   -ex "continue" \
   -ex "backtrace"

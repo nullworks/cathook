@@ -58,6 +58,7 @@ class CatVarKey : public CatVarInt {
 public:
 	CatVarKey(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long) {}
+	inline bool Depressed() const;
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
 };

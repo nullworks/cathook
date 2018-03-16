@@ -6,6 +6,7 @@
  *
  */
 
+#include "../util/functions.hpp"
 #include "../framework/entitys.hpp"	// Contains entity and bone info
 
 namespace features::aimbot {
@@ -17,7 +18,7 @@ extern CMFunction<CatVector(CatEntity*)> GetAutoHitbox;
 CatVector RetrieveAimpoint(CatEntity* entity, int mode);
 
 // For modules to add their target selection stuff, return true if target is acceptable
-extern std::vector<bool(*)(CatEntity*)> TargetSelectionModule;
+extern std::vector<CMFunction<bool(CatEntity*)>> TargetSelectionModule;
 
 extern CatEntity* highlight_target;
 

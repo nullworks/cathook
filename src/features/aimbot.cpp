@@ -125,7 +125,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 // Target Selection
 
 // For modules to add their target selection stuff
-std::vector<bool(*)(CatEntity*)> TargetSelectionModule;
+std::vector<CMFunction<bool(CatEntity*)>> TargetSelectionModule;
 
 // A second check to determine whether a target is good enough to be aimed at
 static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
@@ -223,7 +223,7 @@ static bool ShouldAim() {
 	// Alive check
 	if (!GetAlive(local_ent)) return false;
 	// Aimkey
-	if (aimkey && !input::pressed_buttons[aimkey]) return false;
+	if (!aimkey.Depressed()) return false;
 
 	return true;
 }

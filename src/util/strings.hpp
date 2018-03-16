@@ -33,9 +33,9 @@ inline size_t fuzstrstr(const std::string& main, const std::string& sub) { // st
   return reduce_str(main).find(reduce_str(sub));
 }
 // A "fuzzy" strcmp
-inline int fuzstrcmp(const char* str1, const char* str2) {
+inline auto fuzstrcmp(const char* str1, const char* str2) {
 	return strcmp(reduce_str(str1).c_str(), reduce_str(str2).c_str());
 }
-inline bool fuzstrcmp(const std::string& str1, const std::string& str2) { // std::string version
+inline auto fuzstrcmp(const std::string& str1, const std::string& str2) { // std::string version
 	return reduce_str(str1) == reduce_str(str2);
 }

@@ -34,3 +34,6 @@ constexpr const char* Platform(const char* _linux = "", const char* _windows = "
 		#error "Unknown Platform"
 	#endif
 }
+
+// Since __has_include is new, we should make it not likely to break due to it not being defined
+#define HAS_INCLUDE(x) (defined(__has_include) && !__has_include(x))

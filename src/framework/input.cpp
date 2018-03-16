@@ -78,4 +78,11 @@ const char* key_names[] = {
 	"M_WHEEL_UP", "M_WHEEL_DOWN"
 };
 
+#if false
+#include "../util/functions.hpp"
+CMFunction<std::pair<int, int>> GetWindowBounds;
+CMFunction<std::pair<int, int>> GetMousePos;
+CMFunction<bool(int)> GetPressed;
+#endif
+
 }

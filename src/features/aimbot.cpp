@@ -44,7 +44,7 @@ static CatEnum silent_aim_enum({"OFF", "SNAPBACK", "MODULE"});
 static CatVarEnum silent_aim(aimbot_menu, silent_aim_enum, "aimbot_silent", 0, "Silent aimbot", "SNAPBACK: Snaps the aimbot back after aiming\n"
 																																																							"MODULE: Uses the modules own version of silent, if any");
 static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug info about aimbot");
-
+// TODO: static CatVarInt multipoint(aimbot_menu, "aimbot_multipoint", 8, "Multipoint", "How many points to check");
 
 // Hitbox selection
 
@@ -55,6 +55,24 @@ CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](auto){ return CatVector(); }
 // A function to find a place to aim for on the target
 CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 
+#if false
+	auto TryMultiPt = [&](const CatBox& in) -> CatVector {
+		if (!multipoint) return in.GetCenter();
+		int need_recur = multipoint / 8;
+		auto TryMultiPt_internal = [&](int recur) {
+			// The most we want to go out is .9 of the original size
+			// Take the amount of times we will recurse,
+			// TODO: make multipoint recurse from the center, math skills needed
+			auto shrink = (in * 0.9) / (recursions - needed_recursions / recursions)
+			// Try to find a point that fits
+			for (const auto i : shrink.GetPoints())
+				if (trace::trace_entity(entity, GetCamera(GetLocalPlayer()), i))
+					return i;
+			// If we didnt find a point, try to recurse
+			return try_multipoints(in, needed_recursions, recur_left--);
+		}
+	};
+#endif
 	// Check if we can use bones
 	// Get our best bone
 	switch(mode) {

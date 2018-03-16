@@ -108,3 +108,50 @@ private:
   CMFunction<void()> thread_loop;
   int state = RUNNING;
 };
+
+// Is to be used like an ordered map, but by replacing hashing with iteration, it can be faster with a small amount of items
+// It is very simple, it has limited uses but that shouldnt hurt much in the way i use it
+template<typename T_Key, typename T_Value>
+class CatFastMap {
+public:
+  using bucket_values = std::pair<T_Key, T_Value>;
+  using bucket_type = std::vector<bucket_values>;
+  CatFastMap(){}
+  CatFastMap(const bucket_type& _bucket) {
+    this = _bucket;
+  }
+  CatFastMap(std::initializer_list<bucket_values> _bucket) {
+    bucket_type tmp = _bucket;
+    *this = tmp;
+  }
+  // vector funcs
+  inline void operator=(const bucket_type& input) {
+    this->clear();
+    for (const auto& i : input)
+      this->insert(i); // We do this to multiple same keys
+  }
+  inline void clear() { this->bucket.clear(); }
+  inline auto size() const { return this->bucket.size(); }
+  inline auto begin() const {return this->bucket.begin();} // TODO: fix iterators
+  inline auto end() const {return this->bucket.end();}
+  // map funcs
+  inline void insert(const bucket_values& in) {
+    if (this->find(in.first) != this->end()) // Gotta retain normal map behaviour
+      return;
+    this->bucket.push_back(in);
+  }
+  inline auto& operator[](const T_Key& i) { return this->find(i); }
+  inline const auto& operator[](const T_Key& i) const { return this->find(i); }
+  inline auto find(const T_Key& in) {
+    for (int i = 0; i < this->bucket.size(); i++)
+      if (this->bucket[i].first == in) return this->bucket.begin() + i;
+    return this->bucket.end();
+  }
+  inline const auto find(const T_Key& in) const {
+    for (int i = 0; i < this->bucket.size(); i++)
+      if (this->bucket[i].first == in) return this->bucket.begin() + i;
+    return this->bucket.end();
+  }
+private:
+  bucket_type bucket;
+};

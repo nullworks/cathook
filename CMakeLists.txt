@@ -42,7 +42,7 @@ EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/module
 
 # Flags we use for every build type
 set(CMAKE_CXX_STANDARD 17)
-set(CCOMMON_FLAGS "-mtune=generic -O3")
+set(CCOMMON_FLAGS "")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -93,36 +93,9 @@ if(USE_XLIB)
   list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/xlib.cpp")
 endif()
 
-# Debug info
-if (CMAKE_BUILD_TYPE MATCHES DEBUG)
-  foreach (ITR ${SOURCE_FILES})
-    message(STATUS "Building with:${ITR}")
-  endforeach()
-endif()
-
-# Set git hash and date if possible
-find_package(Git)
-if(GIT_FOUND)
-	execute_process(
-	  COMMAND git log -1 --pretty="%h"
-	  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	  OUTPUT_VARIABLE GIT_COMMIT_HASH
-	  OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
-	execute_process(
-	  COMMAND git log -1 --pretty="%ai"
-	  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	  OUTPUT_VARIABLE GIT_COMMIT_DATE
-	  OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	add_definitions("-DGIT_COMMIT_DATE=${GIT_COMMIT_DATE}")
-endif()
-
-
 # Default compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} -s -mtune=generic -O3")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 

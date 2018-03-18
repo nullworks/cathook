@@ -16,12 +16,10 @@
 
 #include "esp.hpp"
 
-// TODO, phase out esp cache
-
 namespace features::esp {
 
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
-CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
+static CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
 static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
@@ -52,6 +50,9 @@ static CatVarEnum tracers(esp_menu, tracers_enum, "esp_tracers", 2, "Tracers", "
 // Other
 static CatEnum box_mode_enum({"Collision", "Bone", "Hitbox"});
 static CatVarEnum box_mode(esp_menu, box_mode_enum, "esp_box_mode", 0, "Box mode", "What method to use to get the esp box");
+
+// Externed, add you functions to get strings onto entities
+std::vector<CMFunction<std::pair<const char*, CatVector4>(CatEntity*)>> GetEntityStrings;
 
 // Esp draw func to be ran at draw
 static void Draw() {
@@ -136,8 +137,7 @@ static void Draw() {
 			// We now have our entity box, set the state and return true
 			sbox_state = SBOX_SUCCESSFUL;
 		 	return true;
-	 };
-
+	 	};
 
 		// Get our color
 		auto ent_color = colors::EntityColor(entity);
@@ -256,6 +256,13 @@ static void Draw() {
 				static char buf[8];
 				sprintf(buf, "%im", (int)GetDistance(entity));
 				str_cache.push_back(std::make_pair(buf, colors::white));
+			}
+
+			// Write module strings
+			for (auto i : GetEntityStrings) {
+				auto tmp = i(entity);
+				if (!tmp.first) continue;
+				str_cache.push_back(tmp);
 			}
 		}
 		// Check if there is strings to draw

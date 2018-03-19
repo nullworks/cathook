@@ -30,7 +30,7 @@ const static std::vector<std::string> nekohook_spam({
   "Nekohook - Did I mention that I run arch!",
   "Nekohook - Only real gamers use linux!",
   "Nekohook - the only true multi-hack!",
-  "Nekohook - supporting over 2 games!", // I need more games :/
+  "Nekohook - supporting over 3 games!", // Team Fortress 2, Fistful of frags, and CSGO!
   "Nekohook - Get it at https://github.com/oneechanhax/nekohook", // Why not advertise while were at it!
   "Nekohook - Get it at https://github.com/oneechanhax/nekohook",
   // Credits to Nopey Nopey

@@ -140,6 +140,20 @@ public:
       return;
     this->bucket.push_back(in);
   }
+  inline void set(const bucket_values& in) { // use to set a variable inside the map, if it doesnt exist it constructs it
+    this->erase(in.first);// TODO, fix below
+    this->insert(in);
+    /*auto find = this->find(in.first);
+    if (find == this->end())
+      this->insert(in);
+    else { // TODO, fix
+      find = in;*/
+  }
+  inline void erase(const T_Key& in){
+    auto find = this->find(in);
+    if (find != this->end())
+      bucket.erase(find);
+  }
   inline auto& operator[](const T_Key& i) { return this->find(i); }
   inline const auto& operator[](const T_Key& i) const { return this->find(i); }
   inline auto find(const T_Key& in) {

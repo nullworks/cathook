@@ -6,10 +6,10 @@
  *      Author: nullifiedcat
  */
 
-#include "gui.hpp"
+//#include "gui.hpp"
 
 namespace gui {
 
-base::CBaseRoot g_pGui;
+//base::CBaseRoot g_pGui;
 
 }

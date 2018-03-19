@@ -12,9 +12,9 @@
 
 // Stuff to init
 #include "gui.hpp"
-#include "menu/menu.hpp"
+//#include "menu/menu.hpp"
 #include "hudstrings/sidestrings.hpp"
-#include "base/examples/test_window.hpp"
+//#include "base/examples/test_window.hpp"
 
 #include "init.hpp"
 

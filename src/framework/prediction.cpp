@@ -60,7 +60,9 @@ static void AfterWorldTick(){
 }
 
 // Gives the downward acceleration that a player recieves every worldtick
-CMFunction<float(CatEntity*)> GetGravity{[](auto){return 0.0f;}}; // TODO!
+CMFunction<float(CatEntity*)> GetGravity{[](auto){
+  return 0.0f;
+}}; // TODO!
 
 // Gives velocity of an object
 CatVector GetVelocity(CatEntity* entity) {
@@ -70,7 +72,7 @@ CatVector GetVelocity(CatEntity* entity) {
   // Generate velocity, NOTE: this is a general velocity, we need something better to account a change over time in the case of airstrafing. This is a maybe though...
   CatVector velocity;
   for (size_t i = 0; i < p_data.origins.size() - 1; i++) {
-    auto delta = p_data.origins.at(i) - p_data.origins.at(i + 1);
+    auto delta = p_data.origins[i] - p_data.origins[i + 1];
     if (i == 0) // If its the first time looping, we cant average 2 deltas
       velocity = delta;
     else // meanwhile we average these

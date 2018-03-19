@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "base/CBaseRoot.hpp"
+//#include "base/CBaseRoot.hpp"
 
 namespace gui {
 
-extern base::CBaseRoot g_pGui;
+//extern base::CBaseRoot g_pGui;
 
 }

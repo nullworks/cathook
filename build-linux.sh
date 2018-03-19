@@ -6,7 +6,9 @@ build_dir=bin/lin
 # build cmake
 mkdir -p $build_dir
 cd $build_dir
-cmake $cur_dir $@ # pass the args to cmake
+if [ ! -f CMakeCache.txt ]; then
+ cmake $cur_dir $@ # pass the args to cmake
+fi
 
 # make  with all threads
 make -j$(nproc)

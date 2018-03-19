@@ -19,7 +19,7 @@ instance=0
 pid=0
 no_scramble=0
 filename="$(realpath libnekohook.so)"
-while getopts :hbdi:p:sf:c arg; do
+while getopts :hbgdi:p:sf:c arg; do
   case $arg in
     \?)
       echo "$(basename "$0"): unrecognized option '$OPTARG'"
@@ -45,6 +45,7 @@ while getopts :hbdi:p:sf:c arg; do
       ;;
     g)
       repl=1
+      ;;
     d)
       detach=1
       ;;
@@ -138,10 +139,10 @@ echo Using "$filename" with "$(ps -p $pid -o comm=)"
 
 # Adding commands to gdb dynamicly is tricky with bash, but we can do much simpler with this
 GDB_COMMANDS="/tmp/gdb-tmp"
-GDB_ARGS = "-n -q --command=$GDB_COMMANDS"
+GDB_ARGS="-n -q --command=$GDB_COMMANDS"
 
 # REPL (Batch Mode)
-if [ $repl == 0 ]
+if [ $repl == 0 ]; then
   echo "No REPL, using GDB's Batch Mode"
   GDB_ARGS = "$GDB_ARGS -batch"
 else

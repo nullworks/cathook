@@ -182,7 +182,7 @@ if [ $backtrace == 0 ]; then
 # Backtrace
 else
   echo "Backtracing!"
-  echo "catch exit exit_group">>$GDB_COMMANDS
+  #echo "catch exit exit_group">>$GDB_COMMANDS
   echo "continue">>$GDB_COMMANDS
   echo "backtrace">>$GDB_COMMANDS
 fi
@@ -191,11 +191,9 @@ fi
 gdb $GDB_ARGS
 rm $GDB_COMMANDS
 
-# Remove for safety
 if [ $no_scramble == 0 ]; then
-  rm $filename
+  rm $filename # Remove for safety
+  sleep 1
+  sudo killall -18 steamwebhelper
+  sudo killall -18 steam
 fi
-
-sleep 1
-sudo killall -18 steamwebhelper
-sudo killall -18 steam

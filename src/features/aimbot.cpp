@@ -50,7 +50,7 @@ static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug
 
 
 // Somewhere to store the auto-hitbox function
-CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](auto){ return CatVector(); }};
+CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](CatEntity* entity){ return RetrieveAimpoint(entity, 3); }};
 
 // A function to find a place to aim for on the target
 CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
@@ -71,7 +71,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 			// If we didnt find a point, try to recurse
 			return try_multipoints(in, needed_recursions, recur_left--);
 		}
-	};
+	};*/
 #endif
 	// Check if we can use bones
 	// Get our best bone

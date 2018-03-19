@@ -13,7 +13,7 @@
 #include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
-
+#include "../util/logging.hpp"
 #include "esp.hpp"
 
 namespace features::esp {
@@ -168,23 +168,25 @@ static void Draw() {
 				};
 				// Loop through the bone sets
 				for (const auto& current_set : bonesets) {
-
+					static CatVector last_bone = CatVector(); // Our last bone location as we might not get every bone
 					// Draw the bones in the bone set
 					for (size_t ii = 0; ii < current_set.size() - 1; ii++) { // We do it like this so we can identify where we are in the loop
-
 						// Get our 2 bones to connect
 						CatVector bone1, bone2;
-						if (GetBoneCenter(entity, current_set[ii], bone1) && GetBoneCenter(entity, current_set[ii + 1], bone2)) {
-
-							// World to screen them
-							CatVector scn1, scn2;
-							if (draw::WorldToScreen(bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
-
-								// Draw a line connecting the points
-								draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, ent_color);
+						if (last_bone != CatVector() || GetBoneCenter(entity, current_set[ii], bone1)) {
+							if (GetBoneCenter(entity, current_set[ii + 1], bone2)) {
+								// World to screen them
+								CatVector scn1, scn2;
+								if (draw::WorldToScreen((last_bone != CatVector()) ? last_bone : bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
+									// Draw a line connecting the points
+									draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, ent_color);
+								}
+							last_bone = bone2; // save the bone so we dont need it again
 							}
 						}
 					}
+					// Clear it out as we dont want a different set connecting to it
+					last_bone = CatVector();
 				}
 
 				// Debug for bone esp, prints strings on screen of what bone is being represented

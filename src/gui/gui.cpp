@@ -19,5 +19,4 @@ CatVarKey field_leftkey(gui_menu, "gui_field_lefttkey", CATKEY_LEFT, "GUI Field 
 CatVarKey field_rightkey(gui_menu, "gui_field_rightkey", CATKEY_RIGHT, "GUI Field Right Button", "In a text field, moves cursor right.");
 CatVarKey field_escapekey(gui_menu, "gui_field_escapekey", CATKEY_ENTER, "GUI Field Finish Button", "In a text field, releases focus.");
 base::CBaseRoot g_pGui;
-
 }

@@ -6,7 +6,7 @@
  */
 
 #include "../util/catvars.hpp"
-#include "../gui/base/CBaseWindow.hpp"
+//#include "../gui/base/CBaseWindow.hpp"
 
 #include "radar.hpp"
 

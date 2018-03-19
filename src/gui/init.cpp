@@ -12,10 +12,15 @@
 #include "../framework/input.hpp"			// For key_pressed & released callbacks
 
 // Stuff to init
+<<<<<<< HEAD
 //#include "gui.hpp"
 #include "menu/menu.hpp"
+=======
+#include "gui.hpp"
+//#include "menu/menu.hpp"
+>>>>>>> 5a757086e5dd7f5aeb142f17fe8ec7cd352becf1
 #include "hudstrings/sidestrings.hpp"
-#include "base/examples/test_window.hpp"
+//#include "base/examples/test_window.hpp"
 
 #include "init.hpp"
 

@@ -47,6 +47,8 @@ CatCommand debug_ent_dump("debug_entity_dump", [](std::vector<std::string>){
       GetName(ent), GetOrigin(ent) != CatVector(), GetCollision(ent) != CatBox(),
       GetSteamId(ent));
   }
+  tmp_log.log("End Entity Info Dump---");
+  g_CatLogging.log("End Entity Info Dump---");
 });
 
 // todo fov debug

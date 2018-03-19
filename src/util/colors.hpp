@@ -57,7 +57,17 @@ const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 // Color functions
 extern CMFunction<CatVector4(CatEntity*)> EntityColor;
 
-CatVector4 Health(CatEntity* entity);
+// Returns a color based on entity health
+inline CatVector4 Health(CatEntity* entity) {
+	if (GetHealth(entity) > GetMaxHealth(entity))	// If health is too much, they must be over their normal health so we make them blue
+		return CatVector4(64, 128, 255, 255);
+
+	// Percentage of health our of max
+	float hf = (float)GetHealth(entity) / (float)GetMaxHealth(entity);
+	// Sick logic
+	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
+}
+
 CatVector4 RainbowCurrent();
 
 }

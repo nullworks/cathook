@@ -6,13 +6,6 @@
  *
  */
 
-#include <cstring>
-#include <fstream> // to read/write to files
-#ifdef __linux__
-  #include <unistd.h>
-  #include <pwd.h>
-#endif
-
 #include "../util/logging.hpp"
 #include "../util/catvars.hpp"
 #include "../util/iohelper.hpp"
@@ -24,15 +17,6 @@
 
 namespace configs {
 
-// Save location
-std::string SAVE_LOC() {
-  std::string ret;
-  #if defined(__linux__)
-    ret = std::string(getpwuid(getuid())->pw_dir) + "/.config/nekohook/";
-  #endif
-  return ret;
-}
-
 CatCommand LoadConfig("load", [](std::vector<std::string> args) {
 
   // args check
@@ -40,38 +24,24 @@ CatCommand LoadConfig("load", [](std::vector<std::string> args) {
     g_CatLogging.log("Missing input argument");
     return;
   }
-  auto cfg_name = args[0];
 
   // Ensure we have .cfg to make loading file easy
-  if (cfg_name.find(".cfg") == std::string::npos)
-    cfg_name += ".cfg";
+  if (args.at(0).find(".cfg") == std::string::npos)
+    args.at(0) += ".cfg";
 
-  cfg_name = SAVE_LOC() + "cfg/cat" + cfg_name;
+  // Get where the file is likely to be stored
+  args.at(0) = io::GetSaveLocation() + "cfg/cat" + args.at(0);
 
-  try {
-    // Open the file
-  	std::ifstream cfg_stream(cfg_name.c_str());
-    if (!cfg_stream.is_open()) {
-      g_CatLogging.log("Couldnt Open %s", cfg_name.c_str());
-      return;
-    }
+  // Read from the file
+  auto tmp = io::ReadFile(args.at(0));
+  if (tmp.empty()) // if empty, something probs happened and we wont be able to load the config
+    return;
 
-  	// Recurse through the lines of the file
-  	while (!cfg_stream.eof()) {
-  		// Get our line
-  		char buffer[256];
-  		cfg_stream.getline(buffer, sizeof(buffer));
+  // Call all of the lines as commands
+  for (auto i : tmp)
+    CallCommand(i);
 
-      // Dont run empty commands
-      if (strlen(buffer) == 0) continue;
-
-      // Execute it
-      CallCommand(buffer);
-    }
-    g_CatLogging.log("Loaded %s successfully!", cfg_name.c_str());
-  } catch (const std::ios_base::failure& e) {
-    g_CatLogging.log("Couldnt Load Config: %s", e.what());
-  }
+  g_CatLogging.log("Loaded %s successfully!", args.at(0).c_str());
 });
 
 CatCommand SaveConfig("save", [](std::vector<std::string> args) {
@@ -81,49 +51,43 @@ CatCommand SaveConfig("save", [](std::vector<std::string> args) {
     g_CatLogging.log("Missing input argument");
     return;
   }
-  auto cfg_name = args[0];
 
   // Ensure we have .cfg to make saving file easy
-  if (cfg_name.find(".cfg") == std::string::npos)
-    cfg_name += ".cfg";
+  if (args.at(0).find(".cfg") == std::string::npos)
+    args.at(0) += ".cfg";
 
   // Make it a path to file
-  cfg_name = std::string(SAVE_LOC()) + "cfg/cat" + cfg_name;
+  args.at(0) = io::GetSaveLocation() + "cfg/cat" + args.at(0);
 
   // Make directories if needed
-  CreateDirectorys(std::string(SAVE_LOC()) + "cfg");
+  io::CreateDirectorys(io::GetSaveLocation() + "cfg");
 
-  try {
-    // Create the file stream
-    std::fstream cfg_stream(cfg_name, std::ios::out | std::ios_base::trunc);
-    if (!cfg_stream.is_open()) {
-      g_CatLogging.log("Couldnt Open %s", cfg_name.c_str());
-      return;
-    }
+	// Generate a list of commands from catvars
+  std::vector<std::string> cfg_lines;
+	for (const auto& catvar : CatVarMap)
+    cfg_lines.push_back(catvar.second->name + ' ' + catvar.second->GetValue());
 
-  	// Recurse through the lines of the file
-  	for (const auto& catvar : CatVarMap) {
-      // Write a command to file
-      std::string command = catvar.second->name + ' ' + catvar.second->GetValue() + '\n';
-  		cfg_stream.write(command.c_str(), command.size());
-    }
-    g_CatLogging.log("Saved %s successfully!", cfg_name.c_str());
-  } catch (const std::ios_base::failure& e) {
-    g_CatLogging.log("Couldnt Save Config: %s", e.what());
-  }
+  io::WriteFile(args.at(0), cfg_lines);
+
+  g_CatLogging.log("Saved %s successfully!", args.at(0).c_str());
 });
 
 std::vector<std::string> ListConfigs() {
   return std::vector<std::string>();
 }
 
-void WorldTick() {
+static CatCommand ListConfig("list_configs", [](std::vector<std::string> args) {
+  g_CatLogging.log("TODO!", args.at(0).c_str());
+});
+
+static void WorldTick() {
 
   // Recreation of match exec
   static bool last_ingame = false;
-  if (last_ingame && last_ingame != g_GameInfo.in_game)
+  auto ingame = game::GetInGame();
+  if (last_ingame && last_ingame != ingame)
     LoadConfig({"matchexec"});
-  last_ingame = g_GameInfo.in_game;
+  last_ingame = ingame;
 }
 
 void Init() {

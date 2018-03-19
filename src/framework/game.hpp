@@ -1,7 +1,7 @@
 
 /*
  *
- *	The part of the framework to contain information about the game we are in.
+ *	The part of the framework to interact with the game we are in.
  *
  *
  */
@@ -9,13 +9,18 @@
 #include <string>
 #include <vector>
 
-class CGameInfo {
-public:
+#include "../util/functions.hpp"
 
-	bool in_game = false;	// To identify if the game is ingame, please set this wherever you can
-	std::vector<std::string> authors = {"Onee-chan", "nullifiedcat"}; // Add to this when you create your module to get credit
-	std::vector<std::string> loaded_modules;	// Add your module to the string to notify whats loaded
+namespace game {
 
-};
+// To identify if the game is ingame
+extern CMFunction<bool()> GetInGame;
 
-extern CGameInfo g_GameInfo;
+// Add to this when you create your module to get credit
+extern std::vector<std::string> authors;
+
+// Add your module to the string to notify whats loaded
+// TODO, make not unused
+extern std::vector<std::string> loaded_modules;
+
+}

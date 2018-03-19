@@ -41,7 +41,8 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 
 # Flags we use for every build type
-set(CCOMMON_FLAGS "-std=gnu++17 -mtune=generic -O3")
+set(CMAKE_CXX_STANDARD 17)
+set(CCOMMON_FLAGS "")
 
 ## Game modules
 message(STATUS "Game module: ${CGAME}")
@@ -83,7 +84,7 @@ endif()
 if(CBASE STREQUAL "SOURCE_2013_SDK")
 	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
   add_definitions(-DCATHOOK_SOURCE_2013=1)
-  file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
+  file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/source2013/*.c*")
 	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
 endif()
 
@@ -92,36 +93,9 @@ if(USE_XLIB)
   list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/xlib.cpp")
 endif()
 
-# Debug info
-if (CMAKE_BUILD_TYPE MATCHES DEBUG)
-  foreach (ITR ${SOURCE_FILES})
-    message(STATUS "Building with:${ITR}")
-  endforeach()
-endif()
-
-# Set git hash and date if possible
-find_package(Git)
-if(GIT_FOUND)
-	execute_process(
-	  COMMAND git log -1 --pretty="%h"
-	  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	  OUTPUT_VARIABLE GIT_COMMIT_HASH
-	  OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
-	execute_process(
-	  COMMAND git log -1 --pretty="%ai"
-	  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	  OUTPUT_VARIABLE GIT_COMMIT_DATE
-	  OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	add_definitions("-DGIT_COMMIT_DATE=${GIT_COMMIT_DATE}")
-endif()
-
-
 # Default compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} -s -mtune=generic -O3")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 

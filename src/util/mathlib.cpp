@@ -16,22 +16,6 @@
 
 namespace util {
 
-// Clamps angles to prevent them from going out of bounds
-void ClampAngles(CatVector& angles) {
-	// Pitch
-	while(angles.x > 89)
-		angles.x -= 180;
-	while(angles.x < -89)
-		angles.x += 180;
-	// Yaw
-	while(angles.y > 180)
-		angles.y -= 360;
-	while(angles.y < -180)
-		angles.y += 360;
-	// Roll
-	angles.z = 0;
-}
-
 // Returns angles to a point in space
 CatVector VectorAngles(CatVector src_point, CatVector dest_point) {
 	CatVector aim_point = dest_point - src_point;
@@ -41,8 +25,7 @@ CatVector VectorAngles(CatVector src_point, CatVector dest_point) {
 	out.x = atan2(-aim_point.z, sqrt(aim_point.x * aim_point.x + aim_point.y * aim_point.y)) * 180 / PI;
 
 	// Clamp and return
-	ClampAngles(out);
-	return out;
+	return ClampAngles(out);
 }
 
 // A function to get the difference from angles, Please make sure inputs are clamped

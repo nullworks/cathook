@@ -10,7 +10,7 @@
 #pragma once
 
 #include <math.h> // This is a mathlib, did you think we didnt need math?
-
+#include <array> // std::array<>
 // Macro for getting the size of an array, Uses the size of first element then compares it to the size of the entire array. This is optimised out.
 #define GET_ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -30,10 +30,10 @@ public:
 	inline CatVector operator/(CatVector value) const { return CatVector(x / value.x, y / value.y, z / value.z); }
 	inline CatVector operator*(float value) 	   const { return CatVector(x * value, y * value, z * value); }
 	inline CatVector operator/(float value)	   const { return CatVector(x / value, y / value, z / value); }
-	inline bool 	operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
-	inline bool 	operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
+	inline bool operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
+	inline bool operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors
-	inline float DistTo(CatVector end) const { return sqrt((pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2))); }
+	inline float DistTo(CatVector end) const { return sqrt(pow(x - end.x, 2) + pow(y - end.y, 2) + pow(z - end.z, 2)); }
 };
 
 // Used to store points in a box
@@ -42,23 +42,57 @@ public:
 	inline CatBox(CatVector min = CatVector(), CatVector max = CatVector()) : min(min), max(max) {};
 	CatVector min, max;
 
-	inline void GetPoints(CatVector(&points)[8]) const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
-		float x, y, z;
-		x = max.x - min.x;
-		y = max.y - min.y;
-		z = max.z - min.z;
+	inline auto GetPoints() const { // Used to get out all 8 points from our box, Be sure to pass an array with at least 8 values
+		// Get deltas
+		auto delta = this->GetDelta();
+		// Expand deltas into 8 points for box
+		std::array<CatVector, 8> points;
 		points[0] = min;
-		points[1] = min + CatVector(x, 0, 0);
-		points[2] = min + CatVector(x, y, 0);
-		points[3] = min + CatVector(0, y, 0);
-		points[4] = min + CatVector(0, 0, z);
-		points[5] = min + CatVector(x, 0, z);
-		points[6] = min + CatVector(0, y, z);
-		points[7] = min + CatVector(x, y, z);
+		points[1] = min + CatVector(delta.x, 0,       0);
+		points[2] = min + CatVector(delta.x, delta.y, 0);
+		points[3] = min + CatVector(0,       delta.y, 0);
+		points[4] = min + CatVector(0,       0,       delta.z);
+		points[5] = min + CatVector(delta.x, 0,       delta.z);
+		points[6] = min + CatVector(0,       delta.y, delta.z);
+		points[7] = max;
+		return points;
+	}
+	// Credits to cathook
+	inline bool LineIntersects(CatVector src, CatVector dst) const {
+    if (dst.x < min.x && src.x < min.x)
+        return false;
+    if (dst.y < min.y && src.y < min.y)
+        return false;
+    if (dst.z < min.z && src.z < min.z)
+        return false;
+    if (dst.x > max.x && src.x > max.x)
+        return false;
+    if (dst.y > max.y && src.y > max.y)
+        return false;
+		if (dst.z > max.z && src.z > max.z)
+			return false;
+		return true;
 	}
 	inline CatVector GetCenter() const { return (min + max) * 0.5; }
+	inline CatVector GetDelta() const { return max - min; }
 	inline bool operator==(CatBox value) const { return value.min == min && value.max == max; }
 	inline bool operator!=(CatBox value) const { return value.min != min || value.max != max; }
+	inline CatBox operator*(float value) const { // for expanding relative to center
+		// Take the center so we can operate on the delta later
+		CatVector center = this->GetCenter();
+		// Take the delta and do the operation on our box, devide by 2 after so we can add to center
+		CatVector delta = (this->GetDelta() * value) * 0.5;
+		// Recreate the box with the new delta and return
+		return CatBox(center - delta, center + delta);
+	}
+	inline CatBox operator/(float value) const { // for shrinking relative to center
+		// Take the center so we can operate on the delta later
+		CatVector center = this->GetCenter();
+		// Take the delta and do the operation on our box, devide by 2 after so we can add to center
+		CatVector delta = (this->GetDelta() / value) * 0.5;
+		// Recreate the box with the new delta and return
+    return CatBox(center - delta, center + delta);
+	}
 };
 
 // Struct for point in 4d space
@@ -76,8 +110,23 @@ public:
 
 namespace util {
 
-// Clamps angles to be "normal" values
-void ClampAngles(CatVector& angles);
+// Clamps angles to prevent them from going out of bounds, this is simple and should be inlined
+inline CatVector& ClampAngles(CatVector& angles) {
+	// Pitch
+	while(angles.x > 89)
+		angles.x -= 180;
+	while(angles.x < -89)
+		angles.x += 180;
+	// Yaw
+	while(angles.y > 180)
+		angles.y -= 360;
+	while(angles.y < -180)
+		angles.y += 360;
+	// Roll
+	angles.z = 0;
+	return angles;
+}
+
 // Input 2 angles to get the delta of difference
 CatVector GetAngleDifference(CatVector cur_angles, CatVector dest_angles);
 // Input the angles of your player, the vector position of your camera, and the destination point and it returns fov value

@@ -8,7 +8,7 @@
 #include <algorithm> // min()
 #include <string.h>  // strcpy()
 
-#include "../framework/gameticks.hpp"			// So we can run things in draw and world tick
+#include "../framework/gameticks.hpp"			// So we can run things in draw
 #include "../framework/entitys.hpp"			// So we can use entitys
 #include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
@@ -16,23 +16,28 @@
 
 #include "esp.hpp"
 
-// TODO, phase out esp cache
-
 namespace features::esp {
 
 CatEnum esp_menu({ "Visuals", "Esp" }); // Menu locator for esp settings
-CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
+static CatVarBool esp_enabled(esp_menu, "esp", true, "ESP", "Master esp switch");
 // Target selection
 static CatVarBool esp_players(esp_menu, "esp_players", true, "ESP Players", "Whether to esp with players");
 static CatVarBool esp_other_hostile(esp_menu, "esp_other_hostile", true, "ESP Other Hostile", "Whether to esp with other hostile entitys\nThis is anything not a player but still hostile to you");
-static CatVarEnum esp_team(esp_menu, {"Enemy", "Friendly", "Both"}, "esp_team", 2, "Team", "Select which team to show esp on.");
+static CatEnum esp_team_enum({"Enemy", "Friendly", "Both"});
+static CatVarEnum esp_team(esp_menu, esp_team_enum, "esp_team", 2, "Team", "Select which team to show esp on.");
 // Box esp + Options
-static CatVarEnum box_esp(esp_menu, {"None", "Normal", "Corners"}, "esp_box", 1, "Box", "Draw a 2D box");
+static CatEnum box_esp_enum({"None", "Normal", "Corners"});
+static CatVarEnum box_esp(esp_menu, box_esp_enum, "esp_box", 1, "Box", "Draw a 2D box");
 static CatVarInt box_corner_size(esp_menu, "esp_box_corner_size", 10, "Corner Size", "Controls corner box size");
 // Strings
-static CatVarEnum esp_text_position(esp_menu, {"TOP RIGHT", "BOTTOM RIGHT", "ABOVE", "BELOW", "CENTER"}, "esp_text_position", 0, "Text position", "Defines text position");
+static CatEnum esp_text_position_enum({"TOP RIGHT", "BOTTOM RIGHT", "ABOVE", "BELOW", "CENTER"});
+static CatVarEnum esp_text_position(esp_menu, esp_text_position_enum, "esp_text_position", 0, "Text position", "Defines text position");
 // Health Esp
-static CatVarEnum show_health(esp_menu, {"None", "Text", "Healthbar", "Both"}, "esp_health", 3, "Health ESP", "Show health");
+static CatEnum show_health_enum({"None", "Text", "Healthbar", "Both"});
+static CatVarEnum show_health(esp_menu, show_health_enum, "esp_health", 3, "Health ESP", "Show health");
+static CatEnum health_bar_pos_enum({"Left", "Right", "Top", "Bottom"});
+static CatVarEnum health_bar_pos(esp_menu, health_bar_pos_enum, "esp_health_bar_pos", 0, "Health Bar Position", "Where to put the health bar");
+
 // Other strings
 static CatVarBool show_name(esp_menu, "esp_name", true, "Name ESP", "Shows the entity names of entitys");
 static CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", "Shows distance on entitys");
@@ -40,51 +45,20 @@ static CatVarBool show_distance(esp_menu, "esp_distance", true, "Distance ESP", 
 static CatVarBool esp_bone(esp_menu, "esp_bones", true, "Bone ESP", "Shows cached bones");
 static CatVarBool esp_bone_debug(esp_menu, "esp_bones_debug", false, "Bone ESP debug", "Shows debug info about bones");
 // Tracers
-static CatVarEnum tracers(esp_menu, {"OFF", "CENTER", "BOTTOM"}, "esp_tracers", 2, "Tracers", "Draws a line from the player to a position on your screen");
+static CatEnum tracers_enum({"OFF", "CENTER", "BOTTOM"});
+static CatVarEnum tracers(esp_menu, tracers_enum, "esp_tracers", 2, "Tracers", "Draws a line from the player to a position on your screen");
+// Other
+static CatEnum box_mode_enum({"Collision", "Bone", "Hitbox"});
+static CatVarEnum box_mode(esp_menu, box_mode_enum, "esp_box_mode", 0, "Box mode", "What method to use to get the esp box");
 
-// Entity Box state enum
-enum {EBOX_NOT_RAN, EBOX_FAILED, EBOX_SUCCESSFUL};
-class ScreenBox {
-public:
-	ScreenBox(){}
-	ScreenBox(std::pair<int, int> _min , std::pair<int, int> _max) : min(_min), max(_max) {}
-	std::pair<int, int> min;
-	std::pair<int, int> max;
-	int state = EBOX_NOT_RAN;
-};
-static ScreenBox sbox; // For storing the world to screen box
-
-// Sets the screenbox for an entity
-static bool GetEntityBox(CatEntity* entity) {
-	if (sbox.state != EBOX_NOT_RAN) return sbox.state == EBOX_SUCCESSFUL; // If we already have the screenbox.second, we return true
-	sbox.state = EBOX_FAILED; // Pre-set this so we can return false at any time without worry
-	sbox.min = std::make_pair(65536, 65536); sbox.max = std::make_pair(-65536, -65536); // Reset our cached screen box
-
-	// Get our 8 points of our box
-	CatVector points_w[8];
-	GetCollision(entity).GetPoints(points_w);
-
-	// Go through the points getting world to screen and create our screenbox with them
-	for (auto& point : points_w) {
-		if (!draw::WorldToScreen(point, point)) return false; // Get world to screen. Return false if we dont get our point
-
-		// Create and expand the bounds based our our last point
-		if (point.x > sbox.max.first) sbox.max.first = point.x;
-		if (point.y > sbox.max.second) sbox.max.second = point.y;
-		if (point.x < sbox.min.first) sbox.min.first = point.x;
-		if (point.y < sbox.min.second) sbox.min.second = point.y;
-	}
-
-	// We now have our entity box, set the state and return true
-	sbox.state = EBOX_SUCCESSFUL;
-	return true;
-}
+// Externed, add you functions to get strings onto entities
+std::vector<CMFunction<std::pair<const char*, CatVector4>(CatEntity*)>> GetEntityStrings;
 
 // Esp draw func to be ran at draw
 static void Draw() {
 
 	// We dont want esp if its disabled, or while not ingame
-	if (!esp_enabled || !g_GameInfo.in_game) return;
+	if (!esp_enabled || !game::GetInGame()) return;
 
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {
@@ -99,8 +73,72 @@ static void Draw() {
 		auto enemy = GetEnemy(entity);
 		if (esp_team != 2 && ((esp_team == 0) ? !enemy : enemy)) continue;
 
-		// Reset the entity box state
-		sbox.state = EBOX_NOT_RAN;
+		// Cant use namespaces here
+		enum {SBOX_NOT_RAN, SBOX_FAILED, SBOX_SUCCESSFUL};
+		std::pair<int, int> sbox_min;
+		std::pair<int, int> sbox_max;
+		unsigned short sbox_state = SBOX_NOT_RAN;
+		// Call this to tell if you're allowed to use the entity box
+		auto GetEntityBox = [&]() -> bool {
+		 	if (sbox_state != SBOX_NOT_RAN)
+		 		return sbox_state == SBOX_SUCCESSFUL; // If we already have the screenbox.second, we return true
+			sbox_state = SBOX_FAILED; // Pre-set this so we can return false at any time without worry
+			sbox_min = {65536, 65536}; sbox_max = {-65536, -65536}; // Reset our cached screen box
+			auto ExpandWithPoint = [&](const CatVector& pnt) {
+				// Create and expand the bounds based our our last point
+				if (pnt.x > sbox_max.first)
+					sbox_max.first = pnt.x;
+				if (pnt.y > sbox_max.second)
+					sbox_max.second = pnt.y;
+				if (pnt.x < sbox_min.first)
+					sbox_min.first = pnt.x;
+				if (pnt.y < sbox_min.second)
+					sbox_min.second = pnt.y;
+			};
+		 	// If we use bones, try to do so here, we still want collision as a fallback
+		 	if (box_mode >= 1) {
+				// get bones
+			 	std::vector<CatBox> cur_bones;
+			 	for (int ii = 0; ii < EBone_count; ii++) {
+					CatBox tmp;
+				 	if (GetBone(entity, ii, tmp))
+				 		cur_bones.push_back(tmp);
+			 	}
+			 	if (!cur_bones.empty()) {
+					for (auto& tmp : cur_bones) {
+						if (box_mode == 1) { // Bone
+							auto pt = tmp.GetCenter();
+							if (!draw::WorldToScreen(pt, pt))
+								return false;
+							ExpandWithPoint(pt);
+						} else { // Hitbox
+							auto points = tmp.GetPoints();
+							for(auto& pt : points) {
+								if (!draw::WorldToScreen(pt, pt))
+									return false;
+								ExpandWithPoint(pt);
+							}
+						}
+					}
+					sbox_state = SBOX_SUCCESSFUL;
+					return true;
+			 	}
+	 	 	}
+			// Get our 8 points of our box
+			auto points = GetCollision(entity).GetPoints();
+
+			// Go through the points getting world to screen and create our screenbox with them
+			for (auto& pt : points) {
+  			if (!draw::WorldToScreen(pt, pt))
+					return false;
+				ExpandWithPoint(pt);
+			}
+
+			// We now have our entity box, set the state and return true
+			sbox_state = SBOX_SUCCESSFUL;
+		 	return true;
+	 	};
+
 		// Get our color
 		auto ent_color = colors::EntityColor(entity);
 
@@ -121,12 +159,17 @@ static void Draw() {
 
 			// Bone esp
 			if (esp_bone) {
-
+				// This is for how to draw the bones
+				const std::vector<int> bonesets[] = {
+					{EBone_head, EBone_top_spine, EBone_upper_spine, EBone_middle_spine, EBone_bottom_spine, EBone_pelvis}, // Center
+					{EBone_lower_arm_l, EBone_middle_arm_l, EBone_upper_arm_l, EBone_top_spine, EBone_upper_arm_r, EBone_middle_arm_r, EBone_lower_arm_r}, // Upper limbs
+					{EBone_lower_leg_l, EBone_middle_leg_l, EBone_upper_leg_l, EBone_pelvis,    EBone_upper_leg_r, EBone_middle_leg_r, EBone_lower_leg_r}  // Lower limbs
+				};
 				// Loop through the bone sets
-				for (const auto& current_set : bones::bonesets) {
+				for (const auto& current_set : bonesets) {
 
 					// Draw the bones in the bone set
-					for (int ii = 0; ii < current_set.size() - 1; ii++) { // We do it like this so we can identify where we are in the loop
+					for (size_t ii = 0; ii < current_set.size() - 1; ii++) { // We do it like this so we can identify where we are in the loop
 
 						// Get our 2 bones to connect
 						CatVector bone1, bone2;
@@ -163,12 +206,12 @@ static void Draw() {
 			if (box_esp) {
 
 				// Attempt to get our entity box
-				if (GetEntityBox(entity)) {
+				if (GetEntityBox()) {
 
 					// Simple box esp
-					draw::Rect(sbox.min.first, sbox.min.second, sbox.max.first - sbox.min.first, sbox.max.second - sbox.min.second, colors::black);
-					draw::Rect(sbox.min.first + 1, sbox.min.second + 1, sbox.max.first - sbox.min.first - 2, sbox.max.second - sbox.min.second - 2, ent_color);
-					draw::Rect(sbox.min.first + 2, sbox.min.second + 2, sbox.max.first - sbox.min.first - 4, sbox.max.second - sbox.min.second - 4, colors::black);
+					draw::Rect(sbox_min.first, sbox_min.second, sbox_max.first - sbox_min.first, sbox_max.second - sbox_min.second, colors::black);
+					draw::Rect(sbox_min.first + 1, sbox_min.second + 1, sbox_max.first - sbox_min.first - 2, sbox_max.second - sbox_min.second - 2, ent_color);
+					draw::Rect(sbox_min.first + 2, sbox_min.second + 2, sbox_max.first - sbox_min.first - 4, sbox_max.second - sbox_min.second - 4, colors::black);
 				}
 			}
 
@@ -176,14 +219,16 @@ static void Draw() {
 			if ((int)show_health >= 2) {
 
 				// Attempt to get our entity box
-				if (GetEntityBox(entity)) {
+				if (GetEntityBox()) {
+
+					// TODO, add right, top, and bottom health bars
 
 					// Get in bar height
-					int hbh = (sbox.max.second - sbox.min.second - 2) * std::min((float)GetHealth(entity) / (float)GetMaxHealth(entity), 1.0f);
+					int hbh = (sbox_max.second - sbox_min.second - 2) * std::min((float)GetHealth(entity) / (float)GetMaxHealth(entity), 1.0f);
 
 					// Draw
-					draw::Rect(sbox.min.first - 7, sbox.min.second, 7, sbox.max.second - sbox.min.second, colors::black);
-					draw::RectFilled(sbox.min.first - 6, sbox.max.second - hbh - 1, 5, hbh, colors::Health(entity));
+					draw::Rect(sbox_min.first - 7, sbox_min.second, 7, sbox_max.second - sbox_min.second, colors::black);
+					draw::RectFilled(sbox_min.first - 6, sbox_max.second - hbh - 1, 5, hbh, colors::Health(entity));
 				}
 			}
 		}
@@ -208,9 +253,16 @@ static void Draw() {
 
 			// Distance esp
 			if (show_distance) {
-				static char buf[12];
+				static char buf[8];
 				sprintf(buf, "%im", (int)GetDistance(entity));
 				str_cache.push_back(std::make_pair(buf, colors::white));
+			}
+
+			// Write module strings
+			for (auto i : GetEntityStrings) {
+				auto tmp = i(entity);
+				if (!tmp.first) continue;
+				str_cache.push_back(tmp);
 			}
 		}
 		// Check if there is strings to draw
@@ -222,16 +274,18 @@ static void Draw() {
 
 				// Change draw point if needed & determine wheter we center the strings
 				bool center_strings = true;
-				if (sbox.state != EBOX_NOT_RAN && esp_text_position < 4) { // Check if we have an entity box
+				if (sbox_state == SBOX_SUCCESSFUL && esp_text_position < 4) { // Check if we have an entity box
 					center_strings = false; // Dont center strings
 
 					switch(esp_text_position) {
 					case 0: // TOP RIGHT
-						draw_point = CatVector(sbox.max.first + 2, sbox.min.second, 0); break;
+						draw_point = CatVector(sbox_max.first + 2, sbox_min.second, 0); break;
 					case 3: // BELOW
-						draw_point = CatVector(sbox.min.first, sbox.max.second, 0); break;
-					case 1: // BOTTOM RIGHT
-					case 2: { // ABOVE
+						center_strings = true;
+						draw_point = CatVector(sbox_min.first, sbox_max.second, 0); break;
+					case 2: // ABOVE
+						center_strings = true;
+					case 1: { // BOTTOM RIGHT
 						// Get our height
 						int total_height = 0;
 						for (const auto& str : str_cache) {
@@ -239,9 +293,9 @@ static void Draw() {
 							total_height += size.second;
 						}
 						if (esp_text_position == 1) // BOTTOM RIGHT
-							draw_point = CatVector(sbox.min.first, sbox.min.second - total_height);
+							draw_point = CatVector(sbox_min.first, sbox_min.second - total_height);
 						else // ABOVE
-							draw_point = CatVector(sbox.max.first + 2, sbox.max.second - total_height);
+							draw_point = CatVector(sbox_max.first + 2, sbox_max.second - total_height);
 						}
 					}
 				}
@@ -253,11 +307,11 @@ static void Draw() {
 					// Get string sizes
 					auto size = draw::GetStringLength(str.first, 0, 28);
 
-					if (center_strings) { // Centered strings
+					if (center_strings) // Centered strings
 						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, draw::default_font, draw::default_font_size, str.second);
-					} else { // Not centered
+					else // Not centered
 						draw::String(str.first, draw_point.x, draw_point.y, draw::default_font, draw::default_font_size, str.second);
-					}
+
 					// Lower draw point for recursions
 					draw_point.y += size.second;
 				}

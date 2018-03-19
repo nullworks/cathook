@@ -10,6 +10,8 @@
 #include "esp.hpp"
 #include "aimbot.hpp"
 #include "antiaim.hpp"
+#include "followbot.hpp"
+#include "spam.hpp"
 
 #include "features.hpp"
 
@@ -22,9 +24,15 @@ void Init() {
 
 	// Antiaim, Must be before anything that changes angles!!!
 	antiaim::Init();
-	
+
 	// Aimbot
 	aimbot::Init();
+
+	// Followbot
+	followbot::Init();
+
+	// Chat Spam
+	spam::Init();
 }
 
 

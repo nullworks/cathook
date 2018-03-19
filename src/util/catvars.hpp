@@ -11,6 +11,7 @@
 #include <vector>	// Makes storage of GUI locations and enum info really hard not to recomend
 #include <unordered_map>
 
+#include "../framework/input.hpp" // CatVarKey uses it to look for catkeys as well as its Depressed Function
 #include "../framework/console.hpp"
 #include "colors.hpp"
 
@@ -58,6 +59,7 @@ class CatVarKey : public CatVarInt {
 public:
 	CatVarKey(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long) {}
+	inline bool Depressed() const { return (*this) ? input::pressed_buttons[this->value] : true;}
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
 };
@@ -113,7 +115,7 @@ class CatMenuTree {
 public:
 	CatMenuTree(std::string string = "") : name(string) {}
 
-	void AddTree(CatVar* cat_var, int recursions = 0);
+	void AddTree(CatVar* cat_var, size_t recursions = 0);
 	std::string name;
 	std::vector<CatMenuTree> children;
 	std::vector<CatVar*> cat_children;	// Nyaa~ :3

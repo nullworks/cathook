@@ -10,18 +10,47 @@
 
 #include <exception>
 
-#include "../framework/input.hpp" // CatVarKey uses it to look for catkeys
+#include "strings.hpp"
 #include "logging.hpp"
 
 #include "catvars.hpp"
 
 // The CatCommand map
-std::unordered_map<std::string, CatVar*> __attribute__ ((init_priority (102))) CatVarMap; // Need to init this before other catvars are inited
+std::unordered_map<std::string, CatVar*>
+#ifdef __GNUC__
+ 	__attribute__ ((init_priority (102)))// Need to init this before other catvars are inited
+#endif
+CatVarMap;
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
+CatCommand list_vars("list", [](std::vector<std::string> args){
+  auto print_var = [](CatVar* i) {
+    // if we are writing an enum, we should display the enums with it
+		if (auto cvar_enum = dynamic_cast<CatVarEnum*>(i)) {
+			// generate the enum string
+			std::string enum_str;
+			for (const auto& tmp : cvar_enum->cat_enum) {
+				enum_str += (enum_str.empty()) ? tmp : ", " + tmp;
+			}
+			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"\n\t\tEnums: %s",
+											 cvar_enum->name.c_str(), cvar_enum->desc_short.c_str(), cvar_enum->desc_long.c_str(), enum_str.c_str());
+		} else
+			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"",
+											 i->name.c_str(), i->desc_short.c_str(), i->desc_long.c_str());
+  };
+  if (!args.empty()) {
+
+  }
+	g_CatLogging.log("Current list of CatVars--");
+	for (const auto& i : CatVarMap) {
+    print_var(i.second);
+	}
+	g_CatLogging.log("End of list--");
+});
+
 // Menu tree
-void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
+void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
 	// Check if we reached the end if the enum info, if not we can add more to the tree
 	if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing
@@ -103,41 +132,45 @@ void CatVarEnum::callback(std::vector<std::string> args) {
 		g_CatLogging.log("%s: %f", name.c_str(), value);
 		return;
 	}
-
-	// int input
-	try {
-		value = std::stoi(args[0]);
-		return;
-	} catch (std::exception& e) {
-		// Text
-		for (int i = 0; i < cat_enum.size(); i++) {
-			if (args[0] == cat_enum.at(i)) {
-				value = i;
-				return;
-			}
+	// Text
+	for (size_t i = 0; i < cat_enum.size(); i++) {
+		if (fuzstrcmp(args[0], cat_enum.at(i))) {
+			value = i;
+			return;
 		}
 	}
-	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+  // int input
+  try {
+    value = std::stoi(args[0]);
+  } catch (std::exception& e) {
+	   g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());
+  }
 }
 std::string CatVarEnum::GetValue() {
-	// Try catch still doesnt fix error :/
-	return std::to_string(value);
 	try {
 		return cat_enum.at(value);
 	} catch (int i) {
 		return std::to_string(value);
 	}
 }
+
 void CatVarKey::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
-		g_CatLogging.log("%s: %i", name.c_str(), value);
+		g_CatLogging.log("%s: %s", this->name.c_str(), this->GetValue().c_str());
 		return;
 	}
+  // Need a way to clear
+  if (fuzstrcmp(args[0], "empty")) {
+    this->value = 0;
+    g_CatLogging.log("Catkey Cleared!");
+    return;
+  }
 	// Text input
 	for (int i = 0; i < CATKEY_COUNT; i++) {
-		if (args[0] == std::string("CATKEY_") + input::key_names[i] || args[0] == input::key_names[i]) {
-			value = i;
+		if (fuzstrcmp(args[0], std::string("CATKEY_") + input::key_names[i]) || fuzstrcmp(args[0], input::key_names[i])) {
+			this->value = i;
+      g_CatLogging.log("Catkey set to \"%s\"!", this->GetValue().c_str());
 			return;
 		}
 	}

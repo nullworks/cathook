@@ -17,38 +17,27 @@ namespace gui { namespace sidestrings {
 HudString SideStrings(8, 8);// Stores side strings
 
 // The main string to use at the top
-std::string top_string = "Nekohook";
+inline const std::string top_string(){
+	using namespace game;
+	std::string ret = "Nekohook";
+
+	// Check if we have authors
+	if (authors.empty())
+		return ret;
+
+	ret += " by ";
+	for (size_t i = 0; i < authors.size(); i++) {
+		ret += authors.at(i);
+		if (i != authors.size() - 1)
+			ret += (i == authors.size() - 2) ? " and " : ", ";
+	}
+	return ret;
+}
 
 // Adds default strings
 static void AddDefault() {
-	// Init strings
-	static bool init = false;
-	if (!init) {
-
-		// Default to cathook
-		top_string = "Nekohook";
-
-		// Check if we have authors
-		if (!g_GameInfo.authors.empty()) {
-			top_string += " by ";
-			for (int i = 0; i < g_GameInfo.authors.size(); i++) {
-				const std::string& tmp = g_GameInfo.authors.at(i);
-				// Determine whether we should add a comma
-				if (i > 0) {
-					if (i - 2 >= g_GameInfo.authors.size())
-						top_string += " and ";
-					else
-						top_string += ", ";
-				}
-				top_string += tmp; // Add our author
-			}
-		}
-		// Suqqe
-		init = true;
-	}
-
 	// Our default strings
-	SideStrings.AddString(top_string, colors::RainbowCurrent());
+	SideStrings.AddString(top_string(), colors::RainbowCurrent());
 #if defined(GIT_COMMIT_HASH) && defined(GIT_COMMIT_DATE)
 	SideStrings.AddString("Version: #" GIT_COMMIT_HASH " " GIT_COMMIT_DATE, colors::pink);
 #endif

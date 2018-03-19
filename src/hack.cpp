@@ -20,7 +20,7 @@
 // TODO, ifdef this to shutup errors
 // Game Modules
 #if defined(CATHOOK_SOURCE_2013)
-#include "modules/Source_2013/init.hpp"
+#include "modules/source2013/init.hpp"
 #elif defined(CATHOOK_CSGO)
 #include "modules/csgo/init.hpp"
 #endif

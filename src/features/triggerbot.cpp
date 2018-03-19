@@ -15,8 +15,10 @@ namespace features::trigger {
 static CatEnum trigger_menu({"TriggerBot"});
 static CatVarBool enabled(trigger_menu, "trigger", false, "Enable TriggerBot", "Master TriggerBot switch");
 static CatVarKey trigger_key(trigger_menu, "trigger_key", CATKEY_NONE, "Triggerbot key", "Triggerbot key.");
-static CatVarEnum teammates(trigger_menu, {"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"}, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
-static CatVarEnum hitbox_mode(trigger_menu, {"AUTO", "HEAD", "ANY"}, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode");
+static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
+static CatVarEnum teammates(trigger_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
+static CatEnum hitbox_mode_enum({"AUTO", "HEAD", "ANY"});
+static CatVarEnum hitbox_mode(trigger_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode");
 
 /*static bool TargetGood(CatEntity* entity) {
   if (!entity || GetDormant(entity))

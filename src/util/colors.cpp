@@ -15,6 +15,7 @@
 #include <ratio> // above
 
 #include "../features/aimbot.hpp"
+#include "../features/followbot.hpp"
 
 #include "colors.hpp"
 
@@ -24,12 +25,14 @@ namespace colors {
 CMFunction<CatVector4(CatEntity*)> EntityColor {
 	[](CatEntity* entity) {
 
+	// Highlight targets
+	if (entity == features::aimbot::highlight_target)
+		return pink;
+	if (entity == features::followbot::follow_target)
+		return green;
+
 	// Default color
 	CatVector4 ent_color = white;
-
-	// Aimbot Color
-	if (entity == features::aimbot::highlight_target)
-		return colors::pink;
 
 	// Different strokes for different folks
 	auto ent_type = GetType(entity);
@@ -58,17 +61,6 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 	}
 	return ent_color;
 }};
-
-// Returns a color based on entity health
-CatVector4 Health(CatEntity* entity) {
-	if (GetHealth(entity) > GetMaxHealth(entity))	// If health is too much, they must be over their normal health so we make them blue
-		return CatVector4(64, 128, 255, 255);
-
-	// Percentage of health our of max
-	float hf = (float)GetHealth(entity) / (float)GetMaxHealth(entity);
-	// Sick logic
-	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
-}
 
 // Returns a rainbow color based on time
 CatVector4 RainbowCurrent() {

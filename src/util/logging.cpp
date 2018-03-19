@@ -12,7 +12,11 @@
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger __attribute__ ((init_priority (101))) g_CatLogging(P_tmpdir "/nekohook.log", true); // We want this to be init fast so we can log other inits!
+CatLogger
+#ifdef __GNUC__
+ 	__attribute__ ((init_priority (101)))// We want this to be init fast so we can log other inits!
+#endif
+g_CatLogging(P_tmpdir "/nekohook.log", true);
 
 CatLogger::CatLogger(const char* _file_path, bool _ptime) : log_handle(fopen(_file_path, "w")), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }

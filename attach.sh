@@ -13,6 +13,7 @@ topstring="__--Nekohook Injector--__"
 
 # Option handler
 backtrace=0
+repl=0
 detach=0
 instance=0
 pid=0
@@ -30,6 +31,7 @@ while getopts :hbdi:p:sf:c arg; do
       echo "  Usage:"
       echo "  -h    Gives help info"
       echo "  -b    Injects and backtraces"
+      echo "  -g    Let GDB enter REPL"
       echo "  -d    Detaches"
       echo "  -i    Attaches to a specific instance"
       echo "  -p    Attaches to a specific pid(overrides -i)"
@@ -41,6 +43,8 @@ while getopts :hbdi:p:sf:c arg; do
     b)
       backtrace=1
       ;;
+    g)
+      repl=1
     d)
       detach=1
       ;;
@@ -134,6 +138,16 @@ echo Using "$filename" with "$(ps -p $pid -o comm=)"
 
 # Adding commands to gdb dynamicly is tricky with bash, but we can do much simpler with this
 GDB_COMMANDS="/tmp/gdb-tmp"
+GDB_ARGS = "-n -q --command=$GDB_COMMANDS"
+
+# REPL (Batch Mode)
+if [ $repl == 0 ]
+  echo "No REPL, using GDB's Batch Mode"
+  GDB_ARGS = "$GDB_ARGS -batch"
+else
+  echo "GDB will enter a REPL"
+fi
+
 echo "attach $pid">$GDB_COMMANDS
 echo "set \$dlopen = (void*(*)(char*, int)) dlopen">>$GDB_COMMANDS
 
@@ -173,7 +187,7 @@ else
 fi
 
 # Run the Injector and remove tmp file
-gdb -n -q -batch --command=$GDB_COMMANDS
+gdb $GDB_ARGS
 rm $GDB_COMMANDS
 
 # Remove for safety

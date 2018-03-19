@@ -6,13 +6,18 @@
  */
 
 #include <cstring> // strcmp()
-#include <algorithm> // std::sort
+#include <algorithm> // std::sort, min, max
 
+#include "../../framework/drawing.hpp" // Draw stuff
+#include "../../util/colors.hpp" // Draw stuff
 #include "../../framework/input.hpp"
+#include "../gui.hpp"
 
 #include "CBaseContainer.hpp"
 
 namespace gui { namespace base {
+
+using namespace gui;
 
 // Constructor & destructor
 CBaseContainer::CBaseContainer(const char* _name) : CBaseWidget(_name) {}
@@ -29,13 +34,16 @@ void CBaseContainer::Update() {
 	CBaseWidget::Update();
 }
 void CBaseContainer::Draw() {
-	for (auto child : children) {
+	for (auto child : childrenZSort) {
 		if (child->IsVisible()) {
 			child->Draw();
 		}
 	}
+	CBaseWidget::Draw();
 }
 void CBaseContainer::DrawBounds() {
+	auto abs_pos = AbsolutePosition();
+	draw::Rect(abs_pos.first, abs_pos.second, size.first, size.second, focus ? (focused_child==-1?colors::blue:colors::pink) : colors::gray);
 	for (auto child : children) {
 		if (child->IsVisible()) {
 			child->DrawBounds();
@@ -46,47 +54,124 @@ void CBaseContainer::DrawBounds() {
 
 // User input functions
 void CBaseContainer::OnMouseLeave() {
-	HoverOn(0);
+	HoverOn(-1);
 	CBaseWidget::OnMouseLeave();
 }
 void CBaseContainer::OnMousePress() {
-	PressOn(ChildByPoint(input::mouse.first, input::mouse.second));
+	//TODO: Fix mouse input
+	//PressOn(ChildByPoint(input::mouse.first, input::mouse.second));
+	for(auto child:children){
+		child->OnMousePress();
+	}
 }
 void CBaseContainer::OnMouseRelease() {
-	if (pressed_child) pressed_child->OnMouseRelease();
+	for(auto child:children){
+		child->OnMouseRelease();
+	}
+}
+bool CBaseContainer::TryFocusGain() {
+	if(can_focus_on_nothing) return true;
+	//TODO: Move this into it's own function.
+	for(int i=0;i<children.size();i++){
+		if(children[i]->IsVisible()&&TryFocusOn(i)){
+			return true;
+		}
+	}
+	return false;
 }
 void CBaseContainer::OnFocusLose() {
-	FocusOn(0);
 	CBaseWidget::OnFocusLose();
+	TryFocusOn(-1);
 }
-void CBaseContainer::OnKeyPress(int key, bool repeat) {
-	if (focused_child) focused_child->OnKeyPress(key, repeat);
+void CBaseContainer::OnKeyPress(int key) {
+	if(focused_child!=-1&&children[focused_child]->ConsumesKey(key)){
+		children[focused_child]->OnKeyPress(key);
+	}else{
+		//Flip to next child
+		if(focused_child!=-1){
+			if(key==nextkey.value){
+				//TODO: Replace focused_child with the index of the selected child
+				// so we don't have to spend time finding it here
+				for(int i = focused_child+1;i<children.size();i++){
+					if(children[i]->IsVisible()&&TryFocusOn(i)){
+						//We found a new child
+						break;
+					}
+				}
+			}
+			//Flip to previous child
+			else if (key==prevkey.value){
+				for(int i = ((focused_child==-1)?children.size():focused_child)-1;i>=0;i--){
+					if(children[i]->IsVisible()&&TryFocusOn(i)){
+						//We found a new child
+						break;
+					}
+				}
+			}
+		}
+		//Escape
+		else if (key==backkey.value){
+			if(can_focus_on_nothing){
+				TryFocusOn(-1);
+			}
+		}
+		else if (key==activatekey.value){
+			if(focused_child==-1){
+				for(int child=0;child<children.size();child++){
+					if(children[child]->IsVisible()){
+						if(TryFocusOn(child)) return;
+					}
+				}
+				TryFocusOn(-1);
+			}
+		}
+		
+	}
 }
 void CBaseContainer::OnKeyRelease(int key) {
-	if (focused_child) focused_child->OnKeyRelease(key);
+	//Tempted to just fully hand these key release events on, but that'll just slow things down.
+	if (focused_child!=-1) children[focused_child]->OnKeyRelease(key);
 }
 bool CBaseContainer::ConsumesKey(int key) {
-	if (focused_child) return focused_child->ConsumesKey(key);
-	return false;
+	//If our focused child consumes, we can't
+	return (focused_child!=-1 && children[focused_child]->ConsumesKey(key))
+	//If we can go to prev/next child, do so.
+	|| (key==nextkey && focused_child!=children.size()-1)
+	|| (key==prevkey && focused_child!=0)
+	//If we can focus on nothing, and are currently focusing on something
+	//(otherwise our parent container gets the backkey and will defocus our entire container)
+	|| (key==backkey && focus && can_focus_on_nothing && focused_child)
+	//Or if we can `activate`
+	|| (key==activatekey && focus && focused_child==-1);
 }
 
 // Visiblity
 void CBaseContainer::Hide() {
 	CBaseWidget::Hide();
-	if (hovered_child) hovered_child->OnMouseLeave();
-	if (focused_child) focused_child->OnFocusLose();
-	if (pressed_child) pressed_child->OnMouseRelease();
+	if (hovered_child!=-1){
+		children[hovered_child]->OnMouseLeave();
+		hovered_child=-1;
+	}
+	if (focused_child!=-1){
+		children[focused_child]->OnFocusLose();
+		focused_child=-1;
+	}
+	if (pressed_child!=-1){
+		children[pressed_child]->OnMouseRelease();
+		pressed_child=-1;
+	}
 }
 
 // Tooltips
 const std::string& CBaseContainer::GetTooltip() {
-	if (hovered_child) return hovered_child->GetTooltip();
+	if (hovered_child!=-1) return children[hovered_child]->GetTooltip();
 	return tooltip;
 }
 
 // Children
 void CBaseContainer::AddChild(IWidget* child) {
 	children.push_back(child);
+	childrenZSort.push_back(child);
 	child->parent = this;
 }
 
@@ -103,108 +188,144 @@ IWidget* CBaseContainer::ChildByName(const char* name) {
 	}
 	return nullptr;
 }
-IWidget* CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space to return a child within it
+int CBaseContainer::ChildByPoint(int x, int y) { // Input a point in space to return a child within it
+	int z=1337*69;
+	int best=-1;
 	for (int i = children.size() - 1; i >= 0; i--) {
-		auto child = ChildByIndex(i);
+		auto child = children[i];
 		if (!child->visible) continue; // We dont care about always visible, we just want visible
 		auto abs = child->AbsolutePosition();
-		if (x >= abs.first && x <= abs.first + child->size.first &&
+		if (z>child->zindex && x >= abs.first && x <= abs.first + child->size.first &&
 			y >= abs.second && y <= abs.second + child->size.second) {
-			return child;
+			best=i;
+			z=child->zindex;
 		}
 	}
-	return nullptr;
+	return best;
 }
 
 // Child related update functions
 void CBaseContainer::SortByZIndex() {
 	// Sort everything
-	std::sort(children.begin(), children.end(), [](IWidget* a, IWidget* b) -> bool {
+	std::sort(childrenZSort.begin(), childrenZSort.end(), [](IWidget* a, IWidget* b) -> bool {
 		return a->zindex < b->zindex;
 	});
 	// Make everything have a linear number... For delicious stacking
-	for (int i = 0; i < children.size(); i++)
-		children[i]->zindex = i;
+	for (int i = 0; i < childrenZSort.size(); i++)
+		childrenZSort[i]->zindex = i;
 }
 void CBaseContainer::UpdateHovers() {
+	//TODO: Hovering using input::mouse_event
+	/*
 	auto hovered = ChildByPoint(input::mouse.first, input::mouse.second);
 	if (hovered != hovered_child)
-		HoverOn(hovered);
+		HoverOn(hovered);*/
 }
 void CBaseContainer::MoveChildren() {
+	//TODO: Decipher MoveChildren, as written by nullcat back in 2017
+	//minmax_size is being used as a minimum on this class
 	// Used space
-	std::pair<int, int> space = std::make_pair(-1, -1);
-	// Get our absolutes down
+	std::pair<int, int> space = minmax_size;
+	// Find a Bounding box around all of the absolutes
 	for (auto c : children) {
 		if (!c->IsVisible()) continue;
 		// Check if not absolute
 		if (c->position_mode != ABSOLUTE)
 			continue;
-		// Add the amount of space it takes to our used amount
-		std::pair<int, int> space_taken;
-		space_taken.first = c->offset.first + c->size.first;
-		space_taken.second = c->offset.second + c->size.second;
-
 		// If some our used space is less than the space taken by the widget, add it to used space.
-		if (space.first < space_taken.first)
-			space.first = space_taken.first;
-		if (space.second < space_taken.second)
-			space.second = space_taken.second;
+		space.first = std::max(space.first, c->offset.first + c->size.first);
+		space.second = std::max(space.second, c->offset.second + c->size.second);
 	}
-
-	// Get our size for the container and set it
-	std::pair<int, int> tmp_max = (max_size == std::make_pair(-1, -1)) ? space : max_size;
-	size = tmp_max;
-
+	
 	// Organize our inlines
-	std::pair<int, int> cur_pos = std::make_pair(2, 2);
-	int lane_height = 0;
-	for (auto c : children) {
-		if (!c->IsVisible()) continue;
-
-		// Check if inline
-		if (c->position_mode != INLINE)
-			continue;
-
-		// Get whether widget width would overlap max size, make widget go in new lane if true
-		if (cur_pos.first + c->size.first + 2 > tmp_max.first) {
-
-			// Put the widget on a new line
-			cur_pos = std::make_pair(2, cur_pos.second + lane_height + 2);
-			lane_height = 0;
-		}
-
-		// If our widget height is more than the lane size, add to it
-		if (c->size.second > lane_height)
-			lane_height = c->size.second;
-
-		// Set the inline widgets position
-		c->offset = cur_pos;
-
-		// Add to the length used
-		cur_pos.first += c->size.first + 2;
+	int x = 0;
+	auto bounds = input::GetBounds();
+	int longest_column_height = 0;//Cannot exceed bounds.second
+	int column_height = space.second;//init'd to abs' height
+	int column=0;
+	int columnFirstIDX=0;
+	if(columnWidth.size()==0){
+		columnWidth.push_back(defaultColumnWidth);
 	}
+	//for (auto c : children) {
+	for(int idx=0;idx<children.size();idx++){
+		auto c = children[idx];
+		// Check if visible & inline
+		if (!c->IsVisible()||c->position_mode != INLINE)
+			continue;
+		if(c->size.first>columnWidth[column]){
+			columnWidth[column]=c->size.first;
+			idx = columnFirstIDX-1;
+			continue;//Increments idx
+		}
+		c->minmax_size.first=columnWidth[column];
+		c->offset=std::make_pair(x, column_height);
+		//Wrap to Next Column
+		if(column_height+c->size.second>bounds.second){
+			//Check for the longest column
+			longest_column_height=std::max(column_height,longest_column_height);
+			//Move right
+			x+=columnWidth[column]+columnSpacing;
+			//If this is the first time this column has existed
+			if(++column>=columnWidth.size()){
+				//Give it a default width
+				columnWidth.push_back(defaultColumnWidth);
+			}
+			//Reset to top of column
+			column_height=space.second;
+			columnFirstIDX=idx;
+		}
+		//Add to column
+		column_height+=c->size.second;
+	}
+	//Check for longest column
+	longest_column_height = std::max(column_height,longest_column_height);
+	//Move right
+	x+=columnWidth[column]+columnSpacing;
+	//Set own size
+	size = std::make_pair(x,longest_column_height);
+	//Ensure we don't go off the bottom of the screen
+	auto abs_pos = AbsolutePosition();
+	offset.second=std::min(offset.second,bounds.second+offset.second-abs_pos.second-longest_column_height);
 }
 
 // Child info related to the container
-void CBaseContainer::HoverOn(IWidget* child) {
-	if (hovered_child) hovered_child->OnMouseLeave();
-	if (child) child->OnMouseEnter();
+void CBaseContainer::HoverOn(int child) {
+	if (hovered_child!=-1) children[hovered_child]->OnMouseLeave();
+	if (hover_is_focus&&focus) {
+		TryFocusOn(child);
+	}
+	if (child!=-1) children[child]->OnMouseEnter();
 	hovered_child = child;
 }
-void CBaseContainer::FocusOn(IWidget* child) {
+bool CBaseContainer::TryFocusOn(int child) {
 	if (focused_child != child) {
-		if (focused_child) focused_child->OnFocusLose();
-		if (child) child->OnFocusGain();
-		focused_child = child;
+		if (child!=-1){
+			if(children[child]->TryFocusGain()){
+				if (focused_child!=-1) children[focused_child]->OnFocusLose();
+				focused_child = child;
+				return true;
+			}
+		}else{
+			if(can_focus_on_nothing||!focus){
+				if (focused_child!=-1) children[focused_child]->OnFocusLose();
+				focused_child = -1;
+				//You can focus on nothing if you want to
+				//(as proved in elementary school)
+				return true;
+			}
+		}
+		return false;
+	}else{
+		//We can focus something thats already focused..
+		//By doing nothin'!
+		return true;
 	}
 }
-void CBaseContainer::PressOn(IWidget* child) {
+void CBaseContainer::PressOn(int child) {
 	pressed_child = child;
-	if (child) {
-		FocusOn(child);
-		child->OnMousePress();
-	} else FocusOn(0);
+	children[child]->press=true;
+	if (focus) TryFocusOn(child);
 }
 
 }}

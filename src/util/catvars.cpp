@@ -162,21 +162,21 @@ void CatVarKey::callback(std::vector<std::string> args) {
 	}
   // Need a way to clear
   if (fuzstrcmp(args[0], "empty")) {
-    this->value = 0;
+    this->value = CATKEY_NONE;
     g_CatLogging.log("Catkey Cleared!");
     return;
   }
 	// Text input
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 		if (fuzstrcmp(args[0], std::string("CATKEY_") + input::key_names[i]) || fuzstrcmp(args[0], input::key_names[i])) {
-			this->value = i;
+			this->value = (CatKey) i;
       g_CatLogging.log("Catkey set to \"%s\"!", this->GetValue().c_str());
 			return;
 		}
 	}
 	// int input
 	try {
-		value = std::stoi(args[0]);
+		value = (CatKey) std::stoi(args[0]);
 		return;
 	} catch (std::exception& e){}
 	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());

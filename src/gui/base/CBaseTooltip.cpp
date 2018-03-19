@@ -2,7 +2,7 @@
 /*
  *
  *  An easy way to display information to the user.
- *  Make sure to set max_size to have clamping
+ *  Make sure to set minmax_size to have clamping
  *
  */
 
@@ -39,7 +39,7 @@ void CBaseTooltip::Draw() {
   auto tooltip_size = draw::GetStringLength(tooltip.c_str(), 1, 20);
 
   // Check if we need to wrap
-  if (tooltip_size.first > max_size.first) {
+  if (minmax_size.first!=-1&&tooltip_size.first > minmax_size.first) {
 
     std::string wrapped_str; // A place to store the wrapped string, with the size ;)
     std::string cur_line; // Our current line
@@ -51,7 +51,7 @@ void CBaseTooltip::Draw() {
     for (const auto& cur_str : sep_strs) {
 
       // If it goes over max width, we add the current line to the ourput, then return
-      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20).first > max_size.first) {
+      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20).first > minmax_size.first) {
         // Add the current line
         wrapped_str += cur_line + '\n';
 
@@ -70,9 +70,10 @@ void CBaseTooltip::Draw() {
     tooltip = wrapped_str;
   }
   // Draw string
-  draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::Transparent(colors::black));
-  draw::Rect(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::pink);
-  draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);
+  //TODO: Mouse movement
+  //draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::Transparent(colors::black));
+  //draw::Rect(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::pink);
+  //draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);
 }
 
 }}

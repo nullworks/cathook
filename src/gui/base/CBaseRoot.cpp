@@ -9,6 +9,7 @@
 #include "CBaseInfoBox.hpp"
 
 #include "CBaseRoot.hpp"
+#include "../../util/logging.hpp"
 
 namespace gui { namespace base {
 
@@ -16,13 +17,14 @@ namespace gui { namespace base {
 CBaseRoot::CBaseRoot() : CBaseContainer("Root") {
 	/*tooltip_widget = new CBaseInfoBox("tooltip");
 	tooltip_widget->position_mode = FLOATING;
-	tooltip_widget->max_size = std::make_pair(200, 180);
+	tooltip_widget->minmax_size = std::make_pair(200, 180);
 	AddChild(tooltip_widget);*/
+  	minmax_size = input::GetBounds();
 }
 
 // An update engine for the gui
 void CBaseRoot::Update() {
-
+/*
   // Input handler
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 
@@ -68,7 +70,7 @@ void CBaseRoot::Update() {
 
   // Increse our framecount
   frame_count++;
-
+*/
   // Update tick to elements
   CBaseContainer::Update();
 
@@ -76,7 +78,29 @@ void CBaseRoot::Update() {
   Draw();
 }
 
+void CBaseRoot::OnKeyPress(int key){
+	if(key==CATKEY_MOUSE_1){
+		OnMousePress();
+	}else{
+		CBaseContainer::OnKeyPress(key);
+	}
+}
+
+void CBaseRoot::OnKeyRelease(int key){
+	if(key==CATKEY_MOUSE_1){
+		OnMouseRelease();
+	}else{
+		CBaseContainer::OnKeyRelease(key);
+	}
+}
+
 // This would draw the entire screen so we override
-void CBaseRoot::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
+void CBaseRoot::DrawBounds() {
+	for (auto child : children){
+		if (child->IsVisible()){
+			child->DrawBounds();
+		}
+	}
+}
 
 }}

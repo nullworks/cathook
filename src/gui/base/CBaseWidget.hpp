@@ -26,9 +26,9 @@ public:
 	virtual void OnMouseLeave();
 	virtual void OnMousePress();
 	virtual void OnMouseRelease();
-	virtual void OnFocusGain();
+	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
-	virtual void OnKeyPress(int key, bool repeat);
+	virtual void OnKeyPress(int key);
 	virtual void OnKeyRelease(int key);
 	virtual bool ConsumesKey(int key);
 

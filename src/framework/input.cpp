@@ -10,15 +10,12 @@
 #include "input.hpp"
 
 namespace input {
-
-// Used to store depressed keys
-bool pressed_buttons[CATKEY_COUNT];
-
-// Mouse info
-std::pair<int, int> mouse(0, 0);
-
-// Screen height and width
-std::pair<int, int> bounds(0, 0);
+CMFunction<std::pair<int, int>(void)> GetBounds;
+CMEvent<std::pair<int, int>> bounds_event;
+CMFunction<std::pair<int, int>(void)> GetMouse;
+CMEvent<std::pair<int, int>> mouse_event;
+CMFunction<bool(CatKey)> GetKey;
+CMEvent<CatKey, bool> key_event;
 
 // Holds our cat keys as strings
 const char* key_names[] = {
@@ -77,12 +74,5 @@ const char* key_names[] = {
 	"MOUSE_5",
 	"M_WHEEL_UP", "M_WHEEL_DOWN"
 };
-
-#if false
-#include "../util/functions.hpp"
-CMFunction<std::pair<int, int>> GetWindowBounds;
-CMFunction<std::pair<int, int>> GetMousePos;
-CMFunction<bool(int)> GetPressed;
-#endif
 
 }

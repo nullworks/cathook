@@ -2,7 +2,7 @@
 /*
  *
  *	This file is meant to show off the gui.
- *	Run the """TODO PUT HERE""" function to show the menu
+ *	Enable the ShowTestWindow call in gui/init.cpp to show the menu
  *	
  *
  */

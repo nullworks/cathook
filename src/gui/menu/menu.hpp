@@ -12,11 +12,13 @@ namespace gui { namespace menu {
 
 class CMenu : public base::CBaseWindow {
 public:
+  CMenu(const char *);
   std::vector<int> menu_position = {0};
   //virtual void OnMousePress();
+  virtual void Update();
 };
 
-extern CMenu pMenu;
+extern base::CBaseWindow pMenu;
 void Init();
 
 }}

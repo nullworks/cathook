@@ -22,12 +22,15 @@ public:
 	virtual void MoveChildren(){};
 	void Update();
   virtual void DrawBounds();
+	//For redirecting CATKEY_MOUSE_1 to OnMouse
+	virtual void OnKeyPress(int key);
+	virtual void OnKeyRelease(int key);
 
 	// used to store what frame we are on
-	unsigned long frame_count = 0;
+	//unsigned long frame_count = 0;
 	// Used to store our previous presses and times they were pressed
-	bool pressed_state[CATKEY_COUNT];
-	int  pressed_frame[CATKEY_COUNT];
+	//bool pressed_state[CATKEY_COUNT];
+	//int  pressed_frame[CATKEY_COUNT];
 };
 
 }}

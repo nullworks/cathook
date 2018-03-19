@@ -8,8 +8,9 @@
 #pragma once
 
 #include <utility> // Pairs
+#include "../util/functions.hpp" //CMFunction, CMEvent
 
-enum {
+enum CatKey{
 	CATKEY_NONE,
 	CATKEY_0, CATKEY_1, CATKEY_2,
 	CATKEY_3, CATKEY_4, CATKEY_5,
@@ -65,16 +66,13 @@ enum {
 };
 
 namespace input {
-
-extern bool pressed_buttons[CATKEY_COUNT];
-
-// Mouse info
-extern std::pair<int, int> mouse;
-
-// Screen height and width
-extern std::pair<int, int> bounds;
-
 // Holds our cat keys string names for easy access
 extern const char* key_names[];
 
+extern CMFunction<std::pair<int, int>(void)> GetBounds;
+extern CMEvent<std::pair<int, int>> bounds_event;
+extern CMFunction<std::pair<int, int>(void)> GetMouse;
+extern CMEvent<std::pair<int, int>> mouse_event;
+extern CMFunction<bool(CatKey)> GetKey;
+extern CMEvent<CatKey, bool> key_event;
 }

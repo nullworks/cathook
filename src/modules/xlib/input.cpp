@@ -9,6 +9,7 @@
  */
 
 #include <X11/Xutil.h> // For xlibs keycodes, window geometry
+#include <bitset> // For caching pressed keys
 
 #include "../../framework/input.hpp" // To manipulate the input framework ofc
 #include "../../framework/gameticks.hpp" 	// For init
@@ -24,8 +25,9 @@
 
 namespace xlib {
 
+//TODO: xlib - FastMap instead of this mess
 // Stores potential conversions between xlib's keycodes and cathooks catkeyss. Add more as nessesary! /usr/include/X11/keysymdef.h
-static const std::pair<int, int> xlibToCatVar[] = {
+static const std::pair<int, CatKey> xlibToCatVar[] = {
 	{XK_0, CATKEY_0}, {XK_1, CATKEY_1}, {XK_2, CATKEY_2},
 	{XK_3, CATKEY_3}, {XK_4, CATKEY_4}, {XK_5, CATKEY_5},
 	{XK_6, CATKEY_6}, {XK_7, CATKEY_7}, {XK_8, CATKEY_8},
@@ -76,33 +78,51 @@ static const std::pair<int, int> xlibToCatVar[] = {
 	{XK_Pointer_DfltBtnPrev, CATKEY_M_WHEEL_UP}, {XK_Pointer_DfltBtnNext, CATKEY_M_WHEEL_DOWN}
 };
 
+// Used to store depressed keys
+static std::bitset<CATKEY_COUNT> pressed_buttons;
+
+// Mouse info
+static std::pair<int, int> mouse(-1, -1);
+
+// Screen height and width
+static std::pair<int, int> bounds(-1, -1);
+
 // Request this to update the input system on button, mouse, and window info
 static void RefreshState() {
 
 	// Ensure we have a window
 	if (!GetXWindow()) return;
 
-	// Reset current pressed
-	for (bool& tmp : input::pressed_buttons) {
-		tmp = false;
-	}
-
 	// Get window bounds
 	Window root_return; int rel_x, rel_y; unsigned int border, depth, boundsx, boundsy;
 	if (XGetGeometry(xAppDisplay, xAppWindow, &root_return, &rel_x, &rel_y, &boundsx, &boundsy, &border, &depth)) {
-		input::bounds = std::make_pair(boundsx, boundsy);
+		bounds = std::make_pair(boundsx, boundsy);
+		input::bounds_event(bounds);
 	}
 
 	// Update mouse position
 	Window child_return; int root_x, root_y, mousex, mousey; unsigned int mask_return;
 	if (XQueryPointer(xAppDisplay, xAppWindow, &root_return, &child_return, &root_x, &root_y, &mousex, &mousey, &mask_return)) { // only update the cursor if this returns true
-		if (!(mousex <= 0 || mousey <= 0 || mousex >= input::mouse.first || mousey >= input::mouse.second)) { // Clamp positions to the window
-			input::mouse = std::make_pair(mousex, mousey);
+		if (mousex!=mouse.first||mousey!=mouse.second||!(mousex <= 0 || mousey <= 0 || mousex >= bounds.first || mousey >= bounds.second)) { // Clamp positions to the window
+			mouse = std::make_pair(mousex, mousey);
+			input::mouse_event(mouse);
 		}
 		// We did a pointer query so check our buttons too!
-		if (mask_return & (Button1Mask)) input::pressed_buttons[CATKEY_MOUSE_1] = true;
-		if (mask_return & (Button2Mask)) input::pressed_buttons[CATKEY_MOUSE_2] = true;
-		if (mask_return & (Button3Mask)) input::pressed_buttons[CATKEY_MOUSE_3] = true;
+		bool s = (mask_return & (Button1Mask));
+		if (s != pressed_buttons[CATKEY_MOUSE_1]){
+			pressed_buttons[CATKEY_MOUSE_1] = s;
+			input::key_event(CATKEY_MOUSE_1, s);
+		}
+		s = (mask_return & (Button2Mask));
+		if (s != pressed_buttons[CATKEY_MOUSE_2]){
+			pressed_buttons[CATKEY_MOUSE_2] = s;
+			input::key_event(CATKEY_MOUSE_2, s);
+		}
+		s = (mask_return & (Button3Mask));
+		if (s != pressed_buttons[CATKEY_MOUSE_3]){
+			pressed_buttons[CATKEY_MOUSE_3] = s;
+			input::key_event(CATKEY_MOUSE_3, s);
+		}
 	}
 
 	// Find depressed keys and save them to the stored map
@@ -115,13 +135,32 @@ static void RefreshState() {
 		int current_key = XKeysymToKeycode(xAppDisplay, current.first);
 
 		// Use the keymap with bitwise logic to get state, oof this took forever to make
-		if (keys[current_key / 8] & (1 << (current_key % 8))) input::pressed_buttons[current.second] = true;
+		bool s = (keys[current_key / 8] & (1 << (current_key % 8)));
+		if (s != pressed_buttons[current.second]){
+			pressed_buttons[current.second]=s;
+			input::key_event(current.second, s);
+		}
 	}
+}
+
+static bool GetKey(CatKey k){
+	return pressed_buttons[k];
+}
+
+static std::pair<int,int> GetMouse(){
+	return mouse;
+}
+
+static std::pair<int,int> GetBounds(){
+	return bounds;
 }
 
 // Simple init function to enable xlib input functionality
 void InitInput() {
 	drawmgr.REventBefore(RefreshState);
+	input::GetKey = GetKey;
+	input::GetMouse = GetMouse;
+	input::GetBounds = GetBounds;
 }
 
 }

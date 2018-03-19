@@ -28,9 +28,9 @@ void CBaseWindow::Draw() {
 
 // User Input
 // We set our index to -1 to put us in front of other windows
-void CBaseWindow::OnFocusGain() {
+bool CBaseWindow::TryFocusGain() {
 	zindex = -1;
-	CBaseContainer::OnFocusGain();
+	return CBaseContainer::TryFocusGain();
 }
 
 }}

@@ -21,7 +21,7 @@ public:
 	virtual void Draw() override;
 
 	// User Input
-	virtual void OnFocusGain() override;
+	virtual bool TryFocusGain() override;
 };
 
 }}

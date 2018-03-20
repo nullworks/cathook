@@ -59,6 +59,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 	// A simple multi-point function, call it when you get bone center to get a point that hits. This does tracing for you.
 	// First in pair is if it could get bone, second is if it could find a point
 	// set trace to true if you want it tracing first point if multipoint is disabled
+	// TODO: find a better way to impliment other than using as a drop-in for GetBone
  	auto GetMultiBone = [&](int bone, CatVector& out, bool trace = false) -> std::pair<bool, bool> {
 		auto camera = GetCamera(GetLocalPlayer()); // we can assume we have a local ent at this point
 		// Normal bone stuff

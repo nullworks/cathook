@@ -13,7 +13,7 @@
 #include "../framework/input.hpp"		// So we can get screen size
 #include "../framework/drawing.hpp"			// We do lots of drawing!
 #include "../framework/game.hpp"			// So we can stop esp if not ingame
-#include "../util/logging.hpp"
+
 #include "esp.hpp"
 
 namespace features::esp {

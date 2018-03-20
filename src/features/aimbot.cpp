@@ -34,20 +34,21 @@ static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an
 static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
 static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode\n"
-																																																																			 		  "AUTO: Automaticly chooses best hitbox\n"
-																																																																					  "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
-																																																																					  "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
-																																																																					  "HEAD: Head only\n"
-																																																																					  "CENTER: Aims directly in the center of the entity");
+																																																		 "AUTO: Automaticly chooses best hitbox\n"
+																																																		 "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
+																																																		 "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
+																																																		 "HEAD: Head only\n"
+																																																		 "CENTER: Aims directly in the center of the entity");
 static CatVarInt smooth_aim(aimbot_menu, "aimbot_smooth", 0, "Smooth Aim", "Smooths the aimbot");
 static CatEnum silent_aim_enum({"OFF", "SNAPBACK", "MODULE"});
 static CatVarEnum silent_aim(aimbot_menu, silent_aim_enum, "aimbot_silent", 0, "Silent aimbot", "SNAPBACK: Snaps the aimbot back after aiming\n"
-																																																							"MODULE: Uses the modules own version of silent, if any");
+																																																						"MODULE: Uses the modules own version of silent, if any");
 static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug info about aimbot");
-// TODO: static CatVarInt multipoint(aimbot_menu, "aimbot_multipoint", 8, "Multipoint", "How many points to check");
+static CatVarInt multipoint(aimbot_menu, "aimbot_multipoint", 0, "Multipoint", "Amount of boxes to check, 0 = off\n NOTE: THIS IS EXTREMELY INTENSIVE, USE ONLY WHAT YOU NEED!", 5);
+static CatVarInt multipoint_ratio(aimbot_menu, "aimbot_multipoint_ratio", 86, "Multipoint Ratio", "Some games might have crappier lag comp than others, this shrinks the hitbox to correct for that.", 100);
+
 
 // Hitbox selection
-
 
 // Somewhere to store the auto-hitbox function
 CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](CatEntity* entity){ return RetrieveAimpoint(entity, 3); }};
@@ -55,41 +56,52 @@ CMFunction<CatVector(CatEntity*)> GetAutoHitbox {[](CatEntity* entity){ return R
 // A function to find a place to aim for on the target
 CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 
-#if false
-	auto TryMultiPt = [&](const CatBox& in) -> CatVector {
-		if (!multipoint) return in.GetCenter();
-		int need_recur = multipoint / 8;
-		auto TryMultiPt_internal = [&](int recur) {
-			// The most we want to go out is .9 of the original size
-			// Take the amount of times we will recurse,
-			// TODO: make multipoint recurse from the center, math skills needed
-			auto shrink = (in * 0.9) / (recursions - needed_recursions / recursions)
-			// Try to find a point that fits
-			for (const auto i : shrink.GetPoints())
-				if (trace::trace_entity(entity, GetCamera(GetLocalPlayer()), i))
-					return i;
-			// If we didnt find a point, try to recurse
-			return try_multipoints(in, needed_recursions, recur_left--);
+	// A simple multi-point function, call it when you get bone center to get a point that hits. This does tracing for you.
+	// First in pair is if it could get bone, second is if it could find a point
+	// set trace to true if you want it tracing first point if multipoint is disabled
+ 	auto GetMultiBone = [&](int bone, CatVector& out, bool trace = false) -> std::pair<bool, bool> {
+		auto camera = GetCamera(GetLocalPlayer()); // we can assume we have a local ent at this point
+		// Normal bone stuff
+		CatBox tmp_bone;
+		if (!GetBone(entity, bone, tmp_bone)) return {false, false};
+
+		// If we arent using multi-point and we arent tracing first, we can just return it
+		CatVector center = tmp_bone.GetCenter();
+		if ((!multipoint && !trace) || trace::trace_entity(entity, camera, center)) {
+			out = center;
+			return {true, true};
 		}
-	};*/
-#endif
-	// Check if we can use bones
+
+		// First we shrink the box to try to avoid latency issues, we do this once to save the little cycles we have
+		// then we devide that by how many times we will recurse to get the ratio
+		auto ratio = (tmp_bone * (multipoint_ratio / 100)) / multipoint;
+		for (int i = 1; i <= multipoint; i++) {
+			// then we multiply it using the ratio to expand the point back to the size we want to check
+			auto expanded = ratio * i;
+			// Try to find a point that fits
+			for (const auto ii : expanded.GetPoints()) {
+				if (trace::trace_entity(entity, camera, ii)) {
+					out = ii;
+					return {true, true};
+				}
+			}
+		}
+
+		// We didnt get any points ;( but we can still return the first, which is already set, and return trace as false
+		return {true, false};
+	};
+
 	// Get our best bone
 	switch(mode) {
 	case 0: { // AUTO
 		return GetAutoHitbox(entity);
 	}
 	case 1: { // AUTO-HEAD
-		// We need this for vis checks
-		auto local_ent = GetLocalPlayer();
 		// Head is first bone, should be fine to iterate through them
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
-			if (!GetBoneCenter(entity, i, tmp)) continue;
-			// Vis check
-			if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
-				continue;
+			if (!GetMultiBone(i, tmp, true).first) continue;
 			return tmp;
 		}
 		break;
@@ -97,20 +109,21 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 	case 2: { // AUTO-CLOSEST
 		// We need this for fov checks
 		auto local_ent = GetLocalPlayer();
-		if (!local_ent) break;
+		auto camera_ang = GetCameraAngle(local_ent);
+		auto camera = GetCamera(local_ent);
 		// Book-keepers for the best one we have found
-		CatVector closest;
+		CatVector closest = CatVector();
 		float closest_fov = 360;
 		for (int i = 0; i < EBone_count; i++) {
 			// Get our bone
 			CatVector tmp;
-			if (!GetBoneCenter(entity, i, tmp)) continue;
+			if (!GetMultiBone(i, tmp).first) continue;
 			// Get FOV
-			float fov = util::GetFov(GetCameraAngle(local_ent), GetCamera(local_ent), tmp);
+			float fov = util::GetFov(camera_ang, camera, tmp);
 			// Check if fov is lower than our current best
 			if (fov > closest_fov) continue;
 			// Vis check
-			if (!trace::trace_entity(entity, GetCamera(local_ent), tmp))
+			if (!trace::trace_entity(entity, camera, tmp))
 				continue;
 			// Set the new current best
 			closest = tmp;
@@ -123,14 +136,14 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 	}
 	case 3: { // HEAD
 		CatVector tmp;
-		if (GetBoneCenter(entity, EBone_head, tmp)) return tmp;
+		if (GetMultiBone(EBone_head, tmp).first) return tmp; // if we couldnt get a bone, we let collision take over
 		break;
 	}
 	}
 
 	// Center fallback, uses center of collision box
 
-	// Check if collision box is set
+	// Check if collision box is set, TODO: multipoint collision?
 	auto coll = GetCollision(entity);
 	if (coll != CatBox())
 		// We can use the center collision for an aimpoint

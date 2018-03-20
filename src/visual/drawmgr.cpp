@@ -11,6 +11,7 @@
 
 void render_cheat_visuals()
 {
+    enableGUI();
     BeginCheatVisuals();
     //    xoverlay_draw_rect(300, 300, 100, 100, xoverlay_rgba(200, 100, 100,
     //    255));
@@ -38,7 +39,7 @@ std::mutex drawing_mutex;
 
 CatVar info_text(CV_SWITCH, "info", "1", "Show info",
                  "Show cathook version in top left corner");
-CatVar info_text_min(CV_SWITCH, "info_min", "0", "Show minimal info",
+CatVar info_text_min(CV_SWITCH, "info_min", "1", "Show minimal info",
                      "Only show cathook title in top left corner");
 
 void DrawCheatVisuals()

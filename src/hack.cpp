@@ -214,10 +214,10 @@ free(logname);*/
 
     draw::Initialize();
 #if ENABLE_GUI
-/*
+
 g_pGUI = new CatGUI();
 g_pGUI->Setup();
-*/
+
 #endif
 
 #endif /* TEXTMODE */

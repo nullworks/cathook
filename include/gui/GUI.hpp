@@ -16,3 +16,12 @@ void init();
 void update();
 void draw();
 }
+
+class CatGUI {
+public:
+	CatGUI();
+	~CatGUI();
+	void Setup();
+};
+
+extern CatGUI* g_pGUI;

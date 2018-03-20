@@ -84,7 +84,8 @@ ifdef BUILD_DEBUG
 COMMON_FLAGS+=-g3 -ggdb
 else
 ifneq ($(NO_LTO),1)
-COMMON_FLAGS+=-flto
+#aimbot crashes tf2 when an enemy is close when this flag is enabled, no idea why
+#COMMON_FLAGS+=-flto
 endif
 endif
 

@@ -2,7 +2,7 @@
 /*
  *
  *  An easy way to display information to the user.
- *  Make sure to set minmax_size to have clamping
+ *  Make sure to set max_size to have clamping
  *
  */
 
@@ -17,16 +17,10 @@
 // Make sure the root hover on works, and that it will recurse
 namespace gui { namespace base {
 
-CBaseTooltip::CBaseTooltip(const char* _name) : CBaseWidget(_name) {
-  position_mode = FLOATING; // We dont want anything to move us
+CBaseTooltip::CBaseTooltip(std::string name, std::pair<int,int> max_size) : CBaseWidget(name), max_size(max_size) {
   // Here we want to set the size and offset to something that ChildByPoint wont find
   offset = std::make_pair(-128, -128);
   size = std::make_pair(0, 0);
-}
-
-// as well as set our zindex to always be on top
-void CBaseTooltip::Update() {
-  zindex = -100;
 }
 
 void CBaseTooltip::Draw() {
@@ -39,7 +33,7 @@ void CBaseTooltip::Draw() {
   auto tooltip_size = draw::GetStringLength(tooltip.c_str(), 1, 20);
 
   // Check if we need to wrap
-  if (minmax_size.first!=-1&&tooltip_size.first > minmax_size.first) {
+  if (max_size.first!=-1&&tooltip_size.first > max_size.first) {
 
     std::string wrapped_str; // A place to store the wrapped string, with the size ;)
     std::string cur_line; // Our current line
@@ -51,7 +45,7 @@ void CBaseTooltip::Draw() {
     for (const auto& cur_str : sep_strs) {
 
       // If it goes over max width, we add the current line to the ourput, then return
-      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20).first > minmax_size.first) {
+      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), 1, 20).first > max_size.first) {
         // Add the current line
         wrapped_str += cur_line + '\n';
 

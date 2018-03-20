@@ -9,36 +9,37 @@ Child is open, displayed.
 */
 
 namespace gui { namespace menu {
-    CMenuButton::CMenuButton(const char * str):CBaseWidget(str){
-    }
-    void CMenuButton::Draw(){
-        auto abs = AbsolutePosition();
-        auto color=focus?(child_focused?colors::pink:colors::RainbowCurrent()):colors::gray;
-    	draw::RectFilled(abs.first, abs.second, size.first, size.second, colors::Transparent(color, 0.3));
-    	draw::Rect(abs.first, abs.second, size.first, size.second, color);
-        auto textsize=draw::GetStringLength(name.c_str(),draw::default_font.value,draw::default_font_size.value);
-        draw::String(name.c_str(),abs.first+(size.first-textsize.first)/2,abs.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
-	    CBaseWidget::Draw();
-        if(child&&child->IsVisible()) child->Draw();
-    }
-    void CMenuButton::Update(){
-        size=draw::GetStringLength(name.c_str(),draw::default_font.value,draw::default_font_size.value);
-        size.first=std::max(size.first+padding.first*2,minmax_size.first);
-        size.second+=padding.second*2;
-        if(child) child->Update();
-    }
+CMenuButton::CMenuButton(std::string str):CBaseWidget(str){
+}
+void CMenuButton::Draw(){
+    auto color=focus?(child_focused?colors::pink:colors::RainbowCurrent()):colors::gray;
+    draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
+    draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
+    auto textsize=draw::GetStringLength(name.c_str(),draw::default_font.value,draw::default_font_size.value);
+    draw::String(name.c_str(),global_pos.first+(size.first-textsize.first)/2,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
+    CBaseWidget::Draw();
+    if(child&&child->IsVisible()) child->Draw();
+}
+void CMenuButton::UpdatePositioning(){
+    int min_width = size.first;
+    size=draw::GetStringLength(name.c_str(),draw::default_font.value,draw::default_font_size.value);
+    size.first=std::max(size.first+padding.first*2,min_width);
+    size.second+=padding.second*2;
+    if(child) child->UpdatePositioning();
+}
 bool CMenuButton::TryFocusGain() {
     child_focused=false;
-    if(child) child->Show();
+    if(child) child->visible=true;
+    UpdatePositioning();
 	return CBaseWidget::TryFocusGain();
 }
 void CMenuButton::OnFocusLose() {
     if(child&&child_focused) child->OnFocusLose();
-    if(child) child->Hide();
+    if(child) child->visible=false;
 	child_focused=false;
 	CBaseWidget::OnFocusLose();
 }
-void CMenuButton::OnKeyPress(int key) {
+void CMenuButton::OnKeyPress(int key, bool repeat) {
     if(child){
         if (child_focused){
             if(!child->ConsumesKey(key)){
@@ -47,7 +48,7 @@ void CMenuButton::OnKeyPress(int key) {
                     child_focused=false;
                 }
             }
-            child->OnKeyPress(key);
+            child->OnKeyPress(key, repeat);
         }else if (key==activatekey.value&&focus){
             //Only runs if child_focused==false
             child_focused|=child->TryFocusGain();
@@ -67,15 +68,10 @@ bool CMenuButton::ConsumesKey(int key) {
 }
 
 
-    // Visiblity
-    void CMenuButton::Hide() {
-        CBaseWidget::Hide();
-        if(child) child->Hide();
-    }
     // Children
     void CMenuButton::SetChild(IWidget* child) {
         this->child=child;
     	child->parent = this;
-        child->Hide();
+        child->visible=false;
     }
 }}

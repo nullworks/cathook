@@ -5,16 +5,15 @@
 namespace gui { namespace menu {
 class CMenuButton : public base::CBaseWidget {
 public:
-  CMenuButton(const char *);
+  CMenuButton(std::string name);
   virtual bool TryFocusGain();
   virtual void OnFocusLose();
-  virtual void OnKeyPress(int);
+  virtual void OnKeyPress(int, bool);
   virtual void OnKeyRelease(int);
   virtual bool ConsumesKey(int);
-  virtual void Hide();
   //virtual void OnMousePress();
   virtual void Draw();
-  virtual void Update();
+  virtual void UpdatePositioning();
 
   void SetChild(IWidget *);
   //Only really relevant to keyboard input.

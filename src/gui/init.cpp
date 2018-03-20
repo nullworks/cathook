@@ -12,13 +12,8 @@
 #include "../framework/input.hpp"			// For key_pressed & released callbacks
 
 // Stuff to init
-<<<<<<< HEAD
-//#include "gui.hpp"
 #include "menu/menu.hpp"
-=======
 #include "gui.hpp"
-//#include "menu/menu.hpp"
->>>>>>> 5a757086e5dd7f5aeb142f17fe8ec7cd352becf1
 #include "hudstrings/sidestrings.hpp"
 //#include "base/examples/test_window.hpp"
 
@@ -30,16 +25,16 @@ void Init() {
 
 	// Setup the draw manager to run gui
 	//TODO: Make GUI use CatKey instead of int
-	drawmgr.REventDuring([](){g_pGui.Update();});
+	drawmgr.REventDuring([](){g_pGui.Draw();});
 	input::key_event.add([](CatKey key, bool newstate){
 		if (newstate){
-			g_pGui.OnKeyPress(key);
+			g_pGui.OnKeyPress(key, false);
 		}else{
 			g_pGui.OnKeyRelease(key);
 		}
 		});
 	input::bounds_event.add([](std::pair<int,int> bounds){
-		g_pGui.minmax_size=bounds;
+		g_pGui.size=bounds;
 	});
 	input::mouse_event.add([](std::pair<int,int> mouse){
 		//TODO: gui - mouse
@@ -48,9 +43,8 @@ void Init() {
 
 	// Other gui elements
 	sidestrings::Init();
-	ShowTestWindow();
+	//ShowTestWindow();
 	//g_pGUI = new CatGUI();
-	//drawmgr.REventDuring([](){g_pGui.Update();});
 }
 
 }

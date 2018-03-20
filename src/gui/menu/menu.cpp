@@ -37,12 +37,11 @@ void populateMenu(base::CBaseContainer *parent, CatMenuTree &branch, unsigned in
 }
 CMenu::CMenu(const char * str):CBaseWindow(str){
   hover_is_focus=true;
-  position_mode = base::FLOATING;
 }
 
-void CMenu::Update() {
+void CMenu::UpdatePositioning() {
   offset = std::make_pair(parent->size.first,0);
-  CBaseWindow::Update();
+  CBaseWindow::UpdatePositioning();
 }
 
 void Init() {

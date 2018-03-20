@@ -8,11 +8,11 @@ class CCatVar : public base::CBaseWidget {
 public:
   CCatVar(CatVar *);
   virtual void OnFocusLose();
-  virtual void OnKeyPress(int);
+  virtual void OnKeyPress(int, bool);
   virtual void OnKeyRelease(int);
   virtual bool ConsumesKey(int);
   virtual void Draw();
-  virtual void Update();
+  virtual void UpdatePositioning();
 
   int min_mid_padding=3;
   std::pair<int,int> padding=std::make_pair(3,3);

@@ -16,29 +16,29 @@ namespace gui { namespace menu {
     CCatVar::CCatVar(CatVar * cv):CBaseWidget(cv->name.c_str()){
     }
     void CCatVar::Draw(){
-        auto abs = AbsolutePosition();
         auto color=focus?(typing?colors::pink:colors::RainbowCurrent()):colors::gray;
-    	draw::RectFilled(abs.first, abs.second, size.first, size.second, colors::Transparent(color, 0.3));
-    	draw::Rect(abs.first, abs.second, size.first, size.second, color);
+    	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
+    	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
         auto textsize=draw::GetStringLength(cv->desc_short.c_str(),draw::default_font.value,draw::default_font_size.value);
-    	draw::RectFilled(abs.first, abs.second, textsize.first, size.second, colors::Transparent(colors::black, 0.3));
-        draw::String(cv->desc_short.c_str(),abs.first,abs.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
+    	draw::RectFilled(global_pos.first, global_pos.second, textsize.first, size.second, colors::Transparent(colors::black, 0.3));
+        draw::String(cv->desc_short.c_str(),global_pos.first,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
         textsize=draw::GetStringLength(content.c_str(),draw::default_font.value,draw::default_font_size.value);
-        draw::String(content.c_str(),abs.first+size.first-textsize.first,abs.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
+        draw::String(content.c_str(),global_pos.first+size.first-textsize.first,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
         if(typing){
 	        std::chrono::duration<float, std::deca> curtime = std::chrono::steady_clock::now() - blink_start_time;
             if(std::fmod(curtime.count(), blink_period)<blink_vis_time){
-                auto beep=abs.first-textsize.first+draw::GetStringLength(content.substr(0,cursor).c_str(),draw::default_font.value,draw::default_font_size.value).first;
+                auto beep=global_pos.first-textsize.first+draw::GetStringLength(content.substr(0,cursor).c_str(),draw::default_font.value,draw::default_font_size.value).first;
                 //colors::RainbowCurrent()
             }
         }
         CBaseWidget::Draw();
     }
-    void CCatVar::Update(){
+    void CCatVar::UpdatePositioning(){
+        int minwidth = size.first;
         if (!typing||!focus) content=cv->GetValue();
         auto label=draw::GetStringLength(cv->desc_short.c_str(),draw::default_font.value,draw::default_font_size.value);
         size=draw::GetStringLength(content.c_str(),draw::default_font.value,draw::default_font_size.value);
-        size.first=std::max(label.first+min_mid_padding+size.first,minmax_size.first);
+        size.first=std::max(label.first+min_mid_padding+size.first, minwidth);
         size.second=std::max(label.second,size.second)+padding.second*2;
     }
 void CCatVar::OnFocusLose() {
@@ -46,7 +46,7 @@ void CCatVar::OnFocusLose() {
     typing=false;
 	CBaseWidget::OnFocusLose();
 }
-void CCatVar::OnKeyPress(int key) {
+void CCatVar::OnKeyPress(int key, bool repeat) {
     if (key==activatekey.value&&focus&&!typing){
         typing=true;
         cursor=content.size();

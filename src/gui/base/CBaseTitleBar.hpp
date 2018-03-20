@@ -17,8 +17,8 @@ public:
 	CBaseTitleBar(const char* _title);
 
 	virtual void Draw();
-	virtual void Update();
-	virtual void OnMousePress();
+	//virtual void Update();
+	//virtual void OnMousePress();
 
 	const std::string title;
 	std::pair<int, int> last_mouse;

@@ -82,8 +82,9 @@ extern CMFunction<CatLocalPlayer*()> GetLocalPlayer;
 
 // "Make life easy"
 inline bool GetBoneCenter(CatEntity* this_ptr, int hb, CatVector& bone) {
-	CatBox tmp; auto ret = GetBone(this_ptr, hb, tmp);
-	bone = tmp.GetCenter(); return ret;
+	CatBox tmp;
+	auto ret = GetBone(this_ptr, hb, tmp);
+	if (ret) bone = tmp.GetCenter(); return ret;
 }
 inline float GetDistance(CatEntity* this_ptr) {
 	auto local_ent = GetLocalPlayer();

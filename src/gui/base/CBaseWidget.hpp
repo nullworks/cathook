@@ -1,7 +1,7 @@
 
 /*
  *
- *	This is a base widget for things like sliders, checkboxes, dropdowns, etc.
+ *	This is a base for widgets such as sliders, checkboxes, dropdowns, etc.
  *
  *
  */
@@ -13,31 +13,23 @@
 namespace gui { namespace base {
 
 class CBaseWidget : virtual public IWidget {
+protected:
+	std::string tooltip;
+	CatVector4 bounds_color;
 public:
-	CBaseWidget(const char* _name);
+	CBaseWidget(std::string name, std::string tooltip = "");
 
 	// General functions
-	virtual void Update();
+	virtual void UpdatePositioning();
 	virtual void Draw();
-	virtual void DrawBounds();
 
 	// User input functions
-	virtual void OnMouseEnter();
-	virtual void OnMouseLeave();
-	virtual void OnMousePress();
-	virtual void OnMouseRelease();
+	virtual bool OnMouseMove(std::pair<int,int> mouse_pos, bool hover_taken);
 	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
-	virtual void OnKeyPress(int key);
+	virtual void OnKeyPress(int key, bool repeat);
 	virtual void OnKeyRelease(int key);
 	virtual bool ConsumesKey(int key);
-
-	// Visibility
-	virtual void Show();
-	virtual void Hide();
-
-	// Sizing
-	virtual std::pair<int, int> AbsolutePosition();
 
 	// Naming
 	virtual const std::string& GetTooltip();

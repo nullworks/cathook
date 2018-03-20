@@ -87,14 +87,22 @@ private:
 };
 
 // a class to make loop threading easier
-// TODO, make threading from objects possible
+// TODO: Still broken, pls fix
+template<typename... args>
 class ThreadedLoop {
 public:
-  ThreadedLoop(CMFunction<void()> _thread_loop) : thread_loop(_thread_loop) {
+  ThreadedLoop(){}
+  ThreadedLoop(void(*_thread_loop)(args...), args... a){
+    Init(_thread_loop, a...);
+  }
+  void Init(void(*_thread_loop)(args...), args... a) {
+    if (state != HALTED) return;
+    thread_loop = _thread_loop;
     // This is the loop
     std::thread thread_construct([&](){
+      state = RUNNING;
       while (state != STOP) // We loop while stop isnt true
-        thread_loop();
+        thread_loop(a...);
       state = HALTED;
     });
     thread_construct.detach();
@@ -107,8 +115,8 @@ public:
   }
 private:
   enum {RUNNING, STOP, HALTED};
-  CMFunction<void()> thread_loop;
-  int state = RUNNING;
+  CMFunction<void(args...)> thread_loop;
+  int state = HALTED;
 };
 
 // Is to be used like an ordered map, but by replacing hashing with iteration, it can be faster with a small amount of items

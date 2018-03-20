@@ -15,7 +15,7 @@ public:
   CMenu(const char *);
   std::vector<int> menu_position = {0};
   //virtual void OnMousePress();
-  virtual void Update();
+  virtual void UpdatePositioning();
 };
 
 extern base::CBaseWindow pMenu;

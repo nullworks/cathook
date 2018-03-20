@@ -6,8 +6,15 @@ build_dir=bin/lin
 # build cmake
 mkdir -p $build_dir
 cd $build_dir
+
+if [ -f "./MakeFile" ]; then
+  echo Cleaning up old-style build
+  ./clean.sh
+fi
+
 if [ ! -f CMakeCache.txt ]; then
- cmake $cur_dir $@ # pass the args to cmake
+  echo Generating CMake Files
+  cmake $cur_dir $@ # pass the args to cmake
 fi
 
 # make  with all threads

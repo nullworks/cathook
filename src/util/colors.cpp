@@ -69,4 +69,9 @@ CatVector4 RainbowCurrent() {
 	return colors::FromHSL(fabs(sin(curtime.count())) * 360.0f, 0.85f, 0.9f);
 }
 
+// Returns a random color 
+CatVector4 RandomColor() {
+	return colors::FromHSL(rand() % 360, float(rand() % 10)/50+0.5f, float(rand() % 10)/50+0.5f);
+}
+
 }

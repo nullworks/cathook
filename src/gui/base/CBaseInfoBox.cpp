@@ -2,7 +2,7 @@
 /*
  *
  *  An easy way to display information to the user.
- *  Make sure to set minmax_size to have clamping
+ *  Make sure to set max_size to have clamping
  *
  */
 
@@ -15,8 +15,7 @@
 
 namespace gui { namespace base {
 
-CBaseInfoBox::CBaseInfoBox(const char* _name, const char* info) : CBaseWidget(_name), infostring(info){
-  position_mode = ABSOLUTE;
+CBaseInfoBox::CBaseInfoBox(std::string name, std::string info, std::pair<int, int> max_size) : CBaseWidget(name), infostring(info), max_size(max_size) {
 }
 
 void CBaseInfoBox::Draw() {
@@ -25,7 +24,7 @@ void CBaseInfoBox::Draw() {
   auto infostring_size = draw::GetStringLength(infostring.c_str(), 1, 20);
 
   // Check if we need to wrap
-  if (minmax_size.first!=-1&&infostring_size.first > minmax_size.first) {
+  if (max_size.first!=-1&&infostring_size.first > max_size.first) {
 
     std::string wrapped_str; // A place to store the wrapped string, with the size ;)
     std::string cur_line; // Our current line
@@ -37,7 +36,7 @@ void CBaseInfoBox::Draw() {
     for (const auto& cur_str : sep_strs) {
 
       // If it goes over max width, we add the current line to the ourput, then return
-      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), draw::default_font, draw::default_font_size).first > minmax_size.first) {
+      if (draw::GetStringLength((cur_line + ' ' + cur_str).c_str(), draw::default_font, draw::default_font_size).first > max_size.first) {
         // Add the current line
         wrapped_str += cur_line + '\n';
 

@@ -69,5 +69,6 @@ inline CatVector4 Health(CatEntity* entity) {
 }
 
 CatVector4 RainbowCurrent();
+CatVector4 RandomColor();
 
 }

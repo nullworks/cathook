@@ -9,21 +9,17 @@
 #pragma once
 
 #include "../../framework/input.hpp" // So we can update our gui & know, its included here for CATKEY_COUNT
-#include "CBaseContainer.hpp"
+#include "CBaseParent.hpp"
 
 namespace gui { namespace base {
 
-class CBaseRoot : public CBaseContainer {
+class CBaseRoot : public CBaseParent {
   //CBaseInfoBox* tooltip_widget; // So we can use tooltips
 public:
-	CBaseRoot();
+	CBaseRoot(std::string name = "Root", std::string tooltip="");
 
-  // This is root, doesnt matter if its virtual or not, faster to do it like this
-	virtual void MoveChildren(){};
-	void Update();
-  virtual void DrawBounds();
 	//For redirecting CATKEY_MOUSE_1 to OnMouse
-	virtual void OnKeyPress(int key);
+	virtual void OnKeyPress(int key, bool repeat);
 	virtual void OnKeyRelease(int key);
 
 	// used to store what frame we are on

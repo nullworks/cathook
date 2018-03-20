@@ -1,7 +1,7 @@
 
 /*
  *
- *	This is a base widget for things like sliders, checkboxes, dropdowns, etc.
+ *	This is a base for widgets such as sliders, checkboxes, dropdowns, etc.
  *
  *
  */
@@ -18,64 +18,41 @@
 namespace gui { namespace base {
 
 // Constructors
-CBaseWidget::CBaseWidget(const char* _name) {
-	name = _name;
-	position_mode = INLINE;
-	Show();
+CBaseWidget::CBaseWidget(std::string name, std::string tooltip){
+	this->name=name;
+	this->tooltip=tooltip;
 }
 
 // General functions
-void CBaseWidget::Update() {}
-void CBaseWidget::Draw() {
-	//TODO: Remove hover debug
-	//if(hover) DrawBounds();
+void CBaseWidget::UpdatePositioning() {
+	//BaseWidget is inline by default
+	if(parent){
+		auto pgpos = parent->GetGlobalPos();
+		global_pos = std::make_pair(offset.first+pgpos.first, offset.second+pgpos.second);
+	}else{
+		//No parent
+		global_pos = offset;
+	}
 }
-void CBaseWidget::DrawBounds() {
-	//If the bounds color is unset
-	if (bounds_color == CatVector4())
-		// Set random bounds color
-		bounds_color = CatVector4(rand() % 255, rand() % 255, rand() % 255, 255);
-	auto abs_pos = AbsolutePosition();
-	draw::RectFilled(abs_pos.first, abs_pos.second, size.first, size.second, colors::Transparent(bounds_color, 0.25f));
-	draw::Rect(abs_pos.first, abs_pos.second, size.first, size.second, bounds_color);
+
+void CBaseWidget::Draw() {
+	if(draw_bounds){
+		//If the bounds color is unset, set random bounds color
+		if (bounds_color == CatVector4())
+			bounds_color = colors::RandomColor();
+		//Draw it
+		draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(bounds_color, 0.25f));
+		draw::Rect(global_pos.first, global_pos.second, size.first, size.second, bounds_color);
+	}
 }
 
 // User input functions
-void CBaseWidget::OnMouseEnter()	{ hover = true; }
-void CBaseWidget::OnMouseLeave() 	 { hover = false; }
-void CBaseWidget::OnMousePress(){
-  auto abs = AbsolutePosition();
-  //TODO: Mouse press
-  //auto mf = input::mouse.first-abs.first;
-  //auto ms = input::mouse.second-abs.second;
-  //if(mf>0&&ms>0&&mf<size.first&&ms<size.second){
-  //  press = true;
-  //}
-}
-void CBaseWidget::OnMouseRelease() { press = false; }
+bool CBaseWidget::OnMouseMove(std::pair<int,int> mouse_pos, bool hover_taken){ return false; }
 bool CBaseWidget::TryFocusGain() 	 { focus = true; return true; }
 void CBaseWidget::OnFocusLose() 	 { focus = false; }
-void CBaseWidget::OnKeyPress(int key) {};
+void CBaseWidget::OnKeyPress(int key, bool repeat) {};
 void CBaseWidget::OnKeyRelease(int key) {};
 bool CBaseWidget::ConsumesKey(int key) { return false; }
-
-// Visibility
-void CBaseWidget::Show() { visible = true; }
-void CBaseWidget::Hide() { visible = false; }
-
-// Sizing
-//TODO: Optimization: Have parent pass own absolute position to child at drawtime
-std::pair<int, int> CBaseWidget::AbsolutePosition() {
-	auto result = offset;
-	auto pParent = parent;
-	while (pParent) {
-		auto poffset = pParent->offset;
-		result.first += poffset.first;
-		result.second += poffset.second;
-		pParent = pParent->parent;
-	}
-	return result;
-}
 
 // Get our tooltip
 const std::string& CBaseWidget::GetTooltip() { return tooltip; }

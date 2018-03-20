@@ -16,10 +16,9 @@ namespace gui { namespace base {
 
 // Constructor
 CBaseTitleBar::CBaseTitleBar(const char* _title) : title(_title), CBaseWidget("titlebar") {
-	position_mode = ABSOLUTE;
 }
 
-void CBaseTitleBar::Update() {
+/*void CBaseTitleBar::Update() {
 	if (!parent) return;
 
 	// Set our size
@@ -43,14 +42,13 @@ void CBaseTitleBar::OnMousePress() {
 	CBaseWidget::OnMousePress();
 }
 
-
+*/
 void CBaseTitleBar::Draw() {
 	// Draw a nice rect
-	auto abs = AbsolutePosition();
-	draw::Rect(abs.first, abs.second, size.first, size.second, colors::Transparent(colors::pink,hover?0.7f:1.0f));
+	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(colors::pink,hover?0.7f:1.0f));
 	// Draw our string
 	auto title_size = draw::GetStringLength(title.c_str(), 1, 9);
-	draw::String(title.c_str(), abs.first + (size.first - title_size.first) / 2, abs.second + (size.second - title_size.second) / 2, 1, 9, colors::white);
+	draw::String(title.c_str(), global_pos.first + (size.first - title_size.first) / 2, global_pos.second + (size.second - title_size.second) / 2, 1, 9, colors::white);
 }
 
 }}

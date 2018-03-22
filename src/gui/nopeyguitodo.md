@@ -1,10 +1,11 @@
 # NOPEY'S NEKOHOOK UI TODOLIST
-Mar 19th 2018
 ## Maintenance
-* Remove "CBase" prefixes
-* Merge IWidget & CBaseWidget
+* Remove "CBase" prefixes?
 * grep "TODO:" src/gui -r 
-* Figure out graphical size bug
+* Figure out keyboard nav bug
+* General Debugging
+* Remove the excess logging and includes
 ## Features
-* Mouse
 * Consider Z-Sorting
+* Dirty flag for UpdatePosition
+* Cache BB around all children for mousemove optimization

@@ -12,6 +12,7 @@
 #include "../../framework/drawing.hpp"
 
 #include "CBaseTooltip.hpp"
+#include "CBaseParent.hpp"
 
 // Draw tooltip on mouse, and put size and offset somewhere else to prevent child by point from going off
 // Make sure the root hover on works, and that it will recurse

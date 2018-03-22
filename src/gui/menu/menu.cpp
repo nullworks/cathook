@@ -12,6 +12,7 @@
 #include "../base/CBaseTitleBar.hpp"
 #include "menu.hpp"
 #include "menubutton.hpp"
+#include "catvar.hpp"
 #include <sstream>
 
 // menus aspect ratio, dont judge
@@ -23,17 +24,20 @@ namespace gui { namespace menu {
 base::CBaseWindow pMenu("Menu Root");
 
 void populateMenu(base::CBaseContainer *parent, CatMenuTree &branch, unsigned int depth=0){
+  g_CatLogging.log("Populating %s ",parent->name.c_str());
   for(auto& child:branch.children){
     CMenuButton *button=new CMenuButton(child.name.c_str());
     parent->AddChild(button);
     CMenu *childMenu = new CMenu(child.name.c_str());
-    button->SetChild(childMenu);
+    button->AddChild(childMenu);
     populateMenu(childMenu, child, depth+1);
   }
   for(auto child:branch.cat_children){
-    CMenuButton *button=new CMenuButton(child->name.c_str());
+    CCatVar *button=new CCatVar(child);
     parent->AddChild(button);
+  g_CatLogging.log("CVar %s ",child->name.c_str());
   }
+  g_CatLogging.log("Fin %s ",parent->name.c_str());
 }
 CMenu::CMenu(const char * str):CBaseWindow(str){
   hover_is_focus=true;
@@ -45,6 +49,8 @@ void CMenu::UpdatePositioning() {
 }
 
 void Init() {
+  pMenu.offset.first = 100;
+  pMenu.offset.second = 100;
   g_pGui.AddChild(&pMenu);
   base::CBaseTitleBar *title=new base::CBaseTitleBar("Menu");
   pMenu.AddChild(title);

@@ -17,12 +17,6 @@
 
 #include "input.hpp"
 
-// These arent defined by default so I do that here
-#define XK_leftarrow                     0x08fb
-#define XK_uparrow                       0x08fc
-#define XK_rightarrow                    0x08fd
-#define XK_downarrow                     0x08fe
-
 namespace xlib {
 
 //TODO: xlib - FastMap instead of this mess
@@ -67,8 +61,8 @@ static const std::pair<int, CatKey> xlibToCatVar[] = {
 	{XK_KP_Subtract, CATKEY_PAD_MINUS},	{XK_KP_Add, CATKEY_PAD_PLUS},
 	{XK_KP_Enter, CATKEY_PAD_ENTER}, {XK_KP_Decimal, CATKEY_PAD_DECIMAL},
 
-	{XK_uparrow, CATKEY_UP}, {XK_leftarrow, CATKEY_LEFT},
-	{XK_downarrow, CATKEY_DOWN}, {XK_rightarrow, CATKEY_RIGHT},
+	{XK_Up, CATKEY_UP}, {XK_Left, CATKEY_LEFT},
+	{XK_Down, CATKEY_DOWN}, {XK_Right, CATKEY_RIGHT},
 
 	{XK_F1, CATKEY_F1}, {XK_F2, CATKEY_F2}, {XK_F3, CATKEY_F3},
 	{XK_F4, CATKEY_F4}, {XK_F5, CATKEY_F5}, {XK_F6, CATKEY_F6},
@@ -96,8 +90,10 @@ static void RefreshState() {
 	// Get window bounds
 	Window root_return; int rel_x, rel_y; unsigned int border, depth, boundsx, boundsy;
 	if (XGetGeometry(xAppDisplay, xAppWindow, &root_return, &rel_x, &rel_y, &boundsx, &boundsy, &border, &depth)) {
-		bounds = std::make_pair(boundsx, boundsy);
-		input::bounds_event(bounds);
+		if(boundsx!=bounds.first||boundsy!=bounds.second){
+			bounds = std::make_pair(boundsx, boundsy);
+			input::bounds_event(bounds);
+		}
 	}
 
 	// Update mouse position

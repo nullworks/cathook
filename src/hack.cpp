@@ -38,9 +38,6 @@ void hack::Initialize() {
 	g_CatLogging.log("Initializing main cheat features...");
 	features::Init();
 
-	g_CatLogging.log("Initializing gui...");
-	gui::Init(); // init the gui
-
 	// Please put only one GAME module here. Any other type of module can screw with things.
 	// Please also put compiler options to not compile the modules that are not needed.
 	// Modules need to be initialized first to let the managers know what they can do.
@@ -50,6 +47,10 @@ void hack::Initialize() {
 #elif defined(CATHOOK_CSGO) 	// CSGO
 	modules::csgo::Init();
 #endif
+
+	//GUI NEEDS	TO INIT AFTER GAMES TO DO FONTS RIGHT
+	g_CatLogging.log("Initializing gui...");
+	gui::Init(); // init the gui
 
 	// Load configs
 	configs::Init();

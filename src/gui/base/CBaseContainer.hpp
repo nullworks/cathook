@@ -19,6 +19,7 @@ public:
 
 	// General functions
 	virtual void UpdatePositioning();
+	virtual bool OnBounds(std::pair<int,int> bounds);
 
 	// Child related util
 	virtual void MoveChildren();

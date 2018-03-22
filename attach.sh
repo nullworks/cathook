@@ -122,7 +122,7 @@ fi
 
 # If option s isnt set, we can scramble name and attempt to prevent vac
 if [ $no_scramble == 0 ]; then
-  # pBypass for crash dumps being sent
+  # Bypass for crash dumps being sent
   # You may also want to consider using -nobreakpad in your launch options.
   sudo rm -rf /tmp/dumps # Remove if it exists
   sudo mkdir /tmp/dumps # Make it as root
@@ -146,7 +146,7 @@ GDB_ARGS="-n -q --command=$GDB_COMMANDS"
 # REPL (Batch Mode)
 if [ $repl == 0 ]; then
   echo "No REPL, using GDB's Batch Mode"
-  GDB_ARGS = "-batch $GDB_ARGS"
+  GDB_ARGS="-batch $GDB_ARGS"
 else
   echo "GDB will enter a REPL"
 fi
@@ -184,7 +184,7 @@ if [ $backtrace == 0 ]; then
 # Backtrace
 else
   echo "Backtracing!"
-  #echo "catch exit exit_group">>$GDB_COMMANDS
+  #echo "catch syscall exit exit_group">>$GDB_COMMANDS
   echo "continue">>$GDB_COMMANDS
   echo "backtrace">>$GDB_COMMANDS
 fi

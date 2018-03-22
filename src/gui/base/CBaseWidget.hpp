@@ -7,24 +7,46 @@
  */
 
 #pragma once
+#include <functional> // Pair
+#include <string>
 
-#include "IWidget.hpp" // has a widget class that we build apon
+#include "../../util/mathlib.hpp" // Colors
 
 namespace gui { namespace base {
 
-class CBaseWidget : virtual public IWidget {
+//Forward decl
+class CBaseParent;
+
+class CBaseWidget{
 protected:
 	std::string tooltip;
 	CatVector4 bounds_color;
+	std::pair<int, int> global_pos;
 public:
+	std::string name;
+	CBaseParent *parent=nullptr;
 	CBaseWidget(std::string name, std::string tooltip = "");
+	// States
+	//TODO: Add Mouse support to UI
+	//bool press = false;
+	bool hover = false;
+	bool focus = false;
 
-	// General functions
+
+	// Positioning
+	inline std::pair<int, int> GetGlobalPos(){ return global_pos; };
+	std::pair<int, int> offset;
+	std::pair<int, int> size;
 	virtual void UpdatePositioning();
+	
+	// Graphics
+	bool visible = true;
+	bool draw_bounds = false;
 	virtual void Draw();
 
-	// User input functions
-	virtual bool OnMouseMove(std::pair<int,int> mouse_pos, bool hover_taken);
+	// Input
+	virtual bool OnMouse(std::pair<int,int> mouse_pos, bool hover_taken);
+	virtual bool OnBounds(std::pair<int,int> bounds);
 	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
 	virtual void OnKeyPress(int key, bool repeat);

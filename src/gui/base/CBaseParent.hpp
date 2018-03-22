@@ -20,9 +20,11 @@ public:
 
 	// General functions
 	virtual void Draw();
+	virtual void UpdatePositioning();
 
 	// User input functions
-	virtual bool OnMouseMove(std::pair<int,int> mouse_pos, bool hover_taken);
+	virtual bool OnMouse(std::pair<int,int> mouse_pos, bool hover_taken);
+	virtual bool OnBounds(std::pair<int,int> bounds);
 	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
 	virtual void OnKeyPress(int key, bool repeat);
@@ -33,12 +35,12 @@ public:
 	virtual const std::string& GetTooltip();
 
 	// Children
-	std::vector<IWidget*> children;
-	void AddChild(IWidget* child);
+	std::vector<CBaseWidget*> children;
+	void AddChild(CBaseWidget* child);
 
 	// Get Child/info
-	IWidget* ChildByIndex(int idx);
-	IWidget* ChildByName(const char* name);
+	CBaseWidget* ChildByIndex(int idx);
+	CBaseWidget* ChildByName(const char* name);
 
 	// Child info related to the container
 	bool TryFocusOn(int child);

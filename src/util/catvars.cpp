@@ -51,8 +51,8 @@ CatCommand list_vars("list", [](std::vector<std::string> args){
 
 // Menu tree
 void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
-	// Check if we reached the end if the enum info, if not we can add more to the tree
-	if (cat_var->gui_position.size() <= recursions) {
+  // Check if we reached the end if the enum info, if not we can add more to the tree
+  if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing
     return;
   }
@@ -60,7 +60,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
   // Look through the children and if any have the name of one we might want to make, we can reuse the branch
   for (auto& tree_branch : children) {
     // Test if this is an existing branch with matching names
-    if (tree_branch.name == cat_var->gui_position[recursions]) continue;
+    if (tree_branch.name != cat_var->gui_position[recursions]) continue;
     // We found our branch, recurse into it
     tree_branch.AddTree(cat_var, recursions + 1);
     return;

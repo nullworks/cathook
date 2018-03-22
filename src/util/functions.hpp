@@ -36,6 +36,7 @@ private:
 template <typename... args>
 class CMEvent {
   using func_type = void(*)(args...);
+protected:
   std::vector<func_type> func_pool; // to store added functions
 public:
   inline void operator()(args... a /*bool do_multithreading = false*/) {

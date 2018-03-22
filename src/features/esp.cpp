@@ -308,7 +308,7 @@ static void Draw() {
 				for (const auto& str : str_cache) {
 
 					// Get string sizes
-					auto size = draw::GetStringLength(str.first, 0, 28);
+					auto size = draw::GetStringLength(str.first, draw::default_font, draw::default_font_size);
 
 					if (center_strings) // Centered strings
 						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, draw::default_font, draw::default_font_size, str.second);

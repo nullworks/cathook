@@ -12,6 +12,8 @@
 
 #include "debug.hpp"
 
+// TODO, draw multipoint
+
 namespace features::debug {
 
 static CatEnum debug_menu({"debug"});

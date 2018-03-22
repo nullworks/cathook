@@ -58,25 +58,25 @@ public:
 // Setters/Getters
 public:
   // Used to get a list of members
-  inline std::vector<std::string> GetMembers() {
+  inline std::vector<std::string> GetMembers() const {
     std::vector<std::string> ret;
     if (!this->IpcMemSpace)// Saftey net
       return ret;
-    for (auto i: this->IpcMemSpace->members)
+    for (const auto& i: this->IpcMemSpace->members)
       ret.push_back(i.name);
     return ret;
   }
   // Returns the name used in ipc
-  inline std::string GetIpcName() {
+  inline std::string GetIpcName() const {
     if (!this->IpcMemSpace || ipc_pos == -1) return std::string();
     return this->IpcMemSpace->members[ipc_pos].name;
   }
   // Returns whether member exists
-  inline bool MemberExists(const std::string& test_name) {
+  inline bool MemberExists(const std::string& test_name) const {
     return (FindMember(test_name) == -1) ? false : true;
   }
   // Returns the slot of the member, returns -1 on failure
-  inline int FindMember(const std::string& test_name) {
+  inline int FindMember(const std::string& test_name) const {
     for (int i = 0; i < MAX_IPC_MEMBERS; i++)
       if (this->IpcMemSpace->members[i].name == test_name)
         return i;
@@ -87,15 +87,15 @@ private:
   inline void IpcCleanup(){
     // For the cleanup, we look for anything not open and check the timer on it
     // We clean thing more than 3 seconds of idle
-    for (auto i : this->IpcMemSpace->members)
+    for (auto& i : this->IpcMemSpace->members)
       if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
         i.state = ipc_state::OPEN;
-    for (auto i : this->IpcMemSpace->message_pool)
+    for (auto& i : this->IpcMemSpace->message_pool)
       if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
         i.state = ipc_state::OPEN;
   }
   // Internal use for finding open slots, be sure to give it the right size to prevent segfaults
-  inline int GetOpenSlot(IpcSlot* slot_array, int size){
+  inline int GetOpenSlot(IpcSlot* slot_array, int size) const {
     for (int i = 0; i < size; i++)
       if (slot_array[i].state == ipc_state::OPEN)
         return i;
@@ -110,7 +110,7 @@ private:
   void thread_loop();
 public:
   // Use to send messages through ipc, use member pos or by name, returns true on success
-  bool SendMessage(std::string recipient, const char* command, const void* payload, size_t size);
+  bool SendMessage(const std::string& recipient, const char* command, const void* payload, size_t size);
   bool SendMessage(int recipient, const char* command, const void* payload, size_t size);
   void SendAll(const char* command, const void* payload, size_t size);
 };

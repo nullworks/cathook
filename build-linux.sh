@@ -12,7 +12,7 @@ if [ -f "./MakeFile" ]; then
   ./clean.sh
 fi
 
-if [ ! -f CMakeCache.txt ]; then
+if [ $# != 0 ] || [ ! -f CMakeCache.txt ]; then
   echo Generating CMake Files
   cmake $cur_dir $@ # pass the args to cmake
 fi

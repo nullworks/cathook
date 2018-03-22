@@ -17,7 +17,7 @@ public:
     last_time = std::chrono::steady_clock::now();
     return *this;
   }
-  inline bool CheckTime(std::chrono::steady_clock::duration dur) {
+  inline bool CheckTime(std::chrono::steady_clock::duration dur) const {
     return std::chrono::steady_clock::now() - last_time > dur;
   }
   inline bool ResetAfter(std::chrono::steady_clock::duration dur) {

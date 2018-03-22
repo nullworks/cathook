@@ -12,6 +12,7 @@
   #include <errno.h>
   #include <string.h> // error string
   #include <sys/mman.h> // mmap
+  #include <unistd.h> // ftruncate
 #endif
 
 #include "../util/logging.hpp" // Logging is good u noob
@@ -45,6 +46,14 @@ IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
     return;
   }
 
+  // truncate size, this is required for memory to be read/writable, as mmap needs the handle to have a size beforehand
+  if (ftruncate(shm_res, sizeof(IpcContent)) == -1){
+	  char buffer[1024];
+    const char* error_string = strerror_r(errno, buffer, sizeof(buffer));
+    g_CatLogging.log("IPC: ftruncate recieved a unknown error... halp: %s\n", error_string);
+	  return;
+  }
+
   // Map the memory pool
   this->IpcMemSpace = (IpcContent*)mmap(NULL, sizeof(IpcContent), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_32BIT, shm_res, 0);
   if (this->IpcMemSpace == MAP_FAILED) {
@@ -74,6 +83,8 @@ IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
       }
     }
     if (strlen(this->IpcMemSpace->members[this->ipc_pos].name) != 0){
+      // Allow peers to see us
+      this->IpcMemSpace->members[this->ipc_pos].state = ipc_state::RECIPIENT_LOCKED;
       g_CatLogging.log("IPC: Found name: %s!", this->IpcMemSpace->members[this->ipc_pos].name);
     } else {
       g_CatLogging.log("IPC: Cant find suitible name!");
@@ -104,7 +115,7 @@ void IpcStream::thread_loop() {
     this->IpcMemSpace->members[this->ipc_pos].time.Reset();
 
     // Find new messages sent to us
-    for (auto i : this->IpcMemSpace->message_pool) {
+    for (const auto& i : this->IpcMemSpace->message_pool) {
       if (i.state == ipc_state::RECIPIENT_LOCKED) {
         if (i.recipient == this->ipc_pos) {
           // TODO, make system to handle this
@@ -132,7 +143,7 @@ IpcStream::~IpcStream() {
   shm_unlink(this->pool_name);
 }
 
-bool IpcStream::SendMessage(std::string recipient, const char* command, const void* payload, size_t size) {
+bool IpcStream::SendMessage(const std::string& recipient, const char* command, const void* payload, size_t size) {
   auto tmp = this->FindMember(recipient);
   if (tmp == -1) return false;
   this->SendMessage(tmp, command, payload, size);

@@ -16,11 +16,7 @@
 #include "catvars.hpp"
 
 // The CatCommand map
-std::unordered_map<std::string, CatVar*>
-#ifdef __GNUC__
- 	__attribute__ ((init_priority (102)))// Need to init this before other catvars are inited
-#endif
-CatVarMap;
+std::unordered_map<std::string, CatVar*> CatVarMap;
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
@@ -160,17 +156,10 @@ void CatVarKey::callback(std::vector<std::string> args) {
 		g_CatLogging.log("%s: %s", this->name.c_str(), this->GetValue().c_str());
 		return;
 	}
-  // Need a way to clear
-  if (fuzstrcmp(args[0], "empty")) {
-    this->value = CATKEY_NONE;
-    g_CatLogging.log("Catkey Cleared!");
-    return;
-  }
 	// Text input
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 		if (fuzstrcmp(args[0], std::string("CATKEY_") + input::key_names[i]) || fuzstrcmp(args[0], input::key_names[i])) {
 			this->value = (CatKey) i;
-      g_CatLogging.log("Catkey set to \"%s\"!", this->GetValue().c_str());
 			return;
 		}
 	}

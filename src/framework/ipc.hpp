@@ -2,7 +2,9 @@
 #include <thread> // Threads are useful!
 #include <vector>
 
+
 #include "../util/chrono.hpp" // for the cat timer, and so we can sleep in thread
+#include "../util/functions.hpp"
 
 // Increase as needed, we just need enough space to handle
 #define MAX_IPC_MEMBERS 32
@@ -25,7 +27,7 @@ struct IpcSlot {
 };
 // A message, it is the recipients job to recieve it in time and reset it
 struct IpcMessage : public IpcSlot {
-  int author; // number in array
+  int author; // number in member array
   int recipient;
   char command[64]; // A command that tells the recipient what to do with the payload
   char payload[1024]; // This could be anything
@@ -37,6 +39,15 @@ struct IpcMember : public IpcSlot {
 struct IpcContent {
   IpcMember members[MAX_IPC_MEMBERS];
   IpcMessage message_pool[MAX_IPC_MESSAGE_CAP];
+};
+
+// IPC command handler
+class IpcCommand {
+public:
+  IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* payload));
+  inline void operator()(const IpcMessage* message){com_callback(message);}
+private:
+  CMFunction<void(const IpcMessage*)> com_callback;
 };
 
 // IPC Driver
@@ -78,8 +89,9 @@ public:
   // Returns the slot of the member, returns -1 on failure
   inline int FindMember(const std::string& test_name) const {
     for (int i = 0; i < MAX_IPC_MEMBERS; i++)
-      if (this->IpcMemSpace->members[i].name == test_name)
-        return i;
+      if (this->IpcMemSpace->members[i].state == ipc_state::RECIPIENT_LOCKED) // we only want members that arent locked
+        if (this->IpcMemSpace->members[i].name == test_name)
+          return i;
     return -1;
   }
 private:
@@ -114,5 +126,8 @@ public:
   bool SendMessage(int recipient, const char* command, const void* payload, size_t size);
   void SendAll(const char* command, const void* payload, size_t size);
 };
+
+// not garrenteed to not be null, check before using it
+extern IpcStream* g_IpcStream;
 
 }

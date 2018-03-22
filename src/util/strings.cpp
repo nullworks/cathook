@@ -12,14 +12,49 @@
 
 #include "strings.hpp"
 
-// Seperates multiple strings from one string, seperated by spaces
-std::vector<std::string> sepstr(std::string input) { // TODO, add correction to handle unescaped strings
+// Seperates multiple strings from one string, seperated by spaces, or enclosed in quotes
+std::vector<std::string> sepstr(std::string input) {
   std::vector<std::string> ret;
-  std::smatch reg_result;
-  while (std::regex_search(input, reg_result, std::regex("[\\S]+"))) { // regex is really slow and adds alot to file size, but is really convienient for this purpose
-    ret.push_back(reg_result[0]);
-    input = reg_result.suffix();
+
+  std::string tmp;
+  char quote_enclosed = '\0'; // the last quote we recieved
+  bool escaped = false;
+  for (const char& i : input){
+    // Check if we encountered a quote, we want to consume it if its not already within quotes or escaped
+    if ((i == '\"' || i == '\'') && !escaped) {
+      // Encountered our starting quote
+      if (quote_enclosed == '\0') {
+        quote_enclosed = i;
+        continue;
+      // if we encountered our closing quote, we can push to ret
+      } else if (quote_enclosed == i) {
+        quote_enclosed = '\0';
+        ret.push_back(tmp);
+        tmp.clear();
+        continue;;
+      }
+    }
+
+    // Check for escape
+    if (i == '\\' && !escaped) {
+      escaped = true;
+      continue;
+    }
+
+    // if we encountered a space and arent in a quote, we can push the string to ret
+    if (i == ' ' && quote_enclosed == '\0' && !tmp.empty()) {
+      ret.push_back(tmp);
+      tmp.clear();
+    } else
+      // Add our char
+      tmp.push_back(i);
+
+    // reset escaped status
+    escaped = false;
   }
+  // push whats left over to ret
+  if (!tmp.empty())
+    ret.push_back(tmp);
   return ret;
 }
 

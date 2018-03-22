@@ -5,7 +5,7 @@
  *
  */
 
-//#include <queue> // todo
+#include <unordered_map>
 #ifdef __linux__
   #include <fcntl.h> // flags for shm_open()
   #include <sys/stat.h> // S_IRWXU, S_IRWXG, S_IRWXO
@@ -16,6 +16,7 @@
 #endif
 
 #include "../util/logging.hpp" // Logging is good u noob
+#include "console.hpp"
 
 #include "ipc.hpp"
 
@@ -23,6 +24,60 @@
 // TODO: Windows support?
 
 namespace ipc {
+
+// The big boi
+IpcStream* g_IpcStream = nullptr;
+
+// Command handler
+static std::unordered_map<std::string, IpcCommand*> IpcCommandMap;
+IpcCommand::IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* message)) : com_callback(_com_callback) {
+  IpcCommandMap.insert({name, this});
+}
+
+// Stock ipc commands
+static IpcCommand ipc_exec("exec", [](const IpcMessage* message){
+  CallCommand((const char*)message->payload);
+});
+
+// Stock CatCommands to handle ipc
+static CatCommand exec_all("ipc_exec_all", [](std::vector<std::string> args) {
+  if (args.empty()) {
+    g_CatLogging.log("Missing args");
+    return;
+  }
+  if (!g_IpcStream) {
+    g_CatLogging.log("IPC isnt connected");
+    return;
+  }
+  // we send size + 1 to include end char
+  g_IpcStream->SendAll("exec", (void*)args.at(0).c_str(), args.at(0).size() + 1);
+});
+
+// Stock CatCommands to handle ipc
+static CatCommand connect("ipc_connect", [](std::vector<std::string> args) {
+  if (g_IpcStream) {
+    g_CatLogging.log("IPC already connected");
+    return;
+  }
+  // If no args, use default network
+  std::string tmp;
+  if (args.empty())
+    tmp = "neko_ipc";
+  else
+    tmp = args.at(0);
+  // Connect to ipc
+  g_IpcStream = new IpcStream(tmp.c_str());
+});
+
+CatCommand disconnect("ipc_disconnect", [](std::vector<std::string> args) {
+  if (!g_IpcStream) {
+    g_CatLogging.log("IPC isnt connected");
+    return;
+  }
+  // Destruct ipc stream and set to null
+  delete g_IpcStream;
+  g_IpcStream = nullptr;
+});
 
 // Constructor responsibilities, constructing the shared memory pool and starting the thread if successful
 IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
@@ -105,8 +160,20 @@ IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
   #endif
 }
 
-void IpcStream::thread_loop() {
+IpcStream::~IpcStream() {
+  #ifdef __linux__
+    g_CatLogging.log("IPC: IPC shutting down!");
+    this->state = STOP;
+    // We hang the thread deconstructing this until the loop thread ends to prevent segfaulting
+    while(this->state != HALTED)
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // Unmap the shared memory
+    munmap(this->IpcMemSpace, sizeof(IpcContent));
+    shm_unlink(this->pool_name);
+  #endif
+}
 
+void IpcStream::thread_loop() {
   // Main loop
   this->state = RUNNING;
   while (this->state != STOP) {
@@ -115,10 +182,18 @@ void IpcStream::thread_loop() {
     this->IpcMemSpace->members[this->ipc_pos].time.Reset();
 
     // Find new messages sent to us
-    for (const auto& i : this->IpcMemSpace->message_pool) {
+    for (auto& i : this->IpcMemSpace->message_pool) {
       if (i.state == ipc_state::RECIPIENT_LOCKED) {
         if (i.recipient == this->ipc_pos) {
-          // TODO, make system to handle this
+          auto find = IpcCommandMap.find(i.command);
+          if (find != IpcCommandMap.end()) {
+            g_CatLogging.log("IPC: Recieved Command: %s!", i.command);
+            // Run the command we found
+            (*find->second)(&i);
+          } else
+            g_CatLogging.log("IPC: Recieved Unknown Command: %s!", i.command);
+          // Reset the message status since we recieved it
+          i.state = ipc_state::OPEN;
         }
       }
     }
@@ -134,16 +209,13 @@ void IpcStream::thread_loop() {
   this->state = HALTED;
 }
 
-IpcStream::~IpcStream() {
-  g_CatLogging.log("IPC: IPC shutting down!");
-  this->state = STOP;
-  // We hang the thread deconstructing this until the loop thread ends to prevent segfaulting
-  while(this->state != HALTED)
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  shm_unlink(this->pool_name);
-}
+
 
 bool IpcStream::SendMessage(const std::string& recipient, const char* command, const void* payload, size_t size) {
+  if (recipient == "all") {
+    this->SendAll(command, payload, size);
+    return true;
+  }
   auto tmp = this->FindMember(recipient);
   if (tmp == -1) return false;
   this->SendMessage(tmp, command, payload, size);
@@ -168,6 +240,7 @@ bool IpcStream::SendMessage(int recipient, const char* command, const void* payl
 void IpcStream::SendAll(const char* command, const void* payload, size_t size) {
   this->IpcCleanup();// Cleanup so we only get existing members
   for (int i = 0; i < MAX_IPC_MEMBERS; i++) {
+    if (i == this->ipc_pos) continue; // dont send one to yourself dummy
     if (this->IpcMemSpace->members[i].state != ipc_state::RECIPIENT_LOCKED) continue;
     this->SendMessage(i, command, payload, size);
   }

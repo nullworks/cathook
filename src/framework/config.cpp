@@ -64,8 +64,13 @@ CatCommand SaveConfig("save", [](std::vector<std::string> args) {
 
 	// Generate a list of commands from catvars
   std::vector<std::string> cfg_lines;
-	for (const auto& catvar : CatVarMap)
-    cfg_lines.push_back(catvar.second->name + ' ' + catvar.second->GetValue());
+	for (const auto& catvar : CatVarMap) {
+    // CatVarEnums need quotes as their values can have spaces in them
+    if (dynamic_cast<CatVarEnum*>(catvar.second))
+      cfg_lines.push_back(catvar.second->name + " \"" + catvar.second->GetValue() + '"');
+    else
+      cfg_lines.push_back(catvar.second->name + ' ' + catvar.second->GetValue());
+  }
 
   io::WriteFile(args.at(0), cfg_lines);
 

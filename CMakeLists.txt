@@ -40,7 +40,7 @@ ENDFUNCTION()
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.c*")
 EXCLUDE_FILES_FROM_DIR_IN_LIST("${SOURCE_FILES}" "${CMAKE_SOURCE_DIR}/src/modules/")
 #these source files will be compiled & linked first, therefor their globals init'd first.
-set(EARLY_SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/util/catvars.cpp" "${CMAKE_SOURCE_DIR}/src/util/logging.cpp" "${CMAKE_SOURCE_DIR}/src/framework/console.cpp")
+set(EARLY_SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/util/catvars.cpp" "${CMAKE_SOURCE_DIR}/src/util/logging.cpp" "${CMAKE_SOURCE_DIR}/src/framework/console.cpp" "${CMAKE_SOURCE_DIR}/src/framework/ipc.cpp")
 
 # Flags we use for every build type
 set(CMAKE_CXX_STANDARD 17)

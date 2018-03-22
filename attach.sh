@@ -13,12 +13,13 @@ topstring="__--Nekohook Injector--__"
 
 # Option handler
 backtrace=0
+repl=0
 detach=0
 instance=0
 pid=0
 no_scramble=0
 filename="$(realpath libnekohook.so)"
-while getopts :hbdi:p:sf:c arg; do
+while getopts :hbgdi:p:sf:c arg; do
   case $arg in
     \?)
       echo "$(basename "$0"): unrecognized option '$OPTARG'"
@@ -30,6 +31,7 @@ while getopts :hbdi:p:sf:c arg; do
       echo "  Usage:"
       echo "  -h    Gives help info"
       echo "  -b    Injects and backtraces"
+      echo "  -g    Let GDB enter REPL"
       echo "  -d    Detaches"
       echo "  -i    Attaches to a specific instance"
       echo "  -p    Attaches to a specific pid(overrides -i)"
@@ -40,6 +42,9 @@ while getopts :hbdi:p:sf:c arg; do
       ;;
     b)
       backtrace=1
+      ;;
+    g)
+      repl=1
       ;;
     d)
       detach=1
@@ -58,26 +63,28 @@ while getopts :hbdi:p:sf:c arg; do
       filename="$(realpath $OPTARG)"
       ;;
     c)
-      echo "WMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-      echo "MMMMMMMMMMKOdKXNMMMMMMMMMMMMMMMMMMMMMMMM"
-      echo "MMMMMMMWo';lxXMMMMMMMMMMMMMMMMMMMXkolKMM"
-      echo "MMMMMMMk ;NMMMW;',;lxKMMMMMMMMWk,':o;kMM"
-      echo "MMMMMMMMx'.:dKW.oddl:''l;'...,'.,xdd'XMM"
-      echo "MMMMMMMMMMXo'.,';ooo;'.......;cdc,;l'MMM"
-      echo "MMMMMMMMMMMMX..,.;;...,;,..'OK0:;,..kMMM"
-      echo "MMMMMMMMMMMMX..... ........c0KKo.'..dMMM"
-      echo "MMMMMMMMMWX:.....,...,...,.oKKXX'. .cMMM"
-      echo "MMMMMMMN,... ....'..';   ,;0XNWMNd,,:MMM"
-      echo "MMMMMMMo..    .. ....,;:cxXKKKKXNNNNWMMW"
-      echo "MMMMMMMl.. .o;'.....,dO00OOO00kOO0XNNNNW"
-      echo "MMMMWMMk...dMM0'.  ..':,,;;;;,;0KWWMMMMM"
-      echo "MX0Okx:.  .WMX.....,'...... .. ..c0MMMWN"
-      echo "N0K0kd;;ccoWM:...cl:loddoc:;c:,...'oxx0k"
-      echo "MNKkkO0NWMNKO'   OWOddxkxdoclOd'....':KK"
-      echo "MMMNO0XWWWMW.....xMMMWXXKKXNMMd. ....xK0"
-      echo "MMMWXXXXNWW0.....kMMMMMMMMMMMMd.....;00K"
-      echo "MMMMWXXXKKKO:,';xMMMMMMMMMMMMMW0xxxKMWNN"
-      echo "MMMMMMWNNNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+      C="\e[1m\e[38;5;169m\e[48;5;15m"
+      E="\e[0m"
+      echo -e "${C}MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM${E}"
+      echo -e "${C}MMMMMMMMMMKOdKXNMMMMMMMMMMMMMMMMMMMMMMMM${E}"
+      echo -e "${C}MMMMMMMWo';lxXMMMMMMMMMMMMMMMMMMMXkolKMM${E}"
+      echo -e "${C}MMMMMMMk ;NMMMW;',;lxKMMMMMMMMWk,':o;kMM${E}"
+      echo -e "${C}MMMMMMMMx'.:dKW.oddl:''l;'...,'.,xdd'XMM${E}"
+      echo -e "${C}MMMMMMMMMMXo'.,';ooo;'.......;cdc,;l'MMM${E}"
+      echo -e "${C}MMMMMMMMMMMMX..,.;;...,;,..'OK0:;,..kMMM${E}"
+      echo -e "${C}MMMMMMMMMMMMX..... ........c0KKo.'..dMMM${E}"
+      echo -e "${C}MMMMMMMMMWX:.....,...,...,.oKKXX'. .cMMM${E}"
+      echo -e "${C}MMMMMMMN,... ....'..';   ,;0XNWMNd,,:MMM${E}"
+      echo -e "${C}MMMMMMMo..    .. ....,;:cxXKKKKXNNNNWMMW${E}"
+      echo -e "${C}MMMMMMMl.. .o;'.....,dO00OOO00kOO0XNNNNW${E}"
+      echo -e "${C}MMMMWMMk...dMM0'.  ..':,,;;;;,;0KWWMMMMM${E}"
+      echo -e "${C}MX0Okx:.  .WMX.....,'...... .. ..c0MMMWN${E}"
+      echo -e "${C}N0K0kd;;ccoWM:...cl:loddoc:;c:,...'oxx0k${E}"
+      echo -e "${C}MNKkkO0NWMNKO'   OWOddxkxdoclOd'....':KK${E}"
+      echo -e "${C}MMMNO0XWWWMW.....xMMMWXXKKXNMMd. ....xK0${E}"
+      echo -e "${C}MMMWXXXXNWW0.....kMMMMMMMMMMMMd.....;00K${E}"
+      echo -e "${C}MMMMWXXXKKKO:,';xMMMMMMMMMMMMMW0xxxKMWNN${E}"
+      echo -e "${C}MMMMMMWNNNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM${E}"
       exit
       ;;
   esac
@@ -115,7 +122,7 @@ fi
 
 # If option s isnt set, we can scramble name and attempt to prevent vac
 if [ $no_scramble == 0 ]; then
-  # pBypass for crash dumps being sent
+  # Bypass for crash dumps being sent
   # You may also want to consider using -nobreakpad in your launch options.
   sudo rm -rf /tmp/dumps # Remove if it exists
   sudo mkdir /tmp/dumps # Make it as root
@@ -134,6 +141,16 @@ echo Using "$filename" with "$(ps -p $pid -o comm=)"
 
 # Adding commands to gdb dynamicly is tricky with bash, but we can do much simpler with this
 GDB_COMMANDS="/tmp/gdb-tmp"
+GDB_ARGS="-n -q --command=$GDB_COMMANDS"
+
+# REPL (Batch Mode)
+if [ $repl == 0 ]; then
+  echo "No REPL, using GDB's Batch Mode"
+  GDB_ARGS="-batch $GDB_ARGS"
+else
+  echo "GDB will enter a REPL"
+fi
+
 echo "attach $pid">$GDB_COMMANDS
 echo "set \$dlopen = (void*(*)(char*, int)) dlopen">>$GDB_COMMANDS
 
@@ -167,13 +184,13 @@ if [ $backtrace == 0 ]; then
 # Backtrace
 else
   echo "Backtracing!"
-  #echo "catch exit exit_group">>$GDB_COMMANDS
+  #echo "catch syscall exit exit_group">>$GDB_COMMANDS
   echo "continue">>$GDB_COMMANDS
   echo "backtrace">>$GDB_COMMANDS
 fi
 
 # Run the Injector and remove tmp file
-gdb -n -q -batch --command=$GDB_COMMANDS
+gdb $GDB_ARGS
 rm $GDB_COMMANDS
 
 if [ $no_scramble == 0 ]; then

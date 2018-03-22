@@ -14,14 +14,14 @@ namespace gui { namespace base {
 class CBaseWindow : public CBaseContainer {
 public:
 	// Constructors & Deconstructors
-	CBaseWindow(const char*);
+	CBaseWindow(std::string name);
 	virtual ~CBaseWindow() {};
 
 	// General functions
 	virtual void Draw() override;
 
 	// User Input
-	virtual void OnFocusGain() override;
+	//virtual bool TryFocusGain() override;
 };
 
 }}

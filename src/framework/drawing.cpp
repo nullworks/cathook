@@ -19,9 +19,7 @@
 namespace draw {
 
 // Line
-CMFunction<void(int, int, int, int, CatVector4)> Line {
-	[](int x, int y, int w, int h, CatVector4 color) {}
-};
+CMFunction<void(int, int, int, int, CatVector4)> Line;
 
 // Outline rect
 CMFunction<void(int, int, int, int, CatVector4)> Rect {

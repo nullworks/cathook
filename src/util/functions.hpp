@@ -25,7 +25,7 @@ template <typename ret, typename... args>
 class CMFunction <ret(args...)> {
   using func_type = ret(*)(args...); // For std::function template like use
 public:
-  CMFunction(func_type _func) : func(_func) {}
+  CMFunction(func_type func=[](args...){ return ret(); }) : func(func) {}
   inline auto operator()(args... a) { return func(a...); }
   inline void operator=(func_type _func) { func = _func; }
 private:
@@ -33,11 +33,14 @@ private:
 };
 
 // To handle calling of events
+template <typename... args>
 class CMEvent {
-  std::vector<void_func> func_pool; // to store added functions
+  using func_type = void(*)(args...);
+protected:
+  std::vector<func_type> func_pool; // to store added functions
 public:
-  inline void operator()(/*bool do_multithreading = false*/) {
-    for (const auto& func : func_pool) func();
+  inline void operator()(args... a /*bool do_multithreading = false*/) {
+    for (const auto& func : func_pool) func(a...);
     /* TODO, FIX THREADING
     // Make enough threads for as many functions as we have.
     std::thread func_threads[func_pool.size()];
@@ -49,8 +52,8 @@ public:
     for (auto& thread : func_threads)
       thread.join();*/
   }
-  void add(void_func in) { func_pool.push_back(in); }
-  void remove(void_func in) {
+  void add(func_type in) { func_pool.push_back(in); }
+  void remove(func_type in) {
     for(size_t i = 0; i < func_pool.size(); i++) {
       if (func_pool[i] == in) {
         // Remove function from pool
@@ -66,9 +69,9 @@ public:
 // This is to handle before and after events happen
 class CMEventGroup {
 public:
-  CMEvent before_event;
-  CMEvent during_event;
-  CMEvent after_event;
+  CMEvent<> before_event;
+  CMEvent<> during_event;
+  CMEvent<> after_event;
   inline void operator()() {
     in_event = true;
     before_event();

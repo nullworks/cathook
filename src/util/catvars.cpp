@@ -51,8 +51,8 @@ CatCommand list_vars("list", [](std::vector<std::string> args){
 
 // Menu tree
 void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
-	// Check if we reached the end if the enum info, if not we can add more to the tree
-	if (cat_var->gui_position.size() <= recursions) {
+  // Check if we reached the end if the enum info, if not we can add more to the tree
+  if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing
     return;
   }
@@ -60,7 +60,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
   // Look through the children and if any have the name of one we might want to make, we can reuse the branch
   for (auto& tree_branch : children) {
     // Test if this is an existing branch with matching names
-    if (tree_branch.name == cat_var->gui_position[recursions]) continue;
+    if (tree_branch.name != cat_var->gui_position[recursions]) continue;
     // We found our branch, recurse into it
     tree_branch.AddTree(cat_var, recursions + 1);
     return;
@@ -162,21 +162,21 @@ void CatVarKey::callback(std::vector<std::string> args) {
 	}
   // Need a way to clear
   if (fuzstrcmp(args[0], "empty")) {
-    this->value = 0;
+    this->value = CATKEY_NONE;
     g_CatLogging.log("Catkey Cleared!");
     return;
   }
 	// Text input
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 		if (fuzstrcmp(args[0], std::string("CATKEY_") + input::key_names[i]) || fuzstrcmp(args[0], input::key_names[i])) {
-			this->value = i;
+			this->value = (CatKey) i;
       g_CatLogging.log("Catkey set to \"%s\"!", this->GetValue().c_str());
 			return;
 		}
 	}
 	// int input
 	try {
-		value = std::stoi(args[0]);
+		value = (CatKey) std::stoi(args[0]);
 		return;
 	} catch (std::exception& e){}
 	g_CatLogging.log("No value in \"%s\" found for \"%s\"", name.c_str(), args[0].c_str());

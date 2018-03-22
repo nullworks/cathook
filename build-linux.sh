@@ -7,12 +7,13 @@ build_dir=bin/lin
 mkdir -p $build_dir
 cd $build_dir
 
-# TODO: fix ;(
-if [ ! -e "$(realpath ./MakeFile)" ]; then
-  echo kms
+if [ -f "./MakeFile" ]; then
+  echo Cleaning up old-style build
+  ./clean.sh
 fi
 
-if [ ! $# -eq 0 ] || [ ! -f ./MakeFile ]; then
+if [ ! -f CMakeCache.txt ]; then
+  echo Generating CMake Files
   cmake $cur_dir $@ # pass the args to cmake
 fi
 

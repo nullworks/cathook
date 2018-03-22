@@ -153,7 +153,8 @@ static void Draw() {
 				if (draw::WorldToScreen(GetOrigin(entity), scn)) {
 
 					// Draw a line
-					draw::Line(scn.x, scn.y, input::bounds.first / 2 - scn.x, ((tracers == 2) ? input::bounds.second : input::bounds.second / 2) - scn.y, ent_color);
+					auto bounds = input::GetBounds();
+					draw::Line(scn.x, scn.y, bounds.first / 2 - scn.x, ((tracers == 2) ? bounds.second : bounds.second / 2) - scn.y, ent_color);
 				}
 			}
 

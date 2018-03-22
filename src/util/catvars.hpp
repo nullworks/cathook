@@ -55,11 +55,16 @@ public:
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
 };
-class CatVarKey : public CatVarInt {
+class CatVarKey : public CatVar {
 public:
-	CatVarKey(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
-		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long) {}
-	inline bool Depressed() const { return (*this) ? input::pressed_buttons[this->value] : true;}
+	CatVarKey(const CatEnum& _gui_position, std::string _name, CatKey _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
+		: CatVar(_gui_position, _name, _desc_short, _desc_long), value(_defaults), defaults(_defaults) {}
+	const CatKey defaults;
+	CatKey value;
+	inline operator CatKey() const { return value; }
+	inline void operator= (CatKey in_value) { value = in_value; }
+	inline bool operator==(CatKey in_value) const { return value == in_value; }
+	inline bool Depressed() const { return (*this) ? input::GetKey(this->value) : true;}
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
 };

@@ -14,9 +14,10 @@
 namespace gui { namespace base {
 
 class CBaseTooltip : public CBaseWidget {
+protected:
+  std::pair<int,int> max_size;
 public:
-  CBaseTooltip(const char* _name);
-  virtual void Update();
+  CBaseTooltip(std::string name,std::pair<int,int> max_size = std::make_pair(-1,-1));
   virtual void Draw();
 };
 

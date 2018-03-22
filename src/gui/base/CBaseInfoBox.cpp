@@ -15,8 +15,7 @@
 
 namespace gui { namespace base {
 
-CBaseInfoBox::CBaseInfoBox(const char* _name, const char* info) : CBaseWidget(_name), infostring(info) {
-  position_mode = ABSOLUTE;
+CBaseInfoBox::CBaseInfoBox(std::string name, std::string info, std::pair<int, int> max_size) : CBaseWidget(name), infostring(info), max_size(max_size) {
 }
 
 void CBaseInfoBox::Draw() {
@@ -25,7 +24,7 @@ void CBaseInfoBox::Draw() {
   auto infostring_size = draw::GetStringLength(infostring.c_str(), 1, 20);
 
   // Check if we need to wrap
-  if (infostring_size.first > max_size.first) {
+  if (max_size.first!=-1&&infostring_size.first > max_size.first) {
 
     std::string wrapped_str; // A place to store the wrapped string, with the size ;)
     std::string cur_line; // Our current line
@@ -56,9 +55,10 @@ void CBaseInfoBox::Draw() {
     infostring = wrapped_str;
   }
   // Draw string
-  draw::RectFilled(input::mouse.first, input::mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::Transparent(colors::black));
-  draw::Rect(input::mouse.first, input::mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::pink);
-  draw::String(infostring.c_str(), input::mouse.first + 2, input::mouse.second + 2, draw::default_font_size, draw::default_font_size, colors::white);
+  auto mouse = input::GetMouse();
+  draw::RectFilled(mouse.first, mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::Transparent(colors::black));
+  draw::Rect(mouse.first, mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::pink);
+  draw::String(infostring.c_str(), mouse.first + 2, mouse.second + 2, draw::default_font_size, draw::default_font_size, colors::white);
 }
 
 }}

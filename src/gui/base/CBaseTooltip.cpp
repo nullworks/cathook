@@ -12,21 +12,16 @@
 #include "../../framework/drawing.hpp"
 
 #include "CBaseTooltip.hpp"
+#include "CBaseParent.hpp"
 
 // Draw tooltip on mouse, and put size and offset somewhere else to prevent child by point from going off
 // Make sure the root hover on works, and that it will recurse
 namespace gui { namespace base {
 
-CBaseTooltip::CBaseTooltip(const char* _name) : CBaseWidget(_name) {
-  position_mode = FLOATING; // We dont want anything to move us
+CBaseTooltip::CBaseTooltip(std::string name, std::pair<int,int> max_size) : CBaseWidget(name), max_size(max_size) {
   // Here we want to set the size and offset to something that ChildByPoint wont find
   offset = std::make_pair(-128, -128);
   size = std::make_pair(0, 0);
-}
-
-// as well as set our zindex to always be on top
-void CBaseTooltip::Update() {
-  zindex = -100;
 }
 
 void CBaseTooltip::Draw() {
@@ -39,7 +34,7 @@ void CBaseTooltip::Draw() {
   auto tooltip_size = draw::GetStringLength(tooltip.c_str(), 1, 20);
 
   // Check if we need to wrap
-  if (tooltip_size.first > max_size.first) {
+  if (max_size.first!=-1&&tooltip_size.first > max_size.first) {
 
     std::string wrapped_str; // A place to store the wrapped string, with the size ;)
     std::string cur_line; // Our current line
@@ -70,9 +65,10 @@ void CBaseTooltip::Draw() {
     tooltip = wrapped_str;
   }
   // Draw string
-  draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::Transparent(colors::black));
-  draw::Rect(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::pink);
-  draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);
+  //TODO: Mouse movement
+  //draw::RectFilled(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::Transparent(colors::black));
+  //draw::Rect(input::mouse.first, input::mouse.second, tooltip_size.first + 4, tooltip_size.second + 4, colors::pink);
+  //draw::String(tooltip.c_str(), input::mouse.first + 2, input::mouse.second + 2, 1, 20, colors::white);
 }
 
 }}

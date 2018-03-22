@@ -54,7 +54,7 @@ private:
 public:
   IpcStream(const char* _pool_name);
   ~IpcStream();
-  
+
 // Setters/Getters
 public:
   // Used to get a list of members
@@ -112,7 +112,7 @@ public:
   // Use to send messages through ipc, use member pos or by name, returns true on success
   bool SendMessage(std::string recipient, const char* command, const void* payload, size_t size);
   bool SendMessage(int recipient, const char* command, const void* payload, size_t size);
-
+  void SendAll(const char* command, const void* payload, size_t size);
 };
 
 }

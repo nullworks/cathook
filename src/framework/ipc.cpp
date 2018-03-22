@@ -152,6 +152,14 @@ bool IpcStream::SendMessage(int recipient, const char* command, const void* payl
   memcpy(this->IpcMemSpace->message_pool[tmp].payload, payload, size);
   // Allow the recipient to read it
   this->IpcMemSpace->message_pool[tmp].state = ipc_state::RECIPIENT_LOCKED;
+  return true;
+}
+void IpcStream::SendAll(const char* command, const void* payload, size_t size) {
+  this->IpcCleanup();// Cleanup so we only get existing members
+  for (int i = 0; i < MAX_IPC_MEMBERS; i++) {
+    if (this->IpcMemSpace->members[i].state != ipc_state::RECIPIENT_LOCKED) continue;
+    this->SendMessage(i, command, payload, size);
+  }
 }
 
 }

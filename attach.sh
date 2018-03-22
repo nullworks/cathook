@@ -145,7 +145,6 @@ GDB_ARGS="-n -q --command=$GDB_COMMANDS"
 
 # REPL (Batch Mode)
 if [ $repl == 0 ]; then
-  echo "No REPL, using GDB's Batch Mode"
   GDB_ARGS="-batch $GDB_ARGS"
 else
   echo "GDB will enter a REPL"

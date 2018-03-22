@@ -23,7 +23,8 @@
 namespace gui {
 
 void Init() {
-	g_pGui.size = input::GetBounds();
+	// Commented as menu is wip
+	/*g_pGui.size = input::GetBounds();
 	g_pGui.draw_bounds=false;
 	drawmgr.REventDuring([](){g_pGui.Draw();});
 	input::key_event.add([](CatKey key, bool newstate){
@@ -41,10 +42,10 @@ void Init() {
 	input::mouse_event.add([](std::pair<int,int> mouse){
 		g_pGui.OnMouse(mouse,false);
 	});
-	
+
 	// Setup the draw manager to run gui
 	//TODO: Make GUI use CatKey instead of int
-	menu::Init();
+	menu::Init();*/
 
 	// Other gui elements
 	sidestrings::Init();

@@ -17,7 +17,6 @@
 namespace features::debug {
 
 static CatEnum debug_menu({"debug"});
-static CatVarBool debug_fov(debug_menu, "debug_fov", 0, "Fov Debug", "kys");
 
 CatCommand debug_ent_dump("debug_entity_dump", [](std::vector<std::string>){
   CatLogger tmp_log("/tmp/entdump.tmp");

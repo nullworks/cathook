@@ -20,8 +20,10 @@ CMFunction<CatBox(CatEntity*)> GetCollision {[](auto) -> auto { return CatBox();
 CMFunction<int(CatEntity*)> GetSteamId {[](auto) -> auto { return 0; }};
 CMFunction<bool(CatEntity*, int, CatBox&)> GetBone {[](CatEntity*, int, CatBox&) -> auto { return false; }};
 
+CMFunction<void(CatLocalPlayer*)> Attack;
+CMFunction<void(CatLocalPlayer*)> Jump;
+CMFunction<void(CatLocalPlayer*, CatVector)> WalkTo;
 CMFunction<bool(CatLocalPlayer*)> InThirdperson {[](auto) -> auto { return false; }};
-CMFunction<void(CatLocalPlayer*)> Attack {[](auto){}};
 CMFunction<CatVector(CatLocalPlayer*)> GetCamera {[](auto) -> auto { return CatVector(); }};
 CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle {[](auto) -> auto { return CatVector(); }};
 CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle {[](CatLocalPlayer*, CatVector){}};

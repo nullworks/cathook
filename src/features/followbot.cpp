@@ -14,6 +14,9 @@
 #include "../framework/gameticks.hpp" // So we can run things in draw and world tick
 #include "../framework/trace.hpp"
 #include "../framework/drawing.hpp"	// draw some crumbs
+#include "../framework/prediction.hpp" // DistanceToGround()
+#include "../framework/ipc.hpp" // Ipc to control followbots would be nice...
+#include "../framework/console.hpp" // Using console as a wrapper for ipc is even better
 
 #include "followbot.hpp"
 
@@ -121,11 +124,11 @@ static void WorldTick() {
     idle_time.Reset();
 
   // New crumbs, we add one if its empty so we have something to follow
-	if (breadcrumbs.empty() || tar_orig.DistTo(breadcrumbs.at(breadcrumbs.size() - 1)) > 40.0F) //&& DistanceToGround(found_entity) < 40) {
-		breadcrumbs.push_back(tar_orig);
+	if ((breadcrumbs.empty() || tar_orig.DistTo(breadcrumbs.at(breadcrumbs.size() - 1)) > 40.0F) && DistanceToGround(follow_target) < 30)
+    breadcrumbs.push_back(tar_orig);
 
   // Prune old and close crumbs that we wont need anymore, update idle timer too
-  while (breadcrumbs.size() > 2 && loc_orig.DistTo(breadcrumbs.at(0)) < 60.f) {
+  while (breadcrumbs.size() > 1 && loc_orig.DistTo(breadcrumbs.at(0)) < 60.f) {
     idle_time.Reset();
     breadcrumbs.erase(breadcrumbs.begin());
   }
@@ -138,8 +141,7 @@ static void WorldTick() {
       follow_target = nullptr;
       return;
     }
-    // TODO, make walk to CMFunction in entitys framework
-    // WalkTo(breadcrumbs.at(0));
+    WalkTo(local_ent, breadcrumbs.at(0));
 	} else
     idle_time.Reset();
 }
@@ -158,6 +160,26 @@ static void DrawTick(){
   draw::RectFilled(wts.x - 4, wts.y - 4, 8, 8, colors::white);
   draw::Rect(wts.x - 5, wts.y - 5, 10, 10, colors::black);
 }
+
+static CatCommand follow_me("fb_follow_me", [](std::vector<std::string>){
+  if (!ipc::g_IpcStream) {
+    g_CatLogging.log("IPC isnt connected");
+    return;
+  }
+  auto local_ent = GetLocalPlayer();
+  if (!local_ent) {
+    g_CatLogging.log("Cant get a local player");
+    return;
+  }
+  auto steam_id = GetSteamId((CatEntity*)local_ent);
+  if (!steam_id) {
+    g_CatLogging.log("Cant get steam-id, the game module probably doesnt support it.");
+    return;
+  }
+  // Construct the command
+  std::string tmp = COM_PREFIX + follow_steam.name + " " + std::to_string(steam_id);
+  ipc::g_IpcStream->SendAll("exec", tmp.c_str(), tmp.size() + 1);
+});
 
 void Init(){
   wtickmgr.REventDuring(WorldTick);

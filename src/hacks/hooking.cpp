@@ -43,3 +43,12 @@ void VMTHook::Release() {
 	g_CatLogging.log("Un-hooking 0x%08x (vtable @ 0x%08x)", vtable_ptr, *vtable_ptr);
 	*this->vtable_ptr = this->vtable_original;
 }
+
+
+// TODO, asm hook
+// This is for hooking non-virtual function
+template<typename Replacement>
+class ASMHook {
+public:
+	ASMHook();
+};

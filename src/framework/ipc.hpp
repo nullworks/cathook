@@ -71,15 +71,14 @@ public:
   // Used to get a list of members
   inline std::vector<std::string> GetMembers() const {
     std::vector<std::string> ret;
-    if (!this->IpcMemSpace)// Saftey net
-      return ret;
     for (const auto& i: this->IpcMemSpace->members)
-      ret.push_back(i.name);
+      if (i.state == ipc_state::RECIPIENT_LOCKED)
+        ret.push_back(i.name);
     return ret;
   }
   // Returns the name used in ipc
   inline std::string GetIpcName() const {
-    if (!this->IpcMemSpace || ipc_pos == -1) return std::string();
+    if (ipc_pos == -1) return std::string();
     return this->IpcMemSpace->members[ipc_pos].name;
   }
   // Returns whether member exists
@@ -98,12 +97,12 @@ private:
   // Internal cleanup of the ipc space, in the case of a member not being nice >:(
   inline void IpcCleanup(){
     // For the cleanup, we look for anything not open and check the timer on it
-    // We clean thing more than 3 seconds of idle
+    // We clean thing more than 6 seconds of idle
     for (auto& i : this->IpcMemSpace->members)
-      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
+      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(6)))
         i.state = ipc_state::OPEN;
     for (auto& i : this->IpcMemSpace->message_pool)
-      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
+      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(6)))
         i.state = ipc_state::OPEN;
   }
   // Internal use for finding open slots, be sure to give it the right size to prevent segfaults

@@ -69,8 +69,10 @@ extern CMFunction<bool(CatEntity*, int, CatBox&)> GetBone;
 
 class CatLocalPlayer; // same as above
 // Local player specific
-extern CMFunction<bool(CatLocalPlayer*)> InThirdperson;
 extern CMFunction<void(CatLocalPlayer*)> Attack;
+extern CMFunction<void(CatLocalPlayer*)> Jump;
+extern CMFunction<void(CatLocalPlayer*, CatVector)> WalkTo;
+extern CMFunction<bool(CatLocalPlayer*)> InThirdperson;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCamera;
 extern CMFunction<CatVector(CatLocalPlayer*)> GetCameraAngle;
 extern CMFunction<void(CatLocalPlayer*, CatVector)> SetCameraAngle;

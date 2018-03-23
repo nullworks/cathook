@@ -4,6 +4,7 @@
  * Everything to do with time and time keeping
  *
  */
+#pragma once
 
 #include <chrono>
 

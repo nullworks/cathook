@@ -6,13 +6,15 @@
  */
 
 #include <unordered_map>
-#ifdef __linux__
+#if defined(__linux__)
   #include <fcntl.h> // flags for shm_open()
   #include <sys/stat.h> // S_IRWXU, S_IRWXG, S_IRWXO
   #include <errno.h>
   #include <string.h> // error string
   #include <sys/mman.h> // mmap
   #include <unistd.h> // ftruncate
+#elif defined(_WIN32)
+  #include <windows.h>
 #endif
 
 #include "../util/logging.hpp" // Logging is good u noob
@@ -69,7 +71,7 @@ static CatCommand connect("ipc_connect", [](std::vector<std::string> args) {
   g_IpcStream = new IpcStream(tmp.c_str());
 });
 
-CatCommand disconnect("ipc_disconnect", [](std::vector<std::string> args) {
+static CatCommand disconnect("ipc_disconnect", [](std::vector<std::string> args) {
   if (!g_IpcStream) {
     g_CatLogging.log("IPC isnt connected");
     return;
@@ -79,50 +81,62 @@ CatCommand disconnect("ipc_disconnect", [](std::vector<std::string> args) {
   g_IpcStream = nullptr;
 });
 
+static CatCommand list("ipc_list", [](std::vector<std::string> args) {
+  if (!g_IpcStream) {
+    g_CatLogging.log("IPC isnt connected");
+    return;
+  }
+  auto tmp = g_IpcStream->GetMembers();
+  for (const auto& i : tmp)
+    g_CatLogging.log("Found IPC member: %s", i.c_str());
+});
+
 // Constructor responsibilities, constructing the shared memory pool and starting the thread if successful
 IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
   #ifdef __linux__ // Linux only sadly, gotta find a way to do this in windows
-  // Try to get access to the memory pool
-  int shm_res = shm_open(this->pool_name, O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
-  bool first_peer = false;
-  if (shm_res == -1) {
-    if (errno == ENOENT) { // The memory isnt mapped, we will do so ourselves.
-      shm_res = shm_open(this->pool_name, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
-      first_peer = true;
-    }
-    if (shm_res == -1) { // check if we still have error from above, or above wasnt run
+    // Try to get access to the memory pool
+    int shm_res = shm_open(this->pool_name, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (shm_res == -1) {
       char buffer[1024];
       const char* error_string = strerror_r(errno, buffer, sizeof(buffer));
-      g_CatLogging.log("IPC: Fatal shm_open error: %s", error_string);
+      g_CatLogging.log("IPC: Fatal shm_open error: \"%s\", panicing and stopping!", error_string);
+      return;
     }
-  }
-  if (shm_res == -1) {
-    g_CatLogging.log("IPC: Fatal shm_open error, panicing and stopping!");
+
+    // truncate size, this is required for memory to be read/writable, as mmap needs the handle to have a size beforehand
+    if (ftruncate(shm_res, sizeof(IpcContent)) == -1){
+  	  char buffer[1024];
+      const char* error_string = strerror_r(errno, buffer, sizeof(buffer));
+      g_CatLogging.log("IPC: ftruncate recieved a unknown error... halp: %s\n", error_string);
+  	  return;
+    }
+
+    // Map the memory pool
+    this->IpcMemSpace = (IpcContent*)mmap(NULL, sizeof(IpcContent), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_32BIT, shm_res, 0);
+    if (this->IpcMemSpace == MAP_FAILED) {
+      g_CatLogging.log("IPC: Fatal mmap error, panicing and stopping!");
+      return;
+    }
+  #elif defined(_WIN32)
+    #pragma message ("Windows IPC is in an experimental state")
+    // This is just from windows documentation, this needs sometesting to get working
+    // Get memory handle
+    HANDLE hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(IpcContent), this->pool_name);
+    if (hMapFile == NULL) {
+      g_CatLogging.log("IPC: Cannot create file mapping: \"%s\", panicing and stopping!", GetLastError());
+      return;
+    }
+    // Open for viewing
+    this->IpcMemSpace = (IpcContent*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(IpcContent));
+    if (this->IpcMemSpace == NULL) {
+      g_CatLogging.log("IPC: Cannot get MapViewOfFile: \"%s\", panicing and stopping!", GetLastError());
+      return;
+    }
+  #else
+    #pragma message ("IPC DISABLED")
+    g_CatLogging.log("IPC: IPC disabled, wrong platform!");
     return;
-  }
-
-  // truncate size, this is required for memory to be read/writable, as mmap needs the handle to have a size beforehand
-  if (ftruncate(shm_res, sizeof(IpcContent)) == -1){
-	  char buffer[1024];
-    const char* error_string = strerror_r(errno, buffer, sizeof(buffer));
-    g_CatLogging.log("IPC: ftruncate recieved a unknown error... halp: %s\n", error_string);
-	  return;
-  }
-
-  // Map the memory pool
-  this->IpcMemSpace = (IpcContent*)mmap(NULL, sizeof(IpcContent), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_32BIT, shm_res, 0);
-  if (this->IpcMemSpace == MAP_FAILED) {
-    g_CatLogging.log("IPC: Fatal mmap error, panicing and stopping!");
-    return;
-  }
-
-  // If we are the first peers, we must setup everything ourselves
-  if (first_peer) {
-    g_CatLogging.log("IPC: Setting up ipc space!");
-    memset(this->IpcMemSpace, 0, sizeof(IpcContent));
-    *this->IpcMemSpace = IpcContent();
-  }
-
+  #endif
   // Setup a member slot for us
   this->IpcCleanup(); // cleanup to make sure we get unused slots
   this->ipc_pos = GetOpenSlot(this->IpcMemSpace->members, MAX_IPC_MEMBERS);
@@ -155,9 +169,6 @@ IpcStream::IpcStream(const char* _pool_name) : pool_name(_pool_name) {
   g_CatLogging.log("IPC: Starting Thread");
   std::thread ipc_thread(&IpcStream::thread_loop, this);
   ipc_thread.detach();
-  #else
-    #pragma message ("IPC DISABLED")
-  #endif
 }
 
 IpcStream::~IpcStream() {

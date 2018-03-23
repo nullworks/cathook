@@ -14,6 +14,7 @@
 
 // Framework stuff
 #include "framework/config.hpp"
+#include "framework/prediction.hpp"
 #include "features/features.hpp"
 #include "gui/init.hpp"
 
@@ -54,6 +55,7 @@ void hack::Initialize() {
 
 	// Load configs
 	configs::Init();
+	pred::Init();
 
 	g_CatLogging.log("Initializing Done!");
 }

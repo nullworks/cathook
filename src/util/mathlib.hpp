@@ -28,8 +28,8 @@ public:
 	inline CatVector operator-(CatVector value) const { return CatVector(x - value.x, y - value.y, z - value.z); }
 	inline CatVector operator*(CatVector value) const { return CatVector(x * value.x, y * value.y, z * value.z); }
 	inline CatVector operator/(CatVector value) const { return CatVector(x / value.x, y / value.y, z / value.z); }
-	inline CatVector operator*(float value) 	   const { return CatVector(x * value, y * value, z * value); }
-	inline CatVector operator/(float value)	   const { return CatVector(x / value, y / value, z / value); }
+	inline CatVector operator*(float value) 	  const { return CatVector(x * value, y * value, z * value); }
+	inline CatVector operator/(float value)	    const { return CatVector(x / value, y / value, z / value); }
 	inline bool operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
 	inline bool operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors
@@ -77,6 +77,8 @@ public:
 	inline CatVector GetDelta() const { return max - min; }
 	inline bool operator==(CatBox value) const { return value.min == min && value.max == max; }
 	inline bool operator!=(CatBox value) const { return value.min != min || value.max != max; }
+	inline CatBox operator+(CatVector value) const { return CatBox(min + value, max + value); }
+	inline CatBox operator-(CatVector value) const { return CatBox(min - value, max - value); }
 	inline CatBox operator*(float value) const { // for expanding relative to center
 		// Take the center so we can operate on the delta later
 		CatVector center = this->GetCenter();

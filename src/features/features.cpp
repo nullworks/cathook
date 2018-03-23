@@ -12,6 +12,7 @@
 #include "antiaim.hpp"
 #include "followbot.hpp"
 #include "spam.hpp"
+#include "bhop.hpp"
 
 #include "features.hpp"
 
@@ -33,6 +34,9 @@ void Init() {
 
 	// Chat Spam
 	spam::Init();
+
+	// Bunnyhop
+	bhop::Init();
 }
 
 

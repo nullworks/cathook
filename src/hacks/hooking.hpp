@@ -31,9 +31,3 @@ public:
 	void** vtable_original = nullptr; // location of the objects original vtable
 	std::unique_ptr<void*[]> vtable_replacement; // location of our vtable replacement
 };
-
-// This is for hooking non-virtual function
-class ASMHook {
-public:
-
-};

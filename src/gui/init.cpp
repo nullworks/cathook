@@ -7,10 +7,10 @@
  *
  */
 
-// Stuff to init with
+#include "../util/logging.hpp" // debugging
+#include "../util/chrono.hpp"
 #include "../framework/gameticks.hpp"		// So we can get drawmgr to draw our stuff
 #include "../framework/input.hpp"			// For key_pressed & released callbacks
-#include "../util/logging.hpp"
 
 // Stuff to init
 #include "menu/menu.hpp"
@@ -24,13 +24,19 @@ namespace gui {
 
 void Init() {
 	// Commented as menu is wip
-	/*g_pGui.size = input::GetBounds();
+	g_pGui.size = input::GetBounds();
 	g_pGui.draw_bounds=false;
 	drawmgr.REventDuring([](){g_pGui.Draw();});
 	input::key_event.add([](CatKey key, bool newstate){
 		//g_CatLogging.log("Key %s %s", input::key_names[key], newstate?"down":"up");
+		/*// Do this in a text input object
+		static CatTimer repeat_timer;
+		if (newstate)
+			repeat_timer.Reset();
+		else if (repeat_timer.ResetAfter(std::chrono::seconds(2.5)))
+			g_pGui.OnKeyPress(key);*/
 		if (newstate){
-			g_pGui.OnKeyPress(key, false);
+			g_pGui.OnKeyPress(key);
 		}else{
 			g_pGui.OnKeyRelease(key);
 		}
@@ -45,7 +51,7 @@ void Init() {
 
 	// Setup the draw manager to run gui
 	//TODO: Make GUI use CatKey instead of int
-	menu::Init();*/
+	menu::Init();
 
 	// Other gui elements
 	sidestrings::Init();

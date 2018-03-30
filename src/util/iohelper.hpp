@@ -16,11 +16,24 @@ namespace io {
 // Get the name of the process
 std::string GetProcessName();
 
+// Get a general location to read and write files
+std::string GetSaveLocation();
+
+// Get systems tmpdir
+std::string GetTmpDir();
+
+// Below actualy deals with filesystem
+
+// Because windows is bad, we need to use backslashes
+constexpr char GetDirSeperator() {
+  #if defined(_WIN32) // Only windows uses this awkward scheme
+    return '\\';
+  #endif
+  return '/';
+}
+
 // Creates directory for a file
 void CreateDirectorys(std::string path);
-
-// Get a general location to read and write files!
-std::string GetSaveLocation();
 
 // Easier reading and writing of files
 std::vector<std::string> ReadFile(const std::string& path);

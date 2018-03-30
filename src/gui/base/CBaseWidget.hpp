@@ -26,6 +26,7 @@ public:
 	std::string name;
 	CBaseParent *parent=nullptr;
 	CBaseWidget(std::string name, std::string tooltip = "");
+	virtual ~CBaseWidget(){} // needs to be virtual, to enable deleting
 	// States
 	//TODO: Add Mouse support to UI
 	//bool press = false;
@@ -38,7 +39,7 @@ public:
 	std::pair<int, int> offset;
 	std::pair<int, int> size;
 	virtual void UpdatePositioning();
-	
+
 	// Graphics
 	bool visible = true;
 	bool draw_bounds = false;
@@ -46,10 +47,10 @@ public:
 
 	// Input
 	virtual bool OnMouse(std::pair<int,int> mouse_pos, bool hover_taken);
-	virtual bool OnBounds(std::pair<int,int> bounds);
+	virtual void OnBounds(std::pair<int,int> bounds);
 	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
-	virtual void OnKeyPress(int key, bool repeat);
+	virtual void OnKeyPress(int key);
 	virtual void OnKeyRelease(int key);
 	virtual bool ConsumesKey(int key);
 

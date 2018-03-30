@@ -14,7 +14,7 @@
 
 class CatLogger {
 public:
-  CatLogger(const char*  _file_path, bool _ptime = false);
+  CatLogger(std::string _file_path, bool _ptime = false);
   ~CatLogger();
   void log(const char* fmt, ...); // Use to log with
   CMFunction<void(const char*)> console_tap { [](const char*){return;}};

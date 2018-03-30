@@ -15,6 +15,8 @@
   #include <errno.h> // errors
   #include <unistd.h> // Linux username and paths
   #include <pwd.h>
+#elif
+  #include <Windows.h>
 #endif
 
 #include "logging.hpp"
@@ -22,27 +24,21 @@
 
 #include "iohelper.hpp"
 
-// Uhhhhh, TODO!!!!
-/*PackedFile::PackedFile(const void* _file_start, size_t _file_size) : file_start(_file_start), file_size(_file_size)  {
-
-	// Make a temp file to store the file
-	char tmp[] = P_tmpdir "/neko.XXXXXX";
-	mkstemp(tmp);
-	name = tmp;
-	// Open our file
-	file_handle = fopen(tmp, "w");
-	// Write our packed info to the tmp file
-	fwrite(file_start , sizeof(char), (file_size - (size_t)_file_start) / (size_t)sizeof(void*), file_handle);
-	fflush(file_handle);
-}
-
-PackedFile::~PackedFile() {
-	fclose(file_handle);
-}*/
-
 namespace io {
 
-// TODO, remake this, its one of my first implimentations of ifstream, could be much better
+std::string GetTmpDir(){
+  #if defined(__linux__)
+    return P_tmpdir;
+  #elif defined(_WIN32)
+    char buf[MAX_PATH];
+    if (GetTempPathA(MAX_PATH, buf))
+      return buf;
+  #elif
+    #pragma message ("Unable to get tmp dir")
+  #endif
+  return std::string();
+}
+
 // Gets name of process using unix goodies
 std::string GetProcessName() {
   #ifdef __linux__
@@ -62,6 +58,7 @@ std::string GetProcessName() {
   #else
     #warning "Cannot get process name"
   #endif
+  return std::string();
 }
 
 void CreateDirectorys(std::string path) {

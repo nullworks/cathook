@@ -9,16 +9,14 @@
 #include <string.h> // String stuff
 #include <time.h> 	// Time
 
+#include "iohelper.hpp"
+
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger
-#ifdef __GNUC__
- 	__attribute__ ((init_priority (101)))// We want this to be init fast so we can log other inits!
-#endif
-g_CatLogging(P_tmpdir "/nekohook.log", true);
+CatLogger g_CatLogging(io::GetTmpDir() + io::GetDirSeperator() + "nekohook.log", true);
 
-CatLogger::CatLogger(const char* _file_path, bool _ptime) : log_handle(fopen(_file_path, "w")), ptime(_ptime) {}
+CatLogger::CatLogger(std::string _file_path, bool _ptime) : log_handle(fopen(_file_path.c_str(), "w")), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }
 
 void CatLogger::log(const char* fmt, ...) {

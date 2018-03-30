@@ -18,6 +18,7 @@ protected:
   std::pair<int,int> max_size;
 public:
   CBaseTooltip(std::string name,std::pair<int,int> max_size = std::make_pair(-1,-1));
+  virtual ~CBaseTooltip(){} // we might want to destruct this alot, try to keep it non existant to keep menu fast
   virtual void Draw();
 };
 

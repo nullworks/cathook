@@ -32,6 +32,6 @@ private:
   CMFunction<void(std::vector<std::string>)> com_callback;
 };
 
-void CallCommand(std::string input);
+void CallCommand(const std::string& input);
 
 extern std::unordered_map<std::string, CatCommand*> CatCommandMap;

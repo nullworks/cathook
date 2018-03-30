@@ -8,7 +8,7 @@ public:
   CMenuButton(std::string name);
   virtual bool TryFocusGain();
   virtual void OnFocusLose();
-  virtual void OnKeyPress(int, bool);
+  virtual void OnKeyPress(int);
   virtual bool ConsumesKey(int);
   //virtual void OnMousePress();
   virtual void Draw();

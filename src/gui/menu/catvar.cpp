@@ -27,7 +27,7 @@ namespace gui { namespace menu {
         if(typing){
 	        std::chrono::duration<float, std::deca> curtime = std::chrono::steady_clock::now() - blink_start_time;
             if(std::fmod(curtime.count(), blink_period)<blink_vis_time){
-                auto beep=global_pos.first-textsize.first+draw::GetStringLength(content.substr(0,cursor).c_str(),draw::default_font.value,draw::default_font_size.value).first;
+                auto beep = global_pos.first-textsize.first+draw::GetStringLength(content.substr(0,cursor).c_str(),draw::default_font.value,draw::default_font_size.value).first;
                 //colors::RainbowCurrent()
             }
         }
@@ -47,7 +47,7 @@ void CCatVar::OnFocusLose() {
     typing=false;
 	CBaseWidget::OnFocusLose();
 }
-void CCatVar::OnKeyPress(int key, bool repeat) {
+void CCatVar::OnKeyPress(int key) {
     if (key==activatekey.value&&focus&&!typing){
         typing=true;
         cursor=content.size();
@@ -70,7 +70,7 @@ void CCatVar::OnKeyPress(int key, bool repeat) {
             //TODO: Text Input
         }
     }
-    
+
 }
 void CCatVar::OnKeyRelease(int key) {
 	//Tempted to just fully hand these key release events on, but that'll just slow things down.

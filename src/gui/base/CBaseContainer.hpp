@@ -16,10 +16,11 @@ namespace gui { namespace base {
 class CBaseContainer : public CBaseParent {
 public:
 	CBaseContainer(std::string name, std::string tooltip = "");
+  virtual ~CBaseContainer(){}
 
 	// General functions
 	virtual void UpdatePositioning();
-	virtual bool OnBounds(std::pair<int,int> bounds);
+	virtual void OnBounds(std::pair<int,int> bounds);
 
 	// Child related util
 	virtual void MoveChildren();

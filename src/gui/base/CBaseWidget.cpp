@@ -56,10 +56,10 @@ bool CBaseWidget::OnMouse(std::pair<int,int> mouse_pos, bool hover_taken){
 		&&mouse_pos.first<offset.first
 		&&mouse_pos.second<offset.second;
 }
-bool CBaseWidget::OnBounds(std::pair<int,int> bounds){ }
+void CBaseWidget::OnBounds(std::pair<int,int> bounds){ }
 bool CBaseWidget::TryFocusGain() 	 { focus = true; return true; }
 void CBaseWidget::OnFocusLose() 	 { focus = false; }
-void CBaseWidget::OnKeyPress(int key, bool repeat) {
+void CBaseWidget::OnKeyPress(int key) {
 	//g_CatLogging.log("Key %s in %s", input::key_names[key], name.c_str());
 };
 void CBaseWidget::OnKeyRelease(int key) {};

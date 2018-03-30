@@ -30,7 +30,7 @@ void CBaseContainer::UpdatePositioning() {
 	MoveChildren();
 }
 
-bool CBaseContainer::OnBounds(std::pair<int,int> bounds){
+void CBaseContainer::OnBounds(std::pair<int,int> bounds){
 	MoveChildren();
 	CBaseParent::OnBounds(bounds);
 }
@@ -49,7 +49,7 @@ void CBaseContainer::MoveChildren() {
 		space.first = std::max(space.first, c->offset.first + c->size.first);
 		space.second = std::max(space.second, c->offset.second + c->size.second);
 	}*/
-	
+
 	// Organize our inlines
 	int x = 0;
 	auto bounds = input::GetBounds();

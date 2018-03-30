@@ -6,6 +6,9 @@
  *
  */
 
+// TODO actualy impliment a use for it
+// The point was to use this to display desc_long from catvars hovered on a menu
+
 #include "../../util/strings.hpp"
 #include "../../util/colors.hpp"
 #include "../../framework/input.hpp" // For mouse location

@@ -1,8 +1,8 @@
 /*
- * 
+ *
  * Base class for widgets with children.
  * Examples include: Root, Window, and Inliner (prev known as Container)
- * 
+ *
  */
 
 #include <cstring> // strcmp()
@@ -84,9 +84,9 @@ void CBaseParent::OnFocusLose() {
 	CBaseWidget::OnFocusLose();
 	TryFocusOn(-1);
 }
-void CBaseParent::OnKeyPress(int key, bool repeat) {
+void CBaseParent::OnKeyPress(int key) {
 	if(focused_child!=-1&&children[focused_child]->ConsumesKey(key)){
-		children[focused_child]->OnKeyPress(key, repeat);
+		children[focused_child]->OnKeyPress(key);
 	}else{
 		//Flip to next child
 		if(focused_child!=-1&&key==nextkey.value){
@@ -139,7 +139,7 @@ void CBaseParent::OnKeyPress(int key, bool repeat) {
 			}
 		}
 	}
-    CBaseWidget::OnKeyPress(key,repeat);
+    CBaseWidget::OnKeyPress(key);
 }
 
 void CBaseParent::OnKeyRelease(int key) {
@@ -159,7 +159,7 @@ bool CBaseParent::ConsumesKey(int key) {
 	|| (key==activatekey && focused_child==-1);
 }
 
-bool CBaseParent::OnBounds(std::pair<int,int> bounds){
+void CBaseParent::OnBounds(std::pair<int,int> bounds){
 	for(auto c : children){
 		c->OnBounds(bounds);
 	}

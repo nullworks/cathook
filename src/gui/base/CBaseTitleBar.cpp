@@ -15,7 +15,7 @@
 namespace gui { namespace base {
 
 // Constructor
-CBaseTitleBar::CBaseTitleBar(const char* _title) : title(_title), CBaseWidget("titlebar") {
+CBaseTitleBar::CBaseTitleBar(const char* _title) : CBaseWidget("titlebar"), title(_title){
 }
 
 /*void CBaseTitleBar::Update() {
@@ -37,7 +37,7 @@ CBaseTitleBar::CBaseTitleBar(const char* _title) : title(_title), CBaseWidget("t
 }
 
 void CBaseTitleBar::OnMousePress() {
-	// Save the mouse location for delta use later	
+	// Save the mouse location for delta use later
 	//last_mouse = std::make_pair(parent->offset.first-input::mouse.first,parent->offset.second-input::mouse.second);
 	CBaseWidget::OnMousePress();
 }

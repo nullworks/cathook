@@ -96,7 +96,7 @@ if(USE_XLIB)
 endif()
 
 # Default compiler flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb")
+set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} -s -mtune=generic -O3")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")

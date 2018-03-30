@@ -9,6 +9,8 @@
 #include "../util/catvars.hpp"
 #include "../framework/gameticks.hpp"
 #include "../framework/entitys.hpp"
+#include "../framework/drawing.hpp"
+#include "aimbot.hpp"
 
 #include "debug.hpp"
 
@@ -57,12 +59,44 @@ static void WorldTick(){
 
 }
 
+CatVarBool multi_debug(debug_menu, "debug_multipoint", false, "Multipoint");
+
 static void DrawTick(){
 
+  // Multipoint shit, its pasted from aimbot so if u change that code, this will need to be remade to fix the math
+  if (multi_debug) {
+    for(int i = 0; i < GetEntityCount(); i++) {
+      auto entity = GetEntity(i);
+      if (!entity || GetDormant(entity) || !GetAlive(entity) || GetType(entity) != ETYPE_PLAYER) continue;
+
+  		CatBox tmp_bone;
+  		if (!GetBone(entity, EBone_head, tmp_bone)) continue;
+
+      // So i dont need to do this everywhere :/
+      auto draw_pt = [](CatVector in, CatVector4 color) {
+        CatVector wts;
+        if (!draw::WorldToScreen(in, wts)) return;
+        draw::RectFilled(wts.x - 3, wts.y - 3, 6, 6, color);
+        draw::Rect(wts.x - 4, wts.y - 4, 8, 8, colors::black);
+      };
+
+      // Draw multipoints
+		  auto ratio = (tmp_bone * ((float)aimbot::multipoint_ratio * 0.01)) / aimbot::multipoint;
+  		for (int i = 1; i <= aimbot::multipoint; i++)
+  		  for (const auto ii : (ratio * i).GetPoints())
+          draw_pt(ii, colors::white);
+
+      // Draw center, and sides
+      draw_pt(tmp_bone.GetCenter(), colors::red);
+      draw_pt(tmp_bone.min, colors::red);
+      draw_pt(tmp_bone.max, colors::red);
+		}
+  }
 }
 
 void Init() {
-
+  drawmgr.REventDuring(DrawTick);
+  wtickmgr.REventDuring(WorldTick);
 }
 
 }

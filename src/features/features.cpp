@@ -13,6 +13,7 @@
 #include "followbot.hpp"
 #include "spam.hpp"
 #include "bhop.hpp"
+#include "debug.hpp"
 
 #include "features.hpp"
 
@@ -37,6 +38,9 @@ void Init() {
 
 	// Bunnyhop
 	bhop::Init();
+
+	// Debug shit
+	debug::Init();
 }
 
 

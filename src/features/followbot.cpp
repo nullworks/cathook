@@ -38,7 +38,10 @@ static const int crumb_limit = 64; // limit
 CatEntity* follow_target = nullptr;
 
 static void WorldTick() {
-  if (!followbot) return;
+  if (!followbot) {
+    follow_target = nullptr;
+    return;
+  }
 
   // We need a local player to control
   auto local_ent = GetLocalPlayer();

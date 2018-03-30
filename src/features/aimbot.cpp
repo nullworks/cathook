@@ -11,8 +11,6 @@
 #include "../framework/gameticks.hpp" // To run our stuff
 #include "../framework/input.hpp" // to get userinput for aimkeys
 #include "../framework/trace.hpp" // so we can vis check
-#include "../gui/hudstrings/sidestrings.hpp"
-#include "esp.hpp"	// SetEspColor()
 
 #include "aimbot.hpp"
 
@@ -21,32 +19,31 @@ namespace features::aimbot {
 // do the dew with "punchangles"
 
 static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
-static CatVarBool enabled(aimbot_menu, "aimbot", true, "Enable Aimbot", "Main aimbot switch");
+static CatVarBool enabled(aimbot_menu, "ab", true, "Enable Aimbot", "Main aimbot switch");
 // Target Selection
 static CatEnum priority_mode_enum({"SMART", "FOV", "DISTANCE", "HEALTH"});
-static CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "aimbot_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
-static CatVarFloat fov(aimbot_menu, "aimbot_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
+static CatVarEnum priority_mode(aimbot_menu, priority_mode_enum, "ab_prioritymode", 1, "Priority mode", "Priority mode.\nSMART: Basically Auto-Threat.\nFOV, DISTANCE, HEALTH are self-explainable.\nHEALTH picks the weakest enemy");
+static CatVarFloat fov(aimbot_menu, "ab_fov", 0, "Aimbot FOV", "FOV range for aimbot to lock targets.", 180.0f);
 static CatEnum teammates_enum({"ENEMY ONLY", "TEAMMATE ONLY", "BOTH"});
-static CatVarEnum teammates(aimbot_menu, teammates_enum, "aimbot_teammates", 0, "Teammates", "Use to choose which team/s to target");
-static CatVarBool target_lock(aimbot_menu, "aimbot_targetlock", false, "Target lock", "Once aimbot finds a target, it will continue to use that target untill that target is no longer valid");
+static CatVarEnum teammates(aimbot_menu, teammates_enum, "ab_teammates", 0, "Teammates", "Use to choose which team/s to target");
+static CatVarBool target_lock(aimbot_menu, "ab_targetlock", false, "Target lock", "Once aimbot finds a target, it will continue to use that target untill that target is no longer valid");
 // Aiming
-static CatVarKey aimkey(aimbot_menu, "aimbot_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
-static CatVarBool autoshoot(aimbot_menu, "aimbot_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
+static CatVarKey aimkey(aimbot_menu, "ab_aimkey", CATKEY_E, "Aimkey", "If an aimkey is set, aimbot only works while key is depressed.");
+static CatVarBool autoshoot(aimbot_menu, "ab_autoshoot", true, "Auto-shoot", "Automaticly shoots when it can");
 static CatEnum hitbox_mode_enum({"AUTO", "AUTO-HEAD", "AUTO-CLOSEST", "HEAD", "CENTER"});
-static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode\n"
+static CatVarEnum hitbox_mode(aimbot_menu, hitbox_mode_enum, "ab_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode\n"
 																																																		 "AUTO: Automaticly chooses best hitbox\n"
 																																																		 "AUTO-HEAD: Head is first priority, but will aim anywhere else if not possible\n"
 																																																		 "AUTO-CLOSEST: Aims to the closest hitbox to your crosshair\n"
 																																																		 "HEAD: Head only\n"
 																																																		 "CENTER: Aims directly in the center of the entity");
-static CatVarInt smooth_aim(aimbot_menu, "aimbot_smooth", 0, "Smooth Aim", "Smooths the aimbot");
+static CatVarInt smooth_aim(aimbot_menu, "ab_smooth", 0, "Smooth Aim", "Smooths the aimbot");
 static CatEnum silent_aim_enum({"OFF", "SNAPBACK", "MODULE"});
-static CatVarEnum silent_aim(aimbot_menu, silent_aim_enum, "aimbot_silent", 0, "Silent aimbot", "SNAPBACK: Snaps the aimbot back after aiming\n"
+static CatVarEnum silent_aim(aimbot_menu, silent_aim_enum, "ab_silent", 0, "Silent aimbot", "SNAPBACK: Snaps the aimbot back after aiming\n"
 																																																						"MODULE: Uses the modules own version of silent, if any");
-static CatVarBool debug(aimbot_menu, "aimbot_debug", true, "debug", "gives debug info about aimbot");
-static CatVarInt multipoint(aimbot_menu, "aimbot_multipoint", 0, "Multipoint", "Amount of boxes to check, 0 = off\n NOTE: THIS IS EXTREMELY INTENSIVE, USE ONLY WHAT YOU NEED!", 5);
-static CatVarInt multipoint_ratio(aimbot_menu, "aimbot_multipoint_ratio", 86, "Multipoint Ratio", "Some games might have crappier lag comp than others, this shrinks the hitbox to correct for that.", 100);
-
+CatVarInt multipoint(aimbot_menu, "ab_multipoint", 0, "Multipoint", "Amount of boxes to check, 0 = off\n NOTE: THIS IS EXTREMELY INTENSIVE, USE ONLY WHAT YOU NEED!", 5);
+CatVarInt multipoint_ratio(aimbot_menu, "ab_multipoint_ratio", 86, "Multipoint Ratio", "Some games might have crappier lag comp than others, this shrinks the hitbox to correct for that.", 100);
+static CatVarBool can_shoot(aimbot_menu, "ab_canshoot", true, "Can Shoot check", "Aimbot will only aim when the weapon can shoot\nDoesnt work well with legit configs if using weapons that shoot rappidly\nNEEDS MODULE SUPPORT");
 
 // Hitbox selection
 
@@ -75,7 +72,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 
 		// First we shrink the box to try to avoid latency issues, we do this once to save the little cycles we have
 		// then we devide that by how many times we will recurse to get the ratio
-		auto ratio = (tmp_bone * (multipoint_ratio / 100)) / multipoint;
+		auto ratio = (tmp_bone * ((float)multipoint_ratio * 0.01)) / multipoint;
 		for (int i = 1; i <= multipoint; i++) {
 			// then we multiply it using the ratio to expand the point back to the size we want to check
 			auto expanded = ratio * i;
@@ -263,6 +260,9 @@ static bool ShouldAim() {
 // Externed entity to highlight color
 CatEntity* highlight_target = nullptr;
 
+// Used so a module can return whether weapon can shoot
+CMFunction<bool()> CanShoot {[]() -> bool {return true;}};
+
 // The main "loop" of the aimbot.
 static void WorldTick() {
 
@@ -346,7 +346,8 @@ static void WorldTick() {
 		// Autoshoot
 		if (autoshoot)
 			Attack(local_ent);
-		//  Get angles and Aim at player
+		// Check weapon time, we only want to aim when the weapon can shoot
+		// Get angles and Aim at player
 		auto aim_angles = util::VectorAngles(GetCamera(local_ent), target.second);
 		switch(silent_aim){
 		case 0: // OFF

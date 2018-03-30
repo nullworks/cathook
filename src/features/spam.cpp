@@ -24,6 +24,7 @@ static CatVarEnum spam_type(spam_menu, spam_type_enum, "spam", 0, "Spam", "Choos
 static CatVarBool spam_random(spam_menu, "spam_random", true, "Spam Random", "Randomly use a line to spam!");
 static CatVarString spam_file(spam_menu, "spam_file", "default.txt", "Spam File", "Put in a file to use with custom spam");
 static CatVarFloat spam_time(spam_menu, "spam_time", 2, "Spam Time", "Time to wait between each spam!");
+static CatVarInt spam_newline(spam_menu, "spam_newlines", 0, "Spam Time", "Time to wait between each spam!");
 
 const static std::vector<std::string> nekohook_spam({
   // Onee-chan's
@@ -132,7 +133,18 @@ static std::string GetSpamString(){
   if (last_spam >= spam_group->size()) // clamp around
     last_spam = 0;
 
-  return spam_group->at(spam_random ? rand() % spam_group->size() : last_spam);
+  // Get our string
+  auto spam_string = spam_group->at(spam_random ? (rand() % spam_group->size()) : last_spam);
+
+  // Add newlines if needed
+  if (spam_newline) {
+    std::string tmp;
+    for (int i = 0; i < spam_newline; i++)
+      tmp += '\n';
+    spam_string = tmp + spam_string;
+  }
+  
+  return spam_string;
 }
 
 // Externed, please set in your module to enable chat spam features

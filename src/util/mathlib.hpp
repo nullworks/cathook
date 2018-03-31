@@ -30,6 +30,7 @@ public:
 	inline CatVector operator/(CatVector value) const { return CatVector(x / value.x, y / value.y, z / value.z); }
 	inline CatVector operator*(float value) 	  const { return CatVector(x * value, y * value, z * value); }
 	inline CatVector operator/(float value)	    const { return CatVector(x / value, y / value, z / value); }
+	inline CatVector& operator/=(float value)	  			{ x /= value; y /= value; z /= value; return *this;}
 	inline bool operator==(CatVector value) const { return value.x == x && value.y == y && value.z == z; }
 	inline bool operator!=(CatVector value) const { return value.x != x || value.y != y || value.z != z; }
 	// Used to get the distance between 2 vectors

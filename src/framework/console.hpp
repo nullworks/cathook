@@ -14,7 +14,7 @@
 
 #include "../util/functions.hpp"
 
-#define COM_PREFIX "neko_"
+#define COM_PREFIX "n_"
 
 // The base command class
 class CatComBase {

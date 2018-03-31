@@ -163,7 +163,7 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 
 	// Local player check
 	auto local_ent = GetLocalPlayer(); // we use this below
-	if (!local_ent || (CatEntity*)local_ent == entity) return ret;
+	if ((CatEntity*)local_ent == entity) return ret;
 
 	// Type
 	auto type = GetType(entity);
@@ -210,7 +210,6 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 	float highest_score = -1024;
 
 	auto local_ent = GetLocalPlayer();
-	if (!local_ent) return ret;
 
 	// Loop through all entitys
 	for (int i = 0; i < GetEntityCount(); i++) {
@@ -248,7 +247,7 @@ static bool ShouldAim() {
 
 	// It would be prefered to have a local ent before we shoot
 	auto local_ent = (CatEntity*)GetLocalPlayer();
-	if (!local_ent || GetDormant(local_ent)) return false;
+
 	// Alive check
 	if (!GetAlive(local_ent)) return false;
 	// Aimkey
@@ -271,7 +270,7 @@ static void WorldTick() {
 
 	// Get local ent for use below
 	auto local_ent = GetLocalPlayer();
-	if (!local_ent) { last_target = nullptr; highlight_target = nullptr; return; }
+	if (!local_ent || GetDormant((CatEntity*)local_ent)) { last_target = nullptr; highlight_target = nullptr; return; }
 
 	// Snapback Silent Info
 	static std::tuple<int, CatVector, CatTimer> snap_info;

@@ -8,9 +8,9 @@
 #pragma once
 
 #include <utility> // Pairs
-#include "../util/functions.hpp" //CMFunction, CMEvent
+#include "../util/functional.hpp" //CMFunction, CMEvent
 
-enum CatKey{
+enum CatKey {
 	CATKEY_NONE,
 	CATKEY_0, CATKEY_1, CATKEY_2,
 	CATKEY_3, CATKEY_4, CATKEY_5,

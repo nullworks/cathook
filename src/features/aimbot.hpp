@@ -7,7 +7,7 @@
  */
 
 #include "../util/catvars.hpp"
-#include "../util/functions.hpp"
+#include "../util/functional.hpp"
 #include "../framework/entitys.hpp"	// Contains entity and bone info
 
 namespace features::aimbot {
@@ -18,10 +18,16 @@ namespace features::aimbot {
 extern CMFunction<CatVector(CatEntity*)> GetAutoHitbox;
 
 // For modules to add their target selection stuff, return true if target is acceptable
-extern std::vector<CMFunction<bool(CatEntity*)>> TargetSelectionModule;
+extern CMFunction<bool(CatEntity*)> TargetSelectionModule;
+
+// TODO, find good name and impliment
+//extern CMFunction<bool(CatEntity*)> CanAimModule;
 
 // Used to tell when an weapon can shoot
 extern CMFunction<bool()> CanShoot;
+
+// Use to share same aimbot menu ;)
+extern CatEnum aimbot_menu;
 
 // Other
 

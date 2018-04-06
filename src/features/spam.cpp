@@ -19,7 +19,7 @@
 namespace features::spam {
 
 const static CatEnum spam_menu({"Spam"});
-static CatEnum spam_type_enum({"OFF", "NEKOHOOK", "CATHOOK", "LMAOBOX", "LITHIUM", "NULLCORE", "CUSTOM"});
+static CatEnum spam_type_enum({"OFF", "NEKOHOOK", "CATHOOK", "LMAOBOX", "LITHIUM", "NULLCORE", "BLANK", "CUSTOM"});
 static CatVarEnum spam_type(spam_menu, spam_type_enum, "spam", 0, "Spam", "Choose your type of spam!");
 static CatVarBool spam_random(spam_menu, "spam_random", true, "Spam Random", "Randomly use a line to spam!");
 static CatVarString spam_file(spam_menu, "spam_file", "default.txt", "Spam File", "Put in a file to use with custom spam");
@@ -74,6 +74,7 @@ const static std::vector<std::string> nullcrap_spam({
     "NULL CORE - CAN CAUSE KIDS TO RAGE!",
     "NULL CORE - F2P NOOBS WILL BE 100% NERFED!"
 });
+const static std::vector<std::string> blank_spam({"\x0F"});
 
 static std::vector<std::string> custom_spam;
 
@@ -113,7 +114,8 @@ static std::string GetSpamString(){
   case 3: spam_group = &lmaobox_spam; break;
   case 4: spam_group = &lithium_spam; break;
   case 5: spam_group = &nullcrap_spam; break;
-  case 6: {
+  case 6: spam_group = &blank_spam; break;
+  case 7: { //  Custom
     spam_group = &custom_spam;
     // Here we make sure the custom spam is updated and that we have something
     static std::string last_string = spam_file;
@@ -121,6 +123,8 @@ static std::string GetSpamString(){
       spam_reload({});
       last_string = spam_file;
     }
+    if (custom_spam.empty())
+      return std::string();
   }}
 
   // In case some idiot sets the spam_type var too high or low
@@ -143,7 +147,7 @@ static std::string GetSpamString(){
       tmp += '\n';
     spam_string = tmp + spam_string;
   }
-  
+
   return spam_string;
 }
 

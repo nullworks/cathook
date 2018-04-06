@@ -17,7 +17,7 @@ inline void substr(char* buffer, const char* input, int start, int end) {
 }
 
 // Seperates multiple strings from one string, seperated by spaces
-std::vector<std::string> sepstr(std::string);
+std::vector<std::string> sepstr(const std::string&);
 
 // Used to simplify strings
 std::string reduce_str(std::string in);

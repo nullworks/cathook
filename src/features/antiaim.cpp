@@ -12,21 +12,30 @@
 #include "../util/catvars.hpp"
 #include "../framework/gameticks.hpp"
 #include "../framework/trace.hpp"
+#include "../framework/input.hpp"
 
 #include "antiaim.hpp"
 
 namespace features::antiaim {
 
 static CatEnum antiaim_menu({"Anti-Aim"});
-static CatVarBool enabled(antiaim_menu, "antiaim", false, "Enable Anti-Aim", "Master Anti-Aim switch");
+static CatVarBool enabled(antiaim_menu, "aa", false, "Enable Anti-Aim", "Master Anti-Aim switch");
 static CatEnum aa_pitch_enum({"OFF", "FIXED", "UP", "DOWN", "FAKEUP", "FAKEDOWN", "FAKECENTER", "RANDOM", "BIGRANDOM", "FLIP", "FAKEFLIP"});
-static CatVarEnum aa_pitch(antiaim_menu, aa_pitch_enum, "antiaim_pitch", 0, "AA Pitch Type", "Type of anti-aim to use for pitch");
+static CatVarEnum aa_pitch(antiaim_menu, aa_pitch_enum, "aa_pitch", 0, "AA Pitch Type", "Type of anti-aim to use for pitch");
 static CatEnum aa_yaw_enum({"OFF", "FIXED", "FIXEDOFFSET", "RANDOM", "BIGRANDOM", "FLIP", "SPIN", "EDGE"});
-static CatVarEnum aa_yaw(antiaim_menu, aa_yaw_enum, "antiaim_yaw", 0, "AA Yaw Type", "Type of anti-aim to use for yaw");
-static CatVarFloat aa_pitch_amt(antiaim_menu, "antiaim_pitch_fixed", 0, "AA Pitch Fixed", "Value for fixed anti-aim");
-static CatVarFloat aa_yaw_amt(antiaim_menu, "antiaim_yaw_fixed", 0, "AA Yaw Fixed", "Value for fixed anti-aim");
-static CatVarFloat aa_spin_amt(antiaim_menu, "antiaim_spin_amt", 2.5f, "AA Spin Speed", "How fast to spin to win");
-static CatVarBool allow_unclamped(antiaim_menu, "antiaim_unclamp", false, "AA UnClamped", "Allow UnClamped angles?\nThis is a very dangerous thing to enable if an anti-cheat is present!");
+static CatVarEnum aa_yaw(antiaim_menu, aa_yaw_enum, "aa_yaw", 0, "AA Yaw Type", "Type of anti-aim to use for yaw");
+static CatVarFloat aa_pitch_amt(antiaim_menu, "aa_pitch_fixed", 0, "AA Pitch Fixed", "Value for fixed anti-aim");
+static CatVarFloat aa_yaw_amt(antiaim_menu, "aa_yaw_fixed", 0, "AA Yaw Fixed", "Value for fixed anti-aim");
+static CatVarFloat aa_spin_amt(antiaim_menu, "aa_spin_amt", 2.5f, "AA Spin Speed", "How fast to spin to win");
+static CatVarBool allow_unclamped(antiaim_menu, "aa_unclamp", false, "AA UnClamped", "Allow UnClamped angles?\nThis is a very dangerous thing to enable if an anti-cheat is present!");
+// TODO, method to change way of doing the antiaims if one would be prefered over the other depending on game
+// Example: aa in csgo wouldnt work with overflowing angles, so we would use sendpacket
+// othergames might not have aa but some games do, gotta make it *modular*
+//static CatEnum aa_method_enum({"OVERFLOW", "PACKET-SWITCH"});
+//static CatVarEnum aa_method(antiaim_menu, aa_method, "antiaim_yaw", 0, "AA Yaw Type", "Type of anti-aim to use for yaw");
+
+// Change this to something more accurate in your game module
+CMFunction<bool()> ShouldAA {[](){return !input::GetKey(CATKEY_MOUSE_1);}};
 
 static void WorldTick() {
   if (!enabled) return;
@@ -35,6 +44,9 @@ static void WorldTick() {
   auto local_ent = GetLocalPlayer();
   if (!local_ent || GetDormant((CatEntity*)local_ent) || !GetAlive((CatEntity*)local_ent)) return;
   auto angles = GetCameraAngle(local_ent);
+
+  // Check if can aa
+  if (!ShouldAA()) return;
 
   // Pitch
   switch(aa_pitch) {

@@ -18,7 +18,7 @@ namespace features::aimbot {
 
 // do the dew with "punchangles"
 
-static CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
+CatEnum aimbot_menu({"Aimbot"}); // Menu locator for esp settings
 static CatVarBool enabled(aimbot_menu, "ab", true, "Enable Aimbot", "Main aimbot switch");
 // Target Selection
 static CatEnum priority_mode_enum({"SMART", "FOV", "DISTANCE", "HEALTH"});
@@ -154,7 +154,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 // Target Selection
 
 // For modules to add their target selection stuff
-std::vector<CMFunction<bool(CatEntity*)>> TargetSelectionModule;
+CMFunction<bool(CatEntity*)> TargetSelectionModule {[](auto){return true;}};
 
 // A second check to determine whether a target is good enough to be aimed at
 static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
@@ -177,8 +177,7 @@ static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 	if (teammates != 2 && ((teammates == 0) ? !team : team)) return ret;
 
 	// Do the custom stuff
-	for (auto tmp : TargetSelectionModule)
-		if (!tmp(entity)) return ret;
+	if (!TargetSelectionModule(entity)) return ret;
 
 	// Get our best Aimpoint
 	CatVector aimpoint = RetrieveAimpoint(entity);
@@ -346,6 +345,8 @@ static void WorldTick() {
 		if (autoshoot)
 			Attack(local_ent);
 		// Check weapon time, we only want to aim when the weapon can shoot
+		if (!CanShoot())
+			return;
 		// Get angles and Aim at player
 		auto aim_angles = util::VectorAngles(GetCamera(local_ent), target.second);
 		switch(silent_aim){
@@ -368,13 +369,8 @@ static void WorldTick() {
 	}
 }
 
-static void DrawTick() {
-
-}
-
 void Init() {
 	wtickmgr.REventDuring(WorldTick);
-	drawmgr.REventDuring(DrawTick);
 }
 
 }

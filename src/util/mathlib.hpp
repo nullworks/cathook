@@ -98,19 +98,6 @@ public:
 	}
 };
 
-// Struct for point in 4d space
-class CatVector4 {
-public:
-	inline CatVector4(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f, float _a = 0.0f) : x(_x), y(_y), z(_z), a(_a) {}
-	float x, y, z, a;
-
-	// So we can do math with our catvectors easily
-  inline CatVector4 operator*(float value)	const { return CatVector4(x * value, y * value, z * value, a * value); }
-  inline CatVector4 operator/(float value)	const { return CatVector4(x / value, y / value, z / value, a / value); }
-	inline bool operator==(CatVector4 value) const { return value.x == x && value.y == y && value.z == z && value.a == a; }
-	inline bool operator!=(CatVector4 value) const { return value.x != x || value.y != y || value.z != z || value.a != a; }
-};
-
 namespace util {
 
 // Clamps angles to prevent them from going out of bounds, this is simple and should be inlined

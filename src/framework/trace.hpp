@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../util/functions.hpp" // CMFunction
+#include "../util/functional.hpp" // CMFunction
 #include "../util/mathlib.hpp"   // CatVector
 #include "entitys.hpp"
 

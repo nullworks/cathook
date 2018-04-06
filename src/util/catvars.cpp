@@ -9,14 +9,16 @@
  */
 
 #include <exception>
+#include <algorithm>
 
 #include "strings.hpp"
 #include "logging.hpp"
 
 #include "catvars.hpp"
 
-// The CatCommand map
-std::unordered_map<std::string, CatVar*> CatVarMap;
+// :b:ig list of catvars
+std::vector<CatVar*> CatVar::CatVarList;
+
 // Our Menu tree
 CatMenuTree CatMenuRoot;
 
@@ -30,18 +32,24 @@ CatCommand list_vars("list", [](std::vector<std::string> args){
 				enum_str += (enum_str.empty()) ? tmp : ", " + tmp;
 			}
 			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"\n\t\tEnums: %s",
-											 cvar_enum->name.c_str(), cvar_enum->desc_short.c_str(), cvar_enum->desc_long.c_str(), enum_str.c_str());
+											 cvar_enum->name.c_str(), cvar_enum->desc_short, cvar_enum->desc_long, enum_str.c_str());
 		} else
 			g_CatLogging.log("Command: \"%s\", \"%s\"\n\t\t\"%s\"",
-											 i->name.c_str(), i->desc_short.c_str(), i->desc_long.c_str());
+											 i->name.c_str(), i->desc_short, i->desc_long);
   };
+  // Single var list
   if (!args.empty()) {
-
+    auto find = std::find_if(CatVar::CatVarList.begin(), CatVar::CatVarList.end(), [&](auto i){return i->name == args.at(0);});
+    if (find == CatVar::CatVarList.end())
+      g_CatLogging.log("Unknown catvar: \"%s\"", args.at(0).c_str());
+    else
+      print_var(*find);
+    return;
   }
+  // Entire var list
 	g_CatLogging.log("Current list of CatVars--");
-	for (const auto& i : CatVarMap) {
-    print_var(i.second);
-	}
+	for (const auto& i : CatVar::CatVarList)
+    print_var(i);
 	g_CatLogging.log("End of list--");
 });
 
@@ -68,22 +76,22 @@ void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
 }
 
 // General catvar constructor
-CatVar::CatVar(const CatEnum& _gui_position, std::string _name, std::string _desc_short, std::string _desc_long)
-	: gui_position(_gui_position), name(COM_PREFIX + _name), desc_short(_desc_short), desc_long(_desc_long) {
-	CatVarMap.insert({name, this}); // Broken
+CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
+	: gui_position(_gui_position), name(std::string(COM_PREFIX) + _name), desc_short(_desc_short), desc_long(_desc_long) {
+	CatVarList.push_back(this);
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
 }
 // Catvar Constructors
-CatVarBool::CatVarBool(const CatEnum& _gui_position, std::string _name, bool _defaults, std::string _desc_short, std::string _desc_long)
+CatVarBool::CatVarBool(const CatEnum& _gui_position, const char* _name, bool _defaults, const char* _desc_short, const char* _desc_long)
   : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
-CatVarInt::CatVarInt(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long, int _min, int _max)
+CatVarInt::CatVarInt(const CatEnum& _gui_position, const char* _name, int _defaults, const char* _desc_short, const char* _desc_long, int _min, int _max)
   : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(_min), max(_max) {}
-CatVarFloat::CatVarFloat(const CatEnum& _gui_position, std::string _name, float _defaults, std::string _desc_short, std::string _desc_long, float _min, float _max)
+CatVarFloat::CatVarFloat(const CatEnum& _gui_position, const char* _name, float _defaults, const char* _desc_short, const char* _desc_long, float _min, float _max)
   : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults), min(_min), max(_max) {}
-CatVarString::CatVarString(const CatEnum& _gui_position, std::string _name, std::string _defaults, std::string _desc_short, std::string _desc_long)
+CatVarString::CatVarString(const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long)
   : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
-CatVarColor::CatVarColor(const CatEnum& _gui_position, std::string _name, CatVector4 _defaults, std::string _desc_short, std::string _desc_long)
+CatVarColor::CatVarColor(const CatEnum& _gui_position, const char* _name, CatColor _defaults, const char* _desc_short, const char* _desc_long)
   : CatVar(_gui_position, _name, _desc_short, _desc_long), defaults(_defaults), value(_defaults) {}
 
 // Command Callbacks
@@ -202,29 +210,22 @@ std::string CatVarString::GetValue() {
 void CatVarColor::callback(std::vector<std::string> args) {
 	// Empty args
 	if (args.empty()) {
-		g_CatLogging.log("%s: R:%f, G:%f, B:%f, A:%f", name.c_str(), value.x, value.y, value.z, value.a);
+		g_CatLogging.log("%s: R:%f, G:%f, B:%f, A:%f", name.c_str(), value.r, value.g, value.b, value.a);
 		return;
 	}
-	auto size = args.size();
 	try {
-		value.x = std::stof(args[0]);
-		if (size >= 2) {
-			value.y = std::stof(args[1]);
-			if (size >= 3) {
-				value.z = std::stof(args[2]);
-				if (size >= 4) {
-					value.a = std::stof(args[3]);
-				}
-			}
-		}
+	value.r = std::stof(args.at(0));
+	value.g = std::stof(args.at(1));
+	value.b = std::stof(args.at(2));
+	value.a = std::stof(args.at(3));
 	} catch (std::exception& e) {
 		g_CatLogging.log("Exception: %s", e.what());
 	}
 }
 std::string CatVarColor::GetValue() {
 	return
-	std::to_string(value.x) + ' ' +
-	std::to_string(value.y) + ' ' +
-	std::to_string(value.z) + ' ' +
+	std::to_string(value.r) + ' ' +
+	std::to_string(value.g) + ' ' +
+	std::to_string(value.b) + ' ' +
 	std::to_string(value.a);
 }

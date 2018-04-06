@@ -39,10 +39,10 @@ void CBaseWidget::UpdatePositioning() {
 void CBaseWidget::Draw() {
 	if(draw_bounds){
 		//If the bounds color is unset, set random bounds color
-		if (bounds_color == CatVector4())
+		if (bounds_color == CatColor())
 			bounds_color = colors::RandomColor();
 		//Draw it
-		draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(bounds_color, 0.25f));
+		draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, bounds_color.Transparent(0.25f));
 		draw::Rect(global_pos.first, global_pos.second, size.first, size.second, bounds_color);
 		//g_CatLogging.log("Drawing %s",name.c_str());
 	}

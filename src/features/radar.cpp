@@ -48,7 +48,7 @@ void CRadar::Draw() {
     CBaseWindow::Draw(); // We can use window for this
   else { // Circle
     auto size_fix = (size.first + size.second) / 2; // We need to average sizes as we draw weird circles
-    draw::CircleFilled(global_pos.first + size_fix / 2, global_pos.first + size_fix / 2, size_fix, 20, colors::Transparent(colors::gray));
+    draw::CircleFilled(global_pos.first + size_fix / 2, global_pos.first + size_fix / 2, size_fix, 20, colors::gray.Transparent());
     draw::Circle(global_pos.first + size_fix / 2, global_pos.first + size_fix / 2, size_fix, 20, colors::white);
   }
 
@@ -65,7 +65,7 @@ void CRadar::Draw() {
   auto local_ent = GetLocalPlayer();
   if (!local_ent || GetDormant((CatEntity*)local_ent)) return;
   auto loc_origin = GetOrigin((CatEntity*)local_ent);
-  auto camera_yaw = GetCameraAngle(local_ent).y;
+  //auto camera_yaw = GetCameraAngle(local_ent).y;
 
   // Here we draw entitys
   for (int i = 1; i < GetEntityCount(); i++) {
@@ -113,6 +113,8 @@ void CRadar::Draw() {
   }
 }
 
-void Init() {}
+void Init() {
+
+}
 
 }

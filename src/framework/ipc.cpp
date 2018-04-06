@@ -5,7 +5,8 @@
  *
  */
 
-#include <unordered_map>
+#include <algorithm>
+
 #if defined(__linux__)
   #include <fcntl.h> // flags for shm_open()
   #include <sys/stat.h> // S_IRWXU, S_IRWXG, S_IRWXO
@@ -31,9 +32,9 @@ namespace ipc {
 IpcStream* g_IpcStream = nullptr;
 
 // Command handler
-static std::unordered_map<std::string, IpcCommand*> IpcCommandMap;
+static std::vector<IpcCommand*> IpcCommandList;
 IpcCommand::IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* message)) : com_callback(_com_callback) {
-  IpcCommandMap.insert({name, this});
+  IpcCommandList.push_back(this);
 }
 
 // Stock ipc commands
@@ -196,11 +197,11 @@ void IpcStream::thread_loop() {
     for (auto& i : this->IpcMemSpace->message_pool) {
       if (i.state == ipc_state::RECIPIENT_LOCKED) {
         if (i.recipient == this->ipc_pos) {
-          auto find = IpcCommandMap.find(i.command);
-          if (find != IpcCommandMap.end()) {
+          auto find = std::find_if(IpcCommandList.begin(), IpcCommandList.end(), [&](auto c) {return !strcmp(c->name, i.command);});
+          if (find != IpcCommandList.end()) {
             g_CatLogging.log("IPC: Recieved Command: %s!", i.command);
             // Run the command we found
-            (*find->second)(&i);
+            (*find)->run(&i);
           } else
             g_CatLogging.log("IPC: Recieved Unknown Command: %s!", i.command);
           // Reset the message status since we recieved it

@@ -10,7 +10,7 @@
 #include <functional> // Pair
 #include <string>
 
-#include "../../util/mathlib.hpp" // Colors
+#include "../../util/colors.hpp" // Colors
 
 namespace gui { namespace base {
 
@@ -20,7 +20,7 @@ class CBaseParent;
 class CBaseWidget{
 protected:
 	std::string tooltip;
-	CatVector4 bounds_color;
+	CatColor bounds_color;
 	std::pair<int, int> global_pos;
 public:
 	std::string name;

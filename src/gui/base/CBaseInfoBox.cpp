@@ -20,7 +20,7 @@ CBaseInfoBox::CBaseInfoBox(std::string name, std::string info, std::pair<int, in
 
 void CBaseInfoBox::Draw() {
 
-  // Get tooltip size
+  /*// Get tooltip size
   auto infostring_size = draw::GetStringLength(infostring.c_str(), 1, 20);
 
   // Check if we need to wrap
@@ -58,7 +58,7 @@ void CBaseInfoBox::Draw() {
   auto mouse = input::GetMouse();
   draw::RectFilled(mouse.first, mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::Transparent(colors::black));
   draw::Rect(mouse.first, mouse.second, infostring_size.first + 4, infostring_size.second + 4, colors::pink);
-  draw::String(infostring.c_str(), mouse.first + 2, mouse.second + 2, draw::default_font_size, draw::default_font_size, colors::white);
+  draw::String(infostring.c_str(), mouse.first + 2, mouse.second + 2, draw::default_font_size, draw::default_font_size, colors::white);*/
 }
 
 }}

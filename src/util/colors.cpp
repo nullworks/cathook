@@ -22,7 +22,7 @@
 namespace colors {
 
 // Use this to get a color from an entity!
-CMFunction<CatVector4(CatEntity*)> EntityColor {
+CMFunction<CatColor(CatEntity*)> EntityColor {
 	[](CatEntity* entity) {
 
 	// Highlight targets
@@ -32,7 +32,7 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 		return green;
 
 	// Default color
-	CatVector4 ent_color = white;
+	CatColor ent_color = white;
 
 	// Different strokes for different folks
 	auto ent_type = GetType(entity);
@@ -63,14 +63,14 @@ CMFunction<CatVector4(CatEntity*)> EntityColor {
 }};
 
 // Returns a rainbow color based on time
-CatVector4 RainbowCurrent() {
+CatColor RainbowCurrent() {
 	static auto start_time = std::chrono::steady_clock::now();
 	std::chrono::duration<float, std::deca> curtime = std::chrono::steady_clock::now() - start_time;
 	return colors::FromHSL(fabs(sin(curtime.count())) * 360.0f, 0.85f, 0.9f);
 }
 
-// Returns a random color 
-CatVector4 RandomColor() {
+// Returns a random color
+CatColor RandomColor() {
 	return colors::FromHSL(rand() % 360, float(rand() % 10)/50+0.5f, float(rand() % 10)/50+0.5f);
 }
 

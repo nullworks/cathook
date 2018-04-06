@@ -4,7 +4,7 @@
 
 
 #include "../util/chrono.hpp" // for the cat timer, and so we can sleep in thread
-#include "../util/functions.hpp"
+#include "../util/functional.hpp"
 
 // Increase as needed, we just need enough space to handle
 #define MAX_IPC_MEMBERS 32
@@ -45,7 +45,8 @@ struct IpcContent {
 class IpcCommand {
 public:
   IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* payload));
-  inline void operator()(const IpcMessage* message){com_callback(message);}
+  inline void run(const IpcMessage* message){com_callback(message);}
+  const char* name;
 private:
   CMFunction<void(const IpcMessage*)> com_callback;
 };

@@ -23,7 +23,13 @@ static CatVarInt bhop_ticks(bhop_menu, "bhop_ticks", 5, "Ticks to wait before at
 // I dont know how to modularize removing jump without adding a remove jump to framework/entitys :/
 // TODO: Finish this to get it working...
 
+// Time to rant again
+// WHY IS THIS SUCH A FUCKING RETARTED THING TO MODULARIZE AHHHH
+// Maybe i should make it game module dependant :/
+// But thats gay and it takes effort for each game i port to...
+
 static void WorldTick(){
+  return;
   if (!bhop) return;
 
   auto local_ent = GetLocalPlayer();

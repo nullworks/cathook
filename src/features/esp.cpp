@@ -52,7 +52,7 @@ static CatEnum box_mode_enum({"Collision", "Bone", "Hitbox"});
 static CatVarEnum box_mode(esp_menu, box_mode_enum, "esp_box_mode", 0, "Box mode", "What method to use to get the esp box");
 
 // Externed, add you functions to get strings onto entities
-std::vector<CMFunction<std::pair<const char*, CatVector4>(CatEntity*)>> GetEntityStrings;
+std::vector<std::pair<const char*, CatColor>(*)(CatEntity*)> GetEntityStrings;
 
 // Esp draw func to be ran at draw
 static void Draw() {
@@ -84,17 +84,19 @@ static void Draw() {
 		 		return sbox_state == SBOX_SUCCESSFUL; // If we already have the screenbox.second, we return true
 			sbox_state = SBOX_FAILED; // Pre-set this so we can return false at any time without worry
 			sbox_min = {65536, 65536}; sbox_max = {-65536, -65536}; // Reset our cached screen box
-			auto ExpandWithPoint = [&](const CatVector& pnt) {
+			auto ExpandWithPoint = [&](const std::pair<int, int>& pnt) {
 				// Create and expand the bounds based our our last point
-				if (pnt.x > sbox_max.first)
-					sbox_max.first = pnt.x;
-				if (pnt.y > sbox_max.second)
-					sbox_max.second = pnt.y;
-				if (pnt.x < sbox_min.first)
-					sbox_min.first = pnt.x;
-				if (pnt.y < sbox_min.second)
-					sbox_min.second = pnt.y;
+				if (pnt.first > sbox_max.first)
+					sbox_max.first = pnt.first;
+				if (pnt.second > sbox_max.second)
+					sbox_max.second = pnt.second;
+				if (pnt.first < sbox_min.first)
+					sbox_min.first = pnt.first;
+				if (pnt.second < sbox_min.second)
+					sbox_min.second = pnt.second;
 			};
+			// Convinient for everything to use
+			std::pair<int, int> wts;
 		 	// If we use bones, try to do so here, we still want collision as a fallback
 		 	if (box_mode >= 1) {
 				// get bones
@@ -107,16 +109,14 @@ static void Draw() {
 			 	if (!cur_bones.empty()) {
 					for (auto& tmp : cur_bones) {
 						if (box_mode == 1) { // Bone
-							auto pt = tmp.GetCenter();
-							if (!draw::WorldToScreen(pt, pt))
+							if (!draw::WorldToScreen(tmp.GetCenter(), wts))
 								return false;
-							ExpandWithPoint(pt);
+							ExpandWithPoint(wts);
 						} else { // Hitbox
-							auto points = tmp.GetPoints();
-							for(auto& pt : points) {
-								if (!draw::WorldToScreen(pt, pt))
+							for(auto pt : tmp.GetPoints()) {
+								if (!draw::WorldToScreen(pt, wts))
 									return false;
-								ExpandWithPoint(pt);
+								ExpandWithPoint(wts);
 							}
 						}
 					}
@@ -129,9 +129,9 @@ static void Draw() {
 
 			// Go through the points getting world to screen and create our screenbox with them
 			for (auto& pt : points) {
-  			if (!draw::WorldToScreen(pt, pt))
+  			if (!draw::WorldToScreen(pt, wts))
 					return false;
-				ExpandWithPoint(pt);
+				ExpandWithPoint(wts);
 			}
 
 			// We now have our entity box, set the state and return true
@@ -149,12 +149,12 @@ static void Draw() {
 			if (tracers) {
 
 				// Get world to screen
-				CatVector scn;
+				std::pair<int, int> scn;
 				if (draw::WorldToScreen(GetOrigin(entity), scn)) {
 
 					// Draw a line
 					auto bounds = input::GetBounds();
-					draw::Line(scn.x, scn.y, bounds.first / 2 - scn.x, ((tracers == 2) ? bounds.second : bounds.second / 2) - scn.y, ent_color);
+					draw::Line(scn.first, scn.second, bounds.first / 2 - scn.first, ((tracers == 2) ? bounds.second : bounds.second / 2) - scn.second, ent_color);
 				}
 			}
 
@@ -176,10 +176,10 @@ static void Draw() {
 						if (last_bone != CatVector() || GetBoneCenter(entity, current_set[ii], bone1)) {
 							if (GetBoneCenter(entity, current_set[ii + 1], bone2)) {
 								// World to screen them
-								CatVector scn1, scn2;
+								std::pair<int, int> scn1, scn2;
 								if (draw::WorldToScreen((last_bone != CatVector()) ? last_bone : bone1, scn1) && draw::WorldToScreen(bone2, scn2)) {
 									// Draw a line connecting the points
-									draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, ent_color);
+									draw::Line(scn1.first, scn1.second, scn2.first - scn1.first, scn2.second - scn1.second, ent_color);
 								}
 							last_bone = bone2; // save the bone so we dont need it again
 							}
@@ -196,11 +196,12 @@ static void Draw() {
 						CatVector tmp;
 						if (!GetBoneCenter(entity, ii, tmp)) continue;
 						// Get wts
-						if (!draw::WorldToScreen(tmp, tmp)) continue;
+						std::pair<int, int> wts;
+						if (!draw::WorldToScreen(tmp, wts)) continue;
 						// Draw
 						char buf[8];
 						sprintf(buf, "B:%i", ii);
-						draw::String(buf, tmp.x, tmp.y, draw::default_font, draw::default_font_size, colors::white);
+						draw::String(buf, wts.first, wts.second, draw::default_font, draw::default_font_size, colors::white);
 					}
 				}
 			}
@@ -239,7 +240,7 @@ static void Draw() {
 		// Strings
 
 		// Get our strings
-		std::vector<std::pair<const char*, CatVector4>> str_cache;
+		std::vector<std::pair<const char*, CatColor>> str_cache;
 
 		if ((esp_players && type == ETYPE_PLAYER) || (esp_other_hostile && type == ETYPE_OTHERHOSTILE)) {
 			// Name esp
@@ -272,7 +273,7 @@ static void Draw() {
 		if (!str_cache.empty()) {
 
 			// Get world to screen
-			CatVector draw_point;
+			std::pair<int, int> draw_point;
 			if (draw::WorldToScreen(GetOrigin(entity), draw_point)) {
 
 				// Change draw point if needed & determine wheter we center the strings
@@ -282,10 +283,10 @@ static void Draw() {
 
 					switch(esp_text_position) {
 					case 0: // TOP RIGHT
-						draw_point = CatVector(sbox_max.first + 2, sbox_min.second, 0); break;
+						draw_point = {sbox_max.first + 2, sbox_min.second}; break;
 					case 3: // BELOW
 						center_strings = true;
-						draw_point = CatVector(sbox_min.first, sbox_max.second, 0); break;
+						draw_point = {sbox_min.first, sbox_max.second}; break;
 					case 2: // ABOVE
 						center_strings = true;
 					case 1: { // BOTTOM RIGHT
@@ -296,9 +297,9 @@ static void Draw() {
 							total_height += size.second;
 						}
 						if (esp_text_position == 1) // BOTTOM RIGHT
-							draw_point = CatVector(sbox_min.first, sbox_min.second - total_height);
+							draw_point = {sbox_min.first, sbox_min.second - total_height};
 						else // ABOVE
-							draw_point = CatVector(sbox_max.first + 2, sbox_max.second - total_height);
+							draw_point = {sbox_max.first + 2, sbox_max.second - total_height};
 						}
 					}
 				}
@@ -311,12 +312,12 @@ static void Draw() {
 					auto size = draw::GetStringLength(str.first, draw::default_font, draw::default_font_size);
 
 					if (center_strings) // Centered strings
-						draw::String(str.first, draw_point.x - size.first / 2, draw_point.y, draw::default_font, draw::default_font_size, str.second);
+						draw::String(str.first, draw_point.first - size.first / 2, draw_point.second, draw::default_font, draw::default_font_size, str.second);
 					else // Not centered
-						draw::String(str.first, draw_point.x, draw_point.y, draw::default_font, draw::default_font_size, str.second);
+						draw::String(str.first, draw_point.first, draw_point.second, draw::default_font, draw::default_font_size, str.second);
 
 					// Lower draw point for recursions
-					draw_point.y += size.second;
+					draw_point.second += size.second;
 				}
 			}
 		}

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../util/functions.hpp"
+#include "../util/functional.hpp"
 
 namespace game {
 

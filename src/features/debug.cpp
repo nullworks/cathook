@@ -73,11 +73,11 @@ static void DrawTick(){
   		if (!GetBone(entity, EBone_head, tmp_bone)) continue;
 
       // So i dont need to do this everywhere :/
-      auto draw_pt = [](CatVector in, CatVector4 color) {
-        CatVector wts;
+      auto draw_pt = [](CatVector in, CatColor color) {
+        std::pair<int, int> wts;
         if (!draw::WorldToScreen(in, wts)) return;
-        draw::RectFilled(wts.x - 3, wts.y - 3, 6, 6, color);
-        draw::Rect(wts.x - 4, wts.y - 4, 8, 8, colors::black);
+        draw::RectFilled(wts.first - 3, wts.second - 3, 6, 6, color);
+        draw::Rect(wts.first - 4, wts.second - 4, 8, 8, colors::black);
       };
 
       // Draw multipoints

@@ -6,6 +6,7 @@
  *
  */
 
+#include "../../framework/input.hpp"
 #include "../../framework/gameticks.hpp"	// To init our sidestrings
 #include "../../framework/game.hpp"		// Module authors
 #include "../gui.hpp"					// guicolor

@@ -7,17 +7,24 @@
 
 #pragma once
 
-#include "functions.hpp" // CMFunction
+#include "functional.hpp" // CMFunction
 #include "../framework/entitys.hpp" // We use entitys as an argument for our entity to color
+
+// Color classes
+// This is to replace CatVector4, it uses floats, we can make things faster with integers. I will remove this comment eventually.
+class CatColor {
+public:
+	inline CatColor(int _r = 255, int _g = 255, int _b = 255, int _a = 255) : r(_r), g(_g), b(_b), a(_a) {}
+	inline bool operator==(CatColor value) const {return r == value.r && g == value.g && b == value.b && a == value.a;}
+	inline CatColor Transparent(float multiplier = 0.5f /*= 255 / 2*/) const { return CatColor(r, g, b, a * multiplier); } // need better way to do this
+	int r, g, b, a;
+};
 
 namespace colors {
 
 // Color utils
-inline CatVector4 FromRGBA8(CatVector4 color) { return color / 255; }
-inline CatVector4   ToRGBA8(CatVector4 color) { return color * 255; }
-inline CatVector4   ToRGBA8(float r, float g, float b, float a) { return CatVector4(r * 255, g * 255, b * 255, a * 255); }
-inline CatVector4 Transparent(CatVector4 color, float multiplier = 0.5f) { return CatVector4(color.x, color.y, color.z, color.a * multiplier); }
-inline CatVector4 FromHSL(float h, float s, float v) {
+inline CatColor ToRGBA8(float r, float g, float b, float a) { return CatColor(r * 255, g * 255, b * 255, a * 255); }
+inline CatColor FromHSL(float h, float s, float v) { // Color wheel func, lookup hsl for info, credits goto cathook for this
 	if (s <= 0.0) return ToRGBA8(v, v, v, 1.0f);
 	if (h >= 360.0) h = 0.0;
 	h /= 60.0;
@@ -43,36 +50,34 @@ inline CatVector4 FromHSL(float h, float s, float v) {
 }
 
 // Colors
-const CatVector4 white 	= CatVector4(255, 255, 255, 255);
-const CatVector4 black 	= CatVector4(0, 0, 0, 255);
-const CatVector4 pink 	= CatVector4(255, 105, 180, 255);
-const CatVector4 red 	= CatVector4(237, 42, 42, 255);
-const CatVector4 blue 	= CatVector4(28, 108, 237, 255);
-const CatVector4 yellow = CatVector4(255, 255, 0, 255);
-const CatVector4 orange = CatVector4(255, 120, 0, 255);
-const CatVector4 green 	= CatVector4(0, 255, 0, 255);
-const CatVector4 gray   = CatVector4(100, 100, 100, 255);
-const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
-
-//Extra colors, just because.
-const CatVector4 lightgray = CatVector4(180, 180, 180, 255);
-const CatVector4 darkgray = CatVector4(50, 50, 50, 255);
+const CatColor white = CatColor();
+const CatColor black = CatColor(0, 0, 0);
+const CatColor pink = CatColor(255, 105, 180);
+const CatColor red = CatColor(237, 42, 42);
+const CatColor blue = CatColor(28, 108, 237);
+const CatColor yellow = CatColor(255, 255, 0);
+const CatColor orange = CatColor(255, 120, 0);
+const CatColor green = CatColor(0, 255, 0);
+const CatColor gray = CatColor(100, 100, 100);
+const CatColor lightgray = CatColor(180, 180, 180);
+const CatColor darkgray = CatColor(50, 50, 50);
+const CatColor empty = CatColor(0, 0, 0, 0);
 
 // Color functions
-extern CMFunction<CatVector4(CatEntity*)> EntityColor;
+extern CMFunction<CatColor(CatEntity*)> EntityColor;
 
 // Returns a color based on entity health
-inline CatVector4 Health(CatEntity* entity) {
+inline CatColor Health(CatEntity* entity) {
 	if (GetHealth(entity) > GetMaxHealth(entity))	// If health is too much, they must be over their normal health so we make them blue
-		return CatVector4(64, 128, 255, 255);
+		return CatColor(64, 128);
 
 	// Percentage of health our of max
 	float hf = (float)GetHealth(entity) / (float)GetMaxHealth(entity);
 	// Sick logic
-	return CatVector4((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0, 255);
+	return CatColor((hf <= 0.5 ? 1.0 : 1.0 - 2 * (hf - 0.5)) * 255, (hf <= 0.5 ? (2 * hf) : 1) * 255, 0);
 }
 
-CatVector4 RainbowCurrent();
-CatVector4 RandomColor();
+CatColor RainbowCurrent();
+CatColor RandomColor();
 
 }

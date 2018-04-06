@@ -17,11 +17,11 @@ namespace gui { namespace menu {
     }
     void CCatVar::Draw(){
         auto color=focus?(typing?colors::pink:colors::RainbowCurrent()):(hover?colors::lightgray:colors::gray);
-    	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
+    	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, color.Transparent(0.3));
     	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
-        auto textsize=draw::GetStringLength(cv->desc_short.c_str(),draw::default_font.value,draw::default_font_size.value);
-    	draw::RectFilled(global_pos.first, global_pos.second, textsize.first, size.second, colors::Transparent(colors::black, 0.3));
-        draw::String(cv->desc_short.c_str(),global_pos.first,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
+        auto textsize=draw::GetStringLength(cv->desc_short,draw::default_font.value,draw::default_font_size.value);
+    	draw::RectFilled(global_pos.first, global_pos.second, textsize.first, size.second, colors::black.Transparent(0.3));
+        draw::String(cv->desc_short,global_pos.first,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
         textsize=draw::GetStringLength(content.c_str(),draw::default_font.value,draw::default_font_size.value);
         draw::String(content.c_str(),global_pos.first+size.first-textsize.first,global_pos.second+(size.second-textsize.second)/2,draw::default_font.value,draw::default_font_size.value,colors::white);
         if(typing){
@@ -36,7 +36,7 @@ namespace gui { namespace menu {
     void CCatVar::UpdatePositioning(){
         int minwidth = size.first;
         if (!typing||!focus) content=cv->GetValue();
-        auto label=draw::GetStringLength(cv->desc_short.c_str(),draw::default_font.value,draw::default_font_size.value);
+        auto label=draw::GetStringLength(cv->desc_short,draw::default_font.value,draw::default_font_size.value);
         size=draw::GetStringLength(content.c_str(),draw::default_font.value,draw::default_font_size.value);
         size.first=std::max(label.first+min_mid_padding+size.first, minwidth);
         size.second=std::max(label.second,size.second)+padding.second*2;

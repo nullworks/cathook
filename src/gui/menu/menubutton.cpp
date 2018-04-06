@@ -14,7 +14,7 @@ CMenuButton::CMenuButton(std::string str):CBaseParent(str){
 }
 void CMenuButton::Draw(){
     auto color = focus ? (focused_child == -1 ? colors::pink : colors::RainbowCurrent()) : (hover ? colors::lightgray : colors::gray);
-    draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
+    draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, color.Transparent(0.3));
     draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
     auto textsize=draw::GetStringLength(name.c_str(), draw::default_font.value, draw::default_font_size.value);
     draw::String(name.c_str(), global_pos.first + (size.first - textsize.first) / 2, global_pos.second + (size.second - textsize.second) / 2, draw::default_font.value, draw::default_font_size.value, colors::white);

@@ -21,17 +21,21 @@ typedef const std::vector<std::string> CatEnum;
 // Catvar base
 class CatVar : public CatComBase {
 public:
-	CatVar(const CatEnum& _gui_position, std::string _name, std::string _desc_short, std::string _desc_long);
+	CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long);
+	~CatVar();
 	const CatEnum& gui_position;	// Where to place in menu tree
-	std::string name;							// Command name if it needs to be registered into a games console
-	std::string desc_short;				// Name in gui
-	std::string desc_long;				// Descripton in gui
-	virtual std::string GetValue() = 0; // Used by cfg mgr and other things
+	const std::string name;				// Command name if it needs to be registered into a games console
+	const char* desc_short;				// Name in gui
+	const char* desc_long;				// Descripton in gui
+	virtual std::string GetValue() = 0; // Used by cfg mgr and gui
+
+	// We put this into the class to prevent init errors
+	static std::vector<CatVar*> CatVarList;
 };
 // CatVar varients
 class CatVarBool : public CatVar {
 public:
-	CatVarBool(const CatEnum& _gui_position, std::string _name, bool _defaults, std::string _desc_short, std::string _desc_long = "Unknown");
+	CatVarBool(const CatEnum& _gui_position, const char* _name, bool _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
 	inline operator bool() const { return value; }
 	inline void operator= (bool in_value) { value = in_value; }
 	inline bool operator==(bool in_value) const { return value == in_value; }
@@ -42,8 +46,8 @@ public:
 };
 class CatVarInt : public CatVar {
 public:
-	CatVarInt(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long, int _min, int _max);
-	CatVarInt(const CatEnum& _gui_position, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown", int _max = 100)
+	CatVarInt(const CatEnum& _gui_position, const char* _name, int _defaults, const char* _desc_short, const char* _desc_long, int _min, int _max);
+	CatVarInt(const CatEnum& _gui_position, const char* _name, int _defaults, const char* _desc_short, const char* _desc_long = "Unknown", int _max = 100)
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long, 0, _max) {}
 	inline operator int() const { return value; }
 	inline void operator= (int in_value) { value = in_value; }
@@ -57,10 +61,10 @@ public:
 };
 class CatVarKey : public CatVar {
 public:
-	CatVarKey(const CatEnum& _gui_position, std::string _name, CatKey _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
+	CatVarKey(const CatEnum& _gui_position, const char* _name, CatKey _defaults, const char* _desc_short, const char* _desc_long = "Unknown")
 		: CatVar(_gui_position, _name, _desc_short, _desc_long), value(_defaults), defaults(_defaults) {}
-	const CatKey defaults;
 	CatKey value;
+	const CatKey defaults;
 	inline operator CatKey() const { return value; }
 	inline void operator= (CatKey in_value) { value = in_value; }
 	inline bool operator==(CatKey in_value) const { return value == in_value; }
@@ -70,7 +74,7 @@ public:
 };
 class CatVarEnum : public CatVarInt {
 public:
-	CatVarEnum(const CatEnum& _gui_position, const CatEnum& _cat_enum, std::string _name, int _defaults, std::string _desc_short, std::string _desc_long = "Unknown")
+	CatVarEnum(const CatEnum& _gui_position, const CatEnum& _cat_enum, const char* _name, int _defaults, const char* _desc_short, const char* _desc_long = "Unknown")
 		: CatVarInt(_gui_position, _name, _defaults, _desc_short, _desc_long, 0, _cat_enum.size() - 1), cat_enum(_cat_enum) {}
 	const CatEnum& cat_enum;
 	virtual void callback(std::vector<std::string>);
@@ -78,8 +82,8 @@ public:
 };
 class CatVarFloat : public CatVar {
 public:
-	CatVarFloat(const CatEnum& _gui_position, std::string _name, float _defaults, std::string _desc_short, std::string _desc_long, float _min, float _max);
-	CatVarFloat(const CatEnum& _gui_position, std::string _name, float _defaults, std::string _desc_short, std::string _desc_long = "Unknown", float _max = 100)
+	CatVarFloat(const CatEnum& _gui_position, const char* _name, float _defaults, const char* _desc_short, const char* _desc_long, float _min, float _max);
+	CatVarFloat(const CatEnum& _gui_position, const char* _name, float _defaults, const char* _desc_short, const char* _desc_long = "Unknown", float _max = 100)
 		: CatVarFloat(_gui_position, _name, _defaults, _desc_short, _desc_long, 0, _max) {}
 	inline operator float() const { return value; }
 	inline void operator= (float in_value) { value = in_value; }
@@ -93,7 +97,7 @@ public:
 };
 class CatVarString : public CatVar {
 public:
-	CatVarString(const CatEnum& _gui_position, std::string _name, std::string _defaults, std::string _desc_short, std::string _desc_long = "Unknown");
+	CatVarString(const CatEnum& _gui_position, const char* _name, const char* _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
 	inline operator std::string() const { return value; }
 	inline void operator= (const std::string& in_value) { value = in_value; }
 	inline bool operator==(const std::string& in_value) const { return value == in_value; }
@@ -104,16 +108,16 @@ public:
 };
 class CatVarColor : public CatVar {
 public:
-	CatVarColor(const CatEnum& _gui_position, std::string _name, CatVector4 _defaults, std::string _desc_short, std::string _desc_long = "Unknown");
-	inline operator CatVector4() const { return value; }
-	inline void operator= (CatVector4 in_value) { value = in_value; }
-	inline bool operator==(CatVector4 in_value) const { return value == in_value; }
-	const CatVector4 defaults;
-	CatVector4 value;
+	CatVarColor(const CatEnum& _gui_position, const char* _name, CatColor _defaults, const char* _desc_short, const char* _desc_long = "Unknown");
+	inline operator CatColor() const { return rainbow ? colors::RainbowCurrent() : value; }
+	inline void operator= (CatColor in_value) { value = in_value; }
+	inline bool operator==(CatColor in_value) const { return value == in_value; }
+	const CatColor defaults;
+	CatColor value;
+	bool rainbow = false; // Change to set color to rainbow
 	virtual void callback(std::vector<std::string>);
 	virtual std::string GetValue();
 };
-
 
 // Class to store how the menu is layed out
 class CatMenuTree {
@@ -126,7 +130,5 @@ public:
 	std::vector<CatVar*> cat_children;	// Nyaa~ :3
 };
 
-// Map to be used for commands
-extern std::unordered_map<std::string, CatVar*> CatVarMap;
 // Uhh, look in cpp
 extern CatMenuTree CatMenuRoot;

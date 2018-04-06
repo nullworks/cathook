@@ -5,13 +5,15 @@
  *
  */
 
-#include "../util/functions.hpp"
+#include <unordered_map>
+
+#include "../util/functional.hpp"
 #include "../util/logging.hpp"
 #include "entitys.hpp"
 #include "console.hpp"
 
 // Playerstates for steamid and name respectivly
-CatFastMap<int, int> PlayerStates_steam;
+CatFastMap<int, int> PlayerStates_steam; // Should we use a fastmap for this? I dont know, but once the size gets really big might be an issue...
 std::unordered_map<std::string, int> PlayerStates_name;
 
 enum{
@@ -51,5 +53,4 @@ void SetPlayerState(CatEntity* entity, int state) {
       find->second = state;
     return;
   }
-  g_CatLogging.log("Cant set playerstate!");
 }

@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <string>
 #include <vector>
 
-#include "../util/functions.hpp"
+#include "../util/functional.hpp"
 
+// A define for commands to use in front of their actual command
 #define COM_PREFIX "n_"
 
 // The base command class
@@ -34,4 +34,4 @@ private:
 
 void CallCommand(const std::string& input);
 
-extern std::unordered_map<std::string, CatCommand*> CatCommandMap;
+extern std::vector<CatCommand*> CatCommandList;

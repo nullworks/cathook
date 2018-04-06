@@ -6,6 +6,8 @@
  *
  */
 
+#include <algorithm> // std::find_if
+
 #include "../util/strings.hpp" // sepstr()
 #include "../util/logging.hpp"
 #include "../util/catvars.hpp"
@@ -13,11 +15,11 @@
 #include "console.hpp"
 
 // The main list to store cat commands
-std::unordered_map<std::string, CatCommand*> __attribute__ ((init_priority (102))) CatCommandMap;
+std::vector<CatCommand*> CatCommandList;
 
 CatCommand::CatCommand(std::string _name, void(*_callback)(std::vector<std::string>))
   : name(COM_PREFIX + _name), com_callback(_callback) {
-  CatCommandMap.insert({name, this});
+  CatCommandList.push_back(this);
 }
 
 void CallCommand(const std::string& input) {
@@ -31,18 +33,18 @@ void CallCommand(const std::string& input) {
 
   // Try to find command from command list
   CatComBase* command = nullptr;
-  auto find_com = CatCommandMap.find(tmp.at(0));
-  if (find_com != CatCommandMap.end())
-    command = find_com->second;
+  auto find_com = std::find_if(CatCommandList.begin(), CatCommandList.end(), [&](auto i){ return tmp[0] == i->name; });
+  if (find_com != CatCommandList.end())
+    command = *find_com;
 
   // Find a CatVar instead
   if (!command) {
-    auto find_var = CatVarMap.find(tmp.at(0));
-    if (find_var == CatVarMap.end()) {
+    auto find_var = std::find_if(CatVar::CatVarList.begin(), CatVar::CatVarList.end(), [&](auto i){ return tmp[0] == i->name; });
+    if (find_var == CatVar::CatVarList.end()) {
       g_CatLogging.log("Cannot find command: \"%s\"", tmp.at(0).c_str());
       return;
     }
-    command = find_var->second;
+    command = *find_var;
   }
 
   // We have our command, pop it out of the vector and pass it as arguments

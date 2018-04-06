@@ -21,7 +21,7 @@ class HudString {
 public:
 	// Constructor
 	inline HudString(int x, int y, bool _center = false) : center(_center), draw_point(std::make_pair(x, y)) {}
-	inline void AddString(const char* input_string, const CatVector4& input_color) {
+	inline void AddString(const char* input_string, const CatColor& input_color) {
 		strings.push_back(std::make_pair(input_string, input_color));
 	};
 	inline void Draw() {
@@ -33,11 +33,12 @@ public:
 		}
 		strings.clear();
 	}
+	inline void SetDrawPoint(std::pair<int, int> in) {draw_point = in;}
 private:
 	const bool center;
 	std::pair<int, int> draw_point;
 	// we use a char array as it is faster than std::string in our use
-	std::vector<std::pair<const char*, CatVector4>> strings;
+	std::vector<std::pair<const char*, CatColor>> strings;
 };
 
 }

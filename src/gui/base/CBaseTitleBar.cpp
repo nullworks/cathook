@@ -45,7 +45,7 @@ void CBaseTitleBar::OnMousePress() {
 */
 void CBaseTitleBar::Draw() {
 	// Draw a nice rect
-	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(colors::pink,hover?0.7f:1.0f));
+	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, colors::pink.Transparent(hover?0.7f:1.0f));
 	// Draw our string
 	auto title_size = draw::GetStringLength(title.c_str(), 1, 9);
 	draw::String(title.c_str(), global_pos.first + (size.first - title_size.first) / 2, global_pos.second + (size.second - title_size.second) / 2, 1, 9, colors::white);

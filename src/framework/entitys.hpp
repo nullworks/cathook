@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../util/mathlib.hpp"	// CatVectors and CatBoxes
-#include "../util/functions.hpp" // CMFunction()
+#include "../util/functional.hpp" // CMFunction()
 
 // Enums, yay!
 enum { // Entity Team

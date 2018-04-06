@@ -153,15 +153,15 @@ static void DrawTick(){
   if (!followbot || !draw_crumb) return;
   if (breadcrumbs.size() < 2) return;
   for (size_t i = 0; i < breadcrumbs.size() - 1; i++) {
-    CatVector wts1, wts2;
+    std::pair<int, int> wts1, wts2;
     if (draw::WorldToScreen(breadcrumbs.at(i), wts1) && draw::WorldToScreen(breadcrumbs.at(i + 1), wts2)) {
-      draw::Line(wts1.x, wts1.y, wts2.x - wts1.x, wts2.y - wts1.y, colors::white);
+      draw::Line(wts1.first, wts1.second, wts2.first - wts1.first, wts2.second - wts1.second, colors::white);
     }
   }
-  CatVector wts;
+  std::pair<int, int> wts;
   if (!draw::WorldToScreen(breadcrumbs.at(0), wts)) return;
-  draw::RectFilled(wts.x - 4, wts.y - 4, 8, 8, colors::white);
-  draw::Rect(wts.x - 5, wts.y - 5, 10, 10, colors::black);
+  draw::RectFilled(wts.first - 4, wts.second - 4, 8, 8, colors::white);
+  draw::Rect(wts.first - 5, wts.second - 5, 10, 10, colors::black);
 }
 
 static CatCommand follow_me("fb_follow_me", [](std::vector<std::string>){

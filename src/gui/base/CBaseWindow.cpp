@@ -19,7 +19,7 @@ CBaseWindow::CBaseWindow(std::string name) : CBaseContainer(name) {
 
 // General functions
 void CBaseWindow::Draw() {
-	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(colors::black, 0.9));
+	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::black.Transparent(0.9));
 	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, colors::pink);
 	CBaseContainer::Draw();
 }

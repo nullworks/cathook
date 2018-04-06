@@ -13,7 +13,7 @@
 #include "strings.hpp"
 
 // Seperates multiple strings from one string, seperated by spaces, or enclosed in quotes
-std::vector<std::string> sepstr(std::string input) {
+std::vector<std::string> sepstr(const std::string& input) {
   std::vector<std::string> ret;
 
   std::string tmp;

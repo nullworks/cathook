@@ -54,3 +54,10 @@ sudo ./attach
 You may report issues to the github, or through discord.    
 Please explain what the issue is and how to recreate it.   
 If you are developing, providing a backtrace or even a pull request is recommended.
+
+### Credits
+Contribute to nekohook and get yourself some credits!   
+Current Credits goto...   
+nullifiedcat - Nekohook is still loosly based off of cathook and I use alot from it.    
+F1ssi0n - Helping me when I started changing nekohook to be more modular and less tied to source, and continuing to help me with various questions about c++.    
+Nopey Nope - Contributing to nekohook directly by fixing up the gui to a more workable state.   

@@ -10,7 +10,7 @@
 #include <stdarg.h> // ... arg
 #include <stdio.h> // fopen(), fprint(), fputs(), FILE
 
-#include "functions.hpp"
+#include "functional.hpp"
 
 class CatLogger {
 public:

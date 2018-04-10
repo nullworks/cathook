@@ -119,7 +119,8 @@ CatVector PredIter(CatEntity* entity, bool(*iter)(CatEntity*, CatVector, int)){
 }
 
 void DrawTick(){
-  /*for (int i = 0; i < GetEntityCount(); i++) {
+  /*auto ent_count = GetEntityCount();
+  for (int i = 0; i < ent_count; i++) {
     auto entity = GetEntity(i);
     if (!entity || GetDormant(entity) || !GetAlive(entity) || GetType(entity) != ETYPE_PLAYER) continue;
     static CatVector last;

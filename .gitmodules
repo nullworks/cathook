@@ -1,3 +1,6 @@
 [submodule "src/modules/gl_draw/libglez"]
 	path = src/modules/gl_draw/libglez
 	url = https://github.com/nullifiedcat/libglez
+[submodule "utils/cmake/ucm"]
+	path = utils/cmake/ucm
+	url = https://github.com/onqtam/ucm

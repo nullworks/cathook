@@ -17,7 +17,7 @@
 #include "catvars.hpp"
 
 // :b:ig list of catvars
-std::vector<CatVar*> CatVar::CatVarList;
+std::vector<CatVar*> CatVar::List;
 
 // Our Menu tree
 CatMenuTree CatMenuRoot;
@@ -39,8 +39,8 @@ CatCommand list_vars("list", [](std::vector<std::string> args){
   };
   // Single var list
   if (!args.empty()) {
-    auto find = std::find_if(CatVar::CatVarList.begin(), CatVar::CatVarList.end(), [&](auto i){return i->name == args.at(0);});
-    if (find == CatVar::CatVarList.end())
+    auto find = std::find_if(CatVar::List.begin(), CatVar::List.end(), [&](auto i){return i->name == args.at(0);});
+    if (find == CatVar::List.end())
       g_CatLogging.log("Unknown catvar: \"%s\"", args.at(0).c_str());
     else
       print_var(*find);
@@ -48,7 +48,7 @@ CatCommand list_vars("list", [](std::vector<std::string> args){
   }
   // Entire var list
 	g_CatLogging.log("Current list of CatVars--");
-	for (const auto& i : CatVar::CatVarList)
+	for (const auto& i : CatVar::List)
     print_var(i);
 	g_CatLogging.log("End of list--");
 });
@@ -78,7 +78,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, size_t recursions) {
 // General catvar constructor
 CatVar::CatVar(const CatEnum& _gui_position, const char* _name, const char* _desc_short, const char* _desc_long)
 	: gui_position(_gui_position), name(std::string(COM_PREFIX) + _name), desc_short(_desc_short), desc_long(_desc_long) {
-	CatVarList.push_back(this);
+	List.push_back(this);
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
 }
@@ -218,9 +218,7 @@ void CatVarColor::callback(std::vector<std::string> args) {
 	value.g = std::stof(args.at(1));
 	value.b = std::stof(args.at(2));
 	value.a = std::stof(args.at(3));
-	} catch (std::exception& e) {
-		g_CatLogging.log("Exception: %s", e.what());
-	}
+  } catch (...) {}
 }
 std::string CatVarColor::GetValue() {
 	return

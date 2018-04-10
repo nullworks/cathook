@@ -68,7 +68,8 @@ void CRadar::Draw() {
   //auto camera_yaw = GetCameraAngle(local_ent).y;
 
   // Here we draw entitys
-  for (int i = 1; i < GetEntityCount(); i++) {
+  auto ent_count = GetEntityCount();
+  for (int i = 0; i < ent_count; i++) {
     auto entity = GetEntity(i);
     if (!entity || GetDormant(entity)) continue;
     if (GetType(entity) != ETYPE_PLAYER || !GetAlive(entity)) continue;

@@ -39,7 +39,8 @@ std::string NameSteal() {
   auto local_ent = GetLocalPlayer(); // We probs dont need to check for null or anything
   static std::string last_name;
   std::vector<std::string> potential_names;
-  for (int i = 1; i < GetEntityCount(); i++) {
+  auto ent_count = GetEntityCount();
+  for (int i = 0; i < ent_count; i++) {
     auto entity = GetEntity(i);
 
     if (!entity) continue;

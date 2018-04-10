@@ -30,7 +30,7 @@ public:
 	virtual std::string GetValue() = 0; // Used by cfg mgr and gui
 
 	// We put this into the class to prevent init errors
-	static std::vector<CatVar*> CatVarList;
+	static std::vector<CatVar*> List;
 };
 // CatVar varients
 class CatVarBool : public CatVar {

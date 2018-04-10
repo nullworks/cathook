@@ -34,7 +34,8 @@ CatCommand debug_ent_dump("debug_entity_dump", [](std::vector<std::string>){
     tmp_log.log("Local Entity:\n\tThirdperson: %i\n\tCamera: %i\n\tCamera Angles: %i",
       InThirdperson(local_ent), GetCamera(local_ent) != CatVector(), GetCameraAngle(local_ent) != CatVector());
   // other
-  for (int i = 0; i < GetEntityCount(); i++) {
+  auto ent_count = GetEntityCount();
+  for (int i = 0; i < ent_count; i++) {
     auto ent = GetEntity(i);
     if (!ent)
       tmp_log.log("Entity %i: Null", i);
@@ -65,7 +66,8 @@ static void DrawTick(){
 
   // Multipoint shit, its pasted from aimbot so if u change that code, this will need to be remade to fix the math
   if (multi_debug) {
-    for(int i = 0; i < GetEntityCount(); i++) {
+    auto ent_count = GetEntityCount();
+	for (int i = 0; i < ent_count; i++) {
       auto entity = GetEntity(i);
       if (!entity || GetDormant(entity) || !GetAlive(entity) || GetType(entity) != ETYPE_PLAYER) continue;
 

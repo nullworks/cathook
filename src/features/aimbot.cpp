@@ -157,7 +157,7 @@ CatVector RetrieveAimpoint(CatEntity* entity, int mode = hitbox_mode) {
 CMFunction<bool(CatEntity*)> TargetSelectionModule {[](auto){return true;}};
 
 // A second check to determine whether a target is good enough to be aimed at
-static std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
+std::pair<bool, CatVector> IsTargetGood(CatEntity* entity) {
 	auto ret = std::make_pair(false, CatVector());
 	if (!entity || GetDormant(entity)) return ret;
 
@@ -211,7 +211,8 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 	auto local_ent = GetLocalPlayer();
 
 	// Loop through all entitys
-	for (int i = 0; i < GetEntityCount(); i++) {
+	auto ent_count = GetEntityCount();
+	for (int i = 0; i < ent_count; i++) {
 		auto entity = GetEntity(i);
 		if (!entity) continue;
 
@@ -242,7 +243,7 @@ static std::pair<CatEntity*, CatVector> RetrieveBestTarget() {
 	return ret;
 }
 // A check to determine whether the local player should aimbot
-static bool ShouldAim() {
+bool ShouldAim() {
 
 	// It would be prefered to have a local ent before we shoot
 	auto local_ent = (CatEntity*)GetLocalPlayer();

@@ -66,7 +66,8 @@ static void WorldTick() {
 
     if (follow_steam) {
       // Find a target with the steam id, as it is prioritized
-      for (int i = 0; i < GetEntityCount(); i++) {
+      auto ent_count = GetEntityCount();
+	  for (int i = 0; i < ent_count; i++) {
         auto entity = GetEntity(i);
         if (!entity || GetDormant(entity)) // Exist + dormant
           continue;
@@ -87,7 +88,8 @@ static void WorldTick() {
     // If we dont have a follow target from that, we look again for someone else who is suitable
     if (!follow_target && roambot) {
       // Try to get a new target
-      for (int i = 0; i < GetEntityCount(); i++) {
+      auto ent_count = GetEntityCount();
+	  for (int i = 0; i < ent_count; i++) {
         auto entity = GetEntity(i);
         if (!entity || GetDormant(entity)) // Exist + dormant
           continue;

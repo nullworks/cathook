@@ -6,7 +6,9 @@
  */
 
 #include "../util/catvars.hpp"
-#include "../framework/input.hpp"
+#include "../framework/gameticks.hpp"
+#include "../framework/trace.hpp"
+#include "aimbot.hpp" // We will use the aimbot shoot target checks to make triggerbot simple
 
 #include "triggerbot.hpp"
 
@@ -20,35 +22,26 @@ static CatVarEnum teammates(trigger_menu, teammates_enum, "aimbot_teammates", 0,
 static CatEnum hitbox_mode_enum({"AUTO", "HEAD", "ANY"});
 static CatVarEnum hitbox_mode(trigger_menu, hitbox_mode_enum, "aimbot_hitbox_mode", 0, "Hitbox Mode", "Hitbox selection mode");
 
-/*static bool TargetGood(CatEntity* entity) {
-  if (!entity || GetDormant(entity))
-    return false;
-  if (!GetAlive(entity)
-    return false;
-
-  return true;
-}*/
 static void WorldTick(){
-  /*if (!enabled) return;
+  if (!enabled) return;
 
   auto local_ent = GetLocalPlayer();
   if (!local_ent) return;
 
   // Check if we can shoot in the first place
-  //if (!ShouldShoot())
-    //return;
+  if (!aimbot::ShouldAim())
+    return;
 
   // Get what we see
   auto camera_pos = GetCamera(local_ent);
-  auto camera_ang = GetCameraAngles(local_ent);
-  auto trace_res = trace_sight(camera_pos, util::ExtendLine(camera_pos, camera_ang, 8192.0f));
+  auto camera_ang = GetCameraAngle(local_ent);
+  auto trace_res = trace::trace_sight(camera_pos, util::ExtendLine(camera_pos, camera_ang, 8192.0f));
 
   // Check if shootable
-  if (!TargetGood(entity))
-    return;*/
+  if (!aimbot::IsTargetGood(trace_res.first).first)
+    return;
 
-
-
+  Attack(local_ent);
 }
 
 void Init() {

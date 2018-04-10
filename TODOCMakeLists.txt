@@ -14,123 +14,104 @@ project (libnekohook)
 ##
 
 set(CGAME tf2 CACHE STRING "Game to build with")
+#set(CARCH 32 CACHE STRING "Prefered arch to build for") # TODO, setup dynamic
 set(CUSERNAME UNREGISTERED CACHE STRING "Register a username")
 set(CUSERID 0 CACHE STRING "Register a id")
-set(CForceClang false CACHE STRING "Should cmake force compilation with clang?")
 set(CMAKE_BUILD_TYPE RELEASE CACHE STRING "Obvious")
 
-# TODO strip symbols
+##
+# Cmake includes
+##
+
+include(utils/cmake/ucm/cmake/ucm.cmake)
 
 ##
 # Functions
 ##
 
 # Easy log
-Function(Log in_string)
-  Message(STATUS ${in_string})
+Function(Log in_string arg2)
+  if(arg2 STREQUAL "")
+    set(arg2 "STATUS")
+  endif()
+  if(arg2 STREQUAL DEBUG)
+    if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+      Message(STATUS ${in_string})
+    endif()
+  else()
+    Message(STATUS ${in_string})
+  endif()
 endfunction()
 
-# Function to remove source files from a directory, ripped from aimtux fuzion <3
-Function(RemoveSourceFiles files_to_remove)
-  foreach(i ${source_files})
-    if("${i}" MATCHES "(.*)${files_to_remove}(.*)") # Check if the item matches the directory name in _excludeDirName
-      list(REMOVE_ITEM source_files ${i}) # Remove the item from the list
+Macro(add_impl)
+  foreach(i IN LISTS ${ARGN})
+    # Check if is a base
+    if(NOT "BASE_${i}" STREQUAL "")
+      add_impl(${BASE_${i}})
+      add_definitions("-DNEKO${i}_=1")
+    # If it isnt a module, we treat it like a directory to add
+    else()
+      ucm_add_dirs("src/modules/${i}" TO sources RECURSIVE)
     endif()
   endforeach()
-endfunction()
+endmacro()
 
-# Use to add files instead of remove
-Function(AddSourceFiles files_to_add)
-  File(GLOB_RECURSE tmp "${files_to_add}")
-  List(APPEND source_files ${tmp})
-endfunction()
-
-# Changes compiler arguments to be in the native format for the compiler
-#Function(NativeCompilerArgs in_stringa)
-
-
-
-# Use if your module depends or is in the base
-Function(AddBase base_name files)
-  #string(TOUPPER INTERNAL_${base_name})
-  add_definitions("-DNEKO${base_name}_=1")
-endfunction()
-
-# Use if your module depends on a base
-Function(ModuleUsesBase module_name base_name)
-  if(CGAME STREQUAL name)
-    add_definitions("-DNEKO${base_name}_=1")
+# A function to easily add a module, for second arg, if you depend on a base, put that in
+Macro(AddModule)
+  # Do args
+  cmake_parse_arguments(arg "" "name" "with" ${ARGN})
+  if(arg_name STREQUAL "")
+    message(FATAL_ERROR "Missing first name argument")
+  elseif(arg_with STREQUAL "")
+    set(arg_with "${arg_name}")
+    Log("Missing second file dir argument for ${arg_name}, assuming!" DEBUG)
   endif()
-endfunction()
-
-# A function to easily add a module
-Function(AddModule module_name)
-  if(CGAME STREQUAL name)
-    add_definitions("-DNEKO${module_name}_=1")
+  # do module stuff
+  if(CGAME STREQUAL arg_name)
+    add_impl(arg_with)
+    string(TOUPPER name tmp)
+    add_definitions("-DNEKO${tmp}_=1")
   endif()
-endfunction()
+  #cleanup
+  list(REMOVE_DUPLICATES sources)
+endmacro()
 
+Macro(AddBase)
+  # Do args
+  cmake_parse_arguments(arg "" "name" "with" ${ARGN})
+  if(arg_name STREQUAL "")
+    message(FATAL_ERROR "Missing first name argument")
+  elseif(arg_with STREQUAL "")
+    set(file_dir "${name}")
+    Log("Missing second file dir argument for ${name}, assuming!" DEBUG)
+  endif()
+  # Here we want to save our stuff so that when the module called wants to load, we can let it load our deps
+  string(TOUPPER name tmp)
+  set(BASE_${tmp} "${arg_with}")
+endmacro()
 
+# Add nekohooks source files except the modules, we add those selectivly
+ucm_add_dirs("src" TO sources RECURSIVE)
+ucm_remove_directories("src/modules" FROM sources)
 
-# For use in static builds
-#Function(WriteHeader path)
-  #file(WRITE ${path})
-#endfunction
-
-# Add cathooks source files except the modules, we add those selectivly
-File(GLOB_RECURSE source_files "${CMAKE_SOURCE_DIR}/src/*.c*")
-RemoveSourceFiles("${CMAKE_SOURCE_DIR}/src/modules/*.*")
-
-# Flags we use for every build type
+# We like the cpp 17 standard, it makes everything so pretty ^_^
 set(CMAKE_CXX_STANDARD 17)
-set(CCOMMON_FLAGS "")
-
-## Game modules
-Log("Game module: ${CGAME}")
-# Team Fortress game module
-if(CGAME STREQUAL "tf2")
-	add_definitions("-DCATHOOK_TF2=1")
-	set(CBASE "SOURCE_2013_SDK")
-# Fistful of Frags game module
-elseif(CGAME STREQUAL "fof")
-	add_definitions("-DCATHOOK_FOF=1")
-	set(CBASE "SOURCE_2013_SDK")
-elseif(CGAME STREQUAL "csgo")
-	add_definitions("-DCATHOOK_CSGO=1")
-  AddSourceFiles("${CMAKE_SOURCE_DIR}/src/modules/csgo/*.c*")
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC") # microsoft gay
+  #todo?
+else()
+  ucm_add_flags(-g3 -ggdb -Wall CONFIG Debug)
+  ucm_add_flags(-mtune=generic -O3 CONFIG Release)
 endif()
 
-## Graphics modules
-message(STATUS "Graphics module: ${CGFX}")
-# Valve surface
-if(CGFX STREQUAL "valve_surface")
-	add_definitions("-DCATHOOK_GFX_SURFACE=1")
-elseif(CGFX STREQUAL "gl_draw")
-  add_definitions("-DCATHOOK_GFX_GL=1")
-  list(APPEND source_files "src/modules/gl_draw/gl_draw.cpp")
-endif()
+# Bases
+AddBase(source2013)
+AddBase(gl_draw)
+AddBase(xlib)
 
-## Input modules
-message(STATUS "Input module: ${CINP}")
-# Valve surface
-if(CINP STREQUAL "xlib")
-	add_definitions("-DCATHOOK_INP_XLIB=1")
-  list(APPEND source_files "${CMAKE_SOURCE_DIR}/src/modules/xlib/input.cpp")
-  set(USE_XLIB true)
-endif()
-
-## SDK/Bases if needed
-# The source sdk that everyone loves
-if(CBASE STREQUAL "SOURCE_2013_SDK")
-	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
-  add_definitions(-DCATHOOK_SOURCE_2013=1)
-  AddSourceFiles("${CMAKE_SOURCE_DIR}/src/modules/source2013/*.c*")
-endif()
-
-# If anything uses xlib, we need the main file
-if(USE_XLIB)
-  list(APPEND source_files "${CMAKE_SOURCE_DIR}/src/modules/xlib/xlib.cpp")
-endif()
+#modules
+AddModule(tf2 source2013 gl_draw)
+AddModule(fof source2013 gl_draw)
+AddModule(csgo "csgo" gl_draw)
 
 # Set git hash and date if possible
 find_package(Git)
@@ -153,8 +134,6 @@ endif()
 
 
 # Default compiler flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} -mtune=generic -O3")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 

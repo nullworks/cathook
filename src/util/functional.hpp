@@ -25,7 +25,14 @@ template <typename ret, typename... args>
 class CMFunction <ret(args...)> {
   using func_type = ret(*)(args...); // For std::function template like use
 public:
-  CMFunction(func_type func=[](args...){ return ret(); }) : func(func) {}
+  #if defined(MSCV_VER) // mscv does some wierd things so we try to correct it with this
+    private:
+    static ret init(args... a) {return ret();}
+    public:
+    CMFunction(func_type func=init): func(func){}
+  #else
+    CMFunction(func_type func=[](args...){ return ret(); }) : func(func) {}
+  #endif
   inline auto operator()(args... a) { return func(a...); }
   inline void operator=(func_type _func) { func = _func; }
 private:

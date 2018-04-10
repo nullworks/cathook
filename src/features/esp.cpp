@@ -61,7 +61,8 @@ static void Draw() {
 	if (!esp_enabled || !game::GetInGame()) return;
 
 	// Loop through all entitys
-	for (int i = 0; i < GetEntityCount(); i++) {
+	auto ent_count = GetEntityCount();
+	for (int i = 0; i < ent_count; i++) {
 		CatEntity* entity = GetEntity(i);
 		if (!entity || GetDormant(entity)) continue;
 

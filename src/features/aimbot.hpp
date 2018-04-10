@@ -33,6 +33,8 @@ extern CatEnum aimbot_menu;
 
 // A function to find a place to aim for on the target
 CatVector RetrieveAimpoint(CatEntity* entity, int mode);
+std::pair<bool, CatVector> IsTargetGood(CatEntity* entity);
+bool ShouldAim();
 
 // esp colors
 extern CatEntity* highlight_target;

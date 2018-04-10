@@ -37,8 +37,15 @@ static CatVarBool allow_unclamped(antiaim_menu, "aa_unclamp", false, "AA UnClamp
 // Change this to something more accurate in your game module
 CMFunction<bool()> ShouldAA {[](){return !input::GetKey(CATKEY_MOUSE_1);}};
 
+int AASafeTicks = 0;
+
 static void WorldTick() {
   if (!enabled) return;
+
+  if (AASafeTicks) {
+    AASafeTicks--;
+    return;
+  }
 
   // Get our local ents angles
   auto local_ent = GetLocalPlayer();

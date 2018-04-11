@@ -18,10 +18,12 @@ public:
   ~CatLogger();
   void log(const char* fmt, ...); // Use to log with
   CMFunction<void(const char*)> console_tap { [](const char*){return;}};
+
+  static CatLogger global_log;
 private:
   FILE* log_handle = nullptr; // Handle used to log to files with
   const bool ptime;
 };
 
 // Use this to log
-extern CatLogger g_CatLogging;
+static auto& g_CatLogging = CatLogger::global_log;

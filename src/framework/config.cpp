@@ -64,7 +64,7 @@ CatCommand SaveConfig("save", [](std::vector<std::string> args) {
 
 	// Generate a list of commands from catvars
   std::vector<std::string> cfg_lines;
-	for (const auto& catvar : CatVar::CatVarList) {
+	for (const auto& catvar : CatVar::List) {
     auto value = catvar->GetValue();
     if (value.find(' ') != std::string::npos) // add quotes if value contains a space so the command executer doesnt have problems
       cfg_lines.push_back(catvar->name + " \"" + value + '"');

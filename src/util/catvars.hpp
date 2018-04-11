@@ -28,8 +28,6 @@ public:
 	const char* desc_short;				// Name in gui
 	const char* desc_long;				// Descripton in gui
 	virtual std::string GetValue() = 0; // Used by cfg mgr and gui
-
-	// We put this into the class to prevent init errors
 	static std::vector<CatVar*> List;
 };
 // CatVar varients

@@ -15,11 +15,11 @@
 #include "console.hpp"
 
 // The main list to store cat commands
-std::vector<CatCommand*> CatCommandList;
+std::vector<CatCommand*> CatCommand::List;
 
 CatCommand::CatCommand(std::string _name, void(*_callback)(std::vector<std::string>))
   : name(COM_PREFIX + _name), com_callback(_callback) {
-  CatCommandList.push_back(this);
+  List.push_back(this);
 }
 
 void CallCommand(const std::string& input) {
@@ -33,14 +33,14 @@ void CallCommand(const std::string& input) {
 
   // Try to find command from command list
   CatComBase* command = nullptr;
-  auto find_com = std::find_if(CatCommandList.begin(), CatCommandList.end(), [&](auto i){ return tmp[0] == i->name; });
-  if (find_com != CatCommandList.end())
+  auto find_com = std::find_if(CatCommand::List.begin(), CatCommand::List.end(), [&](auto i){ return tmp[0] == i->name; });
+  if (find_com != CatCommand::List.end())
     command = *find_com;
 
   // Find a CatVar instead
   if (!command) {
-    auto find_var = std::find_if(CatVar::CatVarList.begin(), CatVar::CatVarList.end(), [&](auto i){ return tmp[0] == i->name; });
-    if (find_var == CatVar::CatVarList.end()) {
+    auto find_var = std::find_if(CatVar::List.begin(), CatVar::List.end(), [&](auto i){ return tmp[0] == i->name; });
+    if (find_var == CatVar::List.end()) {
       g_CatLogging.log("Cannot find command: \"%s\"", tmp.at(0).c_str());
       return;
     }

@@ -47,6 +47,9 @@ public:
   IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* payload));
   inline void run(const IpcMessage* message){com_callback(message);}
   const char* name;
+protected:
+  friend class IpcStream; // allow the ipc stream to read the list
+  static std::vector<IpcCommand*> List;
 private:
   CMFunction<void(const IpcMessage*)> com_callback;
 };

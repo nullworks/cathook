@@ -28,10 +28,9 @@ public:
   virtual void callback(std::vector<std::string> args) { com_callback(args); };
   std::string name;
   inline void operator()(std::vector<std::string> args) { com_callback(args); }
+  static std::vector<CatCommand*> List;
 private:
   CMFunction<void(std::vector<std::string>)> com_callback;
 };
 
 void CallCommand(const std::string& input);
-
-extern std::vector<CatCommand*> CatCommandList;

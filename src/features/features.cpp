@@ -9,6 +9,7 @@
 // Stuff to init
 #include "esp.hpp"
 #include "aimbot.hpp"
+#include "triggerbot.hpp"
 #include "antiaim.hpp"
 #include "followbot.hpp"
 #include "spam.hpp"
@@ -29,6 +30,9 @@ void Init() {
 
 	// Aimbot
 	aimbot::Init();
+
+	// Triggerbot
+	trigger::Init();
 
 	// Followbot
 	followbot::Init();

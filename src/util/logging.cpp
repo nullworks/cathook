@@ -14,7 +14,7 @@
 #include "logging.hpp"
 
 // Cathooks main logging util
-CatLogger g_CatLogging(io::GetTmpDir() + io::GetDirSeperator() + "nekohook.log", true);
+CatLogger CatLogger::global_log(io::GetTmpDir() + io::GetDirSeperator() + "nekohook.log", true);
 
 CatLogger::CatLogger(std::string _file_path, bool _ptime) : log_handle(fopen(_file_path.c_str(), "w")), ptime(_ptime) {}
 CatLogger::~CatLogger() {	fclose(log_handle); }
@@ -25,7 +25,7 @@ void CatLogger::log(const char* fmt, ...) {
 	if (ptime) {
 		// Get our time
 		time_t current_time = time(0);
-		struct tm* time_info = localtime(&current_time);
+		auto time_info = localtime(&current_time);
 
 		// print it to a string
 		char timeString[10];
@@ -39,7 +39,7 @@ void CatLogger::log(const char* fmt, ...) {
 	char buffer[1024];
 	va_list list;
 	va_start(list, fmt);
-	vsprintf(buffer, fmt, list);
+	vsnprintf(buffer, sizeof(buffer), fmt, list);
 	va_end(list);
 	strcat(buffer, "\n");
 

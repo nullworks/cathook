@@ -35,9 +35,6 @@ struct userdata
 {
     k_EState state{ k_EState::DEFAULT };
     rgba_t color{ 0, 0, 0, 0 };
-    float inventory_value{ 0 };
-    unsigned deaths_to{ 0 };
-    unsigned kills{ 0 };
 };
 
 extern std::unordered_map<unsigned, userdata> data;

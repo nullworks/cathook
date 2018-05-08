@@ -19,7 +19,6 @@ namespace chat_stack
 struct msg_t
 {
     std::string text;
-    bool team;
 };
 
 void Say(const std::string &message, bool team = false);

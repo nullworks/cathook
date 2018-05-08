@@ -61,7 +61,6 @@ struct user_data_s
 
     struct accumulated_t
     {
-        int kills;  // TODO
         int deaths; // TODO
         int score;
 
@@ -79,17 +78,12 @@ struct user_data_s
         int score;
 
         int shots;     // TODO
-        int hits;      // TODO
         int headshots; // TODO
 
-        int team;
         int role; // class
         char life_state;
-        int health;
         int health_max;
 
-        float x;
-        float y;
         float z;
 
         int player_count;

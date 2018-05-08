@@ -17,10 +17,6 @@ namespace ac
 namespace aimbot
 {
 
-struct ac_data
-{
-    size_t detections;
-    int last_weapon;
 };
 extern int amount[32];
 

@@ -42,11 +42,6 @@ extern SetRuntimeAttributeValue_t SetRuntimeAttributeValueFn;
 // Seriously tho, it's modified at least.
 // Credits: blackfire62
 
-struct attribute_s
-{
-    float value;
-};
-
 class CAttribute
 {
 public:

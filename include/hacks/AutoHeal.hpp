@@ -18,15 +18,6 @@ namespace autoheal
 // TODO extern CatVar target_only;
 void CreateMove();
 
-struct patient_data_s
-{
-    float last_damage{ 0.0f };
-    int last_health{ 0 };
-    int accum_damage{
-        0
-    }; // accumulated damage over X seconds
-};
-
 extern std::vector<patient_data_s> data;
 
 void UpdateData();

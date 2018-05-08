@@ -23,7 +23,6 @@ constexpr unsigned OUTDATED_AGE =
 struct backpack_data_s
 {
     bool pending{ false };
-    bool bad{ true };
     bool no_value{ false };       // No recorded value
     bool outdated_value{ false }; // Outdated value. Private inventory?
     unsigned last_request{ 0 };

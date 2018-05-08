@@ -15,11 +15,6 @@ namespace ac
 namespace bhop
 {
 
-struct ac_data
-{
-    bool was_on_ground{ false };
-};
-
 void ResetEverything();
 void ResetPlayer(int idx);
 

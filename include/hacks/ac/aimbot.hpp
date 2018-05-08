@@ -20,7 +20,6 @@ namespace aimbot
 struct ac_data
 {
     size_t detections;
-    int check_timer;
     int last_weapon;
 };
 extern int amount[32];

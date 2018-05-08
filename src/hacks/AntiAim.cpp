@@ -174,13 +174,6 @@ enum k_EFuckMode
     FM_COUNT
 };
 
-struct FuckData_s
-{
-    float fl1, fl2, fl3, fl4;
-    int i1, i2;
-    bool b1, b2;
-};
-
 /*
  * Not yet implemented.
  */

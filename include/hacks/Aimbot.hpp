@@ -19,7 +19,6 @@ namespace hacks::shared::aimbot
 // Used to store aimbot data to prevent calculating it again
 struct AimbotCalculatedData_s
 {
-    unsigned long predict_tick{ 0 };
     Vector aim_position{ 0 };
     bool visible{ false };
     float fov{ 0 };

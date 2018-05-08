@@ -20,9 +20,6 @@ namespace hacks::shared::aimbot
 struct AimbotCalculatedData_s
 {
     Vector aim_position{ 0 };
-    bool visible{ false };
-    float fov{ 0 };
-    int hitbox{ 0 };
 };
 
 // Functions used to calculate aimbot data, and if already calculated use it

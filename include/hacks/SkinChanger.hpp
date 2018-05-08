@@ -44,7 +44,6 @@ extern SetRuntimeAttributeValue_t SetRuntimeAttributeValueFn;
 
 struct attribute_s
 {
-    uint16_t defidx;
     float value;
 };
 

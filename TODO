@@ -18,7 +18,7 @@ Hook + Aimbot FIX																									//	//
 																													//	//																								        //	//
 																													//	//
 Make hacks respect Mannpower powerups and other conditions when calcuating damage, hitbox and prioritizing targets	//	//
-																		//	//
+																													//	//
 																													//	//
 Flare aim on fire																									//	//
 Improve Projectile Aimbot. A lot.																					//	//
@@ -27,13 +27,12 @@ MAX -> MIN priority																									//	//
 																													//	//
 Hunter Rifle?																										//	//
 																													//	//
-																							//	//
+																													//	//
 Ambassador bodyshotting																								//	//
 No Trigger Mediguns																									//	//
 More projectile weapons aimbot (wrap assassin, wrangler, stickybomb, airstrike)										//	//
 Auto trigger DR before rockets																						//	//
 																													//	//
-Make make sentrys slightly lower priority (for getting those pesky turtle engies)									//	//
 																													//	//
 Make building aimbot compensate for gravity on projectile weapons													//	//
 																													//	//
@@ -41,9 +40,9 @@ add Spectator Silent for projectile weapons 																		//	//
 																													//	//
 Improve aimbot accuracy 																							//	//
 																													//	//
-										//	//
 																													//	//
-															//	//
+																													//	//
+																													//	//
 																													//	//
 //------------------------------------------------------------------------------------------------------------------//	//
 //																														//

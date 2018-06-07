@@ -9,6 +9,7 @@
 #include "Radar.hpp"
 
 #ifndef FEATURE_RADAR_DISABLED
+#if ENABLE_VISUALS
 
 namespace hacks
 {
@@ -295,4 +296,5 @@ void Draw()
 }
 }
 
+#endif
 #endif

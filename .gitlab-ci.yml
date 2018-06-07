@@ -1,0 +1,12 @@
+image: registry.gitlab.com/nullworks/cathook-ci/ubuntu-cat-dependencies:build
+variables:
+  DOCKER_DRIVER: overlay2
+build:
+    stage: build
+    before_script:
+        - "git submodule update --init --recursive"
+    script:
+        - "cd libglez;mkdir build;cd build;cmake ..;make;make install;cd ..;cd .."
+        - "cd libxoverlay;mkdir build;cd build;cmake ..;make;make install;cd ..;cd .."
+        - "cd simple-ipc;mkdir build;cd build;cmake ..;make;make install;cd ..;cd .."
+        - "mkdir build; cd build; cmake ..; make; cd .."

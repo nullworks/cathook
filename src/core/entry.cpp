@@ -10,6 +10,8 @@
 
 #include "hack.hpp"
 
+#include "copypasted/xorstring.h"
+
 pthread_mutex_t mutex_quit;
 pthread_t thread_main;
 

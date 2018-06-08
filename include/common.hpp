@@ -49,7 +49,7 @@
 #include "core/macros.hpp"
 #include <visual/colors.hpp>
 
-#include "xorstring.h"
+#include "copypasted/xorstring.h"
 
 #if ENABLE_VISUALS
 

@@ -108,10 +108,10 @@ void CreateInterfaces()
     IF_GAME(IsTF2())
     {
         uintptr_t sig_steamapi = gSignatures.GetEngineSignature(
-            XORSTR("55 0F 57 C0 89 E5 83 EC 18 F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? ")
-            XORSTR("? F3 0F 10 05 ? ? ? ? C7 04 24 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F ")
-            XORSTR("11 05 ? ? ? ? E8 ? ? ? ? C7 44 24 08 ? ? ? ? C7 44 24 04 ? ? ? ? ")
-            XORSTR("C7 04 24 ? ? ? ? E8 ? ? ? ? C9 C3"));
+            XORSTR("55 0F 57 C0 89 E5 83 EC 18 F3 0F 11 05 ? ? ? ? F3 0F 11 05 ? ? ? "
+            "? F3 0F 10 05 ? ? ? ? C7 04 24 ? ? ? ? F3 0F 11 05 ? ? ? ? F3 0F "
+            "11 05 ? ? ? ? E8 ? ? ? ? C7 44 24 08 ? ? ? ? C7 44 24 04 ? ? ? ? "
+            "C7 04 24 ? ? ? ? E8 ? ? ? ? C9 C3"));
         logging::Info(XORSTR("SteamAPI: 0x%08x"), sig_steamapi);
         void **SteamAPI_engine = *reinterpret_cast<void ***>(sig_steamapi + 36);
         g_ISteamFriends        = (ISteamFriends *) (SteamAPI_engine[2]); //
@@ -143,16 +143,16 @@ void CreateInterfaces()
         g_IInput = **(reinterpret_cast<IInput ***>(
             (uintptr_t) 1 +
             gSignatures.GetClientSignature(
-                XORSTR("A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF ")
-                XORSTR("92 B4 00 00 00 A1 ? ? ? ? 8B 10"))));
+                XORSTR("A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
+                "92 B4 00 00 00 A1 ? ? ? ? 8B 10"))));
     }
     else IF_GAME(IsTF2C())
     {
         g_IInput = **(reinterpret_cast<IInput ***>(
             (uintptr_t) 1 +
             gSignatures.GetClientSignature(
-                XORSTR("A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF ")
-                XORSTR("92 A8 00 00 00 A1 ? ? ? ? 8B 10"))));
+                XORSTR("A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
+                "92 A8 00 00 00 A1 ? ? ? ? 8B 10"))));
     }
     else
     {
@@ -166,9 +166,9 @@ void CreateInterfaces()
                                                           sharedobj::engine());
     g_IBaseClientState = *(reinterpret_cast<CBaseClientState **>(
         gSignatures.GetEngineSignature(
-            XORSTR("55 89 E5 83 EC 18 C7 44 24 04 01 00 00 00 C7 04 24 ? ? ? ? E8 ? ? ")
-            XORSTR("? ? C7 04 24 ? ? ? ? 89 44 24 04 E8 ? ? ? ? A1 ? ? ? ? 85 C0 74 ")
-            XORSTR("15 A1 ? ? ? ? 8B 10 89 04 24 FF 52 38 C9 C3")) +
+            XORSTR("55 89 E5 83 EC 18 C7 44 24 04 01 00 00 00 C7 04 24 ? ? ? ? E8 ? ? "
+            "? ? C7 04 24 ? ? ? ? 89 44 24 04 E8 ? ? ? ? A1 ? ? ? ? 85 C0 74 "
+            "15 A1 ? ? ? ? 8B 10 89 04 24 FF 52 38 C9 C3")) +
         17));
     logging::Info(XORSTR("BaseClientState: 0x%08x"), g_IBaseClientState);
     g_IAchievementMgr = g_IEngine->GetAchievementMgr();
@@ -219,17 +219,17 @@ void CreateInterfaces()
         g_pScreenSpaceEffects = **(
             IScreenSpaceEffectManager **
                 *) (gSignatures.GetClientSignature(
-                        XORSTR("F3 0F 10 83 40 05 00 00 C7 44 24 04 ? ? ? ? 89 34 24 ")
-                        XORSTR("F3 0F 11 44 24 08 E8 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 ")
-                        XORSTR("24 89 74 24 08 C7 44 24 04 ? ? ? ? FF 52 0C A1 ? ? ? ")
-                        XORSTR("? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 14")) +
+                        XORSTR("F3 0F 10 83 40 05 00 00 C7 44 24 04 ? ? ? ? 89 34 24 "
+                        "F3 0F 11 44 24 08 E8 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 "
+                        "24 89 74 24 08 C7 44 24 04 ? ? ? ? FF 52 0C A1 ? ? ? "
+                        "? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 14")) +
                     31);
         g_ppScreenSpaceRegistrationHead = *(
             CScreenSpaceEffectRegistration ***) (gSignatures.GetClientSignature(
-                                                     XORSTR("55 89 E5 53 83 EC 14 8B ")
-                                                     XORSTR("1D ? ? ? ? 85 DB 74 25 ")
-                                                     XORSTR("8D B4 26 00 00 00 00 8B ")
-                                                     XORSTR("43 04 85 C0 74 10")) +
+                                                     XORSTR("55 89 E5 53 83 EC 14 8B "
+                                                     "1D ? ? ? ? 85 DB 74 25 "
+                                                     "8D B4 26 00 00 00 00 8B "
+                                                     "43 04 85 C0 74 10")) +
                                                  9);
     }
     else IF_GAME(IsTF2C())
@@ -243,18 +243,18 @@ void CreateInterfaces()
     {
         g_pScreenSpaceEffects =
             **(IScreenSpaceEffectManager ***) (gSignatures.GetClientSignature(
-                                                   XORSTR("FF 52 14 E9 E0 FE FF FF 8D ")
-                                                   XORSTR("76 00 A1 ? ? ? ? 8B 5D F4 ")
-                                                   XORSTR("8B 75 F8 8B 7D FC 8B 10 C7 ")
-                                                   XORSTR("45 0C ? ? ? ? 89 45 08 8B ")
-                                                   XORSTR("42 1C 89 EC 5D FF E0")) +
+                                                   XORSTR("FF 52 14 E9 E0 FE FF FF 8D "
+                                                   "76 00 A1 ? ? ? ? 8B 5D F4 "
+                                                   "8B 75 F8 8B 7D FC 8B 10 C7 "
+                                                   "45 0C ? ? ? ? 89 45 08 8B "
+                                                   "42 1C 89 EC 5D FF E0")) +
                                                12);
         g_ppScreenSpaceRegistrationHead =
             *(CScreenSpaceEffectRegistration **
                   *) (gSignatures.GetClientSignature(
-                          XORSTR("E8 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 ")
-                          XORSTR("28 85 C0 75 4B 8B 35 ? ? ? ? 85 F6 74 31 90 8B 5E ")
-                          XORSTR("04 85 DB 74 22 8B 03 89 1C 24")) +
+                          XORSTR("E8 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 "
+                          "28 85 C0 75 4B 8B 35 ? ? ? ? 85 F6 74 31 90 8B 5E "
+                          "04 85 DB 74 22 8B 03 89 1C 24")) +
                       27);
     }
     logging::Info(XORSTR("Finding HUD"));
@@ -267,10 +267,10 @@ void CreateInterfaces()
     {
         uintptr_t hud_sig =
             gSignatures.GetClientSignature(
-                XORSTR("FF 50 08 D9 9D 24 FE FF FF 89 3C 24 E8 ? ? ? ? C7 44 24 04 ? ")
-                XORSTR("? ? ? C7 04 24 ? ? ? ? D9 9D 20 FE FF FF E8 ? ? ? ? 85 C0 74 ")
-                XORSTR("3B 66 0F 6E C3 C7 44 24 10 00 00 00 00 F3 0F 5C 85 20 FE FF ")
-                XORSTR("FF")) +
+                XORSTR("FF 50 08 D9 9D 24 FE FF FF 89 3C 24 E8 ? ? ? ? C7 44 24 04 ? "
+                "? ? ? C7 04 24 ? ? ? ? D9 9D 20 FE FF FF E8 ? ? ? ? 85 C0 74 "
+                "3B 66 0F 6E C3 C7 44 24 10 00 00 00 00 F3 0F 5C 85 20 FE FF "
+                "FF")) +
             28;
         g_CHUD = *reinterpret_cast<CHud **>(hud_sig);
         logging::Info(XORSTR("HUD 0x%08x 0x%08x"), hud_sig, g_CHUD);

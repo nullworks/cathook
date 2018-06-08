@@ -86,7 +86,7 @@ bool loaded = false;
 void DrawEntity(int x, int y, CachedEntity *ent)
 {
 
-    static textures::texture_atlas texture(DATA_PATH XORSTR("/res/atlas.png"), 1024,
+    static textures::texture_atlas texture(DATA_PATH "/res/atlas.png", 1024,
                                            512);
     if (!loaded)
     {
@@ -95,7 +95,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
         {
             logging::Info(XORSTR("Invalid atlas, retrying...."));
             texture.texture.handle =
-                glez_texture_load_png_rgba(DATA_PATH XORSTR("/res/atlas.png"));
+                glez_texture_load_png_rgba(DATA_PATH "/res/atlas.png");
             return;
         }
         else if (texture.texture.handle != GLEZ_TEXTURE_INVALID)

@@ -20,12 +20,12 @@ namespace skinchanger
 
 // Because fuck you, that's why.
 const char *sig_GetAttributeDefinition =
-    XORSTR("55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 ")
-    XORSTR("00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6");
+    XORSTR("55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 "
+    "00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6");
 const char *sig_SetRuntimeAttributeValue =
     XORSTR("55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33");
-const char *sig_GetItemSchema = XORSTR("55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 ")
-                                XORSTR("DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3");
+const char *sig_GetItemSchema = XORSTR("55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 "
+                                "DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3");
 
 ItemSystem_t ItemSystem{ nullptr };
 GetAttributeDefinition_t GetAttributeDefinitionFn{ nullptr };
@@ -282,17 +282,17 @@ void DrawText()
 
 void Save(std::string filename)
 {
-    DIR *cathook_directory = opendir(DATA_PATH XORSTR("/skinchanger"));
+    DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
     if (!cathook_directory)
     {
         logging::Info(XORSTR("Skinchanger directory doesn't exist, creating one!"));
-        mkdir(DATA_PATH XORSTR("/skinchanger"), S_IRWXU | S_IRWXG);
+        mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
     }
     else
         closedir(cathook_directory);
     try
     {
-        std::ofstream file(DATA_PATH XORSTR("/skinchanger/") + filename,
+        std::ofstream file(DATA_PATH "/skinchanger/" + filename,
                            std::ios::out | std::ios::binary);
         BINARY_FILE_WRITE(file, SERIALIZE_VERSION);
         size_t size = modifier_map.size();
@@ -324,17 +324,17 @@ void Save(std::string filename)
 
 void Load(std::string filename, bool merge)
 {
-    DIR *cathook_directory = opendir(DATA_PATH XORSTR("/skinchanger"));
+    DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
     if (!cathook_directory)
     {
         logging::Info(XORSTR("Skinchanger directory doesn't exist, creating one!"));
-        mkdir(DATA_PATH XORSTR("/skinchanger"), S_IRWXU | S_IRWXG);
+        mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
     }
     else
         closedir(cathook_directory);
     try
     {
-        std::ifstream file(DATA_PATH XORSTR("/skinchanger/") + filename,
+        std::ifstream file(DATA_PATH "/skinchanger/" + filename,
                            std::ios::in | std::ios::binary);
         unsigned file_serialize = 0;
         BINARY_FILE_READ(file, file_serialize);

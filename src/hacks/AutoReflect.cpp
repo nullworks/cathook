@@ -23,8 +23,8 @@ static CatVar idle_only(CV_SWITCH, XORSTR("reflect_only_idle"), XORSTR("0"),
                         XORSTR("Don't AutoReflect if you're holding M1"));
 static CatVar
     legit(CV_SWITCH, XORSTR("reflect_legit"), XORSTR("0"), XORSTR("Legit Reflect"),
-          XORSTR("Only Auto-airblasts projectiles that you can see, doesnt move ")
-          XORSTR("your crosshair"));
+          XORSTR("Only Auto-airblasts projectiles that you can see, doesnt move "
+          "your crosshair"));
 static CatVar dodgeball(CV_SWITCH, XORSTR("reflect_dodgeball"), XORSTR("0"), XORSTR("Dodgeball Mode"),
                         XORSTR("Allows auto-reflect to work in dodgeball servers"));
 static CatVar blastkey(CV_KEY, XORSTR("reflect_key"), XORSTR("0"), XORSTR("Reflect Key"),
@@ -33,8 +33,8 @@ static CatVar stickies(CV_SWITCH, XORSTR("reflect_stickybombs"), XORSTR("0"),
                        XORSTR("Reflect stickies"), XORSTR("Reflect Stickybombs"));
 static CatVar teammates(CV_SWITCH, XORSTR("reflect_teammates"), XORSTR("0"),
                         XORSTR("Reflect teammates projectiles"),
-                        XORSTR("Useful in dodgeball with ")
-                        XORSTR("free-for-all enabled"));
+                        XORSTR("Useful in dodgeball with "
+                        "free-for-all enabled"));
 static CatVar fov(CV_FLOAT, XORSTR("reflect_fov"), XORSTR("85"), XORSTR("Reflect FOV"), XORSTR("Reflect FOV"),
                   180.0f);
 static CatVar fov_draw(CV_SWITCH, XORSTR("reflect_fov_draw"), XORSTR("0"), XORSTR("Draw Fov Ring"),

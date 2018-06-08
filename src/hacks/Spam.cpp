@@ -18,14 +18,14 @@ namespace spam
 static CatEnum spam_enum({ XORSTR("DISABLED"), XORSTR("CUSTOM"), XORSTR("DEFAULT"), XORSTR("LENNYFACES"),
                            XORSTR("BLANKS"), XORSTR("NULLCORE"), XORSTR("LMAOBOX"), XORSTR("LITHIUM") });
 CatVar spam_source(spam_enum, XORSTR("spam"), XORSTR("0"), XORSTR("Chat Spam"),
-                   XORSTR("Defines source of spam lines. CUSTOM spam file must be set ")
-                   XORSTR("in cat_spam_file and loaded with cat_spam_reload (Use ")
-                   XORSTR("console!)"));
+                   XORSTR("Defines source of spam lines. CUSTOM spam file must be set "
+                   "in cat_spam_file and loaded with cat_spam_reload (Use "
+                   "console!)"));
 static CatVar random_order(CV_SWITCH, XORSTR("spam_random"), XORSTR("0"), XORSTR("Random Order"));
 static CatVar
     filename(CV_STRING, XORSTR("spam_file"), XORSTR("spam.txt"), XORSTR("Spam file"),
-             XORSTR("Spam file name. Each line should be no longer than 100 ")
-             XORSTR("characters, file must be located in cathook data folder"));
+             XORSTR("Spam file name. Each line should be no longer than 100 "
+             "characters, file must be located in cathook data folder"));
 CatCommand reload(XORSTR("spam_reload"), XORSTR("Reload spam file"), Reload);
 static CatVar spam_delay(CV_INT, XORSTR("spam_delay"), XORSTR("800"), XORSTR("Spam delay"),
                          XORSTR("Delay between spam messages (in ms)"), 0.0f, 8000.0f);

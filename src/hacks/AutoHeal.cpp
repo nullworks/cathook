@@ -144,9 +144,9 @@ static CatVar auto_vacc_blast_checking(CV_SWITCH, XORSTR("auto_vacc_blast"), XOR
                                        XORSTR("Check blast danger"));
 static CatVar auto_vacc_proj_danger_range(CV_INT, XORSTR("auto_vacc_rocket_range"),
                                           XORSTR("650"), XORSTR("Rocket Danger Range"),
-                                          XORSTR("This range should be high enough to ")
-                                          XORSTR("give more time to change ")
-                                          XORSTR("resistances."));
+                                          XORSTR("This range should be high enough to "
+                                          "give more time to change "
+                                          "resistances."));
 
 int BlastDangerValue(CachedEntity *patient)
 {
@@ -212,8 +212,8 @@ int CurrentResistance()
 
 static CatVar change_timer(CV_INT, XORSTR("auto_vacc_reset_timer"), XORSTR("200"),
                            XORSTR("Reset Timer"),
-                           XORSTR("If no dangers were detected for # ticks, ")
-                           XORSTR("resistance will be reset to default, 0 to disable"));
+                           XORSTR("If no dangers were detected for # ticks, "
+                           "resistance will be reset to default, 0 to disable"));
 
 static CatVar auto_vacc_bullet_pop_ubers(
     CV_INT, XORSTR("auto_vacc_bullet_pop_ubers"), XORSTR("0"), XORSTR("Pop Bullet if Ubers >="),

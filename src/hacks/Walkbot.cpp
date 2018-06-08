@@ -282,16 +282,16 @@ void Save(std::string filename)
         return;
     }
     {
-        DIR *walkbot_dir = opendir(DATA_PATH XORSTR("/walkbot"));
+        DIR *walkbot_dir = opendir(DATA_PATH "/walkbot");
         if (!walkbot_dir)
         {
             logging::Info(XORSTR("Walkbot directory doesn't exist, creating one!"));
-            mkdir(DATA_PATH XORSTR("/walkbot"), S_IRWXU | S_IRWXG);
+            mkdir(DATA_PATH "/walkbot", S_IRWXU | S_IRWXG);
         }
         else
             closedir(walkbot_dir);
     }
-    std::string path = format(DATA_PATH XORSTR("/walkbot/"), GetLevelName());
+    std::string path = format(DATA_PATH "/walkbot/", GetLevelName());
     {
         DIR *level_dir = opendir(path.c_str());
         if (!level_dir)
@@ -339,7 +339,7 @@ void Save(std::string filename)
 bool Load(std::string filename)
 {
     {
-        DIR *walkbot_dir = opendir(DATA_PATH XORSTR("/walkbot"));
+        DIR *walkbot_dir = opendir(DATA_PATH "/walkbot");
         if (!walkbot_dir)
         {
             logging::Info(XORSTR("Walkbot directory doesn't exist!"));
@@ -348,7 +348,7 @@ bool Load(std::string filename)
         else
             closedir(walkbot_dir);
     }
-    std::string path = format(DATA_PATH XORSTR("/walkbot/"), GetLevelName());
+    std::string path = format(DATA_PATH "/walkbot/", GetLevelName());
     {
         DIR *level_dir = opendir(path.c_str());
         if (!level_dir)

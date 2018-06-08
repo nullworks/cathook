@@ -28,8 +28,8 @@ static CatVar follow_distance(CV_INT, XORSTR("fb_distance"), XORSTR("175"), XORS
                               XORSTR("How close the bots should stay to the target"));
 static CatVar follow_activation(CV_INT, XORSTR("fb_activation"), XORSTR("175"),
                                 XORSTR("Activation Distance"),
-                                XORSTR("How close a player should be until the ")
-                                XORSTR("followbot will pick them as a target"));
+                                XORSTR("How close a player should be until the "
+                                "followbot will pick them as a target"));
 unsigned steamid = 0x0;
 CatCommand follow_steam(XORSTR("fb_steam"), XORSTR("Follow Steam Id"),
                         [](const CCommand &args) {
@@ -312,8 +312,8 @@ static CatCommand
         auto steam_id = info.friendsID;
         if (!steam_id)
         {
-            logging::Info(XORSTR("Cant get steam-id, the game module probably doesnt ")
-                          XORSTR("support it."));
+            logging::Info(XORSTR("Cant get steam-id, the game module probably doesnt "
+                          "support it."));
             return;
         }
         // Construct the command

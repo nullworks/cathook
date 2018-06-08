@@ -18,9 +18,9 @@ namespace killsay
 static CatEnum killsay_enum({ XORSTR("NONE"), XORSTR("CUSTOM"), XORSTR("DEFAULT"), XORSTR("NCC - OFFENSIVE"),
                               XORSTR("NCC - MLG") });
 static CatVar killsay_mode(killsay_enum, XORSTR("killsay"), XORSTR("0"), XORSTR("Killsay"),
-                           XORSTR("Defines source of killsay lines. CUSTOM killsay ")
-                           XORSTR("file must be set in cat_killsay_file and loaded ")
-                           XORSTR("with cat_killsay_reload (Use console!)"));
+                           XORSTR("Defines source of killsay lines. CUSTOM killsay "
+                           "file must be set in cat_killsay_file and loaded "
+                           "with cat_killsay_reload (Use console!)"));
 static CatVar
     filename(CV_STRING, XORSTR("killsay_file"), XORSTR("killsays.txt"), XORSTR("Killsay file"),
              XORSTR("Killsay file name. Should be located in cathook data folder"));
@@ -118,8 +118,8 @@ const std::vector<std::string> builtin_default = {
     XORSTR("You must really like that respawn timer, %name%."),
 
     XORSTR("If your main is %class%, you should give up."),
-    XORSTR("Hey %name%, i see you can't play %class%. Try quitting the game.")
-    XORSTR("%team% is filled with spergs"),
+    XORSTR("Hey %name%, i see you can't play %class%. Try quitting the game."
+    "%team% is filled with spergs"),
     XORSTR("%name%@gmail.com to vacreview@valvesoftware.com\nFOUND CHEATER"),
     XORSTR("\n☐ Not rekt\n ☑ Rekt\n ☑ Really Rekt\n ☑ Tyrannosaurus Rekt")
 };
@@ -143,8 +143,8 @@ const std::vector<std::string> builtin_nonecore_offensive = {
     XORSTR("Piss off, you poor, ignorant, mullet-wearing porch monkey."),
     XORSTR("Your Mom says your turn-ons consist of butthole licking and scat porn."),
     XORSTR("Shut up, you'll never be the man your mother is."),
-    XORSTR("It looks like your face caught on fire and someone tried to put it out ")
-    XORSTR("with a fork."),
+    XORSTR("It looks like your face caught on fire and someone tried to put it out "
+    "with a fork."),
     XORSTR("You're so ugly Hello Kitty said goodbye to you."),
     XORSTR("Don't you love nature, despite what it did to you?")
 

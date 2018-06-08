@@ -70,12 +70,12 @@ static CatVar esp_expand(
                                                           // casting as float
 static CatVar
     vischeck(CV_SWITCH, XORSTR("esp_vischeck"), XORSTR("1"), XORSTR("VisCheck"),
-             XORSTR("ESP visibility check - makes enemy info behind walls darker, ")
-             XORSTR("disable this if you get FPS drops"));
+             XORSTR("ESP visibility check - makes enemy info behind walls darker, "
+             "disable this if you get FPS drops"));
 static CatVar
     legit(CV_SWITCH, XORSTR("esp_legit"), XORSTR("0"), XORSTR("Legit Mode"),
-          XORSTR("Don't show invisible enemies\nHides invisable enemies with ")
-          XORSTR("visibility enabled"));
+          XORSTR("Don't show invisible enemies\nHides invisable enemies with "
+          "visibility enabled"));
 static CatVar esp_font_scale(CV_INT, XORSTR("esp_font_scale"), XORSTR("14"), XORSTR("ESP font scale"));
 // Selective esp options
 static CatVar local_esp(CV_SWITCH, XORSTR("esp_local"), XORSTR("1"), XORSTR("ESP Local Player"),
@@ -401,10 +401,10 @@ void Init()
             if (fonts::esp_font.handle != GLEZ_FONT_INVALID)
                 draw_api::destroy_font(fonts::esp_font);
             fonts::esp_font = draw_api::create_font(
-                DATA_PATH XORSTR("/fonts/verasans.ttf"), esp_font_scale);
+                DATA_PATH "/fonts/verasans.ttf", esp_font_scale);
         });
-    textur     = glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/atlas.png"));
-    idspecific = glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/idspec.png"));
+    textur     = glez_texture_load_png_rgba(DATA_PATH "/textures/atlas.png");
+    idspecific = glez_texture_load_png_rgba(DATA_PATH "/textures/idspec.png");
     if (textur == GLEZ_TEXTURE_INVALID)
     {
         logging::Info(XORSTR("Invalid atlas, retrying in 10 seconds...."));
@@ -413,7 +413,7 @@ void Init()
             if (retry.test_and_set(10000))
             {
                 textur =
-                    glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/atlas.png"));
+                    glez_texture_load_png_rgba(DATA_PATH "/textures/atlas.png");
                 if (textur != GLEZ_TEXTURE_INVALID)
                     break;
                 logging::Info(XORSTR("Invalid atlas, retrying in 10 seconds...."));
@@ -428,7 +428,7 @@ void Init()
             if (retry.test_and_set(10000))
             {
                 idspecific = glez_texture_load_png_rgba(DATA_PATH
-                                                        XORSTR("/textures/idspec.png"));
+                                                        "/textures/idspec.png");
                 if (idspecific != GLEZ_TEXTURE_INVALID)
                     break;
                 logging::Info(XORSTR("Invalid idspecific, retrying in 10 seconds...."));

@@ -17,8 +17,8 @@ namespace bunnyhop
 // Var for user settings
 static CatVar
     enabled(CV_SWITCH, XORSTR("bhop_enabled"), XORSTR("0"), XORSTR("Bunnyhop"),
-            XORSTR("Enable Bunnyhop. All extra features like autojump and perfect ")
-            XORSTR("jump limit were temporary removed."));
+            XORSTR("Enable Bunnyhop. All extra features like autojump and perfect "
+            "jump limit were temporary removed."));
 // CatVar perfect_jump_limit(CV_INT, XORSTR("bhop_enabled"), XORSTR("0"), XORSTR("Bunnyhop"), XORSTR("Enable
 // Bunnyhop. All extra features like autojump and perfect jump limit were
 // temporary removed.XORSTR(");

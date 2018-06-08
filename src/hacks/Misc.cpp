@@ -32,9 +32,9 @@ static CatVar flashlight_spam(CV_SWITCH, XORSTR("flashlight"), XORSTR("0"), XORS
 static CatVar
     auto_balance_spam(CV_SWITCH, XORSTR("request_balance_spam"), XORSTR("0"),
                       XORSTR("Inf Auto Balance Spam"),
-                      XORSTR("Use to send a autobalance request to the server that ")
-                      XORSTR("doesnt prevent you from using it again\nCredits to ")
-                      XORSTR("Blackfire"));
+                      XORSTR("Use to send a autobalance request to the server that "
+                      "doesnt prevent you from using it again\nCredits to "
+                      "Blackfire"));
 static CatVar
     anti_afk(CV_SWITCH, XORSTR("anti_afk"), XORSTR("0"), XORSTR("Anti-AFK"),
              XORSTR("Sends random commands to prevent being kicked from server"));
@@ -52,8 +52,8 @@ static CatVar no_homo(CV_SWITCH, XORSTR("no_homo"), XORSTR("1"), XORSTR("No Homo
 static CatVar tauntslide(CV_SWITCH, XORSTR("tauntslide"), XORSTR("0"), XORSTR("TF2C tauntslide"),
                          XORSTR("Allows moving and shooting while taunting"));
 static CatVar tauntslide_tf2(CV_SWITCH, XORSTR("tauntslide_tf2"), XORSTR("0"), XORSTR("Tauntslide"),
-                             XORSTR("Allows free movement while taunting with movable ")
-                             XORSTR("taunts\nOnly works in tf2"));
+                             XORSTR("Allows free movement while taunting with movable "
+                             "taunts\nOnly works in tf2"));
 static CatVar
     show_spectators(CV_SWITCH, XORSTR("show_spectators"), XORSTR("0"), XORSTR("Show spectators"),
                     XORSTR("Show who's spectating you\nonly works in valve servers"));
@@ -539,8 +539,8 @@ void Schema_Reload()
     logging::Info(XORSTR("Custom schema loading is not supported right now."));
 
     static uintptr_t InitSchema_s = gSignatures.GetClientSignature(
-        XORSTR("55 89 E5 57 56 53 83 EC ? 8B 5D ? 8B 7D ? 8B 03 89 1C 24 FF 50 ? C7 ")
-        XORSTR("04 24 ? ? ? ?"));
+        XORSTR("55 89 E5 57 56 53 83 EC ? 8B 5D ? 8B 7D ? 8B 03 89 1C 24 FF 50 ? C7 "
+        "04 24 ? ? ? ?"));
     typedef bool (*InitSchema_t)(void *, CUtlBuffer &, int);
     static InitSchema_t InitSchema   = (InitSchema_t) InitSchema_s;
     static uintptr_t GetItemSchema_s = gSignatures.GetClientSignature(
@@ -606,7 +606,7 @@ CatCommand set_value(XORSTR("set"), XORSTR("Set value"), [](const CCommand &args
     std::string value(args.Arg(2));
     ReplaceString(value, XORSTR("\\n"), XORSTR("\n"));
     var->SetValue(value.c_str());
-    logging::Info(XORSTR("Set '%s' to '%s'", args.Arg(1), value.c_str());
+    logging::Info(XORSTR("Set '%s' to '%s'"), args.Arg(1), value.c_str());
 });
 CatCommand say_lines(XORSTR("say_lines"), XORSTR("Say with newlines (\\n)"),
                      [](const CCommand &args) {

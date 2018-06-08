@@ -27,20 +27,20 @@ static CatEnum trigger_key_modes_enum({ XORSTR("DISABLED"), XORSTR("TRIGGERKEY")
                                         XORSTR("TOGGLE") });
 static CatVar trigger_key_mode(trigger_key_modes_enum, XORSTR("trigger_key_mode"), XORSTR("1"),
                                XORSTR("Triggerbot key mode"),
-                               XORSTR("DISABLED: triggerbot is always active\nAIMKEY: ")
-                               XORSTR("triggerbot is active when key is ")
-                               XORSTR("down\nREVERSE: triggerbot is disabled when key ")
-                               XORSTR("is down\nTOGGLE: pressing key toggles ")
-                               XORSTR("triggerbot"));
+                               XORSTR("DISABLED: triggerbot is always active\nAIMKEY: "
+                               "triggerbot is active when key is "
+                               "down\nREVERSE: triggerbot is disabled when key "
+                               "is down\nTOGGLE: pressing key toggles "
+                               "triggerbot"));
 
 static CatEnum hitbox_mode_enum({ XORSTR("AUTO-HEAD"), XORSTR("AUTO-CLOSEST"), XORSTR("Head only") });
 static CatVar hitbox_mode(hitbox_mode_enum, XORSTR("trigger_hitboxmode"), XORSTR("0"),
                           XORSTR("Hitbox Mode"), XORSTR("Defines hitbox selection mode"));
 
 static CatVar accuracy(CV_INT, XORSTR("trigger_accuracy"), XORSTR("1"), XORSTR("Improve accuracy"),
-                       XORSTR("Improves triggerbot accuracy when aiming for specific ")
-                       XORSTR("hitbox. Recommended to use with sniper ")
-                       XORSTR("rifle/ambassador"));
+                       XORSTR("Improves triggerbot accuracy when aiming for specific "
+                       "hitbox. Recommended to use with sniper "
+                       "rifle/ambassador"));
 
 static CatVar ignore_vaccinator(
     CV_SWITCH, XORSTR("trigger_ignore_vaccinator"), XORSTR("1"), XORSTR("Ignore Vaccinator"),
@@ -70,8 +70,8 @@ static CatVar zoomed_only(CV_SWITCH, XORSTR("trigger_zoomed"), XORSTR("1"), XORS
                           XORSTR("Don't trigger with unzoomed rifles"));
 static CatVar
     max_range(CV_INT, XORSTR("trigger_maxrange"), XORSTR("0"), XORSTR("Max distance"),
-              XORSTR("Max range for triggerbot\n")
-              XORSTR("900-1100 range is efficient for scout/widowmaker engineer"),
+              XORSTR("Max range for triggerbot\n"
+              "900-1100 range is efficient for scout/widowmaker engineer"),
               4096.0f);
 
 static CatVar delay(CV_FLOAT, XORSTR("trigger_delay"), XORSTR("0"), XORSTR("Delay"),

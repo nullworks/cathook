@@ -26,8 +26,8 @@ static CatVar healarrow_callout_message(
     CV_STRING, XORSTR("healarrow_callout_text"),
     XORSTR("Hey %%, I've just healed you for $$ HP! Your health is now ##."),
     XORSTR("Call Out Text"),
-    XORSTR("Formatting:\n%% - player name\n$$ - healing amount\n## - new health\n@@ - ")
-    XORSTR("old health"));
+    XORSTR("Formatting:\n%% - player name\n$$ - healing amount\n## - new health\n@@ - "
+    "old health"));
 
 float healarrow_time = 0.0f;
 

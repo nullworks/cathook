@@ -272,8 +272,8 @@ void update()
         {
             if (count_bots >= int(abandon_if_bots_gte))
             {
-                logging::Info(XORSTR("Abandoning because there are %d bots in game, ")
-                              XORSTR("and abandon_if_bots_gte is %d."),
+                logging::Info(XORSTR("Abandoning because there are %d bots in game, "
+                              "and abandon_if_bots_gte is %d."),
                               count_bots, int(abandon_if_bots_gte));
                 tfmm::abandon();
                 return;
@@ -283,8 +283,8 @@ void update()
         {
             if (count_ipc >= int(abandon_if_ipc_bots_gte))
             {
-                logging::Info(XORSTR("Abandoning because there are %d local players ")
-                              XORSTR("in game, and abandon_if_ipc_bots_gte is %d."),
+                logging::Info(XORSTR("Abandoning because there are %d local players "
+                              "in game, and abandon_if_ipc_bots_gte is %d."),
                               count_ipc, int(abandon_if_ipc_bots_gte));
                 tfmm::abandon();
                 return;
@@ -294,8 +294,8 @@ void update()
         {
             if (count_total - count_bots <= int(abandon_if_humans_lte))
             {
-                logging::Info(XORSTR("Abandoning because there are %d non-bots in ")
-                              XORSTR("game, and abandon_if_humans_lte is %d."),
+                logging::Info(XORSTR("Abandoning because there are %d non-bots in "
+                              "game, and abandon_if_humans_lte is %d."),
                               count_total - count_bots,
                               int(abandon_if_humans_lte));
                 tfmm::abandon();
@@ -306,8 +306,8 @@ void update()
         {
             if (count_total <= int(abandon_if_players_lte))
             {
-                logging::Info(XORSTR("Abandoning because there are %d total players ")
-                              XORSTR("in game, and abandon_if_players_lte is %d."),
+                logging::Info(XORSTR("Abandoning because there are %d total players "
+                              "in game, and abandon_if_players_lte is %d."),
                               count_total, int(abandon_if_players_lte));
                 tfmm::abandon();
                 return;

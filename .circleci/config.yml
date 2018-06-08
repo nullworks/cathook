@@ -7,5 +7,5 @@ jobs:
       - checkout
       - run:
           name: build
-          command: "git submodule update --init --recursive; cd libglez;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..,cd libxoverlay;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..;cd simple-ipc;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..; mkdir build; cd build; cmake ..; make; cd .."
+          command: git submodule update --init --recursive; cd libglez;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..,cd libxoverlay;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..;cd simple-ipc;mkdir build;cd build;cmake ..;make;make install;cd ..;cd ..; mkdir build; cd build; cmake ..; make; cd ..
             

@@ -22,7 +22,7 @@ addons:
     - libglew-dev:i386 
     - libglew-dev 
     - libfreetype6-dev=2.5.2-1ubuntu2.8
-    - libfreetype6-dev:i386 
+    - libfreetype6-dev:i386=2.5.2-1ubuntu2.8
     - cmake 
     - libpng-dev 
     - libssl-dev 

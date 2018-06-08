@@ -1,9 +1,9 @@
 sudo: true
 install:
-    - sudo apt-get update - && sudo apt-get install -y -qq software-properties-common
+    - sudo apt-get update - && sudo apt-get install -y -qq software-properties-common aptitude
     - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     - sudo apt-get update -qq
-    - sudo apt-get install --no-install-suggests --no-install-recommends -y build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-6-multilib gcc-6 g++-6 libssl-dev:i386 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev libfreetype6-dev:i386 cmake libpng12-dev libssl-dev cmake gcc-multilib g++-multilib
+    - sudo apt install --no-install-suggests --no-install-recommends -y build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-6-multilib gcc-6 g++-6 libssl-dev:i386 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev libfreetype6-dev:i386 cmake libpng12-dev libssl-dev cmake gcc-multilib g++-multilib
 script:
   - "cd libglez;mkdir build;cd build;cmake ..;make;sudo make install;cd ..;cd .."
   - "cd libxoverlay;mkdir build;cd build;cmake ..;make;sudo make install;cd ..;cd .."

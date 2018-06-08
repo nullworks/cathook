@@ -22,12 +22,12 @@ std::string WordWrap(std::string &in, int max, unsigned long font)
         if (ch == ' ' || ch == '\n')
         {
             word = wordstream.str();
-            // logging::Info(XORSTR("got word: '%s'"), word.c_str());
+            // logging::Info(XORSTR("got word: '%s'", word.c_str());
             wordstream.str(XORSTR(""));
             auto size = draw::GetStringLength(font, line.str() + word);
             if (size.first >= max)
             {
-                // logging::Info(XORSTR("wrapping: '%s'"), line.str().c_str());
+                // logging::Info(XORSTR("wrapping: '%s'", line.str().c_str());
                 result << line.str() << '\n';
                 line.str(XORSTR(""));
             }

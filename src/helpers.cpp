@@ -332,7 +332,7 @@ char GetUpperChar(ButtonCode_t button)
     case KEY_BACKQUOTE:
         return '~';
     case KEY_APOSTROPHE:
-        return 'XORSTR("';
+        return '"';
     case KEY_COMMA:
         return '<';
     case KEY_PERIOD:

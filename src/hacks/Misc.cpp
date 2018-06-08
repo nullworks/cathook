@@ -606,7 +606,7 @@ CatCommand set_value(XORSTR("set"), XORSTR("Set value"), [](const CCommand &args
     std::string value(args.Arg(2));
     ReplaceString(value, XORSTR("\\n"), XORSTR("\n"));
     var->SetValue(value.c_str());
-    logging::Info(XORSTR("Set '%s' to '%s'"), args.Arg(1), value.c_str());
+    logging::Info(XORSTR("Set '%s' to '%s'", args.Arg(1), value.c_str());
 });
 CatCommand say_lines(XORSTR("say_lines"), XORSTR("Say with newlines (\\n)"),
                      [](const CCommand &args) {

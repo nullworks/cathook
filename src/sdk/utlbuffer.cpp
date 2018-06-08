@@ -62,7 +62,7 @@ public:
 BEGIN_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
                              XORSTR("\""), '\\'){ '\n', XORSTR("n") },
     { '\t', XORSTR("t") }, { '\v', XORSTR("v") }, { '\b', XORSTR("b") }, { '\r', XORSTR("r") }, { '\f', XORSTR("f") },
-    { '\a', XORSTR("a") }, { '\\', XORSTR("\\" }, { '\?', ")\?XORSTR(" }, { '\'', ")\'XORSTR(" },
+    { '\a', XORSTR("a") }, { '\\', XORSTR("\\" }, { '\?', ")\?XORSTR(" }, { '\'', ")\'" },
     { '\"', XORSTR("\"") },
     END_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
                                XORSTR("\""), '\\')

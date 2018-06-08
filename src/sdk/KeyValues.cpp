@@ -615,7 +615,7 @@ const char *KeyValues::ReadToken(CUtlBuffer &buf, bool &wasQuoted,
             break;
 
         // break if any control character appears in non quoted tokens
-        if (*c == 'XORSTR("' || *c == '{' || *c == '}')
+        if (*c == '"' || *c == '{' || *c == '}')
             break;
 
         if (*c == '[')

@@ -71,16 +71,16 @@ csv_stream &operator<<(csv_stream &log, const std::string &string)
     }
     if (log.columns)
         log.stream << ',';
-    log.stream << 'XORSTR("';
+    log.stream << '"';
     for (const auto &i : string)
     {
-        if (i == 'XORSTR("')
+        if (i == '"')
         {
-            log.stream << 'XORSTR("';
+            log.stream << '"';
         }
         log.stream << i;
     }
-    log.stream << 'XORSTR("';
+    log.stream << '"';
     log.columns++;
     return log;
 }

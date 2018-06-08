@@ -32,7 +32,7 @@ static CatVar aimkey_mode(aimkey_modes_enum, XORSTR("aimbot_aimkey_mode"), XORST
                           XORSTR("toggles aimbot"));
 static CatVar autoshoot(CV_SWITCH, XORSTR("aimbot_autoshoot"), XORSTR("1"), XORSTR("Autoshoot"),
                         XORSTR("Shoot automatically when the target is locked, isn't ")
-                        XORSTR("compatible with 'Enable when attacking'"));
+                        XORSTR("compatible with 'Enable when attacking'");
 static CatVar autoshoot_disguised(CV_SWITCH, XORSTR("aimbot_autoshoot_disguised"), XORSTR("1"),
                                   XORSTR("Autoshoot while disguised"),
                                   XORSTR("Shoot automatically if disguised."));

@@ -203,7 +203,7 @@ List *List::FromString(const std::string &string)
         }
         if (!brackets)
         {
-            if (c == 'XORSTR("')
+            if (c == '"')
             {
                 readingkey = !readingkey;
                 if (!readingkey)

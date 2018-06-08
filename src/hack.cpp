@@ -34,7 +34,7 @@ const std::string &hack::GetVersion()
     if (version_set)
         return version;
 #if defined(GIT_COMMIT_HASH) && defined(GIT_COMMIT_DATE)
-    version = XORSTR("Version: #") GIT_COMMIT_HASH XORSTR(" ") GIT_COMMIT_DATE;
+    version = "Version: #" GIT_COMMIT_HASH " " GIT_COMMIT_DATE;
 #endif
     version_set = true;
     return version;
@@ -53,13 +53,13 @@ const std::string &hack::GetType()
 #if not ENABLE_GUI
     version += XORSTR(" NOGUI");
 #else
-    version += XORSTR(" GUI");
+    version += " GUI";
 #endif
 
 #ifndef DYNAMIC_CLASSES
 
 #ifdef GAME_SPECIFIC
-    version += XORSTR(" GAME ") TO_STRING(GAME);
+    version += " GAME " TO_STRING(GAME);
 #else
     version += XORSTR(" UNIVERSAL");
 #endif
@@ -72,7 +72,7 @@ const std::string &hack::GetType()
     version += XORSTR(" NOVISUALS");
 #endif
 
-    version     = version.substr(1);
+    version = version.substr(1);
     version_set = true;
     return version;
 }
@@ -91,7 +91,7 @@ std::stack<std::string> &hack::command_stack()
 static CatVar cat_event_hurt(CV_SWITCH, XORSTR("cat_event_hurt"), XORSTR("1"),
                              XORSTR("Enable OnHurt Event"),
                              XORSTR("Disable if your chat gets spammed with \"blah "
-                             XORSTR("damaged blah down to blah hp\"")));
+                             "damaged blah down to blah hp\""));
 class AdvancedEventListener : public IGameEventListener
 {
 public:
@@ -247,12 +247,12 @@ free(logname);*/
                                                XORSTR("fonts/tf2build.ttf") };
         for (const auto &s : essential)
         {
-            std::ifstream exists(DATA_PATH XORSTR("/") + s, std::ios::in);
+            std::ifstream exists(DATA_PATH "/" + s, std::ios::in);
             if (not exists)
             {
-                Error((XORSTR("Missing essential file: ") + s +
-                        XORSTR("/%s\nYou MUST run install-data script to finish "
-                       XORSTR("installation")))
+                Error(("Missing essential file: " + s +
+                        "/%s\nYou MUST run install-data script to finish "
+                       "installation")
                           .c_str(),
                       s.c_str());
             }

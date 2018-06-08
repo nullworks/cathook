@@ -30,9 +30,9 @@ void BeginConVars()
                                    std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
         {
-            cfg_autoexec << XORSTR("// Put your custom cathook settings in this ")
-                            XORSTR("file\n// This script will be executed EACH TIME ")
-                            XORSTR("YOU INJECT CATHOOK\n");
+            cfg_autoexec << XORSTR("// Put your custom cathook settings in this "
+                            "file\n// This script will be executed EACH TIME "
+                            "YOU INJECT CATHOOK\n");
         }
     }
     if (!std::ifstream(XORSTR("tf/cfg/cat_autoexec.cfg")))
@@ -41,9 +41,9 @@ void BeginConVars()
                                    std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
         {
-            cfg_autoexec << XORSTR("// Put your custom cathook settings in this ")
-                            XORSTR("file\n// This script will be executed EACH TIME ")
-                            XORSTR("YOU JOIN A MATCH\n");
+            cfg_autoexec << XORSTR("// Put your custom cathook settings in this "
+                            "file\n// This script will be executed EACH TIME "
+                            "YOU JOIN A MATCH\n");
         }
     }
     logging::Info(XORSTR(":b:"));
@@ -61,10 +61,10 @@ void EndConVars()
                                std::ios::out | std::ios::trunc);
     if (cfg_defaults.good())
     {
-        cfg_defaults << XORSTR("// This file is auto-generated and will be ")
-                        XORSTR("overwritten each time you inject cathook\n// Do not ")
-                        XORSTR("make edits to this file\n\n// Every registered ")
-                        XORSTR("variable dump\n");
+        cfg_defaults << XORSTR("// This file is auto-generated and will be "
+                        "overwritten each time you inject cathook\n// Do not "
+                        "make edits to this file\n\n// Every registered "
+                        "variable dump\n");
         for (const auto &i : RegisteredVarsList())
         {
             cfg_defaults << i->GetName() << XORSTR(" \"") << i->GetDefault() << XORSTR("\"\n");

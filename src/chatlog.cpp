@@ -49,7 +49,7 @@ public:
         {
             uname = std::string(pw->pw_name);
         }
-        stream.open(DATA_PATH XORSTR("/chat-") + uname + XORSTR(".csv"),
+        stream.open(DATA_PATH "/chat-" + uname + ".csv",
                     std::ios::out | std::ios::app);
         return stream.good();
     }

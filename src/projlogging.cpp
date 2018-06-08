@@ -34,8 +34,8 @@ void Update()
                 //(%.2f) | EAV: %.2f %.2f %.2f (%.2f)XORSTR(", i,
                 // RAW_ENT(ent)->GetClientClass()->GetName(), v.x, v.y, v.z,
                 // v.Length(), a.x, a.y, a.z);
-                logging::Info(XORSTR("%d [%s]: CatVelocity: %.2f %.2f %.2f (%.2f) | ")
-                              XORSTR("EAV: %.2f %.2f %.2f (%.2f)"),
+                logging::Info(XORSTR("%d [%s]: CatVelocity: %.2f %.2f %.2f (%.2f) | "
+                              "EAV: %.2f %.2f %.2f (%.2f)"),
                               i, RAW_ENT(ent)->GetClientClass()->GetName(), v.x,
                               v.y, v.z, v.Length(), eav.x, eav.y, eav.z,
                               eav.Length());

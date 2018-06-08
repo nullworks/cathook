@@ -27,8 +27,8 @@ bool valid_api_key    = false;
 
 static CatVar
     enable_bptf(CV_SWITCH, XORSTR("bptf_enable"), XORSTR("0"), XORSTR("Enable backpack.tf"),
-                XORSTR("Enable backpack.tf integration\nYou have to set your API ")
-                XORSTR("key in cat_bptf_key"));
+                XORSTR("Enable backpack.tf integration\nYou have to set your API "
+                "key in cat_bptf_key"));
 CatCommand api_key(XORSTR("bptf_key"), XORSTR("Set API Key"), [](const CCommand &args) {
     api_key_s = args.ArgS();
     logging::Info(XORSTR("API key changed!"));
@@ -113,8 +113,8 @@ void processing_thread()
                                     const auto &v = it.value();
                                     if (not v.is_object())
                                     {
-                                        logging::Info(XORSTR("Data for %u (%s) is not ")
-                                                      XORSTR("an object!"),
+                                        logging::Info(XORSTR("Data for %u (%s) is not "
+                                                      "an object!"),
                                                       userid, it.key().c_str());
                                         continue;
                                     }

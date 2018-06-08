@@ -49,6 +49,8 @@
 #include "core/macros.hpp"
 #include <visual/colors.hpp>
 
+#include "xorstring.h"
+
 #if ENABLE_VISUALS
 
 #include <visual/drawex.hpp>

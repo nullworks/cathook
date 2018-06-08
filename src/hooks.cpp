@@ -34,7 +34,7 @@ bool IsHooked(ptr_t inst, uint32_t offset)
 
 VMTHook::VMTHook()
 {
-    static_assert(ptr_size == 4, XORSTR("Pointer size must be DWORD."));
+    static_assert(ptr_size == 4, "Pointer size must be DWORD.");
 };
 
 VMTHook::~VMTHook()

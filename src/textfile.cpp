@@ -17,7 +17,7 @@ bool TextFile::TryLoad(std::string name)
 {
     if (name.length() == 0)
         return false;
-    std::string filename = format(DATA_PATH XORSTR("/"), name);
+    std::string filename = format(DATA_PATH "/", name);
     std::ifstream file(filename, std::ios::in);
     if (!file)
     {
@@ -35,7 +35,7 @@ bool TextFile::TryLoad(std::string name)
 
 void TextFile::Load(std::string name)
 {
-    std::string filename = format(DATA_PATH XORSTR("/"), name);
+    std::string filename = format(DATA_PATH "/", name);
     std::ifstream file(filename, std::ios::in);
     if (file.bad())
     {

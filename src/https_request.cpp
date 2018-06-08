@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include "xorstring.h"
+
 namespace https
 {
 

@@ -15,18 +15,18 @@ static CatVar enabled(CV_SWITCH, XORSTR("votelog"), XORSTR("0"), XORSTR("Log vot
 static CatVar requeue(CV_SWITCH, XORSTR("votelog_requeue"), XORSTR("1"),
                       XORSTR("Auto requeue on vote kick"), XORSTR("Auto requeue on vote kick"));
 static CatVar anti_votekick(CV_SWITCH, XORSTR("anti_votekick"), XORSTR("0"), XORSTR("anti-votekick"),
-                            XORSTR("Prevent votekicks by lagging the server in a way ")
-                            XORSTR("that every vote comes is delayed.\ndo not forget ")
-                            XORSTR("to enable votelog and that this\nmakes the server ")
-                            XORSTR("be down for about 30 seconds\ncl_timeout 60 is a ")
-                            XORSTR("must"));
+                            XORSTR("Prevent votekicks by lagging the server in a way "
+                            "that every vote comes is delayed.\ndo not forget "
+                            "to enable votelog and that this\nmakes the server "
+                            "be down for about 30 seconds\ncl_timeout 60 is a "
+                            "must"));
 static CatVar kick_msg(CV_STRING, XORSTR("anti_votekick_string"),
-                       XORSTR("Everyone thank $NAME for initiating the votekick! The ")
-                       XORSTR("server will now be shut down!"),
+                       XORSTR("Everyone thank $NAME for initiating the votekick! The "
+                       "server will now be shut down!"),
                        XORSTR("anti-votekick message"),
-                       XORSTR("Send this message on Votekick attempts against ")
-                       XORSTR("you.\n$NAME gets replaced with their name\n$CLASS with ")
-                       XORSTR("their class."));
+                       XORSTR("Send this message on Votekick attempts against "
+                       "you.\n$NAME gets replaced with their name\n$CLASS with "
+                       "their class."));
 Timer antikick{};
 bool active = false;
 

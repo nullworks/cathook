@@ -21,7 +21,7 @@ addons:
     - libsdl2-dev 
     - libglew-dev:i386 
     - libglew-dev 
-    - libfreetype6-dev 
+    - libfreetype6-dev=2.5.2-1ubuntu2.8
     - libfreetype6-dev:i386 
     - cmake 
     - libpng-dev 

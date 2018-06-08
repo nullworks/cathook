@@ -2,8 +2,8 @@ sudo: enabled
  install:
    - sudo dpkg --add-architecture i386
    - sudo apt-get update - && sudo apt-get install -y -qq software-properties-common
--  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
    - sudo apt-get update -qq
    - sudo apt-get install -y -qq build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-6-multilib gcc-6 g++-6 libssl-dev:i386 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev=2.5.2-1ubuntu2 libfreetype6-dev:i386=2.5.2-1ubuntu2 cmake libpng-dev libssl-dev cmake gcc-multilib g++-multilib
 script:

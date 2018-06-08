@@ -1,5 +1,4 @@
 image: registry.gitlab.com/nullworks/cathook-ci/ubuntu-cat-dependencies:build
-sudo: enabled
 variables:
   DOCKER_DRIVER: overlay2
 build:

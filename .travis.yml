@@ -1,5 +1,5 @@
 sudo: enabled
- install:
+install:
    - sudo dpkg --add-architecture i386
    - sudo apt-get update - && sudo apt-get install -y -qq software-properties-common
    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test

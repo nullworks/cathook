@@ -31,6 +31,7 @@
 
 #include <core/logging.hpp>
 #include <core/interfaces.hpp>
+#include "copypasted/xorstring.h"
 
 //-----------------------------------------------------------------------------
 // Statically constructed list of ConCommandBases,
@@ -406,8 +407,8 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
     int nLen = Q_strlen(pCommand);
     if (nLen >= COMMAND_MAX_LENGTH - 1)
     {
-        Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows the ")
-                XORSTR("tokenizer buffer.. Skipping!\n"));
+        Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows the "
+                "tokenizer buffer.. Skipping!\n"));
         return false;
     }
 
@@ -459,8 +460,8 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
         m_ppArgv[m_nArgc++] = pArgvBuf;
         if (m_nArgc >= COMMAND_MAX_ARGC)
         {
-            Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows ")
-                    XORSTR("the argument buffer.. Clamped!\n"));
+            Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows "
+                    "the argument buffer.. Clamped!\n"));
         }
 
         nArgvBufferSize += nSize + 1;
@@ -1300,8 +1301,8 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
         if (pBounded && fabs(pBounded->GetFloat() - var->GetFloat()) > 0.0001f)
         {
             ConColorMsg(clr,
-                        XORSTR("** NOTE: The real value is %.3f but the server has ")
-                        XORSTR("temporarily restricted it to %.3f **\n"),
+                        XORSTR("** NOTE: The real value is %.3f but the server has "
+                        "temporarily restricted it to %.3f **\n"),
                         var->GetFloat(), pBounded->GetFloat());
         }
     }

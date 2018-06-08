@@ -42,16 +42,16 @@ const std::string &hack::GetVersion()
 
 const std::string &hack::GetType()
 {
-    static std::string version(XORSTR("Unknown Type"));
+    static std::string version("Unknown Type");
     static bool version_set = false;
     if (version_set)
         return version;
-    version = XORSTR("");
+    version = "";
 #if not ENABLE_IPC
-    version += XORSTR(" NOIPC");
+    version += " NOIPC";
 #endif
 #if not ENABLE_GUI
-    version += XORSTR(" NOGUI");
+    version += " NOGUI";
 #else
     version += " GUI";
 #endif
@@ -61,15 +61,15 @@ const std::string &hack::GetType()
 #ifdef GAME_SPECIFIC
     version += " GAME " TO_STRING(GAME);
 #else
-    version += XORSTR(" UNIVERSAL");
+    version += " UNIVERSAL";
 #endif
 
 #else
-    version += XORSTR(" DYNAMIC");
+    version += " DYNAMIC";
 #endif
 
 #if not ENABLE_VISUALS
-    version += XORSTR(" NOVISUALS");
+    version += " NOVISUALS";
 #endif
 
     version = version.substr(1);
@@ -261,7 +261,7 @@ free(logname);*/
 
 #endif /* TEXTMODE */
 
-    logging::Info(XORSTR("Initializing..."));
+    logging::Info("Initializing...");
     srand(time(0));
     sharedobj::LoadAllSharedObjects();
     CreateInterfaces();

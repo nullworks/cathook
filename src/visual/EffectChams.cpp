@@ -44,8 +44,8 @@ static CatVar weapons_white(CV_SWITCH, XORSTR("chams_weapons_white"), XORSTR("1"
 static CatVar legit(CV_SWITCH, XORSTR("chams_legit"), XORSTR("0"), XORSTR("Legit chams"),
                     XORSTR("Don't show chams through walls"));
 static CatVar singlepass(CV_SWITCH, XORSTR("chams_singlepass"), XORSTR("0"), XORSTR("Single-pass"),
-                         XORSTR("Render chams only once (this disables 'darker' chams ")
-                         XORSTR("on invisible parts of player"));
+                         XORSTR("Render chams only once (this disables 'darker' chams "
+                         "on invisible parts of player"));
 static CatVar chamsself(CV_SWITCH, XORSTR("chams_self"), XORSTR("0"), XORSTR("Enable chams on self"),
                         XORSTR(""));
 static CatVar rainbow(CV_SWITCH, XORSTR("chams_self_rainbow"), XORSTR("1"),

@@ -14,8 +14,8 @@ CTFGCClientSystem *CTFGCClientSystem::GTFGCClientSystem()
 {
     typedef CTFGCClientSystem *(*GTFGCClientSystem_t)();
     static uintptr_t addr1 = gSignatures.GetClientSignature(
-        XORSTR("55 B8 ? ? ? ? 89 E5 5D C3 8D B6 00 00 00 00 55 A1 ? ? ? ? 89 E5 5D C3 ")
-        XORSTR("8D B6 00 00 00 00 A1"));
+        XORSTR("55 B8 ? ? ? ? 89 E5 5D C3 8D B6 00 00 00 00 55 A1 ? ? ? ? 89 E5 5D C3 "
+        "8D B6 00 00 00 00 A1"));
     static GTFGCClientSystem_t GTFGCClientSystem_fn =
         GTFGCClientSystem_t(addr1);
 

@@ -62,8 +62,8 @@ void CMaterialReference::Init(char const *pMaterialName,
     {
         if (IsOSX())
         {
-            printf(XORSTR("\n ##### CMaterialReference::Init got error material for ")
-                   XORSTR("%s in tex group %s"),
+            printf(XORSTR("\n ##### CMaterialReference::Init got error material for "
+                   "%s in tex group %s"),
                    pMaterialName, pTextureGroupName);
         }
     }

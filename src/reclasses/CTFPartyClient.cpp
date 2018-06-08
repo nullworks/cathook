@@ -33,8 +33,8 @@ bool re::CTFPartyClient::BCanQueueForStandby(re::CTFPartyClient *this_)
 {
     typedef bool (*BCanQueueForStandby_t)(re::CTFPartyClient *);
     static uintptr_t addr = gSignatures.GetClientSignature(
-        XORSTR("55 89 E5 53 83 EC 24 8B 5D 08 80 7B 46 00 75 40 8B 4B 38 85 C9 74 39 ")
-        XORSTR("E8 ? ? ? ? 89 04 24 E8 ? ? ? ? 84 C0 75 28"));
+        XORSTR("55 89 E5 53 83 EC 24 8B 5D 08 80 7B 46 00 75 40 8B 4B 38 85 C9 74 39 "
+        "E8 ? ? ? ? 89 04 24 E8 ? ? ? ? 84 C0 75 28"));
     static BCanQueueForStandby_t BCanQueueForStandby_fn =
         BCanQueueForStandby_t(addr);
 
@@ -79,8 +79,8 @@ char re::CTFPartyClient::RequestLeaveForMatch(int type)
 {
     typedef char (*RequestLeaveForMatch_t)(re::CTFPartyClient *, int);
     uintptr_t addr = gSignatures.GetClientSignature(
-        XORSTR("55 89 E5 57 56 53 83 EC ? 8B 45 ? 89 44 24 ? 8B 45 ? 89 04 24 E8 ? ? ")
-        XORSTR("? ? 84 C0 89 C6 75"));
+        XORSTR("55 89 E5 57 56 53 83 EC ? 8B 45 ? 89 44 24 ? 8B 45 ? 89 04 24 E8 ? ? "
+        "? ? 84 C0 89 C6 75"));
     RequestLeaveForMatch_t RequestLeaveForMatch_fn =
         RequestLeaveForMatch_t(addr);
 

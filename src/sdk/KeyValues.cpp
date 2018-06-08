@@ -30,6 +30,7 @@
 #include "utlqueue.h"
 #include "UtlSortVector.h"
 #include "convar.h"
+#include "copypasted/xorstring.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -799,8 +800,8 @@ bool KeyValues::SaveToFile(IBaseFileSystem *filesystem,
 
     if (f == FILESYSTEM_INVALID_HANDLE)
     {
-        DevMsg(1, XORSTR("KeyValues::SaveToFile: couldn't open file \"%s\" in path ")
-                  XORSTR("\"%s\".\n"),
+        DevMsg(1, XORSTR("KeyValues::SaveToFile: couldn't open file \"%s\" in path "
+                  "\"%s\".\n"),
                resourceName ? resourceName : XORSTR("NULL"), pathID ? pathID : XORSTR("NULL"));
         return false;
     }
@@ -1025,8 +1026,8 @@ void KeyValues::SaveKeyToFile(KeyValues *dat, IBaseFileSystem *filesystem,
             break;
         }
         case TYPE_COLOR:
-            DevMsg(1, XORSTR("KeyValues::RecursiveSaveToFile: TODO, missing code for ")
-                      XORSTR("TYPE_COLOR.\n"));
+            DevMsg(1, XORSTR("KeyValues::RecursiveSaveToFile: TODO, missing code for "
+                      "TYPE_COLOR.\n"));
             break;
 
         default:
@@ -1539,21 +1540,21 @@ const wchar_t *KeyValues::GetWString(const char *keyName,
         switch (dat->m_iDataType)
         {
         case TYPE_FLOAT:
-            swprintf(wbuf, Q_ARRAYSIZE(wbuf), LXORSTR("%f"), dat->m_flValue);
+            swprintf(wbuf, Q_ARRAYSIZE(wbuf), L"%f", dat->m_flValue);
             SetWString(keyName, wbuf);
             break;
         case TYPE_PTR:
-            swprintf(wbuf, Q_ARRAYSIZE(wbuf), LXORSTR("%lld"),
+            swprintf(wbuf, Q_ARRAYSIZE(wbuf), L"%lld",
                      (int64)(size_t) dat->m_pValue);
             SetWString(keyName, wbuf);
             break;
         case TYPE_INT:
-            swprintf(wbuf, Q_ARRAYSIZE(wbuf), LXORSTR("%d"), dat->m_iValue);
+            swprintf(wbuf, Q_ARRAYSIZE(wbuf), L"%d", dat->m_iValue);
             SetWString(keyName, wbuf);
             break;
         case TYPE_UINT64:
         {
-            swprintf(wbuf, Q_ARRAYSIZE(wbuf), LXORSTR("%lld"),
+            swprintf(wbuf, Q_ARRAYSIZE(wbuf), L"%lld",
                      *((uint64 *) (dat->m_sValue)));
             SetWString(keyName, wbuf);
         }
@@ -1739,7 +1740,7 @@ void KeyValues::SetWString(const char *keyName, const wchar_t *value)
         if (!value)
         {
             // ensure a valid value
-            value = LXORSTR("");
+            value = L"";
         }
 
         // allocate memory for the new value and copy it in
@@ -2200,8 +2201,8 @@ void KeyValues::ParseIncludedKeys(char const *resourceName,
     }
     else
     {
-        DevMsg(XORSTR("KeyValues::ParseIncludedKeys: Couldn't load included keyvalue ")
-               XORSTR("file %s\n"),
+        DevMsg(XORSTR("KeyValues::ParseIncludedKeys: Couldn't load included keyvalue "
+               "file %s\n"),
                fullpath);
         newKV->deleteThis();
     }
@@ -2573,9 +2574,9 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName,
         {
             if (wasConditional)
             {
-                g_KeyValuesErrorStack.ReportError(XORSTR("RecursiveLoadFromBuffer:  ")
-                                                  XORSTR("got conditional between key ")
-                                                  XORSTR("and value"));
+                g_KeyValuesErrorStack.ReportError(XORSTR("RecursiveLoadFromBuffer:  "
+                                                  "got conditional between key "
+                                                  "and value"));
                 break;
             }
 

@@ -16,6 +16,7 @@
 #include <limits.h>
 #include "tier1/strtools.h"
 #include "tier1/characterset.h"
+#include "copypasted/xorstring.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -62,7 +63,7 @@ public:
 BEGIN_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
                              XORSTR("\""), '\\'){ '\n', XORSTR("n") },
     { '\t', XORSTR("t") }, { '\v', XORSTR("v") }, { '\b', XORSTR("b") }, { '\r', XORSTR("r") }, { '\f', XORSTR("f") },
-    { '\a', XORSTR("a") }, { '\\', XORSTR("\\" }, { '\?', ")\?XORSTR(" }, { '\'', ")\'" },
+    { '\a', XORSTR("a") }, { '\\', XORSTR("\\") }, { '\?', XORSTR("\?") }, { '\'', XORSTR(")\'") },
     { '\"', XORSTR("\"") },
     END_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
                                XORSTR("\""), '\\')

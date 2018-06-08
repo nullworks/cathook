@@ -28,18 +28,18 @@ RAII_HTTPS_Socket::RAII_HTTPS_Socket(const std::string &host) : hostname_(host)
 {
     if (!initialized)
     {
-        logging::Info("Initializing SSL");
+        logging::Info(XORSTR("Initializing SSL"));
         initialize();
     }
     sock_ = socket(AF_INET, SOCK_STREAM, 0);
     if (sock_ < 0)
     {
-        throw std::runtime_error("Socket creation error");
+        throw std::runtime_error(XORSTR("Socket creation error"));
     }
     host_ = gethostbyname(hostname_.c_str());
     if (not host_)
     {
-        throw std::runtime_error("Could not resolve hostname: " + host);
+        throw std::runtime_error(XORSTR("Could not resolve hostname: ") + host);
     }
     memset(&addr_, 0, sizeof(addr_));
     addr_.sin_family = AF_INET;
@@ -49,7 +49,7 @@ RAII_HTTPS_Socket::RAII_HTTPS_Socket(const std::string &host) : hostname_(host)
     {
         close(sock_);
         sock_ = -1;
-        throw std::runtime_error("Couldn't connect to host");
+        throw std::runtime_error(XORSTR("Couldn't connect to host"));
     }
     ssl_connect();
 }
@@ -68,7 +68,7 @@ bool RAII_HTTPS_Socket::ssl_connect()
     int ret = SSL_connect(connection_);
     if (ret != 1)
     {
-        logging::Info("SSL connection error: %d, %d, %x\n", ret,
+        logging::Info(XORSTR("SSL connection error: %d, %d, %x\n"), ret,
                       SSL_get_error(connection_, ret), ERR_get_error());
         return false;
     }
@@ -94,7 +94,7 @@ std::string RAII_HTTPS_Socket::get(const std::string &path)
 
     memset(buffer_rq.get(), 0, rq_size);
     int rq_length = snprintf(buffer_rq.get(), rq_size,
-                             "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
+                             XORSTR("GET %s HTTP/1.0\r\nHost: %s\r\n\r\n"),
                              path.c_str(), hostname_.c_str());
     int sent  = 0;
     int chunk = 0;
@@ -104,7 +104,7 @@ std::string RAII_HTTPS_Socket::get(const std::string &path)
             SSL_write(connection_, buffer_rq.get() + sent, rq_length - sent);
         if (chunk < 0)
         {
-            throw std::runtime_error("Error writing to Secure Socket: " +
+            throw std::runtime_error(XORSTR("Error writing to Secure Socket: ") +
                                      std::to_string(ERR_get_error()));
         }
         else if (chunk == 0)
@@ -122,14 +122,14 @@ std::string RAII_HTTPS_Socket::get(const std::string &path)
         chunk =
             SSL_read(connection_, buffer_rs.get() + received, total - received);
         if (chunk < 0)
-            throw std::runtime_error("Error reading from socket");
+            throw std::runtime_error(XORSTR("Error reading from socket"));
         if (chunk == 0)
             break;
         received += chunk;
     } while (received < total);
 
     if (received == total)
-        throw std::runtime_error("Response too large");
+        throw std::runtime_error(XORSTR("Response too large"));
 
     return std::string(buffer_rs.get());
 }

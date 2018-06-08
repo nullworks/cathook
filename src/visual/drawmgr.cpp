@@ -21,13 +21,13 @@ void render_cheat_visuals()
     }
     //    xoverlay_draw_rect(300, 300, 100, 100, xoverlay_rgba(200, 100, 100,
     //    255));
-    // draw_api::draw_string(100, 100, "Testing", fonts::main_font,
+    // draw_api::draw_string(100, 100, XORSTR("Testing"), fonts::main_font,
     // colors::white);
     //    static draw_api::font_handle_t fh = draw_api::create_font(DATA_PATH
-    //    "/fonts/tf2build.ttf", 14); xoverlay_draw_string(100, 100,
-    //    "TestingSTR", fh.handle, *reinterpret_cast<const xoverlay_rgba_t
+    //    XORSTR("/fonts/tf2build.ttf"), 14); xoverlay_draw_string(100, 100,
+    //    XORSTR("TestingSTR"), fh.handle, *reinterpret_cast<const xoverlay_rgba_t
     //    *>(&colors::white), 0, 0);
-    // xoverlay_draw_string_with_outline(100, 20, "Testing2", )
+    // xoverlay_draw_string_with_outline(100, 20, XORSTR("Testing2"), )
     {
         PROF_SECTION(DrawCheatVisuals);
         DrawCheatVisuals();
@@ -49,12 +49,12 @@ void BeginCheatVisuals()
 
 std::mutex drawing_mutex;
 
-static CatVar info_text(CV_SWITCH, "info", "1", "Show info",
-                        "Show cathook version in top left corner");
-static CatVar info_text_min(CV_SWITCH, "info_min", "0", "Show minimal info",
-                            "Only show cathook title in top left corner");
-static CatVar enable_logo(CV_SWITCH, "nullcore_mode_logo", "1",
-                          "Enable Nullcore watermark", "");
+static CatVar info_text(CV_SWITCH, XORSTR("info"), XORSTR("1"), XORSTR("Show info"),
+                        XORSTR("Show cathook version in top left corner"));
+static CatVar info_text_min(CV_SWITCH, XORSTR("info_min"), XORSTR("0"), XORSTR("Show minimal info"),
+                            XORSTR("Only show cathook title in top left corner"));
+static CatVar enable_logo(CV_SWITCH, XORSTR("nullcore_mode_logo"), XORSTR("1"),
+                          XORSTR("Enable Nullcore watermark"), XORSTR(""));
 
 void DrawCheatVisuals()
 {
@@ -71,7 +71,7 @@ void DrawCheatVisuals()
         PROF_SECTION(PT_info_text);
         if (info_text)
         {
-            AddSideString("cathook by nullifiedcat", colors::RainbowCurrent());
+            AddSideString(XORSTR("cathook by nullifiedcat"), colors::RainbowCurrent());
             if (!info_text_min)
             {
                 AddSideString(hack::GetVersion(),
@@ -79,9 +79,9 @@ void DrawCheatVisuals()
                 AddSideString(hack::GetType(), GUIColor()); //  Compile type
 #if ENABLE_GUI
                 AddSideString(
-                    "Press 'INSERT' or 'F11' key to open/close cheat menu.",
+                    XORSTR("Press 'INSERT' or 'F11' key to open/close cheat menu."),
                     GUIColor());
-                AddSideString("Use mouse to navigate in menu.", GUIColor());
+                AddSideString(XORSTR("Use mouse to navigate in menu."), GUIColor());
 #endif
                 if (!g_IEngine->IsInGame()
 #if ENABLE_GUI
@@ -93,14 +93,14 @@ void DrawCheatVisuals()
                 {
                     name_s = force_name.GetString();
                     if (name_s.length() < 3)
-                        name_s = "*Not Set*";
+                        name_s = XORSTR("*Not Set*");
                     reason_s   = disconnect_reason.GetString();
                     if (reason_s.length() < 3)
-                        reason_s = "*Not Set*";
-                    AddSideString(""); // foolish
-                    AddSideString(format("Custom Name: ", name_s), GUIColor());
+                        reason_s = XORSTR("*Not Set*");
+                    AddSideString(XORSTR("")); // foolish
+                    AddSideString(format(XORSTR("Custom Name: "), name_s), GUIColor());
                     AddSideString(
-                        format("Custom Disconnect Reason: ", reason_s),
+                        format(XORSTR("Custom Disconnect Reason: "), reason_s),
                         GUIColor());
                 }
             }
@@ -108,7 +108,7 @@ void DrawCheatVisuals()
     }
     if (spectator_target)
     {
-        AddCenterString("Press SPACE to stop spectating");
+        AddCenterString(XORSTR("Press SPACE to stop spectating"));
     }
     if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid)
     {

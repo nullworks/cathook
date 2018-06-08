@@ -10,8 +10,8 @@
 #include "hitrate.hpp"
 #include "hack.hpp"
 
-static CatVar cursor_fix_experimental(CV_SWITCH, "experimental_cursor_fix", "1",
-                                      "Cursor fix");
+static CatVar cursor_fix_experimental(CV_SWITCH, XORSTR("experimental_cursor_fix"), XORSTR("1"),
+                                      XORSTR("Cursor fix"));
 
 namespace hooked_methods
 {
@@ -61,7 +61,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
             std::lock_guard<std::mutex> guard(hack::command_stack_mutex);
             while (!hack::command_stack().empty())
             {
-                // logging::Info("executing %s",
+                // logging::Info(XORSTR("executing %s"),
                 //              hack::command_stack().top().c_str());
                 g_IEngine->ClientCmd_Unrestricted(
                     hack::command_stack().top().c_str());

@@ -14,11 +14,11 @@ namespace ac
 namespace aimbot
 {
 
-static CatVar enabled(CV_SWITCH, "ac_aimbot", "1", "Detect Aimbot",
-                      "Is not recommended");
-static CatVar detect_angle(CV_FLOAT, "ac_aimbot_angle", "30", "Aimbot Angle");
-static CatVar detections_warning(CV_INT, "ac_aimbot_detections", "3",
-                                 "Min detections to warn");
+static CatVar enabled(CV_SWITCH, XORSTR("ac_aimbot"), XORSTR("1"), XORSTR("Detect Aimbot"),
+                      XORSTR("Is not recommended"));
+static CatVar detect_angle(CV_FLOAT, XORSTR("ac_aimbot_angle"), XORSTR("30"), XORSTR("Aimbot Angle"));
+static CatVar detections_warning(CV_INT, XORSTR("ac_aimbot_detections"), XORSTR("3"),
+                                 XORSTR("Min detections to warn"));
 
 ac_data data_table[32];
 int amount[32];
@@ -59,7 +59,7 @@ void Update(CachedEntity *player)
                 wep->m_iClassID() != CL_CLASS(CTFFlameThrower))
             {
                 am++;
-                // logging::Info("[ac] %d deviation %.2f #%d", player->m_IDX,
+                // logging::Info(XORSTR("[ac] %d deviation %.2f #%d"), player->m_IDX,
                 // deviation, data.detections);
                 player_info_t info;
                 g_IEngine->GetPlayerInfo(player->m_IDX, &info);
@@ -71,7 +71,7 @@ void Update(CachedEntity *player)
                 if (++data.detections > int(detections_warning))
                 {
 
-                    const char *wp_name = "[unknown]";
+                    const char *wp_name = XORSTR("[unknown]");
                     int widx = CE_INT(player, netvar.hActiveWeapon) & 0xFFF;
                     if (IDX_GOOD(widx))
                     {
@@ -79,8 +79,8 @@ void Update(CachedEntity *player)
                         wp_name              = weapon->InternalEntity()
                                       ->GetClientClass()
                                       ->GetName();
-                        /*logging::Info("%d", weapon->m_IDX);
-                        logging::Info("%s", );
+                        /*logging::Info(XORSTR("%d"), weapon->m_IDX);
+                        logging::Info(XORSTR("%s"), );
                         IClientEntity* e_weapon = RAW_ENT(weapon);
                         if (CE_GOOD(weapon)) {
                             const char* wname = vfunc<const
@@ -89,9 +89,9 @@ void Update(CachedEntity *player)
                         }*/
                     }
                     hacks::shared::anticheat::Accuse(
-                        player->m_IDX, "Aimbot",
-                        format("Weapon: ", wp_name, " | Deviation: ", deviation,
-                               "° | ", data.detections));
+                        player->m_IDX, XORSTR("Aimbot"),
+                        format(XORSTR("Weapon: "), wp_name, XORSTR(" | Deviation: "), deviation,
+                               XORSTR("° | "), data.detections));
                 }
             }
         }
@@ -102,11 +102,11 @@ void Event(KeyValues *event)
 {
     if (not enabled)
         return;
-    if (!strcmp(event->GetName(), "player_death") ||
-        !strcmp(event->GetName(), "player_hurt"))
+    if (!strcmp(event->GetName(), XORSTR("player_death")) ||
+        !strcmp(event->GetName(), XORSTR("player_hurt")))
     {
-        int attacker = event->GetInt("attacker");
-        int victim   = event->GetInt("userid");
+        int attacker = event->GetInt(XORSTR("attacker"));
+        int victim   = event->GetInt(XORSTR("userid"));
         int eid      = g_IEngine->GetPlayerForUserID(attacker);
         int vid      = g_IEngine->GetPlayerForUserID(victim);
         if (eid > 0 && eid < 33)
@@ -116,7 +116,7 @@ void Event(KeyValues *event)
             if (victim->m_vecOrigin().DistTo(attacker->m_vecOrigin()) > 250)
             {
                 data_table[eid - 1].check_timer = 1;
-                data_table[eid - 1].last_weapon = event->GetInt("weaponid");
+                data_table[eid - 1].last_weapon = event->GetInt(XORSTR("weaponid"));
             }
         }
     }

@@ -4,10 +4,10 @@ namespace fonts
 {
 unsigned long MENU                   = 0;
 unsigned long MENU_BIG               = 0;
-const std::vector<std::string> fonts = { "Tahoma Bold",  "Tahoma",
-                                         "TF2 Build",    "Verdana",
-                                         "Verdana Bold", "Arial",
-                                         "Courier New",  "Ubuntu Mono Bold" };
+const std::vector<std::string> fonts = { XORSTR("Tahoma Bold"),  XORSTR("Tahoma"),
+                                         XORSTR("TF2 Build"),    XORSTR("Verdana"),
+                                         XORSTR("Verdana Bold"), XORSTR("Arial"),
+                                         XORSTR("Courier New"),  XORSTR("Ubuntu Mono Bold") };
 CatEnum family_enum(fonts);
 }
 
@@ -104,7 +104,7 @@ void draw::String(unsigned long font, int x, int y, int color, int shadow,
     if (newlined)
     {
         memset(ch, 0, sizeof(char) * 512);
-        GetStringLength(font, "W", w, h);
+        GetStringLength(font, XORSTR("W"), w, h);
         strncpy(ch, text, 511);
         s = 0;
         n = 0;
@@ -133,8 +133,8 @@ void draw::String(unsigned long font, int x, int y, int color, int shadow,
 {
     draw::String(font, x, y, color, shadow, text.c_str());
 }
-CatVar fast_outline(CV_SWITCH, "fast_outline", "0", "Fast font outline",
-                    "Use only single repaint to increase performance");
+CatVar fast_outline(CV_SWITCH, XORSTR("fast_outline"), XORSTR("0"), XORSTR("Fast font outline"),
+                    XORSTR("Use only single repaint to increase performance"));
 void draw::WString(unsigned long font, int x, int y, int color, int shadow,
                    const wchar_t *text)
 {

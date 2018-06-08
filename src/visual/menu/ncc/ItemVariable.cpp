@@ -16,7 +16,7 @@ namespace ncc
 {
 
 ItemVariable::ItemVariable(CatVar &variable)
-    : Item("ncc_item_variable_" + variable.name), catvar(variable)
+    : Item(XORSTR("ncc_item_variable_") + variable.name), catvar(variable)
 {
 }
 
@@ -28,7 +28,7 @@ void ItemVariable::Update()
             if (catvar.desc_long.c_str())
                 if (!catvar.desc_long.empty())
                     if (catvar.desc_long.length() && IsHovered() &&
-                        catvar.desc_long != "no description")
+                        catvar.desc_long != XORSTR("no description"))
                         ShowTooltip(catvar.desc_long);
 }
 
@@ -40,7 +40,7 @@ void ItemVariable::Change(float amount)
     {
     case CV_SWITCH:
     {
-        if (catvar.desc_long != "INVALID COMMAND")
+        if (catvar.desc_long != XORSTR("INVALID COMMAND"))
             catvar = !catvar;
     }
     break;
@@ -90,7 +90,7 @@ void ItemVariable::OnMousePress()
             capturing = true;
     }
     if (catvar.type == CV_SWITCH)
-        if (catvar.desc_long != "INVALID COMMAND")
+        if (catvar.desc_long != XORSTR("INVALID COMMAND"))
             catvar = !catvar;
 }
 
@@ -186,13 +186,13 @@ void ItemVariable::OnKeyPress(ButtonCode_t key, bool repeat)
 void ItemVariable::Draw(int x, int y)
 {
     Item::Draw(x, y);
-    std::string val = "[UNDEFINED]";
+    std::string val = XORSTR("[UNDEFINED]");
     switch (catvar.type)
     {
     case CV_SWITCH:
     {
-        if (catvar.desc_long != "INVALID COMMAND")
-            val = catvar ? "ON" : "OFF";
+        if (catvar.desc_long != XORSTR("INVALID COMMAND"))
+            val = catvar ? XORSTR("ON") : XORSTR("OFF");
     }
     break;
     case CV_INT:
@@ -219,7 +219,7 @@ void ItemVariable::Draw(int x, int y)
     {
         if (capturing)
         {
-            val = "[PRESS A KEY]";
+            val = XORSTR("[PRESS A KEY]");
         }
         else
         {
@@ -234,14 +234,14 @@ void ItemVariable::Draw(int x, int y)
             }
             else
             {
-                val = "[CLICK TO SET]";
+                val = XORSTR("[CLICK TO SET]");
             }
         }
     }
     break;
     }
     draw::String(menu::ncc::font_item, x + 2, y, colorsint::white, 2,
-                 format(catvar.desc_short, ": ", val));
+                 format(catvar.desc_short, XORSTR(": "), val));
 }
 }
 }

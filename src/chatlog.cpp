@@ -15,12 +15,12 @@
 namespace chatlog
 {
 
-static CatVar enabled(CV_SWITCH, "chat_log", "0", "Chat log",
-                      "Log chat to file");
-static CatVar dont_log_spam(CV_SWITCH, "chat_log_nospam", "1", "No Spam",
-                            "Don't log your messages if spam is active");
-static CatVar dont_log_ipc(CV_SWITCH, "chat_log_noipc", "1", "No IPC",
-                           "Don't log messages sent by bots");
+static CatVar enabled(CV_SWITCH, XORSTR("chat_log"), XORSTR("0"), XORSTR("Chat log"),
+                      XORSTR("Log chat to file"));
+static CatVar dont_log_spam(CV_SWITCH, XORSTR("chat_log_nospam"), XORSTR("1"), XORSTR("No Spam"),
+                            XORSTR("Don't log your messages if spam is active"));
+static CatVar dont_log_ipc(CV_SWITCH, XORSTR("chat_log_noipc"), XORSTR("1"), XORSTR("No IPC"),
+                           XORSTR("Don't log messages sent by bots"));
 
 class csv_stream
 {
@@ -41,15 +41,15 @@ public:
     }
     bool open()
     {
-        logging::Info("csvstream: Trying to open log file");
+        logging::Info(XORSTR("csvstream: Trying to open log file"));
         uid_t uid         = geteuid();
         struct passwd *pw = getpwuid(uid);
-        std::string uname = "";
+        std::string uname = XORSTR("");
         if (pw)
         {
             uname = std::string(pw->pw_name);
         }
-        stream.open(DATA_PATH "/chat-" + uname + ".csv",
+        stream.open(DATA_PATH XORSTR("/chat-") + uname + XORSTR(".csv"),
                     std::ios::out | std::ios::app);
         return stream.good();
     }
@@ -65,22 +65,22 @@ csv_stream &operator<<(csv_stream &log, const std::string &string)
 {
     if (!log.stream.good())
     {
-        logging::Info("[ERROR] csvstream is not open!");
+        logging::Info(XORSTR("[ERROR] csvstream is not open!"));
         if (!log.open())
             return log;
     }
     if (log.columns)
         log.stream << ',';
-    log.stream << '"';
+    log.stream << 'XORSTR("';
     for (const auto &i : string)
     {
-        if (i == '"')
+        if (i == 'XORSTR("')
         {
-            log.stream << '"';
+            log.stream << 'XORSTR("';
         }
         log.stream << i;
     }
-    log.stream << '"';
+    log.stream << 'XORSTR("';
     log.columns++;
     return log;
 }
@@ -89,7 +89,7 @@ csv_stream &operator<<(csv_stream &log, const csv_stream::end_t &end)
 {
     if (!log.stream.good())
     {
-        logging::Info("[ERROR] csvstream is not open!");
+        logging::Info(XORSTR("[ERROR] csvstream is not open!"));
         if (!log.open())
             return log;
     }

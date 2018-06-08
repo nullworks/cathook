@@ -6,10 +6,10 @@
 #include <MiscTemporary.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar no_arms(CV_SWITCH, "no_arms", "0", "No Arms",
-                      "Removes arms from first person");
-static CatVar no_hats(CV_SWITCH, "no_hats", "0", "No Hats",
-                      "Removes non-stock hats");
+static CatVar no_arms(CV_SWITCH, XORSTR("no_arms"), XORSTR("0"), XORSTR("No Arms"),
+                      XORSTR("Removes arms from first person"));
+static CatVar no_hats(CV_SWITCH, XORSTR("no_hats"), XORSTR("0"), XORSTR("No Hats"),
+                      XORSTR("Removes non-stock hats"));
 
 namespace hooked_methods
 {
@@ -41,12 +41,12 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_,
             if (name)
             {
                 sname = name;
-                if (no_arms && sname.find("arms") != std::string::npos)
+                if (no_arms && sname.find(XORSTR("arms")) != std::string::npos)
                 {
                     return;
                 }
                 else if (no_hats &&
-                         sname.find("player/items") != std::string::npos)
+                         sname.find(XORSTR("player/items")) != std::string::npos)
                 {
                     return;
                 }

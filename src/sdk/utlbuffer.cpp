@@ -60,21 +60,21 @@ public:
 // List of character conversions
 //-----------------------------------------------------------------------------
 BEGIN_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
-                             "\"", '\\'){ '\n', "n" },
-    { '\t', "t" }, { '\v', "v" }, { '\b', "b" }, { '\r', "r" }, { '\f', "f" },
-    { '\a', "a" }, { '\\', "\\" }, { '\?', "\?" }, { '\'', "\'" },
-    { '\"', "\"" },
+                             XORSTR("\""), '\\'){ '\n', XORSTR("n") },
+    { '\t', XORSTR("t") }, { '\v', XORSTR("v") }, { '\b', XORSTR("b") }, { '\r', XORSTR("r") }, { '\f', XORSTR("f") },
+    { '\a', XORSTR("a") }, { '\\', XORSTR("\\" }, { '\?', ")\?XORSTR(" }, { '\'', ")\'XORSTR(" },
+    { '\"', XORSTR("\"") },
     END_CUSTOM_CHAR_CONVERSION(CUtlCStringConversion, s_StringCharConversion,
-                               "\"", '\\')
+                               XORSTR("\""), '\\')
 
         CUtlCharConversion *GetCStringCharConversion()
 {
     return &s_StringCharConversion;
 }
 
-BEGIN_CUSTOM_CHAR_CONVERSION(CUtlNoEscConversion, s_NoEscConversion, "\"",
-                             0x7F){ 0x7F, "" },
-    END_CUSTOM_CHAR_CONVERSION(CUtlNoEscConversion, s_NoEscConversion, "\"",
+BEGIN_CUSTOM_CHAR_CONVERSION(CUtlNoEscConversion, s_NoEscConversion, XORSTR("\""),
+                             0x7F){ 0x7F, XORSTR("") },
+    END_CUSTOM_CHAR_CONVERSION(CUtlNoEscConversion, s_NoEscConversion, XORSTR("\""),
                                0x7F)
 
         CUtlCharConversion *GetNoEscCharConversion()
@@ -547,8 +547,8 @@ bool CUtlBuffer::PeekStringMatch(int nOffset, const char *pString, int nLen)
 }
 
 //-----------------------------------------------------------------------------
-// This version of PeekStringLength converts \" to \\ and " to \, etc.
-// It also reads a " at the beginning and end of the string
+// This version of PeekStringLength converts \" to \\ and XORSTR(" to \, etc.
+// It also reads a XORSTR(" at the beginning and end of the string
 //-----------------------------------------------------------------------------
 int CUtlBuffer::PeekDelimitedStringLength(CUtlCharConversion *pConv,
                                           bool bActualSize)
@@ -567,7 +567,7 @@ int CUtlBuffer::PeekDelimitedStringLength(CUtlCharConversion *pConv,
                          pConv->GetDelimiterLength()))
         return 0;
 
-    // Try to read ending ", but don't accept \"
+    // Try to read ending XORSTR(", but don't accept \"
     int nActualStart = nOffset;
     nOffset += pConv->GetDelimiterLength();
     int nLen = 1; // Starts at 1 for the '\0' termination
@@ -694,8 +694,8 @@ void CUtlBuffer::GetLine(char *pLine, int nMaxChars)
 }
 
 //-----------------------------------------------------------------------------
-// This version of GetString converts \ to \\ and " to \", etc.
-// It also places " at the beginning and end of the string
+// This version of GetString converts \ to \\ and XORSTR(" to \", etc.
+// It also places XORSTR(" at the beginning and end of the string
 //-----------------------------------------------------------------------------
 char CUtlBuffer::GetDelimitedCharInternal(CUtlCharConversion *pConv)
 {
@@ -1380,8 +1380,8 @@ void CUtlBuffer::PutString(const char *pString)
 }
 
 //-----------------------------------------------------------------------------
-// This version of PutString converts \ to \\ and " to \", etc.
-// It also places " at the beginning and end of the string
+// This version of PutString converts \ to \\ and XORSTR(" to \", etc.
+// It also places XORSTR(" at the beginning and end of the string
 //-----------------------------------------------------------------------------
 inline void CUtlBuffer::PutDelimitedCharInternal(CUtlCharConversion *pConv,
                                                  char c)
@@ -1634,7 +1634,7 @@ bool CUtlBuffer::ConvertCRLF(CUtlBuffer &outBuf)
         const char *pCurr = &pBase[nCurrGet];
         if (bFromCRLF)
         {
-            const char *pNext = Q_strnistr(pCurr, "\r\n", nInCount - nCurrGet);
+            const char *pNext = Q_strnistr(pCurr, XORSTR("\r\n"), nInCount - nCurrGet);
             if (!pNext)
             {
                 outBuf.Put(pCurr, nInCount - nCurrGet);

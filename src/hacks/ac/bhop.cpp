@@ -13,8 +13,8 @@ namespace ac
 namespace bhop
 {
 
-static CatVar bhop_detect_count(CV_INT, "ac_bhop_count", "4",
-                                "BHop Detections");
+static CatVar bhop_detect_count(CV_INT, XORSTR("ac_bhop_count"), XORSTR("4"),
+                                XORSTR("BHop Detections"));
 
 ac_data data_table[32]{};
 
@@ -58,13 +58,13 @@ void Update(CachedEntity *player)
                 // TODO FIXME
                 if (data.detections >= int(bhop_detect_count))
                 {
-                    logging::Info("[%d] Suspected BHop: %d", player->m_IDX,
+                    logging::Info(XORSTR("[%d] Suspected BHop: %d"), player->m_IDX,
                                   data.detections);
                     if ((tickcount - data.last_accusation) > 600)
                     {
                         hacks::shared::anticheat::Accuse(
-                            player->m_IDX, "Bunnyhop",
-                            format("Perfect jumps = ", data.detections));
+                            player->m_IDX, XORSTR("Bunnyhop"),
+                            format(XORSTR("Perfect jumps = "), data.detections));
                         data.last_accusation = tickcount;
                     }
                 }

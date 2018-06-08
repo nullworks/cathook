@@ -15,57 +15,57 @@ namespace shared
 namespace antiaim
 {
 
-CatVar communicate(CV_SWITCH, "identify", "0", "identify",
-                   "Auto identify for other cathook users");
-CatVar enabled(CV_SWITCH, "aa_enabled", "0", "Anti-Aim",
-               "Master AntiAim switch");
-static CatVar trueang(CV_SWITCH, "aa_realfakes", "0", "Real fakes",
-                      "Do real fakeangles (Unresolveable)");
-static CatVar yaw(CV_FLOAT, "aa_yaw", "0.0", "Yaw", "Static yaw (left/right)",
+CatVar communicate(CV_SWITCH, XORSTR("identify"), XORSTR("0"), XORSTR("identify"),
+                   XORSTR("Auto identify for other cathook users"));
+CatVar enabled(CV_SWITCH, XORSTR("aa_enabled"), XORSTR("0"), XORSTR("Anti-Aim"),
+               XORSTR("Master AntiAim switch"));
+static CatVar trueang(CV_SWITCH, XORSTR("aa_realfakes"), XORSTR("0"), XORSTR("Real fakes"),
+                      XORSTR("Do real fakeangles (Unresolveable)"));
+static CatVar yaw(CV_FLOAT, XORSTR("aa_yaw"), XORSTR("0.0"), XORSTR("Yaw"), XORSTR("Static yaw (left/right)"),
                   360.0);
-static CatVar pitch(CV_FLOAT, "aa_pitch", "-89.0", "Pitch",
-                    "Static pitch (up/down)", -89.0, 89.0);
-static CatVar yaw_real(CV_FLOAT, "aa_yaw_real", "0.0", "Real Yaw",
-                       "Static yaw (left/right)", 360.0);
-static CatVar pitch_real(CV_FLOAT, "aa_pitch_real", "-89.0", "Real Pitch",
-                         "Static pitch (up/down)", -89.0, 89.0);
-static CatEnum yaw_mode_enum({ "KEEP", "STATIC", "JITTER", "BIGRANDOM",
-                               "RANDOM", "SPIN", "OFFSETKEEP", "EDGE", "HECK",
-                               "FAKESIDEWAYS" });
-static CatEnum pitch_mode_enum({ "KEEP", "STATIC", "JITTER", "RANDOM", "FLIP",
-                                 "FAKEFLIP", "FAKEUP", "FAKEDOWN", "FAKECENTER",
-                                 "UP", "DOWN", "HECK" });
-CatVar yaw_mode(yaw_mode_enum, "aa_yaw_mode", "0", "Yaw mode", "Yaw mode");
-static CatVar pitch_mode(pitch_mode_enum, "aa_pitch_mode", "0", "Pitch mode",
-                         "Pitch mode");
-static CatVar true_yaw_mode(yaw_mode_enum, "aa_yaw_mode_real", "0",
-                            "The Real Yaw", "Yaw mode");
-static CatVar true_pitch_mode(pitch_mode_enum, "aa_pitch_mode_real", "0",
-                              "The Real Pitch", "Pitch mode");
-static CatVar roll(CV_FLOAT, "aa_roll", "0", "Roll",
-                   "Roll angle (viewangles.z)", -180, 180);
+static CatVar pitch(CV_FLOAT, XORSTR("aa_pitch"), XORSTR("-89.0"), XORSTR("Pitch"),
+                    XORSTR("Static pitch (up/down)"), -89.0, 89.0);
+static CatVar yaw_real(CV_FLOAT, XORSTR("aa_yaw_real"), XORSTR("0.0"), XORSTR("Real Yaw"),
+                       XORSTR("Static yaw (left/right)"), 360.0);
+static CatVar pitch_real(CV_FLOAT, XORSTR("aa_pitch_real"), XORSTR("-89.0"), XORSTR("Real Pitch"),
+                         XORSTR("Static pitch (up/down)"), -89.0, 89.0);
+static CatEnum yaw_mode_enum({ XORSTR("KEEP"), XORSTR("STATIC"), XORSTR("JITTER"), XORSTR("BIGRANDOM"),
+                               XORSTR("RANDOM"), XORSTR("SPIN"), XORSTR("OFFSETKEEP"), XORSTR("EDGE"), XORSTR("HECK"),
+                               XORSTR("FAKESIDEWAYS") });
+static CatEnum pitch_mode_enum({ XORSTR("KEEP"), XORSTR("STATIC"), XORSTR("JITTER"), XORSTR("RANDOM"), XORSTR("FLIP"),
+                                 XORSTR("FAKEFLIP"), XORSTR("FAKEUP"), XORSTR("FAKEDOWN"), XORSTR("FAKECENTER"),
+                                 XORSTR("UP"), XORSTR("DOWN"), XORSTR("HECK") });
+CatVar yaw_mode(yaw_mode_enum, XORSTR("aa_yaw_mode"), XORSTR("0"), XORSTR("Yaw mode"), XORSTR("Yaw mode"));
+static CatVar pitch_mode(pitch_mode_enum, XORSTR("aa_pitch_mode"), XORSTR("0"), XORSTR("Pitch mode"),
+                         XORSTR("Pitch mode"));
+static CatVar true_yaw_mode(yaw_mode_enum, XORSTR("aa_yaw_mode_real"), XORSTR("0"),
+                            XORSTR("The Real Yaw"), XORSTR("Yaw mode"));
+static CatVar true_pitch_mode(pitch_mode_enum, XORSTR("aa_pitch_mode_real"), XORSTR("0"),
+                              XORSTR("The Real Pitch"), XORSTR("Pitch mode"));
+static CatVar roll(CV_FLOAT, XORSTR("aa_roll"), XORSTR("0"), XORSTR("Roll"),
+                   XORSTR("Roll angle (viewangles.z)"), -180, 180);
 static CatVar
-    no_clamping(CV_SWITCH, "aa_no_clamp", "0", "Don't clamp angles",
-                "Use this with STATIC mode for unclamped manual angles");
-static CatVar spin(CV_FLOAT, "aa_spin", "10.0", "Spin speed",
-                   "Spin speed (degrees/second)");
+    no_clamping(CV_SWITCH, XORSTR("aa_no_clamp"), XORSTR("0"), XORSTR("Don't clamp angles"),
+                XORSTR("Use this with STATIC mode for unclamped manual angles"));
+static CatVar spin(CV_FLOAT, XORSTR("aa_spin"), XORSTR("10.0"), XORSTR("Spin speed"),
+                   XORSTR("Spin speed (degrees/second)"));
 
-static CatVar aaaa_enabled(CV_SWITCH, "aa_aaaa_enabled", "0", "Enable AAAA",
-                           "Enable Anti-Anti-Anti-Aim (Overrides AA Pitch)");
-static CatVar aaaa_interval(CV_FLOAT, "aa_aaaa_interval", "0", "Interval",
-                            "Interval in seconds, 0 = random");
-static CatVar aaaa_interval_random_high(CV_FLOAT, "aa_aaaa_interval_high", "15",
-                                        "Interval Ceiling",
-                                        "Upper bound for random AAAA interval");
-static CatVar aaaa_interval_random_low(CV_FLOAT, "aa_aaaa_interval_low", "3",
-                                       "Interval Floor",
-                                       "Lower bound for random AAAA interval");
-static CatEnum aaaa_modes_enum({ "(FAKE)UP", "(FAKE)DOWN" });
-static CatVar aaaa_mode(aaaa_modes_enum, "aa_aaaa_mode", "0", "Mode",
-                        "Anti-Anti-Anti-Aim Mode");
-static CatVar aaaa_flip_key(CV_KEY, "aa_aaaa_flip_key", "0", "Flip key",
-                            "If you press that key, current AA will change");
-static CatVar test(CV_KEY, "aa_test", "0", "debug", "test");
+static CatVar aaaa_enabled(CV_SWITCH, XORSTR("aa_aaaa_enabled"), XORSTR("0"), XORSTR("Enable AAAA"),
+                           XORSTR("Enable Anti-Anti-Anti-Aim (Overrides AA Pitch)"));
+static CatVar aaaa_interval(CV_FLOAT, XORSTR("aa_aaaa_interval"), XORSTR("0"), XORSTR("Interval"),
+                            XORSTR("Interval in seconds, 0 = random"));
+static CatVar aaaa_interval_random_high(CV_FLOAT, XORSTR("aa_aaaa_interval_high"), XORSTR("15"),
+                                        XORSTR("Interval Ceiling"),
+                                        XORSTR("Upper bound for random AAAA interval"));
+static CatVar aaaa_interval_random_low(CV_FLOAT, XORSTR("aa_aaaa_interval_low"), XORSTR("3"),
+                                       XORSTR("Interval Floor"),
+                                       XORSTR("Lower bound for random AAAA interval"));
+static CatEnum aaaa_modes_enum({ XORSTR("(FAKE)UP"), XORSTR("(FAKE)DOWN") });
+static CatVar aaaa_mode(aaaa_modes_enum, XORSTR("aa_aaaa_mode"), XORSTR("0"), XORSTR("Mode"),
+                        XORSTR("Anti-Anti-Anti-Aim Mode"));
+static CatVar aaaa_flip_key(CV_KEY, XORSTR("aa_aaaa_flip_key"), XORSTR("0"), XORSTR("Flip key"),
+                            XORSTR("If you press that key, current AA will change"));
+static CatVar test(CV_KEY, XORSTR("aa_test"), XORSTR("0"), XORSTR("debug"), XORSTR("test"));
 float cur_yaw  = 0.0f;
 int safe_space = 0;
 

@@ -16,10 +16,10 @@ namespace autotaunt
 {
 
 static CatVar enabled(
-    CV_SWITCH, "autotaunt", "0", "AutoTaunt",
-    "Automatically taunt after killing an enemy, use with walkbots I guess");
-static CatVar chance(CV_FLOAT, "autotaunt_chance", "8", "AutoTaunt chance",
-                     "Chance of taunting after kill. 0 to 100.", 0.0f, 100.0f);
+    CV_SWITCH, XORSTR("autotaunt"), XORSTR("0"), XORSTR("AutoTaunt"),
+    XORSTR("Automatically taunt after killing an enemy, use with walkbots I guess"));
+static CatVar chance(CV_FLOAT, XORSTR("autotaunt_chance"), XORSTR("8"), XORSTR("AutoTaunt chance"),
+                     XORSTR("Chance of taunting after kill. 0 to 100."), 0.0f, 100.0f);
 
 class AutoTauntListener : public IGameEventListener2
 {
@@ -30,12 +30,12 @@ public:
         {
             return;
         }
-        if (g_IEngine->GetPlayerForUserID(event->GetInt("attacker")) ==
+        if (g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("attacker"))) ==
             g_IEngine->GetLocalPlayer())
         {
             if (RandomFloat(0, 100) <= float(chance))
             {
-                hack::ExecuteCommand("taunt");
+                hack::ExecuteCommand(XORSTR("taunt"));
             }
         }
     }
@@ -45,7 +45,7 @@ AutoTauntListener listener;
 
 // TODO remove event listener when uninjecting?
 InitRoutine init([]() {
-    g_IEventManager2->AddListener(&listener, "player_death", false);
+    g_IEventManager2->AddListener(&listener, XORSTR("player_death"), false);
 });
 }
 }

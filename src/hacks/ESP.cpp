@@ -16,139 +16,139 @@ namespace esp
 {
 
 // Main Switch
-static CatVar enabled(CV_SWITCH, "esp_enabled", "0", "ESP",
-                      "Master ESP switch");
+static CatVar enabled(CV_SWITCH, XORSTR("esp_enabled"), XORSTR("0"), XORSTR("ESP"),
+                      XORSTR("Master ESP switch"));
 // Box esp + Options
-static CatEnum box_esp_enum({ "None", "Normal", "Corners" });
-static CatVar box_esp(box_esp_enum, "esp_box", "2", "Box", "Draw a 2D box");
-static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10",
-                              "Corner Size");
-static CatVar box_3d_player(CV_SWITCH, "esp_3d_players", "0",
-                            "Draw 3D box over players");
-static CatVar box_3d_building(CV_SWITCH, "esp_3d_buildings", "1",
-                              "Draw 3D box over buildings");
+static CatEnum box_esp_enum({ XORSTR("None"), XORSTR("Normal"), XORSTR("Corners") });
+static CatVar box_esp(box_esp_enum, XORSTR("esp_box"), XORSTR("2"), XORSTR("Box"), XORSTR("Draw a 2D box"));
+static CatVar box_corner_size(CV_INT, XORSTR("esp_box_corner_size"), XORSTR("10"),
+                              XORSTR("Corner Size"));
+static CatVar box_3d_player(CV_SWITCH, XORSTR("esp_3d_players"), XORSTR("0"),
+                            XORSTR("Draw 3D box over players"));
+static CatVar box_3d_building(CV_SWITCH, XORSTR("esp_3d_buildings"), XORSTR("1"),
+                              XORSTR("Draw 3D box over buildings"));
 // Tracers
-static CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
+static CatEnum tracers_enum({ XORSTR("OFF"), XORSTR("CENTER"), XORSTR("BOTTOM") });
 static CatVar
-    tracers(tracers_enum, "esp_tracers", "0", "Tracers",
-            "SDraws a line from the player to a position on your screen");
+    tracers(tracers_enum, XORSTR("esp_tracers"), XORSTR("0"), XORSTR("Tracers"),
+            XORSTR("SDraws a line from the player to a position on your screen"));
 // Emoji Esp
-static CatEnum emoji_esp_enum({ "None", "Joy", "Thinking" });
-static CatVar emoji_esp(emoji_esp_enum, "esp_emoji", "0", "Emoji ESP",
-                        "Draw emoji on peopels head");
-static CatVar emoji_ok(CV_SWITCH, "esp_okhand", "0", "ok_hand",
-                       "Draw ok_hand on hands");
-static CatVar emoji_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size",
-                             "Emoji size");
-static CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1",
-                                "Emoji ESP Scaling", "Emoji ESP Scaling");
+static CatEnum emoji_esp_enum({ XORSTR("None"), XORSTR("Joy"), XORSTR("Thinking") });
+static CatVar emoji_esp(emoji_esp_enum, XORSTR("esp_emoji"), XORSTR("0"), XORSTR("Emoji ESP"),
+                        XORSTR("Draw emoji on peopels head"));
+static CatVar emoji_ok(CV_SWITCH, XORSTR("esp_okhand"), XORSTR("0"), XORSTR("ok_hand"),
+                       XORSTR("Draw ok_hand on hands"));
+static CatVar emoji_esp_size(CV_FLOAT, XORSTR("esp_emoji_size"), XORSTR("32"), XORSTR("Emoji ESP Size"),
+                             XORSTR("Emoji size"));
+static CatVar emoji_esp_scaling(CV_SWITCH, XORSTR("esp_emoji_scaling"), XORSTR("1"),
+                                XORSTR("Emoji ESP Scaling"), XORSTR("Emoji ESP Scaling"));
 static CatVar
-    emoji_min_size(CV_INT, "esp_emoji_min_size", "20", "Emoji ESP min size",
-                   "Minimum size for an emoji when you use auto scaling");
+    emoji_min_size(CV_INT, XORSTR("esp_emoji_min_size"), XORSTR("20"), XORSTR("Emoji ESP min size"),
+                   XORSTR("Minimum size for an emoji when you use auto scaling"));
 
 hitbox_cache::CachedHitbox *hitboxcache[32][18]{};
 // Other esp options
-static CatEnum show_health_enum({ "None", "Text", "Healthbar", "Both" });
-static CatVar show_health(show_health_enum, "esp_health", "3", "Health ESP",
-                          "Show enemy health");
-static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Draw Bones");
+static CatEnum show_health_enum({ XORSTR("None"), XORSTR("Text"), XORSTR("Healthbar"), XORSTR("Both") });
+static CatVar show_health(show_health_enum, XORSTR("esp_health"), XORSTR("3"), XORSTR("Health ESP"),
+                          XORSTR("Show enemy health"));
+static CatVar draw_bones(CV_SWITCH, XORSTR("esp_bones"), XORSTR("0"), XORSTR("Draw Bones"));
 static CatEnum
-    sightlines_enum({ "None", "Sniper Only",
-                      "All" }); // I ripped of lbox's choices cuz its nice
-static CatVar sightlines(sightlines_enum, "esp_sightlines", "0",
-                         "Show sightlines",
-                         "Displays a line of where players are looking");
-static CatEnum esp_text_position_enum({ "TOP RIGHT", "BOTTOM RIGHT", "CENTER",
-                                        "ABOVE", "BELOW" });
-static CatVar esp_text_position(esp_text_position_enum, "esp_text_position",
-                                "0", "Text position", "Defines text position");
+    sightlines_enum({ XORSTR("None"), XORSTR("Sniper Only"),
+                      XORSTR("All") }); // I ripped of lbox's choices cuz its nice
+static CatVar sightlines(sightlines_enum, XORSTR("esp_sightlines"), XORSTR("0"),
+                         XORSTR("Show sightlines"),
+                         XORSTR("Displays a line of where players are looking"));
+static CatEnum esp_text_position_enum({ XORSTR("TOP RIGHT"), XORSTR("BOTTOM RIGHT"), XORSTR("CENTER"),
+                                        XORSTR("ABOVE"), XORSTR("BELOW") });
+static CatVar esp_text_position(esp_text_position_enum, XORSTR("esp_text_position"),
+                                XORSTR("0"), XORSTR("Text position"), XORSTR("Defines text position"));
 static CatVar esp_expand(
-    CV_INT, "esp_expand", "0", "Expand Esp",
-    "Spreads out Box, health bar, and text from center"); // Note, check if this
+    CV_INT, XORSTR("esp_expand"), XORSTR("0"), XORSTR("Expand Esp"),
+    XORSTR("Spreads out Box, health bar, and text from center")); // Note, check if this
                                                           // should be int, it
                                                           // is being used by
                                                           // casting as float
 static CatVar
-    vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck",
-             "ESP visibility check - makes enemy info behind walls darker, "
-             "disable this if you get FPS drops");
+    vischeck(CV_SWITCH, XORSTR("esp_vischeck"), XORSTR("1"), XORSTR("VisCheck"),
+             XORSTR("ESP visibility check - makes enemy info behind walls darker, ")
+             XORSTR("disable this if you get FPS drops"));
 static CatVar
-    legit(CV_SWITCH, "esp_legit", "0", "Legit Mode",
-          "Don't show invisible enemies\nHides invisable enemies with "
-          "visibility enabled");
-static CatVar esp_font_scale(CV_INT, "esp_font_scale", "14", "ESP font scale");
+    legit(CV_SWITCH, XORSTR("esp_legit"), XORSTR("0"), XORSTR("Legit Mode"),
+          XORSTR("Don't show invisible enemies\nHides invisable enemies with ")
+          XORSTR("visibility enabled"));
+static CatVar esp_font_scale(CV_INT, XORSTR("esp_font_scale"), XORSTR("14"), XORSTR("ESP font scale"));
 // Selective esp options
-static CatVar local_esp(CV_SWITCH, "esp_local", "1", "ESP Local Player",
-                        "Shows local player ESP in thirdperson");
-static CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Building ESP",
-                        "Show buildings");
-static CatVar teammates(CV_SWITCH, "esp_teammates", "0", "ESP Teammates",
-                        "Teammate ESP");
-static CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Show tank",
-                   "Show tanks in mvm");
+static CatVar local_esp(CV_SWITCH, XORSTR("esp_local"), XORSTR("1"), XORSTR("ESP Local Player"),
+                        XORSTR("Shows local player ESP in thirdperson"));
+static CatVar buildings(CV_SWITCH, XORSTR("esp_buildings"), XORSTR("1"), XORSTR("Building ESP"),
+                        XORSTR("Show buildings"));
+static CatVar teammates(CV_SWITCH, XORSTR("esp_teammates"), XORSTR("0"), XORSTR("ESP Teammates"),
+                        XORSTR("Teammate ESP"));
+static CatVar tank(CV_SWITCH, XORSTR("esp_show_tank"), XORSTR("1"), XORSTR("Show tank"),
+                   XORSTR("Show tanks in mvm"));
 // Text Esps
-static CatVar show_weapon(CV_SWITCH, "esp_weapon", "0", "Show weapon name",
-                          "Show which weapon the enemy is using");
-static CatVar show_distance(CV_SWITCH, "esp_distance", "1", "Distance ESP",
-                            "Show distance to target");
-static CatVar show_name(CV_SWITCH, "esp_name", "1", "Name ESP", "Show name");
-static CatVar show_class(CV_SWITCH, "esp_class", "1", "Class ESP",
-                         "Show class");
-static CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions ESP",
-                              "Show conditions");
+static CatVar show_weapon(CV_SWITCH, XORSTR("esp_weapon"), XORSTR("0"), XORSTR("Show weapon name"),
+                          XORSTR("Show which weapon the enemy is using"));
+static CatVar show_distance(CV_SWITCH, XORSTR("esp_distance"), XORSTR("1"), XORSTR("Distance ESP"),
+                            XORSTR("Show distance to target"));
+static CatVar show_name(CV_SWITCH, XORSTR("esp_name"), XORSTR("1"), XORSTR("Name ESP"), XORSTR("Show name"));
+static CatVar show_class(CV_SWITCH, XORSTR("esp_class"), XORSTR("1"), XORSTR("Class ESP"),
+                         XORSTR("Show class"));
+static CatVar show_conditions(CV_SWITCH, XORSTR("esp_conds"), XORSTR("1"), XORSTR("Conditions ESP"),
+                              XORSTR("Show conditions"));
 static CatVar
-    show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge ESP",
-                    "Show ubercharge percentage while players medigun is out");
-static CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbot ESP",
-                          "Show followbot ID");
-static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerup ESP",
-                          "Shows powerups a player is using");
+    show_ubercharge(CV_SWITCH, XORSTR("esp_ubercharge"), XORSTR("1"), XORSTR("Ubercharge ESP"),
+                    XORSTR("Show ubercharge percentage while players medigun is out"));
+static CatVar show_bot_id(CV_SWITCH, XORSTR("esp_followbot_id"), XORSTR("1"), XORSTR("Followbot ESP"),
+                          XORSTR("Show followbot ID"));
+static CatVar powerup_esp(CV_SWITCH, XORSTR("esp_powerups"), XORSTR("1"), XORSTR("Powerup ESP"),
+                          XORSTR("Shows powerups a player is using"));
 // Item esp
-static CatVar item_esp(CV_SWITCH, "esp_item", "1", "Item ESP",
-                       "Master Item ESP switch (health packs, etc.)");
-static CatVar item_dropped_weapons(CV_SWITCH, "esp_item_weapons", "0",
-                                   "Dropped weapons", "Show dropped weapons");
-static CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "0", "Ammo packs",
-                              "Show ammo packs");
-static CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1",
-                                "Health packs", "Show health packs");
-static CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups",
-                            "Shows powerups in the world");
-static CatVar item_money(CV_SWITCH, "esp_money", "1", "MvM money",
-                         "Show MvM money");
-static CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red MvM money",
-                             "Show red MvM money");
-static CatVar item_spellbooks(CV_SWITCH, "esp_spellbooks", "1", "Spellbooks",
-                              "Spell Books");
-static CatVar item_weapon_spawners(CV_SWITCH, "esp_weapon_spawners", "1",
-                                   "Show weapon spawners",
-                                   "TF2C deathmatch weapon spawners");
-static CatVar item_adrenaline(CV_SWITCH, "esp_item_adrenaline", "0",
-                              "Show Adrenaline", "TF2C adrenaline pills");
+static CatVar item_esp(CV_SWITCH, XORSTR("esp_item"), XORSTR("1"), XORSTR("Item ESP"),
+                       XORSTR("Master Item ESP switch (health packs, etc.)"));
+static CatVar item_dropped_weapons(CV_SWITCH, XORSTR("esp_item_weapons"), XORSTR("0"),
+                                   XORSTR("Dropped weapons"), XORSTR("Show dropped weapons"));
+static CatVar item_ammo_packs(CV_SWITCH, XORSTR("esp_item_ammo"), XORSTR("0"), XORSTR("Ammo packs"),
+                              XORSTR("Show ammo packs"));
+static CatVar item_health_packs(CV_SWITCH, XORSTR("esp_item_health"), XORSTR("1"),
+                                XORSTR("Health packs"), XORSTR("Show health packs"));
+static CatVar item_powerups(CV_SWITCH, XORSTR("esp_item_powerups"), XORSTR("1"), XORSTR("Powerups"),
+                            XORSTR("Shows powerups in the world"));
+static CatVar item_money(CV_SWITCH, XORSTR("esp_money"), XORSTR("1"), XORSTR("MvM money"),
+                         XORSTR("Show MvM money"));
+static CatVar item_money_red(CV_SWITCH, XORSTR("esp_money_red"), XORSTR("1"), XORSTR("Red MvM money"),
+                             XORSTR("Show red MvM money"));
+static CatVar item_spellbooks(CV_SWITCH, XORSTR("esp_spellbooks"), XORSTR("1"), XORSTR("Spellbooks"),
+                              XORSTR("Spell Books"));
+static CatVar item_weapon_spawners(CV_SWITCH, XORSTR("esp_weapon_spawners"), XORSTR("1"),
+                                   XORSTR("Show weapon spawners"),
+                                   XORSTR("TF2C deathmatch weapon spawners"));
+static CatVar item_adrenaline(CV_SWITCH, XORSTR("esp_item_adrenaline"), XORSTR("0"),
+                              XORSTR("Show Adrenaline"), XORSTR("TF2C adrenaline pills"));
 // Projectile esp
-static CatVar proj_esp(CV_SWITCH, "esp_proj", "1", "Projectile ESP",
-                       "Projectile ESP");
-static CatEnum proj_esp_enum({ "OFF", "ALL", "CRIT" });
-static CatVar proj_rockets(proj_esp_enum, "esp_proj_rockets", "1", "Rockets",
-                           "Rockets");
-static CatVar proj_arrows(proj_esp_enum, "esp_proj_arrows", "1", "Arrows",
-                          "Arrows");
-static CatVar proj_pipes(proj_esp_enum, "esp_proj_pipes", "1", "Pipes",
-                         "Pipebombs");
-static CatVar proj_stickies(proj_esp_enum, "esp_proj_stickies", "1", "Stickies",
-                            "Stickybombs");
-static CatVar proj_enemy(CV_SWITCH, "esp_proj_enemy", "1",
-                         "Only enemy projectiles",
-                         "Don't show friendly projectiles");
+static CatVar proj_esp(CV_SWITCH, XORSTR("esp_proj"), XORSTR("1"), XORSTR("Projectile ESP"),
+                       XORSTR("Projectile ESP"));
+static CatEnum proj_esp_enum({ XORSTR("OFF"), XORSTR("ALL"), XORSTR("CRIT") });
+static CatVar proj_rockets(proj_esp_enum, XORSTR("esp_proj_rockets"), XORSTR("1"), XORSTR("Rockets"),
+                           XORSTR("Rockets"));
+static CatVar proj_arrows(proj_esp_enum, XORSTR("esp_proj_arrows"), XORSTR("1"), XORSTR("Arrows"),
+                          XORSTR("Arrows"));
+static CatVar proj_pipes(proj_esp_enum, XORSTR("esp_proj_pipes"), XORSTR("1"), XORSTR("Pipes"),
+                         XORSTR("Pipebombs"));
+static CatVar proj_stickies(proj_esp_enum, XORSTR("esp_proj_stickies"), XORSTR("1"), XORSTR("Stickies"),
+                            XORSTR("Stickybombs"));
+static CatVar proj_enemy(CV_SWITCH, XORSTR("esp_proj_enemy"), XORSTR("1"),
+                         XORSTR("Only enemy projectiles"),
+                         XORSTR("Don't show friendly projectiles"));
 // Debug
-static CatVar entity_info(CV_SWITCH, "esp_entity", "0", "Entity ESP",
-                          "Show entity info (debug)");
-static CatVar entity_model(CV_SWITCH, "esp_model_name", "0", "Model name ESP",
-                           "Model name esp (DEBUG ONLY)");
-static CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "Entity ID",
-                        "Used with Entity ESP. Shows entityID");
+static CatVar entity_info(CV_SWITCH, XORSTR("esp_entity"), XORSTR("0"), XORSTR("Entity ESP"),
+                          XORSTR("Show entity info (debug)"));
+static CatVar entity_model(CV_SWITCH, XORSTR("esp_model_name"), XORSTR("0"), XORSTR("Model name ESP"),
+                           XORSTR("Model name esp (DEBUG ONLY)"));
+static CatVar entity_id(CV_SWITCH, XORSTR("esp_entity_id"), XORSTR("1"), XORSTR("Entity ID"),
+                        XORSTR("Used with Entity ESP. Shows entityID"));
 
-// CatVar draw_hitbox(CV_SWITCH, "esp_hitbox", "1", "Draw Hitbox");
+// CatVar draw_hitbox(CV_SWITCH, XORSTR("esp_hitbox"), XORSTR("1"), XORSTR("Draw Hitbox"));
 
 // Unknown
 std::mutex threadsafe_mutex;
@@ -164,22 +164,22 @@ std::mutex entities_need_repaint_mutex{};
 // be a pain.
 
 // Vars to store what bones connect to what
-const std::string bonenames_leg_r[] = { "bip_foot_R", "bip_knee_R",
-                                        "bip_hip_R" };
-const std::string bonenames_leg_l[] = { "bip_foot_L", "bip_knee_L",
-                                        "bip_hip_L" };
-const std::string bonenames_bottom[] = { "bip_hip_R", "bip_pelvis",
-                                         "bip_hip_L" };
-const std::string bonenames_spine[] = { "bip_pelvis",  "bip_spine_0",
-                                        "bip_spine_1", "bip_spine_2",
-                                        "bip_spine_3", "bip_neck",
-                                        "bip_head" };
-const std::string bonenames_arm_r[] = { "bip_upperArm_R", "bip_lowerArm_R",
-                                        "bip_hand_R" };
-const std::string bonenames_arm_l[] = { "bip_upperArm_L", "bip_lowerArm_L",
-                                        "bip_hand_L" };
-const std::string bonenames_up[] = { "bip_upperArm_R", "bip_spine_3",
-                                     "bip_upperArm_L" };
+const std::string bonenames_leg_r[] = { XORSTR("bip_foot_R"), XORSTR("bip_knee_R"),
+                                        XORSTR("bip_hip_R") };
+const std::string bonenames_leg_l[] = { XORSTR("bip_foot_L"), XORSTR("bip_knee_L"),
+                                        XORSTR("bip_hip_L") };
+const std::string bonenames_bottom[] = { XORSTR("bip_hip_R"), XORSTR("bip_pelvis"),
+                                         XORSTR("bip_hip_L") };
+const std::string bonenames_spine[] = { XORSTR("bip_pelvis"),  XORSTR("bip_spine_0"),
+                                        XORSTR("bip_spine_1"), XORSTR("bip_spine_2"),
+                                        XORSTR("bip_spine_3"), XORSTR("bip_neck"),
+                                        XORSTR("bip_head") };
+const std::string bonenames_arm_r[] = { XORSTR("bip_upperArm_R"), XORSTR("bip_lowerArm_R"),
+                                        XORSTR("bip_hand_R") };
+const std::string bonenames_arm_l[] = { XORSTR("bip_upperArm_L"), XORSTR("bip_lowerArm_L"),
+                                        XORSTR("bip_hand_L") };
+const std::string bonenames_up[] = { XORSTR("bip_upperArm_R"), XORSTR("bip_spine_3"),
+                                     XORSTR("bip_upperArm_L") };
 
 // Dont fully understand struct but a guess is a group of something.
 // I will return once I have enough knowlage to reverse this.
@@ -230,7 +230,7 @@ struct bonelist_s
         }
         catch (std::exception &ex)
         {
-            logging::Info("Bone list exception: %s", ex.what());
+            logging::Info(XORSTR("Bone list exception: %s"), ex.what());
         }
         setup = true;
     }
@@ -294,9 +294,9 @@ struct bonelist_s
             Vector screen;
             if (draw::WorldToScreen(pos, screen)) {
                 if (hdr->pBone(i)->pszName()) {
-                    draw::FString(fonts::ESP, screen.x, screen.y, fg, 2, "%s
-        [%d]", hdr->pBone(i)->pszName(), i); } else draw::FString(fonts::ESP,
-        screen.x, screen.y, fg, 2, "%d", i);
+                    draw::FString(fonts::ESP, screen.x, screen.y, fg, 2, XORSTR("%s
+        [%d]XORSTR(", hdr->pBone(i)->pszName(), i); } else draw::FString(fonts::ESP,
+        screen.x, screen.y, fg, 2, XORSTR("%d"), i);
             }
         }*/
     }
@@ -401,37 +401,37 @@ void Init()
             if (fonts::esp_font.handle != GLEZ_FONT_INVALID)
                 draw_api::destroy_font(fonts::esp_font);
             fonts::esp_font = draw_api::create_font(
-                DATA_PATH "/fonts/verasans.ttf", esp_font_scale);
+                DATA_PATH XORSTR("/fonts/verasans.ttf"), esp_font_scale);
         });
-    textur     = glez_texture_load_png_rgba(DATA_PATH "/textures/atlas.png");
-    idspecific = glez_texture_load_png_rgba(DATA_PATH "/textures/idspec.png");
+    textur     = glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/atlas.png"));
+    idspecific = glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/idspec.png"));
     if (textur == GLEZ_TEXTURE_INVALID)
     {
-        logging::Info("Invalid atlas, retrying in 10 seconds....");
+        logging::Info(XORSTR("Invalid atlas, retrying in 10 seconds...."));
         while (1)
         {
             if (retry.test_and_set(10000))
             {
                 textur =
-                    glez_texture_load_png_rgba(DATA_PATH "/textures/atlas.png");
+                    glez_texture_load_png_rgba(DATA_PATH XORSTR("/textures/atlas.png"));
                 if (textur != GLEZ_TEXTURE_INVALID)
                     break;
-                logging::Info("Invalid atlas, retrying in 10 seconds....");
+                logging::Info(XORSTR("Invalid atlas, retrying in 10 seconds...."));
             }
         }
     }
     if (idspecific == GLEZ_TEXTURE_INVALID)
     {
-        logging::Info("Invalid idspecific, retrying in 10 seconds....");
+        logging::Info(XORSTR("Invalid idspecific, retrying in 10 seconds...."));
         while (1)
         {
             if (retry.test_and_set(10000))
             {
                 idspecific = glez_texture_load_png_rgba(DATA_PATH
-                                                        "/textures/idspec.png");
+                                                        XORSTR("/textures/idspec.png"));
                 if (idspecific != GLEZ_TEXTURE_INVALID)
                     break;
-                logging::Info("Invalid idspecific, retrying in 10 seconds....");
+                logging::Info(XORSTR("Invalid idspecific, retrying in 10 seconds...."));
             }
         }
     }
@@ -943,7 +943,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     {
         AddEntityString(ent,
                         format(RAW_ENT(ent)->GetClientClass()->m_pNetworkName,
-                               " [", classid, "]"));
+                               XORSTR(" ["), classid, XORSTR("]")));
         if (entity_id)
         {
             AddEntityString(ent, std::to_string(ent->m_IDX));
@@ -973,7 +973,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             {
                 if ((int) proj_rockets != 2 || ent->m_bCritProjectile())
                 {
-                    AddEntityString(ent, "[ ==> ]");
+                    AddEntityString(ent, XORSTR("[ ==> ]"));
                 }
             }
 
@@ -989,14 +989,14 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     break;
                 if ((int) proj_pipes == 2 && !ent->m_bCritProjectile())
                     break;
-                AddEntityString(ent, "[ (PP) ]");
+                AddEntityString(ent, XORSTR("[ (PP) ]"));
                 break;
             case 1: // Stickys
                 if (!proj_stickies)
                     break;
                 if ((int) proj_stickies == 2 && !ent->m_bCritProjectile())
                     break;
-                AddEntityString(ent, "[ {*} ]");
+                AddEntityString(ent, XORSTR("[ {*} ]"));
             }
 
             // Huntsman
@@ -1005,7 +1005,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             if ((int) proj_arrows != 2 || ent->m_bCritProjectile())
             {
-                AddEntityString(ent, "[ >>---> ]");
+                AddEntityString(ent, XORSTR("[ >>---> ]"));
             }
         }
     }
@@ -1019,27 +1019,27 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             {
                 int string_count_backup = data[ent->m_IDX].string_count;
                 if (classid == CL_CLASS(CWeapon_SLAM))
-                    AddEntityString(ent, "SLAM");
+                    AddEntityString(ent, XORSTR("SLAM"));
                 else if (classid == CL_CLASS(CWeapon357))
-                    AddEntityString(ent, ".357");
+                    AddEntityString(ent, XORSTR(".357"));
                 else if (classid == CL_CLASS(CWeaponAR2))
-                    AddEntityString(ent, "AR2");
+                    AddEntityString(ent, XORSTR("AR2"));
                 else if (classid == CL_CLASS(CWeaponAlyxGun))
-                    AddEntityString(ent, "Alyx Gun");
+                    AddEntityString(ent, XORSTR("Alyx Gun"));
                 else if (classid == CL_CLASS(CWeaponAnnabelle))
-                    AddEntityString(ent, "Annabelle");
+                    AddEntityString(ent, XORSTR("Annabelle"));
                 else if (classid == CL_CLASS(CWeaponBinoculars))
-                    AddEntityString(ent, "Binoculars");
+                    AddEntityString(ent, XORSTR("Binoculars"));
                 else if (classid == CL_CLASS(CWeaponBugBait))
-                    AddEntityString(ent, "Bug Bait");
+                    AddEntityString(ent, XORSTR("Bug Bait"));
                 else if (classid == CL_CLASS(CWeaponCrossbow))
-                    AddEntityString(ent, "Crossbow");
+                    AddEntityString(ent, XORSTR("Crossbow"));
                 else if (classid == CL_CLASS(CWeaponShotgun))
-                    AddEntityString(ent, "Shotgun");
+                    AddEntityString(ent, XORSTR("Shotgun"));
                 else if (classid == CL_CLASS(CWeaponSMG1))
-                    AddEntityString(ent, "SMG");
+                    AddEntityString(ent, XORSTR("SMG"));
                 else if (classid == CL_CLASS(CWeaponRPG))
-                    AddEntityString(ent, "RPG");
+                    AddEntityString(ent, XORSTR("RPG"));
                 if (string_count_backup != data[ent->m_IDX].string_count)
                 {
                     SetEntityColor(ent, colors::yellow);
@@ -1052,7 +1052,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     // Tank esp
     if (classid == CL_CLASS(CTFTankBoss) && tank)
     {
-        AddEntityString(ent, "Tank");
+        AddEntityString(ent, XORSTR("Tank"));
 
         // Dropped weapon esp
     }
@@ -1060,7 +1060,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
              item_dropped_weapons)
     {
         AddEntityString(
-            ent, format("WEAPON ", RAW_ENT(ent)->GetClientClass()->GetName()));
+            ent, format(XORSTR("WEAPON "), RAW_ENT(ent)->GetClientClass()->GetName()));
 
         // MVM Money esp
     }
@@ -1070,12 +1070,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             if (item_money_red)
             {
-                AddEntityString(ent, "~$~");
+                AddEntityString(ent, XORSTR("~$~"));
             }
         }
         else
         {
-            AddEntityString(ent, "$$$");
+            AddEntityString(ent, XORSTR("$$$"));
         }
 
         // Other item esp
@@ -1089,19 +1089,19 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
              itemtype == ITEM_HL_BATTERY))
         {
             if (itemtype == ITEM_HEALTH_SMALL)
-                AddEntityString(ent, "[+]");
+                AddEntityString(ent, XORSTR("[+]"));
             if (itemtype == ITEM_HEALTH_MEDIUM)
-                AddEntityString(ent, "[++]");
+                AddEntityString(ent, XORSTR("[++]"));
             if (itemtype == ITEM_HEALTH_LARGE)
-                AddEntityString(ent, "[+++]");
+                AddEntityString(ent, XORSTR("[+++]"));
             if (itemtype == ITEM_HL_BATTERY)
-                AddEntityString(ent, "[Z]");
+                AddEntityString(ent, XORSTR("[Z]"));
 
             // TF2C Adrenaline esp
         }
         else if (item_adrenaline && itemtype == ITEM_TF2C_PILL)
         {
-            AddEntityString(ent, "[a]");
+            AddEntityString(ent, XORSTR("[a]"));
 
             // Ammo pack esp
         }
@@ -1109,11 +1109,11 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                  itemtype <= ITEM_AMMO_LARGE)
         {
             if (itemtype == ITEM_AMMO_SMALL)
-                AddEntityString(ent, "{i}");
+                AddEntityString(ent, XORSTR("{i}"));
             if (itemtype == ITEM_AMMO_MEDIUM)
-                AddEntityString(ent, "{ii}");
+                AddEntityString(ent, XORSTR("{ii}"));
             if (itemtype == ITEM_AMMO_LARGE)
-                AddEntityString(ent, "{iii}");
+                AddEntityString(ent, XORSTR("{iii}"));
 
             // Powerup esp
         }
@@ -1121,7 +1121,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                  itemtype <= ITEM_POWERUP_LAST)
         {
             AddEntityString(ent, format(powerups[itemtype - ITEM_POWERUP_FIRST],
-                                        " PICKUP"));
+                                        XORSTR(" PICKUP")));
 
             // TF2C weapon spawner esp
         }
@@ -1130,9 +1130,9 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             AddEntityString(
                 ent, format(tf2c_weapon_names[itemtype - ITEM_TF2C_W_FIRST],
-                            " SPAWNER"));
+                            XORSTR(" SPAWNER")));
             if (CE_BYTE(ent, netvar.bRespawning))
-                AddEntityString(ent, "-- RESPAWNING --");
+                AddEntityString(ent, XORSTR("-- RESPAWNING --"));
 
             // Halloween spell esp
         }
@@ -1141,11 +1141,11 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             if (itemtype == ITEM_SPELL)
             {
-                AddEntityString(ent, "Spell", colors::green);
+                AddEntityString(ent, XORSTR("Spell"), colors::green);
             }
             else
             {
-                AddEntityString(ent, "Rare Spell",
+                AddEntityString(ent, XORSTR("Rare Spell"),
                                 colors::FromRGBA8(139, 31, 221, 255));
             }
         }
@@ -1171,17 +1171,17 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             const std::string &name =
                 (classid == CL_CLASS(CObjectTeleporter)
-                     ? "Teleporter"
-                     : (classid == CL_CLASS(CObjectSentrygun) ? "Sentry Gun"
-                                                              : "Dispenser"));
+                     ? XORSTR("Teleporter")
+                     : (classid == CL_CLASS(CObjectSentrygun) ? XORSTR("Sentry Gun")
+                                                              : XORSTR("Dispenser")));
             int level = CE_INT(ent, netvar.iUpgradeLevel);
-            AddEntityString(ent, format("LV ", level, ' ', name));
+            AddEntityString(ent, format(XORSTR("LV "), level, ' ', name));
         }
         // If text health is true, then add a string with the health
         if ((int) show_health == 1 || (int) show_health == 3)
         {
             AddEntityString(
-                ent, format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), " HP"),
+                ent, format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), XORSTR(" HP")),
                 colors::Health(ent->m_iHealth(), ent->m_iMaxHealth()));
         }
         // Set the entity to repaint
@@ -1206,7 +1206,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         if (!g_IEngine->GetPlayerInfo(ent->m_IDX, &info))
             return;
 
-        // TODO, check if u can just use "ent->m_bEnemy()" instead of m_iTeam
+        // TODO, check if u can just use XORSTR("ent->m_bEnemy()") instead of m_iTeam
         // Legit mode handling
         if (legit && ent->m_iTeam() != g_pLocalPlayer->team &&
             playerlist::IsDefault(info.friendsID))
@@ -1226,7 +1226,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             powerup_type power = GetPowerupOnPlayer(ent);
             if (power != not_powerup)
-                AddEntityString(ent, format("^ ", powerups[power], " ^"));
+                AddEntityString(ent, format(XORSTR("^ "), powerups[power], XORSTR(" ^")));
         }
 
         // Dont understand reasoning for this check
@@ -1255,7 +1255,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         ipc::peer->memory->peer_user_data[i].friendid ==
                             info.friendsID)
                     {
-                        AddEntityString(ent, format("BOT #", i));
+                        AddEntityString(ent, format(XORSTR("BOT #"), i));
                         break;
                     }
                 }
@@ -1266,7 +1266,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             {
                 AddEntityString(
                     ent,
-                    format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), " HP"),
+                    format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), XORSTR(" HP")),
                     colors::Health(ent->m_iHealth(), ent->m_iMaxHealth()));
             }
             IF_GAME(IsTF())
@@ -1303,7 +1303,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                                                         netvar
                                                             .m_flChargeLevel) *
                                                     100),
-                                                '%', " Uber"),
+                                                '%', XORSTR(" Uber")),
                                             colors::Health(
                                                 (CE_FLOAT(
                                                      weapon,
@@ -1321,7 +1321,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                                                         netvar
                                                             .m_flChargeLevel) *
                                                     100),
-                                                '%', " Uber | Charges: ",
+                                                '%', XORSTR(" Uber | Charges: "),
                                                 floor(
                                                     CE_FLOAT(
                                                         weapon,
@@ -1347,45 +1347,45 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     // Invis
                     if (IsPlayerInvisible(ent))
                         AddEntityString(
-                            ent, "*CLOAKED*",
+                            ent, XORSTR("*CLOAKED*"),
                             colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                     // Uber/Bonk
                     if (IsPlayerInvulnerable(ent))
-                        AddEntityString(ent, "*INVULNERABLE*");
+                        AddEntityString(ent, XORSTR("*INVULNERABLE*"));
                     // Vaccinator
                     if (HasCondition<TFCond_UberBulletResist>(ent))
                     {
-                        AddEntityString(ent, "*VACCINATOR*");
+                        AddEntityString(ent, XORSTR("*VACCINATOR*"));
                     }
                     else if (HasCondition<TFCond_SmallBulletResist>(ent))
                     {
-                        AddEntityString(ent, "*PASSIVE RESIST*");
+                        AddEntityString(ent, XORSTR("*PASSIVE RESIST*"));
                     }
                     // Crit
                     if (IsPlayerCritBoosted(ent))
-                        AddEntityString(ent, "*CRITS*", colors::orange);
+                        AddEntityString(ent, XORSTR("*CRITS*"), colors::orange);
                     // Zoomed
                     if (HasCondition<TFCond_Zoomed>(ent))
                     {
                         AddEntityString(
-                            ent, "*ZOOMING*",
+                            ent, XORSTR("*ZOOMING*"),
                             colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                         // Slowed
                     }
                     else if (HasCondition<TFCond_Slowed>(ent))
                     {
                         AddEntityString(
-                            ent, "*SLOWED*",
+                            ent, XORSTR("*SLOWED*"),
                             colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                     }
                     // Jarated
                     if (HasCondition<TFCond_Jarated>(ent))
-                        AddEntityString(ent, "*JARATED*", colors::yellow);
+                        AddEntityString(ent, XORSTR("*JARATED*"), colors::yellow);
                 }
             }
             // Hoovy Esp
             if (IsHoovy(ent))
-                AddEntityString(ent, "Hoovy");
+                AddEntityString(ent, XORSTR("Hoovy"));
 
             // Active weapon esp
             int widx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;

@@ -7,14 +7,14 @@
 
 #include "common.hpp"
 
-static CatVar crit_info(CV_SWITCH, "crit_info", "0", "Show crit info");
-static CatVar crit_key(CV_KEY, "crit_key", "0", "Crit Key");
-static CatVar crit_melee(CV_SWITCH, "crit_melee", "0", "Melee crits");
+static CatVar crit_info(CV_SWITCH, XORSTR("crit_info"), XORSTR("0"), XORSTR("Show crit info"));
+static CatVar crit_key(CV_KEY, XORSTR("crit_key"), XORSTR("0"), XORSTR("Crit Key"));
+static CatVar crit_melee(CV_SWITCH, XORSTR("crit_melee"), XORSTR("0"), XORSTR("Melee crits"));
 static CatVar crit_legiter(
-    CV_SWITCH, "crit_force_gameplay", "0", "Don't hinder gameplay",
-    "Attempt to crit when possible but do not hinder normal gameplay");
-static CatVar crit_experimental(CV_SWITCH, "crit_experimental", "0",
-                                "Experimental crithack");
+    CV_SWITCH, XORSTR("crit_force_gameplay"), XORSTR("0"), XORSTR("Don't hinder gameplay"),
+    XORSTR("Attempt to crit when possible but do not hinder normal gameplay"));
+static CatVar crit_experimental(CV_SWITCH, XORSTR("crit_experimental"), XORSTR("0"),
+                                XORSTR("Experimental crithack"));
 
 std::unordered_map<int, int> command_number_mod{};
 
@@ -111,7 +111,7 @@ bool force_crit(IClientEntity *weapon)
     }
     else
         number = lastnumber;
-    logging::Info("Found critical: %d -> %d", g_pUserCmd->command_number,
+    logging::Info(XORSTR("Found critical: %d -> %d"), g_pUserCmd->command_number,
                   number);
     lastweapon = weapon->GetModel();
     lastnumber = number;
@@ -188,7 +188,7 @@ void create_move()
 bool random_crits_enabled()
 {
     static ConVar *tf_weapon_criticals =
-        g_ICvar->FindVar("tf_weapon_criticals");
+        g_ICvar->FindVar(XORSTR("tf_weapon_criticals"));
     return tf_weapon_criticals->GetBool();
 }
 
@@ -208,17 +208,17 @@ void draw()
     {
         if (crit_key.KeyDown())
         {
-            AddCenterString("FORCED CRITS!", colors::red);
+            AddCenterString(XORSTR("FORCED CRITS!"), colors::red);
         }
         IF_GAME(IsTF2())
         {
             if (!random_crits_enabled())
-                AddCenterString("Random crits are disabled", colors::yellow);
+                AddCenterString(XORSTR("Random crits are disabled"), colors::yellow);
             else
             {
                 if (!re::C_TFWeaponBase::CanFireCriticalShot(RAW_ENT(LOCAL_W),
                                                              false, nullptr))
-                    AddCenterString("Weapon can't randomly crit",
+                    AddCenterString(XORSTR("Weapon can't randomly crit"),
                                     colors::yellow);
                 else if (lastusercmd)
                 {
@@ -229,21 +229,21 @@ void draw()
                         if (nextcrit > 0.0f)
                         {
                             AddCenterString(
-                                format("Time to next crit: ", nextcrit, "s"),
+                                format(XORSTR("Time to next crit: "), nextcrit, XORSTR("s")),
                                 colors::orange);
                         }
                     }
-                    AddCenterString("Weapon can randomly crit");
+                    AddCenterString(XORSTR("Weapon can randomly crit"));
                 }
             }
             if (GetWeaponMode() == weapon_melee)
-                AddCenterString(format("Bucket: 1000"));
+                AddCenterString(format(XORSTR("Bucket: 1000")));
             else
                 AddCenterString(
-                    format("Bucket: ",
+                    format(XORSTR("Bucket: "),
                            re::C_TFWeaponBase::crit_bucket_(RAW_ENT(LOCAL_W))));
         }
-        // AddCenterString(format("Time: ",
+        // AddCenterString(format(XORSTR("Time: "),
         // *(float*)((uintptr_t)RAW_ENT(LOCAL_W) + 2872u)));
     }
 }

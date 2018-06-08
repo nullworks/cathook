@@ -15,8 +15,8 @@ namespace noisemaker
 {
 
 static CatVar
-    enabled(CV_SWITCH, "noisemaker", "0", "Noisemaker spam",
-            "Spams noisemakers Infinitly\nWorks with limited use noisemakers");
+    enabled(CV_SWITCH, XORSTR("noisemaker"), XORSTR("0"), XORSTR("Noisemaker spam"),
+            XORSTR("Spams noisemakers Infinitly\nWorks with limited use noisemakers"));
 
 void CreateMove()
 {
@@ -24,9 +24,9 @@ void CreateMove()
     {
         if (g_GlobalVars->framecount % 100 == 0)
         {
-            KeyValues *kv = new KeyValues("+use_action_slot_item_server");
+            KeyValues *kv = new KeyValues(XORSTR("+use_action_slot_item_server"));
             g_IEngine->ServerCmdKeyValues(kv);
-            KeyValues *kv2 = new KeyValues("-use_action_slot_item_server");
+            KeyValues *kv2 = new KeyValues(XORSTR("-use_action_slot_item_server"));
             g_IEngine->ServerCmdKeyValues(kv2);
         }
     }

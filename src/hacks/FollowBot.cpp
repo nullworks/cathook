@@ -17,21 +17,21 @@ namespace shared
 namespace followbot
 {
 
-CatVar followbot(CV_SWITCH, "fb", "0", "Followbot Switch",
-                 "Set to 1 in followbots' configs");
+CatVar followbot(CV_SWITCH, XORSTR("fb"), XORSTR("0"), XORSTR("Followbot Switch"),
+                 XORSTR("Set to 1 in followbots' configs"));
 bool followcart = false;
-CatVar roambot(CV_SWITCH, "fb_roaming", "1", "Roambot",
-               "Followbot will roam free, finding targets it can");
-static CatVar draw_crumb(CV_SWITCH, "fb_draw", "1", "Draw crumbs",
-                         "Self explanitory");
-static CatVar follow_distance(CV_INT, "fb_distance", "175", "Follow Distance",
-                              "How close the bots should stay to the target");
-static CatVar follow_activation(CV_INT, "fb_activation", "175",
-                                "Activation Distance",
-                                "How close a player should be until the "
-                                "followbot will pick them as a target");
+CatVar roambot(CV_SWITCH, XORSTR("fb_roaming"), XORSTR("1"), XORSTR("Roambot"),
+               XORSTR("Followbot will roam free, finding targets it can"));
+static CatVar draw_crumb(CV_SWITCH, XORSTR("fb_draw"), XORSTR("1"), XORSTR("Draw crumbs"),
+                         XORSTR("Self explanitory"));
+static CatVar follow_distance(CV_INT, XORSTR("fb_distance"), XORSTR("175"), XORSTR("Follow Distance"),
+                              XORSTR("How close the bots should stay to the target"));
+static CatVar follow_activation(CV_INT, XORSTR("fb_activation"), XORSTR("175"),
+                                XORSTR("Activation Distance"),
+                                XORSTR("How close a player should be until the ")
+                                XORSTR("followbot will pick them as a target"));
 unsigned steamid = 0x0;
-CatCommand follow_steam("fb_steam", "Follow Steam Id",
+CatCommand follow_steam(XORSTR("fb_steam"), XORSTR("Follow Steam Id"),
                         [](const CCommand &args) {
                             if (args.ArgC() < 1)
                             {
@@ -42,14 +42,14 @@ CatCommand follow_steam("fb_steam", "Follow Steam Id",
                             steamid         = *(unsigned int *) &tempid;
 
                         });
-static CatVar mimic_slot(CV_SWITCH, "fb_mimic_slot", "0", "Mimic weapon slot",
-                         "Mimic follow target's weapon slot");
-static CatVar always_medigun(CV_SWITCH, "fb_always_medigun", "0",
-                             "Always Medigun", "Always use medigun");
-static CatVar sync_taunt(CV_SWITCH, "fb_sync_taunt", "0", "Synced taunt",
-                         "Taunt when follow target does");
-static CatVar change(CV_SWITCH, "fb_switch", "1", "Change followbot target",
-                     "Always change roaming target when possible");
+static CatVar mimic_slot(CV_SWITCH, XORSTR("fb_mimic_slot"), XORSTR("0"), XORSTR("Mimic weapon slot"),
+                         XORSTR("Mimic follow target's weapon slot"));
+static CatVar always_medigun(CV_SWITCH, XORSTR("fb_always_medigun"), XORSTR("0"),
+                             XORSTR("Always Medigun"), XORSTR("Always use medigun"));
+static CatVar sync_taunt(CV_SWITCH, XORSTR("fb_sync_taunt"), XORSTR("0"), XORSTR("Synced taunt"),
+                         XORSTR("Taunt when follow target does"));
+static CatVar change(CV_SWITCH, XORSTR("fb_switch"), XORSTR("1"), XORSTR("Change followbot target"),
+                     XORSTR("Always change roaming target when possible"));
 // Something to store breadcrumbs created by followed players
 static std::vector<Vector> breadcrumbs;
 static const int crumb_limit = 64; // limit
@@ -99,7 +99,7 @@ void WorldTick()
                 continue;
             if (steamid != entity->player_info.friendsID) // steamid check
                 continue;
-            logging::Info("Success");
+            logging::Info(XORSTR("Success"));
 
             if (!entity->m_bAlivePlayer()) // Dont follow dead players
                 continue;
@@ -199,7 +199,7 @@ void WorldTick()
             return;
         }
         if (sync_taunt && HasCondition<TFCond_Taunting>(ENTITY(follow_target)))
-            g_IEngine->ClientCmd("taunt");
+            g_IEngine->ClientCmd(XORSTR("taunt"));
         static float last_slot_check = 0.0f;
         if (g_GlobalVars->curtime < last_slot_check)
             last_slot_check = 0.0f;
@@ -243,7 +243,7 @@ void WorldTick()
                     {
                         if (my_slot != 1)
                         {
-                            g_IEngine->ExecuteClientCmd("slot2");
+                            g_IEngine->ExecuteClientCmd(XORSTR("slot2"));
                         }
 
                         // Else we attemt to keep our weapon mimiced with our
@@ -255,7 +255,7 @@ void WorldTick()
                         if (my_slot != owner_slot)
                         {
                             g_IEngine->ExecuteClientCmd(
-                                format("slot", owner_slot + 1).c_str());
+                                format(XORSTR("slot"), owner_slot + 1).c_str());
                         }
                     }
                 }
@@ -295,16 +295,16 @@ void DrawTick()
 
 #if ENABLE_IPC
 static CatCommand
-    follow_me("fb_follow_me", "IPC connected bots will follow you", []() {
+    follow_me(XORSTR("fb_follow_me"), XORSTR("IPC connected bots will follow you"), []() {
         if (!ipc::peer)
         {
-            logging::Info("IPC isnt connected");
+            logging::Info(XORSTR("IPC isnt connected"));
             return;
         }
         auto local_ent = LOCAL_E;
         if (!local_ent)
         {
-            logging::Info("Cant get a local player");
+            logging::Info(XORSTR("Cant get a local player"));
             return;
         }
         player_info_s info;
@@ -312,13 +312,13 @@ static CatCommand
         auto steam_id = info.friendsID;
         if (!steam_id)
         {
-            logging::Info("Cant get steam-id, the game module probably doesnt "
-                          "support it.");
+            logging::Info(XORSTR("Cant get steam-id, the game module probably doesnt ")
+                          XORSTR("support it."));
             return;
         }
         // Construct the command
         std::string tmp =
-            CON_PREFIX + follow_steam.name + " " + std::to_string(steam_id);
+            CON_PREFIX + follow_steam.name + XORSTR(" ") + std::to_string(steam_id);
         if (tmp.length() >= 63)
         {
             ipc::peer->SendMessage(0, 0, ipc::commands::execute_client_cmd_long,

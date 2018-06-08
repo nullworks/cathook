@@ -42,7 +42,7 @@ sprite texture_atlas::create_sprite(float x, float y, float sx, float sy)
 
 texture_atlas &atlas()
 {
-    static texture_atlas object{ DATA_PATH "/res/atlas.png", 1024, 512 };
+    static texture_atlas object{ DATA_PATH XORSTR("/res/atlas.png"), 1024, 512 };
     return object;
 }
 }

@@ -17,23 +17,23 @@ namespace uberspam
 
 TextFile custom_lines;
 
-static CatEnum source_enum({ "DISABLED", "CATHOOK", "NCC", "CUSTOM" });
-static CatVar source(source_enum, "uberspam", "0", "Ubercharge Spam",
-                     "Defines spam ubercharge source");
-static CatVar on_ready(CV_SWITCH, "uberspam_ready", "1", "Uber Ready");
-static CatVar on_used(CV_SWITCH, "uberspam_used", "1", "Uber Used");
-static CatVar on_ended(CV_SWITCH, "uberspam_ended", "1", "Uber Ended");
-static CatVar on_build(CV_INT, "uberspam_build", "25", "Uber Build",
-                       "Send a message every #% ubercharge. 0 = never send", 0,
+static CatEnum source_enum({ XORSTR("DISABLED"), XORSTR("CATHOOK"), XORSTR("NCC"), XORSTR("CUSTOM") });
+static CatVar source(source_enum, XORSTR("uberspam"), XORSTR("0"), XORSTR("Ubercharge Spam"),
+                     XORSTR("Defines spam ubercharge source"));
+static CatVar on_ready(CV_SWITCH, XORSTR("uberspam_ready"), XORSTR("1"), XORSTR("Uber Ready"));
+static CatVar on_used(CV_SWITCH, XORSTR("uberspam_used"), XORSTR("1"), XORSTR("Uber Used"));
+static CatVar on_ended(CV_SWITCH, XORSTR("uberspam_ended"), XORSTR("1"), XORSTR("Uber Ended"));
+static CatVar on_build(CV_INT, XORSTR("uberspam_build"), XORSTR("25"), XORSTR("Uber Build"),
+                       XORSTR("Send a message every #% ubercharge. 0 = never send"), 0,
                        100);
-static CatVar team_chat(CV_SWITCH, "uberspam_team", "1", "Uber Team Chat",
-                        "Send uberspam messages in team chat");
+static CatVar team_chat(CV_SWITCH, XORSTR("uberspam_team"), XORSTR("1"), XORSTR("Uber Team Chat"),
+                        XORSTR("Send uberspam messages in team chat"));
 static CatVar
-    custom_file(CV_STRING, "uberspam_file", "uberspam.txt",
-                "Ubercharge Spam File",
-                "Use cat_uberspam_file_reload! Same as spam/killsay files.");
+    custom_file(CV_STRING, XORSTR("uberspam_file"), XORSTR("uberspam.txt"),
+                XORSTR("Ubercharge Spam File"),
+                XORSTR("Use cat_uberspam_file_reload! Same as spam/killsay files."));
 static CatCommand custom_file_reload(
-    "uberspam_file_reload", "Reload Ubercharge Spam File",
+    XORSTR("uberspam_file_reload"), XORSTR("Reload Ubercharge Spam File"),
     []() { custom_lines.Load(std::string(custom_file.GetString())); });
 
 const std::vector<std::string> *GetSource()
@@ -112,7 +112,7 @@ void CreateMove()
                 {
                     std::string res =
                         GetSource()->at(ChargePercentLineIndex(charge));
-                    ReplaceString(res, "%i%",
+                    ReplaceString(res, XORSTR("%i%"),
                                   std::to_string((int) (charge * 100.0f)));
                     chat_stack::Say(res, !!team_chat);
                 }
@@ -126,16 +126,16 @@ void CreateMove()
 // Ready, Used, Ended, %...
 
 const std::vector<std::string> builtin_cathook = {
-    "-> I am charged!",
-    "-> Not a step back! UBERCHARGE USED!",
-    "-> My Ubercharge comes to an end!",
-    "-> I have a bit of ubercharge!",
-    "-> I have half of the ubercharge!",
-    "-> Ubercharge almost ready!"
+    XORSTR("-> I am charged!"),
+    XORSTR("-> Not a step back! UBERCHARGE USED!"),
+    XORSTR("-> My Ubercharge comes to an end!"),
+    XORSTR("-> I have a bit of ubercharge!"),
+    XORSTR("-> I have half of the ubercharge!"),
+    XORSTR("-> Ubercharge almost ready!")
 };
 const std::vector<std::string> builtin_nonecore = {
-    ">>> GET READY TO RUMBLE! <<<", ">>> CHEATS ACTIVATED! <<<",
-    ">>> RUMBLE COMPLETE! <<<", ">>> RUMBLE IS %i%% CHARGED! <<<"
+    XORSTR(">>> GET READY TO RUMBLE! <<<"), XORSTR(">>> CHEATS ACTIVATED! <<<"),
+    XORSTR(">>> RUMBLE COMPLETE! <<<"), XORSTR(">>> RUMBLE IS %i%% CHARGED! <<<")
 };
 }
 }

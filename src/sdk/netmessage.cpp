@@ -86,7 +86,7 @@ bool bf_write::WriteBytes(const void *pBuf, int nBytes)
 bool bf_write::WriteBits(const void *pInData, int nBits)
 {
 #if defined(BB_PROFILING)
-    VPROF("bf_write::WriteBits");
+    VPROF(XORSTR("bf_write::WriteBits"));
 #endif
 
     unsigned char *pOut = (unsigned char *) pInData;
@@ -369,7 +369,7 @@ bool CLC_RespondCvarValue::ReadFromBuffer(bf_read &buffer)
 
 const char *CLC_RespondCvarValue::ToString(void) const
 {
-    return strfmt("%s: status: %d, value: %s, cookie: %d", GetName(),
+    return strfmt(XORSTR("%s: status: %d, value: %s, cookie: %d"), GetName(),
                   m_eStatusCode, m_szCvarValue, m_iCookie);
 }
 
@@ -386,7 +386,7 @@ bool NET_NOP::ReadFromBuffer(bf_read &buffer)
 
 const char *NET_NOP::ToString(void) const
 {
-    return "(null)";
+    return XORSTR("(null)");
 }
 
 bool NET_SignonState::WriteToBuffer(bf_write &buffer)
@@ -408,13 +408,13 @@ bool NET_SignonState::ReadFromBuffer(bf_read &buffer)
 
 const char *NET_SignonState::ToString(void) const
 {
-    return strfmt("net_SignonState: state %i, count %i", m_nSignonState,
+    return strfmt(XORSTR("net_SignonState: state %i, count %i"), m_nSignonState,
                   m_nSpawnCount);
 }
 
 const char *CLC_VoiceData::ToString(void) const
 {
-    return strfmt("%s: %i bytes", GetName(), m_nLength);
+    return strfmt(XORSTR("%s: %i bytes"), GetName(), m_nLength);
 }
 
 bool CLC_VoiceData::WriteToBuffer(bf_write &buffer)
@@ -442,7 +442,7 @@ bool CLC_VoiceData::ReadFromBuffer(bf_read &buffer)
 #define MAX_BACKUP_COMMANDS ((1 << NUM_BACKUP_COMMAND_BITS) - 1)
 const char *CLC_Move::ToString(void) const
 {
-    return strfmt("%s: backup %i, new %i, bytes %i", GetName(), m_nNewCommands,
+    return strfmt(XORSTR("%s: backup %i, new %i, bytes %i"), GetName(), m_nNewCommands,
                   m_nBackupCommands, Bits2Bytes(m_nLength));
 }
 
@@ -471,21 +471,21 @@ bool CLC_Move::ReadFromBuffer(bf_read &buffer)
 
 bool NET_SetConVar::WriteToBuffer(bf_write &buffer)
 {
-    // logging::Info("Writing to buffer 0x%08x!", buf);
+    // logging::Info(XORSTR("Writing to buffer 0x%08x!"), buf);
     buffer.WriteUBitLong(GetType(), 6);
-    // logging::Info("A");
+    // logging::Info(XORSTR("A"));
     int numvars = 1; // m_ConVars.Count();
-    // logging::Info("B");
+    // logging::Info(XORSTR("B"));
     // Note how many we're sending
     buffer.WriteByte(numvars);
-    // logging::Info("C");
+    // logging::Info(XORSTR("C"));
     // for (int i=0; i< numvars; i++ )
     //{
     // cvar_t * cvar = &m_ConVars[i];
     buffer.WriteString(convar.name);
     buffer.WriteString(convar.value);
     //}
-    // logging::Info("D");
+    // logging::Info(XORSTR("D"));
     return !buffer.IsOverflowed();
 }
 
@@ -507,18 +507,18 @@ bool NET_SetConVar::ReadFromBuffer(bf_read &buffer)
 
 const char *NET_SetConVar::ToString(void) const
 {
-    /*snprintf(s_text, sizeof(s_text), "%s: %i cvars, \"%s\"=\"%s\"",
+    /*snprintf(s_text, sizeof(s_text), XORSTR("%s: %i cvars, \"%s\"=\"%s\""),
         GetName(), m_ConVars.Count(),
         m_ConVars[0].name, m_ConVars[0].value );
     return s_text;*/
-    return "(NULL)";
+    return XORSTR("(NULL)");
 }
 
 bool NET_StringCmd::WriteToBuffer(bf_write &buffer)
 {
     buffer.WriteUBitLong(GetType(), 6);
     return buffer.WriteString(m_szCommand ? m_szCommand
-                                          : " NET_StringCmd NULL");
+                                          : XORSTR(" NET_StringCmd NULL"));
 }
 
 bool NET_StringCmd::ReadFromBuffer(bf_read &buffer)
@@ -529,5 +529,5 @@ bool NET_StringCmd::ReadFromBuffer(bf_read &buffer)
 
 const char *NET_StringCmd::ToString(void) const
 {
-    return "STRINGCMD";
+    return XORSTR("STRINGCMD");
 }

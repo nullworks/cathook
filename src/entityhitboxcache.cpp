@@ -104,11 +104,11 @@ bool EntityHitboxCache::VisibilityCheck(int id)
     return m_VisCheck[id];
 }
 
-static CatEnum setupbones_time_enum({ "ZERO", "CURTIME", "LP SERVERTIME",
-                                      "SIMTIME" });
+static CatEnum setupbones_time_enum({ XORSTR("ZERO"), XORSTR("CURTIME"), XORSTR("LP SERVERTIME"),
+                                      XORSTR("SIMTIME") });
 static CatVar setupbones_time(
-    setupbones_time_enum, "setupbones_time", "3", "Setupbones",
-    "Defines setupbones 4th argument, change it if your aimbot misses, idk!!");
+    setupbones_time_enum, XORSTR("setupbones_time"), XORSTR("3"), XORSTR("Setupbones"),
+    XORSTR("Defines setupbones 4th argument, change it if your aimbot misses, idk!!"));
 
 std::mutex setupbones_mutex;
 

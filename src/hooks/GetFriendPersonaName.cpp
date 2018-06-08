@@ -5,15 +5,15 @@
 
 #include "HookedMethods.hpp"
 
-static CatVar ipc_name(CV_STRING, "name_ipc", "", "IPC Name");
+static CatVar ipc_name(CV_STRING, XORSTR("name_ipc"), XORSTR(""), XORSTR("IPC Name"));
 
-static CatEnum namesteal_enum({ "OFF", "PASSIVE", "ACTIVE" });
+static CatEnum namesteal_enum({ XORSTR("OFF"), XORSTR("PASSIVE"), XORSTR("ACTIVE") });
 static CatVar
-    namesteal(namesteal_enum, "name_stealer", "0", "Name Stealer",
-              "Attemt to steal your teammates names. Usefull for avoiding "
-              "kicks\nPassive only changes when the name stolen is no "
-              "longer the best name to use\nActive Attemps to change the "
-              "name whenever possible");
+    namesteal(namesteal_enum, XORSTR("name_stealer"), XORSTR("0"), XORSTR("Name Stealer"),
+              XORSTR("Attemt to steal your teammates names. Usefull for avoiding ")
+              XORSTR("kicks\nPassive only changes when the name stolen is no ")
+              XORSTR("longer the best name to use\nActive Attemps to change the ")
+              XORSTR("name whenever possible"));
 
 static std::string stolen_name;
 
@@ -116,7 +116,7 @@ DEFINE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *this_,
         namestr.assign(ipc_name.GetString());
         if (namestr.length() > 3)
         {
-            ReplaceString(namestr, "%%", std::to_string(ipc::peer->client_id));
+            ReplaceString(namestr, XORSTR("%%"), std::to_string(ipc::peer->client_id));
             return namestr.c_str();
         }
     }
@@ -137,7 +137,7 @@ DEFINE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *this_,
             {
 
                 // Return the name that has changed from the func above
-                return format(stolen_name, "\x0F").c_str();
+                return format(stolen_name, XORSTR("\x0F")).c_str();
             }
         }
     }

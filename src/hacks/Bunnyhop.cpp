@@ -16,12 +16,12 @@ namespace bunnyhop
 
 // Var for user settings
 static CatVar
-    enabled(CV_SWITCH, "bhop_enabled", "0", "Bunnyhop",
-            "Enable Bunnyhop. All extra features like autojump and perfect "
-            "jump limit were temporary removed.");
-// CatVar perfect_jump_limit(CV_INT, "bhop_enabled", "0", "Bunnyhop", "Enable
+    enabled(CV_SWITCH, XORSTR("bhop_enabled"), XORSTR("0"), XORSTR("Bunnyhop"),
+            XORSTR("Enable Bunnyhop. All extra features like autojump and perfect ")
+            XORSTR("jump limit were temporary removed."));
+// CatVar perfect_jump_limit(CV_INT, XORSTR("bhop_enabled"), XORSTR("0"), XORSTR("Bunnyhop"), XORSTR("Enable
 // Bunnyhop. All extra features like autojump and perfect jump limit were
-// temporary removed.");
+// temporary removed.XORSTR(");
 
 static int ticks_last_jump = 0;
 // static int perfect_jumps = 0;
@@ -39,7 +39,7 @@ void CreateMove()
     if (!g_pUserCmd->command_number)
         return;
 
-    // var for "if on ground" from the flags netvar
+    // var for XORSTR("if on ground") from the flags netvar
     bool ground = CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & (1 << 0);
     // Var for if the player is pressing jump
     bool jump = (g_pUserCmd->buttons & IN_JUMP);

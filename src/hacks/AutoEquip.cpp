@@ -8,6 +8,6 @@
 
 void CreateMove()
 {
-    auto preset = g_ICvar->FindCommand("load_itempreset");
+    auto preset = g_ICvar->FindCommand(XORSTR("load_itempreset"));
     const CCommand cmd;
 }

@@ -14,10 +14,10 @@ namespace tf2
 namespace antidisguise
 {
 
-static CatVar enabled(CV_SWITCH, "antidisguise", "0", "Remove spy disguise",
-                      "Removes the disguise from spys\nUsefull for aimbot");
-static CatVar no_invisibility(CV_SWITCH, "no_invis", "0", "Remove Invisibility",
-                              "Useful with chams!");
+static CatVar enabled(CV_SWITCH, XORSTR("antidisguise"), XORSTR("0"), XORSTR("Remove spy disguise"),
+                      XORSTR("Removes the disguise from spys\nUsefull for aimbot"));
+static CatVar no_invisibility(CV_SWITCH, XORSTR("no_invis"), XORSTR("0"), XORSTR("Remove Invisibility"),
+                              XORSTR("Useful with chams!"));
 
 void Draw()
 {

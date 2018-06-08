@@ -5,8 +5,8 @@
 
 #include "HookedMethods.hpp"
 
-static CatVar medal_flip(CV_SWITCH, "medal_flip", "0", "Infinite Medal Flip",
-                         "");
+static CatVar medal_flip(CV_SWITCH, XORSTR("medal_flip"), XORSTR("0"), XORSTR("Infinite Medal Flip"),
+                         XORSTR(""));
 
 namespace hooked_methods
 {

@@ -16,7 +16,7 @@ int GetRebasedCatVarCount()
     return rebased_count;
 }
 
-static CatCommand cfg_rebase("cfg_setbase", "Rebase config", []() {
+static CatCommand cfg_rebase(XORSTR("cfg_setbase"), XORSTR("Rebase config"), []() {
     for (auto &cv : CatVarList())
     {
         std::string value(cv->GetString());
@@ -26,10 +26,10 @@ static CatCommand cfg_rebase("cfg_setbase", "Rebase config", []() {
             rebased_count++;
         }
     }
-    logging::Info("Successfully rebased %d variables", rebased_count);
+    logging::Info(XORSTR("Successfully rebased %d variables"), rebased_count);
 });
 
-static CatCommand cfg_resetbase("cfg_resetbase", "Reset config base", []() {
+static CatCommand cfg_resetbase(XORSTR("cfg_resetbase"), XORSTR("Reset config base"), []() {
     for (auto &cv : CatVarList())
     {
         cv->current_base = cv->defaults;
@@ -38,23 +38,23 @@ static CatCommand cfg_resetbase("cfg_resetbase", "Reset config base", []() {
 });
 
 static CatCommand save_settings(
-    "save", "Save settings (optional filename)", [](const CCommand &args) {
-        std::string filename("lastcfg");
+    XORSTR("save"), XORSTR("Save settings (optional filename)"), [](const CCommand &args) {
+        std::string filename(XORSTR("lastcfg"));
         if (args.ArgC() > 1)
         {
             filename = std::string(args.Arg(1));
         }
-        std::string path = format("tf/cfg/cat_", filename, ".cfg");
-        logging::Info("Saving settings to %s", path.c_str());
+        std::string path = format(XORSTR("tf/cfg/cat_"), filename, XORSTR(".cfg"));
+        logging::Info(XORSTR("Saving settings to %s"), path.c_str());
         if (GetRebasedCatVarCount())
         {
-            logging::Info("[Warning] %d CatVars are rebased!",
+            logging::Info(XORSTR("[Warning] %d CatVars are rebased!"),
                           GetRebasedCatVarCount());
         }
         std::ofstream file(path, std::ios::out);
         if (file.bad())
         {
-            logging::Info("Couldn't open the file!");
+            logging::Info(XORSTR("Couldn't open the file!"));
             return;
         }
         for (const auto &i : CatVarList())
@@ -65,32 +65,32 @@ static CatCommand save_settings(
                 continue;
             if (i->GetBase() != std::string(i->GetString()))
             {
-                file << CON_PREFIX << i->name << " \"" << i->GetString()
-                     << "\"\n";
+                file << CON_PREFIX << i->name << XORSTR(" \"") << i->GetString()
+                     << XORSTR("\"\n");
             }
         }
         file.close();
     });
 
 static CatCommand save_settings_complete(
-    "save_complete", "Save all settings (optional filename)",
+    XORSTR("save_complete"), XORSTR("Save all settings (optional filename)"),
     [](const CCommand &args) {
-        std::string filename("lastcfg");
+        std::string filename(XORSTR("lastcfg"));
         if (args.ArgC() > 1)
         {
             filename = std::string(args.Arg(1));
         }
-        std::string path = format("tf/cfg/cat_", filename, ".cfg");
-        logging::Info("Saving settings to %s", path.c_str());
+        std::string path = format(XORSTR("tf/cfg/cat_"), filename, XORSTR(".cfg"));
+        logging::Info(XORSTR("Saving settings to %s"), path.c_str());
         if (GetRebasedCatVarCount())
         {
-            logging::Info("[Warning] %d CatVars are rebased!",
+            logging::Info(XORSTR("[Warning] %d CatVars are rebased!"),
                           GetRebasedCatVarCount());
         }
         std::ofstream file(path, std::ios::out);
         if (file.bad())
         {
-            logging::Info("Couldn't open the file!");
+            logging::Info(XORSTR("Couldn't open the file!"));
             return;
         }
         for (const auto &i : CatVarList())
@@ -99,7 +99,7 @@ static CatCommand save_settings_complete(
                 continue;
             if (!i->GetString())
                 continue;
-            file << CON_PREFIX << i->name << " \"" << i->GetString() << "\"\n";
+            file << CON_PREFIX << i->name << XORSTR(" \"") << i->GetString() << XORSTR("\"\n");
         }
         file.close();
     });
@@ -149,7 +149,7 @@ void CatCommand::Register()
     else if (callback_void)
         cmd = new ConCommand(name_c, callback_void, help_c);
     else
-        throw std::logic_error("no callback in CatCommand");
+        throw std::logic_error(XORSTR("no callback in CatCommand"));
     g_ICvar->RegisterConCommand(cmd);
     RegisteredCommandsList().push_back(cmd);
     // name_c and help_c are not freed because ConCommandBase doesn't copy them
@@ -260,7 +260,7 @@ std::string CatEnum::Name(int value)
     {
         return value_names.at(unsigned(value) - unsigned(min_value));
     }
-    return "unknown";
+    return XORSTR("unknown");
 }
 
 std::vector<CatVar *> &CatVarList()

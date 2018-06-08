@@ -14,8 +14,8 @@ CTFGCClientSystem *CTFGCClientSystem::GTFGCClientSystem()
 {
     typedef CTFGCClientSystem *(*GTFGCClientSystem_t)();
     static uintptr_t addr1 = gSignatures.GetClientSignature(
-        "55 B8 ? ? ? ? 89 E5 5D C3 8D B6 00 00 00 00 55 A1 ? ? ? ? 89 E5 5D C3 "
-        "8D B6 00 00 00 00 A1");
+        XORSTR("55 B8 ? ? ? ? 89 E5 5D C3 8D B6 00 00 00 00 55 A1 ? ? ? ? 89 E5 5D C3 ")
+        XORSTR("8D B6 00 00 00 00 A1"));
     static GTFGCClientSystem_t GTFGCClientSystem_fn =
         GTFGCClientSystem_t(addr1);
 
@@ -26,12 +26,12 @@ void CTFGCClientSystem::AbandonCurrentMatch()
 {
     typedef void *(*AbandonCurrentMatch_t)(CTFGCClientSystem *);
     static uintptr_t addr1 = gSignatures.GetClientSignature(
-        "55 89 E5 57 56 8D 75 ? 53 81 EC ? ? ? ? C7 04 24");
+        XORSTR("55 89 E5 57 56 8D 75 ? 53 81 EC ? ? ? ? C7 04 24"));
     static AbandonCurrentMatch_t AbandonCurrentMatch_fn =
         AbandonCurrentMatch_t(addr1);
     if (AbandonCurrentMatch_fn == nullptr)
     {
-        logging::Info("calling NULL!");
+        logging::Info(XORSTR("calling NULL!"));
     }
     AbandonCurrentMatch_fn(this);
 }
@@ -40,7 +40,7 @@ bool CTFGCClientSystem::BConnectedToMatchServer(bool flag)
 {
     typedef bool (*BConnectedToMatchServer_t)(CTFGCClientSystem *, bool);
     static uintptr_t addr =
-        gSignatures.GetClientSignature("55 89 E5 53 80 7D ? ? 8B 55 ? 75");
+        gSignatures.GetClientSignature(XORSTR("55 89 E5 53 80 7D ? ? 8B 55 ? 75"));
     static BConnectedToMatchServer_t BConnectedToMatchServer_fn =
         BConnectedToMatchServer_t(addr);
 
@@ -51,11 +51,11 @@ bool CTFGCClientSystem::BHaveLiveMatch()
 {
     typedef int (*BHaveLiveMatch_t)(CTFGCClientSystem *);
     static uintptr_t addr =
-        gSignatures.GetClientSignature("55 31 C0 89 E5 53 8B 4D ? 0F B6 91");
+        gSignatures.GetClientSignature(XORSTR("55 31 C0 89 E5 53 8B 4D ? 0F B6 91"));
     static BHaveLiveMatch_t BHaveLiveMatch_fn = BHaveLiveMatch_t(addr);
     if (BHaveLiveMatch_fn == nullptr)
     {
-        logging::Info("calling NULL!");
+        logging::Info(XORSTR("calling NULL!"));
     }
     return BHaveLiveMatch_fn(this);
 }

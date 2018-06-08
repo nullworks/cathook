@@ -21,7 +21,7 @@ std::vector<std::string> invalidvars, missingvars, menu_vars;
 
 List::List(std::string title)
     : open_sublist(nullptr), title(title), got_mouse(false),
-      CBaseContainer("ncc_list")
+      CBaseContainer(XORSTR("ncc_list"))
 {
     AddChild(new ItemTitle(title));
     Hide();
@@ -29,8 +29,8 @@ List::List(std::string title)
 }
 
 List::List()
-    : open_sublist(nullptr), title(""), got_mouse(false),
-      CBaseContainer("ncc_list")
+    : open_sublist(nullptr), title(XORSTR("")), got_mouse(false),
+      CBaseContainer(XORSTR("ncc_list"))
 {
     Hide();
     root_list = this;
@@ -102,8 +102,8 @@ static CatVar *FindCatVar(const std::string name)
     }
     invalidvars.push_back(name);
     DecoyCatVar *unknownvar =
-        new DecoyCatVar(format("Error, can't find ", name));
-    logging::Info("Can't find %s", name.c_str());
+        new DecoyCatVar(format(XORSTR("Error, can't find "), name));
+    logging::Info(XORSTR("Can't find %s"), name.c_str());
     return (CatVar *) unknownvar;
 }
 
@@ -121,12 +121,12 @@ void List::ShowInvalidCatVars()
 {
     if (invalidvars.size())
     {
-        g_ICvar->ConsolePrintf("The following CatVars are invalid\n");
+        g_ICvar->ConsolePrintf(XORSTR("The following CatVars are invalid\n"));
         for (int i = 0; i < invalidvars.size(); i++)
-            g_ICvar->ConsolePrintf("%s\n", invalidvars[i].c_str());
+            g_ICvar->ConsolePrintf(XORSTR("%s\n"), invalidvars[i].c_str());
     }
     else
-        g_ICvar->ConsolePrintf("No CatVars are invalid\n");
+        g_ICvar->ConsolePrintf(XORSTR("No CatVars are invalid\n"));
     static bool init = false;
     if (!init)
     {
@@ -139,12 +139,12 @@ void List::ShowMissingCatVars()
 {
     if (missingvars.size())
     {
-        g_ICvar->ConsolePrintf("The following CatVars are missing\n");
+        g_ICvar->ConsolePrintf(XORSTR("The following CatVars are missing\n"));
         for (int i = 0; i < missingvars.size(); i++)
-            g_ICvar->ConsolePrintf("%s\n", missingvars[i].c_str());
+            g_ICvar->ConsolePrintf(XORSTR("%s\n"), missingvars[i].c_str());
     }
     else
-        g_ICvar->ConsolePrintf("No CatVars are missing\n");
+        g_ICvar->ConsolePrintf(XORSTR("No CatVars are missing\n"));
 }
 // abc def, ghj, [, fdg sgf saqw rter, ], gs
 void FillFromTokens(List *list, const std::vector<std::string> &tokens)
@@ -154,7 +154,7 @@ void FillFromTokens(List *list, const std::vector<std::string> &tokens)
     for (int i = 1; i < tokens.size(); i++)
     {
         const std::string &str = tokens.at(i);
-        if (i == tokens.size() - 1 || tokens[i + 1] != "[")
+        if (i == tokens.size() - 1 || tokens[i + 1] != XORSTR("["))
         {
             list->AddChild(new ItemVariable(*FindCatVar(str)));
             menu_vars.push_back(str);
@@ -172,8 +172,8 @@ List *List::FromString(const std::string &string)
 {
     List *result              = new List();
     bool readingkey           = false;
-    std::string last_read_key = "";
-    std::stringstream readkey("");
+    std::string last_read_key = XORSTR("");
+    std::stringstream readkey(XORSTR(""));
     std::vector<std::string> tokens = {};
     int brackets                    = 0;
     for (const auto &c : string)
@@ -183,8 +183,8 @@ List *List::FromString(const std::string &string)
             brackets++;
             if (brackets == 1)
             {
-                tokens.push_back("[");
-                readkey.str("");
+                tokens.push_back(XORSTR("["));
+                readkey.str(XORSTR(""));
                 readkey.clear();
                 continue;
             }
@@ -195,21 +195,21 @@ List *List::FromString(const std::string &string)
             if (!brackets)
             {
                 tokens.push_back(readkey.str());
-                tokens.push_back("]");
-                readkey.str("");
+                tokens.push_back(XORSTR("]"));
+                readkey.str(XORSTR(""));
                 readkey.clear();
                 continue;
             }
         }
         if (!brackets)
         {
-            if (c == '"')
+            if (c == 'XORSTR("')
             {
                 readingkey = !readingkey;
                 if (!readingkey)
                 {
                     tokens.push_back(readkey.str());
-                    readkey.str("");
+                    readkey.str(XORSTR(""));
                     readkey.clear();
                 }
             }
@@ -225,7 +225,7 @@ List *List::FromString(const std::string &string)
         }
     }
     FillFromTokens(result, tokens);
-    logging::Info("done making list %s - has %i children.",
+    logging::Info(XORSTR("done making list %s - has %i children."),
                   result->title.c_str(), result->ChildCount());
     return result;
 }
@@ -255,9 +255,9 @@ void List::Draw(int x, int y)
 {
     // const auto& size = GetSize();
     draw::OutlineRect(x, y, 2 + Item::size_x,
-                      Props()->GetInt("items") * Item::size_y + 2,
+                      Props()->GetInt(XORSTR("items")) * Item::size_y + 2,
                       NCGUIColor());
-    for (int i = 1; i < Props()->GetInt("items"); i++)
+    for (int i = 1; i < Props()->GetInt(XORSTR("items")); i++)
     {
         draw::DrawLine(x + 1, y + Item::size_y * i, Item::size_x, 0,
                        NCGUIColor());
@@ -268,9 +268,9 @@ void List::Draw(int x, int y)
         Item *item = dynamic_cast<Item *>(ChildByIndex(i));
         if (!item)
         {
-            if (ChildByIndex(i)->GetName().find("ncc_list") == 0)
+            if (ChildByIndex(i)->GetName().find(XORSTR("ncc_list")) == 0)
                 continue;
-            throw std::runtime_error("Invalid cast in NCC-List:Draw!");
+            throw std::runtime_error(XORSTR("Invalid cast in NCC-List:Draw!"));
         }
         const auto &offset = item->GetOffset();
         item->Draw(x + offset.first, y + offset.second);
@@ -320,17 +320,17 @@ void List::MoveChildren()
         Item *item = dynamic_cast<Item *>(ChildByIndex(i));
         if (!item)
         {
-            if (ChildByIndex(i)->GetName().find("ncc_list") == 0)
+            if (ChildByIndex(i)->GetName().find(XORSTR("ncc_list")) == 0)
                 continue;
             throw std::runtime_error(
-                "Invalid cast in NCC-List:MoveChildren! Offender " +
+                XORSTR("Invalid cast in NCC-List:MoveChildren! Offender ") +
                 ChildByIndex(i)->GetName());
         }
         item->SetOffset(1, j * Item::size_y + 1);
         accy += Item::size_y;
         j++;
     }
-    Props()->SetInt("items", j);
+    Props()->SetInt(XORSTR("items"), j);
     List *list = dynamic_cast<List *>(open_sublist);
     if (list)
     {

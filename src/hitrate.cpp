@@ -18,7 +18,7 @@ int count_shots{ 0 };
 int count_hits{ 0 };
 int count_hits_head{ 0 };
 
-CatVar hitrate_check(CV_SWITCH, "hitrate", "1", "Monitor hitrate");
+CatVar hitrate_check(CV_SWITCH, XORSTR("hitrate"), XORSTR("1"), XORSTR("Monitor hitrate"));
 
 std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>
     shots{};
@@ -37,7 +37,7 @@ void OnHit(bool crit)
     }
 }
 
-CatCommand debug_hitrate("debug_hitrate", "Debug hitrate", []() {
+CatCommand debug_hitrate(XORSTR("debug_hitrate"), XORSTR("Debug hitrate"), []() {
     int p1 = 0;
     int p2 = 0;
     if (count_shots)
@@ -48,14 +48,14 @@ CatCommand debug_hitrate("debug_hitrate", "Debug hitrate", []() {
     {
         p2 = float(count_hits_head) / float(count_hits) * 100.0f;
     }
-    logging::Info("%d / %d (%d%%)", count_hits, count_shots, p1);
-    logging::Info("%d / %d (%d%%)", count_hits_head, count_hits, p2);
+    logging::Info(XORSTR("%d / %d (%d%%)"), count_hits, count_shots, p1);
+    logging::Info(XORSTR("%d / %d (%d%%)"), count_hits_head, count_hits, p2);
 });
 
-CatCommand debug_ammo("debug_ammo", "Debug ammo", []() {
+CatCommand debug_ammo(XORSTR("debug_ammo"), XORSTR("Debug ammo"), []() {
     for (int i = 0; i < 4; i++)
     {
-        logging::Info("%d %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
+        logging::Info(XORSTR("%d %d"), i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
     }
 });
 
@@ -91,15 +91,15 @@ class HurtListener : public IGameEventListener
 public:
     virtual void FireGameEvent(KeyValues *event)
     {
-        if (strcmp("player_hurt", event->GetName()))
+        if (strcmp(XORSTR("player_hurt"), event->GetName()))
             return;
-        if (g_IEngine->GetPlayerForUserID(event->GetInt("attacker")) ==
+        if (g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("attacker"))) ==
             g_IEngine->GetLocalPlayer())
         {
             if (CE_GOOD(LOCAL_W) &&
                 (LOCAL_W->m_iClassID() == CL_CLASS(CTFSniperRifle) ||
                  LOCAL_W->m_iClassID() == CL_CLASS(CTFSniperRifleDecap)))
-                OnHit(event->GetBool("crit"));
+                OnHit(event->GetBool(XORSTR("crit")));
         }
     }
 };

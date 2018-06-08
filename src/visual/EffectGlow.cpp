@@ -18,49 +18,49 @@ CScreenSpaceEffectRegistration **g_ppScreenSpaceRegistrationHead = nullptr;
 CScreenSpaceEffectRegistration::CScreenSpaceEffectRegistration(
     const char *pName, IScreenSpaceEffect *pEffect)
 {
-    logging::Info("Creating new effect '%s', head: 0x%08x", pName,
+    logging::Info(XORSTR("Creating new effect '%s', head: 0x%08x"), pName,
                   *g_ppScreenSpaceRegistrationHead);
     m_pEffectName                    = pName;
     m_pEffect                        = pEffect;
     m_pNext                          = *g_ppScreenSpaceRegistrationHead;
     *g_ppScreenSpaceRegistrationHead = this;
-    logging::Info("New head: 0x%08x", *g_ppScreenSpaceRegistrationHead);
+    logging::Info(XORSTR("New head: 0x%08x"), *g_ppScreenSpaceRegistrationHead);
 }
 
 namespace effect_glow
 {
 
-static CatVar enable(CV_SWITCH, "glow_enable", "0", "Enable",
-                     "Main glow switch");
-static CatVar health(CV_SWITCH, "glow_health", "0", "Health",
-                     "Change glow color based on their health");
-static CatVar teammates(CV_SWITCH, "glow_teammates", "0", "Teammates",
-                        "Render glow on teammates");
-static CatVar players(CV_SWITCH, "glow_players", "1", "Players",
-                      "Render glow on player models");
-static CatVar medkits(CV_SWITCH, "glow_medkits", "0", "Medkits",
-                      "Render glow on medkits");
-static CatVar ammobox(CV_SWITCH, "glow_ammo", "0", "Ammoboxes",
-                      "Render glow on ammoboxes");
-static CatVar buildings(CV_SWITCH, "glow_buildings", "0", "Buildings",
-                        "Render glow on buildings");
-static CatVar stickies(CV_SWITCH, "glow_stickies", "0", "Stickies",
-                       "Render glow on stickybombs");
-static CatVar teammate_buildings(CV_SWITCH, "glow_teammate_buildings", "0",
-                                 "Teammate Buildings",
-                                 "Render glow on teammates buildings");
-static CatVar powerups(CV_SWITCH, "glow_powerups", "1", "Powerups");
-static CatVar weapons_white(CV_SWITCH, "glow_weapons_white", "1",
-                            "White Weapon Glow", "Weapons will glow white");
-static CatVar glowself(CV_SWITCH, "glow_self", "0", "Enable glow on self");
-static CatVar rainbow(CV_SWITCH, "glow_self_rainbow", "1",
-                      "Enable rainbow glow on self",
-                      "Only visible in thirdperson!");
-static CatVar glowteam(CV_SWITCH, "glow_self_team", "0", "Team chams color");
-static CatVar glowR(CV_INT, "glow_self_r", "200", "Self glow red", "", 0, 255);
-static CatVar glowG(CV_INT, "glow_self_g", "200", "Self glow green", "", 0,
+static CatVar enable(CV_SWITCH, XORSTR("glow_enable"), XORSTR("0"), XORSTR("Enable"),
+                     XORSTR("Main glow switch"));
+static CatVar health(CV_SWITCH, XORSTR("glow_health"), XORSTR("0"), XORSTR("Health"),
+                     XORSTR("Change glow color based on their health"));
+static CatVar teammates(CV_SWITCH, XORSTR("glow_teammates"), XORSTR("0"), XORSTR("Teammates"),
+                        XORSTR("Render glow on teammates"));
+static CatVar players(CV_SWITCH, XORSTR("glow_players"), XORSTR("1"), XORSTR("Players"),
+                      XORSTR("Render glow on player models"));
+static CatVar medkits(CV_SWITCH, XORSTR("glow_medkits"), XORSTR("0"), XORSTR("Medkits"),
+                      XORSTR("Render glow on medkits"));
+static CatVar ammobox(CV_SWITCH, XORSTR("glow_ammo"), XORSTR("0"), XORSTR("Ammoboxes"),
+                      XORSTR("Render glow on ammoboxes"));
+static CatVar buildings(CV_SWITCH, XORSTR("glow_buildings"), XORSTR("0"), XORSTR("Buildings"),
+                        XORSTR("Render glow on buildings"));
+static CatVar stickies(CV_SWITCH, XORSTR("glow_stickies"), XORSTR("0"), XORSTR("Stickies"),
+                       XORSTR("Render glow on stickybombs"));
+static CatVar teammate_buildings(CV_SWITCH, XORSTR("glow_teammate_buildings"), XORSTR("0"),
+                                 XORSTR("Teammate Buildings"),
+                                 XORSTR("Render glow on teammates buildings"));
+static CatVar powerups(CV_SWITCH, XORSTR("glow_powerups"), XORSTR("1"), XORSTR("Powerups"));
+static CatVar weapons_white(CV_SWITCH, XORSTR("glow_weapons_white"), XORSTR("1"),
+                            XORSTR("White Weapon Glow"), XORSTR("Weapons will glow white"));
+static CatVar glowself(CV_SWITCH, XORSTR("glow_self"), XORSTR("0"), XORSTR("Enable glow on self"));
+static CatVar rainbow(CV_SWITCH, XORSTR("glow_self_rainbow"), XORSTR("1"),
+                      XORSTR("Enable rainbow glow on self"),
+                      XORSTR("Only visible in thirdperson!"));
+static CatVar glowteam(CV_SWITCH, XORSTR("glow_self_team"), XORSTR("0"), XORSTR("Team chams color"));
+static CatVar glowR(CV_INT, XORSTR("glow_self_r"), XORSTR("200"), XORSTR("Self glow red"), XORSTR(""), 0, 255);
+static CatVar glowG(CV_INT, XORSTR("glow_self_g"), XORSTR("200"), XORSTR("Self glow green"), XORSTR(""), 0,
                     255);
-static CatVar glowB(CV_INT, "glow_self_b", "200", "Self glow blue", "", 0, 255);
+static CatVar glowB(CV_INT, XORSTR("glow_self_b"), XORSTR("200"), XORSTR("Self glow blue"), XORSTR(""), 0, 255);
 
 struct ShaderStencilState_t
 {
@@ -108,14 +108,14 @@ ITexture *GetBuffer(int i)
     {
         ITexture *fullframe;
         IF_GAME(IsTF2())
-        fullframe = g_IMaterialSystem->FindTexture("_rt_FullFrameFB",
+        fullframe = g_IMaterialSystem->FindTexture(XORSTR("_rt_FullFrameFB"),
                                                    TEXTURE_GROUP_RENDER_TARGET);
         else fullframe = g_IMaterialSystemHL->FindTexture(
-            "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+            XORSTR("_rt_FullFrameFB"), TEXTURE_GROUP_RENDER_TARGET);
         char *newname    = new char[32];
-        std::string name = format("_cathook_buff", i);
+        std::string name = format(XORSTR("_cathook_buff"), i);
         strncpy(newname, name.c_str(), 30);
-        logging::Info("Creating new buffer %d with size %dx%d %s", i,
+        logging::Info(XORSTR("Creating new buffer %d with size %dx%d %s"), i,
                       fullframe->GetActualWidth(), fullframe->GetActualHeight(),
                       newname);
 
@@ -153,46 +153,46 @@ static ShaderStencilState_t SS_Drawing{};
 
 void EffectGlow::Init()
 {
-    logging::Info("Init Glow...");
+    logging::Info(XORSTR("Init Glow..."));
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
-        kv->SetString("$basetexture", "vgui/white_additive");
-        kv->SetInt("$ignorez", 0);
-        mat_unlit.Init("__cathook_glow_unlit", kv);
+        KeyValues *kv = new KeyValues(XORSTR("UnlitGeneric"));
+        kv->SetString(XORSTR("$basetexture"), XORSTR("vgui/white_additive"));
+        kv->SetInt(XORSTR("$ignorez"), 0);
+        mat_unlit.Init(XORSTR("__cathook_glow_unlit"), kv);
     }
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
-        kv->SetString("$basetexture", "vgui/white_additive");
-        kv->SetInt("$ignorez", 1);
-        mat_unlit_z.Init("__cathook_glow_unlit_z", kv);
+        KeyValues *kv = new KeyValues(XORSTR("UnlitGeneric"));
+        kv->SetString(XORSTR("$basetexture"), XORSTR("vgui/white_additive"));
+        kv->SetInt(XORSTR("$ignorez"), 1);
+        mat_unlit_z.Init(XORSTR("__cathook_glow_unlit_z"), kv);
     }
     // Initialize 2 buffers
     GetBuffer(1);
     GetBuffer(2);
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
-        kv->SetString("$basetexture", "_cathook_buff1");
-        kv->SetInt("$additive", 1);
-        mat_blit.Init("__cathook_glow_blit", TEXTURE_GROUP_CLIENT_EFFECTS, kv);
+        KeyValues *kv = new KeyValues(XORSTR("UnlitGeneric"));
+        kv->SetString(XORSTR("$basetexture"), XORSTR("_cathook_buff1"));
+        kv->SetInt(XORSTR("$additive"), 1);
+        mat_blit.Init(XORSTR("__cathook_glow_blit"), TEXTURE_GROUP_CLIENT_EFFECTS, kv);
         mat_blit->Refresh();
     }
     {
-        KeyValues *kv = new KeyValues("BlurFilterX");
-        kv->SetString("$basetexture", "_cathook_buff1");
-        kv->SetInt("$ignorez", 1);
-        kv->SetInt("$translucent", 1);
-        kv->SetInt("$alphatest", 1);
-        mat_blur_x.Init("_cathook_blurx", kv);
+        KeyValues *kv = new KeyValues(XORSTR("BlurFilterX"));
+        kv->SetString(XORSTR("$basetexture"), XORSTR("_cathook_buff1"));
+        kv->SetInt(XORSTR("$ignorez"), 1);
+        kv->SetInt(XORSTR("$translucent"), 1);
+        kv->SetInt(XORSTR("$alphatest"), 1);
+        mat_blur_x.Init(XORSTR("_cathook_blurx"), kv);
         mat_blur_x->Refresh();
     }
     {
-        KeyValues *kv = new KeyValues("BlurFilterY");
-        kv->SetString("$basetexture", "_cathook_buff2");
-        kv->SetInt("$bloomamount", 5);
-        kv->SetInt("$ignorez", 1);
-        kv->SetInt("$translucent", 1);
-        kv->SetInt("$alphatest", 1);
-        mat_blur_y.Init("_cathook_blury", kv);
+        KeyValues *kv = new KeyValues(XORSTR("BlurFilterY"));
+        kv->SetString(XORSTR("$basetexture"), XORSTR("_cathook_buff2"));
+        kv->SetInt(XORSTR("$bloomamount"), 5);
+        kv->SetInt(XORSTR("$ignorez"), 1);
+        kv->SetInt(XORSTR("$translucent"), 1);
+        kv->SetInt(XORSTR("$alphatest"), 1);
+        mat_blur_y.Init(XORSTR("_cathook_blury"), kv);
         mat_blur_y->Refresh();
     }
     {
@@ -222,7 +222,7 @@ void EffectGlow::Init()
         SS_Drawing.m_PassOp          = STENCILOPERATION_ZERO;
     }
 
-    logging::Info("Init done!");
+    logging::Info(XORSTR("Init done!"));
     init = true;
 }
 
@@ -352,11 +352,11 @@ void EffectGlow::EndRenderGlow()
 }
 
 // https://puu.sh/vobH4/5da8367aef.png
-static CatEnum solid_when_enum({ "Never", "Always", "Invisible" });
-static CatVar blur_scale(CV_INT, "glow_blur_scale", "5", "Blur amount",
-                         "Ammount to blur the glow");
-static CatVar solid_when(solid_when_enum, "glow_solid_when", "0", "Solid when",
-                         "Glow will be solid when entity is...");
+static CatEnum solid_when_enum({ XORSTR("Never"), XORSTR("Always"), XORSTR("Invisible") });
+static CatVar blur_scale(CV_INT, XORSTR("glow_blur_scale"), XORSTR("5"), XORSTR("Blur amount"),
+                         XORSTR("Ammount to blur the glow"));
+static CatVar solid_when(solid_when_enum, XORSTR("glow_solid_when"), XORSTR("0"), XORSTR("Solid when"),
+                         XORSTR("Glow will be solid when entity is..."));
 
 void EffectGlow::StartStenciling()
 {
@@ -492,7 +492,7 @@ void EffectGlow::Render(int x, int y, int w, int h)
     ptr->DrawScreenSpaceRectangle(mat_blur_x, x, y, w, h, 0, 0, w - 1, h - 1, w,
                                   h);
     ptr->SetRenderTarget(GetBuffer(1));
-    blury_bloomamount = mat_blur_y->FindVar("$bloomamount", nullptr);
+    blury_bloomamount = mat_blur_y->FindVar(XORSTR("$bloomamount"), nullptr);
     blury_bloomamount->SetIntValue((int) blur_scale);
     ptr->DrawScreenSpaceRectangle(mat_blur_y, x, y, w, h, 0, 0, w - 1, h - 1, w,
                                   h);

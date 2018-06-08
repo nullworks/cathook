@@ -15,37 +15,37 @@ void EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG()
 {
     // Does not work
     // ((ICommandLine*(*)(void))dlsym(sharedobj::tier0().lmap,
-    // "CommandLine_Tier0"))()->RemoveParm("-textmode");
+    // XORSTR("CommandLine_Tier0")))()->RemoveParm(XORSTR("-textmode"));
     // ((ICommandLine*(*)(void))dlsym(sharedobj::tier0().lmap,
-    // "CommandLine_Tier0"))()->RemoveParm("-insecure");
+    // XORSTR("CommandLine_Tier0")))()->RemoveParm(XORSTR("-insecure"));
     static unsigned char patch[] = { 0x55, 0x89, 0xE5, 0x83, 0xEC, 0x18, 0xB8,
                                      0x01, 0x00, 0x00, 0x00, 0xC9, 0xC3 };
     uintptr_t Host_IsSecureServerAllowed_addr = gSignatures.GetEngineSignature(
-        "55 89 E5 83 EC 18 E8 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 "
-        "2C 85 C0 74 11");
+        XORSTR("55 89 E5 83 EC 18 E8 ? ? ? ? 8B 10 C7 44 24 04 ? ? ? ? 89 04 24 FF 52 ")
+        XORSTR("2C 85 C0 74 11"));
     // +0x21 = allowSecureServers
-    // logging::Info("1337 VAC bypass: 0x%08x",
+    // logging::Info(XORSTR("1337 VAC bypass: 0x%08x"),
     // Host_IsSecureServerAllowed_addr);
     Patch((void *) Host_IsSecureServerAllowed_addr, (void *) patch,
           sizeof(patch));
     uintptr_t allowSecureServers_addr = Host_IsSecureServerAllowed_addr + 0x21;
     allowSecureServers                = *(bool **) (allowSecureServers_addr);
-    logging::Info("Allow Secure Servers: 0x%08x", allowSecureServers);
+    logging::Info(XORSTR("Allow Secure Servers: 0x%08x"), allowSecureServers);
     *allowSecureServers = true;
-    logging::Info("Allow Secure Servers: %d", *allowSecureServers);
+    logging::Info(XORSTR("Allow Secure Servers: %d"), *allowSecureServers);
 }
 
-CatCommand fixvac("fixvac", "Lemme in to secure servers", []() {
+CatCommand fixvac(XORSTR("fixvac"), XORSTR("Lemme in to secure servers"), []() {
     EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG();
 });
 
 InitRoutine init([]() {
 #if ENABLE_TEXTMODE_STDIN
-    logging::Info("[TEXTMODE] Setting up input handling");
+    logging::Info(XORSTR("[TEXTMODE] Setting up input handling"));
     int flags = fcntl(0, F_GETFL, 0);
     flags |= O_NONBLOCK;
     fcntl(0, F_SETFL, flags);
-    logging::Info("[TEXTMODE] stdin is now non-blocking");
+    logging::Info(XORSTR("[TEXTMODE] stdin is now non-blocking"));
 #endif
 #if ENABLE_VAC_BYPASS
     EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG();

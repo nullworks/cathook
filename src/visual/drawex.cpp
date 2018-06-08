@@ -15,7 +15,7 @@
 #include <visual/SDLHooks.hpp>
 
 #if EXTERNAL_DRAWING
-extern "C" {
+extern XORSTR("C") {
 #include <xoverlay.h>
 }
 #endif
@@ -33,7 +33,7 @@ bool init        = false;
 
 font_handle_t create_font(const char *path, float size)
 {
-    logging::Info("Creating font '%s':%f", path, size);
+    logging::Info(XORSTR("Creating font '%s':%f"), path, size);
     font_handle_t result;
     result.filename = std::string(path);
     result.size     = size;
@@ -70,11 +70,11 @@ void initialize()
     xoverlay_draw_end();
     if (status < 0)
     {
-        logging::Info("ERROR: could not initialize Xoverlay: %d", status);
+        logging::Info(XORSTR("ERROR: could not initialize Xoverlay: %d"), status);
     }
     else
     {
-        logging::Info("Xoverlay initialized");
+        logging::Info(XORSTR("Xoverlay initialized"));
     }
     xoverlay_show();
     context = SDL_GL_CreateContext(sdl_hooks::window);

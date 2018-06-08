@@ -14,20 +14,20 @@ namespace tf2
 namespace healarrow
 {
 
-static CatVar healarrow_charge(CV_FLOAT, "healarrow_charge", "0.25",
-                               "Healarrow Charge");
-static CatVar healarrow_timeout(CV_FLOAT, "healarrow_timeout", "2",
-                                "Healarrow Timeout");
-static CatVar healarrow(CV_SWITCH, "healarrow", "0", "Heal Arrow");
+static CatVar healarrow_charge(CV_FLOAT, XORSTR("healarrow_charge"), XORSTR("0.25"),
+                               XORSTR("Healarrow Charge"));
+static CatVar healarrow_timeout(CV_FLOAT, XORSTR("healarrow_timeout"), XORSTR("2"),
+                                XORSTR("Healarrow Timeout"));
+static CatVar healarrow(CV_SWITCH, XORSTR("healarrow"), XORSTR("0"), XORSTR("Heal Arrow"));
 static CatVar healarrow_callout(
-    CV_SWITCH, "healarrow_callout", "0", "Call Out",
-    "Send a message to chat when you heal someone with an arrow");
+    CV_SWITCH, XORSTR("healarrow_callout"), XORSTR("0"), XORSTR("Call Out"),
+    XORSTR("Send a message to chat when you heal someone with an arrow"));
 static CatVar healarrow_callout_message(
-    CV_STRING, "healarrow_callout_text",
-    "Hey %%, I've just healed you for $$ HP! Your health is now ##.",
-    "Call Out Text",
-    "Formatting:\n%% - player name\n$$ - healing amount\n## - new health\n@@ - "
-    "old health");
+    CV_STRING, XORSTR("healarrow_callout_text"),
+    XORSTR("Hey %%, I've just healed you for $$ HP! Your health is now ##."),
+    XORSTR("Call Out Text"),
+    XORSTR("Formatting:\n%% - player name\n$$ - healing amount\n## - new health\n@@ - ")
+    XORSTR("old health"));
 
 float healarrow_time = 0.0f;
 
@@ -45,27 +45,27 @@ public:
         if (LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
             return;
         std::string name(event->GetName());
-        if (name == "player_hurt")
+        if (name == XORSTR("player_hurt"))
         {
-            int attacker = event->GetInt("attacker");
-            int victim   = event->GetInt("userid");
+            int attacker = event->GetInt(XORSTR("attacker"));
+            int victim   = event->GetInt(XORSTR("userid"));
             int eid      = g_IEngine->GetPlayerForUserID(attacker);
             int vid      = g_IEngine->GetPlayerForUserID(victim);
             if (eid == g_IEngine->GetLocalPlayer())
             {
-                int damageamount = event->GetInt("damageamount");
+                int damageamount = event->GetInt(XORSTR("damageamount"));
                 if (damageamount < 0)
                 {
                     player_info_s pinfo;
                     if (g_IEngine->GetPlayerInfo(vid, &pinfo))
                     {
                         std::string msg(healarrow_callout_message.GetString());
-                        ReplaceString(msg, "$$", std::to_string(-damageamount));
-                        int health = event->GetInt("health");
-                        ReplaceString(msg, "##", std::to_string(health));
-                        ReplaceString(msg, "@@",
+                        ReplaceString(msg, XORSTR("$$"), std::to_string(-damageamount));
+                        int health = event->GetInt(XORSTR("health"));
+                        ReplaceString(msg, XORSTR("##"), std::to_string(health));
+                        ReplaceString(msg, XORSTR("@@"),
                                       std::to_string(health + damageamount));
-                        ReplaceString(msg, "%%", pinfo.name);
+                        ReplaceString(msg, XORSTR("%%"), pinfo.name);
                         chat_stack::Say(msg, false);
                     }
                 }
@@ -112,7 +112,7 @@ void CreateMove()
                     g_pUserCmd->command_number + 450;
                 g_pUserCmd->buttons &= ~IN_ATTACK;
                 healarrow_time = g_GlobalVars->curtime;
-                logging::Info("healarrow");
+                logging::Info(XORSTR("healarrow"));
             }
         }
     }
@@ -129,19 +129,19 @@ void Draw()
         if ((g_GlobalVars->curtime - healarrow_time) < float(healarrow_timeout))
         {
             AddCenterString(
-                format("Heal arrow charge: ",
+                format(XORSTR("Heal arrow charge: "),
                        int(std::min(100.0f,
                                     (g_GlobalVars->curtime - healarrow_time) /
                                         float(healarrow_timeout)) *
                            100.0f),
                        '%'),
                 colors::yellow);
-            //			AddCenterString(format("Heal arrow time: ",
+            //			AddCenterString(format(XORSTR("Heal arrow time: "),
             // healarrow_time));
         }
         else
         {
-            AddCenterString("Heal arrow ready", colors::green);
+            AddCenterString(XORSTR("Heal arrow ready"), colors::green);
         }
     }
 #endif

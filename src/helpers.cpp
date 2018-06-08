@@ -23,56 +23,56 @@ std::vector<ConCommand *> &RegisteredCommandsList()
 
 void BeginConVars()
 {
-    logging::Info("Begin ConVars");
-    if (!std::ifstream("tf/cfg/cat_autoexec.cfg"))
+    logging::Info(XORSTR("Begin ConVars"));
+    if (!std::ifstream(XORSTR("tf/cfg/cat_autoexec.cfg")))
     {
-        std::ofstream cfg_autoexec("tf/cfg/cat_autoexec.cfg",
+        std::ofstream cfg_autoexec(XORSTR("tf/cfg/cat_autoexec.cfg"),
                                    std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
         {
-            cfg_autoexec << "// Put your custom cathook settings in this "
-                            "file\n// This script will be executed EACH TIME "
-                            "YOU INJECT CATHOOK\n";
+            cfg_autoexec << XORSTR("// Put your custom cathook settings in this ")
+                            XORSTR("file\n// This script will be executed EACH TIME ")
+                            XORSTR("YOU INJECT CATHOOK\n");
         }
     }
-    if (!std::ifstream("tf/cfg/cat_autoexec.cfg"))
+    if (!std::ifstream(XORSTR("tf/cfg/cat_autoexec.cfg")))
     {
-        std::ofstream cfg_autoexec("tf/cfg/cat_matchexec.cfg",
+        std::ofstream cfg_autoexec(XORSTR("tf/cfg/cat_matchexec.cfg"),
                                    std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
         {
-            cfg_autoexec << "// Put your custom cathook settings in this "
-                            "file\n// This script will be executed EACH TIME "
-                            "YOU JOIN A MATCH\n";
+            cfg_autoexec << XORSTR("// Put your custom cathook settings in this ")
+                            XORSTR("file\n// This script will be executed EACH TIME ")
+                            XORSTR("YOU JOIN A MATCH\n");
         }
     }
-    logging::Info(":b:");
+    logging::Info(XORSTR(":b:"));
     SetCVarInterface(g_ICvar);
 }
 
 void EndConVars()
 {
-    logging::Info("Registering ConVars");
+    logging::Info(XORSTR("Registering ConVars"));
     RegisterCatVars();
     RegisterCatCommands();
     ConVar_Register();
 
-    std::ofstream cfg_defaults("tf/cfg/cat_defaults.cfg",
+    std::ofstream cfg_defaults(XORSTR("tf/cfg/cat_defaults.cfg"),
                                std::ios::out | std::ios::trunc);
     if (cfg_defaults.good())
     {
-        cfg_defaults << "// This file is auto-generated and will be "
-                        "overwritten each time you inject cathook\n// Do not "
-                        "make edits to this file\n\n// Every registered "
-                        "variable dump\n";
+        cfg_defaults << XORSTR("// This file is auto-generated and will be ")
+                        XORSTR("overwritten each time you inject cathook\n// Do not ")
+                        XORSTR("make edits to this file\n\n// Every registered ")
+                        XORSTR("variable dump\n");
         for (const auto &i : RegisteredVarsList())
         {
-            cfg_defaults << i->GetName() << " \"" << i->GetDefault() << "\"\n";
+            cfg_defaults << i->GetName() << XORSTR(" \"") << i->GetDefault() << XORSTR("\"\n");
         }
-        cfg_defaults << "\n// Every registered command dump\n";
+        cfg_defaults << XORSTR("\n// Every registered command dump\n");
         for (const auto &i : RegisteredCommandsList())
         {
-            cfg_defaults << "// " << i->GetName() << "\n";
+            cfg_defaults << XORSTR("// ") << i->GetName() << XORSTR("\n");
         }
     }
 }
@@ -85,7 +85,7 @@ ConVar *CreateConVar(std::string name, std::string value, std::string help)
     strncpy(namec, name.c_str(), 255);
     strncpy(valuec, value.c_str(), 255);
     strncpy(helpc, help.c_str(), 255);
-    // logging::Info("Creating ConVar: %s %s %s", namec, valuec, helpc);
+    // logging::Info(XORSTR("Creating ConVar: %s %s %s"), namec, valuec, helpc);
     ConVar *ret = new ConVar(const_cast<const char *>(namec),
                              const_cast<const char *>(valuec), 0,
                              const_cast<const char *>(helpc));
@@ -115,7 +115,7 @@ std::string GetLevelName()
         slash = 0;
     else
         slash++;
-    size_t bsp = name.find(".bsp");
+    size_t bsp = name.find(XORSTR(".bsp"));
     size_t length =
         (bsp == std::string::npos ? name.length() - slash : bsp - slash);
     return name.substr(slash, length);
@@ -148,15 +148,15 @@ ConCommand *CreateConCommand(const char *name, FnCommandCallback_t callback,
 const char *GetBuildingName(CachedEntity *ent)
 {
     if (!ent)
-        return "[NULL]";
+        return XORSTR("[NULL]");
     int classid = ent->m_iClassID();
     if (classid == CL_CLASS(CObjectSentrygun))
-        return "Sentry";
+        return XORSTR("Sentry");
     if (classid == CL_CLASS(CObjectDispenser))
-        return "Dispenser";
+        return XORSTR("Dispenser");
     if (classid == CL_CLASS(CObjectTeleporter))
-        return "Teleporter";
-    return "[NULL]";
+        return XORSTR("Teleporter");
+    return XORSTR("[NULL]");
 }
 
 void format_internal(std::stringstream &stream)
@@ -332,7 +332,7 @@ char GetUpperChar(ButtonCode_t button)
     case KEY_BACKQUOTE:
         return '~';
     case KEY_APOSTROPHE:
-        return '"';
+        return 'XORSTR("';
     case KEY_COMMA:
         return '<';
     case KEY_PERIOD:
@@ -427,7 +427,7 @@ bool IsEntityVisible(CachedEntity *entity, int hb)
     }
 }
 
-static CatVar tcm(CV_SWITCH, "debug_tcm", "1", "TCM");
+static CatVar tcm(CV_SWITCH, XORSTR("debug_tcm"), XORSTR("1"), XORSTR("TCM"));
 
 std::mutex trace_lock;
 bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos)
@@ -569,10 +569,10 @@ float DistToSqr(CachedEntity *entity)
 void Patch(void *address, void *patch, size_t length)
 {
     void *page = (void *) ((uintptr_t) address & ~0xFFF);
-    logging::Info("mprotect: %d",
+    logging::Info(XORSTR("mprotect: %d"),
                   mprotect(page, 0xFFF, PROT_READ | PROT_WRITE | PROT_EXEC));
     memcpy(address, patch, length);
-    logging::Info("mprotect reverse: %d", mprotect(page, 0xFFF, PROT_EXEC));
+    logging::Info(XORSTR("mprotect reverse: %d"), mprotect(page, 0xFFF, PROT_EXEC));
 }
 
 bool IsProjectileCrit(CachedEntity *ent)
@@ -592,7 +592,7 @@ weaponmode GetWeaponMode()
     weapon_handle = CE_INT(LOCAL_E, netvar.hActiveWeapon);
     if (IDX_BAD((weapon_handle & 0xFFF)))
     {
-        // logging::Info("IDX_BAD: %i", weapon_handle & 0xFFF);
+        // logging::Info(XORSTR("IDX_BAD: %i"), weapon_handle & 0xFFF);
         return weaponmode::weapon_invalid;
     }
     weapon = (ENTITY(weapon_handle & 0xFFF));
@@ -756,20 +756,20 @@ bool Developer(CachedEntity *ent)
     char* buf = new char[256]();
     player_info_t info;
     if (!engineClient->GetPlayerInfo(player->entindex(), &info)) return (const
-char*)0; logging::Info("a"); int hWeapon = NET_INT(player,
+char*)0; logging::Info(XORSTR("a")); int hWeapon = NET_INT(player,
 netvar.hActiveWeapon); if (NET_BYTE(player, netvar.iLifeState)) { sprintf(buf,
-"%s is dead %s", info.name, tfclasses[NET_INT(player, netvar.iClass)]); return
+XORSTR("%s is dead %s"), info.name, tfclasses[NET_INT(player, netvar.iClass)]); return
 buf;
     }
     if (hWeapon) {
         IClientEntity* weapon = ENTITY(hWeapon & 0xFFF);
-        sprintf(buf, "%s is %s with %i health using %s", info.name,
+        sprintf(buf, XORSTR("%s is %s with %i health using %s"), info.name,
 tfclasses[NET_INT(player, netvar.iClass)], NET_INT(player, netvar.iHealth),
-weapon->GetClientClass()->GetName()); } else { sprintf(buf, "%s is %s with %i
-health", info.name, tfclasses[NET_INT(player, netvar.iClass)], NET_INT(player,
+weapon->GetClientClass()->GetName()); } else { sprintf(buf, XORSTR("%s is %s with %i
+healthXORSTR(", info.name, tfclasses[NET_INT(player, netvar.iClass)], NET_INT(player,
 netvar.iHealth));
     }
-    logging::Info("Result: %s", buf);
+    logging::Info(XORSTR("Result: %s"), buf);
     return buf;
 }*/
 
@@ -996,7 +996,7 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
 
 // Used for getting class names
 CatCommand print_classnames(
-    "debug_print_classnames", "Lists classnames currently available in console",
+    XORSTR("debug_print_classnames"), XORSTR("Lists classnames currently available in console"),
     []() {
 
         // Create a tmp ent for the loop
@@ -1024,7 +1024,7 @@ void PrintChat(const char *fmt, ...)
 #if not ENABLE_VISUALS
     return;
 #endif
-    CHudBaseChat *chat = (CHudBaseChat *) g_CHUD->FindElement("CHudChat");
+    CHudBaseChat *chat = (CHudBaseChat *) g_CHUD->FindElement(XORSTR("CHudChat"));
     if (chat)
     {
         std::unique_ptr<char> buf(new char[1024]);
@@ -1032,11 +1032,11 @@ void PrintChat(const char *fmt, ...)
         va_start(list, fmt);
         vsprintf(buf.get(), fmt, list);
         va_end(list);
-        std::unique_ptr<char> str(strfmt("\x07%06X[\x07%06XCAT\x07%06X]\x01 %s",
+        std::unique_ptr<char> str(strfmt(XORSTR("\x07%06X[\x07%06XCAT\x07%06X]\x01 %s"),
                                          0x5e3252, 0xba3d9a, 0x5e3252,
                                          buf.get()));
         // FIXME DEBUG LOG
-        logging::Info("%s", str.get());
+        logging::Info(XORSTR("%s"), str.get());
         chat->Printf(str.get());
     }
     else
@@ -1055,11 +1055,11 @@ char *strfmt(const char *fmt, ...)
     return buf;
 }
 
-const char *powerups[] = { "STRENGTH", "RESISTANCE",   "VAMPIRE",   "REFLECT",
-                           "HASTE",    "REGENERATION", "PRECISION", "AGILITY",
-                           "KNOCKOUT", "KING",         "PLAGUE",    "SUPERNOVA",
-                           "CRITS" };
+const char *powerups[] = { XORSTR("STRENGTH"), XORSTR("RESISTANCE"),   XORSTR("VAMPIRE"),   XORSTR("REFLECT"),
+                           XORSTR("HASTE"),    XORSTR("REGENERATION"), XORSTR("PRECISION"), XORSTR("AGILITY"),
+                           XORSTR("KNOCKOUT"), XORSTR("KING"),         XORSTR("PLAGUE"),    XORSTR("SUPERNOVA"),
+                           XORSTR("CRITS") };
 
-const std::string classes[] = { "Scout",   "Sniper", "Soldier",
-                                "Demoman", "Medic",  "Heavy",
-                                "Pyro",    "Spy",    "Engineer" };
+const std::string classes[] = { XORSTR("Scout"),   XORSTR("Sniper"), XORSTR("Soldier"),
+                                XORSTR("Demoman"), XORSTR("Medic"),  XORSTR("Heavy"),
+                                XORSTR("Pyro"),    XORSTR("Spy"),    XORSTR("Engineer") };

@@ -6,27 +6,27 @@
 #include "HookedMethods.hpp"
 #include "Radar.hpp"
 
-CatVar clean_screenshots(CV_SWITCH, "clean_screenshots", "1",
-                         "Clean screenshots",
-                         "Don't draw visuals while taking a screenshot");
-CatVar disable_visuals(CV_SWITCH, "no_visuals", "0", "Disable ALL drawing",
-                       "Completely hides cathook");
-CatVar no_zoom(CV_SWITCH, "no_zoom", "0", "Disable scope",
-               "Disables black scope overlay");
-static CatVar pure_bypass(CV_SWITCH, "pure_bypass", "0", "Pure Bypass",
-                          "Bypass sv_pure");
+CatVar clean_screenshots(CV_SWITCH, XORSTR("clean_screenshots"), XORSTR("1"),
+                         XORSTR("Clean screenshots"),
+                         XORSTR("Don't draw visuals while taking a screenshot"));
+CatVar disable_visuals(CV_SWITCH, XORSTR("no_visuals"), XORSTR("0"), XORSTR("Disable ALL drawing"),
+                       XORSTR("Completely hides cathook"));
+CatVar no_zoom(CV_SWITCH, XORSTR("no_zoom"), XORSTR("0"), XORSTR("Disable scope"),
+               XORSTR("Disables black scope overlay"));
+static CatVar pure_bypass(CV_SWITCH, XORSTR("pure_bypass"), XORSTR("0"), XORSTR("Pure Bypass"),
+                          XORSTR("Bypass sv_pure"));
 void *pure_orig  = nullptr;
 void **pure_addr = nullptr;
 
-static CatEnum software_cursor_enum({ "KEEP", "ALWAYS", "NEVER", "MENU ON",
-                                      "MENU OFF" });
+static CatEnum software_cursor_enum({ XORSTR("KEEP"), XORSTR("ALWAYS"), XORSTR("NEVER"), XORSTR("MENU ON"),
+                                      XORSTR("MENU OFF") });
 static CatVar
-    software_cursor_mode(software_cursor_enum, "software_cursor_mode", "0",
-                         "Software cursor",
-                         "Try to change this and see what works best for you");
-static CatVar no_reportlimit(CV_SWITCH, "no_reportlimit", "0",
-                             "no report limit",
-                             "Remove playerlist report time limit");
+    software_cursor_mode(software_cursor_enum, XORSTR("software_cursor_mode"), XORSTR("0"),
+                         XORSTR("Software cursor"),
+                         XORSTR("Try to change this and see what works best for you"));
+static CatVar no_reportlimit(CV_SWITCH, XORSTR("no_reportlimit"), XORSTR("0"),
+                             XORSTR("no report limit"),
+                             XORSTR("Remove playerlist report time limit"));
 bool replaced = false;
 namespace hooked_methods
 {
@@ -40,7 +40,7 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_,
     static unsigned long panel_top   = 0;
     static bool cur, draw_flag = false;
     static bool call_default       = true;
-    static ConVar *software_cursor = g_ICvar->FindVar("cl_software_cursor");
+    static ConVar *software_cursor = g_ICvar->FindVar(XORSTR("cl_software_cursor"));
     static const char *name;
     static std::string name_s, name_stripped, reason_stripped;
 
@@ -54,17 +54,17 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_,
     {
         static unsigned char patch[] = { 0xB8, 0x01, 0x00, 0x00, 0x00 };
         static uintptr_t report_addr = gSignatures.GetClientSignature(
-            "55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+            XORSTR("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8"));
         if (report_addr)
         {
             uintptr_t topatch = report_addr + 0x75;
-            logging::Info("No Report limit: 0x%08x", report_addr);
+            logging::Info(XORSTR("No Report limit: 0x%08x"), report_addr);
             Patch((void *) topatch, (void *) patch, sizeof(patch));
             replaced = true;
         }
         else
             report_addr = gSignatures.GetClientSignature(
-                "55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+                XORSTR("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8"));
     }
     if (pure_bypass)
     {
@@ -72,7 +72,7 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_,
         {
             pure_addr = *reinterpret_cast<void ***>(
                 gSignatures.GetEngineSignature(
-                    "A1 ? ? ? ? 85 C0 74 ? C7 44 24 ? ? ? ? ? 89 04 24") +
+                    XORSTR("A1 ? ? ? ? 85 C0 74 ? C7 44 24 ? ? ? ? ? 89 04 24")) +
                 1);
         }
         if (*pure_addr)
@@ -151,7 +151,7 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_,
     if (!panel_scope)
     {
         name = g_IPanel->GetName(panel);
-        if (!strcmp(name, "HudScope"))
+        if (!strcmp(name, XORSTR("HudScope")))
         {
             panel_scope = panel;
         }

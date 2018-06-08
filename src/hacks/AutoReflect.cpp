@@ -16,39 +16,39 @@ namespace autoreflect
 {
 
 // Vars for user settings
-static CatVar enabled(CV_SWITCH, "reflect_enabled", "0", "Auto Reflect",
-                      "Master AutoReflect switch");
-static CatVar idle_only(CV_SWITCH, "reflect_only_idle", "0",
-                        "Only when not shooting",
-                        "Don't AutoReflect if you're holding M1");
+static CatVar enabled(CV_SWITCH, XORSTR("reflect_enabled"), XORSTR("0"), XORSTR("Auto Reflect"),
+                      XORSTR("Master AutoReflect switch"));
+static CatVar idle_only(CV_SWITCH, XORSTR("reflect_only_idle"), XORSTR("0"),
+                        XORSTR("Only when not shooting"),
+                        XORSTR("Don't AutoReflect if you're holding M1"));
 static CatVar
-    legit(CV_SWITCH, "reflect_legit", "0", "Legit Reflect",
-          "Only Auto-airblasts projectiles that you can see, doesnt move "
-          "your crosshair");
-static CatVar dodgeball(CV_SWITCH, "reflect_dodgeball", "0", "Dodgeball Mode",
-                        "Allows auto-reflect to work in dodgeball servers");
-static CatVar blastkey(CV_KEY, "reflect_key", "0", "Reflect Key",
-                       "Hold this key to activate auto-airblast");
-static CatVar stickies(CV_SWITCH, "reflect_stickybombs", "0",
-                       "Reflect stickies", "Reflect Stickybombs");
-static CatVar teammates(CV_SWITCH, "reflect_teammates", "0",
-                        "Reflect teammates projectiles",
-                        "Useful in dodgeball with "
-                        "free-for-all enabled");
-static CatVar fov(CV_FLOAT, "reflect_fov", "85", "Reflect FOV", "Reflect FOV",
+    legit(CV_SWITCH, XORSTR("reflect_legit"), XORSTR("0"), XORSTR("Legit Reflect"),
+          XORSTR("Only Auto-airblasts projectiles that you can see, doesnt move ")
+          XORSTR("your crosshair"));
+static CatVar dodgeball(CV_SWITCH, XORSTR("reflect_dodgeball"), XORSTR("0"), XORSTR("Dodgeball Mode"),
+                        XORSTR("Allows auto-reflect to work in dodgeball servers"));
+static CatVar blastkey(CV_KEY, XORSTR("reflect_key"), XORSTR("0"), XORSTR("Reflect Key"),
+                       XORSTR("Hold this key to activate auto-airblast"));
+static CatVar stickies(CV_SWITCH, XORSTR("reflect_stickybombs"), XORSTR("0"),
+                       XORSTR("Reflect stickies"), XORSTR("Reflect Stickybombs"));
+static CatVar teammates(CV_SWITCH, XORSTR("reflect_teammates"), XORSTR("0"),
+                        XORSTR("Reflect teammates projectiles"),
+                        XORSTR("Useful in dodgeball with ")
+                        XORSTR("free-for-all enabled"));
+static CatVar fov(CV_FLOAT, XORSTR("reflect_fov"), XORSTR("85"), XORSTR("Reflect FOV"), XORSTR("Reflect FOV"),
                   180.0f);
-static CatVar fov_draw(CV_SWITCH, "reflect_fov_draw", "0", "Draw Fov Ring",
-                       "Draws a ring to represent your current reflect fov");
-static CatVar fovcircle_opacity(CV_FLOAT, "reflect_fov_draw_opacity", "0.7",
-                                "FOV Circle Opacity",
-                                "Defines opacity of FOV circle", 0.0f, 1.0f);
+static CatVar fov_draw(CV_SWITCH, XORSTR("reflect_fov_draw"), XORSTR("0"), XORSTR("Draw Fov Ring"),
+                       XORSTR("Draws a ring to represent your current reflect fov"));
+static CatVar fovcircle_opacity(CV_FLOAT, XORSTR("reflect_fov_draw_opacity"), XORSTR("0.7"),
+                                XORSTR("FOV Circle Opacity"),
+                                XORSTR("Defines opacity of FOV circle"), 0.0f, 1.0f);
 // TODO setup proj sorting
-// TODO CatVar big_proj(CV_SWITCH, "reflect_big_projectile", "0", "Reflect big
-// projectiles", "Reflect Rockets");
-// TODO CatVar small_proj(CV_SWITCH, "reflect_small_projectile", "0", "Reflect
-// small projectiles", "Reflect Huntsman arrows, Crusaders bolts");
-// TODO CatVar misc_proj(CV_SWITCH, "reflect_misc_projectile", "0", "Reflect
-// other", "Reflect jarate, milk");
+// TODO CatVar big_proj(CV_SWITCH, XORSTR("reflect_big_projectile"), XORSTR("0"), XORSTR("Reflect big
+// projectilesXORSTR(", ")Reflect RocketsXORSTR(");
+// TODO CatVar small_proj(CV_SWITCH, XORSTR("reflect_small_projectile"), XORSTR("0"), XORSTR("Reflect
+// small projectilesXORSTR(", ")Reflect Huntsman arrows, Crusaders boltsXORSTR(");
+// TODO CatVar misc_proj(CV_SWITCH, XORSTR("reflect_misc_projectile"), XORSTR("0"), XORSTR("Reflect
+// otherXORSTR(", ")Reflect jarate, milkXORSTR(");
 
 // Function called by game for movement
 void CreateMove()

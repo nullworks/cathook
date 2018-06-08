@@ -7,20 +7,20 @@
 
 #include "common.hpp"
 
-static CatVar user_red_blue(CV_INT, "esp_color_red_b", "0", "Red Team: Blue",
-                            "Blue color for red team", 255);
-static CatVar user_red_green(CV_INT, "esp_color_red_g", "0", "Red Team: Green",
-                             "Green color for red team", 255);
-static CatVar user_red_red(CV_INT, "esp_color_red_r", "0", "Red Team: Red",
-                           "Red color for red team", 255);
+static CatVar user_red_blue(CV_INT, XORSTR("esp_color_red_b"), XORSTR("0"), XORSTR("Red Team: Blue"),
+                            XORSTR("Blue color for red team"), 255);
+static CatVar user_red_green(CV_INT, XORSTR("esp_color_red_g"), XORSTR("0"), XORSTR("Red Team: Green"),
+                             XORSTR("Green color for red team"), 255);
+static CatVar user_red_red(CV_INT, XORSTR("esp_color_red_r"), XORSTR("0"), XORSTR("Red Team: Red"),
+                           XORSTR("Red color for red team"), 255);
 
-static CatVar user_blue_blue(CV_INT, "esp_color_blue_b", "0", "Blue Team: Blue",
-                             "Blue color for blue team", 255);
-static CatVar user_blue_green(CV_INT, "esp_color_blue_g", "0",
-                              "Blue Team: Green", "Green color for blue team",
+static CatVar user_blue_blue(CV_INT, XORSTR("esp_color_blue_b"), XORSTR("0"), XORSTR("Blue Team: Blue"),
+                             XORSTR("Blue color for blue team"), 255);
+static CatVar user_blue_green(CV_INT, XORSTR("esp_color_blue_g"), XORSTR("0"),
+                              XORSTR("Blue Team: Green"), XORSTR("Green color for blue team"),
                               255);
-static CatVar user_blue_red(CV_INT, "esp_color_blue_r", "0", "Blue Team: Red",
-                            "Red color for blue team", 255);
+static CatVar user_blue_red(CV_INT, XORSTR("esp_color_blue_r"), XORSTR("0"), XORSTR("Blue Team: Red"),
+                            XORSTR("Red color for blue team"), 255);
 
 rgba_t colors::EntityF(CachedEntity *ent)
 {

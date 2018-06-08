@@ -15,36 +15,36 @@ namespace shared
 {
 namespace spam
 {
-static CatEnum spam_enum({ "DISABLED", "CUSTOM", "DEFAULT", "LENNYFACES",
-                           "BLANKS", "NULLCORE", "LMAOBOX", "LITHIUM" });
-CatVar spam_source(spam_enum, "spam", "0", "Chat Spam",
-                   "Defines source of spam lines. CUSTOM spam file must be set "
-                   "in cat_spam_file and loaded with cat_spam_reload (Use "
-                   "console!)");
-static CatVar random_order(CV_SWITCH, "spam_random", "0", "Random Order");
+static CatEnum spam_enum({ XORSTR("DISABLED"), XORSTR("CUSTOM"), XORSTR("DEFAULT"), XORSTR("LENNYFACES"),
+                           XORSTR("BLANKS"), XORSTR("NULLCORE"), XORSTR("LMAOBOX"), XORSTR("LITHIUM") });
+CatVar spam_source(spam_enum, XORSTR("spam"), XORSTR("0"), XORSTR("Chat Spam"),
+                   XORSTR("Defines source of spam lines. CUSTOM spam file must be set ")
+                   XORSTR("in cat_spam_file and loaded with cat_spam_reload (Use ")
+                   XORSTR("console!)"));
+static CatVar random_order(CV_SWITCH, XORSTR("spam_random"), XORSTR("0"), XORSTR("Random Order"));
 static CatVar
-    filename(CV_STRING, "spam_file", "spam.txt", "Spam file",
-             "Spam file name. Each line should be no longer than 100 "
-             "characters, file must be located in cathook data folder");
-CatCommand reload("spam_reload", "Reload spam file", Reload);
-static CatVar spam_delay(CV_INT, "spam_delay", "800", "Spam delay",
-                         "Delay between spam messages (in ms)", 0.0f, 8000.0f);
+    filename(CV_STRING, XORSTR("spam_file"), XORSTR("spam.txt"), XORSTR("Spam file"),
+             XORSTR("Spam file name. Each line should be no longer than 100 ")
+             XORSTR("characters, file must be located in cathook data folder"));
+CatCommand reload(XORSTR("spam_reload"), XORSTR("Reload spam file"), Reload);
+static CatVar spam_delay(CV_INT, XORSTR("spam_delay"), XORSTR("800"), XORSTR("Spam delay"),
+                         XORSTR("Delay between spam messages (in ms)"), 0.0f, 8000.0f);
 
-static CatEnum voicecommand_enum({ "DISABLED", "RANDOM", "MEDIC", "THANKS",
-                                   "NICE SHOT", "CHEERS", "JEERS" });
-static CatVar voicecommand_spam(voicecommand_enum, "spam_voicecommand", "0",
-                                "Voice Command Spam",
-                                "Spams tf voice commands");
+static CatEnum voicecommand_enum({ XORSTR("DISABLED"), XORSTR("RANDOM"), XORSTR("MEDIC"), XORSTR("THANKS"),
+                                   XORSTR("NICE SHOT"), XORSTR("CHEERS"), XORSTR("JEERS") });
+static CatVar voicecommand_spam(voicecommand_enum, XORSTR("spam_voicecommand"), XORSTR("0"),
+                                XORSTR("Voice Command Spam"),
+                                XORSTR("Spams tf voice commands"));
 
-static CatVar teamname_spam(CV_SWITCH, "spam_teamname", "0", "Teamname Spam",
-                            "Spam changes the tournament name");
+static CatVar teamname_spam(CV_SWITCH, XORSTR("spam_teamname"), XORSTR("0"), XORSTR("Teamname Spam"),
+                            XORSTR("Spam changes the tournament name"));
 
 std::chrono::time_point<std::chrono::system_clock> last_spam_point{};
 
 int current_index{ 0 };
 TextFile file{};
 
-const std::string teams[] = { "RED", "BLU" };
+const std::string teams[] = { XORSTR("RED"), XORSTR("BLU") };
 
 // FUCK enum class.
 // It doesn't have bitwise operators by default!! WTF!! static_cast<int>(REEE)!
@@ -236,11 +236,11 @@ void Init()
 
 bool SubstituteQueries(std::string &input)
 {
-    size_t index = input.find("%query:");
+    size_t index = input.find(XORSTR("%query:"));
     while (index != std::string::npos)
     {
         std::string sub = input.substr(index + 7);
-        size_t closing  = sub.find("%");
+        size_t closing  = sub.find(XORSTR("%"));
         Query q         = QueryFromSubstring(sub);
         int p           = QueryPlayer(q);
         if (!p)
@@ -250,20 +250,20 @@ bool SubstituteQueries(std::string &input)
             return false;
         std::string name = std::string(pinfo.name);
         input.replace(index, 8 + closing, name);
-        index = input.find("%query:", index + name.size());
+        index = input.find(XORSTR("%query:"), index + name.size());
     }
     return true;
 }
 
 bool FormatSpamMessage(std::string &message)
 {
-    ReplaceString(message, "\\n", "\n");
+    ReplaceString(message, XORSTR("\\n"), XORSTR("\n"));
     bool team       = g_pLocalPlayer->team - 2;
     bool enemy_team = !team;
     IF_GAME(IsTF2())
     {
-        ReplaceString(message, "%myteam%", teams[team]);
-        ReplaceString(message, "%enemyteam%", teams[enemy_team]);
+        ReplaceString(message, XORSTR("%myteam%"), teams[team]);
+        ReplaceString(message, XORSTR("%enemyteam%"), teams[enemy_team]);
     }
     return SubstituteQueries(message);
 }
@@ -281,12 +281,12 @@ void CreateMove()
             if (teamname_swap)
             {
                 teamname_swap = false;
-                g_IEngine->ServerCmd("tournament_teamname Cat");
+                g_IEngine->ServerCmd(XORSTR("tournament_teamname Cat"));
             }
             else
             {
                 teamname_swap = true;
-                g_IEngine->ServerCmd("tournament_teamname Hook");
+                g_IEngine->ServerCmd(XORSTR("tournament_teamname Hook"));
             }
         }
 
@@ -299,24 +299,24 @@ void CreateMove()
                 {
                 case 1: // RANDOM
                     g_IEngine->ServerCmd(
-                        format("voicemenu ", floor(RandFloatRange(0, 2.9)), " ",
+                        format(XORSTR("voicemenu "), floor(RandFloatRange(0, 2.9)), XORSTR(" "),
                                floor(RandFloatRange(0, 8.9)))
                             .c_str());
                     break;
                 case 2: // MEDIC
-                    g_IEngine->ServerCmd("voicemenu 0 0");
+                    g_IEngine->ServerCmd(XORSTR("voicemenu 0 0"));
                     break;
                 case 3: // THANKS
-                    g_IEngine->ServerCmd("voicemenu 0 1");
+                    g_IEngine->ServerCmd(XORSTR("voicemenu 0 1"));
                     break;
                 case 4: // NICE SHOT
-                    g_IEngine->ServerCmd("voicemenu 2 6");
+                    g_IEngine->ServerCmd(XORSTR("voicemenu 2 6"));
                     break;
                 case 5: // CHEERS
-                    g_IEngine->ServerCmd("voicemenu 2 2");
+                    g_IEngine->ServerCmd(XORSTR("voicemenu 2 2"));
                     break;
                 case 6: // JEERS
-                    g_IEngine->ServerCmd("voicemenu 2 3");
+                    g_IEngine->ServerCmd(XORSTR("voicemenu 2 3"));
                 }
                 last_voice_spam = g_GlobalVars->curtime;
             }
@@ -397,42 +397,42 @@ void Reload()
 }
 
 const std::vector<std::string> builtin_default = {
-    "cathook - more fun than a ball of yarn!", "GNU/Linux is the best OS!",
-    "visit youtube.com/c/nullifiedcat for more information!",
-    "cathook - free tf2 cheat!", "cathook - ca(n)t stop me meow!"
+    XORSTR("cathook - more fun than a ball of yarn!"), XORSTR("GNU/Linux is the best OS!"),
+    XORSTR("visit youtube.com/c/nullifiedcat for more information!"),
+    XORSTR("cathook - free tf2 cheat!"), XORSTR("cathook - ca(n)t stop me meow!")
 };
 const std::vector<std::string> builtin_lennyfaces = {
-    "( ͡° ͜ʖ ͡°)",  "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)",
-    "ʕ•ᴥ•ʔ",     "(▀̿Ĺ̯▀̿ ̿)",
-    "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง",
-    "(◕‿◕✿)",    "༼ つ  ͡° ͜ʖ ͡° ༽つ"
+    XORSTR("( ͡° ͜ʖ ͡°)"),  XORSTR("( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)"),
+    XORSTR("ʕ•ᴥ•ʔ"),     XORSTR("(▀̿Ĺ̯▀̿ ̿)"),
+    XORSTR("( ͡°╭͜ʖ╮͡° )"), XORSTR("(ง'̀-'́)ง"),
+    XORSTR("(◕‿◕✿)"),    XORSTR("༼ つ  ͡° ͜ʖ ͡° ༽つ")
 };
 const std::vector<std::string> builtin_blanks = {
-    ". \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n "
+    XORSTR(". \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ")
 };
 
 const std::vector<std::string> builtin_nonecore = {
-    "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!",
-    "NULL CORE - WAY TO THE TOP!",
-    "NULL CORE - BEST TF2 CHEAT!",
-    "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!",
-    "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!",
-    "NULL CORE - WHOLE SERVER OBSERVING!",
-    "NULL CORE - GET BACK TO PWNING!",
-    "NULL CORE - WHEN PVP IS TOO HARDCORE!",
-    "NULL CORE - CAN CAUSE KIDS TO RAGE!",
-    "NULL CORE - F2P NOOBS WILL BE 100% NERFED!"
+    XORSTR("NULL CORE - REDUCE YOUR RISK OF BEING OWNED!"),
+    XORSTR("NULL CORE - WAY TO THE TOP!"),
+    XORSTR("NULL CORE - BEST TF2 CHEAT!"),
+    XORSTR("NULL CORE - NOW WITH BLACKJACK AND HOOKERS!"),
+    XORSTR("NULL CORE - BUTTHURT IN 10 SECONDS FLAT!"),
+    XORSTR("NULL CORE - WHOLE SERVER OBSERVING!"),
+    XORSTR("NULL CORE - GET BACK TO PWNING!"),
+    XORSTR("NULL CORE - WHEN PVP IS TOO HARDCORE!"),
+    XORSTR("NULL CORE - CAN CAUSE KIDS TO RAGE!"),
+    XORSTR("NULL CORE - F2P NOOBS WILL BE 100% NERFED!")
 };
 const std::vector<std::string> builtin_lmaobox = {
-    "GET GOOD, GET LMAOBOX!", "LMAOBOX - WAY TO THE TOP",
-    "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!"
+    XORSTR("GET GOOD, GET LMAOBOX!"), XORSTR("LMAOBOX - WAY TO THE TOP"),
+    XORSTR("WWW.LMAOBOX.NET - BEST FREE TF2 HACK!")
 };
 const std::vector<std::string> builtin_lithium = {
-    "CHECK OUT www.YouTube.com/c/DurRud FOR MORE INFORMATION!",
-    "PWNING AIMBOTS WITH OP ANTI-AIMS SINCE 2015 - LITHIUMCHEAT",
-    "STOP GETTING MAD AND STABILIZE YOUR MOOD WITH LITHIUMCHEAT!",
-    "SAVE YOUR MONEY AND GET LITHIUMCHEAT! IT IS FREE!",
-    "GOT ROLLED BY LITHIUM? HEY, THAT MEANS IT'S TIME TO GET LITHIUMCHEAT!!"
+    XORSTR("CHECK OUT www.YouTube.com/c/DurRud FOR MORE INFORMATION!"),
+    XORSTR("PWNING AIMBOTS WITH OP ANTI-AIMS SINCE 2015 - LITHIUMCHEAT"),
+    XORSTR("STOP GETTING MAD AND STABILIZE YOUR MOOD WITH LITHIUMCHEAT!"),
+    XORSTR("SAVE YOUR MONEY AND GET LITHIUMCHEAT! IT IS FREE!"),
+    XORSTR("GOT ROLLED BY LITHIUM? HEY, THAT MEANS IT'S TIME TO GET LITHIUMCHEAT!!")
 };
 }
 }

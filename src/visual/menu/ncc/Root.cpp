@@ -16,7 +16,7 @@ namespace ncc
 /*
 Texture logo_texture(&_binary_logo_start, 768, 384);
 */
-Root::Root() : CBaseWindow("root_nullcore", nullptr)
+Root::Root() : CBaseWindow(XORSTR("root_nullcore"), nullptr)
 {
     SetMaxSize(draw::width, draw::height);
 }
@@ -41,7 +41,7 @@ void Root::Setup()
     tooltip = new Tooltip();
     AddChild(tooltip);
     AddChild(&menu::ncc::MainList());
-    menu::ncc::MainList().ChildByIndex(0)->Props()->SetBool("brackets3", true);
+    menu::ncc::MainList().ChildByIndex(0)->Props()->SetBool(XORSTR("brackets3"), true);
     menu::ncc::MainList().Show();
     menu::ncc::MainList().SetOffset(draw::width / 2, draw::height / 2);
     PlayerList *pl = new PlayerList();

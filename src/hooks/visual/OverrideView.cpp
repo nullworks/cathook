@@ -7,13 +7,13 @@
 #include "HookedMethods.hpp"
 
 static CatVar
-    override_fov_zoomed(CV_FLOAT, "fov_zoomed", "0", "FOV override (zoomed)",
-                        "Overrides FOV with this value when zoomed in "
-                        "(default FOV when zoomed is 20)");
-static CatVar override_fov(CV_FLOAT, "fov", "0", "FOV override",
-                           "Overrides FOV with this value");
+    override_fov_zoomed(CV_FLOAT, XORSTR("fov_zoomed"), XORSTR("0"), XORSTR("FOV override (zoomed)"),
+                        XORSTR("Overrides FOV with this value when zoomed in ")
+                        XORSTR("(default FOV when zoomed is 20)"));
+static CatVar override_fov(CV_FLOAT, XORSTR("fov"), XORSTR("0"), XORSTR("FOV override"),
+                           XORSTR("Overrides FOV with this value"));
 
-static CatVar freecam(CV_KEY, "debug_freecam", "0", "Freecam");
+static CatVar freecam(CV_KEY, XORSTR("debug_freecam"), XORSTR("0"), XORSTR("Freecam"));
 
 namespace hooked_methods
 {

@@ -8,26 +8,26 @@
 #include "common.hpp"
 #include "AutoJoin.hpp"
 
-CatCommand cmd_queue_start("mm_queue_casual", "Start casual queue",
+CatCommand cmd_queue_start(XORSTR("mm_queue_casual"), XORSTR("Start casual queue"),
                            []() { tfmm::queue_start(); });
 
-CatCommand cmd_abandon("mm_abandon", "Abandon match",
+CatCommand cmd_abandon(XORSTR("mm_abandon"), XORSTR("Abandon match"),
                        []() { tfmm::abandon(); });
-static CatEnum queue_mode({ "MvmPractice", "MvmMannup", "LadderMatch6v6",
-                            "LadderMatch9v9", "LadderMatch12v12",
-                            "CasualMatch6v6", "CasualMatch9v9",
-                            "CasualMatch12v12", "CompetitiveEventMatch12v12" });
-static CatVar queue(queue_mode, "autoqueue_mode", "7",
-                    "Autoqueue for this mode", "");
+static CatEnum queue_mode({ XORSTR("MvmPractice"), XORSTR("MvmMannup"), XORSTR("LadderMatch6v6"),
+                            XORSTR("LadderMatch9v9"), XORSTR("LadderMatch12v12"),
+                            XORSTR("CasualMatch6v6"), XORSTR("CasualMatch9v9"),
+                            XORSTR("CasualMatch12v12"), XORSTR("CompetitiveEventMatch12v12") });
+static CatVar queue(queue_mode, XORSTR("autoqueue_mode"), XORSTR("7"),
+                    XORSTR("Autoqueue for this mode"), XORSTR(""));
 
-CatCommand get_state("mm_state", "Get party state", []() {
+CatCommand get_state(XORSTR("mm_state"), XORSTR("Get party state"), []() {
     re::CTFParty *party = re::CTFParty::GetParty();
     if (!party)
     {
-        logging::Info("Party == NULL");
+        logging::Info(XORSTR("Party == NULL"));
         return;
     }
-    logging::Info("State: %d", re::CTFParty::state_(party));
+    logging::Info(XORSTR("State: %d"), re::CTFParty::state_(party));
 });
 
 namespace tfmm
@@ -44,7 +44,7 @@ void queue_start()
         hacks::shared::autojoin::queuetime.update();
     }
     else
-        logging::Info("queue_start: CTFPartyClient == null!");
+        logging::Info(XORSTR("queue_start: CTFPartyClient == null!"));
 }
 void queue_leave()
 {
@@ -52,7 +52,7 @@ void queue_leave()
     if (client)
         client->RequestLeaveForMatch((int) queue);
     else
-        logging::Info("queue_start: CTFPartyClient == null!");
+        logging::Info(XORSTR("queue_start: CTFPartyClient == null!"));
 }
 Timer abandont{};
 
@@ -64,11 +64,11 @@ void dcandabandon()
         abandon();
     else
     {
-        logging::Info("your party client is gay!");
+        logging::Info(XORSTR("your party client is gay!"));
         if (gc)
             queue_leave();
         else
-            logging::Info("your gc is gay!");
+            logging::Info(XORSTR("your gc is gay!"));
     }
     if (gc && client)
         while (1)
@@ -78,7 +78,7 @@ void dcandabandon()
                 break;
             }
 }
-CatCommand abandoncmd("disconnect_and_abandon", "Disconnect and abandon",
+CatCommand abandoncmd(XORSTR("disconnect_and_abandon"), XORSTR("Disconnect and abandon"),
                       []() { dcandabandon(); });
 
 void abandon()
@@ -87,6 +87,6 @@ void abandon()
     if (gc != nullptr && gc->BConnectedToMatchServer(false))
         gc->AbandonCurrentMatch();
     else
-        logging::Info("abandon: CTFGCClientSystem == null!");
+        logging::Info(XORSTR("abandon: CTFGCClientSystem == null!"));
 }
 }

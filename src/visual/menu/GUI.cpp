@@ -32,13 +32,13 @@ void GUIVisibleCallback(IConVar *var, const char *pOldValue, float flOldValue)
     }
 }
 
-CatVar gui_visible(CV_SWITCH, "gui_visible", "0", "GUI Active",
-                   "GUI switch (bind it to a key!)");
-CatVar gui_draw_bounds(CV_SWITCH, "gui_bounds", "0", "Draw Bounds",
-                       "Draw GUI elements' bounding boxes");
-CatCommand debug_invalid("debug_invalid", "Display all invalid CatVars",
+CatVar gui_visible(CV_SWITCH, XORSTR("gui_visible"), XORSTR("0"), XORSTR("GUI Active"),
+                   XORSTR("GUI switch (bind it to a key!)"));
+CatVar gui_draw_bounds(CV_SWITCH, XORSTR("gui_bounds"), XORSTR("0"), XORSTR("Draw Bounds"),
+                       XORSTR("Draw GUI elements' bounding boxes"));
+CatCommand debug_invalid(XORSTR("debug_invalid"), XORSTR("Display all invalid CatVars"),
                          []() { menu::ncc::List::ShowInvalidCatVars(); });
-CatCommand debug_missing("debug_missing", "Display all missing CatVars",
+CatCommand debug_missing(XORSTR("debug_missing"), XORSTR("Display all missing CatVars"),
                          []() { menu::ncc::List::ShowMissingCatVars(); });
 
 CatGUI::CatGUI()
@@ -56,16 +56,16 @@ bool CatGUI::Visible()
     return gui_visible;
 }
 
-CatVar gui_color_r(CV_INT, "gui_color_r", "15", "Main GUI color (red)",
-                   "Defines red component of main gui color");
-CatVar gui_color_g(CV_INT, "gui_color_g", "150", "Main GUI color (green)",
-                   "Defines green component of main gui color");
-CatVar gui_color_b(CV_INT, "gui_color_b", "150", "Main GUI color (blue)",
-                   "Defines blue component of main gui color");
-CatVar gui_color_a(CV_INT, "gui_color_a", "130", "GUI Background Opacity",
-                   "Defines the opacity of the GUI background (no shit?)");
-static CatVar gui_rainbow(CV_SWITCH, "gui_rainbow", "0", "Rainbow GUI",
-                          "RGB all the things!!!");
+CatVar gui_color_r(CV_INT, XORSTR("gui_color_r"), XORSTR("15"), XORSTR("Main GUI color (red)"),
+                   XORSTR("Defines red component of main gui color"));
+CatVar gui_color_g(CV_INT, XORSTR("gui_color_g"), XORSTR("150"), XORSTR("Main GUI color (green)"),
+                   XORSTR("Defines green component of main gui color"));
+CatVar gui_color_b(CV_INT, XORSTR("gui_color_b"), XORSTR("150"), XORSTR("Main GUI color (blue)"),
+                   XORSTR("Defines blue component of main gui color"));
+CatVar gui_color_a(CV_INT, XORSTR("gui_color_a"), XORSTR("130"), XORSTR("GUI Background Opacity"),
+                   XORSTR("Defines the opacity of the GUI background (no shit?)"));
+static CatVar gui_rainbow(CV_SWITCH, XORSTR("gui_rainbow"), XORSTR("0"), XORSTR("Rainbow GUI"),
+                          XORSTR("RGB all the things!!!"));
 
 int NCGUIColor()
 {
@@ -91,7 +91,7 @@ void CatGUI::Update()
         CBaseWindow *root = dynamic_cast<CBaseWindow *>(root_nullcore);
         int new_scroll =
             g_IInputSystem->GetAnalogValue(AnalogCode_t::MOUSE_WHEEL);
-        // logging::Info("scroll: %i", new_scroll);
+        // logging::Info(XORSTR("scroll: %i"), new_scroll);
         if (last_scroll_value < new_scroll)
         {
             // Scrolled up
@@ -134,7 +134,7 @@ void CatGUI::Update()
             {
                 if (changed)
                 {
-                    // logging::Info("Key %i changed! Now %i.", i, down);
+                    // logging::Info(XORSTR("Key %i changed! Now %i."), i, down);
                     if (i == ButtonCode_t::MOUSE_LEFT)
                     {
                         if (Visible())
@@ -224,7 +224,7 @@ void CatGUI::Update()
     }
     catch (std::exception &ex)
     {
-        logging::Info("ERROR: %s", ex.what());
+        logging::Info(XORSTR("ERROR: %s"), ex.what());
     }
 }
 

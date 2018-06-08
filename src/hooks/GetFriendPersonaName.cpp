@@ -10,10 +10,10 @@ static CatVar ipc_name(CV_STRING, XORSTR("name_ipc"), XORSTR(""), XORSTR("IPC Na
 static CatEnum namesteal_enum({ XORSTR("OFF"), XORSTR("PASSIVE"), XORSTR("ACTIVE") });
 static CatVar
     namesteal(namesteal_enum, XORSTR("name_stealer"), XORSTR("0"), XORSTR("Name Stealer"),
-              XORSTR("Attemt to steal your teammates names. Usefull for avoiding ")
-              XORSTR("kicks\nPassive only changes when the name stolen is no ")
-              XORSTR("longer the best name to use\nActive Attemps to change the ")
-              XORSTR("name whenever possible"));
+              XORSTR("Attemt to steal your teammates names. Usefull for avoiding "
+              "kicks\nPassive only changes when the name stolen is no "
+              "longer the best name to use\nActive Attemps to change the "
+              "name whenever possible"));
 
 static std::string stolen_name;
 

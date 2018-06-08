@@ -71,8 +71,8 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg,
         unsigned char buf[4096];
         bf_write buffer(XORSTR("cathook_debug_buffer"), buf, 4096);
         logging::Info(XORSTR("Writing %i"), msg.WriteToBuffer(buffer));
-        std::string bytes    = XORSTR("");
-        constexpr char h2c[] = XORSTR("0123456789abcdef");
+        std::string bytes    = "";
+        constexpr char h2c[] = "0123456789abcdef";
         for (int i = 0; i < buffer.GetNumBytesWritten(); i++)
         {
             // bytes += format(h2c[(buf[i] & 0xF0) >> 4], h2c[(buf[i] & 0xF)], '

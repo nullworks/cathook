@@ -96,7 +96,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
                      CUserCmd *cmd)
 {
     uintptr_t **fp;
-    __asm__(XORSTR("mov %%ebp, %0") : XORSTR("=r")(fp));
+    __asm__("mov %%ebp, %0" : "=r"(fp));
     bSendPackets = reinterpret_cast<bool *>(**fp - 8);
 
     g_Settings.is_create_move = true;

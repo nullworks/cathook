@@ -8,8 +8,8 @@
 
 static CatVar
     override_fov_zoomed(CV_FLOAT, XORSTR("fov_zoomed"), XORSTR("0"), XORSTR("FOV override (zoomed)"),
-                        XORSTR("Overrides FOV with this value when zoomed in ")
-                        XORSTR("(default FOV when zoomed is 20)"));
+                        XORSTR("Overrides FOV with this value when zoomed in "
+                        "(default FOV when zoomed is 20)"));
 static CatVar override_fov(CV_FLOAT, XORSTR("fov"), XORSTR("0"), XORSTR("FOV override"),
                            XORSTR("Overrides FOV with this value"));
 

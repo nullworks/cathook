@@ -18,8 +18,8 @@ static CatVar clean_chat(CV_SWITCH, XORSTR("clean_chat"), XORSTR("0"), XORSTR("C
 static CatVar dispatch_log(CV_SWITCH, XORSTR("debug_log_usermessages"), XORSTR("0"),
                            XORSTR("Log dispatched user messages"));
 static CatVar chat_filter(CV_STRING, XORSTR("chat_censor"), XORSTR(""), XORSTR("Censor words"),
-                          XORSTR("Spam Chat with newlines if the chosen words are ")
-                          XORSTR("said, seperate with commas"));
+                          XORSTR("Spam Chat with newlines if the chosen words are "
+                          "said, seperate with commas"));
 static CatVar chat_filter_enabled(CV_SWITCH, XORSTR("chat_censor_enabled"), XORSTR("0"),
                                   XORSTR("Enable censor"), XORSTR("Censor Words in chat"));
 std::string clear = XORSTR("");

@@ -29,7 +29,7 @@ bool hack::initialized = false;
 
 const std::string &hack::GetVersion()
 {
-    static std::string version(XORSTR(XORSTR("Unknown Version")));
+    static std::string version(XORSTR("Unknown Version"));
     static bool version_set = false;
     if (version_set)
         return version;
@@ -42,7 +42,7 @@ const std::string &hack::GetVersion()
 
 const std::string &hack::GetType()
 {
-    static std::string version(XORSTR(XORSTR("Unknown Type")));
+    static std::string version(XORSTR("Unknown Type"));
     static bool version_set = false;
     if (version_set)
         return version;
@@ -88,9 +88,9 @@ std::stack<std::string> &hack::command_stack()
                          */
 #define red 184, 56, 59, 255
 #define blu 88, 133, 162, 255
-static CatVar cat_event_hurt(CV_SWITCH, XORSTR(XORSTR("cat_event_hurt")), XORSTR(XORSTR("1")),
-                             XORSTR(XORSTR("Enable OnHurt Event")),
-                             XORSTR(XORSTR("Disable if your chat gets spammed with \"blah ")
+static CatVar cat_event_hurt(CV_SWITCH, XORSTR("cat_event_hurt"), XORSTR("1"),
+                             XORSTR("Enable OnHurt Event"),
+                             XORSTR("Disable if your chat gets spammed with \"blah "
                              XORSTR("damaged blah down to blah hp\"")));
 class AdvancedEventListener : public IGameEventListener
 {
@@ -100,47 +100,47 @@ public:
         if (!event_log)
             return;
         const char *name = event->GetName();
-        if (!strcmp(name, XORSTR(XORSTR("player_connect_client"))))
-            PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 \x07%06X%s\x01 joining")), 0xa06ba0,
-                      event->GetString(XORSTR(XORSTR("name"))), 0x914e65,
-                      event->GetString(XORSTR(XORSTR("networkid"))));
-        else if (!strcmp(name, XORSTR(XORSTR("player_activate"))))
+        if (!strcmp(name, XORSTR("player_connect_client")))
+            PrintChat(XORSTR("\x07%06X%s\x01 \x07%06X%s\x01 joining"), 0xa06ba0,
+                      event->GetString(XORSTR("name")), 0x914e65,
+                      event->GetString(XORSTR("networkid")));
+        else if (!strcmp(name, XORSTR("player_activate")))
         {
-            int uid    = event->GetInt(XORSTR(XORSTR("userid")));
+            int uid    = event->GetInt(XORSTR("userid"));
             int entity = g_IEngine->GetPlayerForUserID(uid);
             player_info_s info;
             if (g_IEngine->GetPlayerInfo(entity, &info))
-                PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 connected")), 0xa06ba0, info.name);
+                PrintChat(XORSTR("\x07%06X%s\x01 connected"), 0xa06ba0, info.name);
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_disconnect"))))
+        else if (!strcmp(name, XORSTR("player_disconnect")))
         {
             CachedEntity *player =
-                ENTITY(g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR(XORSTR("userid")))));
-            PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 \x07%06X%s\x01 disconnected")),
+                ENTITY(g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("userid"))));
+            PrintChat(XORSTR("\x07%06X%s\x01 \x07%06X%s\x01 disconnected"),
                       colors::chat::team(player->m_iTeam()),
-                      event->GetString(XORSTR(XORSTR("name"))), 0x914e65,
-                      event->GetString(XORSTR(XORSTR("networkid"))));
+                      event->GetString(XORSTR("name")), 0x914e65,
+                      event->GetString(XORSTR("networkid")));
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_team"))))
+        else if (!strcmp(name, XORSTR("player_team")))
         {
-            if (event->GetBool(XORSTR(XORSTR("disconnect"))) != 1)
+            if (event->GetBool(XORSTR("disconnect")) != 1)
             {
-                int oteam           = event->GetInt(XORSTR(XORSTR("oldteam")));
-                int nteam           = event->GetInt(XORSTR(XORSTR("team")));
+                int oteam           = event->GetInt(XORSTR("oldteam"));
+                int nteam           = event->GetInt(XORSTR("team"));
                 const char *oteam_s = teamname(oteam);
                 const char *nteam_s = teamname(nteam);
-                PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 changed team (\x07%06X%s\x01 -> ")),
-                          XORSTR(XORSTR("\x07%06X%s\x01)")),
-                          0xa06ba0, event->GetString(XORSTR(XORSTR("name"))),
+                PrintChat(XORSTR("\x07%06X%s\x01 changed team (\x07%06X%s\x01 -> "),
+                          XORSTR("\x07%06X%s\x01)"),
+                          0xa06ba0, event->GetString(XORSTR("name")),
                           colors::chat::team(oteam), oteam_s,
                           colors::chat::team(nteam), nteam_s);
             }
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_hurt"))))
+        else if (!strcmp(name, XORSTR("player_hurt")))
         {
-            int victim   = event->GetInt(XORSTR(XORSTR("userid")));
-            int attacker = event->GetInt(XORSTR(XORSTR("attacker")));
-            int health   = event->GetInt(XORSTR(XORSTR("health")));
+            int victim   = event->GetInt(XORSTR("userid"));
+            int attacker = event->GetInt(XORSTR("attacker"));
+            int health   = event->GetInt(XORSTR("health"));
             player_info_s kinfo;
             player_info_s vinfo;
             g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim),
@@ -150,15 +150,15 @@ public:
             CachedEntity *vic = ENTITY(g_IEngine->GetPlayerForUserID(victim));
             CachedEntity *att = ENTITY(g_IEngine->GetPlayerForUserID(attacker));
             PrintChat(
-                XORSTR(XORSTR("\x07%06X%s\x01 hurt \x07%06X%s\x01 down to \x07%06X%d\x01hp")),
+                XORSTR("\x07%06X%s\x01 hurt \x07%06X%s\x01 down to \x07%06X%d\x01hp"),
                 colors::chat::team(att->m_iTeam()), kinfo.name,
                 colors::chat::team(vic->m_iTeam()), vinfo.name, 0x2aaf18,
                 health);
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_death"))))
+        else if (!strcmp(name, XORSTR("player_death")))
         {
-            int victim   = event->GetInt(XORSTR(XORSTR("userid")));
-            int attacker = event->GetInt(XORSTR(XORSTR("attacker")));
+            int victim   = event->GetInt(XORSTR("userid"));
+            int attacker = event->GetInt(XORSTR("attacker"));
             player_info_s kinfo;
             player_info_s vinfo;
             g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim),
@@ -167,39 +167,39 @@ public:
                                      &kinfo);
             CachedEntity *vic = ENTITY(g_IEngine->GetPlayerForUserID(victim));
             CachedEntity *att = ENTITY(g_IEngine->GetPlayerForUserID(attacker));
-            PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 killed \x07%06X%s\x01")),
+            PrintChat(XORSTR("\x07%06X%s\x01 killed \x07%06X%s\x01"),
                       colors::chat::team(att->m_iTeam()), kinfo.name,
                       colors::chat::team(vic->m_iTeam()), vinfo.name);
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_spawn"))))
+        else if (!strcmp(name, XORSTR("player_spawn")))
         {
-            int id = event->GetInt(XORSTR(XORSTR("userid")));
+            int id = event->GetInt(XORSTR("userid"));
             player_info_s info;
             g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info);
             CachedEntity *player = ENTITY(g_IEngine->GetPlayerForUserID(id));
-            PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 (re)spawned")),
+            PrintChat(XORSTR("\x07%06X%s\x01 (re)spawned"),
                       colors::chat::team(player->m_iTeam()), info.name);
         }
-        else if (!strcmp(name, XORSTR(XORSTR("player_changeclass"))))
+        else if (!strcmp(name, XORSTR("player_changeclass")))
         {
-            int id = event->GetInt(XORSTR(XORSTR("userid")));
+            int id = event->GetInt(XORSTR("userid"));
             player_info_s info;
             g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info);
             CachedEntity *player = ENTITY(g_IEngine->GetPlayerForUserID(id));
-            PrintChat(XORSTR(XORSTR("\x07%06X%s\x01 changed to \x07%06X%s\x01")),
+            PrintChat(XORSTR("\x07%06X%s\x01 changed to \x07%06X%s\x01"),
                       colors::chat::team(player->m_iTeam()), info.name,
-                      0xa06ba0, classname(event->GetInt(XORSTR(XORSTR("class")))));
+                      0xa06ba0, classname(event->GetInt(XORSTR("class"))));
         }
-        else if (!strcmp(name, XORSTR(XORSTR("vote_cast"))))
+        else if (!strcmp(name, XORSTR("vote_cast")))
         {
-            int vote_option = event->GetInt(XORSTR(XORSTR("vote_option")));
-            int team        = event->GetInt(XORSTR(XORSTR("team")));
-            int idx         = event->GetInt(XORSTR(XORSTR("entityid")));
+            int vote_option = event->GetInt(XORSTR("vote_option"));
+            int team        = event->GetInt(XORSTR("team"));
+            int idx         = event->GetInt(XORSTR("entityid"));
             player_info_s info;
             const char *team_s = teamname(team);
             g_IEngine->GetPlayerInfo(idx, &info);
             PrintChat(
-                XORSTR(XORSTR("\x07%06X%s\x01 Voted \x07%06X%d\x01 on team \x07%06X%s\x01")),
+                XORSTR("\x07%06X%s\x01 Voted \x07%06X%d\x01 on team \x07%06X%s\x01"),
                 colors::chat::team(team), info.name, colors::chat::team(team),
                 vote_option, colors::chat::team(team), team_s);
         };
@@ -220,9 +220,9 @@ ConCommand *hack::c_Cat = 0;
 
 void hack::CC_Cat(const CCommand &args)
 {
-    g_ICvar->ConsoleColorPrintf(Color(255, 255, 255, 255), XORSTR(XORSTR("cathook")));
-    g_ICvar->ConsoleColorPrintf(Color(0, 0, 255, 255), XORSTR(XORSTR(" by ")));
-    g_ICvar->ConsoleColorPrintf(Color(255, 0, 0, 255), XORSTR(XORSTR("nullifiedcat\n")));
+    g_ICvar->ConsoleColorPrintf(Color(255, 255, 255, 255), XORSTR("cathook"));
+    g_ICvar->ConsoleColorPrintf(Color(0, 0, 255, 255), XORSTR(" by "));
+    g_ICvar->ConsoleColorPrintf(Color(255, 0, 0, 255), XORSTR("nullifiedcat\n"));
 }
 
 void hack::Initialize()
@@ -230,28 +230,28 @@ void hack::Initialize()
     signal(SIGPIPE, SIG_IGN);
     time_injected = time(nullptr);
 /*passwd *pwd   = getpwuid(getuid());
-char *logname = strfmt(XORSTR(XORSTR("/tmp/cathook-game-stdout-%s-%u.log")), pwd->pw_name,
+char *logname = strfmt(XORSTR("/tmp/cathook-game-stdout-%s-%u.log"), pwd->pw_name,
 time_injected);
-freopen(logname, XORSTR(XORSTR("w")), stdout);
+freopen(logname, XORSTR("w"), stdout);
 free(logname);
-logname = strfmt(XORSTR(XORSTR("/tmp/cathook-game-stderr-%s-%u.log")), pwd->pw_name,
+logname = strfmt(XORSTR("/tmp/cathook-game-stderr-%s-%u.log"), pwd->pw_name,
 time_injected);
-freopen(logname, XORSTR(XORSTR("w")), stderr);
+freopen(logname, XORSTR("w"), stderr);
 free(logname);*/
 // Essential files must always exist, except when the game is running in text
 // mode.
 #if ENABLE_VISUALS
 
     {
-        std::vector<std::string> essential = { XORSTR(XORSTR("menu.json")),
-                                               XORSTR(XORSTR("fonts/tf2build.ttf")) };
+        std::vector<std::string> essential = { XORSTR("menu.json"),
+                                               XORSTR("fonts/tf2build.ttf") };
         for (const auto &s : essential)
         {
             std::ifstream exists(DATA_PATH XORSTR("/") + s, std::ios::in);
             if (not exists)
             {
-                Error((XORSTR(XORSTR("Missing essential file: ")) + s +
-                        XORSTR(XORSTR("/%s\nYou MUST run install-data script to finish ")
+                Error((XORSTR("Missing essential file: ") + s +
+                        XORSTR("/%s\nYou MUST run install-data script to finish "
                        XORSTR("installation")))
                           .c_str(),
                       s.c_str());
@@ -261,21 +261,21 @@ free(logname);*/
 
 #endif /* TEXTMODE */
 
-    logging::Info(XORSTR(XORSTR("Initializing...")));
+    logging::Info(XORSTR("Initializing..."));
     srand(time(0));
     sharedobj::LoadAllSharedObjects();
     CreateInterfaces();
     CDumper dumper;
     dumper.SaveDump();
-    logging::Info(XORSTR(XORSTR("Is TF2? %d")), IsTF2());
-    logging::Info(XORSTR(XORSTR("Is TF2C? %d")), IsTF2C());
-    logging::Info(XORSTR(XORSTR("Is HL2DM? %d")), IsHL2DM());
-    logging::Info(XORSTR(XORSTR("Is CSS? %d")), IsCSS());
-    logging::Info(XORSTR(XORSTR("Is TF? %d")), IsTF());
+    logging::Info(XORSTR("Is TF2? %d"), IsTF2());
+    logging::Info(XORSTR("Is TF2C? %d"), IsTF2C());
+    logging::Info(XORSTR("Is HL2DM? %d"), IsHL2DM());
+    logging::Info(XORSTR("Is CSS? %d"), IsCSS());
+    logging::Info(XORSTR("Is TF? %d"), IsTF());
     InitClassTable();
 
     BeginConVars();
-    hack::c_Cat = CreateConCommand(CON_NAME, &hack::CC_Cat, XORSTR(XORSTR("Info")));
+    hack::c_Cat = CreateConCommand(CON_NAME, &hack::CC_Cat, XORSTR("Info"));
     g_Settings.Init();
     EndConVars();
 
@@ -366,8 +366,8 @@ free(logname);*/
     g_IMaterialSystem->SetInStubMode(true);
     IF_GAME(IsTF2())
     {
-        logging::Info(XORSTR(XORSTR("Graphics Nullified")));
-        logging::Info(XORSTR(XORSTR("The game will crash")));
+        logging::Info(XORSTR("Graphics Nullified"));
+        logging::Info(XORSTR("The game will crash"));
         // TODO offsets::()?
         hooks::materialsystem.Set((void *) g_IMaterialSystem);
         uintptr_t base = *(uintptr_t *) (g_IMaterialSystem);
@@ -391,7 +391,7 @@ free(logname);*/
     hacks::tf2::killstreak::init();
 #endif
     hacks::shared::catbot::init();
-    logging::Info(XORSTR(XORSTR("Hooked!")));
+    logging::Info(XORSTR("Hooked!"));
     velocity::Init();
     playerlist::Load();
 
@@ -400,23 +400,23 @@ free(logname);*/
     InitStrings();
 #if ENABLE_GUI
     // cat_reloadscheme to load imgui
-    hack::command_stack().push(XORSTR(XORSTR("cat_reloadscheme")));
+    hack::command_stack().push(XORSTR("cat_reloadscheme"));
 #endif
 #ifndef FEATURE_EFFECTS_DISABLED
     if (g_ppScreenSpaceRegistrationHead && g_pScreenSpaceEffects)
     {
         effect_chams::g_pEffectChams = new CScreenSpaceEffectRegistration(
-            XORSTR(XORSTR("_cathook_chams")), &effect_chams::g_EffectChams);
-        g_pScreenSpaceEffects->EnableScreenSpaceEffect(XORSTR(XORSTR("_cathook_chams")));
+            XORSTR("_cathook_chams"), &effect_chams::g_EffectChams);
+        g_pScreenSpaceEffects->EnableScreenSpaceEffect(XORSTR("_cathook_chams"));
         effect_chams::g_EffectChams.Init();
         effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration(
-            XORSTR(XORSTR("_cathook_glow")), &effect_glow::g_EffectGlow);
-        g_pScreenSpaceEffects->EnableScreenSpaceEffect(XORSTR(XORSTR("_cathook_glow")));
+            XORSTR("_cathook_glow"), &effect_glow::g_EffectGlow);
+        g_pScreenSpaceEffects->EnableScreenSpaceEffect(XORSTR("_cathook_glow"));
     }
-    logging::Info(XORSTR(XORSTR("SSE enabled..")));
+    logging::Info(XORSTR("SSE enabled.."));
 #endif
     sdl_hooks::applySdlHooks();
-    logging::Info(XORSTR(XORSTR("SDL hooking done")));
+    logging::Info(XORSTR("SDL hooking done"));
     g_IGameEventManager->AddListener(&adv_event_listener, false);
 
 #endif /* TEXTMODE */
@@ -427,11 +427,11 @@ free(logname);*/
 #if ENABLE_VISUALS
 #ifndef FEATURE_FIDGET_SPINNER_ENABLED
     InitSpinner();
-    logging::Info(XORSTR(XORSTR("Initialized Fidget Spinner")));
+    logging::Info(XORSTR("Initialized Fidget Spinner"));
 #endif
     hacks::shared::spam::Init();
     backpacktf::init();
-    logging::Info(XORSTR(XORSTR("Initialized Backpack.TF integration")));
+    logging::Info(XORSTR("Initialized Backpack.TF integration"));
 #endif
 #if not LAGBOT_MODE
     hacks::shared::walkbot::Initialize();
@@ -439,20 +439,20 @@ free(logname);*/
 #if ENABLE_VISUALS
     hacks::shared::esp::Init();
 #endif
-    logging::Info(XORSTR(XORSTR("Clearing initializer stack")));
+    logging::Info(XORSTR("Clearing initializer stack"));
     while (!init_stack().empty())
     {
         init_stack().top()();
         init_stack().pop();
     }
-    logging::Info(XORSTR(XORSTR("Initializer stack done")));
+    logging::Info(XORSTR("Initializer stack done"));
 
 #if not ENABLE_VISUALS
     hack::command_stack().push(XORSTR("exec cat_autoexec_textmode"));
 #endif
-    hack::command_stack().push(XORSTR(XORSTR("exec cat_autoexec")));
-    hack::command_stack().push(XORSTR(XORSTR("cat_killsay_reload")));
-    hack::command_stack().push(XORSTR(XORSTR("cat_spam_reload")));
+    hack::command_stack().push(XORSTR("exec cat_autoexec"));
+    hack::command_stack().push(XORSTR("cat_killsay_reload"));
+    hack::command_stack().push(XORSTR("cat_spam_reload"));
     hack::initialized = true;
 }
 
@@ -470,12 +470,12 @@ void hack::Shutdown()
 #if ENABLE_VISUALS
     sdl_hooks::cleanSdlHooks();
 #endif
-    logging::Info(XORSTR(XORSTR("Unregistering convars..")));
+    logging::Info(XORSTR("Unregistering convars.."));
     ConVar_Unregister();
 #if not LAGBOT_MODE
-    logging::Info(XORSTR(XORSTR("Shutting down killsay...")));
+    logging::Info(XORSTR("Shutting down killsay..."));
     hacks::shared::killsay::Shutdown();
     hacks::shared::announcer::shutdown();
 #endif
-    logging::Info(XORSTR(XORSTR("Success..")));
+    logging::Info(XORSTR("Success.."));
 }

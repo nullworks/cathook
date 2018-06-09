@@ -19,141 +19,141 @@ namespace aimbot
 {
 
 // User settings are stored and used by these vars
-static CatVar enabled(CV_SWITCH, "aimbot_enabled", "0", "Enable Aimbot",
-                      "Main aimbot switch");
-static CatVar aimkey(CV_KEY, "aimbot_aimkey", "0", "Aimkey",
-                     "Aimkey. Look at Aimkey Mode too!");
-static CatEnum aimkey_modes_enum({ "DISABLED", "AIMKEY", "REVERSE", "TOGGLE" });
-static CatVar aimkey_mode(aimkey_modes_enum, "aimbot_aimkey_mode", "1",
-                          "Aimkey mode",
-                          "DISABLED: aimbot is always active\nAIMKEY: aimbot "
+static CatVar enabled(CV_SWITCH, XORSTR("aimbot_enabled"), XORSTR("0"), XORSTR("Enable Aimbot"),
+                      XORSTR("Main aimbot switch"));
+static CatVar aimkey(CV_KEY, XORSTR("aimbot_aimkey"), XORSTR("0"), XORSTR("Aimkey"),
+                     XORSTR("Aimkey. Look at Aimkey Mode too!"));
+static CatEnum aimkey_modes_enum({ XORSTR("DISABLED"), XORSTR("AIMKEY"), XORSTR("REVERSE"), XORSTR("TOGGLE") });
+static CatVar aimkey_mode(aimkey_modes_enum, XORSTR("aimbot_aimkey_mode"), XORSTR("1"),
+                          XORSTR("Aimkey mode"),
+                          XORSTR("DISABLED: aimbot is always active\nAIMKEY: aimbot "
                           "is active when key is down\nREVERSE: aimbot is "
                           "disabled when key is down\nTOGGLE: pressing key "
-                          "toggles aimbot");
-static CatVar autoshoot(CV_SWITCH, "aimbot_autoshoot", "1", "Autoshoot",
-                        "Shoot automatically when the target is locked, isn't "
-                        "compatible with 'Enable when attacking'");
-static CatVar autoshoot_disguised(CV_SWITCH, "aimbot_autoshoot_disguised", "1",
-                                  "Autoshoot while disguised",
-                                  "Shoot automatically if disguised.");
-static CatVar multipoint(CV_SWITCH, "aimbot_multipoint", "0", "Multipoint",
-                         "Multipoint aimbot");
-static CatEnum hitbox_mode_enum({ "AUTO", "AUTO-CLOSEST", "STATIC" });
-static CatVar hitbox_mode(hitbox_mode_enum, "aimbot_hitboxmode", "0",
-                          "Hitbox Mode", "Defines hitbox selection mode");
+                          "toggles aimbot"));
+static CatVar autoshoot(CV_SWITCH, XORSTR("aimbot_autoshoot"), XORSTR("1"), XORSTR("Autoshoot"),
+                        XORSTR("Shoot automatically when the target is locked, isn't "
+                        "compatible with 'Enable when attacking'"));
+static CatVar autoshoot_disguised(CV_SWITCH, XORSTR("aimbot_autoshoot_disguised"), XORSTR("1"),
+                                  XORSTR("Autoshoot while disguised"),
+                                  XORSTR("Shoot automatically if disguised."));
+static CatVar multipoint(CV_SWITCH, XORSTR("aimbot_multipoint"), XORSTR("0"), XORSTR("Multipoint"),
+                         XORSTR("Multipoint aimbot"));
+static CatEnum hitbox_mode_enum({ XORSTR("AUTO"), XORSTR("AUTO-CLOSEST"), XORSTR("STATIC") });
+static CatVar hitbox_mode(hitbox_mode_enum, XORSTR("aimbot_hitboxmode"), XORSTR("0"),
+                          XORSTR("Hitbox Mode"), XORSTR("Defines hitbox selection mode"));
 static CatVar fov(
-    CV_FLOAT, "aimbot_fov", "0", "Aimbot FOV",
-    "FOV range for aimbot to lock targets. \"Smart FOV\" coming eventually.",
+    CV_FLOAT, XORSTR("aimbot_fov"), XORSTR("0"), XORSTR("Aimbot FOV"),
+    XORSTR("FOV range for aimbot to lock targets. \"Smart FOV\" coming eventually."),
     180.0f);
-static CatVar fovcircle_opacity(CV_FLOAT, "aimbot_fov_draw_opacity", "0.7",
-                                "FOV Circle Opacity",
-                                "Defines opacity of FOV circle", 0.0f, 1.0f);
+static CatVar fovcircle_opacity(CV_FLOAT, XORSTR("aimbot_fov_draw_opacity"), XORSTR("0.7"),
+                                XORSTR("FOV Circle Opacity"),
+                                XORSTR("Defines opacity of FOV circle"), 0.0f, 1.0f);
 // Selective and related
-static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
-static CatVar priority_mode(priority_mode_enum, "aimbot_prioritymode", "0",
-                            "Priority mode",
-                            "Priority mode.\n"
+static CatEnum priority_mode_enum({ XORSTR("SMART"), XORSTR("FOV"), XORSTR("DISTANCE"), XORSTR("HEALTH") });
+static CatVar priority_mode(priority_mode_enum, XORSTR("aimbot_prioritymode"), XORSTR("0"),
+                            XORSTR("Priority mode"),
+                            XORSTR("Priority mode.\n"
                             "SMART: Basically Auto-Threat. "
                             "FOV, DISTANCE, HEALTH are self-explainable. "
-                            "HEALTH picks the weakest enemy");
+                            "HEALTH picks the weakest enemy"));
 static CatVar
-    wait_for_charge(CV_SWITCH, "aimbot_charge", "0",
-                    "Wait for sniper rifle charge",
-                    "Aimbot waits until it has enough charge to kill");
+    wait_for_charge(CV_SWITCH, XORSTR("aimbot_charge"), XORSTR("0"),
+                    XORSTR("Wait for sniper rifle charge"),
+                    XORSTR("Aimbot waits until it has enough charge to kill"));
 static CatVar ignore_vaccinator(
-    CV_SWITCH, "aimbot_ignore_vaccinator", "1", "Ignore Vaccinator",
-    "Hitscan weapons won't fire if enemy is vaccinated against bullets");
-static CatVar ignore_hoovy(CV_SWITCH, "aimbot_ignore_hoovy", "0",
-                           "Ignore Hoovies", "Aimbot won't attack hoovies");
-static CatVar ignore_cloak(CV_SWITCH, "aimbot_ignore_cloak", "1",
-                           "Ignore cloaked", "Don't aim at invisible enemies");
-static CatVar ignore_deadringer(CV_SWITCH, "aimbot_ignore_deadringer", "1",
-                                "Ignore deadringer",
-                                "Don't aim at deadringed enemies");
-static CatVar buildings_sentry(CV_SWITCH, "aimbot_buildings_sentry", "1",
-                               "Aim Sentry",
-                               "Should aimbot aim at sentryguns?");
-static CatVar buildings_other(CV_SWITCH, "aimbot_buildings_other", "1",
-                              "Aim Other building",
-                              "Should aimbot aim at other buildings");
-static CatVar stickybot(CV_SWITCH, "aimbot_stickys", "0", "Aim Sticky",
-                        "Should aimbot aim at stickys");
-static CatVar rageonly(CV_SWITCH, "aimbot_rage_only", "0",
-                       "Ignore non-rage targets",
-                       "Use playerlist to set up rage targets");
-static CatEnum teammates_enum({ "ENEMY ONLY", "TEAMMATE ONLY", "BOTH" });
-static CatVar teammates(teammates_enum, "aimbot_teammates", "0",
-                        "Aim at teammates",
-                        "Use to choose which team/s to target");
+    CV_SWITCH, XORSTR("aimbot_ignore_vaccinator"), XORSTR("1"), XORSTR("Ignore Vaccinator"),
+    XORSTR("Hitscan weapons won't fire if enemy is vaccinated against bullets"));
+static CatVar ignore_hoovy(CV_SWITCH, XORSTR("aimbot_ignore_hoovy"), XORSTR("0"),
+                           XORSTR("Ignore Hoovies"), XORSTR("Aimbot won't attack hoovies"));
+static CatVar ignore_cloak(CV_SWITCH, XORSTR("aimbot_ignore_cloak"), XORSTR("1"),
+                           XORSTR("Ignore cloaked"), XORSTR("Don't aim at invisible enemies"));
+static CatVar ignore_deadringer(CV_SWITCH, XORSTR("aimbot_ignore_deadringer"), XORSTR("1"),
+                                XORSTR("Ignore deadringer"),
+                                XORSTR("Don't aim at deadringed enemies"));
+static CatVar buildings_sentry(CV_SWITCH, XORSTR("aimbot_buildings_sentry"), XORSTR("1"),
+                               XORSTR("Aim Sentry"),
+                               XORSTR("Should aimbot aim at sentryguns?"));
+static CatVar buildings_other(CV_SWITCH, XORSTR("aimbot_buildings_other"), XORSTR("1"),
+                              XORSTR("Aim Other building"),
+                              XORSTR("Should aimbot aim at other buildings"));
+static CatVar stickybot(CV_SWITCH, XORSTR("aimbot_stickys"), XORSTR("0"), XORSTR("Aim Sticky"),
+                        XORSTR("Should aimbot aim at stickys"));
+static CatVar rageonly(CV_SWITCH, XORSTR("aimbot_rage_only"), XORSTR("0"),
+                       XORSTR("Ignore non-rage targets"),
+                       XORSTR("Use playerlist to set up rage targets"));
+static CatEnum teammates_enum({ XORSTR("ENEMY ONLY"), XORSTR("TEAMMATE ONLY"), XORSTR("BOTH") });
+static CatVar teammates(teammates_enum, XORSTR("aimbot_teammates"), XORSTR("0"),
+                        XORSTR("Aim at teammates"),
+                        XORSTR("Use to choose which team/s to target"));
 // Other prefrences
 static CatVar
-    silent(CV_SWITCH, "aimbot_silent", "1", "Silent",
-           "Your screen doesn't get snapped to the point where aimbot aims at");
+    silent(CV_SWITCH, XORSTR("aimbot_silent"), XORSTR("1"), XORSTR("Silent"),
+           XORSTR("Your screen doesn't get snapped to the point where aimbot aims at"));
 static CatVar target_lock(
-    CV_SWITCH, "aimbot_target_lock", "0", "Target Lock",
-    "Keeps your previously chosen target untill target check fails");
-static CatEnum hitbox_enum({ "HEAD", "PELVIS", "SPINE 0", "SPINE 1", "SPINE 2",
-                             "SPINE 3", "UPPER ARM L", "LOWER ARM L", "HAND L",
-                             "UPPER ARM R", "LOWER ARM R", "HAND R", "HIP L",
-                             "KNEE L", "FOOT L", "HIP R", "KNEE R", "FOOT R" });
-static CatVar hitbox(hitbox_enum, "aimbot_hitbox", "0", "Hitbox",
-                     "Hitbox to aim at. Ignored if AutoHitbox is on");
-static CatVar zoomed_only(CV_SWITCH, "aimbot_zoomed", "0", "Zoomed only",
-                          "Don't autoshoot with unzoomed rifles");
-static CatVar only_can_shoot(CV_SWITCH, "aimbot_only_when_can_shoot", "1",
-                             "Active when can shoot",
-                             "Aimbot only activates when you can instantly "
+    CV_SWITCH, XORSTR("aimbot_target_lock"), XORSTR("0"), XORSTR("Target Lock"),
+    XORSTR("Keeps your previously chosen target untill target check fails"));
+static CatEnum hitbox_enum({ XORSTR("HEAD"), XORSTR("PELVIS"), XORSTR("SPINE 0"), XORSTR("SPINE 1"), XORSTR("SPINE 2"),
+                             XORSTR("SPINE 3"), XORSTR("UPPER ARM L"), XORSTR("LOWER ARM L"), XORSTR("HAND L"),
+                             XORSTR("UPPER ARM R"), XORSTR("LOWER ARM R"), XORSTR("HAND R"), XORSTR("HIP L"),
+                             XORSTR("KNEE L"), XORSTR("FOOT L"), XORSTR("HIP R"), XORSTR("KNEE R"), XORSTR("FOOT R") });
+static CatVar hitbox(hitbox_enum, XORSTR("aimbot_hitbox"), XORSTR("0"), XORSTR("Hitbox"),
+                     XORSTR("Hitbox to aim at. Ignored if AutoHitbox is on"));
+static CatVar zoomed_only(CV_SWITCH, XORSTR("aimbot_zoomed"), XORSTR("0"), XORSTR("Zoomed only"),
+                          XORSTR("Don't autoshoot with unzoomed rifles"));
+static CatVar only_can_shoot(CV_SWITCH, XORSTR("aimbot_only_when_can_shoot"), XORSTR("1"),
+                             XORSTR("Active when can shoot"),
+                             XORSTR("Aimbot only activates when you can instantly "
                              "shoot, sometimes making the autoshoot invisible "
-                             "for spectators");
+                             "for spectators"));
 static CatVar
-    max_range(CV_INT, "aimbot_maxrange", "0", "Max distance",
-              "Max range for aimbot\n"
-              "900-1100 range is efficient for scout/widowmaker engineer",
+    max_range(CV_INT, XORSTR("aimbot_maxrange"), XORSTR("0"), XORSTR("Max distance"),
+              XORSTR("Max range for aimbot\n"
+              "900-1100 range is efficient for scout/widowmaker engineer"),
               4096.0f);
-static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0",
-                          "Latency extrapolation",
-                          "(NOT RECOMMENDED) latency extrapolation");
-static CatVar slow_aim(CV_INT, "aimbot_slow", "0", "Slow Aim",
-                       "Slowly moves your crosshair onto the target for more "
-                       "legit play\nDisables silent aimbot",
+static CatVar extrapolate(CV_SWITCH, XORSTR("aimbot_extrapolate"), XORSTR("0"),
+                          XORSTR("Latency extrapolation"),
+                          XORSTR("(NOT RECOMMENDED) latency extrapolation"));
+static CatVar slow_aim(CV_INT, XORSTR("aimbot_slow"), XORSTR("0"), XORSTR("Slow Aim"),
+                       XORSTR("Slowly moves your crosshair onto the target for more "
+                       "legit play\nDisables silent aimbot"),
                        0, 50);
 static CatVar projectile_aimbot(
-    CV_SWITCH, "aimbot_projectile", "1", "Projectile aimbot",
-    "If you turn it off, aimbot won't try to aim with projectile weapons");
+    CV_SWITCH, XORSTR("aimbot_projectile"), XORSTR("1"), XORSTR("Projectile aimbot"),
+    XORSTR("If you turn it off, aimbot won't try to aim with projectile weapons"));
 static CatVar
-    proj_gravity(CV_FLOAT, "aimbot_proj_gravity", "0", "Projectile gravity",
-                 "Force override projectile gravity. Useful for debugging.",
+    proj_gravity(CV_FLOAT, XORSTR("aimbot_proj_gravity"), XORSTR("0"), XORSTR("Projectile gravity"),
+                 XORSTR("Force override projectile gravity. Useful for debugging."),
                  1.0f);
 static CatVar
-    proj_speed(CV_FLOAT, "aimbot_proj_speed", "0", "Projectile speed",
-               "Force override projectile speed.\n"
+    proj_speed(CV_FLOAT, XORSTR("aimbot_proj_speed"), XORSTR("0"), XORSTR("Projectile speed"),
+               XORSTR("Force override projectile speed.\n"
                "Can be useful for playing with MvM upgrades or on x10 servers "
                "since there is no \"automatic\" projectile speed detection in "
-               "cathook. Yet.");
+               "cathook. Yet."));
 static CatVar
-    huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5",
-                       "Huntsman autoshoot",
-                       "Minimum charge for autoshooting with huntsman.\n"
+    huntsman_autoshoot(CV_FLOAT, XORSTR("aimbot_huntsman_charge"), XORSTR("0.5"),
+                       XORSTR("Huntsman autoshoot"),
+                       XORSTR("Minimum charge for autoshooting with huntsman.\n"
                        "Set it to 0.01 if you want to shoot as soon as you "
-                       "start pulling the arrow",
+                       "start pulling the arrow"),
                        0.01f, 1.0f);
-static CatVar miss_chance(CV_FLOAT, "aimbot_miss_chance", "0", "Miss chance",
-                          "From 0 to 1. Aimbot will NOT aim in these % cases",
+static CatVar miss_chance(CV_FLOAT, XORSTR("aimbot_miss_chance"), XORSTR("0"), XORSTR("Miss chance"),
+                          XORSTR("From 0 to 1. Aimbot will NOT aim in these % cases"),
                           0.0f, 1.0f);
 // Debug vars
-static CatVar aimbot_debug(CV_SWITCH, "aimbot_debug", "0", "Aimbot Debug",
-                           "Display simple debug info for aimbot");
-static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0",
-                              "Engine ProjPred");
+static CatVar aimbot_debug(CV_SWITCH, XORSTR("aimbot_debug"), XORSTR("0"), XORSTR("Aimbot Debug"),
+                           XORSTR("Display simple debug info for aimbot"));
+static CatVar engine_projpred(CV_SWITCH, XORSTR("debug_aimbot_engine_pp"), XORSTR("0"),
+                              XORSTR("Engine ProjPred"));
 // Followbot vars
 static CatVar auto_spin_up(
-    CV_SWITCH, "aimbot_spin_up", "0", "Auto Spin Up",
-    "Spin up minigun if you can see target, useful for followbots");
+    CV_SWITCH, XORSTR("aimbot_spin_up"), XORSTR("0"), XORSTR("Auto Spin Up"),
+    XORSTR("Spin up minigun if you can see target, useful for followbots"));
 static CatVar auto_zoom(
-    CV_SWITCH, "aimbot_auto_zoom", "0", "Auto Zoom",
-    "Automatically zoom in if you can see target, useful for followbots");
-static CatVar auto_unzoom(CV_SWITCH, "aimbot_auto_unzoom", "0", "Auto Un-zoom",
-                          "Automatically unzoom");
+    CV_SWITCH, XORSTR("aimbot_auto_zoom"), XORSTR("0"), XORSTR("Auto Zoom"),
+    XORSTR("Automatically zoom in if you can see target, useful for followbots"));
+static CatVar auto_unzoom(CV_SWITCH, XORSTR("aimbot_auto_unzoom"), XORSTR("0"), XORSTR("Auto Un-zoom"),
+                          XORSTR("Automatically unzoom"));
 
 // Current Entity
 int target_eid{ 0 };
@@ -171,7 +171,7 @@ bool slow_can_shoot = false;
 // for current frame, to avoid performing them again
 AimbotCalculatedData_s calculated_data_array[2048]{};
 
-// The main "loop" of the aimbot.
+// The main XORSTR("loop") of the aimbot.
 void CreateMove()
 {
     PROF_SECTION(PT_aimbot_cm);
@@ -1234,8 +1234,8 @@ void Reset()
 }
 
 #if ENABLE_VISUALS
-static CatVar fov_draw(CV_SWITCH, "aimbot_fov_draw", "0", "Draw Fov Ring",
-                       "Draws a ring to represent your current aimbot fov");
+static CatVar fov_draw(CV_SWITCH, XORSTR("aimbot_fov_draw"), XORSTR("0"), XORSTR("Draw Fov Ring"),
+                       XORSTR("Draws a ring to represent your current aimbot fov"));
 void DrawText()
 {
     // Dont draw to screen when aimbot is disabled

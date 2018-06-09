@@ -14,18 +14,18 @@ namespace tf
 namespace spyalert
 {
 
-static CatVar enabled(CV_SWITCH, "spyalert_enabled", "0", "Enable",
-                      "Master SpyAlert switch");
-static CatVar distance_warning(CV_FLOAT, "spyalert_warning", "500.0",
-                               "Warning distance",
-                               "Distance where yellow warning shows");
-static CatVar distance_backstab(CV_FLOAT, "spyalert_backstab", "200.0",
-                                "Backstab distance",
-                                "Distance where red warning shows");
-static CatVar sound_alerts(CV_SWITCH, "spyalert_sound", "1", "Sound Alerts",
-                           "Demoman yells spy when a spy is within distance");
-static CatVar sound_alert_interval(CV_FLOAT, "spyalert_interval", "3",
-                                   "Alert Interval", "Sound alert interval");
+static CatVar enabled(CV_SWITCH, XORSTR("spyalert_enabled"), XORSTR("0"), XORSTR("Enable"),
+                      XORSTR("Master SpyAlert switch"));
+static CatVar distance_warning(CV_FLOAT, XORSTR("spyalert_warning"), XORSTR("500.0"),
+                               XORSTR("Warning distance"),
+                               XORSTR("Distance where yellow warning shows"));
+static CatVar distance_backstab(CV_FLOAT, XORSTR("spyalert_backstab"), XORSTR("200.0"),
+                                XORSTR("Backstab distance"),
+                                XORSTR("Distance where red warning shows"));
+static CatVar sound_alerts(CV_SWITCH, XORSTR("spyalert_sound"), XORSTR("1"), XORSTR("Sound Alerts"),
+                           XORSTR("Demoman yells spy when a spy is within distance"));
+static CatVar sound_alert_interval(CV_FLOAT, XORSTR("spyalert_interval"), XORSTR("3"),
+                                   XORSTR("Alert Interval"), XORSTR("Sound alert interval"));
 
 bool warning_triggered  = false;
 bool backstab_triggered = false;
@@ -80,14 +80,14 @@ void Draw()
                     (g_GlobalVars->curtime - last_say) >
                         (float) sound_alert_interval)
                 {
-                    g_ISurface->PlaySound("vo/demoman_cloakedspy03.mp3");
+                    g_ISurface->PlaySound(XORSTR("vo/demoman_cloakedspy03.mp3"));
                     last_say = g_GlobalVars->curtime;
                 }
                 backstab_triggered = true;
             }
-            AddCenterString(format("BACKSTAB WARNING! ",
+            AddCenterString(format(XORSTR("BACKSTAB WARNING! "),
                                    (int) (closest_spy_distance / 64 * 1.22f),
-                                   "m (", spy_count, ")"),
+                                   XORSTR("m ("), spy_count, XORSTR(")")),
                             colors::red);
         }
         else if (closest_spy_distance < (float) distance_warning)
@@ -99,14 +99,14 @@ void Draw()
                     (g_GlobalVars->curtime - last_say) >
                         (float) sound_alert_interval)
                 {
-                    g_ISurface->PlaySound("vo/demoman_cloakedspy01.mp3");
+                    g_ISurface->PlaySound(XORSTR("vo/demoman_cloakedspy01.mp3"));
                     last_say = g_GlobalVars->curtime;
                 }
                 warning_triggered = true;
             }
-            AddCenterString(format("Incoming spy! ",
+            AddCenterString(format(XORSTR("Incoming spy! "),
                                    (int) (closest_spy_distance / 64 * 1.22f),
-                                   "m (", spy_count, ")"),
+                                   XORSTR("m ("), spy_count, XORSTR(")")),
                             colors::yellow);
         }
     }

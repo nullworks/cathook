@@ -13,16 +13,16 @@
 static bool retrun = false;
 static Timer sendmsg{};
 static Timer gitgud{};
-static CatVar clean_chat(CV_SWITCH, "clean_chat", "0", "Clean chat",
-                         "Removes newlines from chat");
-static CatVar dispatch_log(CV_SWITCH, "debug_log_usermessages", "0",
-                           "Log dispatched user messages");
-static CatVar chat_filter(CV_STRING, "chat_censor", "", "Censor words",
-                          "Spam Chat with newlines if the chosen words are "
-                          "said, seperate with commas");
-static CatVar chat_filter_enabled(CV_SWITCH, "chat_censor_enabled", "0",
-                                  "Enable censor", "Censor Words in chat");
-std::string clear = "";
+static CatVar clean_chat(CV_SWITCH, XORSTR("clean_chat"), XORSTR("0"), XORSTR("Clean chat"),
+                         XORSTR("Removes newlines from chat"));
+static CatVar dispatch_log(CV_SWITCH, XORSTR("debug_log_usermessages"), XORSTR("0"),
+                           XORSTR("Log dispatched user messages"));
+static CatVar chat_filter(CV_STRING, XORSTR("chat_censor"), XORSTR(""), XORSTR("Censor words"),
+                          XORSTR("Spam Chat with newlines if the chosen words are "
+                          "said, seperate with commas"));
+static CatVar chat_filter_enabled(CV_SWITCH, XORSTR("chat_censor_enabled"), XORSTR("0"),
+                                  XORSTR("Enable censor"), XORSTR("Censor Words in chat"));
+std::string clear = XORSTR("");
 std::string lastfilter{};
 std::string lastname{};
 
@@ -34,7 +34,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
 {
     if (retrun && gitgud.test_and_set(10000))
     {
-        PrintChat("\x07%06X%s\x01: %s", 0xe05938, lastname.c_str(),
+        PrintChat(XORSTR("\x07%06X%s\x01: %s"), 0xe05938, lastname.c_str(),
                   lastfilter.c_str());
         retrun = false;
     }
@@ -69,7 +69,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
             }
             if (chat_filter_enabled && data[0] != LOCAL_E->m_IDX)
             {
-                if (!strcmp(chat_filter.GetString(), ""))
+                if (!strcmp(chat_filter.GetString(), XORSTR("")))
                 {
                     std::string tmp  = {};
                     std::string tmp2 = {};
@@ -83,31 +83,31 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                     switch (g_pLocalPlayer->clazz)
                     {
                     case tf_scout:
-                        claz = "scout";
+                        claz = XORSTR("scout");
                         break;
                     case tf_soldier:
-                        claz = "soldier";
+                        claz = XORSTR("soldier");
                         break;
                     case tf_pyro:
-                        claz = "pyro";
+                        claz = XORSTR("pyro");
                         break;
                     case tf_demoman:
-                        claz = "demo";
+                        claz = XORSTR("demo");
                         break;
                     case tf_engineer:
-                        claz = "engi";
+                        claz = XORSTR("engi");
                         break;
                     case tf_heavy:
-                        claz = "heavy";
+                        claz = XORSTR("heavy");
                         break;
                     case tf_medic:
-                        claz = "med";
+                        claz = XORSTR("med");
                         break;
                     case tf_sniper:
-                        claz = "sniper";
+                        claz = XORSTR("sniper");
                         break;
                     case tf_spy:
-                        claz = "spy";
+                        claz = XORSTR("spy");
                         break;
                     default:
                         break;
@@ -119,7 +119,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                             iii = 0;
                             tmp += i;
                             name2.push_back(tmp);
-                            tmp = "";
+                            tmp = XORSTR("");
                         }
                         else if (iii < 2)
                         {
@@ -135,7 +135,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                             iii = 0;
                             tmp += i;
                             name3.push_back(tmp2);
-                            tmp2 = "";
+                            tmp2 = XORSTR("");
                         }
                         else if (iii < 3)
                         {
@@ -149,9 +149,9 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                         name3.push_back(tmp2);
                     iii                          = 0;
                     std::vector<std::string> res = {
-                        "skid", "script", "cheat", "hak",   "hac",  "f1",
-                        "hax",  "vac",    "ban",   "lmao",  "bot",  "report",
-                        "cat",  "insta",  "revv",  "brass", "kick", claz
+                        XORSTR("skid"), XORSTR("script"), XORSTR("cheat"), XORSTR("hak"),   XORSTR("hac"),  XORSTR("f1"),
+                        XORSTR("hax"),  XORSTR("vac"),    XORSTR("ban"),   XORSTR("lmao"),  XORSTR("bot"),  XORSTR("report"),
+                        XORSTR("cat"),  XORSTR("insta"),  XORSTR("revv"),  XORSTR("brass"), XORSTR("kick"), claz
                     };
                     for (auto i : name2)
                     {
@@ -165,12 +165,12 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                     }
                     std::string message2 = message;
                     boost::to_lower(message2);
-                    boost::replace_all(message2, "4", "a");
-                    boost::replace_all(message2, "3", "e");
-                    boost::replace_all(message2, "0", "o");
-                    boost::replace_all(message2, "6", "g");
-                    boost::replace_all(message2, "5", "s");
-                    boost::replace_all(message2, "7", "t");
+                    boost::replace_all(message2, XORSTR("4"), XORSTR("a"));
+                    boost::replace_all(message2, XORSTR("3"), XORSTR("e"));
+                    boost::replace_all(message2, XORSTR("0"), XORSTR("o"));
+                    boost::replace_all(message2, XORSTR("6"), XORSTR("g"));
+                    boost::replace_all(message2, XORSTR("5"), XORSTR("s"));
+                    boost::replace_all(message2, XORSTR("7"), XORSTR("t"));
                     for (auto filter : res)
                     {
                         if (retrun)
@@ -178,13 +178,13 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                         if (boost::contains(message2, filter))
                         {
 
-                            if (clear == "")
+                            if (clear == XORSTR(""))
                             {
                                 for (int i = 0; i < 120; i++)
-                                    clear += "\n";
+                                    clear += XORSTR("\n");
                             }
                             *bSendPackets = true;
-                            chat_stack::Say(". " + clear, true);
+                            chat_stack::Say(XORSTR(". ") + clear, true);
                             retrun     = true;
                             lastfilter = format(filter);
                             lastname   = format(name);
@@ -197,27 +197,27 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                     boost::to_lower(input);
                     std::string message2 = message;
                     std::vector<std::string> result{};
-                    boost::split(result, input, boost::is_any_of(","));
-                    boost::replace_all(message2, "4", "a");
-                    boost::replace_all(message2, "3", "e");
-                    boost::replace_all(message2, "0", "o");
-                    boost::replace_all(message2, "6", "g");
-                    boost::replace_all(message2, "5", "s");
-                    boost::replace_all(message2, "7", "t");
+                    boost::split(result, input, boost::is_any_of(XORSTR(",")));
+                    boost::replace_all(message2, XORSTR("4"), XORSTR("a"));
+                    boost::replace_all(message2, XORSTR("3"), XORSTR("e"));
+                    boost::replace_all(message2, XORSTR("0"), XORSTR("o"));
+                    boost::replace_all(message2, XORSTR("6"), XORSTR("g"));
+                    boost::replace_all(message2, XORSTR("5"), XORSTR("s"));
+                    boost::replace_all(message2, XORSTR("7"), XORSTR("t"));
                     for (auto filter : result)
                     {
                         if (retrun)
                             break;
                         if (boost::contains(message2, filter))
                         {
-                            if (clear == "")
+                            if (clear == XORSTR(""))
                             {
-                                clear = "";
+                                clear = XORSTR("");
                                 for (int i = 0; i < 120; i++)
-                                    clear += "\n";
+                                    clear += XORSTR("\n");
                             }
                             *bSendPackets = true;
-                            chat_stack::Say(". " + clear, true);
+                            chat_stack::Say(XORSTR(". ") + clear, true);
                             retrun     = true;
                             lastfilter = format(filter);
                             lastname   = format(name);
@@ -228,16 +228,16 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
 #if not LAGBOT_MODE
             if (sendmsg.test_and_set(300000) &&
                 hacks::shared::antiaim::communicate)
-                chat_stack::Say("!!meow");
+                chat_stack::Say(XORSTR("!!meow"));
 #endif
             if (crypt_chat)
             {
-                if (message.find("!!") == 0)
+                if (message.find(XORSTR("!!")) == 0)
                 {
                     if (ucccccp::validate(message))
                     {
 #if not LAGBOT_MODE
-                        if (ucccccp::decrypt(message) == "meow" &&
+                        if (ucccccp::decrypt(message) == XORSTR("meow") &&
                             hacks::shared::antiaim::communicate &&
                             data[0] != LOCAL_E->m_IDX &&
                             playerlist::AccessData(ENTITY(data[0])).state !=
@@ -245,10 +245,10 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                         {
                             playerlist::AccessData(ENTITY(data[0])).state =
                                 playerlist::k_EState::CAT;
-                            chat_stack::Say("!!meow");
+                            chat_stack::Say(XORSTR("!!meow"));
                         }
 #endif
-                        PrintChat("\x07%06X%s\x01: %s", 0xe05938, name.c_str(),
+                        PrintChat(XORSTR("\x07%06X%s\x01: %s"), 0xe05938, name.c_str(),
                                   ucccccp::decrypt(message).c_str());
                     }
                 }
@@ -260,7 +260,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
     }
     if (dispatch_log)
     {
-        logging::Info("D> %i", type);
+        logging::Info(XORSTR("D> %i"), type);
         std::ostringstream str{};
         while (buf.GetNumBytesLeft())
         {
@@ -268,7 +268,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
             str << std::hex << std::setw(2) << std::setfill('0')
                 << static_cast<int>(byte) << ' ';
         }
-        logging::Info("MESSAGE %d, DATA = [ %s ]", type, str.str().c_str());
+        logging::Info(XORSTR("MESSAGE %d, DATA = [ %s ]"), type, str.str().c_str());
         buf.Seek(0);
     }
     votelogger::user_message(buf, type);

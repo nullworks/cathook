@@ -20,14 +20,14 @@ namespace ncc
 unsigned long font_title = 0;
 unsigned long font_item  = 0;
 
-CatVar scale(CV_FLOAT, "gui_ncc_scale", "1", "NCC GUI Scale",
-             "Defines scale of NCC gui", 0.5f, 4.0f);
-static CatVar font_family(fonts::family_enum, "gui_ncc_font_family", "3",
-                          "NCC Font Family",
-                          "Defines font family for NCC menu");
-static CatVar font_title_family(fonts::family_enum, "gui_ncc_font_title_family",
-                                "4", "NCC Title Family",
-                                "Defines font family for NCC menu titles");
+CatVar scale(CV_FLOAT, XORSTR("gui_ncc_scale"), XORSTR("1"), XORSTR("NCC GUI Scale"),
+             XORSTR("Defines scale of NCC gui"), 0.5f, 4.0f);
+static CatVar font_family(fonts::family_enum, XORSTR("gui_ncc_font_family"), XORSTR("3"),
+                          XORSTR("NCC Font Family"),
+                          XORSTR("Defines font family for NCC menu"));
+static CatVar font_title_family(fonts::family_enum, XORSTR("gui_ncc_font_title_family"),
+                                XORSTR("4"), XORSTR("NCC Title Family"),
+                                XORSTR("Defines font family for NCC menu titles"));
 
 Tooltip *tooltip = nullptr;
 Root *root       = nullptr;
@@ -65,8 +65,8 @@ void Init()
         [](IConVar *var, const char *pszOldValue, float flOldValue) {
             if (init_done)
                 RefreshFonts();
-            logging::Info("Scale Changed");
-            root->HandleCustomEvent(KeyValues::AutoDelete("scale_update"));
+            logging::Info(XORSTR("Scale Changed"));
+            root->HandleCustomEvent(KeyValues::AutoDelete(XORSTR("scale_update")));
         });
     font_family.InstallChangeCallback(ChangeCallback);
     font_title_family.InstallChangeCallback(ChangeCallback);
@@ -91,9 +91,10 @@ void RefreshFonts()
             .at(_clamp(0, (int) (fonts::fonts.size() - 1), (int) font_family))
             .c_str(),
         psize_font_item * (float) scale, 0, 0, 0, 0x0);
-    root->HandleCustomEvent(KeyValues::AutoDelete("font_update"));
+    root->HandleCustomEvent(KeyValues::AutoDelete(XORSTR("font_update")));
 }
 
+// fatal error: template instantiation depth exceeds maximum of 900 (use -ftemplate-depth= to increase the maximum)
 static const std::string list_hl2dm = R"(
 "Cat Hook"
 "Aim Bot" [
@@ -120,7 +121,7 @@ static const std::string list_hl2dm = R"(
 		"aimbot_slow_autoshoot"
 	]
 ]
- 
+
 "Trigger Bot" [
 	"Trigger Bot Menu"
 	"trigger_enabled"
@@ -128,8 +129,6 @@ static const std::string list_hl2dm = R"(
 	"trigger_range"
 	"trigger_hitbox"
 ]
- 
-
 
 "Visuals" [
 	"Visuals Menu"
@@ -186,7 +185,6 @@ static const std::string list_hl2dm = R"(
 		"chams_medkits"
 		"chams_ammo"
 	]
-
 	"Glow" [
 		"Glow Menu"
 		"glow_enable"
@@ -228,7 +226,7 @@ static const std::string list_hl2dm = R"(
 		"logo"
 	]
 ]
- 
+
 "Anti-/Anti-Aim" [
 	"Anti-Aim Menu"
 	"aa_enabled"
@@ -250,7 +248,6 @@ static const std::string list_hl2dm = R"(
 		"aa_aaaa_flip_key"
 	]
 ]
-
 "Chat" [
 	"Chat Options Menu"
 	"chat_newlines"
@@ -259,7 +256,7 @@ static const std::string list_hl2dm = R"(
 	"spam"
 	"spam_random"
 ]
- 
+
 "Follow Bot" [
 	"Follow Bot Settings"
 	"fb_bot"
@@ -268,7 +265,6 @@ static const std::string list_hl2dm = R"(
 	"fb_autoclass"
 	"fb_follow_distance"
 ]
-
 "Miscellaneous" [
 	"Miscellaneous Settings"
 	"bhop_enabled"

@@ -20,12 +20,12 @@ namespace skinchanger
 
 // Because fuck you, that's why.
 const char *sig_GetAttributeDefinition =
-    "55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 "
-    "00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6";
+    XORSTR("55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00 8B 75 08 C7 45 A4 00 00 "
+    "00 00 8B 45 0C C6 45 A8 00 C6 45 A9 00 C6");
 const char *sig_SetRuntimeAttributeValue =
-    "55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33";
-const char *sig_GetItemSchema = "55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 "
-                                "DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3";
+    XORSTR("55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33");
+const char *sig_GetItemSchema = XORSTR("55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 "
+                                "DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3");
 
 ItemSystem_t ItemSystem{ nullptr };
 GetAttributeDefinition_t GetAttributeDefinitionFn{ nullptr };
@@ -99,9 +99,9 @@ void CAttributeList::SetAttribute(int index, float value)
     */
 }
 
-static CatVar enabled(CV_SWITCH, "skinchanger", "0", "Skin Changer");
+static CatVar enabled(CV_SWITCH, XORSTR("skinchanger"), XORSTR("0"), XORSTR("Skin Changer"));
 static CatCommand
-    set_attr("skinchanger_set", "Set Attribute", [](const CCommand &args) {
+    set_attr(XORSTR("skinchanger_set"), XORSTR("Set Attribute"), [](const CCommand &args) {
         unsigned attrid = strtoul(args.Arg(1), nullptr, 10);
         float attrv     = strtof(args.Arg(2), nullptr);
         GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex))
@@ -109,7 +109,7 @@ static CatCommand
         InvalidateCookie();
     });
 static CatCommand
-    remove_attr("skinchanger_remove", "Remove attribute",
+    remove_attr(XORSTR("skinchanger_remove"), XORSTR("Remove attribute"),
                 [](const CCommand &args) {
                     unsigned attrid = strtoul(args.Arg(1), nullptr, 10);
                     GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex))
@@ -117,7 +117,7 @@ static CatCommand
                     InvalidateCookie();
                 });
 static CatCommand
-    set_redirect("skinchanger_redirect", "Set Redirect",
+    set_redirect(XORSTR("skinchanger_redirect"), XORSTR("Set Redirect"),
                  [](const CCommand &args) {
                      unsigned redirect = strtoul(args.Arg(1), nullptr, 10);
                      GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex))
@@ -125,67 +125,67 @@ static CatCommand
                      InvalidateCookie();
                  });
 static CatCommand
-    dump_attrs("skinchanger_debug_attrs", "Dump attributes", []() {
+    dump_attrs(XORSTR("skinchanger_debug_attrs"), XORSTR("Dump attributes"), []() {
         CAttributeList *list =
             (CAttributeList *) ((uintptr_t)(RAW_ENT(LOCAL_W)) +
                                 netvar.AttributeList);
-        logging::Info("ATTRIBUTE LIST: %i", list->m_Attributes.Size());
+        logging::Info(XORSTR("ATTRIBUTE LIST: %i"), list->m_Attributes.Size());
         for (int i = 0; i < list->m_Attributes.Size(); i++)
         {
-            logging::Info("%i %.2f", list->m_Attributes[i].defidx,
+            logging::Info(XORSTR("%i %.2f"), list->m_Attributes[i].defidx,
                           list->m_Attributes[i].value);
         }
     });
 
 static CatCommand
-    list_redirects("skinchanger_redirect_list", "Dump redirects", []() {
+    list_redirects(XORSTR("skinchanger_redirect_list"), XORSTR("Dump redirects"), []() {
         for (const auto &mod : modifier_map)
         {
             if (mod.second.defidx_redirect)
             {
-                logging::Info("%d -> %d", mod.first,
+                logging::Info(XORSTR("%d -> %d"), mod.first,
                               mod.second.defidx_redirect);
             }
         }
     });
-static CatCommand save("skinchanger_save", "Save", [](const CCommand &args) {
-    std::string filename = "skinchanger";
+static CatCommand save(XORSTR("skinchanger_save"), XORSTR("Save"), [](const CCommand &args) {
+    std::string filename = XORSTR("skinchanger");
     if (args.ArgC() > 1)
     {
         filename = args.Arg(1);
     }
     Save(filename);
 });
-static CatCommand load("skinchanger_load", "Load", [](const CCommand &args) {
-    std::string filename = "skinchanger";
+static CatCommand load(XORSTR("skinchanger_load"), XORSTR("Load"), [](const CCommand &args) {
+    std::string filename = XORSTR("skinchanger");
     if (args.ArgC() > 1)
     {
         filename = args.Arg(1);
     }
     Load(filename);
 });
-static CatCommand load_merge("skinchanger_load_merge", "Load with merge",
+static CatCommand load_merge(XORSTR("skinchanger_load_merge"), XORSTR("Load with merge"),
                              [](const CCommand &args) {
-                                 std::string filename = "skinchanger";
+                                 std::string filename = XORSTR("skinchanger");
                                  if (args.ArgC() > 1)
                                  {
                                      filename = args.Arg(1);
                                  }
                                  Load(filename, true);
                              });
-static CatCommand remove_redirect("skinchanger_remove_redirect",
-                                  "Remove redirect", [](const CCommand &args) {
+static CatCommand remove_redirect(XORSTR("skinchanger_remove_redirect"),
+                                  XORSTR("Remove redirect"), [](const CCommand &args) {
                                       unsigned redirectid =
                                           strtoul(args.Arg(1), nullptr, 10);
                                       GetModifier(redirectid).defidx_redirect =
                                           0;
-                                      logging::Info("Redirect removed");
+                                      logging::Info(XORSTR("Redirect removed"));
                                       InvalidateCookie();
                                   });
-static CatCommand reset("skinchanger_reset", "Reset",
+static CatCommand reset(XORSTR("skinchanger_reset"), XORSTR("Reset"),
                         []() { modifier_map.clear(); });
 
-static CatCommand invalidate_cookies("skinchanger_bite_cookie", "Bite Cookie",
+static CatCommand invalidate_cookies(XORSTR("skinchanger_bite_cookie"), XORSTR("Bite Cookie"),
                                      InvalidateCookie);
 
 void FrameStageNotify(int stage)
@@ -206,7 +206,7 @@ void FrameStageNotify(int stage)
         SetRuntimeAttributeValueFn =
             (SetRuntimeAttributeValue_t)(gSignatures.GetClientSignature(
                 (char *) sig_SetRuntimeAttributeValue));
-        logging::Info("SetRuntimeAttributeValue: 0x%08x",
+        logging::Info(XORSTR("SetRuntimeAttributeValue: 0x%08x"),
                       SetRuntimeAttributeValueFn);
     }
     if (!GetAttributeDefinitionFn)
@@ -214,7 +214,7 @@ void FrameStageNotify(int stage)
         GetAttributeDefinitionFn =
             (GetAttributeDefinition_t)(gSignatures.GetClientSignature(
                 (char *) sig_GetAttributeDefinition));
-        logging::Info("GetAttributeDefinition: 0x%08x",
+        logging::Info(XORSTR("GetAttributeDefinition: 0x%08x"),
                       GetAttributeDefinitionFn);
     }
 
@@ -231,7 +231,7 @@ void FrameStageNotify(int stage)
         eid    = handle & 0xFFF;
         if (eid < 32 || eid > HIGHEST_ENTITY)
             continue;
-        // logging::Info("eid, %i", eid);
+        // logging::Info(XORSTR("eid, %i"), eid);
         entity = g_IEntityList->GetClientEntity(eid);
         if (!entity)
             continue;
@@ -250,8 +250,8 @@ void FrameStageNotify(int stage)
     last_weapon_out = my_weapon_ptr;
 }
 
-static CatVar show_debug_info(CV_SWITCH, "skinchanger_debug", "0",
-                              "Debug Skinchanger");
+static CatVar show_debug_info(CV_SWITCH, XORSTR("skinchanger_debug"), XORSTR("0"),
+                              XORSTR("Debug Skinchanger"));
 
 void DrawText()
 {
@@ -264,13 +264,13 @@ void DrawText()
     if (CE_GOOD(LOCAL_W))
     {
         AddSideString(
-            format("dIDX: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
+            format(XORSTR("dIDX: "), CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         list = (CAttributeList *) ((uintptr_t)(RAW_ENT(LOCAL_W)) +
                                    netvar.AttributeList);
         for (int i = 0; i < list->m_Attributes.Size(); i++)
         {
-            AddSideString(format('[', i, "] ", list->m_Attributes[i].defidx,
-                                 ": ", list->m_Attributes[i].value));
+            AddSideString(format('[', i, XORSTR("] "), list->m_Attributes[i].defidx,
+                                 XORSTR(": "), list->m_Attributes[i].value));
         }
     }
 }
@@ -285,7 +285,7 @@ void Save(std::string filename)
     DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
     if (!cathook_directory)
     {
-        logging::Info("Skinchanger directory doesn't exist, creating one!");
+        logging::Info(XORSTR("Skinchanger directory doesn't exist, creating one!"));
         mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
     }
     else
@@ -314,11 +314,11 @@ void Save(std::string filename)
             }
         }
         file.close();
-        logging::Info("Writing successful");
+        logging::Info(XORSTR("Writing successful"));
     }
     catch (std::exception &e)
     {
-        logging::Info("Writing unsuccessful: %s", e.what());
+        logging::Info(XORSTR("Writing unsuccessful: %s"), e.what());
     }
 }
 
@@ -327,7 +327,7 @@ void Load(std::string filename, bool merge)
     DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
     if (!cathook_directory)
     {
-        logging::Info("Skinchanger directory doesn't exist, creating one!");
+        logging::Info(XORSTR("Skinchanger directory doesn't exist, creating one!"));
         mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
     }
     else
@@ -341,13 +341,13 @@ void Load(std::string filename, bool merge)
         if (file_serialize != SERIALIZE_VERSION)
         {
             logging::Info(
-                "Outdated/corrupted SkinChanger file! Cannot load this.");
+                XORSTR("Outdated/corrupted SkinChanger file! Cannot load this."));
             file.close();
             return;
         }
         size_t size = 0;
         BINARY_FILE_READ(file, size);
-        logging::Info("Reading %i entries...", size);
+        logging::Info(XORSTR("Reading %i entries..."), size);
         if (!merge)
             modifier_map.clear();
         for (int i = 0; i < size; i++)
@@ -375,12 +375,12 @@ void Load(std::string filename, bool merge)
             }
         }
         file.close();
-        logging::Info("Reading successful! Result: %i entries.",
+        logging::Info(XORSTR("Reading successful! Result: %i entries."),
                       modifier_map.size());
     }
     catch (std::exception &e)
     {
-        logging::Info("Reading unsuccessful: %s", e.what());
+        logging::Info(XORSTR("Reading unsuccessful: %s"), e.what());
     }
 }
 
@@ -396,11 +396,11 @@ void def_attribute_modifier::Set(int id, float value)
     }
     if (modifiers.size() > 13)
     {
-        logging::Info("Woah there, that's too many! Remove some.");
+        logging::Info(XORSTR("Woah there, that's too many! Remove some."));
         return;
     }
     modifiers.push_back(attribute_s{ (uint16_t) id, value });
-    logging::Info("Added new attribute: %i %.2f (%i)", id, value,
+    logging::Info(XORSTR("Added new attribute: %i %.2f (%i)"), id, value,
                   modifiers.size());
 }
 
@@ -422,7 +422,7 @@ void patched_weapon_cookie::Update(int entity)
     if (!ent || ent->IsDormant())
         return;
     if (show_debug_info)
-        logging::Info("Updating cookie for %i", entity); // FIXME DEBUG LOGS!
+        logging::Info(XORSTR("Updating cookie for %i"), entity); // FIXME DEBUG LOGS!
     list   = (CAttributeList *) ((uintptr_t) ent + netvar.AttributeList);
     attrs  = list->m_Attributes.Size();
     eidx   = entity;
@@ -487,7 +487,7 @@ void def_attribute_modifier::Apply(int entity)
     {
         NET_INT(ent, netvar.iItemDefinitionIndex) = defidx_redirect;
         if (show_debug_info)
-            logging::Info("Redirect -> %i",
+            logging::Info(XORSTR("Redirect -> %i"),
                           NET_INT(ent, netvar.iItemDefinitionIndex));
         GetModifier(defidx_redirect).Apply(entity);
         return;

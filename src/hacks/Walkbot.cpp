@@ -33,7 +33,7 @@ void DeleteNode(index_t node);
 float distance_2d(Vector &xyz);
 void Save(std::string filename);
 bool Load(std::string filename);
-const char *prevlvlname = "";
+const char *prevlvlname = XORSTR("");
 enum ENodeFlags
 {
     NF_GOOD = (1 << 0),
@@ -126,7 +126,7 @@ struct walkbot_node_s
         connection free = free_connection();
         if (free == BAD_CONNECTION)
         {
-            logging::Info("[wb] Too many connections! Node at (%.2f %.2f %.2f)",
+            logging::Info(XORSTR("[wb] Too many connections! Node at (%.2f %.2f %.2f)"),
                           x, y, z);
             return;
         }
@@ -257,7 +257,7 @@ void DeleteNode(index_t node)
 {
     if (not node_good(node))
         return;
-    logging::Info("[wb] Deleting node %u", node);
+    logging::Info(XORSTR("[wb] Deleting node %u"), node);
     auto &n = nodes[node];
     for (size_t i = 0; i < MAX_CONNECTIONS; i++)
     {
@@ -278,14 +278,14 @@ void Save(std::string filename)
 {
     if (g_Settings.bInvalid)
     {
-        logging::Info("Not in-game, cannot save!");
+        logging::Info(XORSTR("Not in-game, cannot save!"));
         return;
     }
     {
         DIR *walkbot_dir = opendir(DATA_PATH "/walkbot");
         if (!walkbot_dir)
         {
-            logging::Info("Walkbot directory doesn't exist, creating one!");
+            logging::Info(XORSTR("Walkbot directory doesn't exist, creating one!"));
             mkdir(DATA_PATH "/walkbot", S_IRWXU | S_IRWXG);
         }
         else
@@ -297,21 +297,21 @@ void Save(std::string filename)
         if (!level_dir)
         {
             logging::Info(
-                "Walkbot directory for %s doesn't exist, creating one!",
+                XORSTR("Walkbot directory for %s doesn't exist, creating one!"),
                 GetLevelName().c_str());
             mkdir(path.c_str(), S_IRWXU | S_IRWXG);
         }
         else
             closedir(level_dir);
     }
-    logging::Info("Saving in %s", format(path, "/", filename).c_str());
+    logging::Info(XORSTR("Saving in %s"), format(path, XORSTR("/"), filename).c_str());
     try
     {
-        std::ofstream file(format(path, "/", filename),
+        std::ofstream file(format(path, XORSTR("/"), filename),
                            std::ios::out | std::ios::binary);
         if (not file)
         {
-            logging::Info("Could not open file!");
+            logging::Info(XORSTR("Could not open file!"));
             return;
         }
         walkbot_header_s header;
@@ -328,11 +328,11 @@ void Save(std::string filename)
         file.write(reinterpret_cast<const char *>(state::nodes.data()),
                    sizeof(walkbot_node_s) * header.node_count);
         file.close();
-        logging::Info("Writing successful");
+        logging::Info(XORSTR("Writing successful"));
     }
     catch (std::exception &e)
     {
-        logging::Info("Writing unsuccessful: %s", e.what());
+        logging::Info(XORSTR("Writing unsuccessful: %s"), e.what());
     }
 }
 
@@ -342,7 +342,7 @@ bool Load(std::string filename)
         DIR *walkbot_dir = opendir(DATA_PATH "/walkbot");
         if (!walkbot_dir)
         {
-            logging::Info("Walkbot directory doesn't exist!");
+            logging::Info(XORSTR("Walkbot directory doesn't exist!"));
             return false;
         }
         else
@@ -354,7 +354,7 @@ bool Load(std::string filename)
         if (!level_dir)
         {
             logging::Info(
-                "Walkbot directory for %s doesn't exist, creating one!",
+                XORSTR("Walkbot directory for %s doesn't exist, creating one!"),
                 GetLevelName().c_str());
             mkdir(path.c_str(), S_IRWXU | S_IRWXG);
         }
@@ -363,7 +363,7 @@ bool Load(std::string filename)
     }
     try
     {
-        std::ifstream file(format(path, "/", filename),
+        std::ifstream file(format(path, XORSTR("/"), filename),
                            std::ios::in | std::ios::binary);
         if (!file)
         {
@@ -374,14 +374,14 @@ bool Load(std::string filename)
         // FIXME magic number: 1
         if (header.version != VERSION)
         {
-            logging::Info("Outdated/corrupted walkbot file! Cannot load this.");
+            logging::Info(XORSTR("Outdated/corrupted walkbot file! Cannot load this."));
             file.close();
             return false;
         }
         if (header.author_length > 64 or header.map_length > 512 or
             (not header.author_length or not header.map_length))
         {
-            logging::Info("Corrupted author/level data");
+            logging::Info(XORSTR("Corrupted author/level data"));
         }
         else
         {
@@ -391,14 +391,14 @@ bool Load(std::string filename)
             file.read(name_buffer, header.author_length);
             name_buffer[header.author_length] = 0;
             map_buffer[header.map_length]     = 0;
-            logging::Info("Walkbot navigation map for %s\nAuthor: %s",
+            logging::Info(XORSTR("Walkbot navigation map for %s\nAuthor: %s"),
                           map_buffer, name_buffer);
         }
         state::nodes.clear();
-        logging::Info("Reading %i entries...", header.node_count);
+        logging::Info(XORSTR("Reading %i entries..."), header.node_count);
         if (header.node_count > 32768)
         {
-            logging::Info("Read %d nodes, max is %d. Aborting.",
+            logging::Info(XORSTR("Read %d nodes, max is %d. Aborting."),
                           header.node_count, 32768);
             return false;
         }
@@ -406,29 +406,29 @@ bool Load(std::string filename)
         file.read(reinterpret_cast<char *>(state::nodes.data()),
                   sizeof(walkbot_node_s) * header.node_count);
         file.close();
-        logging::Info("Reading successful! Result: %i entries.",
+        logging::Info(XORSTR("Reading successful! Result: %i entries."),
                       state::nodes.size());
         return true;
     }
     catch (std::exception &e)
     {
-        logging::Info("Reading unsuccessful: %s", e.what());
+        logging::Info(XORSTR("Reading unsuccessful: %s"), e.what());
     }
     return false;
 }
 
-static CatCommand save("wb_save", "Save", [](const CCommand &args) {
-    logging::Info("Saving");
-    std::string filename = "default";
+static CatCommand save(XORSTR("wb_save"), XORSTR("Save"), [](const CCommand &args) {
+    logging::Info(XORSTR("Saving"));
+    std::string filename = XORSTR("default");
     if (args.ArgC() > 1)
     {
         filename = args.Arg(1);
     }
     Save(filename);
 });
-static CatCommand load("wb_load", "Load", [](const CCommand &args) {
-    logging::Info("Loading");
-    std::string filename = "default";
+static CatCommand load(XORSTR("wb_load"), XORSTR("Load"), [](const CCommand &args) {
+    logging::Info(XORSTR("Loading"));
+    std::string filename = XORSTR("default");
     if (args.ArgC() > 1)
     {
         filename = args.Arg(1);
@@ -439,7 +439,7 @@ static CatCommand load("wb_load", "Load", [](const CCommand &args) {
 index_t CreateNode(const Vector &xyz)
 {
     index_t node = state::free_node();
-    logging::Info("[wb] Creating node %u at (%.2f %.2f %.2f)", node, xyz.x,
+    logging::Info(XORSTR("[wb] Creating node %u at (%.2f %.2f %.2f)"), node, xyz.x,
                   xyz.y, xyz.z);
     auto &n = state::nodes[node];
     memset(&n, 0, sizeof(n));
@@ -448,42 +448,42 @@ index_t CreateNode(const Vector &xyz)
     return node;
 }
 
-static CatVar active_recording(CV_SWITCH, "wb_recording", "0", "Do recording",
-                               "Use BindToggle with this");
-static CatVar draw_info(CV_SWITCH, "wb_info", "1", "Walkbot info");
-static CatVar draw_path(CV_SWITCH, "wb_path", "1", "Walkbot path");
-static CatVar draw_nodes(CV_SWITCH, "wb_nodes", "1", "Walkbot nodes");
-static CatVar draw_indices(CV_SWITCH, "wb_indices", "0", "Node indices");
-static CatVar free_move(CV_SWITCH, "wb_freemove", "1", "Allow free movement",
-                        "Allow free movement while pressing movement keys");
-static CatVar spawn_distance(CV_FLOAT, "wb_node_spawn_distance", "54",
-                             "Node spawn distance");
-static CatVar max_distance(CV_FLOAT, "wb_replay_max_distance", "100",
-                           "Max distance to node when replaying");
+static CatVar active_recording(CV_SWITCH, XORSTR("wb_recording"), XORSTR("0"), XORSTR("Do recording"),
+                               XORSTR("Use BindToggle with this"));
+static CatVar draw_info(CV_SWITCH, XORSTR("wb_info"), XORSTR("1"), XORSTR("Walkbot info"));
+static CatVar draw_path(CV_SWITCH, XORSTR("wb_path"), XORSTR("1"), XORSTR("Walkbot path"));
+static CatVar draw_nodes(CV_SWITCH, XORSTR("wb_nodes"), XORSTR("1"), XORSTR("Walkbot nodes"));
+static CatVar draw_indices(CV_SWITCH, XORSTR("wb_indices"), XORSTR("0"), XORSTR("Node indices"));
+static CatVar free_move(CV_SWITCH, XORSTR("wb_freemove"), XORSTR("1"), XORSTR("Allow free movement"),
+                        XORSTR("Allow free movement while pressing movement keys"));
+static CatVar spawn_distance(CV_FLOAT, XORSTR("wb_node_spawn_distance"), XORSTR("54"),
+                             XORSTR("Node spawn distance"));
+static CatVar max_distance(CV_FLOAT, XORSTR("wb_replay_max_distance"), XORSTR("100"),
+                           XORSTR("Max distance to node when replaying"));
 static CatVar reach_distance(
-    CV_FLOAT, "wb_replay_reach_distance", "32",
-    "Distance where bot can be considered 'stepping' on the node");
-static CatVar draw_connection_flags(CV_SWITCH, "wb_connection_flags", "1",
-                                    "Connection flags");
-static CatVar force_slot(CV_INT, "wb_force_slot", "1", "Force slot",
-                         "Walkbot will always select weapon in this slot");
-static CatVar leave_if_empty(CV_SWITCH, "wb_leave_if_empty", "0",
-                             "Leave if no walkbot",
-                             "Leave game if there is no walkbot map");
+    CV_FLOAT, XORSTR("wb_replay_reach_distance"), XORSTR("32"),
+    XORSTR("Distance where bot can be considered 'stepping' on the node"));
+static CatVar draw_connection_flags(CV_SWITCH, XORSTR("wb_connection_flags"), XORSTR("1"),
+                                    XORSTR("Connection flags"));
+static CatVar force_slot(CV_INT, XORSTR("wb_force_slot"), XORSTR("1"), XORSTR("Force slot"),
+                         XORSTR("Walkbot will always select weapon in this slot"));
+static CatVar leave_if_empty(CV_SWITCH, XORSTR("wb_leave_if_empty"), XORSTR("0"),
+                             XORSTR("Leave if no walkbot"),
+                             XORSTR("Leave game if there is no walkbot map"));
 
-CatCommand c_start_recording("wb_record", "Start recording",
+CatCommand c_start_recording(XORSTR("wb_record"), XORSTR("Start recording"),
                              []() { state::state = WB_RECORDING; });
-CatCommand c_start_editing("wb_edit", "Start editing",
+CatCommand c_start_editing(XORSTR("wb_edit"), XORSTR("Start editing"),
                            []() { state::state = WB_EDITING; });
-CatCommand c_start_replaying("wb_replay", "Start replaying", []() {
+CatCommand c_start_replaying(XORSTR("wb_replay"), XORSTR("Start replaying"), []() {
     state::last_node   = state::active_node;
     state::active_node = state::closest_node;
     state::state       = WB_REPLAYING;
 });
-CatCommand c_exit("wb_exit", "Exit", []() { state::state = WB_DISABLED; });
+CatCommand c_exit(XORSTR("wb_exit"), XORSTR("Exit"), []() { state::state = WB_DISABLED; });
 
 // Selects closest node, clears selection if node is selected
-CatCommand c_select_node("wb_select", "Select node", []() {
+CatCommand c_select_node(XORSTR("wb_select"), XORSTR("Select node"), []() {
     if (state::active_node == state::closest_node)
     {
         state::active_node = BAD_NODE;
@@ -494,7 +494,7 @@ CatCommand c_select_node("wb_select", "Select node", []() {
     }
 });
 // Makes a new node in the middle of connection between 2 nodes
-CatCommand c_split_connection("wb_split", "Split connection", []() {
+CatCommand c_split_connection(XORSTR("wb_split"), XORSTR("Split connection"), []() {
     if (not(state::node_good(state::active_node) and
             state::node_good(state::closest_node)))
         return;
@@ -517,11 +517,11 @@ CatCommand c_split_connection("wb_split", "Split connection", []() {
 
 });
 // Deletes closest node and its connections
-CatCommand c_delete_node("wb_delete", "Delete node",
+CatCommand c_delete_node(XORSTR("wb_delete"), XORSTR("Delete node"),
                          []() { DeleteNode(state::closest_node); });
 // Creates a new node under your feet and connects it to closest node to your
 // crosshair
-CatCommand c_create_node("wb_create", "Create node", []() {
+CatCommand c_create_node(XORSTR("wb_create"), XORSTR("Create node"), []() {
     index_t node = CreateNode(g_pLocalPlayer->v_Origin);
     auto &n      = state::nodes[node];
     if (g_pUserCmd->buttons & IN_DUCK)
@@ -531,12 +531,12 @@ CatCommand c_create_node("wb_create", "Create node", []() {
         auto &c = state::nodes[state::closest_node];
         n.link(state::closest_node);
         c.link(node);
-        logging::Info("[wb] Node %u linked to node %u at (%.2f %.2f %.2f)",
+        logging::Info(XORSTR("[wb] Node %u linked to node %u at (%.2f %.2f %.2f)"),
                       node, state::closest_node, c.x, c.y, c.z);
     }
 });
 // Connects selected node to closest one
-CatCommand c_connect_node("wb_connect", "Connect nodes", []() {
+CatCommand c_connect_node(XORSTR("wb_connect"), XORSTR("Connect nodes"), []() {
     if (not(state::node_good(state::active_node) and
             state::node_good(state::closest_node)))
         return;
@@ -552,7 +552,7 @@ CatCommand c_connect_node("wb_connect", "Connect nodes", []() {
 });
 // Makes a one-way connection
 CatCommand
-    c_connect_single_node("wb_connect_single", "Connect nodes (one-way)", []() {
+    c_connect_single_node(XORSTR("wb_connect_single"), XORSTR("Connect nodes (one-way)"), []() {
         if (not(state::node_good(state::active_node) and
                 state::node_good(state::closest_node)))
             return;
@@ -565,7 +565,7 @@ CatCommand
         a.link(state::closest_node);
     });
 // Connects selected node to closest one
-CatCommand c_disconnect_node("wb_disconnect", "Disconnect nodes", []() {
+CatCommand c_disconnect_node(XORSTR("wb_disconnect"), XORSTR("Disconnect nodes"), []() {
     if (not(state::node_good(state::active_node) and
             state::node_good(state::closest_node)))
         return;
@@ -581,7 +581,7 @@ CatCommand c_disconnect_node("wb_disconnect", "Disconnect nodes", []() {
 });
 // Makes a one-way connection
 CatCommand c_disconnect_single_node(
-    "wb_disconnect_single", "Connect nodes (one-way)", []() {
+    XORSTR("wb_disconnect_single"), XORSTR("Connect nodes (one-way)"), []() {
         if (not(state::node_good(state::active_node) and
                 state::node_good(state::closest_node)))
             return;
@@ -594,7 +594,7 @@ CatCommand c_disconnect_single_node(
         a.unlink(state::closest_node);
     });
 // Toggles jump flag on closest node
-CatCommand c_update_duck("wb_duck", "Toggle duck flag", []() {
+CatCommand c_update_duck(XORSTR("wb_duck"), XORSTR("Toggle duck flag"), []() {
     if (not state::node_good(state::closest_node))
         return;
 
@@ -606,7 +606,7 @@ CatCommand c_update_duck("wb_duck", "Toggle duck flag", []() {
         n.flags |= NF_DUCK;
 });
 // Toggles jump flag on closest node
-CatCommand c_update_jump("wb_jump", "Toggle jump flag", []() {
+CatCommand c_update_jump(XORSTR("wb_jump"), XORSTR("Toggle jump flag"), []() {
     if (not state::node_good(state::closest_node))
         return;
 
@@ -637,21 +637,21 @@ std::string DescribeConnection(index_t node, connection conn)
         }
         if (c.flags & CF_LOW_AMMO)
         {
-            extra += "A";
+            extra += XORSTR("A");
         }
         if (c.flags & CF_LOW_HEALTH)
         {
-            extra += "H";
+            extra += XORSTR("H");
         }
     }
     std::string result =
-        format(node, ' ', (broken ? "-x>" : (oneway ? "-->" : "<->")), ' ',
+        format(node, ' ', (broken ? XORSTR("-x>") : (oneway ? XORSTR("-->") : XORSTR("<->"))), ' ',
                c.node, ' ', extra);
     return result;
 }
 CatCommand c_toggle_cf_ammo(
-    "wb_conn_ammo",
-    "Toggle 'ammo' flag on connection from ACTIVE to CLOSEST node", []() {
+    XORSTR("wb_conn_ammo"),
+    XORSTR("Toggle 'ammo' flag on connection from ACTIVE to CLOSEST node"), []() {
         auto a = state::active();
         auto b = state::closest();
         if (not(a and b))
@@ -671,8 +671,8 @@ CatCommand c_toggle_cf_ammo(
         }
     });
 CatCommand c_toggle_cf_health(
-    "wb_conn_health",
-    "Toggle 'health' flag on connection from ACTIVE to CLOSEST node", []() {
+    XORSTR("wb_conn_health"),
+    XORSTR("Toggle 'health' flag on connection from ACTIVE to CLOSEST node"), []() {
         auto a = state::active();
         auto b = state::closest();
         if (not(a and b))
@@ -692,29 +692,29 @@ CatCommand c_toggle_cf_health(
         }
     });
 // Displays all info about closest node and its connections
-CatCommand c_info("wb_dump", "Show info", []() {
+CatCommand c_info(XORSTR("wb_dump"), XORSTR("Show info"), []() {
     index_t node = state::closest_node;
     if (not node_good(node))
         return;
 
     auto &n = nodes[node];
 
-    logging::Info("[wb] Info about node %u", node);
-    logging::Info("[wb] Flags: Duck=%d, Jump=%d, Raw=%u", n.flags & NF_DUCK,
+    logging::Info(XORSTR("[wb] Info about node %u"), node);
+    logging::Info(XORSTR("[wb] Flags: Duck=%d, Jump=%d, Raw=%u"), n.flags & NF_DUCK,
                   n.flags & NF_JUMP, n.flags);
-    logging::Info("[wb] X: %.2f | Y: %.2f | Z: %.2f", n.x, n.y, n.z);
-    logging::Info("[wb] Connections:");
+    logging::Info(XORSTR("[wb] X: %.2f | Y: %.2f | Z: %.2f"), n.x, n.y, n.z);
+    logging::Info(XORSTR("[wb] Connections:"));
     for (size_t i = 0; i < MAX_CONNECTIONS; i++)
     {
         if (n.connections[i].free())
             continue;
-        logging::Info("[wb] %s", DescribeConnection(node, i).c_str());
+        logging::Info(XORSTR("[wb] %s"), DescribeConnection(node, i).c_str());
     }
 });
 // Deletes a whole region of nodes
 // Deletes a single closest node if no node is selected
-CatCommand c_delete_region("wb_delete_region", "Delete region of nodes", []() {
-    logging::Info("< DISABLED >");
+CatCommand c_delete_region(XORSTR("wb_delete_region"), XORSTR("Delete region of nodes"), []() {
+    logging::Info(XORSTR("< DISABLED >"));
     /*index_t a = state::active_node;
     index_t b = state::closest_node;
 
@@ -728,7 +728,7 @@ CatCommand c_delete_region("wb_delete_region", "Delete region of nodes", []() {
         auto& n = state::nodes[current];
 
         if (n.connection_count > 2) {
-            logging::Info("[wb] More than 2 connections on a node! Quitting.");
+            logging::Info(XORSTR("[wb] More than 2 connections on a node! Quitting."));
             return;
         }
         bool found_next = false;
@@ -741,13 +741,13 @@ CatCommand c_delete_region("wb_delete_region", "Delete region of nodes", []() {
         DeleteNode(current);
         current = next;
         if (not found_next) {
-            logging::Info("[wb] Dead end? Can't find next node after %u",
+            logging::Info(XORSTR("[wb] Dead end? Can't find next node after %u"),
     current); break;
         }
     } while (state::node_good(current) and (current != a));*/
 });
 // Clears the state
-CatCommand c_clear("wb_clear", "Removes all nodes",
+CatCommand c_clear(XORSTR("wb_clear"), XORSTR("Removes all nodes"),
                    []() { state::nodes.clear(); });
 
 void Initialize()
@@ -865,7 +865,7 @@ void UpdateSlot()
             int slot = re::C_BaseCombatWeapon::GetSlot(weapon);
             if (slot != int(force_slot) - 1)
             {
-                hack::ExecuteCommand(format("slot", int(force_slot)));
+                hack::ExecuteCommand(format(XORSTR("slot"), int(force_slot)));
             }
         }
     }
@@ -973,7 +973,7 @@ void RecordNode()
         auto &c = state::nodes[state::active_node];
         n.link(state::active_node);
         c.link(node);
-        logging::Info("[wb] Node %u auto-linked to node %u at (%.2f %.2f %.2f)",
+        logging::Info(XORSTR("[wb] Node %u auto-linked to node %u at (%.2f %.2f %.2f)"),
                       node, state::active_node, c.x, c.y, c.z);
     }
     state::last_node_buttons = g_pUserCmd->buttons;
@@ -1015,9 +1015,9 @@ void DrawConnection(index_t a, connection_s &b)
     {
         std::string flags;
         if (b.flags & CF_LOW_AMMO)
-            flags += "A";
+            flags += XORSTR("A");
         if (b.flags & CF_LOW_HEALTH)
-            flags += "H";
+            flags += XORSTR("H");
         // int size_x = 0, size_y = 0;
         // FTGL_StringLength(flags, fonts::font_main, &size_x, &size_y);
         draw_api::draw_string(wts_cc.x, wts_cc.y - 4, flags.c_str(),
@@ -1097,42 +1097,42 @@ void Draw()
     {
     case WB_RECORDING:
     {
-        AddSideString("Walkbot: Recording");
+        AddSideString(XORSTR("Walkbot: Recording"));
     }
     break;
     case WB_EDITING:
     {
-        AddSideString("Walkbot: Editing");
+        AddSideString(XORSTR("Walkbot: Editing"));
     }
     break;
     case WB_REPLAYING:
     {
-        AddSideString("Walkbot: Replaying");
+        AddSideString(XORSTR("Walkbot: Replaying"));
         if (free_move and free_move_used)
         {
-            AddSideString("Walkbot: FREE MOVEMENT (User override)",
+            AddSideString(XORSTR("Walkbot: FREE MOVEMENT (User override)"),
                           colors::green);
         }
         if (HasLowAmmo())
         {
-            AddSideString("Walkbot: LOW AMMO", colors::yellow);
+            AddSideString(XORSTR("Walkbot: LOW AMMO"), colors::yellow);
         }
         if (HasLowHealth())
         {
-            AddSideString("Walkbot: LOW HEALTH", colors::red);
+            AddSideString(XORSTR("Walkbot: LOW HEALTH"), colors::red);
         }
     }
     break;
     }
     if (draw_info)
     {
-        AddSideString(format("Active node: ", state::active_node));
-        AddSideString(format("Highlighted node: ", state::closest_node));
-        AddSideString(format("Last node: ", state::last_node));
-        AddSideString(format("Node count: ", state::nodes.size()));
+        AddSideString(format(XORSTR("Active node: "), state::active_node));
+        AddSideString(format(XORSTR("Highlighted node: "), state::closest_node));
+        AddSideString(format(XORSTR("Last node: "), state::last_node));
+        AddSideString(format(XORSTR("Node count: "), state::nodes.size()));
         if (state::recovery)
         {
-            AddSideString(format("(Recovery mode)"));
+            AddSideString(format(XORSTR("(Recovery mode)")));
         }
     }
     if (draw_path)
@@ -1179,13 +1179,13 @@ void Move()
             if (nodes.size() == 0 || g_IEngine->GetLevelName() != prevlvlname)
             {
                 prevlvlname = g_IEngine->GetLevelName();
-                if (!boost::contains(prevlvlname, "pl_"))
+                if (!boost::contains(prevlvlname, XORSTR("pl_")))
                 {
-                    Load("default");
+                    Load(XORSTR("default"));
                     if (leave_if_empty && nodes.size() == 0 &&
                         quit_timer.test_and_set(5000))
                     {
-                        logging::Info("No map file, abandon");
+                        logging::Info(XORSTR("No map file, abandon"));
                         tfmm::abandon();
                         return;
                     }
@@ -1194,11 +1194,11 @@ void Move()
         }
         prevlvlname            = g_IEngine->GetLevelName();
         std::string prvlvlname = format(prevlvlname);
-        logging::Info("%s %s", prevlvlname, prvlvlname.c_str());
-        if (boost::contains(prvlvlname, "pl_") ||
-            boost::contains(prvlvlname, "cp_"))
+        logging::Info(XORSTR("%s %s"), prevlvlname, prvlvlname.c_str());
+        if (boost::contains(prvlvlname, XORSTR("pl_")) ||
+            boost::contains(prvlvlname, XORSTR("cp_")))
         {
-            logging::Info("1");
+            logging::Info(XORSTR("1"));
             bool ret = false;
             if (lagexploit::pointarr[0] || lagexploit::pointarr[1] ||
                 lagexploit::pointarr[2] || lagexploit::pointarr[3] ||

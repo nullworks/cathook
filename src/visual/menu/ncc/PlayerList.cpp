@@ -42,7 +42,7 @@ void PlayerList::Draw(int x, int y)
     draw::DrawRect(x, y, size.first, size.second,
                    colorsint::Create(0, 0, 0, 77));
     draw::OutlineRect(x, y, size.first, size.second, NCGUIColor());
-    for (int i = 0; i < Props()->GetInt("vischildren"); i++)
+    for (int i = 0; i < Props()->GetInt(XORSTR("vischildren")); i++)
     {
         draw::DrawLine(x, y + i * (Item::size_y + 2), size_table_width(), 0,
                        NCGUIColor());
@@ -86,7 +86,7 @@ void PlayerList::MoveChildren()
             visible++;
     }
     SetSize(size_table_width(), visible * (Item::size_y + 2) + 1);
-    Props()->SetInt("vischildren", visible);
+    Props()->SetInt(XORSTR("vischildren"), visible);
 }
 }
 }

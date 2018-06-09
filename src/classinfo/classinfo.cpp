@@ -43,8 +43,8 @@ void InitClassTable()
     }
     if (!client_class_list)
     {
-        logging::Info("FATAL: Cannot initialize class list! Game will crash if "
-                      "cathook is enabled.");
+        logging::Info(XORSTR("FATAL: Cannot initialize class list! Game will crash if "
+                      "cathook is enabled."));
         // cathook = false;
     }
 }

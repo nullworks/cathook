@@ -16,16 +16,16 @@
 
 class CMoveData;
 #if LAGBOT_MODE
-CatCommand set_value("set", "Set value", [](const CCommand &args) {
+CatCommand set_value(XORSTR("set"), XORSTR("Set value"), [](const CCommand &args) {
     if (args.ArgC() < 2)
         return;
     ConVar *var = g_ICvar->FindVar(args.Arg(1));
     if (!var)
         return;
     std::string value(args.Arg(2));
-    ReplaceString(value, "\\n", "\n");
+    ReplaceString(value, XORSTR("\\n"), XORSTR("\n"));
     var->SetValue(value.c_str());
-    logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
+    logging::Info(XORSTR("Set '%s' to '%s'", args.Arg(1), value.c_str());
 });
 #endif
 namespace engine_prediction
@@ -152,10 +152,10 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     /**bSendPackets = true;
     if (hacks::shared::lagexploit::ExploitActive()) {
         *bSendPackets = ((g_pUserCmd->command_number % 4) == 0);
-        //logging::Info("%d", *bSendPackets);
+        //logging::Info(XORSTR("%d"), *bSendPackets);
     }*/
 
-    // logging::Info("canpacket: %i", ch->CanPacket());
+    // logging::Info(XORSTR("canpacket: %i"), ch->CanPacket());
     // if (!cmd) return ret;
 
     time_replaced = false;
@@ -199,7 +199,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
         PROF_SECTION(EntityCache);
         entity_cache::Update();
     }
-    //	PROF_END("Entity Cache updating");
+    //	PROF_END(XORSTR("Entity Cache updating"));
     {
         PROF_SECTION(CM_PlayerResource);
         g_pPlayerResource->Update();
@@ -229,17 +229,17 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
 
         if (!g_pLocalPlayer->team || (g_pLocalPlayer->team == TEAM_SPEC))
         {
-            // if (!team_joining_state) logging::Info("Bad team, trying to
-            // join...");
+            // if (!team_joining_state) logging::Info(XORSTR("Bad team, trying to
+            // join...XORSTR(");
             team_joining_state = 1;
         }
         else
         {
             if (team_joining_state)
             {
-                logging::Info("Trying to change CLASS");
+                logging::Info(XORSTR("Trying to change CLASS"));
                 g_IEngine->ExecuteClientCmd(
-                    format("join_class ", joinclass.GetString()).c_str());
+                    format(XORSTR("join_class "), joinclass.GetString()).c_str());
             }
             team_joining_state = 0;
         }
@@ -269,12 +269,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
                     switch (CE_INT(found_entity, netvar.iTeamNum))
                     {
                     case TEAM_RED:
-                        logging::Info("Trying to join team RED");
-                        g_IEngine->ExecuteClientCmd("jointeam red");
+                        logging::Info(XORSTR("Trying to join team RED"));
+                        g_IEngine->ExecuteClientCmd(XORSTR("jointeam red"));
                         break;
                     case TEAM_BLU:
-                        logging::Info("Trying to join team BLUE");
-                        g_IEngine->ExecuteClientCmd("jointeam blue");
+                        logging::Info(XORSTR("Trying to join team BLUE"));
+                        g_IEngine->ExecuteClientCmd(XORSTR("jointeam blue"));
                         break;
                     }
                 }
@@ -583,7 +583,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     else if (votelogger::active &&
              votelogger::antikick.test_and_set(antikick_time * 1000))
         votelogger::active = false;
-    //	PROF_END("CreateMove");
+    //	PROF_END(XORSTR("CreateMove"));
     if (!(cmd->buttons & IN_ATTACK))
     {
         // LoadSavedState();

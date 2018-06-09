@@ -48,7 +48,7 @@ void VMTHook::Set(ptr_t inst, uint32_t offset)
     vtable_ptr      = &GetVMT(inst, offset);
     vtable_original = *vtable_ptr;
     int mc          = CountMethods(vtable_original);
-    logging::Info("Hooking vtable 0x%08x with %d methods", vtable_original, mc);
+    logging::Info(XORSTR("Hooking vtable 0x%08x with %d methods"), vtable_original, mc);
     vtable_hooked = static_cast<method_table_t>(calloc(mc + 3, sizeof(ptr_t)));
     memcpy(&vtable_hooked[2], vtable_original, sizeof(ptr_t) * mc);
     vtable_hooked[0] = this;
@@ -59,7 +59,7 @@ void VMTHook::Release()
 {
     if (vtable_ptr && *vtable_ptr == &vtable_hooked[2])
     {
-        logging::Info("Un-hooking 0x%08x (vtable @ 0x%08x)", vtable_ptr,
+        logging::Info(XORSTR("Un-hooking 0x%08x (vtable @ 0x%08x)"), vtable_ptr,
                       *vtable_ptr);
         if ((*vtable_ptr)[-1] == (method_t) GUARD)
         {
@@ -80,7 +80,7 @@ void *VMTHook::GetMethod(uint32_t idx) const
 void VMTHook::HookMethod(ptr_t func, uint32_t idx, ptr_t *backup)
 {
     logging::Info(
-        "Hooking method %d of vtable 0x%08x, replacing 0x%08x with 0x%08x", idx,
+        XORSTR("Hooking method %d of vtable 0x%08x, replacing 0x%08x with 0x%08x"), idx,
         vtable_original, GetMethod(idx), func);
     if (backup)
         *backup            = vtable_hooked[2 + idx];

@@ -44,10 +44,10 @@ CachedEntity::~CachedEntity()
 {
 }
 
-static CatVar ve_window(CV_FLOAT, "debug_ve_window", "0", "VE Window");
-static CatVar ve_smooth(CV_SWITCH, "debug_ve_smooth", "1", "VE Smoothing");
-static CatVar ve_averager_size(CV_INT, "debug_ve_averaging", "8",
-                               "VE Averaging");
+static CatVar ve_window(CV_FLOAT, XORSTR("debug_ve_window"), XORSTR("0"), XORSTR("VE Window"));
+static CatVar ve_smooth(CV_SWITCH, XORSTR("debug_ve_smooth"), XORSTR("1"), XORSTR("VE Smoothing"));
+static CatVar ve_averager_size(CV_INT, XORSTR("debug_ve_averaging"), XORSTR("8"),
+                               XORSTR("VE Averaging"));
 
 void CachedEntity::Update()
 {
@@ -76,8 +76,8 @@ void CachedEntity::Update()
         g_IEngine->GetPlayerInfo(m_IDX, &player_info);
 }
 
-static CatVar fast_vischeck(CV_SWITCH, "fast_vischeck", "0", "Fast VisCheck",
-                            "VisCheck only certain player hitboxes");
+static CatVar fast_vischeck(CV_SWITCH, XORSTR("fast_vischeck"), XORSTR("0"), XORSTR("Fast VisCheck"),
+                            XORSTR("VisCheck only certain player hitboxes"));
 
 bool CachedEntity::IsVisible()
 {

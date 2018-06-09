@@ -8,7 +8,7 @@
 #include "common.hpp"
 
 static CatCommand dump_conditions(
-    "debug_conditions", "Shows conditions for entity #",
+    XORSTR("debug_conditions"), XORSTR("Shows conditions for entity #"),
     [](const CCommand &args) {
         int id = atoi(args.Arg(1));
         if (!id)
@@ -18,14 +18,14 @@ static CatCommand dump_conditions(
             return;
         condition_data_s &old_data =
             CE_VAR(ent, netvar.iCond, condition_data_s);
-        logging::Info(format("old conds: ", std::bitset<32>(old_data.cond_0),
+        logging::Info(format(XORSTR("old conds: "), std::bitset<32>(old_data.cond_0),
                              ' ', std::bitset<32>(old_data.cond_1), ' ',
                              std::bitset<32>(old_data.cond_2), ' ',
                              std::bitset<32>(old_data.cond_3))
                           .c_str());
         condition_data_s &new_data =
             CE_VAR(ent, netvar._condition_bits, condition_data_s);
-        logging::Info(format("new conds: ", std::bitset<32>(new_data.cond_0),
+        logging::Info(format(XORSTR("new conds: "), std::bitset<32>(new_data.cond_0),
                              ' ', std::bitset<32>(new_data.cond_1), ' ',
                              std::bitset<32>(new_data.cond_2), ' ',
                              std::bitset<32>(new_data.cond_3))

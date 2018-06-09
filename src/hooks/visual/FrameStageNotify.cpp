@@ -9,8 +9,8 @@
 #if not LAGBOT_MODE
 #include "Backtrack.hpp"
 #endif
-static CatVar resolver(CV_SWITCH, "resolver", "0", "Resolve angles");
-static CatVar nightmode(CV_SWITCH, "nightmode", "0", "Enable nightmode", "");
+static CatVar resolver(CV_SWITCH, XORSTR("resolver"), XORSTR("0"), XORSTR("Resolve angles"));
+static CatVar nightmode(CV_SWITCH, XORSTR("nightmode"), XORSTR("0"), XORSTR("Enable nightmode"), XORSTR(""));
 namespace hooked_methods
 {
 
@@ -24,11 +24,11 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
         {
 
             static ConVar *r_DrawSpecificStaticProp =
-                g_ICvar->FindVar("r_DrawSpecificStaticProp");
+                g_ICvar->FindVar(XORSTR("r_DrawSpecificStaticProp"));
             if (!r_DrawSpecificStaticProp)
             {
                 r_DrawSpecificStaticProp =
-                    g_ICvar->FindVar("r_DrawSpecificStaticProp");
+                    g_ICvar->FindVar(XORSTR("r_DrawSpecificStaticProp"));
                 return;
             }
             r_DrawSpecificStaticProp->SetValue(0);
@@ -41,12 +41,12 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
 
                 if (!pMaterial)
                     continue;
-                if (strstr(pMaterial->GetTextureGroupName(), "World") ||
-                    strstr(pMaterial->GetTextureGroupName(), "StaticProp"))
+                if (strstr(pMaterial->GetTextureGroupName(), XORSTR("World")) ||
+                    strstr(pMaterial->GetTextureGroupName(), XORSTR("StaticProp")))
                 {
                     if (nightmode)
                         if (strstr(pMaterial->GetTextureGroupName(),
-                                   "StaticProp"))
+                                   XORSTR("StaticProp")))
                             pMaterial->ColorModulate(0.3f, 0.3f, 0.3f);
                         else
                             pMaterial->ColorModulate(0.05f, 0.05f, 0.05f);

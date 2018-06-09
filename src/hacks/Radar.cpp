@@ -18,31 +18,31 @@ namespace tf
 namespace radar
 {
 
-static CatVar size(CV_INT, "radar_size", "300", "Radar size",
-                   "Defines radar size in pixels");
-static CatVar zoom(CV_FLOAT, "radar_zoom", "20", "Radar zoom",
-                   "Defines radar zoom (1px = Xhu)");
-static CatVar healthbar(CV_SWITCH, "radar_health", "1", "Radar healthbar",
-                        "Show radar healthbar");
+static CatVar size(CV_INT, XORSTR("radar_size"), XORSTR("300"), XORSTR("Radar size"),
+                   XORSTR("Defines radar size in pixels"));
+static CatVar zoom(CV_FLOAT, XORSTR("radar_zoom"), XORSTR("20"), XORSTR("Radar zoom"),
+                   XORSTR("Defines radar zoom (1px = Xhu)"));
+static CatVar healthbar(CV_SWITCH, XORSTR("radar_health"), XORSTR("1"), XORSTR("Radar healthbar"),
+                        XORSTR("Show radar healthbar"));
 static CatVar enemies_over_teammates(
-    CV_SWITCH, "radar_enemies_top", "1", "Show enemies on top",
-    "If true, radar will render enemies on top of teammates");
-static CatVar icon_size(CV_INT, "radar_icon_size", "20", "Icon size",
-                        "Defines radar icon size");
-static CatVar radar_enabled(CV_SWITCH, "radar", "0", "Enable", "Enable Radar");
-static CatVar radar_x(CV_INT, "radar_x", "100", "Radar X",
-                      "Defines radar position (X)");
-static CatVar radar_y(CV_INT, "radar_y", "100", "Radar Y",
-                      "Defines radar position (Y)");
+    CV_SWITCH, XORSTR("radar_enemies_top"), XORSTR("1"), XORSTR("Show enemies on top"),
+    XORSTR("If true, radar will render enemies on top of teammates"));
+static CatVar icon_size(CV_INT, XORSTR("radar_icon_size"), XORSTR("20"), XORSTR("Icon size"),
+                        XORSTR("Defines radar icon size"));
+static CatVar radar_enabled(CV_SWITCH, XORSTR("radar"), XORSTR("0"), XORSTR("Enable"), XORSTR("Enable Radar"));
+static CatVar radar_x(CV_INT, XORSTR("radar_x"), XORSTR("100"), XORSTR("Radar X"),
+                      XORSTR("Defines radar position (X)"));
+static CatVar radar_y(CV_INT, XORSTR("radar_y"), XORSTR("100"), XORSTR("Radar Y"),
+                      XORSTR("Defines radar position (Y)"));
 static CatVar
-    use_icons(CV_SWITCH, "radar_icons", "1", "Use Icons",
-              "Radar will use class icons instead of class portraits");
-static CatVar show_teammates(CV_SWITCH, "radar_teammates", "1",
-                             "Show Teammates");
-static CatVar show_healthpacks(CV_SWITCH, "radar_healthpacks", "1",
-                               "Show Healthpacks");
-static CatVar show_ammopacks(CV_SWITCH, "radar_ammopacks", "1",
-                             "Show Ammopacks");
+    use_icons(CV_SWITCH, XORSTR("radar_icons"), XORSTR("1"), XORSTR("Use Icons"),
+              XORSTR("Radar will use class icons instead of class portraits"));
+static CatVar show_teammates(CV_SWITCH, XORSTR("radar_teammates"), XORSTR("1"),
+                             XORSTR("Show Teammates"));
+static CatVar show_healthpacks(CV_SWITCH, XORSTR("radar_healthpacks"), XORSTR("1"),
+                               XORSTR("Show Healthpacks"));
+static CatVar show_ammopacks(CV_SWITCH, XORSTR("radar_ammopacks"), XORSTR("1"),
+                             XORSTR("Show Ammopacks"));
 Timer invalid{};
 
 std::pair<int, int> WorldToRadar(int x, int y)
@@ -93,7 +93,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
         if (texture.texture.handle == GLEZ_TEXTURE_INVALID &&
             invalid.test_and_set(10000))
         {
-            logging::Info("Invalid atlas, retrying....");
+            logging::Info(XORSTR("Invalid atlas, retrying...."));
             texture.texture.handle =
                 glez_texture_load_png_rgba(DATA_PATH "/res/atlas.png");
             return;

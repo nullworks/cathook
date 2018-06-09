@@ -12,7 +12,7 @@ namespace ac
 {
 namespace antiaim
 {
-static CatVar enabled(CV_SWITCH, "ac_antiaim", "1", "Detect Antiaim");
+static CatVar enabled(CV_SWITCH, XORSTR("ac_antiaim"), XORSTR("1"), XORSTR("Detect Antiaim"));
 unsigned long last_accusation[32]{ 0 };
 
 void ResetEverything()
@@ -56,16 +56,16 @@ void Update(CachedEntity *player)
                 am = 0;
             }
             std::string reason =
-                format("Pitch: ", d.angles[idx].x, " Yaw: ", d.angles[idx].y);
+                format(XORSTR("Pitch: "), d.angles[idx].x, XORSTR(" Yaw: "), d.angles[idx].y);
             if (d.angles[idx].x == -271.0f)
             {
-                reason += " (Fakeup)";
+                reason += XORSTR(" (Fakeup)");
             }
             else if (d.angles[idx].x == 271.0f)
             {
-                reason += " (Fakedown)";
+                reason += XORSTR(" (Fakedown)");
             }
-            hacks::shared::anticheat::Accuse(player->m_IDX, "AntiAim", reason);
+            hacks::shared::anticheat::Accuse(player->m_IDX, XORSTR("AntiAim"), reason);
             last_accusation[player->m_IDX - 1] = tickcount;
         }
     }

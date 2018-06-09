@@ -12,7 +12,7 @@ namespace sharedobj
 
 bool LocateSharedObject(std::string &name, std::string &out_full_path)
 {
-    FILE *proc_maps = fopen(strfmt("/proc/%i/maps", getpid()), "r");
+    FILE *proc_maps = fopen(strfmt(XORSTR("/proc/%i/maps"), getpid()), XORSTR("r"));
     if (proc_maps == nullptr)
     {
         return false;
@@ -37,7 +37,7 @@ bool LocateSharedObject(std::string &name, std::string &out_full_path)
 }
 
 SharedObject::SharedObject(const char *_file, bool _factory)
-    : file(_file), path("unassigned"), factory(_factory)
+    : file(_file), path(XORSTR("unassigned")), factory(_factory)
 {
     constructed = true;
 }
@@ -54,18 +54,18 @@ void SharedObject::Load()
         char *error = dlerror();
         if (error)
         {
-            logging::Info("DLERROR: %s", error);
+            logging::Info(XORSTR("DLERROR: %s"), error);
         }
     }
-    logging::Info("Shared object %s loaded at 0x%08x", basename(lmap->l_name),
+    logging::Info(XORSTR("Shared object %s loaded at 0x%08x"), basename(lmap->l_name),
                   lmap->l_addr);
     if (factory)
     {
         fptr = reinterpret_cast<fn_CreateInterface_t>(
-            dlsym(lmap, "CreateInterface"));
+            dlsym(lmap, XORSTR("CreateInterface")));
         if (!this->fptr)
         {
-            logging::Info("Failed to create interface factory for %s",
+            logging::Info(XORSTR("Failed to create interface factory for %s"),
                           basename(lmap->l_name));
         }
     }
@@ -108,64 +108,64 @@ void LoadAllSharedObjects()
     }
     catch (std::exception &ex)
     {
-        logging::Info("Exception: %s", ex.what());
+        logging::Info(XORSTR("Exception: %s"), ex.what());
     }
 }
 
 SharedObject &steamclient()
 {
-    static SharedObject obj("steamclient.so", true);
+    static SharedObject obj(XORSTR("steamclient.so"), true);
     return obj;
 }
 SharedObject &client()
 {
-    static SharedObject obj("client.so", true);
+    static SharedObject obj(XORSTR("client.so"), true);
     return obj;
 }
 SharedObject &engine()
 {
-    static SharedObject obj("engine.so", true);
+    static SharedObject obj(XORSTR("engine.so"), true);
     return obj;
 }
 SharedObject &vstdlib()
 {
-    static SharedObject obj("libvstdlib.so", true);
+    static SharedObject obj(XORSTR("libvstdlib.so"), true);
     return obj;
 }
 SharedObject &tier0()
 {
-    static SharedObject obj("libtier0.so", false);
+    static SharedObject obj(XORSTR("libtier0.so"), false);
     return obj;
 }
 SharedObject &inputsystem()
 {
-    static SharedObject obj("inputsystem.so", true);
+    static SharedObject obj(XORSTR("inputsystem.so"), true);
     return obj;
 }
 SharedObject &materialsystem()
 {
-    static SharedObject obj("materialsystem.so", true);
+    static SharedObject obj(XORSTR("materialsystem.so"), true);
     return obj;
 }
 #if ENABLE_VISUALS
 SharedObject &vguimatsurface()
 {
-    static SharedObject obj("vguimatsurface.so", true);
+    static SharedObject obj(XORSTR("vguimatsurface.so"), true);
     return obj;
 }
 SharedObject &vgui2()
 {
-    static SharedObject obj("vgui2.so", true);
+    static SharedObject obj(XORSTR("vgui2.so"), true);
     return obj;
 }
 SharedObject &studiorender()
 {
-    static SharedObject obj("studiorender.so", true);
+    static SharedObject obj(XORSTR("studiorender.so"), true);
     return obj;
 }
 SharedObject &libsdl()
 {
-    static SharedObject obj("libSDL2-2.0.so.0", false);
+    static SharedObject obj(XORSTR("libSDL2-2.0.so.0"), false);
     return obj;
 }
 #endif

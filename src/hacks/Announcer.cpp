@@ -14,7 +14,7 @@ namespace shared
 namespace announcer
 {
 
-static CatVar enabled(CV_SWITCH, "announcer", "0", "Enable announcer");
+static CatVar enabled(CV_SWITCH, XORSTR("announcer"), XORSTR("0"), XORSTR("Enable announcer"));
 
 struct announcer_entry_s
 {
@@ -23,26 +23,26 @@ struct announcer_entry_s
 };
 
 std::vector<announcer_entry_s> announces_headshot_combo = {
-    { 1, "headshot.wav" },
-    { 2, "headshot.wav" },
-    { 4, "hattrick.wav" },
-    { 6, "headhunter.wav" }
+    { 1, XORSTR("headshot.wav") },
+    { 2, XORSTR("headshot.wav") },
+    { 4, XORSTR("hattrick.wav") },
+    { 6, XORSTR("headhunter.wav") }
 };
 
 std::vector<announcer_entry_s> announces_kill = {
-    { 5, "dominating.wav" },   { 7, "rampage.wav" },
-    { 9, "killingspree.wav" }, { 11, "monsterkill.wav" },
-    { 15, "unstoppable.wav" }, { 17, "ultrakill.wav" },
-    { 19, "godlike.wav" },     { 21, "wickedsick.wav" },
-    { 23, "impressive.wav" },  { 25, "ludicrouskill.wav" },
-    { 27, "holyshit.wav" }
+    { 5, XORSTR("dominating.wav") },   { 7, XORSTR("rampage.wav") },
+    { 9, XORSTR("killingspree.wav") }, { 11, XORSTR("monsterkill.wav") },
+    { 15, XORSTR("unstoppable.wav") }, { 17, XORSTR("ultrakill.wav") },
+    { 19, XORSTR("godlike.wav") },     { 21, XORSTR("wickedsick.wav") },
+    { 23, XORSTR("impressive.wav") },  { 25, XORSTR("ludicrouskill.wav") },
+    { 27, XORSTR("holyshit.wav") }
 };
 
-std::vector<announcer_entry_s> announces_kill_combo = { { 2, "doublekill.wav" },
-                                                        { 3, "triplekill.wav" },
-                                                        { 4, "multikill.wav" },
+std::vector<announcer_entry_s> announces_kill_combo = { { 2, XORSTR("doublekill.wav") },
+                                                        { 3, XORSTR("triplekill.wav") },
+                                                        { 4, XORSTR("multikill.wav") },
                                                         { 5,
-                                                          "combowhore.wav" } };
+                                                          XORSTR("combowhore.wav") } };
 
 unsigned killstreak{ 0 };
 unsigned killcombo{ 0 };
@@ -65,10 +65,10 @@ void playsound(const std::string &sound)
 {
     // yes
     char command[128];
-    snprintf(command, 128, "aplay %s/sound/%s &", DATA_PATH, sound.c_str());
-    logging::Info("system(%s)", command);
+    snprintf(command, 128, XORSTR("aplay %s/sound/%s &"), DATA_PATH, sound.c_str());
+    logging::Info(XORSTR("system(%s)"), command);
     system(command);
-    // g_ISurface->PlaySound(std::string("announcer/" + sound).c_str());
+    // g_ISurface->PlaySound(std::string(XORSTR("announcer/") + sound).c_str());
 }
 
 void reset()
@@ -92,8 +92,8 @@ void check_combos()
 
 void on_kill(IGameEvent *event)
 {
-    int killer_id = g_IEngine->GetPlayerForUserID(event->GetInt("attacker"));
-    int victim_id = g_IEngine->GetPlayerForUserID(event->GetInt("userid"));
+    int killer_id = g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("attacker")));
+    int victim_id = g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("userid")));
 
     if (victim_id == g_IEngine->GetLocalPlayer())
     {
@@ -114,10 +114,10 @@ void on_kill(IGameEvent *event)
 
     if (GetWeaponMode() == weaponmode::weapon_melee)
     {
-        playsound("humiliation.wav");
+        playsound(XORSTR("humiliation.wav"));
         return;
     }
-    if (event->GetInt("customkill") == 1)
+    if (event->GetInt(XORSTR("customkill")) == 1)
     {
         headshotcombo++;
         last_headshot.update();
@@ -143,7 +143,7 @@ void on_kill(IGameEvent *event)
 
 void on_spawn(IGameEvent *event)
 {
-    int userid = g_IEngine->GetPlayerForUserID(event->GetInt("userid"));
+    int userid = g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("userid")));
 
     if (userid == g_IEngine->GetLocalPlayer())
     {
@@ -157,9 +157,9 @@ class AnnouncerEventListener : public IGameEventListener2
     {
         if (!enabled)
             return;
-        if (0 == strcmp(event->GetName(), "player_death"))
+        if (0 == strcmp(event->GetName(), XORSTR("player_death")))
             on_kill(event);
-        else if (0 == strcmp(event->GetName(), "player_spawn"))
+        else if (0 == strcmp(event->GetName(), XORSTR("player_spawn")))
             on_spawn(event);
     }
 };
@@ -172,8 +172,8 @@ AnnouncerEventListener &listener()
 
 void init()
 {
-    g_IEventManager2->AddListener(&listener(), "player_death", false);
-    g_IEventManager2->AddListener(&listener(), "player_spawn", false);
+    g_IEventManager2->AddListener(&listener(), XORSTR("player_death"), false);
+    g_IEventManager2->AddListener(&listener(), XORSTR("player_spawn"), false);
 }
 
 void shutdown()

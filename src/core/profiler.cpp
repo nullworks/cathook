@@ -9,7 +9,7 @@
 
 unsigned g_spewcount{ 0 };
 
-static CatCommand profiler_begin("profiler_spew", "Spew and reset",
+static CatCommand profiler_begin(XORSTR("profiler_spew"), XORSTR("Spew and reset"),
                                  []() { g_spewcount++; });
 
 ProfilerSection::ProfilerSection(std::string name, ProfilerSection *parent)
@@ -42,7 +42,7 @@ void ProfilerSection::OnNodeDeath(ProfilerNode &node)
     if (g_spewcount > m_spewcount)
     {
         logging::Info(
-            "[P],'%-32s',%12llu,%12llu,%12llu,%12llu,%u", m_name.c_str(),
+            XORSTR("[P],'%-32s',%12llu,%12llu,%12llu,%12llu,%u"), m_name.c_str(),
             std::chrono::duration_cast<std::chrono::nanoseconds>(m_sum).count(),
             std::chrono::duration_cast<std::chrono::nanoseconds>(m_sum)
                     .count() /

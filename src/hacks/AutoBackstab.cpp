@@ -25,10 +25,10 @@ const Vector GetWorldSpaceCenter(CachedEntity *ent)
     return vWorldSpaceCenter;
 }
 
-static CatVar enabled(CV_SWITCH, "autobackstab", "0", "Auto Backstab",
-                      "Does not depend on triggerbot!");
-static CatVar value(CV_INT, "autobackstab_range", "75.0f",
-                    "Set Detection Distance to this much");
+static CatVar enabled(CV_SWITCH, XORSTR("autobackstab"), XORSTR("0"), XORSTR("Auto Backstab"),
+                      XORSTR("Does not depend on triggerbot!"));
+static CatVar value(CV_INT, XORSTR("autobackstab_range"), XORSTR("75.0f"),
+                    XORSTR("Set Detection Distance to this much"));
 bool found;
 // TODO improve
 void CreateMove()

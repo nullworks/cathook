@@ -15,9 +15,9 @@ DEFINE_HOOKED_METHOD(FireGameEvent, void, void *this_, IGameEvent *event)
     {
         if (event_log)
         {
-            if (!strcmp(name, "player_connect_client") ||
-                !strcmp(name, "player_disconnect") ||
-                !strcmp(name, "player_team"))
+            if (!strcmp(name, XORSTR("player_connect_client")) ||
+                !strcmp(name, XORSTR("player_disconnect")) ||
+                !strcmp(name, XORSTR("player_team")))
             {
                 return;
             }

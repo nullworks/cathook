@@ -15,24 +15,24 @@ namespace shared
 namespace catbot
 {
 
-static CatVar enabled(CV_SWITCH, "cbu", "0", "CatBot Utils");
-static CatVar abandon_if_bots_gte(CV_INT, "cbu_abandon_if_bots_gte", "0",
-                                  "Abandon if bots >=");
-static CatVar abandon_if_ipc_bots_gte(CV_INT, "cbu_abandon_if_ipc_bots_gte",
-                                      "0", "Abandon if IPC bots >=");
-static CatVar abandon_if_humans_lte(CV_INT, "cbu_abandon_if_humans_lte", "0",
-                                    "Abandon if humans <=");
-static CatVar abandon_if_players_lte(CV_INT, "cbu_abandon_if_players_lte", "0",
-                                     "Abandon if players <=");
-static CatVar mark_human_threshold(CV_INT, "cbu_mark_human_threshold", "2",
-                                   "Mark human after N kills");
-static CatVar random_votekicks(CV_SWITCH, "cbu_random_votekicks", "0",
-                               "Randomly initiate votekicks");
-static CatVar micspam(CV_SWITCH, "cbu_micspam", "0", "Micspam helper");
-static CatVar micspam_on(CV_INT, "cbu_micspam_on_interval", "3",
-                         "+voicerecord interval");
-static CatVar micspam_off(CV_INT, "cbu_micspam_off_interval", "60",
-                          "-voicerecord interval");
+static CatVar enabled(CV_SWITCH, XORSTR("cbu"), XORSTR("0"), XORSTR("CatBot Utils"));
+static CatVar abandon_if_bots_gte(CV_INT, XORSTR("cbu_abandon_if_bots_gte"), XORSTR("0"),
+                                  XORSTR("Abandon if bots >="));
+static CatVar abandon_if_ipc_bots_gte(CV_INT, XORSTR("cbu_abandon_if_ipc_bots_gte"),
+                                      XORSTR("0"), XORSTR("Abandon if IPC bots >="));
+static CatVar abandon_if_humans_lte(CV_INT, XORSTR("cbu_abandon_if_humans_lte"), XORSTR("0"),
+                                    XORSTR("Abandon if humans <="));
+static CatVar abandon_if_players_lte(CV_INT, XORSTR("cbu_abandon_if_players_lte"), XORSTR("0"),
+                                     XORSTR("Abandon if players <="));
+static CatVar mark_human_threshold(CV_INT, XORSTR("cbu_mark_human_threshold"), XORSTR("2"),
+                                   XORSTR("Mark human after N kills"));
+static CatVar random_votekicks(CV_SWITCH, XORSTR("cbu_random_votekicks"), XORSTR("0"),
+                               XORSTR("Randomly initiate votekicks"));
+static CatVar micspam(CV_SWITCH, XORSTR("cbu_micspam"), XORSTR("0"), XORSTR("Micspam helper"));
+static CatVar micspam_on(CV_INT, XORSTR("cbu_micspam_on_interval"), XORSTR("3"),
+                         XORSTR("+voicerecord interval"));
+static CatVar micspam_off(CV_INT, XORSTR("cbu_micspam_off_interval"), XORSTR("60"),
+                          XORSTR("-voicerecord interval"));
 
 struct catbot_user_state
 {
@@ -72,7 +72,7 @@ void on_killed_by(int userid)
 
     // if (human_detecting_map[steamID].has_bot_name)
     human_detecting_map[steamID].treacherous_kills++;
-    logging::Info("Treacherous kill #%d: %s [U:1:%u]",
+    logging::Info(XORSTR("Treacherous kill #%d: %s [U:1:%u]"),
                   human_detecting_map[steamID].treacherous_kills,
                   player->player_info.name, player->player_info.friendsID);
 }
@@ -102,8 +102,8 @@ void do_random_votekick()
     player_info_s info;
     if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(target), &info))
         return;
-    hack::ExecuteCommand("callvote kick " + std::to_string(target) +
-                         " cheating");
+    hack::ExecuteCommand(XORSTR("callvote kick ") + std::to_string(target) +
+                         XORSTR(" cheating"));
 }
 
 void update_catbot_list()
@@ -115,18 +115,18 @@ void update_catbot_list()
             continue;
 
         info.name[31] = 0;
-        if (strcasestr(info.name, "cat-bot") ||
-            strcasestr(info.name, "just disable vac tf") ||
-            strcasestr(info.name, "raul.garcia") ||
-            strcasestr(info.name, "zCat") ||
-            strcasestr(info.name, "lagger bot") ||
-            strcasestr(info.name, "zLag-bot") ||
-            strcasestr(info.name, "crash-bot"))
+        if (strcasestr(info.name, XORSTR("cat-bot")) ||
+            strcasestr(info.name, XORSTR("just disable vac tf")) ||
+            strcasestr(info.name, XORSTR("raul.garcia")) ||
+            strcasestr(info.name, XORSTR("zCat")) ||
+            strcasestr(info.name, XORSTR("lagger bot")) ||
+            strcasestr(info.name, XORSTR("zLag-bot")) ||
+            strcasestr(info.name, XORSTR("crash-bot")))
         {
             if (human_detecting_map.find(info.friendsID) ==
                 human_detecting_map.end())
             {
-                logging::Info("Found bot %s [U:1:%u]", info.name,
+                logging::Info(XORSTR("Found bot %s [U:1:%u]"), info.name,
                               info.friendsID);
                 human_detecting_map.insert(
                     std::make_pair(info.friendsID, catbot_user_state{ 0 }));
@@ -143,8 +143,8 @@ class CatBotEventListener : public IGameEventListener2
             return;
 
         int killer_id =
-            g_IEngine->GetPlayerForUserID(event->GetInt("attacker"));
-        int victim_id = g_IEngine->GetPlayerForUserID(event->GetInt("userid"));
+            g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("attacker")));
+        int victim_id = g_IEngine->GetPlayerForUserID(event->GetInt(XORSTR("userid")));
 
         if (victim_id == g_IEngine->GetLocalPlayer())
         {
@@ -190,7 +190,7 @@ void reportall()
 {
     typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
     static uintptr_t addr2 = gSignatures.GetClientSignature(
-        "55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+        XORSTR("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8"));
     ReportPlayer_t ReportPlayer_fn = ReportPlayer_t(addr2);
     if (!addr2)
         return;
@@ -218,7 +218,7 @@ void reportall()
         }
     }
 }
-CatCommand report("report_debug", "debug", []() { reportall(); });
+CatCommand report(XORSTR("report_debug"), XORSTR("debug"), []() { reportall(); });
 void update()
 {
     if (!enabled)
@@ -233,10 +233,10 @@ void update()
     if (micspam)
     {
         if (micspam_on && micspam_on_timer.test_and_set(int(micspam_on) * 1000))
-            g_IEngine->ExecuteClientCmd("+voicerecord");
+            g_IEngine->ExecuteClientCmd(XORSTR("+voicerecord"));
         if (micspam_off &&
             micspam_off_timer.test_and_set(int(micspam_off) * 1000))
-            g_IEngine->ExecuteClientCmd("-voicerecord");
+            g_IEngine->ExecuteClientCmd(XORSTR("-voicerecord"));
     }
 
     if (random_votekicks && timer_votekicks.test_and_set(5000))
@@ -272,8 +272,8 @@ void update()
         {
             if (count_bots >= int(abandon_if_bots_gte))
             {
-                logging::Info("Abandoning because there are %d bots in game, "
-                              "and abandon_if_bots_gte is %d.",
+                logging::Info(XORSTR("Abandoning because there are %d bots in game, "
+                              "and abandon_if_bots_gte is %d."),
                               count_bots, int(abandon_if_bots_gte));
                 tfmm::abandon();
                 return;
@@ -283,8 +283,8 @@ void update()
         {
             if (count_ipc >= int(abandon_if_ipc_bots_gte))
             {
-                logging::Info("Abandoning because there are %d local players "
-                              "in game, and abandon_if_ipc_bots_gte is %d.",
+                logging::Info(XORSTR("Abandoning because there are %d local players "
+                              "in game, and abandon_if_ipc_bots_gte is %d."),
                               count_ipc, int(abandon_if_ipc_bots_gte));
                 tfmm::abandon();
                 return;
@@ -294,8 +294,8 @@ void update()
         {
             if (count_total - count_bots <= int(abandon_if_humans_lte))
             {
-                logging::Info("Abandoning because there are %d non-bots in "
-                              "game, and abandon_if_humans_lte is %d.",
+                logging::Info(XORSTR("Abandoning because there are %d non-bots in "
+                              "game, and abandon_if_humans_lte is %d."),
                               count_total - count_bots,
                               int(abandon_if_humans_lte));
                 tfmm::abandon();
@@ -306,8 +306,8 @@ void update()
         {
             if (count_total <= int(abandon_if_players_lte))
             {
-                logging::Info("Abandoning because there are %d total players "
-                              "in game, and abandon_if_players_lte is %d.",
+                logging::Info(XORSTR("Abandoning because there are %d total players "
+                              "in game, and abandon_if_players_lte is %d."),
                               count_total, int(abandon_if_players_lte));
                 tfmm::abandon();
                 return;
@@ -318,7 +318,7 @@ void update()
 
 void init()
 {
-    g_IEventManager2->AddListener(&listener(), "player_death", false);
+    g_IEventManager2->AddListener(&listener(), XORSTR("player_death"), false);
 }
 
 void level_init()

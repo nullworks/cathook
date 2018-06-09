@@ -1,5 +1,5 @@
 // Replace darkstorm stuff with my stuff
-//#include "SDK.h"
+//#include XORSTR("SDK.h")
 
 #include "common.hpp"
 
@@ -30,14 +30,14 @@ Elf32_Shdr *getSectionHeader(void *module, const char *sectionName)
         strtab = (char *) ((unsigned) module + strhdr->sh_offset);
 
         if (strtab == NULL)
-            // Log::Fatal("String table was NULL!");
-            logging::Info("String table was NULL!");
+            // Log::Fatal(XORSTR("String table was NULL!"));
+            logging::Info(XORSTR("String table was NULL!"));
         strtabSize = strhdr->sh_size;
     }
     else
     {
-        // Log::Fatal("String table header was corrupted!");
-        logging::Info("String table header was corrupted!");
+        // Log::Fatal(XORSTR("String table header was corrupted!"));
+        logging::Info(XORSTR("String table header was corrupted!"));
     }
 
     for (int i = 0; i < ehdr->e_shnum; i++)
@@ -79,8 +79,8 @@ uintptr_t CSignature::dwFindPattern(uintptr_t dwAddress, uintptr_t dwLength,
         }
     }
 
-    logging::Info("THIS IS SERIOUS: Could not locate signature: "
-                  "\n============\n\"%s\"\n============",
+    logging::Info(XORSTR("THIS IS SERIOUS: Could not locate signature: "
+                  "\n============\n\"%s\"\n============"),
                   szPattern);
 
     return NULL;
@@ -111,7 +111,7 @@ uintptr_t CSignature::GetClientSignature(const char *chPattern)
 
     // static void *module = (void *)moduleMap->l_addr;
 
-    static Elf32_Shdr *textHeader = getSectionHeader(module, ".text");
+    static Elf32_Shdr *textHeader = getSectionHeader(module, XORSTR(".text"));
 
     static int textOffset = textHeader->sh_offset;
 
@@ -140,7 +140,7 @@ uintptr_t CSignature::GetEngineSignature(const char *chPattern)
 
     // static void *module = (void *)moduleMap->l_addr;
 
-    static Elf32_Shdr *textHeader = getSectionHeader(module, ".text");
+    static Elf32_Shdr *textHeader = getSectionHeader(module, XORSTR(".text"));
 
     static int textOffset = textHeader->sh_offset;
 
@@ -169,7 +169,7 @@ uintptr_t CSignature::GetVstdSignature(const char *chPattern)
 
     // static void *module = (void *)moduleMap->l_addr;
 
-    static Elf32_Shdr *textHeader = getSectionHeader(module, ".text");
+    static Elf32_Shdr *textHeader = getSectionHeader(module, XORSTR(".text"));
 
     static int textOffset = textHeader->sh_offset;
 

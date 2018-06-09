@@ -15,13 +15,13 @@ namespace shared
 {
 namespace backtrack
 {
-CatVar enable(CV_SWITCH, "backtrack", "0", "Enable backtrack",
-              "For legit play only as of right now.");
-CatVar draw_bt(CV_SWITCH, "backtrack_draw", "0", "Draw",
-               "Draw backtrack ticks");
-CatVar latency(CV_FLOAT, "backtrack_latency", "0", "fake lantency",
-               "Set fake latency to this many ms");
-CatVar mindistance(CV_FLOAT, "mindistance", "60", "mindistance");
+CatVar enable(CV_SWITCH, XORSTR("backtrack"), XORSTR("0"), XORSTR("Enable backtrack"),
+              XORSTR("For legit play only as of right now."));
+CatVar draw_bt(CV_SWITCH, XORSTR("backtrack_draw"), XORSTR("0"), XORSTR("Draw"),
+               XORSTR("Draw backtrack ticks"));
+CatVar latency(CV_FLOAT, XORSTR("backtrack_latency"), XORSTR("0"), XORSTR("fake lantency"),
+               XORSTR("Set fake latency to this many ms"));
+CatVar mindistance(CV_FLOAT, XORSTR("mindistance"), XORSTR("60"), XORSTR("mindistance"));
 
 BacktrackData headPositions[32][66];
 BestTickData sorted_ticks[66];

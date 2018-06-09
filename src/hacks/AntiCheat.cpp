@@ -17,9 +17,9 @@ namespace shared
 {
 namespace anticheat
 {
-static CatVar enabled(CV_SWITCH, "ac_enabled", "0", "Enable AC");
-static CatVar accuse_chat(CV_SWITCH, "ac_chat", "0", "Accuse in chat");
-static CatVar autorage(CV_SWITCH, "ac_autorage", "0", "Auto Rage");
+static CatVar enabled(CV_SWITCH, XORSTR("ac_enabled"), XORSTR("0"), XORSTR("Enable AC"));
+static CatVar accuse_chat(CV_SWITCH, XORSTR("ac_chat"), XORSTR("0"), XORSTR("Accuse in chat"));
+static CatVar autorage(CV_SWITCH, XORSTR("ac_autorage"), XORSTR("0"), XORSTR("Auto Rage"));
 
 void Accuse(int eid, const std::string &hack, const std::string &details)
 {
@@ -30,13 +30,13 @@ void Accuse(int eid, const std::string &hack, const std::string &details)
         if (accuse_chat)
         {
             hack::command_stack().push(
-                format("say \"", info.name, " (",
-                       classname(CE_INT(ent, netvar.iClass)), ") suspected ",
-                       hack, ": ", details, "\""));
+                format(XORSTR("say \""), info.name, XORSTR(" ("),
+                       classname(CE_INT(ent, netvar.iClass)), XORSTR(") suspected "),
+                       hack, XORSTR(": "), details, XORSTR("\"")));
         }
         else
         {
-            PrintChat("\x07%06X%s\x01 (%s) suspected \x07%06X%s\x01: %s",
+            PrintChat(XORSTR("\x07%06X%s\x01 (%s) suspected \x07%06X%s\x01: %s"),
                       colors::chat::team(ENTITY(eid)->m_iTeam()), info.name,
                       classname(CE_INT(ent, netvar.iClass)), 0xe05938,
                       hack.c_str(), details.c_str());
@@ -44,7 +44,7 @@ void Accuse(int eid, const std::string &hack, const std::string &details)
     }
 }
 
-static CatVar skip_local(CV_SWITCH, "ac_ignore_local", "1", "Ignore Local");
+static CatVar skip_local(CV_SWITCH, XORSTR("ac_ignore_local"), XORSTR("1"), XORSTR("Ignore Local"));
 
 void SetRage(player_info_t info)
 {
@@ -96,15 +96,15 @@ public:
         if (!enabled)
             return;
         std::string name(event->GetName());
-        if (name == "player_activate")
+        if (name == XORSTR("player_activate"))
         {
-            int uid    = event->GetInt("userid");
+            int uid    = event->GetInt(XORSTR("userid"));
             int entity = g_IEngine->GetPlayerForUserID(uid);
             ResetPlayer(entity);
         }
-        else if (name == "player_disconnect")
+        else if (name == XORSTR("player_disconnect"))
         {
-            int uid    = event->GetInt("userid");
+            int uid    = event->GetInt(XORSTR("userid"));
             int entity = g_IEngine->GetPlayerForUserID(uid);
             ResetPlayer(entity);
         }

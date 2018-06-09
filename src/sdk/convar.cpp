@@ -31,6 +31,7 @@
 
 #include <core/logging.hpp>
 #include <core/interfaces.hpp>
+#include "copypasted/xorstring.h"
 
 //-----------------------------------------------------------------------------
 // Statically constructed list of ConCommandBases,
@@ -46,7 +47,7 @@ static bool s_bRegistered = false;
 void SetCVarInterface(ICvar *iface)
 {
     g_pCVar = iface;
-    logging::Info("Set interface to 0x%08x", iface);
+    logging::Info(XORSTR("Set interface to 0x%08x"), iface);
 }
 
 class CDefaultAccessor : public IConCommandBaseAccessor
@@ -170,7 +171,7 @@ void ConCommandBase::CreateBase(const char *pName,
     // Name should be static data
     Assert(pName);
     m_pszName       = pName;
-    m_pszHelpString = pHelpString ? pHelpString : "";
+    m_pszHelpString = pHelpString ? pHelpString : XORSTR("");
 
     m_nFlags = flags;
 
@@ -324,7 +325,7 @@ CCommand::CCommand()
     if (!s_bBuiltBreakSet)
     {
         s_bBuiltBreakSet = true;
-        CharacterSetBuild(&s_BreakSet, "{}()':");
+        CharacterSetBuild(&s_BreakSet, XORSTR("{}()':"));
     }
 
     Reset();
@@ -337,7 +338,7 @@ CCommand::CCommand(int nArgC, const char **ppArgV)
     if (!s_bBuiltBreakSet)
     {
         s_bBuiltBreakSet = true;
-        CharacterSetBuild(&s_BreakSet, "{}()':");
+        CharacterSetBuild(&s_BreakSet, XORSTR("{}()':"));
     }
 
     Reset();
@@ -406,8 +407,8 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
     int nLen = Q_strlen(pCommand);
     if (nLen >= COMMAND_MAX_LENGTH - 1)
     {
-        Warning("CCommand::Tokenize: Encountered command which overflows the "
-                "tokenizer buffer.. Skipping!\n");
+        Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows the "
+                "tokenizer buffer.. Skipping!\n"));
         return false;
     }
 
@@ -445,7 +446,7 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
             m_nArgv0Size -= nSize;
             Assert(m_nArgv0Size != 0);
 
-            // The StartGet check is to handle this case: "foo"bar
+            // The StartGet check is to handle this case: XORSTR("foo")bar
             // which will parse into 2 different args. ArgS should point to bar.
             bool bFoundStartQuote = (m_nArgv0Size > nStartGet) &&
                                     (m_pArgSBuffer[m_nArgv0Size - 1] == '\"');
@@ -459,8 +460,8 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
         m_ppArgv[m_nArgc++] = pArgvBuf;
         if (m_nArgc >= COMMAND_MAX_ARGC)
         {
-            Warning("CCommand::Tokenize: Encountered command which overflows "
-                    "the argument buffer.. Clamped!\n");
+            Warning(XORSTR("CCommand::Tokenize: Encountered command which overflows "
+                    "the argument buffer.. Clamped!\n"));
         }
 
         nArgvBufferSize += nSize + 1;
@@ -479,7 +480,7 @@ const char *CCommand::FindArg(const char *pName) const
     for (int i = 1; i < nArgC; i++)
     {
         if (!Q_stricmp(Arg(i), pName))
-            return (i + 1) < nArgC ? Arg(i + 1) : "";
+            return (i + 1) < nArgC ? Arg(i + 1) : XORSTR("");
     }
     return 0;
 }
@@ -604,7 +605,7 @@ void ConCommand::Dispatch(const CCommand &command)
     }
 
     // Command without callback!!!
-    AssertMsg(0, "Encountered ConCommand '%s' without a callback!\n",
+    AssertMsg(0, XORSTR("Encountered ConCommand '%s' without a callback!\n"),
               GetName());
 }
 
@@ -793,7 +794,7 @@ void ConVar::InternalSetValue(const char *value)
 
     if (ClampValue(fNewValue))
     {
-        Q_snprintf(tempVal, sizeof(tempVal), "%f", fNewValue);
+        Q_snprintf(tempVal, sizeof(tempVal), XORSTR("%f"), fNewValue);
         val = tempVal;
     }
 
@@ -849,7 +850,7 @@ void ConVar::ChangeStringValue(const char *tempVal, float flOldValue)
             m_fnChangeCallback(this, pszOldValue, flOldValue);
         }
         /* URAN */
-        // logging::Info("Calling 0x%08x callbacks", g_pCVar);
+        // logging::Info(XORSTR("Calling 0x%08x callbacks"), g_pCVar);
         g_pCVar->CallGlobalChangeCallbacks(this, pszOldValue, flOldValue);
     }
 
@@ -909,7 +910,7 @@ void ConVar::InternalSetFloatValue(float fNewValue)
     if (!(m_nFlags & FCVAR_NEVER_AS_STRING))
     {
         char tempVal[32];
-        snprintf(tempVal, sizeof(tempVal), "%f", m_fValue);
+        snprintf(tempVal, sizeof(tempVal), XORSTR("%f"), m_fValue);
         ChangeStringValue(tempVal, flOldValue);
     }
     else
@@ -952,7 +953,7 @@ void ConVar::InternalSetIntValue(int nValue)
     if (!(m_nFlags & FCVAR_NEVER_AS_STRING))
     {
         char tempVal[32];
-        snprintf(tempVal, sizeof(tempVal), "%d", m_nValue);
+        snprintf(tempVal, sizeof(tempVal), XORSTR("%d"), m_nValue);
         ChangeStringValue(tempVal, flOldValue);
     }
     else
@@ -1076,7 +1077,7 @@ const char *ConVar::GetDefault(void) const
 
 void ConVar::SetDefault(const char *pszDefault)
 {
-    m_pszDefaultValue = pszDefault ? pszDefault : "";
+    m_pszDefaultValue = pszDefault ? pszDefault : XORSTR("");
     Assert(m_pszDefaultValue);
 }
 
@@ -1087,7 +1088,7 @@ void ConVar::SetDefault(const char *pszDefault)
 class CEmptyConVar : public ConVar
 {
 public:
-    CEmptyConVar() : ConVar("", "0")
+    CEmptyConVar() : ConVar(XORSTR(""), XORSTR("0"))
     {
     }
     // Used for optimal read access
@@ -1102,7 +1103,7 @@ public:
     }
     virtual const char *GetName(void) const
     {
-        return "";
+        return XORSTR("");
     }
     virtual bool IsFlagSet(int nFlags) const
     {
@@ -1137,7 +1138,7 @@ void ConVarRef::Init(const char *pName, bool bIgnoreMissing)
         {
             if (!bIgnoreMissing)
             {
-                Warning("ConVarRef %s doesn't point to an existing ConVar\n",
+                Warning(XORSTR("ConVarRef %s doesn't point to an existing ConVar\n"),
                         pName);
             }
             bFirst = false;
@@ -1164,67 +1165,67 @@ void ConVar_PrintFlags(const ConCommandBase *var)
     bool any = false;
     if (var->IsFlagSet(FCVAR_GAMEDLL))
     {
-        ConMsg(" game");
+        ConMsg(XORSTR(" game"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_CLIENTDLL))
     {
-        ConMsg(" client");
+        ConMsg(XORSTR(" client"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_ARCHIVE))
     {
-        ConMsg(" archive");
+        ConMsg(XORSTR(" archive"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_NOTIFY))
     {
-        ConMsg(" notify");
+        ConMsg(XORSTR(" notify"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_SPONLY))
     {
-        ConMsg(" singleplayer");
+        ConMsg(XORSTR(" singleplayer"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_NOT_CONNECTED))
     {
-        ConMsg(" notconnected");
+        ConMsg(XORSTR(" notconnected"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_CHEAT))
     {
-        ConMsg(" cheat");
+        ConMsg(XORSTR(" cheat"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_REPLICATED))
     {
-        ConMsg(" replicated");
+        ConMsg(XORSTR(" replicated"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_SERVER_CAN_EXECUTE))
     {
-        ConMsg(" server_can_execute");
+        ConMsg(XORSTR(" server_can_execute"));
         any = true;
     }
 
     if (var->IsFlagSet(FCVAR_CLIENTCMD_CAN_EXECUTE))
     {
-        ConMsg(" clientcmd_can_execute");
+        ConMsg(XORSTR(" clientcmd_can_execute"));
         any = true;
     }
 
     if (any)
     {
-        ConMsg("\n");
+        ConMsg(XORSTR("\n"));
     }
 }
 
@@ -1263,11 +1264,11 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
 
             if (fabs((float) intVal - floatVal) < 0.000001)
             {
-                Q_snprintf(tempVal, sizeof(tempVal), "%d", intVal);
+                Q_snprintf(tempVal, sizeof(tempVal), XORSTR("%d"), intVal);
             }
             else
             {
-                Q_snprintf(tempVal, sizeof(tempVal), "%f", floatVal);
+                Q_snprintf(tempVal, sizeof(tempVal), XORSTR("%f"), floatVal);
             }
         }
         else
@@ -1277,31 +1278,31 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
 
         if (value)
         {
-            ConColorMsg(clr, "\"%s\" = \"%s\"", var->GetName(), value);
+            ConColorMsg(clr, XORSTR("\"%s\" = \"%s\""), var->GetName(), value);
 
             if (stricmp(value, var->GetDefault()))
             {
-                ConMsg(" ( def. \"%s\" )", var->GetDefault());
+                ConMsg(XORSTR(" ( def. \"%s\" )"), var->GetDefault());
             }
         }
 
         if (bMin)
         {
-            ConMsg(" min. %f", fMin);
+            ConMsg(XORSTR(" min. %f"), fMin);
         }
         if (bMax)
         {
-            ConMsg(" max. %f", fMax);
+            ConMsg(XORSTR(" max. %f"), fMax);
         }
 
-        ConMsg("\n");
+        ConMsg(XORSTR("\n"));
 
         // Handled virtualized cvars.
         if (pBounded && fabs(pBounded->GetFloat() - var->GetFloat()) > 0.0001f)
         {
             ConColorMsg(clr,
-                        "** NOTE: The real value is %.3f but the server has "
-                        "temporarily restricted it to %.3f **\n",
+                        XORSTR("** NOTE: The real value is %.3f but the server has "
+                        "temporarily restricted it to %.3f **\n"),
                         var->GetFloat(), pBounded->GetFloat());
         }
     }
@@ -1309,7 +1310,7 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
     {
         ConCommand *var = (ConCommand *) pVar;
 
-        ConColorMsg(clr, "\"%s\"\n", var->GetName());
+        ConColorMsg(clr, XORSTR("\"%s\"\n"), var->GetName());
     }
 
     ConVar_PrintFlags(pVar);
@@ -1317,6 +1318,6 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
     pStr = pVar->GetHelpText();
     if (pStr && pStr[0])
     {
-        ConMsg(" - %s\n", pStr);
+        ConMsg(XORSTR(" - %s\n"), pStr);
     }
 }

@@ -17,28 +17,28 @@
 namespace ipc
 {
 
-CatCommand fix_deadlock("ipc_fix_deadlock", "Fix deadlock", []() {
+CatCommand fix_deadlock(XORSTR("ipc_fix_deadlock"), XORSTR("Fix deadlock"), []() {
     if (peer)
     {
         pthread_mutex_unlock(&peer->memory->mutex);
     }
 });
-CatCommand id("ipc_id", "Echo ipc id",
-              []() { logging::Info("%d", ipc::peer->client_id); });
-CatCommand connect("ipc_connect", "Connect to IPC server", []() {
+CatCommand id(XORSTR("ipc_id"), XORSTR("Echo ipc id"),
+              []() { logging::Info(XORSTR("%d"), ipc::peer->client_id); });
+CatCommand connect(XORSTR("ipc_connect"), XORSTR("Connect to IPC server"), []() {
     if (peer)
     {
-        logging::Info("Already connected!");
+        logging::Info(XORSTR("Already connected!"));
         return;
     }
     peer = new peer_t(std::string(server_name.GetString()), false, false);
     try
     {
         peer->Connect();
-        logging::Info("peer count: %i", peer->memory->peer_count);
-        logging::Info("magic number: 0x%08x",
+        logging::Info(XORSTR("peer count: %i"), peer->memory->peer_count);
+        logging::Info(XORSTR("magic number: 0x%08x"),
                       peer->memory->global_data.magic_number);
-        logging::Info("magic number offset: 0x%08x",
+        logging::Info(XORSTR("magic number offset: 0x%08x"),
                       (uintptr_t) &peer->memory->global_data.magic_number -
                           (uintptr_t) peer->memory);
         peer->SetCommandHandler(commands::execute_client_cmd,
@@ -64,42 +64,42 @@ CatCommand connect("ipc_connect", "Connect to IPC server", []() {
     }
     catch (std::exception &error)
     {
-        logging::Info("Runtime error: %s", error.what());
+        logging::Info(XORSTR("Runtime error: %s"), error.what());
         delete peer;
         peer = nullptr;
     }
 
 });
-CatCommand disconnect("ipc_disconnect", "Disconnect from IPC server", []() {
+CatCommand disconnect(XORSTR("ipc_disconnect"), XORSTR("Disconnect from IPC server"), []() {
     if (peer)
         delete peer;
     peer = nullptr;
 });
 CatCommand
-    exec("ipc_exec", "Execute command (first argument = bot ID)",
+    exec(XORSTR("ipc_exec"), XORSTR("Execute command (first argument = bot ID)"),
          [](const CCommand &args) {
              char *endptr       = nullptr;
              unsigned target_id = strtol(args.Arg(1), &endptr, 10);
              if (endptr == args.Arg(1))
              {
-                 logging::Info("Target id is NaN!");
+                 logging::Info(XORSTR("Target id is NaN!"));
                  return;
              }
              if (target_id == 0 || target_id > 31)
              {
-                 logging::Info("Invalid target id: %u", target_id);
+                 logging::Info(XORSTR("Invalid target id: %u"), target_id);
                  return;
              }
              {
                  if (peer->memory->peer_data[target_id].free)
                  {
-                     logging::Info("Trying to send command to a dead peer");
+                     logging::Info(XORSTR("Trying to send command to a dead peer"));
                      return;
                  }
              }
              std::string command = std::string(args.ArgS());
              command             = command.substr(command.find(' ', 0) + 1);
-             ReplaceString(command, " && ", " ; ");
+             ReplaceString(command, XORSTR(" && "), XORSTR(" ; "));
              if (command.length() >= 63)
              {
                  peer->SendMessage(0, (1 << target_id),
@@ -112,10 +112,10 @@ CatCommand
                                    ipc::commands::execute_client_cmd, 0, 0);
              }
          });
-CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
+CatCommand exec_all(XORSTR("ipc_exec_all"), XORSTR("Execute command (on every peer)"),
                     [](const CCommand &args) {
                         std::string command = args.ArgS();
-                        ReplaceString(command, " && ", " ; ");
+                        ReplaceString(command, XORSTR(" && "), XORSTR(" ; "));
                         if (command.length() >= 63)
                         {
                             peer->SendMessage(
@@ -129,13 +129,13 @@ CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
                                               0, 0);
                         }
                     });
-CatVar server_name(CV_STRING, "ipc_server", "cathook_followbot_server",
-                   "IPC server name");
+CatVar server_name(CV_STRING, XORSTR("ipc_server"), XORSTR("cathook_followbot_server"),
+                   XORSTR("IPC server name"));
 
 peer_t *peer{ nullptr };
 
 CatCommand debug_get_ingame_ipc(
-    "ipc_debug_dump_server", "Show other bots on server", []() {
+    XORSTR("ipc_debug_dump_server"), XORSTR("Show other bots on server"), []() {
         std::vector<unsigned> players{};
         for (int j = 1; j < 32; j++)
         {
@@ -160,7 +160,7 @@ CatCommand debug_get_ingame_ipc(
                     {
                         botlist.push_back(i);
                         logging::Info(
-                            "-> %u (%u)", i,
+                            XORSTR("-> %u (%u)"), i,
                             ipc::peer->memory->peer_user_data[i].friendid);
                         count++;
                         highest = i;
@@ -168,14 +168,14 @@ CatCommand debug_get_ingame_ipc(
                 }
             }
         }
-        logging::Info("%d other IPC players on server", count);
+        logging::Info(XORSTR("%d other IPC players on server"), count);
     });
 
 void UpdateServerAddress(bool shutdown)
 {
     if (not peer)
         return;
-    const char *s_addr = "0.0.0.0";
+    const char *s_addr = XORSTR("0.0.0.0");
     if (not shutdown and g_IEngine->GetNetChannelInfo())
     {
         s_addr = g_IEngine->GetNetChannelInfo()->GetAddress();
@@ -274,9 +274,9 @@ void Heartbeat()
     data.heartbeat    = time(nullptr);
 }
 
-static CatVar ipc_update_list(CV_SWITCH, "ipc_update_list", "1",
-                              "IPC Auto-Ignore",
-                              "Automaticly assign playerstates for bots");
+static CatVar ipc_update_list(CV_SWITCH, XORSTR("ipc_update_list"), XORSTR("1"),
+                              XORSTR("IPC Auto-Ignore"),
+                              XORSTR("Automaticly assign playerstates for bots"));
 void UpdatePlayerlist()
 {
     if (peer && ipc_update_list)

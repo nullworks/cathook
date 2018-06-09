@@ -22,14 +22,14 @@ std::string WordWrap(std::string &in, int max, unsigned long font)
         if (ch == ' ' || ch == '\n')
         {
             word = wordstream.str();
-            // logging::Info("got word: '%s'", word.c_str());
-            wordstream.str("");
+            // logging::Info(XORSTR("got word: '%s'", word.c_str());
+            wordstream.str(XORSTR(""));
             auto size = draw::GetStringLength(font, line.str() + word);
             if (size.first >= max)
             {
-                // logging::Info("wrapping: '%s'", line.str().c_str());
+                // logging::Info(XORSTR("wrapping: '%s'", line.str().c_str());
                 result << line.str() << '\n';
-                line.str("");
+                line.str(XORSTR(""));
             }
             line << word << ch;
         }
@@ -39,7 +39,7 @@ std::string WordWrap(std::string &in, int max, unsigned long font)
         }
     }
     word = wordstream.str();
-    wordstream.str("");
+    wordstream.str(XORSTR(""));
     auto size = draw::GetStringLength(fonts::MENU, line.str() + word);
     if (size.first >= max)
     {
@@ -73,28 +73,28 @@ CTextLabel::CTextLabel(std::string name, IWidget *parent, std::string text,
 
 void CTextLabel::SetAutoSize(bool autosize)
 {
-    Props()->SetBool("autosize", autosize);
+    Props()->SetBool(XORSTR("autosize"), autosize);
 }
 
 void CTextLabel::SetCentered(bool centered)
 {
-    Props()->SetBool("centered", centered);
+    Props()->SetBool(XORSTR("centered"), centered);
 }
 
 void CTextLabel::SetPadding(int x, int y)
 {
-    Props()->SetInt("padding_x", x);
-    Props()->SetInt("padding_y", y);
+    Props()->SetInt(XORSTR("padding_x"), x);
+    Props()->SetInt(XORSTR("padding_y"), y);
 }
 
 void CTextLabel::SetText(std::string text)
 {
-    unsigned long font_handle = Props()->GetInt("font", fonts::MENU);
-    Props()->SetString("text", text.c_str());
-    auto padding = std::make_pair(Props()->GetInt("padding_x"),
-                                  Props()->GetInt("padding_y"));
+    unsigned long font_handle = Props()->GetInt(XORSTR("font"), fonts::MENU);
+    Props()->SetString(XORSTR("text"), text.c_str());
+    auto padding = std::make_pair(Props()->GetInt(XORSTR("padding_x")),
+                                  Props()->GetInt(XORSTR("padding_y")));
     auto size = draw::GetStringLength(font_handle, text);
-    if (Props()->GetBool("autosize"))
+    if (Props()->GetBool(XORSTR("autosize")))
     {
         SetSize(size.first + padding.first * 2,
                 size.second + padding.second * 2);
@@ -110,19 +110,19 @@ void CTextLabel::SetText(std::string text)
             auto size2 = draw::GetStringLength(font_handle, txt);
             SetSize(size2.first + padding.first * 2,
                     size2.second + padding.second * 2);
-            Props()->SetString("text", txt.c_str());
+            Props()->SetString(XORSTR("text"), txt.c_str());
         }
     }
 }
 
 std::string CTextLabel::GetText()
 {
-    return std::string(Props()->GetString("text", ""));
+    return std::string(Props()->GetString(XORSTR("text"), XORSTR("")));
 }
 
 void CTextLabel::Draw(int x, int y)
 {
-    if (Props()->GetBool("centered"))
+    if (Props()->GetBool(XORSTR("centered")))
     {
         auto size  = GetSize();
         auto ssize = draw::GetStringLength(fonts::MENU, GetText());

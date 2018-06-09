@@ -24,7 +24,7 @@ void trace::FilterDefault::SetSelf(IClientEntity *self)
 {
     if (self == nullptr)
     {
-        logging::Info("nullptr in FilterDefault::SetSelf");
+        logging::Info(XORSTR("nullptr in FilterDefault::SetSelf"));
     }
     m_pSelf = self;
 }
@@ -71,7 +71,7 @@ void trace::FilterNoPlayer::SetSelf(IClientEntity *self)
 {
     if (self == nullptr)
     {
-        logging::Info("nullptr in FilterNoPlayer::SetSelf");
+        logging::Info(XORSTR("nullptr in FilterNoPlayer::SetSelf"));
         return;
     }
     m_pSelf = self;
@@ -120,7 +120,7 @@ void trace::FilterPenetration::SetSelf(IClientEntity *self)
 {
     if (self == nullptr)
     {
-        logging::Info("nullptr in FilterPenetration::SetSelf");
+        logging::Info(XORSTR("nullptr in FilterPenetration::SetSelf"));
     }
     m_pSelf = self;
 }

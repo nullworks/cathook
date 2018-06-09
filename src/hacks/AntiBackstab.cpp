@@ -15,14 +15,14 @@ namespace tf2
 namespace antibackstab
 {
 bool noaa = false;
-static CatVar enabled(CV_SWITCH, "antibackstab", "0", "Enable",
-                      "Main anti-backstab switch");
-static CatVar distance(CV_FLOAT, "antibackstab_distance", "200", "Distance",
-                       "Distance Until anti-backstab reacts");
-static CatVar silent(CV_SWITCH, "antibackstab_silent", "1", "Silent",
-                     "Works silently without moving your view");
-static CatVar angle(CV_FLOAT, "antibackstab_angle", "90", "Detection Angle");
-static CatVar sayno(CV_SWITCH, "antibackstab_nope", "0", "Nope!", "Memes");
+static CatVar enabled(CV_SWITCH, XORSTR("antibackstab"), XORSTR("0"), XORSTR("Enable"),
+                      XORSTR("Main anti-backstab switch"));
+static CatVar distance(CV_FLOAT, XORSTR("antibackstab_distance"), XORSTR("200"), XORSTR("Distance"),
+                       XORSTR("Distance Until anti-backstab reacts"));
+static CatVar silent(CV_SWITCH, XORSTR("antibackstab_silent"), XORSTR("1"), XORSTR("Silent"),
+                     XORSTR("Works silently without moving your view"));
+static CatVar angle(CV_FLOAT, XORSTR("antibackstab_angle"), XORSTR("90"), XORSTR("Detection Angle"));
+static CatVar sayno(CV_SWITCH, XORSTR("antibackstab_nope"), XORSTR("0"), XORSTR("Nope!"), XORSTR("Memes"));
 
 void SayNope()
 {
@@ -31,7 +31,7 @@ void SayNope()
         last_say = 0.0f;
     if (g_GlobalVars->curtime - last_say < 1.5f)
         return;
-    hack::ExecuteCommand("voicemenu 0 7");
+    hack::ExecuteCommand(XORSTR("voicemenu 0 7"));
     last_say = g_GlobalVars->curtime;
 }
 
@@ -51,7 +51,7 @@ float GetAngle(CachedEntity *spy)
         anglediff -= 360;
     if (anglediff < -180)
         anglediff += 360;
-    // logging::Info("Angle: %.2f | %.2f | %.2f | %.2f", yaw, yaw2, anglediff,
+    // logging::Info(XORSTR("Angle: %.2f | %.2f | %.2f | %.2f"), yaw, yaw2, anglediff,
     // yaw - yaw2);
     return anglediff;
 }
@@ -81,7 +81,7 @@ CachedEntity *ClosestSpy()
         if (fabs(GetAngle(ent)) > (float) angle)
         {
             break;
-            // logging::Info("Backstab???");
+            // logging::Info(XORSTR("Backstab???"));
         }
         if (dist < (float) distance && (dist < closest_dist || !closest_dist))
         {
@@ -100,7 +100,7 @@ void CreateMove()
     if (!enabled)
         return;
     spy                   = ClosestSpy();
-    ConVar *pitchdown     = g_ICvar->FindVar("cl_pitchdown");
+    ConVar *pitchdown     = g_ICvar->FindVar(XORSTR("cl_pitchdown"));
     static int normal_val = pitchdown->GetInt();
     if (spy)
     {

@@ -20,7 +20,7 @@ DEFINE_HOOKED_METHOD(GetUserCmd, CUserCmd *, IInput *this_, int sequence_number)
     if (command_number_mod.find(def->command_number) !=
         command_number_mod.end())
     {
-        // logging::Info("Replacing command %i with %i", def->command_number,
+        // logging::Info(XORSTR("Replacing command %i with %i"), def->command_number,
         // command_number_mod[def->command_number]);
         oldcmd              = def->command_number;
         def->command_number = command_number_mod[def->command_number];

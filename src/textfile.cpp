@@ -39,7 +39,7 @@ void TextFile::Load(std::string name)
     std::ifstream file(filename, std::ios::in);
     if (file.bad())
     {
-        logging::Info("Could not open the file: %s", filename.c_str());
+        logging::Info(XORSTR("Could not open the file: %s"), filename.c_str());
         return;
     }
     lines.clear();

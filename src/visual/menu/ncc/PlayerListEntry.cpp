@@ -70,16 +70,16 @@ void PlayerListEntry::Update()
                 }
                 else
                 {
-                    clazz->text = "N/A";
+                    clazz->text = XORSTR("N/A");
                 }
                 Show();
             }
             else
             {
-                uid->text     = "N/A";
-                steamid->text = "N/A";
-                name->text    = "N/A";
-                clazz->text   = "N/A";
+                uid->text     = XORSTR("N/A");
+                steamid->text = XORSTR("N/A");
+                name->text    = XORSTR("N/A");
+                clazz->text   = XORSTR("N/A");
                 Hide();
             }
         }
@@ -116,15 +116,15 @@ PlayerListEntry::PlayerListEntry(int eid) : CBaseContainer(), idx(eid)
     // If IDX == 0, this is a title.
     if (!idx)
     {
-        AddChild(new SubTitle(*this, "EID"));
-        AddChild(new SubTitle(*this, "UID"));
-        AddChild(new SubTitle(*this, "SteamID"));
-        AddChild(new SubTitle(*this, "Name"));
-        AddChild(new SubTitle(*this, "Class"));
-        AddChild(new SubTitle(*this, "State"));
-        AddChild(new SubTitle(*this, "R"));
-        AddChild(new SubTitle(*this, "G"));
-        AddChild(new SubTitle(*this, "B"));
+        AddChild(new SubTitle(*this, XORSTR("EID")));
+        AddChild(new SubTitle(*this, XORSTR("UID")));
+        AddChild(new SubTitle(*this, XORSTR("SteamID")));
+        AddChild(new SubTitle(*this, XORSTR("Name")));
+        AddChild(new SubTitle(*this, XORSTR("Class")));
+        AddChild(new SubTitle(*this, XORSTR("State")));
+        AddChild(new SubTitle(*this, XORSTR("R")));
+        AddChild(new SubTitle(*this, XORSTR("G")));
+        AddChild(new SubTitle(*this, XORSTR("B")));
         Show();
     }
     else
@@ -254,13 +254,13 @@ void SubState::Update()
     bool success = g_IEngine->GetPlayerInfo(parent.idx, &info);
     if (!success)
     {
-        text = "N/A";
+        text = XORSTR("N/A");
         return;
     }
     playerlist::userdata &data = playerlist::AccessData(info.friendsID);
     if (parent.idx == g_IEngine->GetLocalPlayer())
     {
-        text = "Local Player";
+        text = XORSTR("Local Player");
         return;
     }
     const int state = static_cast<int>(data.state);
@@ -272,7 +272,7 @@ void SubState::Update()
     }
     else
     {
-        text = "N/A";
+        text = XORSTR("N/A");
     }
 }
 

@@ -39,6 +39,7 @@ FILENAME="/tmp/.gl$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 
 
 cp "bin/libcathook.so" "$FILENAME"
 
+echo a
 echo loading "$FILENAME" to "$proc"
 
 sudo killall -19 steam

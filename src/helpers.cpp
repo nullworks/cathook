@@ -108,7 +108,8 @@ void WalkTo(const Vector &vector)
 
 // Function to get the corner location that a vischeck to an entity is possible
 // from
-Vector VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist)
+Vector VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist,
+                    bool checkWalkable)
 {
     int maxiterations = maxdist / 40;
     Vector origin     = player->m_vecOrigin();
@@ -141,14 +142,78 @@ Vector VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist)
                                  virtualOrigin)) // check if player can see the
                                                  // players virtualOrigin
                 continue;
-            if (VisCheckEntFromEntVector(
+            if (!VisCheckEntFromEntVector(
                     virtualOrigin, player,
                     target)) // check if the virtualOrigin can see the target
+                continue;
+            if (!checkWalkable)
+                return virtualOrigin;
+            if (canReachVector(virtualOrigin))
                 return virtualOrigin; // return the corner position that we know
                                       // can see the target
         }
     }
     return { 0, 0, 0 };
+}
+
+float vectorMax(Vector i) // Returns a vectors max value. For example: {123,
+                          // -150, 125} = 125
+{
+    float res = fmaxf(i.x, i.y);
+    return fmaxf(res, i.z);
+}
+
+Vector vectorABS(Vector i)
+{
+    Vector result = i;
+    result.x      = fabsf(i.x);
+    result.y      = fabsf(i.y);
+    result.z      = fabsf(i.z);
+    return result;
+}
+
+// check to see if we can reach a vector or if it is too high / doesn't leave
+// enough space for the player
+bool canReachVector(Vector loc)
+{
+    // check if the vector is too high above ground
+    {
+        trace_t trace;
+        Ray_t ray;
+        Vector down = loc;
+        down.z      = down.z - 5;
+        ray.Init(loc, down);
+        g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
+        if (!(trace.startpos.z - trace.endpos.z <=
+              75)) // higher as to avoid small false positives, player can jump
+                   // 72 hu
+            return false;
+    }
+    for (int i = 0; i < 4; i++) // for loop for all 4 directions
+    {
+        Vector directionalLoc = loc;
+        switch (i) // what to check
+        {
+        case 0:
+            directionalLoc.x = directionalLoc.x + 40;
+            break;
+        case 1:
+            directionalLoc.x = directionalLoc.x - 40;
+            break;
+        case 2:
+            directionalLoc.y = directionalLoc.y + 40;
+            break;
+        case 3:
+            directionalLoc.y = directionalLoc.y - 40;
+            break;
+        }
+        trace_t trace;
+        Ray_t ray;
+        g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
+        if (trace.startpos.DistTo(trace.endpos) < 26.0f)
+            return false;
+    }
+    return true;
 }
 
 std::string GetLevelName()

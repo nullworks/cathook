@@ -123,7 +123,7 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
             return origin;
     }
 
-    for (int i = 0; i < 4; i++) // for loop for all 4 directions
+    for (int i = 0; i < 8; i++) // for loop for all 4 directions
     {
         // 40 * maxiterations = range in HU
         for (int j = 0; j < maxiterations; j++)
@@ -143,6 +143,22 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
                 break;
             case 3:
                 virtualOrigin.y = virtualOrigin.y - 40 * (j + 1);
+                break;
+            case 4:
+                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                break;
+            case 5:
+                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+                break;
+            case 6:
+                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                break;
+            case 7:
+                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
                 break;
             }
             // check if player can see the players virtualOrigin
@@ -182,7 +198,7 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
             return orig;
     }
 
-    for (int i = 0; i < 4; i++) // for loop for all 4 directions
+    for (int i = 0; i < 8; i++) // for loop for all 4 directions
     {
         // 40 * maxiterations = range in HU
         for (int j = 0; j < maxiterations; j++)
@@ -203,11 +219,27 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
             case 3:
                 virtualOrigin.y = virtualOrigin.y - 40 * (j + 1);
                 break;
+            case 4:
+                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                break;
+            case 5:
+                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+                break;
+            case 6:
+                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                break;
+            case 7:
+                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
+                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+                break;
             }
             // check if player can see the players virtualOrigin
             if (!IsVectorVisible(origin, virtualOrigin, true))
                 continue;
-            for (int i = 0; i < 4; i++) // for loop for all 4 directions
+            for (int i = 0; i < 8; i++) // for loop for all 4 directions
             {
                 // 40 * maxiterations = range in HU
                 for (int j = 0; j < maxiterations; j++)
@@ -228,14 +260,34 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
                     case 3:
                         virtualOrigin2.y = virtualOrigin2.y - 40 * (j + 1);
                         break;
+                    case 4:
+                        virtualOrigin2.x = virtualOrigin2.x + 20 * (j + 1);
+                        virtualOrigin2.y = virtualOrigin2.y + 20 * (j + 1);
+                        break;
+                    case 5:
+                        virtualOrigin2.x = virtualOrigin2.x - 20 * (j + 1);
+                        virtualOrigin2.y = virtualOrigin2.y - 20 * (j + 1);
+                        break;
+                    case 6:
+                        virtualOrigin2.x = virtualOrigin2.x - 20 * (j + 1);
+                        virtualOrigin2.y = virtualOrigin2.y + 20 * (j + 1);
+                        break;
+                    case 7:
+                        virtualOrigin2.x = virtualOrigin2.x + 20 * (j + 1);
+                        virtualOrigin2.y = virtualOrigin2.y - 20 * (j + 1);
+                        break;
                     }
                     // check if the virtualOrigin2 can see the target
-                    if (!VisCheckEntFromEntVector(virtualOrigin2, player, target))
-                        continue;
+//                    if (!VisCheckEntFromEntVector(virtualOrigin2, player, target))
+//                        continue;
+//                    if (!IsVectorVisible(virtualOrigin, virtualOrigin2, true))
+//                        continue;
+//                    if (!IsVectorVisible(virtualOrigin2, target->m_vecOrigin(), true))
+//                    	continue;
                     if (!IsVectorVisible(virtualOrigin, virtualOrigin2, true))
                         continue;
-                    if (!IsVectorVisible(virtualOrigin2, target->m_vecOrigin(), true))
-                    	continue;
+                    if (!IsVectorVisible(virtualOrigin2, target->m_vecOrigin()))
+                        continue;
                     std::pair<Vector, Vector> toret(virtualOrigin, virtualOrigin2);
                     if (!checkWalkable)
                         return toret;

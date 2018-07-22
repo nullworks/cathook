@@ -117,6 +117,43 @@ void addCrumbs(CachedEntity *target, Vector corner = g_pLocalPlayer->v_Origin)
             corner + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
     }
 }
+
+void addCrumbPair(CachedEntity *player1, CachedEntity *player2,
+                  std::pair<Vector, Vector> corners)
+{
+    Vector corner1 = corners.first;
+    Vector corner2 = corners.second;
+
+    {
+        Vector dist       = corner1 - player1->m_vecOrigin();
+        int maxiterations = floor(corner1.DistTo(player1->m_vecOrigin())) / 40;
+        for (int i = 0; i < maxiterations; i++)
+        {
+            breadcrumbs.push_back(player1->m_vecOrigin() +
+                                  dist / vectorMax(vectorAbs(dist)) * 40.0f *
+                                      (i + 1));
+        }
+    }
+    {
+        Vector dist       = corner2 - corner1;
+        int maxiterations = floor(corner2.DistTo(corner1)) / 40;
+        for (int i = 0; i < maxiterations; i++)
+        {
+            breadcrumbs.push_back(corner1 + dist / vectorMax(vectorAbs(dist)) *
+                                                40.0f * (i + 1));
+        }
+    }
+    {
+        Vector dist       = player2->m_vecOrigin() - corner2;
+        int maxiterations = floor(corner2.DistTo(player2->m_vecOrigin())) / 40;
+        for (int i = 0; i < maxiterations; i++)
+        {
+            breadcrumbs.push_back(corner2 + dist / vectorMax(vectorAbs(dist)) *
+                                                40.0f * (i + 1));
+        }
+    }
+}
+
 int ClassPriority(CachedEntity *ent)
 {
     switch (g_pPlayerResource->GetClass(ent))
@@ -209,8 +246,9 @@ void WorldTick()
                 	corners = VischeckWall(LOCAL_E, entity, float(follow_activation) / 2, true);
                 	if (!corners.first.z || !corners.second.z)
                 		continue;
-                	addCrumbs(LOCAL_E, corners.first);
-                	addCrumbs(entity, corners.second);
+                    //addCrumbs(LOCAL_E, corners.first);
+                    //addCrumbs(entity, corners.second);
+                    addCrumbPair(LOCAL_E, entity, corners);
                 }
                 if (indirectOrigin.z)
                 	addCrumbs(entity, indirectOrigin);
@@ -287,23 +325,24 @@ void WorldTick()
             {
                 Vector indirectOrigin =
                     VischeckCorner(LOCAL_E, entity, 250,
-                                 true); // get the corner location that the
-                                        // future target is visible from
+                                   true); // get the corner location that the
+                                          // future target is visible from
                 std::pair<Vector, Vector> corners;
-                corners.first.z = 0;
+                corners.first.z  = 0;
                 corners.second.z = 0;
-                if (!indirectOrigin.z && entity->m_IDX == lastent)  // if we couldn't find it, run wallcheck instead
+                if (!indirectOrigin.z &&
+                    entity->m_IDX == lastent) // if we couldn't find it, run
+                                              // wallcheck instead
                 {
-                	corners = VischeckWall(LOCAL_E, entity, 250, true);
-                	if (!corners.first.z || !corners.second.z)
-                		continue;
-                	addCrumbs(LOCAL_E, corners.first);
-                	addCrumbs(entity, corners.second);
+                    corners = VischeckWall(LOCAL_E, entity, 250, true);
+                    if (!corners.first.z || !corners.second.z)
+                        continue;
+                    addCrumbPair(LOCAL_E, entity, corners);
                 }
                 if (indirectOrigin.z)
-                	addCrumbs(entity, indirectOrigin);
+                    addCrumbs(entity, indirectOrigin);
                 else if (!indirectOrigin.z && !corners.first.z)
-                	continue;
+                    continue;
             }
             else
             {

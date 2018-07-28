@@ -104,7 +104,7 @@ void Run()
     float bestFov = 99999;
     BestTick      = 0;
     iBestTarget   = -1;
-    bool IsMelee        = GetWeaponMode() == weapon_melee;
+    bool IsMelee  = GetWeaponMode() == weapon_melee;
 
     float prev_distance = 9999;
 
@@ -136,6 +136,7 @@ void Run()
         float simtime       = CE_FLOAT(pEntity, netvar.m_flSimulationTime);
         Vector hitbox_spine = pEntity->hitboxes.GetHitbox(3)->center;
         Vector ent_orig     = pEntity->InternalEntity()->GetAbsOrigin();
+        auto hdr = g_IModelInfo->GetStudiomodel(RAW_ENT(pEntity)->GetModel());
         headPositions[i][cmd->command_number % ticks] =
             BacktrackData{ cmd->tick_count, hitboxpos,  min,     max,
                            hitbox_spine,    viewangles, simtime, ent_orig };
@@ -160,7 +161,7 @@ void Run()
         float bestFOV = 180.0f;
         float distance, prev_distance_ticks = 9999;
 
-        for (int i          = 0; i < 12; ++i)
+        for (int i          = 0; i < ticks; ++i)
             sorted_ticks[i] = BestTickData{ INT_MAX, i };
         for (int t = 0; t < ticks; ++t)
         {
@@ -169,10 +170,12 @@ void Run()
                     BestTickData{ headPositions[iBestTarget][t].tickcount, t };
         }
         std::sort(sorted_ticks, sorted_ticks + ticks);
+        int tickus = (float(latency) > 800.0f || float(latency) < 200.0f) ? 12 : 24;
         for (int t = 0; t < ticks; ++t)
         {
             bool good_tick = false;
-            for (int i = 0; i < 12; ++i)
+
+            for (int i = 0; i < tickus; ++i)
                 if (t == sorted_ticks[i].tick &&
                     sorted_ticks[i].tickcount != INT_MAX &&
                     sorted_ticks[i].tickcount)
@@ -207,10 +210,10 @@ void Run()
                 return;
             auto i          = headPositions[iBestTarget][bestTick];
             cmd->tick_count = i.tickcount;
-            Vector &angles  = NET_VECTOR(tar, netvar.m_angEyeAngles);
-            float &simtime  = NET_FLOAT(tar, netvar.m_flSimulationTime);
-            angles.y        = i.viewangles;
-            simtime         = i.simtime;
+            Vector &angles  = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
+            float &simtime = NET_FLOAT(RAW_ENT(tar), netvar.m_flSimulationTime);
+            angles.y       = i.viewangles;
+            simtime        = i.simtime;
         }
     }
 }
@@ -223,12 +226,14 @@ void Draw()
         return;
     if (!shouldDrawBt)
         return;
+    int tickus = (float(latency) > 800.0f || float(latency) < 200.0f) ? 12 : 24;
     for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
     {
         for (int j = 0; j < ticks; j++)
         {
             bool good_tick = false;
-            for (int i = 0; i < 12; ++i)
+
+            for (int i = 0; i < tickus; ++i)
                 if (j == sorted_ticks[i].tick)
                     good_tick = true;
             if (!good_tick)

@@ -198,11 +198,11 @@ bool BacktrackAimbot()
     if (iBestTarget == -1)
         return true;
     int tickcnt = 0;
-
+    int tickus = (float(hacks::shared::backtrack::latency) > 800.0f || float(hacks::shared::backtrack::latency) < 200.0f) ? 12 : 24;
     for (auto i : hacks::shared::backtrack::headPositions[iBestTarget])
     {
         bool good_tick = false;
-        for (int j = 0; j < 12; ++j)
+        for (int j = 0; j < tickus; ++j)
             if (tickcnt == hacks::shared::backtrack::sorted_ticks[j].tick &&
                 hacks::shared::backtrack::sorted_ticks[j].tickcount != INT_MAX)
                 good_tick = true;
@@ -220,10 +220,10 @@ bool BacktrackAimbot()
         if (CE_BAD(tar))
             continue;
         // target_eid = tar->m_IDX;
-        Vector &angles         = NET_VECTOR(tar, netvar.m_angEyeAngles);
-        float &simtime         = NET_FLOAT(tar, netvar.m_flSimulationTime);
-        angles.y               = i.viewangles;
-        simtime                = i.simtime;
+        Vector &angles = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
+        float &simtime = CE_FLOAT(tar, netvar.m_flSimulationTime);
+        angles.y       = i.viewangles;
+        simtime        = i.simtime;
         g_pUserCmd->tick_count = i.tickcount;
         Vector tr              = (i.hitboxpos - g_pLocalPlayer->v_Eye);
         Vector angles2;
@@ -255,9 +255,10 @@ void CreateMove()
     // Auto-Unzoom
     if (auto_unzoom)
     {
-        if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && zoomTime.check(3000))
+        if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed &&
+            zoomTime.check(3000))
         {
-                    g_pUserCmd->buttons |= IN_ATTACK2;
+            g_pUserCmd->buttons |= IN_ATTACK2;
         }
     }
     // We do this as we need to pass whether the aimkey allows aiming to both
@@ -509,6 +510,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     // We dont have a target currently so we must find one, reset statuses
     foundTarget = false;
     target_last = nullptr;
+    target_eid  = -1;
 
     float target_highest_score, scr;
     CachedEntity *ent;
@@ -560,6 +562,9 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     }
     // Save the ent for future use with target lock
     target_last = target_highest_ent;
+
+    if (CE_GOOD(target_last))
+        target_eid = target_last->m_IDX;
 
     return target_highest_ent;
 }

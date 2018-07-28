@@ -23,11 +23,9 @@ struct user_data
     bool has_software{ false };
     bool no_target{ false };
     bool is_developer{};
-#if ENABLE_VISUALS
     bool has_color{ false };
     colors::rgba_t color{};
     bool rainbow{ false };
-#endif
 };
 
 /*

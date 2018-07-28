@@ -60,7 +60,9 @@ CatCommand debug_ammo("debug_ammo", "Debug ammo", []() {
         logging::Info("%d %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
     }
 });
-std::deque<int> entstocheck{};
+bool brutesoon[32];
+int lasthits = 0;
+std::array<Timer, 32> xd{};
 void Update()
 {
     CachedEntity *weapon = LOCAL_W;
@@ -84,10 +86,41 @@ void Update()
             // ONLY tracks primary ammo
             int ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 4);
 
+            INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+            static bool firstcall = true;
+            for (int i = 0; i < 32; i++)
+            {
+                if (firstcall)
+                    xd[i].update();
+                firstcall = false;
+                if (ch &&
+                    xd[i].check(ch->GetLatency(MAX_FLOWS) * 1000.0f + 100.0f) &&
+                    brutesoon[i])
+                {
+                    if (lasthits == count_hits)
+                    {
+                        logging::Info("Increased Brutenum of ent %d", i);
+                        g_Settings.brute.brutenum[i]++;
+                    }
+                    brutesoon[i] = false;
+                    lasthits     = count_hits;
+                }
+            }
             if (lastweapon)
             {
+
                 if (ammo < lastammo)
                 {
+                    if (hacks::shared::aimbot::target_eid > -1)
+                    {
+                        if (ch &&
+                            xd[hacks::shared::aimbot::target_eid].check(
+                                ch->GetLatency(MAX_FLOWS) * 1000.0f + 110.0f))
+                        {
+                            xd[hacks::shared::aimbot::target_eid].update();
+                            brutesoon[hacks::shared::aimbot::target_eid] = true;
+                        }
+                    }
                     // for (auto i : entstocheck)
                     //{
                     OnShot();
@@ -131,7 +164,7 @@ class HurtListener : public IGameEventListener
 public:
     virtual void FireGameEvent(KeyValues *event)
     {
-        if (strcmp("player_hurt", event->GetName()) ||
+        if (strcmp("player_hurt", event->GetName()) &&
             strcmp("player_death", event->GetName()))
             return;
         if (g_IEngine->GetPlayerForUserID(event->GetInt("attacker")) ==
@@ -142,7 +175,7 @@ public:
                  LOCAL_W->m_iClassID() == CL_CLASS(CTFSniperRifleDecap)))
                 OnHit(strcmp("player_death", event->GetName())
                           ? event->GetBool("crit")
-                          : false);
+                          : true);
         }
     }
 };

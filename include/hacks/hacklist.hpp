@@ -30,6 +30,7 @@
 #include "AutoDeadringer.hpp"
 #include "Bunnyhop.hpp"
 #include "LagExploit.hpp"
+#include "SeedPrediction.hpp"
 #endif
 #if ENABLE_VISUALS
 #include "Radar.hpp"

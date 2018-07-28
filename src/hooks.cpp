@@ -103,6 +103,7 @@ VMTHook client{};
 VMTHook engine{};
 VMTHook ctfpartyclient;
 VMTHook netchannel{};
+VMTHook firebullets{};
 VMTHook clientdll{};
 VMTHook matsurface{};
 VMTHook studiorender{};

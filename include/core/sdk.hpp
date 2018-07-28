@@ -55,6 +55,7 @@
 #include <dbg.h>
 #include <ienginevgui.h>
 
+#include "sdk/c_basetempentity.h"
 #include "sdk/in_buttons.h"
 #include "sdk/imaterialsystemfixed.h"
 #include "sdk/ScreenSpaceEffects.h"

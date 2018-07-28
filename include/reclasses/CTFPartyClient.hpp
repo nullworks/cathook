@@ -20,6 +20,7 @@ public:
     static ITFGroupMatchCriteria *MutLocalGroupCriteria(CTFPartyClient *client);
     static bool BCanQueueForStandby(CTFPartyClient *this_);
     char RequestQueueForMatch(int type);
+    bool BInQueueForMatchGroup(int type);
     char RequestLeaveForMatch(int type);
     int BInvitePlayerToParty(CSteamID steamid);
     int BRequestJoinPlayer(CSteamID steamid);

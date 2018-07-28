@@ -11,9 +11,6 @@ namespace hooked_methods
 DEFINE_HOOKED_METHOD(SendDatagram, int, INetChannel *ch, bf_write *buf)
 {
 #if not LAGBOT_MODE
-    if (!hacks::shared::backtrack::enable ||
-        (float) hacks::shared::backtrack::latency <= 200.0f)
-        return original::SendDatagram(ch, buf);
     int in     = ch->m_nInSequenceNr;
     auto state = ch->m_nInReliableState;
 

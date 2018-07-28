@@ -82,10 +82,11 @@ bool CanBacktrack()
 {
     int target  = hacks::shared::backtrack::iBestTarget;
     int tickcnt = 0;
+    int tickus = (float(hacks::shared::backtrack::latency) > 800.0f || float(hacks::shared::backtrack::latency) < 200.0f) ? 12 : 24;
     for (auto i : hacks::shared::backtrack::headPositions[target])
     {
         bool good_tick = false;
-        for (int j = 0; j < 12; ++j)
+        for (int j = 0; j < tickus; ++j)
             if (tickcnt == hacks::shared::backtrack::sorted_ticks[j].tick &&
                 hacks::shared::backtrack::sorted_ticks[j].tickcount != INT_MAX)
                 good_tick = true;
@@ -125,9 +126,9 @@ bool CanBacktrack()
             // ok just in case
             if (CE_BAD(tar))
                 continue;
-            Vector &angles         = NET_VECTOR(tar, netvar.m_angEyeAngles);
-            float &simtime         = NET_FLOAT(tar, netvar.m_flSimulationTime);
-            angles.y               = i.viewangles;
+            Vector &angles = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
+            float &simtime = NET_FLOAT(RAW_ENT(tar), netvar.m_flSimulationTime);
+            angles.y       = i.viewangles;
             g_pUserCmd->tick_count = i.tickcount;
             g_pUserCmd->buttons |= IN_ATTACK;
             return false;

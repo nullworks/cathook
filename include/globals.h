@@ -6,9 +6,8 @@
  */
 
 #pragma once
-
+#include <boost/circular_buffer.hpp>
 #include <time.h>
-
 class Vector;
 class ConVar;
 class CatVar;
@@ -38,14 +37,20 @@ extern char *disconnect_reason_newlined;
 extern CatVar disconnect_reason;
 
 extern time_t time_injected;
-
+struct brutestruct
+{
+    int brutenum[32];
+    Vector last_angles[32];
+    std::deque<bool> choke[32];
+    float lastsimtime;
+};
 class GlobalSettings
 {
 public:
     void Init();
     bool bInvalid{ true };
     bool is_create_move{ false };
-    Vector last_angles;
+    brutestruct brute;
 };
 
 class CUserCmd;

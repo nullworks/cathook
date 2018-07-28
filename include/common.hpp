@@ -50,7 +50,6 @@
 #include <visual/colors.hpp>
 
 #if ENABLE_VISUALS
-
 #include <visual/drawing.hpp>
 #include "visual/fidgetspinner.hpp"
 #include <visual/EffectGlow.hpp>
@@ -58,7 +57,6 @@
 #include <visual/EffectChams.hpp>
 #include <visual/drawmgr.hpp>
 #include "visual/menu/compatlayer.hpp"
-
 #endif
 
 #include "core/profiler.hpp"

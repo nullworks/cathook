@@ -123,7 +123,7 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_,
     }
 label1:
     scndwait++;
-    switcherido               = !switcherido;
+    switcherido = !switcherido;
     /*static bool replacedparty = false;
     static int callcnt        = 0;
     if (party_bypass && !replacedparty && callcnt < 5)

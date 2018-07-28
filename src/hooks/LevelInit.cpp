@@ -107,6 +107,8 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     logging::Info("Loaded Skybox: %s", succ ? "true" : "false");
     ConVar *holiday = g_ICvar->FindVar("tf_forced_holiday");
 
+    for (int i                       = 0; i < 32; i++)
+        g_Settings.brute.brutenum[i] = 0;
     if (halloween_mode)
         holiday->SetValue(2);
     else if (holiday->m_nValue == 2)

@@ -1,4 +1,5 @@
 target_sources(cathook PRIVATE
+ 		"${CMAKE_CURRENT_LIST_DIR}/c_basetempentity.h"
         "${CMAKE_CURRENT_LIST_DIR}/CGameRules.h"
         "${CMAKE_CURRENT_LIST_DIR}/HUD.h"
         "${CMAKE_CURRENT_LIST_DIR}/igamemovement.h"

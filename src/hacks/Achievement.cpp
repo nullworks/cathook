@@ -93,18 +93,17 @@ CatCommand
     lock_single("achievement_lock_single", "Locks single achievement by INDEX!",
                 [](const CCommand &args) {
                     char *out = nullptr;
-                    int index = strtol(args.Arg(1), &out, 10);
+                    int index = atoi(args.Arg(1));
                     if (out == args.Arg(1))
                     {
                         logging::Info("NaN achievement INDEX!");
                         return;
                     }
-                    IAchievement *ach =
-                        g_IAchievementMgr->GetAchievementByIndex(index);
+                    IAchievement *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByIndex(index));
                     if (ach)
                     {
                         g_ISteamUserStats->RequestCurrentStats();
-                        g_ISteamUserStats->ClearAchievement(ach->GetName());
+                        g_ISteamUserStats->ClearAchievement(g_IAchievementMgr->GetAchievementByIndex(index)->GetName());
                         g_ISteamUserStats->StoreStats();
                         g_ISteamUserStats->RequestCurrentStats();
                     }

@@ -93,9 +93,14 @@ const char *cmds[7] = { "use",         "voicecommand", "spec_next", "spec_prev",
                         "spec_player", "invprev",      "invnext" };
 namespace hooked_methods
 {
+
 DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
                      CUserCmd *cmd)
 {
+#define TICK_INTERVAL (g_GlobalVars->interval_per_tick)
+#define TIME_TO_TICKS(dt) ((int) (0.5f + (float) (dt) / TICK_INTERVAL))
+#define TICKS_TO_TIME(t) (TICK_INTERVAL * (t))
+#define ROUND_TO_TICKS(t) (TICK_INTERVAL * TIME_TO_TICKS(t))
     uintptr_t **fp;
     __asm__("mov %%ebp, %0" : "=r"(fp));
     bSendPackets = reinterpret_cast<bool *>(**fp - 8);
@@ -163,6 +168,78 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     curtime_old   = g_GlobalVars->curtime;
 
     hacks::tf2::global::runcfg();
+    static IClientEntity *enti;
+    if (resolver && cathook && CE_GOOD(LOCAL_E))
+    {
+        for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
+        {
+            if (i == g_IEngine->GetLocalPlayer())
+                continue;
+            enti = g_IEntityList->GetClientEntity(i);
+            if (enti && !enti->IsDormant() &&
+                !NET_BYTE(enti, netvar.iLifeState))
+            {
+                float quotat = 0;
+                float quotaf = 0;
+                if (!g_Settings.brute.choke[i].empty())
+                    for (auto it : g_Settings.brute.choke[i])
+                    {
+                        if (it)
+                            quotat++;
+                        else
+                            quotaf++;
+                    }
+                float quota    = quotat / quotaf;
+                Vector &angles = NET_VECTOR(enti, netvar.m_angEyeAngles);
+                static bool brutepitch = false;
+                if (g_Settings.brute.brutenum[i] > 5)
+                {
+                    g_Settings.brute.brutenum[i] = 0;
+                    brutepitch                   = !brutepitch;
+                }
+                angles.y = fmod(angles.y + 180.0f, 360.0f);
+                if (angles.y < 0)
+                    angles.y += 360.0f;
+                angles.y -= 180.0f;
+                if (quota < 0.8f)
+                    switch (g_Settings.brute.brutenum[i])
+                    {
+                    case 0:
+                        break;
+                    case 1:
+                        angles.y += 180.0f;
+                        break;
+                    case 2:
+                        angles.y -= 90.0f;
+                        break;
+                    case 3:
+                        angles.y += 90.0f;
+                        break;
+                    case 4:
+                        angles.y -= 180.0f;
+                        break;
+                    case 5:
+                        angles.y = 0.0f;
+                        break;
+                    }
+                if (brutepitch || quota < 0.8f)
+                    switch (g_Settings.brute.brutenum[i] % 4)
+                    {
+                    case 0:
+                        break;
+                    case 1:
+                        angles.x = -89.0f;
+                        break;
+                    case 2:
+                        angles.x = 89.0f;
+                        break;
+                    case 3:
+                        angles.x = 0.0f;
+                        break;
+                    }
+            }
+        }
+    }
     if (nolerp)
     {
         // g_pUserCmd->tick_count += 1;
@@ -512,7 +589,29 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
             (cmd->buttons & IN_ATTACK ||
              !(hacks::shared::antiaim::enabled &&
                float(hacks::shared::antiaim::yaw_mode) >= 9 && !*bSendPackets)))
-            g_Settings.last_angles = cmd->viewangles;
+            g_Settings.brute.last_angles[LOCAL_E->m_IDX] = cmd->viewangles;
+        for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
+        {
+
+            CachedEntity *ent = ENTITY(i);
+            if (CE_GOOD(LOCAL_E))
+                if (ent == LOCAL_E)
+                    continue;
+            if (CE_BAD(ent) || !ent->m_bAlivePlayer())
+                continue;
+            INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+            if (NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) <= 1.5f)
+                continue;
+            float latency = ch->GetAvgLatency(MAX_FLOWS);
+            g_Settings.brute.choke[i].push_back(
+                NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) ==
+                g_Settings.brute.lastsimtime);
+            g_Settings.brute.last_angles[ent->m_IDX] =
+                NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
+            if (!g_Settings.brute.choke[i].empty() &&
+                g_Settings.brute.choke[i].size() > 20)
+                g_Settings.brute.choke[i].pop_front();
+        }
     }
 #endif
     int nextdata = 0;

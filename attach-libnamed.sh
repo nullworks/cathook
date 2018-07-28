@@ -50,9 +50,6 @@ sudo cp "bin/libcathook.so" "/lib/i386-linux-gnu/${FILENAME}"
 
 echo loading "$FILENAME" to "$proc"
 
-sudo killall -19 steam
-sudo killall -19 steamwebhelper
-
 sudo gdb -n -q -batch \
   -ex "attach $proc" \
   -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
@@ -64,6 +61,3 @@ sudo gdb -n -q -batch \
   -ex "quit"
 
 sudo rm "/lib/i386-linux-gnu/${FILENAME}"
-
-sudo killall -18 steamwebhelper
-sudo killall -18 steam

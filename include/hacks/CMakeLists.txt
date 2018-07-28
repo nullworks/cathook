@@ -1,6 +1,7 @@
 target_sources(cathook PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/CatBot.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/SeedPrediction.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Spam.hpp")
 if(NOT LagbotMode)
 target_sources(cathook PRIVATE

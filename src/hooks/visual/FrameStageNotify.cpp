@@ -13,7 +13,8 @@
 static CatVar nightmode(CV_FLOAT, "nightmode", "0", "Enable nightmode", "");
 namespace hooked_methods
 {
-
+#include "reclasses.hpp"
+#include "C_TEFireBullets.hpp"
 DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
                      ClientFrameStage_t stage)
 {
@@ -61,7 +62,6 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
         }
         OldNightmode = nightmode;
     }
-    static IClientEntity *ent;
 
     PROF_SECTION(FrameStageNotify_TOTAL);
 
@@ -70,29 +70,6 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
     {
         PROF_SECTION(FSN_skinchanger);
         hacks::tf2::skinchanger::FrameStageNotify(stage);
-    }
-    if (resolver && cathook && !g_Settings.bInvalid &&
-        stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
-    {
-        PROF_SECTION(FSN_resolver);
-        for (int i = 1; i < 32 && i < HIGHEST_ENTITY; i++)
-        {
-            if (i == g_IEngine->GetLocalPlayer())
-                continue;
-            ent = g_IEntityList->GetClientEntity(i);
-            if (ent && !ent->IsDormant() && !NET_BYTE(ent, netvar.iLifeState))
-            {
-                Vector &angles = NET_VECTOR(ent, netvar.m_angEyeAngles);
-                if (angles.x >= 90)
-                    angles.x = -89;
-                if (angles.x <= -90)
-                    angles.x = 89;
-                angles.y     = fmod(angles.y + 180.0f, 360.0f);
-                if (angles.y < 0)
-                    angles.y += 360.0f;
-                angles.y -= 180.0f;
-            }
-        }
     }
     if (cathook && stage == FRAME_RENDER_START)
     {
@@ -109,6 +86,13 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
 #if ENABLE_IPC
             ipc::UpdateServerAddress();
 #endif
+        }
+        C_TEFireBullets *fire = C_TEFireBullets::GTEFireBullets();
+        if (fire && !hooks::IsHooked((void *)fire))
+        {
+        	hooks::firebullets.Set(fire);
+        	hooks::firebullets.HookMethod(HOOK_ARGS(PreDataUpdate));
+        	hooks::firebullets.Apply();
         }
     }
     if (cathook && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
@@ -128,9 +112,9 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
             if (CE_GOOD(g_pLocalPlayer->entity))
             {
                 CE_FLOAT(g_pLocalPlayer->entity, netvar.deadflag + 4) =
-                    g_Settings.last_angles.x;
+                    g_Settings.brute.last_angles[LOCAL_E->m_IDX].x;
                 CE_FLOAT(g_pLocalPlayer->entity, netvar.deadflag + 8) =
-                    g_Settings.last_angles.y;
+                    g_Settings.brute.last_angles[LOCAL_E->m_IDX].y;
             }
         }
     }

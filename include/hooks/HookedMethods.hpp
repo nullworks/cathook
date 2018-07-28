@@ -7,7 +7,7 @@
 #pragma once
 
 #include "common.hpp"
-
+#include "SeedPrediction.hpp"
 #if ENABLE_VISUALS
 union SDL_Event;
 struct SDL_Window;
@@ -34,9 +34,10 @@ struct SDL_Window;
 #define HOOK_ARGS(name)                                                        \
     hooked_methods::methods::name, offsets::name(),                            \
         &hooked_methods::original::name
-
 namespace hooked_methods
 {
+// FireBullets
+DECLARE_HOOKED_METHOD(PreDataUpdate, void, void *, int);
 // ClientMode
 DECLARE_HOOKED_METHOD(CreateMove, bool, void *, float, CUserCmd *);
 DECLARE_HOOKED_METHOD(LevelInit, void, void *, const char *);

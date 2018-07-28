@@ -78,6 +78,16 @@ char re::CTFPartyClient::RequestQueueForMatch(int type)
 
     return RequestQueueForMatch_fn(this, type);
 }
+bool re::CTFPartyClient::BInQueueForMatchGroup(int type)
+{
+    typedef bool (*BInQueueForMatchGroup_t)(re::CTFPartyClient *, int);
+    static uintptr_t addr = gSignatures.GetClientSignature(
+        "55 89 E5 56 53 8B 5D ? 8B 75 ? 89 D8 E8 ? ? ? ? 84 C0 74 ? 8B 4E");
+    static BInQueueForMatchGroup_t BInQueueForMatchGroup_fn =
+        BInQueueForMatchGroup_t(addr);
+
+    return BInQueueForMatchGroup_fn(this, type);
+}
 char re::CTFPartyClient::RequestLeaveForMatch(int type)
 {
     typedef char (*RequestLeaveForMatch_t)(re::CTFPartyClient *, int);

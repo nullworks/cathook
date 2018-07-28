@@ -109,7 +109,7 @@ void WalkTo(const Vector &vector)
 // Function to get the corner location that a vischeck to an entity is possible
 // from
 Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
-                    bool checkWalkable)
+                      bool checkWalkable)
 {
     int maxiterations = maxdist / 40;
     Vector origin     = player->m_vecOrigin();
@@ -182,8 +182,9 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
 }
 
 // return Two Corners that connect perfectly to ent and local player
-std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist,
-                    bool checkWalkable)
+std::pair<Vector, Vector> VischeckWall(CachedEntity *player,
+                                       CachedEntity *target, float maxdist,
+                                       bool checkWalkable)
 {
     int maxiterations = maxdist / 40;
     Vector origin     = player->m_vecOrigin();
@@ -191,7 +192,7 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
     // if we can see an entity, we don't need to run calculations
     if (VisCheckEntFromEnt(player, target))
     {
-    	std::pair<Vector, Vector> orig(origin, target->m_vecOrigin());
+        std::pair<Vector, Vector> orig(origin, target->m_vecOrigin());
         if (!checkWalkable)
             return orig;
         else if (canReachVector(origin, target->m_vecOrigin()))
@@ -278,21 +279,27 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
                         break;
                     }
                     // check if the virtualOrigin2 can see the target
-//                    if (!VisCheckEntFromEntVector(virtualOrigin2, player, target))
-//                        continue;
-//                    if (!IsVectorVisible(virtualOrigin, virtualOrigin2, true))
-//                        continue;
-//                    if (!IsVectorVisible(virtualOrigin2, target->m_vecOrigin(), true))
-//                    	continue;
+                    //                    if
+                    //                    (!VisCheckEntFromEntVector(virtualOrigin2,
+                    //                    player, target))
+                    //                        continue;
+                    //                    if (!IsVectorVisible(virtualOrigin,
+                    //                    virtualOrigin2, true))
+                    //                        continue;
+                    //                    if (!IsVectorVisible(virtualOrigin2,
+                    //                    target->m_vecOrigin(), true))
+                    //                    	continue;
                     if (!IsVectorVisible(virtualOrigin, virtualOrigin2, true))
                         continue;
                     if (!IsVectorVisible(virtualOrigin2, target->m_vecOrigin()))
                         continue;
-                    std::pair<Vector, Vector> toret(virtualOrigin, virtualOrigin2);
+                    std::pair<Vector, Vector> toret(virtualOrigin,
+                                                    virtualOrigin2);
                     if (!checkWalkable)
                         return toret;
                     // check if the location is accessible
-                    if (!canReachVector(origin, virtualOrigin) || !canReachVector(virtualOrigin2, virtualOrigin))
+                    if (!canReachVector(origin, virtualOrigin) ||
+                        !canReachVector(virtualOrigin2, virtualOrigin))
                         continue;
                     if (canReachVector(virtualOrigin2, target->m_vecOrigin()))
                         return toret;
@@ -301,7 +308,7 @@ std::pair<Vector,Vector> VischeckWall(CachedEntity *player, CachedEntity *target
         }
     }
     // if we didn't find anything, return an empty Vector
-    return { {0, 0, 0}, {0, 0, 0} };
+    return { { 0, 0, 0 }, { 0, 0, 0 } };
 }
 
 // Returns a vectors max value. For example: {123,-150, 125} = 125
@@ -335,7 +342,7 @@ bool canReachVector(Vector loc, Vector dest)
             Vector vec =
                 loc + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1);
 
-            if (DistanceToGround({vec.x,vec.y,vec.z + 5}) >= 40)
+            if (DistanceToGround({ vec.x, vec.y, vec.z + 5 }) >= 40)
                 return false;
 
             for (int j = 0; j < 4; j++)
@@ -371,9 +378,10 @@ bool canReachVector(Vector loc, Vector dest)
     else
     {
         // check if the vector is too high above ground
-        // higher to avoid small false positives, player can jump 42 hu according to
+        // higher to avoid small false positives, player can jump 42 hu
+        // according to
         // the tf2 wiki
-        if (DistanceToGround({loc.x,loc.y,loc.z + 5}) >= 40)
+        if (DistanceToGround({ loc.x, loc.y, loc.z + 5 }) >= 40)
             return false;
 
         // check if there is enough space arround the vector for a player to fit
@@ -400,7 +408,8 @@ bool canReachVector(Vector loc, Vector dest)
             trace_t trace;
             Ray_t ray;
             ray.Init(loc, directionalLoc);
-            g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
+            g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player,
+                               &trace);
             // distance of trace < than 26
             if (trace.startpos.DistTo(trace.endpos) < 26.0f)
                 return false;
@@ -755,7 +764,8 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos)
             g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default,
                                &trace_object);
     }
-    return (((IClientEntity *) trace_object.m_pEnt) == RAW_ENT(entity) || trace_object.fraction >= 0.99f);
+    return (((IClientEntity *) trace_object.m_pEnt) == RAW_ENT(entity) ||
+            trace_object.fraction >= 0.99f);
 }
 
 // For when you need to vis check something that isnt the local player
@@ -1350,7 +1360,8 @@ void PrintChat(const char *fmt, ...)
         va_end(list);
         std::unique_ptr<char> str(strfmt("\x07%06X[\x07%06XCAT\x07%06X]\x01 %s",
                                          0x5e3252, 0xba3d9a, 0x5e3252,
-                                         buf.get()).release());
+                                         buf.get())
+                                      .release());
         // FIXME DEBUG LOG
         logging::Info("%s", str.get());
         chat->Printf(str.get());

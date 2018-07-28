@@ -60,6 +60,7 @@ extern VMTHook clientmode4;
 extern VMTHook client;
 extern VMTHook engine;
 extern VMTHook netchannel;
+extern VMTHook firebullets;
 extern VMTHook clientdll;
 extern VMTHook matsurface;
 extern VMTHook studiorender;

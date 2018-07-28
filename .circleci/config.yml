@@ -7,4 +7,4 @@ jobs:
         - checkout
         - run: 
             name: "Compiling cathook"
-            command: git submodule update --init --recursive; mkdir build; cd build; cmake -DEnableWarnings=0 ..; make -j16; cd ..
+            command: git submodule update --init --recursive; mkdir build; cd build; cmake -DEnableWarnings=0 ..; make -j8; cd ..

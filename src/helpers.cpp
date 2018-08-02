@@ -546,20 +546,6 @@ bool HasWeapon(CachedEntity *ent, int wantedId)
     return false;
 }
 
-bool HasDarwins(CachedEntity *ent)
-{
-    if (CE_BAD(ent))
-        return false;
-    // Check if player is sniper
-    if (CE_INT(ent, netvar.iClass) != tf_sniper)
-        return false;
-    // Check if player is using darwins, 231 is the id for darwins danger sheild
-    if (HasWeapon(ent, 231))
-        return true;
-    // Else return false
-    return false;
-}
-
 void VectorTransform(const float *in1, const matrix3x4_t &in2, float *out)
 {
     out[0] = (in1[0] * in2[0][0] + in1[1] * in2[0][1] + in1[2] * in2[0][2]) +
@@ -726,7 +712,6 @@ float RandFloatRange(float min, float max)
 
 bool IsEntityVisible(CachedEntity *entity, int hb)
 {
-    Vector hit;
     if (g_Settings.bInvalid)
         return false;
     if (entity == g_pLocalPlayer->entity)
@@ -936,7 +921,10 @@ weaponmode GetWeaponMode()
              classid == CL_CLASS(CTFSyringeGun) ||
              classid == CL_CLASS(CTFCrossbow) ||
              classid == CL_CLASS(CTFShotgunBuildingRescue) ||
-             classid == CL_CLASS(CTFDRGPomson))
+             classid == CL_CLASS(CTFDRGPomson) ||
+             classid == CL_CLASS(CTFWeaponFlameBall) ||
+             classid == CL_CLASS(CTFRaygun) ||
+             classid == CL_CLASS(CTFGrapplingHook))
     {
         return weaponmode::weapon_projectile;
     }
@@ -968,8 +956,6 @@ bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax)
     return true;
 }
 
-// TODO add bison and grapple hook
-// TODO FIX this function
 bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
 {
     float rspeed, rgrav;
@@ -982,16 +968,20 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
     rgrav  = 0.0f;
     typedef float(GetProjectileData)(IClientEntity *);
 
-    int classid = weapon->m_iClassID();
-    if (classid == CL_CLASS(CTFRocketLauncher_DirectHit))
+
+    switch (weapon->m_iClassID())
+    {
+    case CL_CLASS(CTFRocketLauncher_DirectHit):
     {
         rspeed = 1980.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFRocketLauncher))
+    case CL_CLASS(CTFRocketLauncher):
     {
         rspeed = 1100.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFGrenadeLauncher))
+    case CL_CLASS(CTFGrenadeLauncher):
     {
         IF_GAME(IsTF2())
         {
@@ -1003,8 +993,9 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
             rspeed = 1100.0f;
             rgrav  = 0.5f;
         }
+        break;
     }
-    else if (classid == CL_CLASS(CTFPipebombLauncher))
+    case CL_CLASS(CTFPipebombLauncher):
     {
         float chargebegin = *((float *) ((unsigned) RAW_ENT(LOCAL_W) + 3152));
         float chargetime  = g_GlobalVars->curtime - chargebegin;
@@ -1012,50 +1003,71 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
             (fminf(fmaxf(chargetime / 4.0f, 0.0f), 1.0f) * 1500.0f) + 900.0f;
         rgrav =
             (fminf(fmaxf(chargetime / 4.0f, 0.0f), 1.0f) * -0.70000001f) + 0.5f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFCompoundBow))
+    case CL_CLASS(CTFCompoundBow):
     {
         float chargetime =
-            g_GlobalVars->curtime * g_GlobalVars->interval_per_tick -
-            CE_FLOAT(weapon, netvar.flChargeBeginTime) *
-                g_GlobalVars->interval_per_tick;
-        rspeed = (fminf(fmaxf(chargetime, 0.0f), 1.0f) * 800.0f) + 1800.0f;
-        rgrav  = (fminf(fmaxf(chargetime, 0.0f), 1.0f) * -0.40000001f) + 0.5f;
+            g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
+        rspeed = (float) ((float) (fminf(fmaxf(chargetime, 0.0), 1.0) * 800.0) +
+                          1800.0);
+        rgrav  = (float) ((float) (fminf(fmaxf(chargetime, 0.0), 1.0) *
+                                  -0.40000001) +
+                         0.5);
+        break;
     }
-    else if (classid == CL_CLASS(CTFBat_Wood))
+    case CL_CLASS(CTFBat_Wood):
     {
         rspeed = 3000.0f;
         rgrav  = 0.5f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFFlareGun))
+    case CL_CLASS(CTFFlareGun):
     {
         rspeed = 2000.0f;
         rgrav  = 0.25f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFSyringeGun))
+    case CL_CLASS(CTFSyringeGun):
     {
         rgrav  = 0.2f;
         rspeed = 990.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFCrossbow))
+    case CL_CLASS(CTFCrossbow):
     {
         rgrav  = 0.2f;
         rspeed = 2400.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFShotgunBuildingRescue))
+    case CL_CLASS(CTFShotgunBuildingRescue):
     {
         rgrav  = 0.2f;
         rspeed = 2400.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFDRGPomson))
+    case CL_CLASS(CTFDRGPomson):
     {
         rspeed = 1200.0f;
+        break;
     }
-    else if (classid == CL_CLASS(CTFWeaponFlameBall))
+    case CL_CLASS(CTFWeaponFlameBall):
     {
-        // ??
-        rspeed = 2500.0f;
+        rspeed = 3000.0f;
+        break;
     }
+    case CL_CLASS(CTFRaygun):
+    {
+        rspeed = 1200.0f;
+        break;
+    }
+    case CL_CLASS(CTFGrapplingHook):
+    {
+        rspeed = 1500.0f;
+        break;
+    }
+    }
+
     speed   = rspeed;
     gravity = rgrav;
     return (rspeed || rgrav);
@@ -1358,10 +1370,9 @@ void PrintChat(const char *fmt, ...)
         va_start(list, fmt);
         vsprintf(buf.get(), fmt, list);
         va_end(list);
-        std::unique_ptr<char> str(strfmt("\x07%06X[\x07%06XCAT\x07%06X]\x01 %s",
-                                         0x5e3252, 0xba3d9a, 0x5e3252,
-                                         buf.get())
-                                      .release());
+        std::unique_ptr<char[]> str =
+            std::move(strfmt("\x07%06X[\x07%06XCAT\x07%06X]\x01 %s", 0x5e3252,
+                             0xba3d9a, 0x5e3252, buf.get()));
         // FIXME DEBUG LOG
         logging::Info("%s", str.get());
         chat->Printf(str.get());

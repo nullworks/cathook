@@ -2,5 +2,7 @@
 #Get updated source code
 git fetch;git pull origin;git submodule update --init --recursive
 #Update cathook
-cd build; cmake ..; make -j$(grep -c '^processor' /proc/cpuinfo); cd ..; cd ..
+cd build; cmake ..; make -j$(grep -c '^processor' /proc/cpuinfo)
+#Update data
+sudo make data;  cd ..; cd ..
 printf "\n\n";printf '\e[1;34m%-6s\e' "Cathook update complete!";printf "\n\n"

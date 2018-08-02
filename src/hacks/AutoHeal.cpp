@@ -76,7 +76,11 @@ int BulletDangerValue(CachedEntity *patient)
         any_zoomed_snipers = true;
         // TODO VisCheck from patient.
         if ((int) vacc_sniper == 1)
-            if (!IsEntityVisible(ent, head))
+            if (!IsEntityVisible(ent, head) &&
+                !IsVectorVisible(ENTITY(m_iCurrentHealingTarget)
+                                     ->hitboxes.GetHitbox(head)
+                                     ->center,
+                                 ent->hitboxes.GetHitbox(head)->center, true))
                 continue;
         return vacc_sniper ? 2 : 1;
     }

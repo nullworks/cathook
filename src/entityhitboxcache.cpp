@@ -108,7 +108,7 @@ bool EntityHitboxCache::VisibilityCheck(int id)
 
 static settings::Int setupbones_time{ "source.setupbones-time", "3" };
 
-std::mutex setupbones_mutex;
+static std::mutex setupbones_mutex;
 
 matrix3x4_t *EntityHitboxCache::GetBones()
 {

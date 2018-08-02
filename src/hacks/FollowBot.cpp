@@ -12,7 +12,7 @@
 #include <settings/Bool.hpp>
 
 static settings::Bool enable{ "follow-bot.enable", "false" };
-static settings::Bool roambot{ "follow-bot.roaming", "false" };
+static settings::Bool roambot{ "follow-bot.roaming", "true" };
 static settings::Bool draw_crumb{ "follow-bot.draw-crumbs", "false" };
 static settings::Float follow_distance{ "follow-bot.distance", "175" };
 static settings::Float follow_activation{ "follow-bot.max-range", "1000" };

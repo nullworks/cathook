@@ -27,7 +27,7 @@ Timer lastVoicemenu{};
 void Draw()
 {
     PROF_SECTION(DRAW_SpyAlert)
-    if (!enabled)
+    if (!enable)
         return;
     CachedEntity *closest_spy, *ent;
     float closest_spy_distance, distance;

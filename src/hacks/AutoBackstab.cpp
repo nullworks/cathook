@@ -26,26 +26,11 @@ const Vector GetWorldSpaceCenter(CachedEntity *ent)
     return vWorldSpaceCenter;
 }
 
-static CatVar enabled(CV_SWITCH, "autobackstab", "0", "Auto Backstab",
-                      "Does not depend on triggerbot!");
-static CatVar silent(CV_SWITCH, "autobackstab_silent", "1", "Silent");
-bool found;
 std::pair<Vector, Vector> GetHitboxBounds(CachedEntity *it, int hitbox)
 {
 	std::pair<Vector, Vector> result(it->hitboxes.GetHitbox(hitbox)->min,it->hitboxes.GetHitbox(hitbox)->max);
 	return result;
 }
-// TODO improve
-bool CanBackstab(CachedEntity *tar, Vector Local_ang)
-{
-    if (CE_BAD(tar))
-        return false;
-    // Get the forward view vector of the target, ignore Z
-    Vector vecVictimForward = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-    vecVictimForward.z      = 0.0f;
-    vecVictimForward.NormalizeInPlace();
-
-int checkNextTick = -1;
 
 void traceEntity(int *result_eindex, Vector *result_pos, QAngle angle,
                  Vector loc)
@@ -82,7 +67,7 @@ bool canBackstab(CachedEntity *tar, Vector angle, Vector loc, Vector hitboxLoc)
 {
     float meleeRange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     Vector targetAngle = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-    if (fabsf(angle.y - targetAngle.y) < 85)
+    if (fabsf(angle.y - targetAngle.y) < 80)
     {
         int IDX;
         Vector hitLoc;
@@ -91,8 +76,6 @@ bool canBackstab(CachedEntity *tar, Vector angle, Vector loc, Vector hitboxLoc)
         {
             if (loc.DistTo(hitboxLoc) <= meleeRange)
                 return true;
-            else
-                checkNextTick = tar->m_IDX;
         }
     }
     return false;
@@ -108,9 +91,6 @@ void CreateMove()
         return;
     CachedEntity *besttarget = nullptr;
 
-    //Check if we need to check a player again. We do this because our backstab range may be different after we have rotated
-    if (checkNextTick == -1)
-    {
     for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *target = ENTITY(i);
@@ -119,14 +99,14 @@ void CreateMove()
         if (target == LOCAL_E || target->m_iTeam() == LOCAL_E->m_iTeam() ||
             !target->m_bAlivePlayer() || target->m_Type() != ENTITY_PLAYER)
             continue;
-        if (target->hitboxes.GetHitbox(spine_3)->center.DistTo(
+        if (target->hitboxes.GetHitbox(spine_2)->center.DistTo(
                 g_pLocalPlayer->v_Eye) <= 300.0f)
         {
             if (CE_GOOD(besttarget))
             {
-                if (target->hitboxes.GetHitbox(spine_3)->center.DistTo(
+                if (target->hitboxes.GetHitbox(spine_2)->center.DistTo(
                         g_pLocalPlayer->v_Eye) <
-                    besttarget->hitboxes.GetHitbox(spine_3)->center.DistTo(
+                    besttarget->hitboxes.GetHitbox(spine_2)->center.DistTo(
                         g_pLocalPlayer->v_Eye))
                     besttarget = target;
             }
@@ -136,17 +116,10 @@ void CreateMove()
             }
         }
     }
-    }
-    else
-    {
-        // If we need to check a player again, set besttarget to the idx of the player
-        besttarget = ENTITY(checkNextTick);
-        checkNextTick = -1;
-    }
     if (CE_GOOD(besttarget))
     {
         Vector hitboxLoc =
-            besttarget->hitboxes.GetHitbox(hacks::shared::aimbot::ClosestHitbox(besttarget))
+            besttarget->hitboxes.GetHitbox(spine_2)
                 ->center;
         Vector angle = NET_VECTOR(RAW_ENT(LOCAL_E), netvar.m_angEyeAngles);
             for (angle.y = -180.0f; angle.y < 180.0f; angle.y += 1.0f)
@@ -160,8 +133,8 @@ void CreateMove()
                 angle.x                = xAngle.x;
                 if (canBackstab(besttarget, angle, g_pLocalPlayer->v_Eye, hitboxLoc))
                 {
-                    g_pUserCmd->viewangles = angle;
-                    g_pUserCmd->buttons |= IN_ATTACK;
+                    current_user_cmd->viewangles = angle;
+                    current_user_cmd->buttons |= IN_ATTACK;
                     besttarget = nullptr;
                     if (silent)
                         g_pLocalPlayer->bUseSilentAngles = true;

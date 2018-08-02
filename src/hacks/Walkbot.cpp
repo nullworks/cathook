@@ -834,7 +834,6 @@ index_t SelectNextNode()
         return FindNearestNode(true);
     }
     auto &n = state::nodes[state::active_node];
-    // TODO medkit connections and shit
     std::vector<index_t> chance{};
     for (index_t i = 0; i < MAX_CONNECTIONS; i++)
     {

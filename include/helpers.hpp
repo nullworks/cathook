@@ -98,7 +98,6 @@ std::unique_ptr<char[]> strfmt(const char *fmt, ...);
 // TODO move that to weaponid.h
 bool HasWeapon(CachedEntity *ent, int wantedId);
 bool IsAmbassador(CachedEntity *ent);
-bool HasDarwins(CachedEntity *ent);
 bool AmbassadorCanHeadshot();
 
 inline const char *teamname(int team)

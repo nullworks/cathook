@@ -72,7 +72,6 @@ void AddCenterString(const std::string &string, const rgba_t &color)
     ++center_strings_count;
 }
 
-// TODO globals
 int draw::width  = 0;
 int draw::height = 0;
 float draw::fov  = 90.0f;

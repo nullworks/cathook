@@ -9,6 +9,7 @@ target_sources(cathook PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Aimbot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Announcer.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiAim.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/AntiAntiAim.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiBackstab.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiCheat.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiDisguise.hpp"
@@ -25,12 +26,11 @@ target_sources(cathook PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/CatBot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/FollowBot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/hacklist.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/HealArrows.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/KillSay.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Killstreak.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/LagExploit.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/LightESP.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Misc.hpp"
+	"${CMAKE_CURRENT_LIST_DIR}/NavBot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Noisemaker.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Spam.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Trigger.hpp"
@@ -44,6 +44,7 @@ target_sources(cathook PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/ESP.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Radar.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/SkinChanger.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Thirdperson.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/SpyAlert.hpp")
 endif()
 

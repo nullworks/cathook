@@ -1,0 +1,7 @@
+<Tab name="Light ESP" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content">
+        <List width="150">
+            <AutoVariable width="fill" target="lightesp.enable" label="Enable"/>
+        </List>
+    </Box>
+</Tab>

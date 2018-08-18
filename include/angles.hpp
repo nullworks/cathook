@@ -95,4 +95,4 @@ inline angle_data_s &data(const CachedEntity *entity)
 {
     return data_idx(entity->m_IDX);
 }
-}
+} // namespace angles

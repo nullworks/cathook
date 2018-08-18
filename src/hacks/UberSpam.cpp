@@ -7,30 +7,25 @@
 
 #include "common.hpp"
 #include <hacks/UberSpam.hpp>
+#include <settings/Int.hpp>
+
+static settings::Int source{ "uberspam.source", "0" };
+static settings::Bool team_chat{ "uberspam.team-chat", "true" };
+static settings::String custom_file{ "uberspam.file", "uberspam.txt" };
+
+static settings::Bool on_ready{ "uberspam.triggers.ready", "true" };
+static settings::Bool on_used{ "uberspam.triggers.used", "true" };
+static settings::Bool on_ended{ "uberspam.triggers.ended", "true" };
+static settings::Int on_build{ "uberspam.triggers.every-n-percent", "25" };
 
 namespace hacks::tf::uberspam
 {
 
 TextFile custom_lines;
 
-static CatEnum source_enum({ "DISABLED", "CATHOOK", "NCC", "CUSTOM" });
-static CatVar source(source_enum, "uberspam", "0", "Ubercharge Spam",
-                     "Defines spam ubercharge source");
-static CatVar on_ready(CV_SWITCH, "uberspam_ready", "1", "Uber Ready");
-static CatVar on_used(CV_SWITCH, "uberspam_used", "1", "Uber Used");
-static CatVar on_ended(CV_SWITCH, "uberspam_ended", "1", "Uber Ended");
-static CatVar on_build(CV_INT, "uberspam_build", "25", "Uber Build",
-                       "Send a message every #% ubercharge. 0 = never send", 0,
-                       100);
-static CatVar team_chat(CV_SWITCH, "uberspam_team", "1", "Uber Team Chat",
-                        "Send uberspam messages in team chat");
-static CatVar
-    custom_file(CV_STRING, "uberspam_file", "uberspam.txt",
-                "Ubercharge Spam File",
-                "Use cat_uberspam_file_reload! Same as spam/killsay files.");
-static CatCommand custom_file_reload(
-    "uberspam_file_reload", "Reload Ubercharge Spam File",
-    []() { custom_lines.Load(std::string(custom_file.GetString())); });
+static CatCommand custom_file_reload("uberspam_file_reload",
+                                     "Reload Ubercharge Spam File",
+                                     []() { custom_lines.Load(*custom_file); });
 
 const std::vector<std::string> *GetSource()
 {
@@ -133,4 +128,4 @@ const std::vector<std::string> builtin_nonecore = {
     ">>> GET READY TO RUMBLE! <<<", ">>> CHEATS ACTIVATED! <<<",
     ">>> RUMBLE COMPLETE! <<<", ">>> RUMBLE IS %i%% CHARGED! <<<"
 };
-}
+} // namespace hacks::tf::uberspam

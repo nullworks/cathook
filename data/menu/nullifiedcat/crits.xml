@@ -1,0 +1,11 @@
+<Tab name="Crits" padding="4 4 4 4">
+    <Box width="content" height="content" padding="12 6 6 6">
+        <List width="200">
+            <AutoVariable width="fill" target="crit.info" label="Crit info"/>
+            <AutoVariable width="fill" target="crit.key" label="Crit key"/>
+            <AutoVariable width="fill" target="crit.experimental" label="Instant crits"/>
+            <AutoVariable width="fill" target="crit.melee" label="Melee Crits"/>
+            <AutoVariable width="fill" target="crit.force-gameplay" label="Do not hinder gameplay"/>
+        </List>
+    </Box>
+</Tab>

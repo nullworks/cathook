@@ -32,4 +32,4 @@ public:
 public:
     CEconItem *GetFirstItemOfItemDef(int id);
 };
-}
+} // namespace re

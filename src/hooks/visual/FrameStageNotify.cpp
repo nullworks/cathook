@@ -5,23 +5,30 @@
 
 #include <MiscTemporary.hpp>
 #include <hacks/hacklist.hpp>
+#include <settings/Bool.hpp>
+#include <hacks/Thirdperson.hpp>
 #include "HookedMethods.hpp"
 #if not LAGBOT_MODE
 #include "hacks/Backtrack.hpp"
 #endif
 
-static CatVar nightmode(CV_FLOAT, "nightmode", "0", "Enable nightmode", "");
+static settings::Float nightmode{ "visual.night-mode", "0" };
+
+static float old_nightmode{ 0.0f };
+
 namespace hooked_methods
 {
 #include "reclasses.hpp"
-#include "C_TEFireBullets.hpp"
 DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
                      ClientFrameStage_t stage)
 {
-    static float OldNightmode = 0.0f;
-    if (OldNightmode != (float) nightmode)
-    {
+    if (!isHackActive())
+        return original::FrameStageNotify(this_, stage);
 
+    PROF_SECTION(FrameStageNotify_TOTAL);
+
+    if (old_nightmode != *nightmode)
+    {
         static ConVar *r_DrawSpecificStaticProp =
             g_ICvar->FindVar("r_DrawSpecificStaticProp");
         if (!r_DrawSpecificStaticProp)
@@ -60,10 +67,8 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
                     pMaterial->ColorModulate(1.0f, 1.0f, 1.0f);
             }
         }
-        OldNightmode = nightmode;
+        old_nightmode = *nightmode;
     }
-
-    PROF_SECTION(FrameStageNotify_TOTAL);
 
     if (!g_IEngine->IsInGame())
         g_Settings.bInvalid = true;
@@ -71,7 +76,7 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
         PROF_SECTION(FSN_skinchanger);
         hacks::tf2::skinchanger::FrameStageNotify(stage);
     }
-    if (cathook && stage == FRAME_RENDER_START)
+    if (isHackActive() && stage == FRAME_RENDER_START)
     {
         INetChannel *ch;
         ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
@@ -87,37 +92,36 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_,
             ipc::UpdateServerAddress();
 #endif
         }
-        C_TEFireBullets *fire = C_TEFireBullets::GTEFireBullets();
-        if (fire && !hooks::IsHooked((void *)fire))
-        {
-        	hooks::firebullets.Set(fire);
-        	hooks::firebullets.HookMethod(HOOK_ARGS(PreDataUpdate));
-        	hooks::firebullets.Apply();
-        }
     }
-    if (cathook && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
+    /*if (hacks::tf2::seedprediction::prediction && CE_GOOD(LOCAL_E)) {
+        C_BaseTempEntity *fire = C_TEFireBullets::GTEFireBullets();
+        while (fire) {
+            logging::Info("0x%08X", (uintptr_t) fire);
+            C_TEFireBullets *fire2 = nullptr;
+            if (!fire->IsDormant() &&
+    fire->GetClientNetworkable()->GetClientClass() &&
+    fire->GetClientNetworkable()->GetClientClass()->m_ClassID ==
+    CL_CLASS(CTEFireBullets))
+                fire2 = (C_TEFireBullets *) fire;
+            if (fire2 && !hooks::IsHooked((void *) fire2)) {
+                hooks::firebullets.Set(fire2);
+                hooks::firebullets.HookMethod(HOOK_ARGS(PreDataUpdate));
+                hooks::firebullets.Apply();
+            }
+            if (fire2)
+                logging::Info("%d", fire2->m_iSeed());
+            fire = fire->m_pNext;
+        }
+    }*/
+    if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
     {
         IF_GAME(IsTF())
         {
-            if (CE_GOOD(LOCAL_E) && no_zoom)
+            if (no_zoom && CE_GOOD(LOCAL_E))
                 RemoveCondition<TFCond_Zoomed>(LOCAL_E);
         }
-        if (force_thirdperson && !g_pLocalPlayer->life_state &&
-            CE_GOOD(g_pLocalPlayer->entity))
-        {
-            CE_INT(g_pLocalPlayer->entity, netvar.nForceTauntCam) = 1;
-        }
-        if (stage == 5 && show_antiaim && g_IInput->CAM_IsThirdPerson())
-        {
-            if (CE_GOOD(g_pLocalPlayer->entity))
-            {
-                CE_FLOAT(g_pLocalPlayer->entity, netvar.deadflag + 4) =
-                    g_Settings.brute.last_angles[LOCAL_E->m_IDX].x;
-                CE_FLOAT(g_pLocalPlayer->entity, netvar.deadflag + 8) =
-                    g_Settings.brute.last_angles[LOCAL_E->m_IDX].y;
-            }
-        }
+        hacks::tf::thirdperson::frameStageNotify();
     }
     return original::FrameStageNotify(this_, stage);
 }
-}
+} // namespace hooked_methods

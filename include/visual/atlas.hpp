@@ -50,4 +50,4 @@ public:
 };
 
 texture_atlas &atlas();
-}
+} // namespace textures

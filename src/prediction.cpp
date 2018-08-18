@@ -6,7 +6,13 @@
  */
 
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool debug_enginepred{ "debug.engine-pred-others", "false" };
+static settings::Bool debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
+static settings::Bool debug_pp_rockettimeping{ "debug.pp-rocket-time-ping",
+                                               "false" };
 
 // TODO there is a Vector() object created each call.
 
@@ -46,9 +52,6 @@ std::vector<std::vector<Vector>> predicted_players{};
 
 int predicted_player_count = 0;
 
-static CatVar debug_enginepred(CV_SWITCH, "debug_engine_pred_others", "0",
-                               "DO NOT USE - MOVEMENT");
-
 void Prediction_CreateMove()
 {
     static bool setup = false;
@@ -72,7 +75,7 @@ void Prediction_CreateMove()
                 ent->m_vecOrigin() = r;
                 predicted_players[i].push_back(std::move(r));
             }
-            ent->m_vecOrigin() = o;
+            ent->m_vecOrigin()    = o;
             CE_VECTOR(ent, 0x354) = o;
             // logging::Info("Predicted %d to be at [%.2f, %.2f, %.2f] vs [%.2f,
             // %.2f, %.2f]", i, r.x,r.y,r.z, o.x, o.y, o.z);
@@ -146,7 +149,7 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     if (velocity::EstimateAbsVelocity)
         velocity::EstimateAbsVelocity(RAW_ENT(entity), vel);
     else
-        vel                = CE_VECTOR(entity, netvar.vVelocity);
+        vel = CE_VECTOR(entity, netvar.vVelocity);
     fakecmd.command_number = last_cmd_number;
     fakecmd.forwardmove    = vel.x;
     fakecmd.sidemove       = -vel.y;
@@ -162,10 +165,11 @@ Vector EnginePrediction(CachedEntity *entity, float time)
         g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = time;
 
-    Vector old_origin = entity->m_vecOrigin();
+    Vector old_origin      = entity->m_vecOrigin();
     NET_VECTOR(ent, 0x354) = entity->m_vecOrigin();
 
-    //*g_PredictionRandomSeed = MD5_PseudoRandom(g_pUserCmd->command_number) &
+    //*g_PredictionRandomSeed =
+    // MD5_PseudoRandom(current_user_cmd->command_number) &
     // 0x7FFFFFFF;
     g_IGameMovement->StartTrackPredictionErrors(
         reinterpret_cast<CBasePlayer *>(ent));
@@ -183,7 +187,7 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
 
-    result = ent->GetAbsOrigin();
+    result                                   = ent->GetAbsOrigin();
     NET_VECTOR(ent, 0x354)                   = old_origin;
     CE_VECTOR(entity, netvar.m_angEyeAngles) = oldangles;
     return result;
@@ -211,12 +215,12 @@ Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed,
     float currenttime = medianTime - range;
     if (currenttime <= 0.0f)
         currenttime = 0.01f;
-    float besttime  = currenttime;
-    float mindelta  = 65536.0f;
-    Vector bestpos  = origin;
-    Vector current  = origin;
-    int maxsteps    = 40;
-    bool onground   = false;
+    float besttime = currenttime;
+    float mindelta = 65536.0f;
+    Vector bestpos = origin;
+    Vector current = origin;
+    int maxsteps   = 40;
+    bool onground  = false;
     if (ent->m_Type() == ENTITY_PLAYER)
     {
         if (CE_INT(ent, netvar.iFlags) & FL_ONGROUND)
@@ -242,7 +246,7 @@ Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed,
             mindelta = fabs(rockettime - currenttime);
         }
     }
-    ent->m_vecOrigin() = origin;
+    ent->m_vecOrigin()    = origin;
     CE_VECTOR(ent, 0x354) = origin;
     bestpos.z += (400 * besttime * besttime * gravitymod);
     // S = at^2/2 ; t = sqrt(2S/a)*/
@@ -251,12 +255,6 @@ Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed,
                   result.y - origin.y, result.z - origin.z);*/
     return result;
 }
-
-static CatVar debug_pp_extrapolate(
-    CV_SWITCH, "debug_pp_extrapolate", "0",
-    "Extrapolate entity position when predicting projectiles");
-static CatVar debug_pp_rockettimeping(CV_SWITCH, "debug_pp_rocket_time_ping",
-                                      "0", "Compensate for ping in pp");
 
 Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed,
                             float gravitymod, float entgmod)
@@ -288,10 +286,10 @@ Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed,
     float currenttime = medianTime - range;
     if (currenttime <= 0.0f)
         currenttime = 0.01f;
-    float besttime  = currenttime;
-    float mindelta  = 65536.0f;
-    Vector bestpos  = result;
-    int maxsteps    = 300;
+    float besttime = currenttime;
+    float mindelta = 65536.0f;
+    Vector bestpos = result;
+    int maxsteps   = 300;
     for (int steps = 0; steps < maxsteps;
          steps++, currenttime += ((float) (2 * range) / (float) maxsteps))
     {

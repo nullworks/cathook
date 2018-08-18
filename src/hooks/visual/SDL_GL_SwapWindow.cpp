@@ -3,11 +3,11 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <SDL2/SDL_syswm.h>
 #include <MiscTemporary.hpp>
 #include <visual/SDLHooks.hpp>
 #include <glez/draw.hpp>
 #include "HookedMethods.hpp"
+#include <SDL2/SDL_syswm.h>
 
 static bool init{ false };
 static bool init_wminfo{ false };
@@ -39,7 +39,7 @@ DEFINE_HOOKED_METHOD(SDL_GL_SwapWindow, void, SDL_Window *window)
     if (!tf2_sdl)
         tf2_sdl = SDL_GL_GetCurrentContext();
 
-    if (cathook && !disable_visuals)
+    if (isHackActive() && !disable_visuals)
     {
         PROF_SECTION(SWAPWINDOW_cathook);
         if (not init)
@@ -63,4 +63,4 @@ DEFINE_HOOKED_METHOD(SDL_GL_SwapWindow, void, SDL_Window *window)
         // glXSwapBuffers(wminfo.info.x11.display, wminfo.info.x11.window);
     }
 }
-}
+} // namespace hooked_methods

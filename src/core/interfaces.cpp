@@ -83,8 +83,8 @@ void CreateInterfaces()
     g_ICvar   = BruteforceInterface<ICvar>("VEngineCvar", sharedobj::vstdlib());
     g_IEngine = BruteforceInterface<IVEngineClient013>("VEngineClient",
                                                        sharedobj::engine());
-    g_AppID       = g_IEngine->GetAppID();
-    g_IEntityList = BruteforceInterface<IClientEntityList>("VClientEntityList",
+    g_AppID   = g_IEngine->GetAppID();
+    g_IEntityList  = BruteforceInterface<IClientEntityList>("VClientEntityList",
                                                            sharedobj::client());
     g_ISteamClient = BruteforceInterface<ISteamClient>(
         "SteamClient", sharedobj::steamclient(), 17);
@@ -94,7 +94,7 @@ void CreateInterfaces()
         "GAMEEVENTSMANAGER", sharedobj::engine(), 1);
     g_IBaseClient =
         BruteforceInterface<IBaseClientDLL>("VClient", sharedobj::client());
-    g_ITrace = BruteforceInterface<IEngineTrace>("EngineTraceClient",
+    g_ITrace       = BruteforceInterface<IEngineTrace>("EngineTraceClient",
                                                  sharedobj::engine());
     g_IInputSystem = BruteforceInterface<IInputSystem>(
         "InputSystemVersion", sharedobj::inputsystem());
@@ -122,7 +122,7 @@ void CreateInterfaces()
         g_ISteamFriends =
             g_ISteamClient->GetISteamFriends(su, sp, "SteamFriends002");
     }
-    g_GlobalVars = **(reinterpret_cast<CGlobalVarsBase ***>(
+    g_GlobalVars  = **(reinterpret_cast<CGlobalVarsBase ***>(
         (uintptr_t) 11 +
         gSignatures.GetClientSignature(
             "55 89 E5 83 EC ? 8B 45 08 8B 15 ? ? ? ? F3 0F 10")));
@@ -141,18 +141,16 @@ void CreateInterfaces()
     IF_GAME(IsTF2())
     {
         g_IInput = **(reinterpret_cast<IInput ***>(
-            (uintptr_t) 1 +
-            gSignatures.GetClientSignature(
-                "A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
-                "92 B4 00 00 00 A1 ? ? ? ? 8B 10")));
+            (uintptr_t) 1 + gSignatures.GetClientSignature(
+                                "A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
+                                "92 B4 00 00 00 A1 ? ? ? ? 8B 10")));
     }
     else IF_GAME(IsTF2C())
     {
         g_IInput = **(reinterpret_cast<IInput ***>(
-            (uintptr_t) 1 +
-            gSignatures.GetClientSignature(
-                "A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
-                "92 A8 00 00 00 A1 ? ? ? ? 8B 10")));
+            (uintptr_t) 1 + gSignatures.GetClientSignature(
+                                "A1 ? ? ? ? C6 05 ? ? ? ? 01 8B 10 89 04 24 FF "
+                                "92 A8 00 00 00 A1 ? ? ? ? 8B 10")));
     }
     else
     {
@@ -211,7 +209,7 @@ void CreateInterfaces()
         "VGUI_Surface", sharedobj::vguimatsurface());
     g_IStudioRender = BruteforceInterface<IStudioRender>(
         "VStudioRender", sharedobj::studiorender());
-    g_IVRenderView = BruteforceInterface<IVRenderView>("VEngineRenderView",
+    g_IVRenderView      = BruteforceInterface<IVRenderView>("VEngineRenderView",
                                                        sharedobj::engine());
     g_IMaterialSystemHL = (IMaterialSystem *) g_IMaterialSystem;
     IF_GAME(IsTF2())

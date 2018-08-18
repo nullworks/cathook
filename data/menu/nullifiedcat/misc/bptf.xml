@@ -1,0 +1,5 @@
+<Tab name="Backpack tf" padding="4 4 4 4">
+    <List width="200">
+        <AutoVariable width="fill" target="backpack-tf.enable" label="Enable Backpack.tf Integration"/>
+    </List>
+</Tab>

@@ -13,4 +13,4 @@ public:
         return *((CTFPlayerShared *) (unsigned(self) + 6092));
     }
 };
-}
+} // namespace re

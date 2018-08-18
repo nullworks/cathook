@@ -5,15 +5,14 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "remove.disguise", "0" };
+static settings::Bool no_invisibility{ "remove.cloak", "0" };
 
 namespace hacks::tf2::antidisguise
 {
-
-static CatVar enabled(CV_SWITCH, "antidisguise", "0", "Remove spy disguise",
-                      "Removes the disguise from spys\nUsefull for aimbot");
-static CatVar no_invisibility(CV_SWITCH, "no_invis", "0", "Remove Invisibility",
-                              "Useful with chams!");
 
 void Draw()
 {
@@ -33,7 +32,7 @@ void Draw()
                 }
             }
         }
-    if (!enabled)
+    if (!enable)
         return;
     for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
     {
@@ -49,4 +48,4 @@ void Draw()
         }
     }
 }
-}
+} // namespace hacks::tf2::antidisguise

@@ -4,10 +4,14 @@
 */
 
 #include <hacks/hacklist.hpp>
+#include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar die_if_vac(CV_SWITCH, "die_if_vac", "0", "Die if VAC banned");
-static CatVar autoabandon(CV_SWITCH, "cbu_abandon", "0", "Auto abandon");
+static settings::Bool die_if_vac{ "misc.die-if-vac", "false" };
+static settings::Bool autoabandon{ "misc.auto-abandon", "false" };
+static settings::String custom_disconnect_reason{ "misc.disconnect-reason",
+                                                  "" };
+
 namespace hooked_methods
 {
 Timer t{};
@@ -29,10 +33,10 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);
 #endif
-    if (cathook && (disconnect_reason.convar_parent->m_StringLength > 3) &&
+    if (isHackActive() && (custom_disconnect_reason.toString().size() > 3) &&
         strstr(reason, "user"))
     {
-        original::Shutdown(this_, disconnect_reason_newlined);
+        original::Shutdown(this_, custom_disconnect_reason.toString().c_str());
     }
     else
     {
@@ -42,14 +46,8 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
     if (autoabandon)
     {
         t.update();
-        while (1)
-            if (t.test_and_set(5000))
-            {
-                tfmm::dcandabandon();
-                break;
-            }
+        tfmm::disconnectAndAbandon();
     }
-    if (hacks::shared::autojoin::auto_queue)
-        tfmm::queue_start();
+    hacks::shared::autojoin::onShutdown();
 }
-}
+} // namespace hooked_methods

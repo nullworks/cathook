@@ -9,10 +9,13 @@
 #include <string.h>
 
 #include <pwd.h>
+#include <settings/Bool.hpp>
 
 #include "common.hpp"
 
-FILE *logging::handle = 0;
+settings::Bool log_to_console{ "hack.log-console", "false" };
+
+FILE *logging::handle{ nullptr };
 
 void logging::Initialize()
 {
@@ -24,7 +27,7 @@ void logging::Initialize()
 
 void logging::Info(const char *fmt, ...)
 {
-    if (logging::handle == 0)
+    if (logging::handle == nullptr)
         logging::Initialize();
     char *buffer = new char[1024];
     va_list list;
@@ -45,7 +48,7 @@ void logging::Info(const char *fmt, ...)
 #if ENABLE_VISUALS
     if (g_ICvar)
     {
-        if (console_logging.convar_parent && console_logging)
+        if (*log_to_console)
             g_ICvar->ConsolePrintf("%s", result);
     }
 #endif
@@ -56,5 +59,5 @@ void logging::Info(const char *fmt, ...)
 void logging::Shutdown()
 {
     fclose(logging::handle);
-    logging::handle = 0;
+    logging::handle = nullptr;
 }

@@ -43,4 +43,4 @@ void Update()
         }
     }
 }
-}
+} // namespace projectile_logging

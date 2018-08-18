@@ -14,7 +14,7 @@ namespace vgui
 {
 class ISurface;
 class IPanel;
-}
+} // namespace vgui
 
 class ISteamClient;
 class ISteamFriends;

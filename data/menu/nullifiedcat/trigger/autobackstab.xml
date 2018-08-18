@@ -1,0 +1,8 @@
+<Tab name="Auto Backstab" padding="4 4 4 4">
+    <Box padding="6 6 6 6" width="content" height="content">
+        <List width="170">
+            <AutoVariable width="fill" target="autobackstab.enable" label="Enable Auto Backstab"/>
+            <AutoVariable width="fill" target="autobackstab.silent" label="Silent"/>
+        </List>
+    </Box>
+</Tab>

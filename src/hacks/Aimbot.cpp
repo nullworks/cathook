@@ -12,155 +12,72 @@
 #include <hacks/Backtrack.hpp>
 #include <glez/draw.hpp>
 #include <PlayerTools.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "aimbot.enable", "false" };
+static settings::Button aimkey{ "aimbot.aimkey.button", "<null>" };
+static settings::Int aimkey_mode{ "aimbot.aimkey.mode", "1" };
+static settings::Bool autoshoot{ "aimbot.autoshoot", "1" };
+static settings::Bool autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
+static settings::Bool multipoint{ "aimbot.multipoint", "false" };
+static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
+static settings::Float fov{ "aimbot.fov", "0" };
+static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
+static settings::Bool wait_for_charge{ "aimbot.wait-for-charge", "0" };
+
+static settings::Bool silent{ "aimbot.silent", "1" };
+static settings::Bool target_lock{ "aimbot.lock-target", "0" };
+static settings::Int hitbox{ "aimbot.hitbox", "0" };
+static settings::Bool zoomed_only{ "aimbot.zoomed-only", "1" };
+static settings::Bool only_can_shoot{ "aimbot.can-shoot-only", "1" };
+
+static settings::Bool extrapolate{ "aimbot.extrapolate", "0" };
+static settings::Int slow_aim{ "aimbot.slow", "0" };
+static settings::Float miss_chance{ "aimbot.miss-chance", "0" };
+
+static settings::Bool projectile_aimbot{ "aimbot.projectile.enable", "true" };
+static settings::Float proj_gravity{ "aimbot.projectile.gravity", "0" };
+static settings::Float proj_speed{ "aimbot.projectile.speed", "0" };
+static settings::Float huntsman_autoshoot{
+    "aimbot.projectile.huntsman-autoshoot", "0.5"
+};
+static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot",
+                                         "0.5" };
+
+static settings::Bool aimbot_debug{ "aimbot.debug", "0" };
+static settings::Bool engine_projpred{ "aimbot.debug.engine-pp", "0" };
+
+static settings::Bool auto_spin_up{ "aimbot.auto.spin-up", "0" };
+static settings::Bool auto_zoom{ "aimbot.auto.zoom", "0" };
+static settings::Bool auto_unzoom{ "aimbot.auto.unzoom", "0" };
+
+static settings::Bool backtrackAimbot{ "aimbot.backtrack", "0" };
+
+// TODO maybe these should be moved into "Targeting"
+static settings::Float max_range{ "aimbot.target.max-range", "4096" };
+static settings::Bool ignore_vaccinator{ "aimbot.target.ignore-vaccinator",
+                                         "1" };
+static settings::Bool ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "1" };
+static settings::Bool ignore_deadringer{ "aimbot.target.ignore-deadringer",
+                                         "1" };
+static settings::Bool buildings_sentry{ "aimbot.target.sentry", "1" };
+static settings::Bool buildings_other{ "aimbot.target.other-buildings", "1" };
+static settings::Bool stickybot{ "aimbot.target.stickybomb", "0" };
+static settings::Bool rageonly{ "aimbot.target.ignore-non-rage", "0" };
+static settings::Int teammates{ "aimbot.target.teammates", "0" };
+
+#if ENABLE_VISUALS
+static settings::Bool fov_draw{ "aimbot.fov-circle.enable", "0" };
+static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
+#endif
 
 namespace hacks::shared::aimbot
 {
-
-// User settings are stored and used by these vars
-static CatVar enabled(CV_SWITCH, "aimbot_enabled", "0", "Enable Aimbot",
-                      "Main aimbot switch");
-static CatVar aimkey(CV_KEY, "aimbot_aimkey", "0", "Aimkey",
-                     "Aimkey. Look at Aimkey Mode too!");
-static CatEnum aimkey_modes_enum({ "DISABLED", "AIMKEY", "REVERSE", "TOGGLE" });
-static CatVar aimkey_mode(aimkey_modes_enum, "aimbot_aimkey_mode", "1",
-                          "Aimkey mode",
-                          "DISABLED: aimbot is always active\nAIMKEY: aimbot "
-                          "is active when key is down\nREVERSE: aimbot is "
-                          "disabled when key is down\nTOGGLE: pressing key "
-                          "toggles aimbot");
-static CatVar autoshoot(CV_SWITCH, "aimbot_autoshoot", "1", "Autoshoot",
-                        "Shoot automatically when the target is locked, isn't "
-                        "compatible with 'Enable when attacking'");
-static CatVar autoshoot_disguised(CV_SWITCH, "aimbot_autoshoot_disguised", "1",
-                                  "Autoshoot while disguised",
-                                  "Shoot automatically if disguised.");
-static CatVar multipoint(CV_SWITCH, "aimbot_multipoint", "0", "Multipoint",
-                         "Multipoint aimbot");
-static CatEnum hitbox_mode_enum({ "AUTO", "AUTO-CLOSEST", "STATIC" });
-static CatVar hitbox_mode(hitbox_mode_enum, "aimbot_hitboxmode", "0",
-                          "Hitbox Mode", "Defines hitbox selection mode");
-static CatVar fov(
-    CV_FLOAT, "aimbot_fov", "0", "Aimbot FOV",
-    "FOV range for aimbot to lock targets. \"Smart FOV\" coming eventually.",
-    180.0f);
-static CatVar fovcircle_opacity(CV_FLOAT, "aimbot_fov_draw_opacity", "0.7",
-                                "FOV Circle Opacity",
-                                "Defines opacity of FOV circle", 0.0f, 1.0f);
-// Selective and related
-static CatEnum priority_mode_enum({ "SMART", "FOV", "DISTANCE", "HEALTH" });
-static CatVar priority_mode(priority_mode_enum, "aimbot_prioritymode", "0",
-                            "Priority mode",
-                            "Priority mode.\n"
-                            "SMART: Basically Auto-Threat. "
-                            "FOV, DISTANCE, HEALTH are self-explainable. "
-                            "HEALTH picks the weakest enemy");
-static CatVar
-    wait_for_charge(CV_SWITCH, "aimbot_charge", "0",
-                    "Wait for sniper rifle charge",
-                    "Aimbot waits until it has enough charge to kill");
-static CatVar ignore_vaccinator(
-    CV_SWITCH, "aimbot_ignore_vaccinator", "1", "Ignore Vaccinator",
-    "Hitscan weapons won't fire if enemy is vaccinated against bullets");
-static CatVar ignore_cloak(CV_SWITCH, "aimbot_ignore_cloak", "1",
-                           "Ignore cloaked", "Don't aim at invisible enemies");
-static CatVar ignore_deadringer(CV_SWITCH, "aimbot_ignore_deadringer", "1",
-                                "Ignore deadringer",
-                                "Don't aim at deadringed enemies");
-static CatVar buildings_sentry(CV_SWITCH, "aimbot_buildings_sentry", "1",
-                               "Aim Sentry",
-                               "Should aimbot aim at sentryguns?");
-static CatVar buildings_other(CV_SWITCH, "aimbot_buildings_other", "1",
-                              "Aim Other building",
-                              "Should aimbot aim at other buildings");
-static CatVar stickybot(CV_SWITCH, "aimbot_stickys", "0", "Aim Sticky",
-                        "Should aimbot aim at stickys");
-static CatVar rageonly(CV_SWITCH, "aimbot_rage_only", "0",
-                       "Ignore non-rage targets",
-                       "Use playerlist to set up rage targets");
-static CatEnum teammates_enum({ "ENEMY ONLY", "TEAMMATE ONLY", "BOTH" });
-static CatVar teammates(teammates_enum, "aimbot_teammates", "0",
-                        "Aim at teammates",
-                        "Use to choose which team/s to target");
-// Other prefrences
-static CatVar
-    silent(CV_SWITCH, "aimbot_silent", "1", "Silent",
-           "Your screen doesn't get snapped to the point where aimbot aims at");
-static CatVar target_lock(
-    CV_SWITCH, "aimbot_target_lock", "0", "Target Lock",
-    "Keeps your previously chosen target untill target check fails");
-static CatEnum hitbox_enum({ "HEAD", "PELVIS", "SPINE 0", "SPINE 1", "SPINE 2",
-                             "SPINE 3", "UPPER ARM L", "LOWER ARM L", "HAND L",
-                             "UPPER ARM R", "LOWER ARM R", "HAND R", "HIP L",
-                             "KNEE L", "FOOT L", "HIP R", "KNEE R", "FOOT R" });
-static CatVar hitbox(hitbox_enum, "aimbot_hitbox", "0", "Hitbox",
-                     "Hitbox to aim at. Ignored if AutoHitbox is on");
-static CatVar zoomed_only(CV_SWITCH, "aimbot_zoomed", "0", "Zoomed only",
-                          "Don't autoshoot with unzoomed rifles");
-static CatVar only_can_shoot(CV_SWITCH, "aimbot_only_when_can_shoot", "1",
-                             "Active when can shoot",
-                             "Aimbot only activates when you can instantly "
-                             "shoot, sometimes making the autoshoot invisible "
-                             "for spectators");
-static CatVar
-    max_range(CV_INT, "aimbot_maxrange", "0", "Max distance",
-              "Max range for aimbot\n"
-              "900-1100 range is efficient for scout/widowmaker engineer",
-              4096.0f);
-static CatVar extrapolate(CV_SWITCH, "aimbot_extrapolate", "0",
-                          "Latency extrapolation",
-                          "(NOT RECOMMENDED) latency extrapolation");
-static CatVar slow_aim(CV_INT, "aimbot_slow", "0", "Slow Aim",
-                       "Slowly moves your crosshair onto the target for more "
-                       "legit play\nDisables silent aimbot",
-                       0, 50);
-static CatVar projectile_aimbot(
-    CV_SWITCH, "aimbot_projectile", "1", "Projectile aimbot",
-    "If you turn it off, aimbot won't try to aim with projectile weapons");
-static CatVar
-    proj_gravity(CV_FLOAT, "aimbot_proj_gravity", "0", "Projectile gravity",
-                 "Force override projectile gravity. Useful for debugging.",
-                 1.0f);
-static CatVar
-    proj_speed(CV_FLOAT, "aimbot_proj_speed", "0", "Projectile speed",
-               "Force override projectile speed.\n"
-               "Can be useful for playing with MvM upgrades or on x10 servers "
-               "since there is no \"automatic\" projectile speed detection in "
-               "cathook. Yet.");
-static CatVar
-    huntsman_autoshoot(CV_FLOAT, "aimbot_huntsman_charge", "0.5",
-                       "Huntsman autoshoot",
-                       "Minimum charge for autoshooting with huntsman.\n"
-                       "Set it to 0.01 if you want to shoot as soon as you "
-                       "start pulling the arrow",
-                       0.01f, 1.0f);
-static CatVar
-    sticky_autoshoot(CV_FLOAT, "aimbot_sticky_charge", "0.5",
-                     "Sticky autoshoot",
-                     "Minimum charge for autoshooting with Pipebomb Launcher.\n"
-                     "Set it to 0.01 if you want to shoot as soon as you "
-                     "start Charging",
-                     0.01f, 4.0f);
-static CatVar miss_chance(CV_FLOAT, "aimbot_miss_chance", "0", "Miss chance",
-                          "From 0 to 1. Aimbot will NOT aim in these % cases",
-                          0.0f, 1.0f);
-// Debug vars
-static CatVar aimbot_debug(CV_SWITCH, "aimbot_debug", "0", "Aimbot Debug",
-                           "Display simple debug info for aimbot");
-static CatVar engine_projpred(CV_SWITCH, "debug_aimbot_engine_pp", "0",
-                              "Engine ProjPred");
-// Followbot vars
-static CatVar auto_spin_up(
-    CV_SWITCH, "aimbot_spin_up", "0", "Auto Spin Up",
-    "Spin up minigun if you can see target, useful for followbots");
-static CatVar auto_zoom(
-    CV_SWITCH, "aimbot_auto_zoom", "0", "Auto Zoom",
-    "Automatically zoom in if you can see target, useful for followbots");
-static CatVar auto_unzoom(CV_SWITCH, "aimbot_auto_unzoom", "0", "Auto Un-zoom",
-                          "Automatically unzoom");
-static CatVar backtrackAimbot(CV_SWITCH, "backtrack_aimbot", "0",
-                              "Backtrack Aimbot", "Enable Backtrack Aimbot");
-
+bool IsBacktracking()
+{
+    return !(!aimkey || !aimkey.isKeyDown()) && *enable && *backtrackAimbot;
+}
 // Current Entity
 int target_eid{ 0 };
 CachedEntity *target      = 0;
@@ -179,111 +96,26 @@ Timer zoomTime{};
 // This array will store calculated projectile/hitscan predictions
 // for current frame, to avoid performing them again
 AimbotCalculatedData_s calculated_data_array[2048]{};
-#define IsMelee GetWeaponMode() == weapon_melee
-bool BacktrackAimbot()
-{
-    if (!hacks::shared::backtrack::enable || !backtrackAimbot)
-        return false;
-    if (aimkey && !aimkey.KeyDown())
-        return false;
-
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || !CanShoot())
-        return false;
-
-    if (zoomed_only && !g_pLocalPlayer->bZoomed &&
-        !(g_pUserCmd->buttons & IN_ATTACK))
-        return false;
-
-    int iBestTarget = hacks::shared::backtrack::iBestTarget;
-    if (iBestTarget == -1)
-        return true;
-    int tickcnt = 0;
-    int tickus = (float(hacks::shared::backtrack::latency) > 800.0f || float(hacks::shared::backtrack::latency) < 200.0f) ? 12 : 24;
-    for (auto i : hacks::shared::backtrack::headPositions[iBestTarget])
-    {
-        bool good_tick = false;
-        for (int j = 0; j < tickus; ++j)
-            if (tickcnt == hacks::shared::backtrack::sorted_ticks[j].tick &&
-                hacks::shared::backtrack::sorted_ticks[j].tickcount != INT_MAX)
-                good_tick = true;
-        tickcnt++;
-        if (!i.hitboxpos.z)
-            continue;
-        if (!good_tick)
-            continue;
-        if (!IsVectorVisible(g_pLocalPlayer->v_Eye, i.hitboxpos, true))
-            continue;
-        float scr = abs(g_pLocalPlayer->v_OrigViewangles.y - i.viewangles);
-
-        CachedEntity *tar = ENTITY(iBestTarget);
-        // ok just in case
-        if (CE_BAD(tar))
-            continue;
-        // target_eid = tar->m_IDX;
-        Vector &angles = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-        float &simtime = CE_FLOAT(tar, netvar.m_flSimulationTime);
-        angles.y       = i.viewangles;
-        simtime        = i.simtime;
-        g_pUserCmd->tick_count = i.tickcount;
-        Vector tr              = (i.hitboxpos - g_pLocalPlayer->v_Eye);
-        Vector angles2;
-        VectorAngles(tr, angles2);
-        // Clamping is important
-        fClampAngle(angles2);
-        // Slow aim
-        if (slow_aim)
-            DoSlowAim(angles2);
-        else if (silent)
-            g_pLocalPlayer->bUseSilentAngles = true;
-        if (!slow_aim)
-            slow_can_shoot = true;
-        // Set angles
-        g_pUserCmd->viewangles = angles2;
-        if (autoshoot && slow_can_shoot)
-            g_pUserCmd->buttons |= IN_ATTACK;
-        return true;
-    }
-    return true;
-}
 // The main "loop" of the aimbot.
 void CreateMove()
 {
     PROF_SECTION(PT_aimbot_cm);
-    if (!enabled)
+    if (!enable)
         return;
 
     // Auto-Unzoom
     if (auto_unzoom)
     {
         if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed &&
-            zoomTime.check(3000))
+            zoomTime.test_and_set(3000))
         {
-            g_pUserCmd->buttons |= IN_ATTACK2;
+            current_user_cmd->buttons |= IN_ATTACK2;
         }
     }
     // We do this as we need to pass whether the aimkey allows aiming to both
     // the find target and aiming system. If we just call the func than toggle
     // aimkey would break so we save it to a var to use it twice
     bool aimkey_status = UpdateAimkey();
-    // Refresh our best target
-    CachedEntity *target_entity = RetrieveBestTarget(aimkey_status);
-    if (CE_BAD(target_entity) || !foundTarget)
-        return;
-    // Auto-zoom
-    IF_GAME(IsTF())
-    {
-        if (auto_zoom)
-        {
-            if (g_pLocalPlayer->holding_sniper_rifle)
-            {
-                zoomTime.update();
-                if (not g_pLocalPlayer->bZoomed)
-                {
-                    g_pUserCmd->buttons |= IN_ATTACK2;
-                }
-            }
-        }
-    }
     // check if we need to run projectile Aimbot code
     projectileAimbotRequired = false;
     if (projectile_aimbot &&
@@ -307,9 +139,45 @@ void CreateMove()
         if (proj_gravity)
             cur_proj_grav = float(proj_gravity);
     }
-    if (BacktrackAimbot())
+    // Refresh our best target
+    CachedEntity *target_entity = RetrieveBestTarget(aimkey_status);
+    if (CE_BAD(target_entity) || !foundTarget)
         return;
-
+    // Auto-zoom
+    IF_GAME(IsTF())
+    {
+        if (auto_zoom)
+        {
+            if (g_pLocalPlayer->holding_sniper_rifle)
+            {
+                zoomTime.update();
+                if (not g_pLocalPlayer->bZoomed)
+                    current_user_cmd->buttons |= IN_ATTACK2;
+            }
+        }
+    }
+    // If zoomed only is on, check if zoomed
+    if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
+    {
+    	if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
+            return;
+    }
+    // Minigun spun up handler
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFMinigun))
+    {
+        int weapon_state =
+                CE_INT(g_pLocalPlayer->weapon(), netvar.iWeaponState);
+        // If user setting for autospin isnt true, then we check if minigun
+        // is already zoomed
+        if ((weapon_state == MinigunState_t::AC_STATE_IDLE ||
+             weapon_state == MinigunState_t::AC_STATE_STARTFIRING) &&
+            !auto_spin_up)
+            return;
+        if (auto_spin_up)
+            current_user_cmd->buttons |= IN_ATTACK2;
+        if (!(current_user_cmd->buttons & (IN_ATTACK2 | IN_ATTACK)))
+            return;
+    }
     if (!g_IEntityList->GetClientEntity(target_entity->m_IDX))
         return;
     if (!target_entity->hitboxes.GetHitbox(
@@ -341,7 +209,7 @@ void CreateMove()
                 currently_charging_huntsman = true;
 
             // Huntsman was released
-            if (!(g_pUserCmd->buttons & IN_ATTACK) &&
+            if (!(current_user_cmd->buttons & IN_ATTACK) &&
                 currently_charging_huntsman)
             {
                 currently_charging_huntsman = false;
@@ -366,7 +234,8 @@ void CreateMove()
                 currently_charging_pipe = true;
 
             // Grenade was released
-            if (!(g_pUserCmd->buttons & IN_ATTACK) && currently_charging_pipe)
+            if (!(current_user_cmd->buttons & IN_ATTACK) &&
+                currently_charging_pipe)
             {
                 currently_charging_pipe = false;
                 Aim(target_entity);
@@ -393,8 +262,6 @@ void CreateMove()
         DoAutoshoot();
         Aim(target_entity);
     }
-
-    return;
 }
 
 // The first check to see if the player should aim in the first place
@@ -403,7 +270,7 @@ bool ShouldAim()
     // Checks should be in order: cheap -> expensive
 
     // Check for +use
-    if (g_pUserCmd->buttons & IN_USE)
+    if (current_user_cmd->buttons & IN_USE)
         return false;
     // Check if using action slot item
     if (g_pLocalPlayer->using_action_slot_item)
@@ -417,12 +284,6 @@ bool ShouldAim()
         // Deadringer out?
         if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
             return false;
-        // If zoomed only is on, check if zoomed
-        if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
-        {
-            if (!g_pLocalPlayer->bZoomed && !(g_pUserCmd->buttons & IN_ATTACK))
-                return false;
-        }
         // Is taunting?
         if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
             return false;
@@ -455,33 +316,10 @@ bool ShouldAim()
         // Check if player is zooming
         if (g_pLocalPlayer->bZoomed)
         {
-            if (!(g_pUserCmd->buttons & (IN_ATTACK | IN_ATTACK2)))
+            if (!(current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2)))
             {
                 if (!CanHeadshot())
                     return false;
-            }
-        }
-
-        // Minigun spun up handler
-        if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFMinigun))
-        {
-            int weapon_state =
-                CE_INT(g_pLocalPlayer->weapon(), netvar.iWeaponState);
-            // If user setting for autospin isnt true, then we check if minigun
-            // is already zoomed
-            if ((weapon_state == MinigunState_t::AC_STATE_IDLE ||
-                 weapon_state == MinigunState_t::AC_STATE_STARTFIRING) &&
-                !auto_spin_up)
-            {
-                return false;
-            }
-            if (auto_spin_up)
-            {
-                g_pUserCmd->buttons |= IN_ATTACK2;
-            }
-            if (!(g_pUserCmd->buttons & (IN_ATTACK2 | IN_ATTACK)))
-            {
-                return false;
             }
         }
     }
@@ -516,50 +354,58 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     CachedEntity *ent;
     CachedEntity *target_highest_ent = 0;
     target_highest_score             = -256;
-
-    for (int i = 0; i < HIGHEST_ENTITY; i++)
+    if (!hacks::shared::backtrack::isBacktrackEnabled || projectile_mode)
     {
-        ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue; // Check for null and dormant
-        // Check whether the current ent is good enough to target
-        if (IsTargetStateGood(ent))
+        for (int i = 0; i < HIGHEST_ENTITY; i++)
         {
+            ent = ENTITY(i);
+            if (CE_BAD(ent))
+                continue; // Check for null and dormant
+            // Check whether the current ent is good enough to target
+            if (IsTargetStateGood(ent))
+            {
 
-            // Distance Priority, Uses this is melee is used
-            if (GetWeaponMode() == weaponmode::weapon_melee ||
-                (int) priority_mode == 2)
-            {
-                scr = 4096.0f -
-                      calculated_data_array[i].aim_position.DistTo(
-                          g_pLocalPlayer->v_Eye);
-            }
-            else
-            {
-                switch ((int) priority_mode)
+                // Distance Priority, Uses this is melee is used
+                if (GetWeaponMode() == weaponmode::weapon_melee ||
+                    (int) priority_mode == 2)
                 {
-                case 0: // Smart Priority
-                    scr = GetScoreForEntity(ent);
-                    break;
-                case 1: // Fov Priority
-                    scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
-                    break;
-                case 3: // Health Priority
-                    scr = 450.0f - ent->m_iHealth();
-                    break;
-                default:
-                    break;
+                    scr =
+                        4096.0f - calculated_data_array[i].aim_position.DistTo(
+                                      g_pLocalPlayer->v_Eye);
                 }
-            }
-            // Compare the top score to our current ents score
-            if (scr > target_highest_score)
-            {
-                foundTarget          = true;
-                target_highest_score = scr;
-                target_highest_ent   = ent;
+                else
+                {
+                    switch ((int) priority_mode)
+                    {
+                    case 0: // Smart Priority
+                        scr = GetScoreForEntity(ent);
+                        break;
+                    case 1: // Fov Priority
+                        scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
+                        break;
+                    case 3: // Health Priority
+                        scr = 450.0f - ent->m_iHealth();
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                // Compare the top score to our current ents score
+                if (scr > target_highest_score)
+                {
+                    foundTarget          = true;
+                    target_highest_score = scr;
+                    target_highest_ent   = ent;
+                }
             }
         }
     }
+    else if (hacks::shared::backtrack::iBestTarget != -1)
+    {
+        target_highest_ent = ENTITY(hacks::shared::backtrack::iBestTarget);
+        foundTarget        = true;
+    }
+
     // Save the ent for future use with target lock
     target_last = target_highest_ent;
 
@@ -574,6 +420,9 @@ bool IsTargetStateGood(CachedEntity *entity)
 {
     PROF_SECTION(PT_aimbot_targetstatecheck);
 
+    if (hacks::shared::backtrack::isBacktrackEnabled &&
+        entity->m_Type() != ENTITY_PLAYER)
+        return false;
     // Checks for Players
     if (entity->m_Type() == ENTITY_PLAYER)
     {
@@ -611,8 +460,16 @@ bool IsTargetStateGood(CachedEntity *entity)
             // Wait for charge
             if (wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
             {
-                float cdmg     = CE_FLOAT(LOCAL_W, netvar.flChargedDamage) * 3;
-                bool maxCharge = cdmg >= 450.0F;
+                float cdmg  = CE_FLOAT(LOCAL_W, netvar.flChargedDamage) * 3;
+                float maxhs = 450.0f;
+                if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 230 ||
+                    HasCondition<TFCond_Jarated>(entity))
+                {
+                    cdmg =
+                        int(CE_FLOAT(LOCAL_W, netvar.flChargedDamage) * 1.35f);
+                    maxhs = 203.0f;
+                }
+                bool maxCharge = cdmg >= maxhs;
 
                 // Darwins damage correction, Darwins protects against 15% of
                 // damage
@@ -636,9 +493,12 @@ bool IsTargetStateGood(CachedEntity *entity)
 
                 // Check if player will die from headshot or if target has more
                 // than 450 health and sniper has max chage
-                if (!(entity->m_iHealth() <= 150.0F ||
+                float hsdmg = 150.0f;
+                if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 230)
+                    hsdmg = int(50.0f * 1.35f);
+                if (!(entity->m_iHealth() <= hsdmg ||
                       entity->m_iHealth() <= cdmg || !g_pLocalPlayer->bZoomed ||
-                      (maxCharge && entity->m_iHealth() > 450.0F)))
+                      (maxCharge && entity->m_iHealth() > maxhs)))
                 {
                     return false;
                 }
@@ -687,7 +547,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Vis check + fov check
         if (!VischeckPredictedEntity(entity))
             return false;
-        if ((float) fov > 0.0f && cd.fov > (float) fov)
+        if (*fov > 0.0f && cd.fov > *fov)
             return false;
 
         return true;
@@ -736,7 +596,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Vis and fov checks
         if (!VischeckPredictedEntity(entity))
             return false;
-        if ((float) fov > 0.0f && cd.fov > (float) fov)
+        if (*fov > 0.0f && cd.fov > *fov)
             return false;
 
         return true;
@@ -780,7 +640,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Vis and fov check
         if (!VischeckPredictedEntity(entity))
             return false;
-        if ((float) fov > 0.0f && cd.fov > (float) fov)
+        if (*fov > 0.0f && cd.fov > *fov)
             return false;
 
         return true;
@@ -818,17 +678,35 @@ void Aim(CachedEntity *entity)
         // Get hitbox num
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         float minx, maxx, miny, maxy, minz, maxz, centerx, centery, centerz;
-        auto hitbox = entity->hitboxes.GetHitbox(cd.hitbox);
+        auto hitboxmin    = entity->hitboxes.GetHitbox(cd.hitbox)->min;
+        auto hitboxmax    = entity->hitboxes.GetHitbox(cd.hitbox)->max;
+        auto hitboxcenter = entity->hitboxes.GetHitbox(cd.hitbox)->center;
+        if (hacks::shared::backtrack::isBacktrackEnabled)
+        {
+            hitboxcenter =
+                hacks::shared::backtrack::headPositions
+                    [entity->m_IDX][hacks::shared::backtrack::BestTick]
+                        .hitboxes[cd.hitbox]
+                        .center;
+            hitboxmin = hacks::shared::backtrack::headPositions
+                            [entity->m_IDX][hacks::shared::backtrack::BestTick]
+                                .hitboxes[cd.hitbox]
+                                .min;
+            hitboxmax = hacks::shared::backtrack::headPositions
+                            [entity->m_IDX][hacks::shared::backtrack::BestTick]
+                                .hitboxes[cd.hitbox]
+                                .max;
+        }
         // get positions
-        minx    = hitbox->min.x;
-        miny    = hitbox->min.y;
-        maxx    = hitbox->max.x;
-        maxy    = hitbox->max.y;
-        minz    = hitbox->min.z;
-        maxz    = hitbox->max.z;
-        centerx = hitbox->center.x;
-        centery = hitbox->center.y;
-        centerz = hitbox->center.z;
+        minx    = hitboxmin.x;
+        miny    = hitboxmin.y;
+        maxx    = hitboxmax.x;
+        maxy    = hitboxmax.y;
+        minz    = hitboxmin.z;
+        maxz    = hitboxmax.z;
+        centerx = hitboxcenter.x;
+        centery = hitboxcenter.y;
+        centerz = hitboxcenter.z;
 
         // Shrink positions
         std::vector<Vector> positions;
@@ -852,7 +730,7 @@ void Aim(CachedEntity *entity)
         positions.push_back({ maxx, maxy, centerz });
         positions.push_back({ minx, miny, centerz });
         positions.push_back({ maxx, maxy, centerz });
-        positions.push_back(hitbox->center);
+        positions.push_back(hitboxcenter);
         for (auto pos : positions)
             if (IsVectorVisible(g_pLocalPlayer->v_Eye, pos))
             {
@@ -870,11 +748,19 @@ void Aim(CachedEntity *entity)
         DoSlowAim(angles);
 
     // Set angles
-    g_pUserCmd->viewangles = angles;
+    current_user_cmd->viewangles = angles;
 
     if (silent && !slow_aim)
         g_pLocalPlayer->bUseSilentAngles = true;
-
+    if (hacks::shared::backtrack::isBacktrackEnabled)
+    {
+        auto i = hacks::shared::backtrack::headPositions
+            [hacks::shared::backtrack::iBestTarget]
+            [hacks::shared::backtrack::BestTick];
+        current_user_cmd->tick_count = i.tickcount;
+        float &simtime = NET_FLOAT(RAW_ENT(entity), netvar.m_flSimulationTime);
+        simtime        = i.simtime;
+    }
     // Finish function
     return;
 }
@@ -902,14 +788,14 @@ void DoAutoshoot()
              (float) huntsman_autoshoot) &&
             begancharge)
         {
-            g_pUserCmd->buttons &= ~IN_ATTACK;
+            current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(3);
             begancharge = false;
             // Pull string if charge isnt enough
         }
         else
         {
-            g_pUserCmd->buttons |= IN_ATTACK;
+            current_user_cmd->buttons |= IN_ATTACK;
             begancharge = true;
         }
         return;
@@ -924,21 +810,21 @@ void DoAutoshoot()
         // Release Sticky if > chargetime
         if ((chargetime >= (float) sticky_autoshoot) && begansticky > 3)
         {
-            g_pUserCmd->buttons &= ~IN_ATTACK;
+            current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(3);
             begansticky = 0;
         }
         // Else just keep charging
         else
         {
-            g_pUserCmd->buttons |= IN_ATTACK;
+            current_user_cmd->buttons |= IN_ATTACK;
             begansticky++;
         }
         return;
     }
     else
         begansticky = 0;
-    bool attack     = true;
+    bool attack = true;
 
     // Rifle check
     IF_GAME(IsTF())
@@ -978,10 +864,8 @@ void DoAutoshoot()
         attack = false;
 
     if (attack)
-        g_pUserCmd->buttons |= IN_ATTACK;
+        current_user_cmd->buttons |= IN_ATTACK;
     hacks::shared::antiaim::SetSafeSpace(1);
-
-    return;
 }
 
 // Grab a vector for a specific ent
@@ -993,45 +877,63 @@ const Vector &PredictEntity(CachedEntity *entity)
     if (cd.predict_tick == tickcount)
         return result;
 
-    // Players
-    if ((entity->m_Type() == ENTITY_PLAYER))
+    if (!hacks::shared::backtrack::isBacktrackEnabled || projectile_mode)
     {
-        // If using projectiles, predict a vector
-        if (projectileAimbotRequired)
+
+        // Players
+        if ((entity->m_Type() == ENTITY_PLAYER))
         {
-            // Use prediction engine if user settings allow
-            if (engine_projpred)
-                result = ProjectilePrediction_Engine(
-                    entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0);
+            // If using projectiles, predict a vector
+            if (projectileAimbotRequired)
+            {
+                // Use prediction engine if user settings allow
+                if (engine_projpred)
+                    result = ProjectilePrediction_Engine(
+                        entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0);
+                else
+                    result = ProjectilePrediction(entity, cd.hitbox,
+                                                  cur_proj_speed, cur_proj_grav,
+                                                  PlayerGravityMod(entity));
+            }
             else
-                result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed,
-                                              cur_proj_grav,
-                                              PlayerGravityMod(entity));
+            {
+                // If using extrapolation, then predict a vector
+                if (extrapolate)
+                    result = SimpleLatencyPrediction(entity, cd.hitbox);
+                // else just grab strait from the hitbox
+                else
+                    GetHitbox(entity, cd.hitbox, result);
+            }
+            // Buildings
+        }
+        else if (entity->m_Type() == ENTITY_BUILDING)
+        {
+            result = GetBuildingPosition(entity);
+            // Other
         }
         else
         {
-            // If using extrapolation, then predict a vector
-            if (extrapolate)
-                result = SimpleLatencyPrediction(entity, cd.hitbox);
-            // else just grab strait from the hitbox
-            else
-                GetHitbox(entity, cd.hitbox, result);
+            result = entity->m_vecOrigin();
         }
-        // Buildings
-    }
-    else if (entity->m_Type() == ENTITY_BUILDING)
-    {
-        result = GetBuildingPosition(entity);
-        // Other
+
+        cd.predict_tick = tickcount;
+
+        cd.fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye,
+                        result);
     }
     else
     {
-        result = entity->m_vecOrigin();
+        // Players only
+        if ((entity->m_Type() == ENTITY_PLAYER))
+        {
+            auto hb = hacks::shared::backtrack::headPositions
+                [entity->m_IDX][hacks::shared::backtrack::BestTick];
+            cd.predict_tick = tickcount;
+            result          = hb.hitboxes[cd.hitbox].center;
+            cd.fov          = GetFov(g_pLocalPlayer->v_OrigViewangles,
+                            g_pLocalPlayer->v_Eye, result);
+        }
     }
-
-    cd.predict_tick = tickcount;
-    cd.fov =
-        GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
     // Return the found vector
     return result;
 }
@@ -1045,7 +947,7 @@ int BestHitbox(CachedEntity *target)
     {
     case 0:
     { // AUTO-HEAD priority
-        int preferred = hitbox;
+        int preferred = int(hitbox);
         bool headonly = false; // Var to keep if we can bodyshot
 
         IF_GAME(IsTF())
@@ -1219,36 +1121,48 @@ bool VischeckPredictedEntity(CachedEntity *entity)
 
     // Update info
     cd.vcheck_tick = tickcount;
-    cd.visible     = IsEntityVectorVisible(entity, PredictEntity(entity));
+    if (!hacks::shared::backtrack::isBacktrackEnabled || projectile_mode)
+        cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity));
+    else
+        cd.visible = IsVectorVisible(
+            g_pLocalPlayer->v_Eye,
+            hacks::shared::backtrack::headPositions
+                [entity->m_IDX][hacks::shared::backtrack::BestTick]
+                    .hitboxes[cd.hitbox]
+                    .center,
+            true);
     return cd.visible;
 }
+
+static float slow_change_dist_p = 0;
+static float slow_change_dist_y = 0;
 
 // A helper function to find a user angle that isnt directly on the target
 // angle, effectively slowing the aiming process
 void DoSlowAim(Vector &input_angle)
 {
-    static float slow_change_dist_p = 0;
-    static float slow_change_dist_y = 0;
+
+    auto viewangles = current_user_cmd->viewangles;
 
     // Yaw
-    if (g_pUserCmd->viewangles.y != input_angle.y)
+    if (viewangles.y != input_angle.y)
     {
 
         // Check if input angle and user angle are on opposing sides of yaw so
         // we can correct for that
         bool slow_opposing = false;
-        if (input_angle.y < -90 && g_pUserCmd->viewangles.y > 90 ||
-            input_angle.y > 90 && g_pUserCmd->viewangles.y < -90)
+        if (input_angle.y < -90 && viewangles.y > 90 ||
+            input_angle.y > 90 && viewangles.y < -90)
             slow_opposing = true;
 
         // Direction
         bool slow_dir = false;
         if (slow_opposing)
         {
-            if (input_angle.y > 90 && g_pUserCmd->viewangles.y < -90)
+            if (input_angle.y > 90 && viewangles.y < -90)
                 slow_dir = true;
         }
-        else if (g_pUserCmd->viewangles.y > input_angle.y)
+        else if (viewangles.y > input_angle.y)
             slow_dir = true;
 
         // Speed, check if opposing. We dont get a new distance due to the
@@ -1256,28 +1170,27 @@ void DoSlowAim(Vector &input_angle)
         // our last one.
         if (!slow_opposing)
             slow_change_dist_y =
-                std::abs(g_pUserCmd->viewangles.y - input_angle.y) /
-                (int) slow_aim;
+                std::abs(viewangles.y - input_angle.y) / (int) slow_aim;
 
         // Move in the direction of the input angle
         if (slow_dir)
-            input_angle.y = g_pUserCmd->viewangles.y - slow_change_dist_y;
+            input_angle.y = viewangles.y - slow_change_dist_y;
         else
-            input_angle.y = g_pUserCmd->viewangles.y + slow_change_dist_y;
+            input_angle.y = viewangles.y + slow_change_dist_y;
     }
 
     // Pitch
-    if (g_pUserCmd->viewangles.x != input_angle.x)
+    if (viewangles.x != input_angle.x)
     {
         // Get speed
         slow_change_dist_p =
-            std::abs(g_pUserCmd->viewangles.x - input_angle.x) / (int) slow_aim;
+            std::abs(viewangles.x - input_angle.x) / (int) slow_aim;
 
         // Move in the direction of the input angle
-        if (g_pUserCmd->viewangles.x > input_angle.x)
-            input_angle.x = g_pUserCmd->viewangles.x - slow_change_dist_p;
+        if (viewangles.x > input_angle.x)
+            input_angle.x = viewangles.x - slow_change_dist_p;
         else
-            input_angle.x = g_pUserCmd->viewangles.x + slow_change_dist_p;
+            input_angle.x = viewangles.x + slow_change_dist_p;
     }
 
     // 0.17 is a good amount in general
@@ -1300,8 +1213,7 @@ bool UpdateAimkey()
     if (aimkey && aimkey_mode)
     {
         // Grab whether the aimkey is depressed
-        bool key_down =
-            g_IInputSystem->IsButtonDown((ButtonCode_t)(int) aimkey);
+        bool key_down = aimkey.isKeyDown();
         switch ((int) aimkey_mode)
         {
         case 1: // Only while key is depressed
@@ -1355,12 +1267,10 @@ void Reset()
 }
 
 #if ENABLE_VISUALS
-static CatVar fov_draw(CV_SWITCH, "aimbot_fov_draw", "0", "Draw Fov Ring",
-                       "Draws a ring to represent your current aimbot fov");
 void DrawText()
 {
     // Dont draw to screen when aimbot is disabled
-    if (!enabled)
+    if (!enable)
         return;
 
     // Fov ring to represent when a target will be shot

@@ -10,9 +10,8 @@
 namespace hacks::shared::autojoin
 {
 
-extern CatVar auto_queue;
-extern Timer queuetime;
-
-void Update();
-void UpdateSearch();
-}
+void resetQueueTimer();
+void update();
+void updateSearch();
+void onShutdown();
+} // namespace hacks::shared::autojoin

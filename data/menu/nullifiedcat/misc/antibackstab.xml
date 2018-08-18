@@ -1,0 +1,11 @@
+<Tab name="Anti Backstab" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content">
+        <List width="170">
+            <AutoVariable width="fill" target="antibackstab.enable" label="Enable Antibackstab"/>
+            <AutoVariable width="fill" target="antibackstab.angle" label="Detection Angle"/>
+            <AutoVariable width="fill" target="antibackstab.distance" label="Detection Distance"/>
+            <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
+            <AutoVariable width="fill" target="antibackstab.nope" label="Nope!"/>
+        </List>
+    </Box>
+</Tab>

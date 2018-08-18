@@ -1,0 +1,66 @@
+<Tab name="Automation" padding="4 4 4 4">
+    <Box name="Autojoin and taunt" width="content" height="content" padding="12 6 6 6">
+        <List width="200">
+            <AutoVariable width="fill" target="autojoin.auto-queue" label="Auto Queue"/>
+            <AutoVariable width="fill" target="autoqueue.mode" label="Autoqueue Mode" min="0" max="12"/>
+            <AutoVariable width="fill" target="hack.requeue-on-kick" label="Requeue on kick"/>
+            <AutoVariable width="fill" target="autotaunt.enable" label="Autotaunt enabled"/>
+            <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt chance" min="0" max="100"/>
+            <LabeledObject width="fill" label="Autojoin Class">
+                <Select target="autojoin.class">
+                    <Option name="None" value="0"/>
+                    <Option name="Scout" value="1"/>
+                    <Option name="Sniper" value="2"/>
+                    <Option name="Soldier" value="3"/>
+                    <Option name="Demoman" value="4"/>
+                    <Option name="Medic" value="5"/>
+                    <Option name="Heavy" value="6"/>
+                    <Option name="Pyro" value="7"/>
+                    <Option name="Spy" value="8"/>
+                    <Option name="Engineer" value="9"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="autojoin.team" label="Autojoin Team" min="0" max="1"/>
+        </List>
+    </Box>
+    <Box name="CBU" width="content" height="content" padding="12 6 6 6" y="130">
+        <List width="200">
+            <AutoVariable width="fill" target="cat-bot.enable" label="Enable CBU"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.bots-gte" label="Abandon if bots gte"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.ipc-bots-gte" label="Abandon if IPC bots gte"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.humans-lte" label="Abandon if humans lte"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.players-lte" label="Abandon if players lte"/>
+            <AutoVariable width="fill" target="cat-bot.auto-crouch" label="Autocrouch"/>
+            <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark human after kills"/>
+            <AutoVariable width="fill" target="cat-bot.micspam.enable" label="Micspam"/>
+            <AutoVariable width="fill" target="cat-bot.micspam.interval-off" label="Micspam interval off"/>
+            <AutoVariable width="fill" target="cat-bot.micspam.interval-on" label="Micspam interval on"/>
+            <AutoVariable width="fill" target="cat-bot.votekicks" label="Random votekicks"/>
+        </List>
+    </Box>
+    <Box name="Followbot" width="content" height="content" padding="12 6 6 6" x="210">
+        <List width="200">
+            <AutoVariable width="fill" target="follow-bot.enable" label="Enable FB"/>
+            <AutoVariable width="fill" target="follow-bot.roaming" label="Roaming"/>
+            <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change when possible"/>
+            <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump if stuck"/>
+            <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced taunts"/>
+            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation range"/>
+            <AutoVariable width="fill" target="follow-bot.distance" label="Follow distance"/>
+            <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic slot"/>
+            <AutoVariable width="fill" target="follow-bot.always-medigun" label="Always Medigun"/>
+            <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK Switch"/>
+            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit"/>
+            <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
+        </List>
+    </Box>
+    <Box name="NavBot" width="content" height="content" padding="12 6 6 6" x="210" y="233">
+        <List width="200">
+            <AutoVariable width="fill" target="misc.pathing" label="Enable Pathing"/>
+            <AutoVariable width="fill" target="navbot.enable" label="Enable NavBot"/>
+            <AutoVariable width="fill" target="navbot.spy-mode" label="Enable Spy Mode"/>
+            <AutoVariable width="fill" target="navbot.heavy-mode" label="Enable Heavy Mode"/>
+            <AutoVariable width="fill" target="navbot.primary-only" label="Best Weapon only"/>
+        </List>
+    </Box>
+</Tab>

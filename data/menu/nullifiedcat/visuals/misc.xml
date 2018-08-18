@@ -1,0 +1,23 @@
+<Tab name="Misc Visuals" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean Screenshots"/>
+        <AutoVariable width="fill" target="visual.disable" label="Disable Visuals"/>
+        <AutoVariable width="fill" target="visual.fov" label="FOV"/>
+        <AutoVariable width="fill" target="visual.fov-zoomed" label="FOV zoomed"/>
+        <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button"/>
+        <AutoVariable width="fill" target="visual.medal-flip" label="Guranteed Medal flip"/>
+        <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="100"/>
+        <AutoVariable width="fill" target="visual.open-gui-button" label="GUI button"/>
+        <LabeledObject width="fill" label="Software cursor mode">
+            <Select target="visual.software-cursor-mode">
+                <Option name="Keep" value="0"/>
+                <Option name="Always" value="1"/>
+                <Option name="Never" value="2"/>
+                <Option name="Menu on" value="3"/>
+            </Select>
+        </LabeledObject>
+        <AutoVariable width="fill" target="visual.sv-pure-bypass" label="SV Pure bypass"/>
+        <AutoVariable width="fill" target="visual.thirdperson.enable" label="Thirdperson"/>
+        <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in thirdperson"/>
+    </List>
+</Tab>

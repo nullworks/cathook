@@ -44,13 +44,13 @@ SOFTWARE.
 #include <initializer_list> // initializer_list
 #include <iomanip>          // setw
 #include <iostream>         // istream, ostream
-#include <iterator>         // advance, begin, back_inserter, bidirectional_iterator_tag, distance, end, inserter, iterator, iterator_traits, next, random_access_iterator_tag, reverse_iterator
-#include <limits>           // numeric_limits
-#include <locale>           // locale
-#include <map>              // map
-#include <memory>      // addressof, allocator, allocator_traits, unique_ptr
-#include <numeric>     // accumulate
-#include <sstream>     // stringstream
+#include <iterator> // advance, begin, back_inserter, bidirectional_iterator_tag, distance, end, inserter, iterator, iterator_traits, next, random_access_iterator_tag, reverse_iterator
+#include <limits>   // numeric_limits
+#include <locale>   // locale
+#include <map>      // map
+#include <memory>   // addressof, allocator, allocator_traits, unique_ptr
+#include <numeric>  // accumulate
+#include <sstream>  // stringstream
 #include <stdexcept>   // domain_error, invalid_argument, out_of_range
 #include <string>      // getline, stoi, string, to_string
 #include <type_traits> // add_pointer, conditional, decay, enable_if, false_type, integral_constant, is_arithmetic, is_base_of, is_const, is_constructible, is_convertible, is_default_constructible, is_enum, is_floating_point, is_integral, is_nothrow_move_assignable, is_nothrow_move_constructible, is_pointer, is_reference, is_same, is_scalar, is_signed, remove_const, remove_cv, remove_pointer, remove_reference, true_type, underlying_type
@@ -208,8 +208,9 @@ using uncvref_t =
 
 // taken from http://stackoverflow.com/a/26936864/266378
 template <typename T>
-using is_unscoped_enum = std::integral_constant<
-    bool, std::is_convertible<T, int>::value and std::is_enum<T>::value>;
+using is_unscoped_enum =
+    std::integral_constant<bool, std::is_convertible<T, int>::value and
+                                     std::is_enum<T>::value>;
 
 /*
 Implementation of two C++17 constructs: conjunction, negation. This is needed
@@ -498,11 +499,10 @@ template <typename BasicJsonType, typename T> struct has_from_json
 {
 private:
     // also check the return type of from_json
-    template <typename U,
-              typename = enable_if_t<
-                  std::is_same<void, decltype(uncvref_t<U>::from_json(
-                                         std::declval<BasicJsonType>(),
-                                         std::declval<T &>()))>::value>>
+    template <typename U, typename = enable_if_t<std::is_same<
+                              void, decltype(uncvref_t<U>::from_json(
+                                        std::declval<BasicJsonType>(),
+                                        std::declval<T &>()))>::value>>
     static int detect(U &&);
     static void detect(...);
 
@@ -517,10 +517,9 @@ public:
 template <typename BasicJsonType, typename T> struct has_non_default_from_json
 {
 private:
-    template <typename U,
-              typename = enable_if_t<
-                  std::is_same<T, decltype(uncvref_t<U>::from_json(
-                                      std::declval<BasicJsonType>()))>::value>>
+    template <typename U, typename = enable_if_t<std::is_same<
+                              T, decltype(uncvref_t<U>::from_json(
+                                     std::declval<BasicJsonType>()))>::value>>
     static int detect(U &&);
     static void detect(...);
 
@@ -969,7 +968,7 @@ namespace
 constexpr const auto &to_json = detail::static_const<detail::to_json_fn>::value;
 constexpr const auto &from_json =
     detail::static_const<detail::from_json_fn>::value;
-}
+} // namespace
 
 /*!
 @brief default JSONSerializer template argument
@@ -1226,7 +1225,7 @@ public:
 #ifdef _WIN32
         result["platform"] = "win32";
 #elif defined __linux__
-        result["platform"] = "linux";
+        result["platform"]        = "linux";
 #elif defined __APPLE__
         result["platform"] = "apple";
 #elif defined __unix__
@@ -1239,7 +1238,7 @@ public:
         result["compiler"] = { { "family", "clang" },
                                { "version", __clang_version__ } };
 #elif defined(__ICC) || defined(__INTEL_COMPILER)
-        result["compiler"] = { { "family", "icc" },
+        result["compiler"]        = { { "family", "icc" },
                                { "version", __INTEL_COMPILER } };
 #elif defined(__GNUC__) || defined(__GNUG__)
         result["compiler"] = { { "family", "gcc" },
@@ -3391,7 +3390,7 @@ public:
     */
     template <
         typename ValueTypeCV,
-        typename ValueType = detail::uncvref_t<ValueTypeCV>,
+        typename ValueType       = detail::uncvref_t<ValueTypeCV>,
         detail::enable_if_t<not std::is_same<basic_json_t, ValueType>::value and
                                 detail::has_non_default_from_json<
                                     basic_json_t, ValueType>::value,
@@ -3613,19 +3612,19 @@ public:
 
     @since version 1.0.0
     */
-    template <typename ValueType,
-              typename std::enable_if<
-                  not std::is_pointer<ValueType>::value and
-                      not std::is_same<ValueType,
-                                       typename string_t::value_type>::value
+    template <
+        typename ValueType,
+        typename std::enable_if<
+            not std::is_pointer<ValueType>::value and
+                not std::is_same<ValueType,
+                                 typename string_t::value_type>::value
 #ifndef _MSC_VER // fix for issue #167 operator<< ambiguity under VS2015
-                      and
-                      not std::is_same<
-                          ValueType, std::initializer_list<
+                and not std::is_same<ValueType,
+                                     std::initializer_list<
                                          typename string_t::value_type>>::value
 #endif
-                  ,
-                  int>::type = 0>
+            ,
+            int>::type = 0>
     operator ValueType() const
     {
         // delegate the call to get<>() const
@@ -6632,9 +6631,8 @@ public:
         assert(std::accumulate(
                    first, last, std::pair<bool, int>(true, 0),
                    [&first](std::pair<bool, int> res, decltype(*first) val) {
-                       res.first &=
-                           (val ==
-                            *(std::next(std::addressof(*first), res.second++)));
+                       res.first &= (val == *(std::next(std::addressof(*first),
+                                                        res.second++)));
                        return res;
                    })
                    .first);
@@ -10299,7 +10297,7 @@ private:
                     }
                 basic_json_parser_9:
                     yyaccept = 0;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych <= 0x1F)
                     {
                         goto basic_json_parser_5;
@@ -10340,7 +10338,7 @@ private:
                     goto basic_json_parser_5;
                 basic_json_parser_13:
                     yyaccept = 1;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych <= '9')
                     {
                         if (yych == '.')
@@ -10426,7 +10424,7 @@ private:
                     }
                 basic_json_parser_23:
                     yyaccept = 0;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych == 'a')
                     {
                         goto basic_json_parser_52;
@@ -10434,7 +10432,7 @@ private:
                     goto basic_json_parser_5;
                 basic_json_parser_24:
                     yyaccept = 0;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych == 'u')
                     {
                         goto basic_json_parser_53;
@@ -10442,7 +10440,7 @@ private:
                     goto basic_json_parser_5;
                 basic_json_parser_25:
                     yyaccept = 0;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych == 'r')
                     {
                         goto basic_json_parser_54;
@@ -10748,7 +10746,7 @@ private:
                     goto basic_json_parser_32;
                 basic_json_parser_43:
                     yyaccept = 2;
-                    yych = *(m_marker = ++m_cursor);
+                    yych     = *(m_marker = ++m_cursor);
                     if (yych <= '9')
                     {
                         if (yych == '.')
@@ -11465,9 +11463,8 @@ private:
             @param[in,out] val shall contain parsed value, or undefined value
             if could not parse
             */
-            template <typename T,
-                      typename = typename std::enable_if<
-                          std::is_arithmetic<T>::value>::type>
+            template <typename T, typename = typename std::enable_if<
+                                      std::is_arithmetic<T>::value>::type>
             bool to(T &val) const
             {
                 return parse(val, std::is_integral<T>());
@@ -12517,7 +12514,7 @@ public:
                  pos != std::string::npos;       // make sure f was found
                  s.replace(pos, f.size(), t),    // replace with t
                  pos = s.find(f, pos + t.size()) // find next occurrence of f
-                 )
+            )
                 ;
         }
 

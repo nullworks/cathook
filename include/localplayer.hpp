@@ -8,6 +8,7 @@
 #pragma once
 
 #include <mathlib/vector.h>
+#include <enums.hpp>
 
 class CachedEntity;
 

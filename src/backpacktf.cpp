@@ -13,6 +13,9 @@
 
 #include <thread>
 #include <queue>
+#include <settings/Bool.hpp>
+
+static settings::Bool bptf_enable{ "backpack-tf.enable", "false" };
 
 namespace backpacktf
 {
@@ -21,14 +24,11 @@ std::unordered_map<unsigned, backpack_data_s> cache{};
 std::queue<backpack_data_s *> pending_queue{};
 std::mutex queue_mutex{};
 std::mutex cache_mutex{};
+bool thread_running{ true };
 
 std::string api_key_s = "";
 bool valid_api_key    = false;
 
-static CatVar
-    enable_bptf(CV_SWITCH, "bptf_enable", "0", "Enable backpack.tf",
-                "Enable backpack.tf integration\nYou have to set your API "
-                "key in cat_bptf_key");
 CatCommand api_key("bptf_key", "Set API Key", [](const CCommand &args) {
     api_key_s = args.ArgS();
     logging::Info("API key changed!");
@@ -49,7 +49,7 @@ void store_data(unsigned id, float value, bool no_value, bool outdated_value);
 void processing_thread()
 {
     logging::Info("[bp.tf] Starting the thread");
-    while (true)
+    while (thread_running)
     {
         if (enabled())
         {
@@ -188,7 +188,7 @@ void request_data(unsigned id)
 
 bool enabled()
 {
-    return enable_bptf && valid_api_key;
+    return bptf_enable && valid_api_key;
 }
 
 backpack_data_s &access_data(unsigned id)
@@ -236,4 +236,4 @@ void init()
 {
     GetBackpackTFThread();
 }
-}
+} // namespace backpacktf

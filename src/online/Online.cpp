@@ -16,6 +16,9 @@
 #include <fstream>
 #include <init.hpp>
 #include <thread>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "online.enable", "false" };
 
 namespace online
 {
@@ -30,7 +33,6 @@ static Timer identify_timer{};
 static bool identify_stale{ false };
 static std::string api_key{};
 
-static CatVar enable(CV_SWITCH, "online", "1", "Enable online features");
 static CatCommand login("online_login", "Login", [](const CCommand &args) {
     if (args.ArgC() != 3)
     {
@@ -330,4 +332,4 @@ user_data *getUserData(unsigned steamId)
     // SteamID does not belong to online user
     return nullptr;
 }
-}
+} // namespace online

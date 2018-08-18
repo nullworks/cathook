@@ -494,6 +494,6 @@ public:
 };
 
 extern hl2dm hl2dm_list;
-}
+} // namespace client_classes
 
 #endif /* hl2dm_AUTOGEN_HPP */

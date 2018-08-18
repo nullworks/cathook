@@ -60,4 +60,4 @@ public:
 extern FilterDefault filter_default;
 extern FilterNoPlayer filter_no_player;
 extern FilterPenetration filter_penetration;
-}
+} // namespace trace

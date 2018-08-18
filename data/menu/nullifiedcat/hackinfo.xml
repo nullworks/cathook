@@ -1,0 +1,10 @@
+<Tab name="Hack Info" padding="4 4 4 4">
+    <Box height="content" width="content" padding="12 6 6 6">
+        <List width="220">
+            <AutoVariable width="fill" target="hack.enable" label="Enable Cathook"/>
+            <AutoVariable width="fill" target="hack.log-console" label="Log Debug Info"/>
+            <AutoVariable width="fill" target="hack-info.enable" label="Enable Cathook Label"/>
+            <AutoVariable width="fill" target="hack-info.minimal" label="minimal Cathook Label"/>
+        </List>
+    </Box>
+</Tab>

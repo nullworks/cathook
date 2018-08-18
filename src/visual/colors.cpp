@@ -9,21 +9,6 @@
 #include <PlayerTools.hpp>
 #include "common.hpp"
 
-static CatVar user_red_blue(CV_INT, "esp_color_red_b", "0", "Red Team: Blue",
-                            "Blue color for red team", 255);
-static CatVar user_red_green(CV_INT, "esp_color_red_g", "0", "Red Team: Green",
-                             "Green color for red team", 255);
-static CatVar user_red_red(CV_INT, "esp_color_red_r", "0", "Red Team: Red",
-                           "Red color for red team", 255);
-
-static CatVar user_blue_blue(CV_INT, "esp_color_blue_b", "0", "Blue Team: Blue",
-                             "Blue color for blue team", 255);
-static CatVar user_blue_green(CV_INT, "esp_color_blue_g", "0",
-                              "Blue Team: Green", "Green color for blue team",
-                              255);
-static CatVar user_blue_red(CV_INT, "esp_color_blue_r", "0", "Blue Team: Red",
-                            "Red color for blue team", 255);
-
 rgba_t colors::EntityF(CachedEntity *ent)
 {
     rgba_t result, plclr;
@@ -94,28 +79,6 @@ rgba_t colors::EntityF(CachedEntity *ent)
             result = blu;
         else if (ent->m_iTeam() == TEAM_RED)
             result = red;
-        // If user has custom color, check if we should change, and do so here
-        if (user_red_blue || user_red_green || user_red_red || user_blue_blue ||
-            user_blue_green || user_blue_red)
-        {
-            switch (ent->m_iTeam())
-            {
-            case TEAM_BLU:
-                if (user_blue_blue || user_blue_green || user_blue_red)
-                {
-                    result = FromRGBA8(user_blue_red, user_blue_green,
-                                       user_blue_blue, 255);
-                }
-                break;
-            case TEAM_RED:
-                if (user_red_blue || user_red_green || user_red_red)
-                {
-                    result = FromRGBA8(user_red_red, user_red_green,
-                                       user_red_blue, 255);
-                }
-                break;
-            }
-        }
         if (ent->m_Type() == ENTITY_PLAYER)
         {
             if (IsPlayerInvulnerable(ent))

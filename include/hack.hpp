@@ -33,7 +33,4 @@ const std::string &GetType();
 void Initialize();
 void Think();
 void Shutdown();
-
-void CC_Cat(const CCommand &args);
-extern ConCommand *c_Cat;
-}
+} // namespace hack

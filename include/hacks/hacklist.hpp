@@ -29,7 +29,6 @@
 #include "AntiCheat.hpp"
 #include "AutoDeadringer.hpp"
 #include "Bunnyhop.hpp"
-#include "LagExploit.hpp"
 #include "SeedPrediction.hpp"
 #endif
 #if ENABLE_VISUALS
@@ -37,13 +36,13 @@
 #endif
 #if not LAGBOT_MODE
 #include "Walkbot.hpp"
+#include "navparser.hpp"
 #endif
 #include "AutoJoin.hpp"
 #if not LAGBOT_MODE
 #include "AntiBackstab.hpp"
 #include "AutoBackstab.hpp"
 #include "FollowBot.hpp"
-#include "HealArrows.hpp"
 #include "Misc.hpp"
 #include "Trigger.hpp"
 #include "KillSay.hpp"
@@ -52,6 +51,7 @@
 #endif
 #include "Spam.hpp"
 #if not LAGBOT_MODE
+#include "NavBot.hpp"
 #include "Noisemaker.hpp"
 #include "FollowBot.hpp"
 #include "Announcer.hpp"

@@ -20,4 +20,4 @@ if (g_pGUI->ConsumesKey((ButtonCode_t)keynum) && g_pGUI->Visible()) {
 #endif
     return original::IN_KeyEvent(this_, eventcode, keynum, binding);
 }
-}
+} // namespace hooked_methods

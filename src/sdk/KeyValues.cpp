@@ -721,9 +721,8 @@ bool KeyValues::LoadFromFile(IBaseFileSystem *filesystem,
                        resourceName ? resourceName : "");
 
     // Keep a cache of keyvalues, try to load it here.
-    if (bUseCacheForRead &&
-        KeyValuesSystem()->LoadFileKeyValuesFromCache(this, resourceName,
-                                                      pathID, filesystem))
+    if (bUseCacheForRead && KeyValuesSystem()->LoadFileKeyValuesFromCache(
+                                this, resourceName, pathID, filesystem))
     {
         COM_TimestampedLog("KeyValues::LoadFromFile(%s%s%s): End / CacheHit",
                            pathID ? pathID : "",
@@ -799,8 +798,9 @@ bool KeyValues::SaveToFile(IBaseFileSystem *filesystem,
 
     if (f == FILESYSTEM_INVALID_HANDLE)
     {
-        DevMsg(1, "KeyValues::SaveToFile: couldn't open file \"%s\" in path "
-                  "\"%s\".\n",
+        DevMsg(1,
+               "KeyValues::SaveToFile: couldn't open file \"%s\" in path "
+               "\"%s\".\n",
                resourceName ? resourceName : "NULL", pathID ? pathID : "NULL");
         return false;
     }
@@ -2998,8 +2998,9 @@ void KeyValues::UnpackIntoStructure(
             Assert(dest_field + pUnpackTable->m_nFieldSize < pDestEnd);
 
             char *dest_s = (char *) dest_field;
-            strncpy(dest_s, GetString(pUnpackTable->m_pKeyName,
-                                      pUnpackTable->m_pKeyDefault),
+            strncpy(dest_s,
+                    GetString(pUnpackTable->m_pKeyName,
+                              pUnpackTable->m_pKeyDefault),
                     pUnpackTable->m_nFieldSize);
         }
         break;
@@ -3012,7 +3013,7 @@ void KeyValues::UnpackIntoStructure(
             int default_int = 0;
             if (pUnpackTable->m_pKeyDefault)
                 default_int = atoi(pUnpackTable->m_pKeyDefault);
-            *(dest_i)       = GetInt(pUnpackTable->m_pKeyName, default_int);
+            *(dest_i) = GetInt(pUnpackTable->m_pKeyName, default_int);
         }
         break;
 

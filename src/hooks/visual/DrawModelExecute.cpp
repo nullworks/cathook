@@ -4,12 +4,11 @@
 */
 
 #include <MiscTemporary.hpp>
+#include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar no_arms(CV_SWITCH, "no_arms", "0", "No Arms",
-                      "Removes arms from first person");
-static CatVar no_hats(CV_SWITCH, "no_hats", "0", "No Hats",
-                      "Removes non-stock hats");
+static settings::Bool no_arms{ "remove.arms", "false" };
+static settings::Bool no_hats{ "remove.hats", "false" };
 
 namespace hooked_methods
 {
@@ -18,13 +17,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_,
                      const DrawModelState_t &state,
                      const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    static const char *name;
-    static std::string sname;
-    static IClientUnknown *unk;
-    static IClientEntity *ent;
+    if (!isHackActive())
+        return;
 
-    if (!cathook ||
-        !(spectator_target || no_arms || no_hats ||
+    if (!(spectator_target || no_arms || no_hats ||
           (clean_screenshots && g_IEngine->IsTakingScreenshot()) ||
           CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer()))
     {
@@ -37,10 +33,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_,
     {
         if (info.pModel)
         {
-            name = g_IModelInfo->GetModelName(info.pModel);
+            const char *name = g_IModelInfo->GetModelName(info.pModel);
             if (name)
             {
-                sname = name;
+                std::string sname = name;
                 if (no_arms && sname.find("arms") != std::string::npos)
                 {
                     return;
@@ -54,10 +50,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_,
         }
     }
 
-    unk = info.pRenderable->GetIClientUnknown();
+    IClientUnknown *unk = info.pRenderable->GetIClientUnknown();
     if (unk)
     {
-        ent = unk->GetIClientEntity();
+        IClientEntity *ent = unk->GetIClientEntity();
         if (ent)
         {
             if (ent->entindex() == spectator_target)
@@ -74,4 +70,4 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_,
 
     return original::DrawModelExecute(this_, state, info, bone);
 }
-}
+} // namespace hooked_methods

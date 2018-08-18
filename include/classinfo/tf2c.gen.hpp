@@ -494,6 +494,6 @@ public:
 };
 
 extern tf2c tf2c_list;
-}
+} // namespace client_classes
 
 #endif /* tf2c_AUTOGEN_HPP */

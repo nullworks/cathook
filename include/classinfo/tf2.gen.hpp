@@ -537,6 +537,6 @@ public:
 };
 
 extern tf2 tf2_list;
-}
+} // namespace client_classes
 
 #endif /* tf2_AUTOGEN_HPP */

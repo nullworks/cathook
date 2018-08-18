@@ -12,7 +12,6 @@
 
 class CachedEntity;
 class Vector;
-class CatVar;
 class IClientEntity;
 class CatEnum;
 class VMatrix;
@@ -22,7 +21,7 @@ namespace fonts
 
 extern std::unique_ptr<glez::font> esp;
 extern std::unique_ptr<glez::font> menu;
-}
+} // namespace fonts
 
 namespace fonts
 {
@@ -36,7 +35,7 @@ void Update();
 
 extern const std::vector<std::string> fonts;
 extern CatEnum family_enum;
-}
+} // namespace fonts
 
 constexpr rgba_t GUIColor()
 {
@@ -70,4 +69,4 @@ bool EntityCenterToScreen(CachedEntity *entity, Vector &out);
 void InitGL();
 void BeginGL();
 void EndGL();
-}
+} // namespace draw

@@ -12,4 +12,4 @@ namespace hacks::tf2::autobackstab
 
 void CreateMove();
 const Vector GetWorldSpaceCenter(CachedEntity *ent);
-}
+} // namespace hacks::tf2::autobackstab

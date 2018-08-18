@@ -5,31 +5,31 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hack.hpp"
 
+static settings::Bool enable{ "cat-bot.enable", "false" };
+
+static settings::Int abandon_if_bots_gte{ "cat-bot.abandon-if.bots-gte", "0" };
+static settings::Int abandon_if_ipc_bots_gte{ "cat-bot.abandon-if.ipc-bots-gte",
+                                              "0" };
+static settings::Int abandon_if_humans_lte{ "cat-bot.abandon-if.humans-lte",
+                                            "0" };
+static settings::Int abandon_if_players_lte{ "cat-bot.abandon-if.players-lte",
+                                             "0" };
+static settings::Int mark_human_threshold{ "cat-bot.mark-human-after-kills",
+                                           "2" };
+
+static settings::Bool micspam{ "cat-bot.micspam.enable", "false" };
+static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "3" };
+static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "60" };
+
+static settings::Bool auto_crouch{ "cat-bot.auto-crouch", "true" };
+static settings::Bool random_votekicks{ "cat-bot.votekicks", "false" };
+
 namespace hacks::shared::catbot
 {
-
-static CatVar enabled(CV_SWITCH, "cbu", "0", "CatBot Utils");
-static CatVar abandon_if_bots_gte(CV_INT, "cbu_abandon_if_bots_gte", "0",
-                                  "Abandon if bots >=");
-static CatVar abandon_if_ipc_bots_gte(CV_INT, "cbu_abandon_if_ipc_bots_gte",
-                                      "0", "Abandon if IPC bots >=");
-static CatVar abandon_if_humans_lte(CV_INT, "cbu_abandon_if_humans_lte", "0",
-                                    "Abandon if humans <=");
-static CatVar abandon_if_players_lte(CV_INT, "cbu_abandon_if_players_lte", "0",
-                                     "Abandon if players <=");
-static CatVar mark_human_threshold(CV_INT, "cbu_mark_human_threshold", "2",
-                                   "Mark human after N kills");
-static CatVar random_votekicks(CV_SWITCH, "cbu_random_votekicks", "0",
-                               "Randomly initiate votekicks");
-static CatVar micspam(CV_SWITCH, "cbu_micspam", "0", "Micspam helper");
-static CatVar micspam_on(CV_INT, "cbu_micspam_on_interval", "3",
-                         "+voicerecord interval");
-static CatVar micspam_off(CV_INT, "cbu_micspam_off_interval", "60",
-                          "-voicerecord interval");
-static CatVar auto_crouch(CV_SWITCH, "cbu_autocrouch", "1", "Auto crouch");
 
 struct catbot_user_state
 {
@@ -134,9 +134,9 @@ void update_catbot_list()
 
 class CatBotEventListener : public IGameEventListener2
 {
-    virtual void FireGameEvent(IGameEvent *event)
+    void FireGameEvent(IGameEvent *event) override
     {
-        if (!enabled)
+        if (!enable)
             return;
 
         int killer_id =
@@ -157,9 +157,9 @@ CatBotEventListener &listener()
     return object;
 }
 
-Timer timer_votekicks{};
-Timer timer_catbot_list{};
-Timer timer_abandon{};
+static Timer timer_votekicks{};
+static Timer timer_catbot_list{};
+static Timer timer_abandon{};
 
 int count_bots{ 0 };
 
@@ -259,11 +259,11 @@ void smart_crouch()
             crouch = false;
     }
     if (crouch)
-        g_pUserCmd->buttons |= IN_DUCK;
+        current_user_cmd->buttons |= IN_DUCK;
 }
 void update()
 {
-    if (!enabled)
+    if (!enable)
         return;
 
     if (g_Settings.bInvalid)
@@ -274,10 +274,9 @@ void update()
 
     if (micspam)
     {
-        if (micspam_on && micspam_on_timer.test_and_set(int(micspam_on) * 1000))
+        if (micspam_on && micspam_on_timer.test_and_set(*micspam_on * 1000))
             g_IEngine->ExecuteClientCmd("+voicerecord");
-        if (micspam_off &&
-            micspam_off_timer.test_and_set(int(micspam_off) * 1000))
+        if (micspam_off && micspam_off_timer.test_and_set(*micspam_off * 1000))
             g_IEngine->ExecuteClientCmd("-voicerecord");
     }
 
@@ -300,7 +299,7 @@ void update()
             else
                 continue;
 
-            player_info_s info;
+            player_info_s info{};
             if (!g_IEngine->GetPlayerInfo(i, &info))
                 continue;
 
@@ -369,4 +368,4 @@ void level_init()
 {
     level_init_timer.update();
 }
-}
+} // namespace hacks::shared::catbot

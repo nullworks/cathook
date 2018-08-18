@@ -5,14 +5,20 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Int.hpp>
 #include "common.hpp"
 #include "hacks/AutoJoin.hpp"
 
+settings::Int queue{ "autoqueue.mode", "7" };
+
 CatCommand cmd_queue_start("mm_queue_casual", "Start casual queue",
-                           []() { tfmm::queue_start(); });
+                           []() { tfmm::startQueue(); });
 
 CatCommand cmd_abandon("mm_abandon", "Abandon match",
                        []() { tfmm::abandon(); });
+
+CatCommand abandoncmd("disconnect_and_abandon", "Disconnect and abandon",
+                      []() { tfmm::disconnectAndAbandon(); });
 
 CatCommand get_state("mm_state", "Get party state", []() {
     re::CTFParty *party = re::CTFParty::GetParty();
@@ -26,25 +32,26 @@ CatCommand get_state("mm_state", "Get party state", []() {
 
 namespace tfmm
 {
-CatEnum queue_mode({ "MvmPractice", "MvmMannup", "LadderMatch6v6",
-                     "LadderMatch9v9", "LadderMatch12v12", "CasualMatch6v6",
-                     "CasualMatch9v9", "CasualMatch12v12",
-                     "CompetitiveEventMatch12v12" });
-CatVar queue(queue_mode, "autoqueue_mode", "7", "Autoqueue for this mode", "");
-void queue_start()
+
+int getQueue()
+{
+    return *queue;
+}
+
+void startQueue()
 {
     re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
     if (client)
     {
-        if (queue == 7)
+        if (*queue == 7)
             client->LoadSavedCasualCriteria();
         client->RequestQueueForMatch((int) queue);
-        hacks::shared::autojoin::queuetime.update();
+        hacks::shared::autojoin::resetQueueTimer();
     }
     else
         logging::Info("queue_start: CTFPartyClient == null!");
 }
-void queue_leave()
+void leaveQueue()
 {
     re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
     if (client)
@@ -52,9 +59,8 @@ void queue_leave()
     else
         logging::Info("queue_start: CTFPartyClient == null!");
 }
-Timer abandont{};
 
-void dcandabandon()
+void disconnectAndAbandon()
 {
     re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
     re::CTFGCClientSystem *gc  = re::CTFGCClientSystem::GTFGCClientSystem();
@@ -64,20 +70,13 @@ void dcandabandon()
     {
         logging::Info("your party client is gay!");
         if (gc)
-            queue_leave();
+            leaveQueue();
         else
             logging::Info("your gc is gay!");
     }
     if (gc && client)
-        while (1)
-            if (abandont.test_and_set(4000))
-            {
-                queue_leave();
-                break;
-            }
+        leaveQueue();
 }
-CatCommand abandoncmd("disconnect_and_abandon", "Disconnect and abandon",
-                      []() { dcandabandon(); });
 
 void abandon()
 {
@@ -87,4 +86,4 @@ void abandon()
     else
         logging::Info("abandon: CTFGCClientSystem == null!");
 }
-}
+} // namespace tfmm

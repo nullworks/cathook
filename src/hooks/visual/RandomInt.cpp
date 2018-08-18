@@ -3,10 +3,10 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
+#include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar medal_flip(CV_SWITCH, "medal_flip", "0", "Infinite Medal Flip",
-                         "");
+static settings::Bool medal_flip{ "visual.medal-flip", "false" };
 
 namespace hooked_methods
 {
@@ -19,4 +19,4 @@ DEFINE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *this_, int min,
 
     return original::RandomInt(this_, min, max);
 }
-}
+} // namespace hooked_methods

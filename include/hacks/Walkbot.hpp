@@ -18,4 +18,4 @@ void Draw();
 #endif
 void Move();
 void OnLevelInit();
-}
+} // namespace hacks::shared::walkbot

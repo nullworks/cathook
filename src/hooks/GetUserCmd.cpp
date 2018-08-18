@@ -38,4 +38,4 @@ DEFINE_HOOKED_METHOD(GetUserCmd, CUserCmd *, IInput *this_, int sequence_number)
     }
     return def;
 }
-}
+} // namespace hooked_methods

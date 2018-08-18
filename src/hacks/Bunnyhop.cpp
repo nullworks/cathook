@@ -5,19 +5,15 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "bunnyhop.enable", "false" };
 
 namespace hacks::shared::bunnyhop
 {
 
 // Var for user settings
-static CatVar
-    enabled(CV_SWITCH, "bhop_enabled", "0", "Bunnyhop",
-            "Enable Bunnyhop. All extra features like autojump and perfect "
-            "jump limit were temporary removed.");
-// CatVar perfect_jump_limit(CV_INT, "bhop_enabled", "0", "Bunnyhop", "Enable
-// Bunnyhop. All extra features like autojump and perfect jump limit were
-// temporary removed.");
 
 static int ticks_last_jump = 0;
 // static int perfect_jumps = 0;
@@ -26,19 +22,17 @@ static int ticks_last_jump = 0;
 void CreateMove()
 {
     // Check user settings if bhop is enabled
-    if (!enabled)
-        return;
-    if (!g_pUserCmd)
+    if (!enable)
         return;
 
     // Check if there is usercommands
-    if (!g_pUserCmd->command_number)
+    if (!current_user_cmd->command_number)
         return;
 
     // var for "if on ground" from the flags netvar
     bool ground = CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & (1 << 0);
     // Var for if the player is pressing jump
-    bool jump = (g_pUserCmd->buttons & IN_JUMP);
+    bool jump = (current_user_cmd->buttons & IN_JUMP);
 
     // Check if player is not on the ground and player is holding their jump key
     if (!ground && jump)
@@ -48,15 +42,12 @@ void CreateMove()
         // the ground or lets go of jump
         if (ticks_last_jump++ >= 9)
         {
-            g_pUserCmd->buttons = g_pUserCmd->buttons & ~IN_JUMP;
+            current_user_cmd->buttons = current_user_cmd->buttons & ~IN_JUMP;
         }
     }
 
     // If the players jump cmd has been used, then we reset our var
     if (!jump)
         ticks_last_jump = 0;
-
-    // Finish the function with return
-    return;
 }
-}
+} // namespace hacks::shared::bunnyhop

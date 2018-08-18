@@ -1,0 +1,9 @@
+<Tab name="Auto Sticky" padding="4 4 4 4">
+    <Box width="content" height="content" padding="6 6 6 6">
+        <List width="200">
+            <AutoVariable width="fill" target="autosticky.enable" label="Enable Auto Sticky"/>
+            <AutoVariable width="fill" target="autosticky.buildings" label="Detonate on Buildings"/>
+            <AutoVariable width="fill" target="autosticky.legit" label="Legit"/>
+        </List>
+    </Box>
+</Tab>

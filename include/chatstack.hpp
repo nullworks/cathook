@@ -28,4 +28,4 @@ void Reset();
 
 extern std::stack<msg_t> stack;
 extern float last_say;
-}
+} // namespace chat_stack

@@ -180,7 +180,7 @@ CatCommand pl_set_state(
         k_EState state =
             static_cast<k_EState>(strtol(args.Arg(2), nullptr, 10));
         if (state < k_EState::DEFAULT || state > k_EState::STATE_LAST)
-            state                 = k_EState::DEFAULT;
+            state = k_EState::DEFAULT;
         AccessData(steamid).state = state;
         logging::Info("Set %d to %d", steamid, state);
     });
@@ -216,4 +216,4 @@ CatCommand pl_info("pl_info", "pl_info uniqueid", [](const CCommand &args) {
         ConColorMsg(*reinterpret_cast<::Color*>(&clr), "[CUSTOM COLOR]\n");
     }*/
 });
-}
+} // namespace playerlist

@@ -6,13 +6,14 @@
  */
 
 #include <hacks/AntiCheat.hpp>
+#include <settings/Int.hpp>
 #include "common.hpp"
+
+static settings::Int bhop_detect_count{ "find-cheaters.bunnyhop.detections",
+                                        "4" };
 
 namespace ac::bhop
 {
-
-static CatVar bhop_detect_count(CV_INT, "ac_bhop_count", "4",
-                                "BHop Detections");
 
 ac_data data_table[32]{};
 
@@ -80,4 +81,4 @@ void Update(CachedEntity *player)
 void Event(KeyValues *event)
 {
 }
-}
+} // namespace ac::bhop

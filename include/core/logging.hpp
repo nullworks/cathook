@@ -9,8 +9,6 @@
 
 #include <stdio.h>
 
-typedef void(fn_Msg_t)(const char *msg, va_list);
-
 #ifdef __cplusplus
 namespace logging
 {

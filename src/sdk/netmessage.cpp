@@ -56,7 +56,7 @@ public:
 
         for (unsigned int maskBit = 0; maskBit < 32; maskBit++)
             g_ExtraMasks[maskBit] = BitForBitnum(maskBit) - 1;
-        g_ExtraMasks[32]          = ~0ul;
+        g_ExtraMasks[32] = ~0ul;
 
         for (unsigned int littleBit = 0; littleBit < 32; littleBit++)
             StoreLittleDWord(&g_LittleBits[littleBit], 0, 1u << littleBit);

@@ -492,6 +492,6 @@ public:
     static constexpr int CCSGameRulesProxy                     = 26;
     static constexpr int CBaseCSGrenadeProjectile              = 7;
 };
-}
+} // namespace client_classes_constexpr
 
 #endif /* css_CONSTEXPR_AUTOGEN_HPP */

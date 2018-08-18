@@ -9,22 +9,14 @@
 
 #include "common.hpp"
 
-class CatCommand;
-
-class KillSayEventListener : public IGameEventListener2
-{
-    virtual void FireGameEvent(IGameEvent *event);
-};
-
 namespace hacks::shared::killsay
 {
 
-void Init();
-void Shutdown();
-void Reload();
-std::string ComposeKillSay(IGameEvent *event);
+void init();
+void shutdown();
+void reload();
 
 extern const std::vector<std::string> builtin_default;
 extern const std::vector<std::string> builtin_nonecore_offensive;
 extern const std::vector<std::string> builtin_nonecore_mlg;
-}
+} // namespace hacks::shared::killsay

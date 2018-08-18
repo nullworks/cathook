@@ -1,0 +1,73 @@
+<Tab name="Chat" padding="4 4 4 4">
+    <Box name="Uber Spam" width="content" height="content" padding="12 6 6 6">
+        <List width="150">
+            <LabeledObject width="fill" label="Source">
+                <Select target="uberspam.source">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Default" value="1"/>
+                    <Option name="Null Core" value="2"/>
+                    <Option name="Custom" value="3"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="uberspam.file" label="File"/>
+            <AutoVariable width="fill" target="uberspam.team-chat" label="Team chat"/>
+
+            <AutoVariable width="fill" target="uberspam.triggers.ended" label="Uber end"/>
+            <AutoVariable width="fill" target="uberspam.triggers.ready" label="Uber ready"/>
+            <AutoVariable width="fill" target="uberspam.triggers.used" label="Uber used"/>
+            <AutoVariable width="fill" target="uberspam.triggers.every-n-percent" label="Every %"/>
+
+            <!-- FIXME add button -->
+        </List>
+    </Box>
+    <Box name="Chat log" width="content" height="content" padding="12 6 6 6" y="135">
+        <List width="200">
+            <AutoVariable width="fill" target="chat-log.enable" label="Enable chatlog"/>
+            <AutoVariable width="fill" target="chat-log.no-ipc" label="IPCless"/>
+            <AutoVariable width="fill" target="chat-log.no-spam" label="Anti spam"/>
+        </List>
+    </Box>
+    <Box name="Chat censor" width="content" height="content" padding="12 6 6 6" x="180">
+        <List width="200">
+            <AutoVariable width="fill" target="chat.censor.enable" label="Enable chat censor"/>
+            <AutoVariable width="fill" target="chat.censor.filter" label="Filter"/>
+        </List>
+    </Box>
+    <Box name="Misc" width="content" height="content" padding="12 6 6 6" x="180" y="50">
+        <List width="200">
+            <AutoVariable width="fill" target="chat.clean" label="Clean Chat"/>
+            <AutoVariable width="fill" target="chat.crypto" label="Crypto Chat"/>
+            <AutoVariable width="fill" target="chat.prefix-newlines" label="Newlines" min="0" max="100"/>
+            <AutoVariable width="fill" target="chat.log-events" label="Log events"/>
+        </List>
+    </Box>
+    <Box name="Killsay and Chatspam" width="content" height="content" padding="12 6 6 6" y="135" x="220">
+        <List width="200">
+            <AutoVariable width="fill" target="killsay.file" label="Killsay file"/>
+            <LabeledObject width="fill" label="Killsay Mode">
+                <Select target="killsay.mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Custom" value="1"/>
+                    <Option name="Default" value="2"/>
+                    <Option name="NCC - Offensive" value="3"/>
+                    <Option name="NCC - MLG" value="4"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="spam.filename" label="Spam file"/>
+            <AutoVariable width="fill" target="spam.delay" label="Spam delay"/>
+            <AutoVariable width="fill" target="spam.random" label="Random"/>
+            <LabeledObject width="fill" label="Spam Mode">
+                <Select target="spam.source">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Custom" value="1"/>
+                    <Option name="Default" value="2"/>
+                    <Option name="Lennyfaces" value="3"/>
+                    <Option name="Newlines" value="4"/>
+                    <Option name="Nullcore" value="5"/>
+                    <Option name="Lmaobox" value="6"/>
+                    <Option name="Lithium" value="7"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+</Tab>

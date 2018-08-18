@@ -13,52 +13,32 @@
 #include <link.h>
 #include <hacks/AntiAim.hpp>
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
 
 #include "core/sharedobj.hpp"
 
 #include "hack.hpp"
 #include "common.hpp"
 
-namespace hacks::shared::misc
-{
+static settings::Bool render_zoomed{ "visuals.render-local-zoomed", "false" };
+static settings::Bool anti_afk{ "misc.anti-afk", "false" };
+static settings::Bool auto_strafe{ "misc.autostrafe", "false" };
+static settings::Bool tauntslide{ "misc.tauntslide-tf2c", "false" };
+static settings::Bool tauntslide_tf2{ "misc.tauntslide", "false" };
+static settings::Bool flashlight_spam{ "misc.flashlight-spam", "false" };
+static settings::Bool auto_balance_spam{ "misc.auto-balance-spam", "false" };
+static settings::Bool nopush_enabled{ "misc.no-push", "false" };
 
-static CatVar debug_info(CV_SWITCH, "debug_info", "0", "Debug info",
-                         "Shows some debug info in-game");
-static CatVar flashlight_spam(CV_SWITCH, "flashlight", "0", "Flashlight spam",
-                              "HL2DM flashlight spam");
-static CatVar
-    auto_balance_spam(CV_SWITCH, "request_balance_spam", "0",
-                      "Inf Auto Balance Spam",
-                      "Use to send a autobalance request to the server that "
-                      "doesnt prevent you from using it again\nCredits to "
-                      "Blackfire");
-static CatVar
-    anti_afk(CV_SWITCH, "anti_afk", "0", "Anti-AFK",
-             "Sends random commands to prevent being kicked from server");
-static CatVar auto_strafe(CV_SWITCH, "auto_strafe", "0", "Auto-Strafe",
-                          "Automaticly airstrafes for you.");
-static CatVar
-    render_zoomed(CV_SWITCH, "render_zoomed", "0",
-                  "Render model when zoomed-in",
-                  "Renders player model while being zoomed in as Sniper");
-static CatVar nopush_enabled(CV_SWITCH, "nopush_enabled", "0", "No Push",
-                             "Prevents other players from pushing you around.");
+#if ENABLE_VISUALS
+static settings::Bool god_mode{ "misc.god-mode", "false" };
+static settings::Bool debug_info{ "misc.debug-info", "false" };
+static settings::Bool no_homo{ "misc.no-homo", "true" };
+static settings::Bool show_spectators{ "misc.show-spectators", "false" };
+#endif
 
-static CatVar no_homo(CV_SWITCH, "no_homo", "1", "No Homo", "read if gay");
-// Taunting stuff
-static CatVar tauntslide(CV_SWITCH, "tauntslide", "0", "TF2C tauntslide",
-                         "Allows moving and shooting while taunting");
-static CatVar tauntslide_tf2(CV_SWITCH, "tauntslide_tf2", "0", "Tauntslide",
-                             "Allows free movement while taunting with movable "
-                             "taunts\nOnly works in tf2");
-static CatVar
-    show_spectators(CV_SWITCH, "show_spectators", "0", "Show spectators",
-                    "Show who's spectating you\nonly works in valve servers");
-static CatVar god_mode(CV_SWITCH, "godmode", "0", "no description",
-                       "no description");
-void *C_TFPlayer__ShouldDraw_original = nullptr;
+static void *C_TFPlayer__ShouldDraw_original = nullptr;
 
-bool C_TFPlayer__ShouldDraw_hook(IClientEntity *thisptr)
+static bool C_TFPlayer__ShouldDraw_hook(IClientEntity *thisptr)
 {
     if (thisptr ==
             g_IEntityList->GetClientEntity(g_IEngine->GetLocalPlayer()) &&
@@ -77,24 +57,50 @@ bool C_TFPlayer__ShouldDraw_hook(IClientEntity *thisptr)
     }
 }
 
-int last_number = 0;
+static void tryPatchLocalPlayerShouldDraw()
+{
+    // Patching local player
+    void **vtable = *(void ***) (g_pLocalPlayer->entity->InternalEntity());
+    if (vtable[offsets::ShouldDraw()] != C_TFPlayer__ShouldDraw_hook)
+    {
+        C_TFPlayer__ShouldDraw_original = vtable[offsets::ShouldDraw()];
+        void *page = (void *) ((uintptr_t) vtable & ~0xFFF);
+        mprotect(page, 0xFFF, PROT_READ | PROT_WRITE | PROT_EXEC);
+        vtable[offsets::ShouldDraw()] = (void *) C_TFPlayer__ShouldDraw_hook;
+        mprotect(page, 0xFFF, PROT_READ | PROT_EXEC);
+    }
+}
 
-float last_bucket = 0;
+static Timer anti_afk_timer{};
+static int last_buttons{ 0 };
 
-static CatCommand test_chat_print(
-    "debug_print_chat", "machine broke", [](const CCommand &args) {
-        CHudBaseChat *chat = (CHudBaseChat *) g_CHUD->FindElement("CHudChat");
-        if (chat)
+static void updateAntiAfk()
+{
+    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)
+    {
+        anti_afk_timer.update();
+        last_buttons = current_user_cmd->buttons;
+    }
+    else
+    {
+        if (anti_afk_timer.check(60000))
         {
-            std::unique_ptr<char> str(
-                strfmt("\x07%06X[CAT]\x01 %s", 0x4D7942, args.ArgS()).get());
-            chat->Printf(str.get());
+            // Send random commands
+            current_user_cmd->sidemove    = RandFloatRange(-450.0, 450.0);
+            current_user_cmd->forwardmove = RandFloatRange(-450.0, 450.0);
+            current_user_cmd->buttons     = rand();
+            // Prevent attack command
+            current_user_cmd->buttons &= ~IN_ATTACK;
+            if (anti_afk_timer.check(61000))
+            {
+                anti_afk_timer.update();
+            }
         }
-        else
-        {
-            logging::Info("Chat is null!");
-        }
-    });
+    }
+}
+
+namespace hacks::shared::misc
+{
 
 // Use to send a autobalance request to the server that doesnt prevent you from
 // using it again, Allowing infinite use of it.
@@ -106,167 +112,51 @@ void SendAutoBalanceRequest()
     kv->SetInt("response", 1);
     g_IEngine->ServerCmdKeyValues(kv);
 }
+
 // Catcommand for above
 CatCommand
     SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance",
                        [](const CCommand &args) { SendAutoBalanceRequest(); });
 
+static int last_number{ 0 };
+static int last_checked_command_number{ 0 };
+static IClientEntity *last_checked_weapon{ nullptr };
+static bool flash_light_spam_switch{ false };
+static Timer auto_balance_timer{};
+
+static ConVar *teammatesPushaway{ nullptr };
+InitRoutine init([]() {
+    teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
+});
+
 void CreateMove()
 {
-#if not LAGBOT_MODE
-    // Crithack
-    static IClientEntity *localplayer, *weapon, *last_weapon = nullptr;
-    static int tries, cmdn, md5seed, rseed, c, b;
-    static crithack_saved_state state;
-    static bool chc;
-    static bool changed = false;
+#if !LAGBOT_MODE
+    if (current_user_cmd->command_number)
+        last_number = current_user_cmd->command_number;
 
-    if (g_pUserCmd->command_number)
-        last_number = g_pUserCmd->command_number;
-
-    static int last_checked_command_number    = 0;
-    static IClientEntity *last_checked_weapon = nullptr;
-
-    /*IF_GAME (IsTF2()) {
-        if (crit_hack_next && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) &&
-       WeaponCanCrit() && RandomCrits()) {
-            PROF_SECTION(CM_misc_crit_hack_prediction);
-            weapon = RAW_ENT(LOCAL_W);
-            // IsBaseCombatWeapon
-            if (weapon &&
-                vfunc<bool(*)(IClientEntity*)>(weapon, 1944 / 4, 0)(weapon)) {
-                /*if (experimental_crit_hack.KeyDown()) {
-                    if (!g_pUserCmd->command_number || critWarmup < 8) {
-                        if (g_pUserCmd->buttons & IN_ATTACK) {
-                            critWarmup++;
-                        } else {
-                            critWarmup = 0;
-                        }
-                        g_pUserCmd->buttons &= ~(IN_ATTACK);
-                    }
-                }*/ /*
-                             if (g_pUserCmd->command_number &&
-                 (last_checked_weapon !=
-                 weapon || last_checked_command_number <
-                 g_pUserCmd->command_number))
-                 {
-                                 tries = 0;
-                                 cmdn = g_pUserCmd->command_number;
-                                 chc = false;
-                                 state.Save(weapon);
-                                 while (!chc && tries < 4096) {
-                                     md5seed = MD5_PseudoRandom(cmdn) &
-                 0x7fffffff;
-                                     rseed = md5seed;
-                                     //float bucket =
-                 *(float*)((uintptr_t)RAW_ENT(LOCAL_W)
-                 + 2612u); *g_PredictionRandomSeed = md5seed; c = LOCAL_W->m_IDX
-                 << 8;
-                 b =
-                 LOCAL_E->m_IDX; rseed = rseed ^ (b | c);
-                                     *(float*)(weapon + 2872ul) = 0.0f;
-                                     RandomSeed(rseed);
-                                     chc =
-                 vfunc<bool(*)(IClientEntity*)>(weapon, 1836
-                 / 4,
-                 0)(weapon); if (!chc) { tries++; cmdn++;
-                                     }
-                                 }
-                                 last_checked_command_number = cmdn;
-                                 last_checked_weapon = weapon;
-                                 state.Load(weapon);
-                                 last_bucket = state.bucket;
-                                 if (chc) {
-                                     found_crit_weapon = weapon;
-                                     found_crit_number = cmdn;
-                                 }
-                             }
-                             if (g_pUserCmd->buttons & (IN_ATTACK)) {
-                                 if (found_crit_weapon == weapon &&
-                 g_pUserCmd->command_number < found_crit_number) { if
-                 (g_IInputSystem->IsButtonDown((ButtonCode_t)((int)experimental_crit_hack)))
-                 { command_number_mod[g_pUserCmd->command_number] = cmdn;
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 }*/
-    /*
-    {
-        PROF_SECTION(CM_misc_crit_hack_apply);
-        if (!AllowAttacking()) g_pUserCmd->buttons &= ~IN_ATTACK;
-    }*/
-    // Spycrab stuff
     // TODO FIXME this should be moved out of here
     IF_GAME(IsTF2())
     {
-        PROF_SECTION(CM_misc_hook_checks);
-        static IClientEntity *localplayer = nullptr;
-        localplayer =
-            g_IEntityList->GetClientEntity(g_IEngine->GetLocalPlayer());
-        if (render_zoomed && localplayer)
-        {
-            // Patchking local player
-            void **vtable = *(void ***) (localplayer);
-            if (vtable[offsets::ShouldDraw()] != C_TFPlayer__ShouldDraw_hook)
-            {
-                C_TFPlayer__ShouldDraw_original = vtable[offsets::ShouldDraw()];
-                void *page = (void *) ((uintptr_t) vtable & ~0xFFF);
-                mprotect(page, 0xFFF, PROT_READ | PROT_WRITE | PROT_EXEC);
-                vtable[offsets::ShouldDraw()] =
-                    (void *) C_TFPlayer__ShouldDraw_hook;
-                mprotect(page, 0xFFF, PROT_READ | PROT_EXEC);
-            }
-        }
+        if (render_zoomed && CE_GOOD(LOCAL_E))
+            tryPatchLocalPlayerShouldDraw();
     }
     // AntiAfk That after a certian time without movement keys depressed, causes
     // random keys to be spammed for 1 second
     if (anti_afk)
-    {
-
-        // Time last idle
-        static float afk_time_idle = 0;
-
-        // If the timer exceeds 1 minute, jump and reset the timer
-        if (g_GlobalVars->curtime - 60 > afk_time_idle)
-        {
-
-            // Send random commands
-            g_pUserCmd->sidemove    = RandFloatRange(-450.0, 450.0);
-            g_pUserCmd->forwardmove = RandFloatRange(-450.0, 450.0);
-            g_pUserCmd->buttons     = rand();
-            // Prevent attack command
-            g_pUserCmd->buttons &= ~IN_ATTACK;
-
-            // After 1 second we reset the idletime
-            if (g_GlobalVars->curtime - 61 > afk_time_idle)
-            {
-                logging::Info("Finish anti-idle");
-                afk_time_idle = g_GlobalVars->curtime;
-            }
-        }
-        else
-        {
-            // If the player uses a button, reset the timer
-            if (g_pUserCmd->buttons & IN_FORWARD ||
-                g_pUserCmd->buttons & IN_BACK ||
-                g_pUserCmd->buttons & IN_MOVELEFT ||
-                g_pUserCmd->buttons & IN_MOVERIGHT ||
-                g_pUserCmd->buttons & IN_JUMP || !LOCAL_E->m_bAlivePlayer())
-                afk_time_idle = g_GlobalVars->curtime;
-        }
-    }
+        updateAntiAfk();
 
     // Automaticly airstrafes in the air
     if (auto_strafe)
     {
-        bool ground = CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & (1 << 0);
+        auto ground = (bool) (CE_INT(g_pLocalPlayer->entity, netvar.iFlags) &
+                              FL_ONGROUND);
         if (!ground)
         {
-            if (g_pUserCmd->mousedx > 1 || g_pUserCmd->mousedx < -1)
+            if (current_user_cmd->mousedx)
             {
-                g_pUserCmd->sidemove = g_pUserCmd->mousedx > 1 ? 450.f : -450.f;
+                current_user_cmd->sidemove =
+                    current_user_cmd->mousedx > 1 ? 450.f : -450.f;
             }
         }
     }
@@ -283,16 +173,14 @@ void CreateMove()
     {
         if (flashlight_spam)
         {
-            static bool flswitch = false;
-            if (flswitch && !g_pUserCmd->impulse)
-                g_pUserCmd->impulse = 100;
-            flswitch                = !flswitch;
+            if (flash_light_spam_switch && !current_user_cmd->impulse)
+                current_user_cmd->impulse = 100;
+            flash_light_spam_switch = !flash_light_spam_switch;
         }
     }
 
     IF_GAME(IsTF2())
     {
-
         // Tauntslide needs improvement for movement but it mostly works
         if (tauntslide_tf2)
         {
@@ -304,26 +192,24 @@ void CreateMove()
                     // get directions
                     float forward = 0;
                     float side    = 0;
-                    if (g_pUserCmd->buttons & IN_FORWARD)
+                    if (current_user_cmd->buttons & IN_FORWARD)
                         forward += 450;
-                    if (g_pUserCmd->buttons & IN_BACK)
+                    if (current_user_cmd->buttons & IN_BACK)
                         forward -= 450;
-                    if (g_pUserCmd->buttons & IN_MOVELEFT)
+                    if (current_user_cmd->buttons & IN_MOVELEFT)
                         side -= 450;
-                    if (g_pUserCmd->buttons & IN_MOVERIGHT)
+                    if (current_user_cmd->buttons & IN_MOVERIGHT)
                         side += 450;
-                    g_pUserCmd->forwardmove = forward;
-                    g_pUserCmd->sidemove    = side;
+                    current_user_cmd->forwardmove = forward;
+                    current_user_cmd->sidemove    = side;
 
-                    static QAngle camera_angle;
+                    QAngle camera_angle;
                     g_IEngine->GetViewAngles(camera_angle);
 
                     // Doesnt work with anti-aim as well as I hoped... I guess
                     // this is as far as I can go with such a simple tauntslide
-                    if (!(hacks::shared::antiaim::enabled &&
-                          hacks::shared::antiaim::yaw_mode &&
-                          !(side || forward)))
-                        g_pUserCmd->viewangles.y       = camera_angle[1];
+                    if (!hacks::shared::antiaim::isEnabled())
+                        current_user_cmd->viewangles.y = camera_angle[1];
                     g_pLocalPlayer->v_OrigViewangles.y = camera_angle[1];
 
                     // Use silent since we dont want to prevent the player from
@@ -334,23 +220,12 @@ void CreateMove()
         }
 
         // Spams infinite autobalance spam function
-        if (auto_balance_spam)
-        {
-
-            static float auto_balance_time = 0;
-            if (g_GlobalVars->curtime - 0.15 > auto_balance_time)
-            {
-
-                SendAutoBalanceRequest();
-                // Reset
-                auto_balance_time = g_GlobalVars->curtime;
-            }
-        }
+        if (auto_balance_spam && auto_balance_timer.test_and_set(150))
+            SendAutoBalanceRequest();
 
         // Simple No-Push through cvars
-        static ConVar *pNoPush = g_ICvar->FindVar("tf_avoidteammates_pushaway");
-        if (nopush_enabled == pNoPush->GetBool())
-            pNoPush->SetValue(!nopush_enabled);
+        if (*nopush_enabled == teammatesPushaway->GetBool())
+            teammatesPushaway->SetValue(!nopush_enabled);
     }
 #endif
 }
@@ -447,7 +322,7 @@ void DrawText()
         AddSideString(format("Velocity2: ", vel.Length2D()));
         AddSideString(format("flSimTime: ",
                              LOCAL_E->var<float>(netvar.m_flSimulationTime)));
-        if (g_pUserCmd)
+        if (current_user_cmd)
             AddSideString(format("command_number: ", last_cmd_number));
         AddSideString(format(
             "clip: ", CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1)));

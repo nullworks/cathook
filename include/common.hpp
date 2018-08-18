@@ -56,7 +56,6 @@
 #include <visual/atlas.hpp>
 #include <visual/EffectChams.hpp>
 #include <visual/drawmgr.hpp>
-#include "visual/menu/compatlayer.hpp"
 #endif
 
 #include "core/profiler.hpp"
@@ -99,12 +98,14 @@
 #include "core/sharedobj.hpp"
 #include "init.hpp"
 #include "reclasses/reclasses.hpp"
+#include <CNavFile.h>
+#include <astar.h>
 
 #include "copypasted/Netvar.h"
 #include "copypasted/CSignature.h"
 
 #if ENABLE_GUI
-#include "visual/menu/GUI.h"
+// FIXME add gui
 #endif
 
 #include <core/sdk.hpp>

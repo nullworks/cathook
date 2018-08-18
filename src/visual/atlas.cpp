@@ -37,4 +37,4 @@ texture_atlas &atlas()
     static texture_atlas object{ DATA_PATH "/textures/atlas.png", 1024, 512 };
     return object;
 }
-}
+} // namespace textures

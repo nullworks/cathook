@@ -26,4 +26,4 @@ public:
     int BRequestJoinPlayer(CSteamID steamid);
     static bool BInQueue(CTFPartyClient *this_);
 };
-}
+} // namespace re

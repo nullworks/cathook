@@ -9,154 +9,77 @@
 #include <glez/draw.hpp>
 #include <online/Online.hpp>
 #include <PlayerTools.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "esp.enable", "false" };
+static settings::Int max_dist{ "esp.range", "4096" };
+
+static settings::Int box_esp{ "esp.box.mode", "2" };
+static settings::Int box_corner_size{ "esp.box.corner-size", "10" };
+static settings::Bool box_3d_player{ "esp.box.player-3d", "false" };
+static settings::Bool box_3d_building{ "esp.box.building-3d", "false" };
+
+static settings::Int tracers{ "esp.tracers-mode", "0" };
+
+static settings::Int emoji_esp{ "esp.emoji.mode", "0" };
+static settings::Int emoji_esp_size{ "esp.emoji.size", "32" };
+static settings::Bool emoji_esp_scaling{ "esp.emoji.scaling", "true" };
+static settings::Int emoji_min_size{ "esp.emoji.min-size", "20" };
+
+static settings::Int show_health{ "esp.health-mode", "3" };
+static settings::Bool draw_bones{ "esp.bones", "false" };
+static settings::Int sightlines{ "esp.sightlines", "0" };
+static settings::Int esp_text_position{ "esp.text-position", "0" };
+static settings::Int esp_expand{ "esp.expand", "0" };
+static settings::Bool vischeck{ "esp.vischeck", "true" };
+static settings::Bool legit{ "esp.legit", "false" };
+
+static settings::Bool local_esp{ "esp.show.local", "true" };
+static settings::Bool buildings{ "esp.show.buildings", "true" };
+static settings::Bool teammates{ "esp.show.teammates", "true" };
+static settings::Bool tank{ "esp.show.tank", "true" };
+
+static settings::Bool show_weapon{ "esp.info.weapon", "false" };
+static settings::Bool show_distance{ "esp.info.distance", "true" };
+static settings::Bool show_name{ "esp.info.name", "true" };
+static settings::Bool show_class{ "esp.info.class", "true" };
+static settings::Bool show_conditions{ "esp.info.conditions", "true" };
+static settings::Bool show_ubercharge{ "esp.info.ubercharge", "true" };
+static settings::Bool show_bot_id{ "esp.info.bot-id", "true" };
+static settings::Bool powerup_esp{ "esp.info.powerup", "true" };
+
+static settings::Bool item_esp{ "esp.item.enable", "true" };
+static settings::Bool item_dropped_weapons{ "esp.item.weapons", "false" };
+static settings::Bool item_ammo_packs{ "esp.item.ammo", "false" };
+static settings::Bool item_health_packs{ "esp.item.health", "true" };
+static settings::Bool item_powerups{ "esp.item.powerup", "true" };
+static settings::Bool item_money{ "esp.item.money", "true" };
+static settings::Bool item_money_red{ "esp.item.money-red", "false" };
+static settings::Bool item_spellbooks{ "esp.item.spellbook", "true" };
+// TF2C
+static settings::Bool item_weapon_spawners{ "esp.item.weapon-spawner", "true" };
+static settings::Bool item_adrenaline{ "esp.item.adrenaline", "true" };
+
+static settings::Bool proj_esp{ "esp.projectile.enable", "false" };
+static settings::Int proj_rockets{ "esp.projectile.rockets", "1" };
+static settings::Int proj_arrows{ "esp.projectile.arrows", "1" };
+static settings::Int proj_pipes{ "esp.projectile.pipes", "1" };
+static settings::Int proj_stickies{ "esp.projectile.stickies", "1" };
+static settings::Bool proj_enemy{ "esp.projectile.enemy-only", "true" };
+
+static settings::Bool entity_info{ "esp.debug.entity", "false" };
+static settings::Bool entity_model{ "esp.debug.model", "false" };
+static settings::Bool entity_id{ "esp.debug.id", "true" };
+
+static settings::Bool online_support{ "esp.online.enable", "true" };
+static settings::Bool online_groups{ "esp.online.groups", "true" };
+static settings::Bool online_software{ "esp.online.software", "true" };
+
+static settings::Bool v9mode{ "esp.v952-mode", "false" };
 
 namespace hacks::shared::esp
 {
-
-// Main Switch
-static CatVar enabled(CV_SWITCH, "esp_enabled", "0", "ESP",
-                      "Master ESP switch");
-
-// Distance limit
-static CatVar max_dist(CV_FLOAT, "esp_range", "5000.0f", "ESP Range",
-                       "Max ESP Range");
-// Box esp + Options
-static CatEnum box_esp_enum({ "None", "Normal", "Corners" });
-static CatVar box_esp(box_esp_enum, "esp_box", "2", "Box", "Draw a 2D box");
-static CatVar box_corner_size(CV_INT, "esp_box_corner_size", "10",
-                              "Corner Size");
-static CatVar box_3d_player(CV_SWITCH, "esp_3d_players", "0",
-                            "Draw 3D box over players");
-static CatVar box_3d_building(CV_SWITCH, "esp_3d_buildings", "0",
-                              "Draw 3D box over buildings");
-// Tracers
-static CatEnum tracers_enum({ "OFF", "CENTER", "BOTTOM" });
-static CatVar
-    tracers(tracers_enum, "esp_tracers", "0", "Tracers",
-            "SDraws a line from the player to a position on your screen");
-// Emoji Esp
-static CatEnum emoji_esp_enum({ "None", "Joy", "Thinking" });
-static CatVar emoji_esp(emoji_esp_enum, "esp_emoji", "0", "Emoji ESP",
-                        "Draw emoji on peopels head");
-static CatVar emoji_esp_size(CV_FLOAT, "esp_emoji_size", "32", "Emoji ESP Size",
-                             "Emoji size");
-static CatVar emoji_esp_scaling(CV_SWITCH, "esp_emoji_scaling", "1",
-                                "Emoji ESP Scaling", "Emoji ESP Scaling");
-static CatVar
-    emoji_min_size(CV_INT, "esp_emoji_min_size", "20", "Emoji ESP min size",
-                   "Minimum size for an emoji when you use auto scaling");
-
-// Other esp options
-static CatEnum show_health_enum({ "None", "Text", "Healthbar", "Both" });
-static CatVar show_health(show_health_enum, "esp_health", "3", "Health ESP",
-                          "Show enemy health");
-static CatVar draw_bones(CV_SWITCH, "esp_bones", "0", "Draw Bones");
-static CatEnum
-    sightlines_enum({ "None", "Sniper Only",
-                      "All" }); // I ripped of lbox's choices cuz its nice
-static CatVar sightlines(sightlines_enum, "esp_sightlines", "0",
-                         "Show sightlines",
-                         "Displays a line of where players are looking");
-static CatEnum esp_text_position_enum({ "TOP RIGHT", "BOTTOM RIGHT", "CENTER",
-                                        "ABOVE", "BELOW" });
-static CatVar esp_text_position(esp_text_position_enum, "esp_text_position",
-                                "0", "Text position", "Defines text position");
-static CatVar esp_expand(
-    CV_INT, "esp_expand", "0", "Expand Esp",
-    "Spreads out Box, health bar, and text from center"); // Note, check if this
-                                                          // should be int, it
-                                                          // is being used by
-                                                          // casting as float
-static CatVar
-    vischeck(CV_SWITCH, "esp_vischeck", "1", "VisCheck",
-             "ESP visibility check - makes enemy info behind walls darker, "
-             "disable this if you get FPS drops");
-static CatVar
-    legit(CV_SWITCH, "esp_legit", "0", "Legit Mode",
-          "Don't show invisible enemies\nHides invisable enemies with "
-          "visibility enabled");
-static CatVar esp_font_scale(CV_INT, "esp_font_scale", "14", "ESP font scale");
-// Selective esp options
-static CatVar local_esp(CV_SWITCH, "esp_local", "1", "ESP Local Player",
-                        "Shows local player ESP in thirdperson");
-static CatVar buildings(CV_SWITCH, "esp_buildings", "1", "Building ESP",
-                        "Show buildings");
-static CatVar teammates(CV_SWITCH, "esp_teammates", "0", "ESP Teammates",
-                        "Teammate ESP");
-static CatVar tank(CV_SWITCH, "esp_show_tank", "1", "Show tank",
-                   "Show tanks in mvm");
-// Text Esps
-static CatVar show_weapon(CV_SWITCH, "esp_weapon", "0", "Show weapon name",
-                          "Show which weapon the enemy is using");
-static CatVar show_distance(CV_SWITCH, "esp_distance", "1", "Distance ESP",
-                            "Show distance to target");
-static CatVar show_name(CV_SWITCH, "esp_name", "1", "Name ESP", "Show name");
-static CatVar show_class(CV_SWITCH, "esp_class", "1", "Class ESP",
-                         "Show class");
-static CatVar show_conditions(CV_SWITCH, "esp_conds", "1", "Conditions ESP",
-                              "Show conditions");
-static CatVar
-    show_ubercharge(CV_SWITCH, "esp_ubercharge", "1", "Ubercharge ESP",
-                    "Show ubercharge percentage while players medigun is out");
-static CatVar show_bot_id(CV_SWITCH, "esp_followbot_id", "1", "Followbot ESP",
-                          "Show followbot ID");
-static CatVar powerup_esp(CV_SWITCH, "esp_powerups", "1", "Powerup ESP",
-                          "Shows powerups a player is using");
-// Item esp
-static CatVar item_esp(CV_SWITCH, "esp_item", "1", "Item ESP",
-                       "Master Item ESP switch (health packs, etc.)");
-static CatVar item_dropped_weapons(CV_SWITCH, "esp_item_weapons", "0",
-                                   "Dropped weapons", "Show dropped weapons");
-static CatVar item_ammo_packs(CV_SWITCH, "esp_item_ammo", "0", "Ammo packs",
-                              "Show ammo packs");
-static CatVar item_health_packs(CV_SWITCH, "esp_item_health", "1",
-                                "Health packs", "Show health packs");
-static CatVar item_powerups(CV_SWITCH, "esp_item_powerups", "1", "Powerups",
-                            "Shows powerups in the world");
-static CatVar item_money(CV_SWITCH, "esp_money", "1", "MvM money",
-                         "Show MvM money");
-static CatVar item_money_red(CV_SWITCH, "esp_money_red", "1", "Red MvM money",
-                             "Show red MvM money");
-static CatVar item_spellbooks(CV_SWITCH, "esp_spellbooks", "1", "Spellbooks",
-                              "Spell Books");
-static CatVar item_weapon_spawners(CV_SWITCH, "esp_weapon_spawners", "1",
-                                   "Show weapon spawners",
-                                   "TF2C deathmatch weapon spawners");
-static CatVar item_adrenaline(CV_SWITCH, "esp_item_adrenaline", "0",
-                              "Show Adrenaline", "TF2C adrenaline pills");
-// Projectile esp
-static CatVar proj_esp(CV_SWITCH, "esp_proj", "1", "Projectile ESP",
-                       "Projectile ESP");
-static CatEnum proj_esp_enum({ "OFF", "ALL", "CRIT" });
-static CatVar proj_rockets(proj_esp_enum, "esp_proj_rockets", "1", "Rockets",
-                           "Rockets");
-static CatVar proj_arrows(proj_esp_enum, "esp_proj_arrows", "1", "Arrows",
-                          "Arrows");
-static CatVar proj_pipes(proj_esp_enum, "esp_proj_pipes", "1", "Pipes",
-                         "Pipebombs");
-static CatVar proj_stickies(proj_esp_enum, "esp_proj_stickies", "1", "Stickies",
-                            "Stickybombs");
-static CatVar proj_enemy(CV_SWITCH, "esp_proj_enemy", "1",
-                         "Only enemy projectiles",
-                         "Don't show friendly projectiles");
-// Debug
-static CatVar entity_info(CV_SWITCH, "esp_entity", "0", "Entity ESP",
-                          "Show entity info (debug)");
-static CatVar entity_model(CV_SWITCH, "esp_model_name", "0", "Model name ESP",
-                           "Model name esp (DEBUG ONLY)");
-static CatVar entity_id(CV_SWITCH, "esp_entity_id", "1", "Entity ID",
-                        "Used with Entity ESP. Shows entityID");
-
-// Online
-static CatVar online(CV_SWITCH, "esp_online", "1", "Show online info",
-                     "Username, etc");
-static CatVar online_groups(CV_SWITCH, "esp_online_groups", "1",
-                            "Show online groups", "Admin, developer, etc");
-static CatVar online_software(CV_SWITCH, "esp_online_software", "1",
-                              "Show software", "cathook, lmaobox, etc");
-
-// CatVar draw_hitbox(CV_SWITCH, "esp_hitbox", "1", "Draw Hitbox");
 
 // Unknown
 std::mutex threadsafe_mutex;
@@ -170,21 +93,21 @@ std::mutex entities_need_repaint_mutex{};
 // be a pain.
 
 // Vars to store what bones connect to what
-const std::string bonenames_leg_r[] = { "bip_foot_R", "bip_knee_R",
+const std::string bonenames_leg_r[]  = { "bip_foot_R", "bip_knee_R",
                                         "bip_hip_R" };
-const std::string bonenames_leg_l[] = { "bip_foot_L", "bip_knee_L",
+const std::string bonenames_leg_l[]  = { "bip_foot_L", "bip_knee_L",
                                         "bip_hip_L" };
 const std::string bonenames_bottom[] = { "bip_hip_R", "bip_pelvis",
                                          "bip_hip_L" };
-const std::string bonenames_spine[] = { "bip_pelvis",  "bip_spine_0",
+const std::string bonenames_spine[]  = { "bip_pelvis",  "bip_spine_0",
                                         "bip_spine_1", "bip_spine_2",
                                         "bip_spine_3", "bip_neck",
                                         "bip_head" };
-const std::string bonenames_arm_r[] = { "bip_upperArm_R", "bip_lowerArm_R",
+const std::string bonenames_arm_r[]  = { "bip_upperArm_R", "bip_lowerArm_R",
                                         "bip_hand_R" };
-const std::string bonenames_arm_l[] = { "bip_upperArm_L", "bip_lowerArm_L",
+const std::string bonenames_arm_l[]  = { "bip_upperArm_L", "bip_lowerArm_L",
                                         "bip_hand_L" };
-const std::string bonenames_up[] = { "bip_upperArm_R", "bip_spine_3",
+const std::string bonenames_up[]     = { "bip_upperArm_R", "bip_spine_3",
                                      "bip_upperArm_L" };
 
 // Dont fully understand struct but a guess is a group of something.
@@ -218,21 +141,21 @@ struct bonelist_s
         }
         try
         {
-            for (int i   = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 leg_r[i] = bones.at(bonenames_leg_r[i]);
-            for (int i   = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 leg_l[i] = bones.at(bonenames_leg_l[i]);
-            for (int i    = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 bottom[i] = bones.at(bonenames_bottom[i]);
-            for (int i   = 0; i < 7; i++)
+            for (int i = 0; i < 7; i++)
                 spine[i] = bones.at(bonenames_spine[i]);
-            for (int i   = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 arm_r[i] = bones.at(bonenames_arm_r[i]);
-            for (int i   = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 arm_l[i] = bones.at(bonenames_arm_l[i]);
             for (int i = 0; i < 3; i++)
-                up[i]  = bones.at(bonenames_up[i]);
-            success    = true;
+                up[i] = bones.at(bonenames_up[i]);
+            success = true;
         }
         catch (std::exception &ex)
         {
@@ -311,7 +234,7 @@ std::unordered_map<studiohdr_t *, bonelist_s> bonelist_map{};
 // Function called on draw
 void Draw()
 {
-    if (!enabled)
+    if (!enable)
         return;
     std::lock_guard<std::mutex> esp_lock(threadsafe_mutex);
     for (auto &i : entities_need_repaint)
@@ -328,7 +251,7 @@ void CreateMove()
 {
 
     // Check usersettings if enabled
-    if (!enabled)
+    if (!enable)
         return;
 
     // Something
@@ -420,14 +343,14 @@ void _FASTCALL emoji(CachedEntity *ent)
                 if (draw::WorldToScreen(hit->center, head_scr))
                 {
                     float size = emoji_esp_scaling ? fabs(hbm.y - hbx.y)
-                                                   : float(emoji_esp_size);
+                                                   : *emoji_esp_size;
                     if (v9mode)
                         size *= 1.4;
-                    if (!size || !float(emoji_min_size))
+                    if (!size || !emoji_min_size)
                         return;
-                    if (emoji_esp_scaling && (size < float(emoji_min_size)))
-                        size = float(emoji_min_size);
-                    player_info_s info;
+                    if (emoji_esp_scaling && (size < *emoji_min_size))
+                        size = *emoji_min_size;
+                    player_info_s info{};
                     unsigned int steamID;
                     unsigned int steamidarray[32]{};
                     bool hascall    = false;
@@ -753,12 +676,11 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 break;
                 case 1:
                 { // BOTTOM RIGHT
-                    draw_point =
-                        Vector(max_x + 2,
-                               max_y -
-                                   data.at(ent->m_IDX).string_count *
-                                       /*((int)fonts::font_main->height)*/ 14,
-                               0);
+                    draw_point = Vector(
+                        max_x + 2,
+                        max_y - data.at(ent->m_IDX).string_count *
+                                    /*((int)fonts::font_main->height)*/ 14,
+                        0);
                 }
                 break;
                 case 2:
@@ -769,12 +691,11 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 break;
                 case 3:
                 { // ABOVE
-                    draw_point =
-                        Vector(min_x,
-                               min_y -
-                                   data.at(ent->m_IDX).string_count *
-                                       /*((int)fonts::font_main->height)*/ 14,
-                               0);
+                    draw_point = Vector(
+                        min_x,
+                        min_y - data.at(ent->m_IDX).string_count *
+                                    /*((int)fonts::font_main->height)*/ 14,
+                        0);
                 }
                 break;
                 case 4:
@@ -876,11 +797,11 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 // Used to process entities from CreateMove
 void _FASTCALL ProcessEntity(CachedEntity *ent)
 {
-    if (!enabled)
+    if (!enable)
         return; // Esp enable check
     if (CE_BAD(ent))
         return; // CE_BAD check to prevent crashes
-    if (max_dist && ent->m_flDistance() > (float) max_dist)
+    if (max_dist && ent->m_flDistance() > *max_dist)
         return;
     int classid = ent->m_iClassID();
     // Entity esp
@@ -1152,7 +1073,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             return;
 
         online::user_data *data =
-            online ? online::getUserData(info.friendsID) : nullptr;
+            online_support ? online::getUserData(info.friendsID) : nullptr;
 
         // TODO, check if u can just use "ent->m_bEnemy()" instead of m_iTeam
         // Legit mode handling
@@ -1489,7 +1410,7 @@ void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color,
 {
     const rgba_t &black =
         transparent ? colors::Transparent(colors::black) : colors::black;
-    const int size = box_corner_size;
+    const int size = *box_corner_size;
 
     // Black corners
     // Top Left
@@ -1549,7 +1470,7 @@ bool GetCollide(CachedEntity *ent)
         // If user setting for box expnad is true, spread the max and mins
         if (esp_expand)
         {
-            const float &exp = (float) esp_expand;
+            const float exp = *esp_expand;
             maxs.x += exp;
             maxs.y += exp;
             maxs.z += exp;
@@ -1644,4 +1565,4 @@ void SetEntityColor(CachedEntity *entity, const rgba_t &color)
 {
     data[entity->m_IDX].color = color;
 }
-}
+} // namespace hacks::shared::esp

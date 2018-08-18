@@ -5,28 +5,19 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "spy-alert.enable", "false" };
+static settings::Float distance_warning{ "spy-alert.distance.warning", "500" };
+static settings::Float distance_alert{ "spy-alert.distance.alert", "200" };
+static settings::Bool sound_alert{ "spy-alert.sound", "true" };
+static settings::Float sound_alert_interval{ "spy-alert.alert-interval", "3" };
+static settings::Bool voicemenu{ "spy-alert.voicemenu", "false" };
+static settings::Bool invisible{ "spy-alert.alert-for-invisible", "false" };
 
 namespace hacks::tf::spyalert
 {
-
-static CatVar enabled(CV_SWITCH, "spyalert_enabled", "0", "Enable",
-                      "Master SpyAlert switch");
-static CatVar distance_warning(CV_FLOAT, "spyalert_warning", "500.0",
-                               "Warning distance",
-                               "Distance where yellow warning shows");
-static CatVar distance_backstab(CV_FLOAT, "spyalert_backstab", "200.0",
-                                "Backstab distance",
-                                "Distance where red warning shows");
-static CatVar sound_alerts(CV_SWITCH, "spyalert_sound", "1", "Sound Alerts",
-                           "Demoman yells spy when a spy is within distance");
-static CatVar sound_alert_interval(CV_FLOAT, "spyalert_interval", "3",
-                                   "Alert Interval", "Sound alert interval");
-static CatVar
-    voicemenu(CV_SWITCH, "spyalert_voice", "0", "Voicemenu",
-              "Inform other Players of a nearby Spy using the Voicemenu.");
-static CatVar invisible(CV_SWITCH, "spyalert_invisible", "0",
-                        "Detect Invisible", "Detect invisible Spies.");
 
 bool warning_triggered  = false;
 bool backstab_triggered = false;
@@ -35,7 +26,8 @@ Timer lastVoicemenu{};
 
 void Draw()
 {
-    if (!enabled)
+    PROF_SECTION(DRAW_SpyAlert)
+    if (!enable)
         return;
     CachedEntity *closest_spy, *ent;
     float closest_spy_distance, distance;
@@ -73,13 +65,12 @@ void Draw()
     }
     if (closest_spy && closest_spy_distance < (float) distance_warning)
     {
-        if (closest_spy_distance < (float) distance_backstab)
+        if (closest_spy_distance < (float) distance_alert)
         {
             if (!backstab_triggered)
             {
-                if (sound_alerts &&
-                    (g_GlobalVars->curtime - last_say) >
-                        (float) sound_alert_interval)
+                if (sound_alert && (g_GlobalVars->curtime - last_say) >
+                                       (float) sound_alert_interval)
                 {
                     g_ISurface->PlaySound("vo/demoman_cloakedspy03.mp3");
                     last_say = g_GlobalVars->curtime;
@@ -98,9 +89,8 @@ void Draw()
             backstab_triggered = false;
             if (!warning_triggered)
             {
-                if (sound_alerts &&
-                    (g_GlobalVars->curtime - last_say) >
-                        (float) sound_alert_interval)
+                if (sound_alert && (g_GlobalVars->curtime - last_say) >
+                                       (float) sound_alert_interval)
                 {
                     g_ISurface->PlaySound("vo/demoman_cloakedspy01.mp3");
                     last_say = g_GlobalVars->curtime;
@@ -121,4 +111,4 @@ void Draw()
         backstab_triggered = false;
     }
 }
-}
+} // namespace hacks::tf::spyalert

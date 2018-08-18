@@ -492,6 +492,6 @@ public:
     static constexpr int CCSGameRulesProxy                     = 0;
     static constexpr int CBaseCSGrenadeProjectile              = 0;
 };
-}
+} // namespace client_classes_constexpr
 
 #endif /* hl2dm_CONSTEXPR_AUTOGEN_HPP */

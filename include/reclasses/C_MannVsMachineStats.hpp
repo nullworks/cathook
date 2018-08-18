@@ -20,4 +20,4 @@ public:
 public:
     int *AddLocalPlayerUpgrade(int id, int &a3);
 };
-}
+} // namespace re

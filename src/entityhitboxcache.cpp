@@ -5,6 +5,7 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Int.hpp>
 #include "common.hpp"
 
 namespace hitbox_cache
@@ -79,7 +80,7 @@ void EntityHitboxCache::Init()
         }
         if (m_nNumHitboxes > CACHE_MAX_HITBOXES)
             m_nNumHitboxes = CACHE_MAX_HITBOXES;
-        m_bModelSet        = true;
+        m_bModelSet = true;
     }
     m_bSuccess = true;
 }
@@ -105,13 +106,9 @@ bool EntityHitboxCache::VisibilityCheck(int id)
     return m_VisCheck[id];
 }
 
-static CatEnum setupbones_time_enum({ "ZERO", "CURTIME", "LP SERVERTIME",
-                                      "SIMTIME" });
-static CatVar setupbones_time(
-    setupbones_time_enum, "setupbones_time", "3", "Setupbones",
-    "Defines setupbones 4th argument, change it if your aimbot misses, idk!!");
+static settings::Int setupbones_time{ "source.setupbones-time", "3" };
 
-std::mutex setupbones_mutex;
+static std::mutex setupbones_mutex;
 
 matrix3x4_t *EntityHitboxCache::GetBones()
 {
@@ -200,4 +197,4 @@ void Update()
 void Invalidate()
 {
 }
-}
+} // namespace hitbox_cache

@@ -5,192 +5,255 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hacks/Backtrack.hpp"
+#include "hacks/Aimbot.hpp"
+#include "hacks/Trigger.hpp"
+#include "hacks/AntiAntiAim.hpp"
+
 namespace hacks::tf2::autobackstab
 {
+namespace backtrack = hacks::shared::backtrack;
+static settings::Bool enable{ "autobackstab.enable", "0" };
+static settings::Bool silent{ "autobackstab.silent", "1" };
 
-// pPaste, thanks to F1ssi0N
-const Vector GetWorldSpaceCenter(CachedEntity *ent)
+// Not required anymore, keeping for future reference
+Vector rotateVector(Vector center, float radianAngle, Vector p)
 {
-    Vector vMin, vMax;
-    RAW_ENT(ent)->GetRenderBounds(vMin, vMax);
-    Vector vWorldSpaceCenter = RAW_ENT(ent)->GetAbsOrigin();
-    vWorldSpaceCenter.z += (vMin.z + vMax.z) / 2;
-    return vWorldSpaceCenter;
+    float s = sin(radianAngle);
+    float c = cos(radianAngle);
+
+    // translate point back to origin:
+    p.x -= center.x;
+    p.y -= center.y;
+
+    // rotate point
+    //  float xnew = p.x * c - p.y * s;
+    //  float ynew = p.x * s + p.y * c;
+    Vector vecNew{ p.x * c - p.y * s, p.x * s + p.y * c, 0 };
+
+    // translate point back:
+    p.x = vecNew.x + center.x;
+    p.y = vecNew.y + center.y;
+    return p;
 }
 
-static CatVar enabled(CV_SWITCH, "autobackstab", "0", "Auto Backstab",
-                      "Does not depend on triggerbot!");
-static CatVar silent(CV_SWITCH, "autobackstab_silent", "1", "Silent");
-bool found;
-std::pair<Vector, Vector> GetHitboxBounds(CachedEntity *it, int hitbox)
+// Function to find the closest hitbox to the v_Eye for a given ent
+int ClosestDistanceHitbox(CachedEntity *target,
+                          backtrack::BacktrackData btd = {})
 {
-	std::pair<Vector, Vector> result(it->hitboxes.GetHitbox(hitbox)->min,it->hitboxes.GetHitbox(hitbox)->max);
-	return result;
+    int closest        = -1;
+    float closest_dist = 0.0f, dist = 0.0f;
+    for (int i = pelvis; i < lowerArm_R; i++)
+    {
+        if (hacks::shared::backtrack::isBacktrackEnabled)
+            dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes.at(i).center);
+        else
+            dist = g_pLocalPlayer->v_Eye.DistTo(
+                target->hitboxes.GetHitbox(i)->center);
+        if (dist < closest_dist || closest == -1)
+        {
+            closest      = i;
+            closest_dist = dist;
+        }
+    }
+    return closest;
 }
-// TODO improve
-bool CanBackstab(CachedEntity *tar, Vector Local_ang)
+
+bool unifiedCanBackstab(Vector &vecAngle, Vector min, Vector max,
+                        Vector hitboxLoc, CachedEntity *besttarget)
 {
-    if (CE_BAD(tar))
+    // Get melee range
+    float meleeRange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+    if (fabsf(vecAngle.y -
+              NET_VECTOR(RAW_ENT(besttarget), netvar.m_angEyeAngles).y) >=
+        60.0f)
         return false;
-    // Get the forward view vector of the target, ignore Z
-    Vector vecVictimForward = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-    vecVictimForward.z      = 0.0f;
-    vecVictimForward.NormalizeInPlace();
+    if (!min.x && !max.x)
+        return false;
 
-    // Get a vector from my origin to my targets origin
-    Vector vecToTarget;
-    vecToTarget   = GetWorldSpaceCenter(tar) - GetWorldSpaceCenter(LOCAL_E);
-    vecToTarget.z = 0.0f;
-    vecToTarget.NormalizeInPlace();
+    Vector head = g_pLocalPlayer->v_Eye;
 
-    // Get a forward vector of the attacker.
-    Vector vecOwnerForward = Local_ang;
-    vecOwnerForward.z      = 0.0f;
-    vecOwnerForward.NormalizeInPlace();
+    // Check if we are in range. Note: This has to be done in order to avoid
+    // false positives even when "forward" is only "meleeRange" away from the
+    // head.
+    if (head.DistTo(hitboxLoc) > meleeRange)
+        return false;
 
-    float flDotOwner  = DotProduct(vecOwnerForward, vecToTarget);
-    float flDotVictim = DotProduct(vecVictimForward, vecToTarget);
+    // Calculate head x angle
+    Vector tr = (hitboxLoc - head);
+    Vector xAngle;
+    VectorAngles(tr, xAngle);
+    fClampAngle(xAngle);
+    vecAngle.x = xAngle.x;
 
-    // Make sure they're actually facing the target.
-    // This needs to be done because lag compensation can place target slightly
-    // behind the attacker.
-    if (flDotOwner > 0.5)
-        return (flDotVictim > -0.1);
+    // Get the min and max for the hitbox
+    Vector minz(fminf(min.x, max.x), fminf(min.y, max.y), fminf(min.z, max.z));
+    Vector maxz(fmaxf(min.x, max.x), fmaxf(min.y, max.y), fmaxf(min.z, max.z));
+
+    Vector forward;
+    float sp, sy, cp, cy;
+    QAngle angle = VectorToQAngle(vecAngle);
+    // Use math to get a vector in front of the player
+    sy        = sinf(DEG2RAD(angle[1]));
+    cy        = cosf(DEG2RAD(angle[1]));
+    sp        = sinf(DEG2RAD(angle[0]));
+    cp        = cosf(DEG2RAD(angle[0]));
+    forward.x = cp * cy;
+    forward.y = cp * sy;
+    forward.z = -sp;
+    forward   = forward * meleeRange + head;
+
+    Vector hit;
+    // Check if we our line is within the targets hitbox
+    if (hacks::shared::triggerbot::CheckLineBox(minz, maxz, head, forward, hit))
+        return true;
     return false;
 }
+
 void CreateMove()
 {
-    if (!enabled)
+    if (!enable)
         return;
-    if (!CE_GOOD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || !CE_GOOD(LOCAL_W))
-        return;
-    if (!LOCAL_E->m_bAlivePlayer())
+    if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W) || !LOCAL_E->m_bAlivePlayer())
         return;
     if (g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFKnife))
         return;
-    int eid = -1;
-    Vector endpos;
-    ICollideable *p    = RAW_ENT(LOCAL_E)->GetCollideable();
-    const Vector &max1 = p->OBBMaxs() + RAW_ENT(LOCAL_E)->GetAbsOrigin();
-    const Vector &min1 = p->OBBMins() + RAW_ENT(LOCAL_E)->GetAbsOrigin();
-    WhatIAmLookingAt(&eid, &endpos);
-
-    CachedEntity *target = nullptr;
-    if (eid > -1)
-        target = ENTITY(eid);
-    if (CE_GOOD(target) && target != LOCAL_E &&
-        target->m_iTeam() != LOCAL_E->m_iTeam() && target->m_bAlivePlayer() &&
-        target->m_Type() == ENTITY_PLAYER &&
-        !hacks::shared::backtrack::enable &&
-        CanBackstab(target, g_pLocalPlayer->v_OrigViewangles))
+    if (!CanShoot())
+        return;
+    CachedEntity *besttarget = nullptr;
+    if (!backtrack::isBacktrackEnabled)
     {
-        float swingrange =
-            re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-        const Vector &max2 = GetHitboxBounds(target, 1).second +
-                             Vector(swingrange, swingrange, swingrange);
-        const Vector &min2 = GetHitboxBounds(target, 1).first -
-                             Vector(swingrange, swingrange, swingrange);
-        if ((min1.x <= max2.x && max1.x >= min2.x) &&
-            (min1.y <= max2.y && max1.y >= min2.y) &&
-            (min1.z <= max2.z && max1.z >= min2.z))
-            g_pUserCmd->buttons |= IN_ATTACK;
-    }
-    else if (!hacks::shared::backtrack::enable)
-    {
-        CachedEntity *tar = nullptr;
-        float bestscr     = 9999.9f;
-        int bestent       = -1;
         for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
         {
-            CachedEntity *tmp = ENTITY(i);
-            if (CE_BAD(tmp))
+            CachedEntity *target = ENTITY(i);
+            if (CE_BAD(target))
                 continue;
-            if (tmp == LOCAL_E)
+            if (target == LOCAL_E || target->m_iTeam() == LOCAL_E->m_iTeam() ||
+                !target->m_bAlivePlayer() || target->m_Type() != ENTITY_PLAYER)
                 continue;
-            if (tmp->m_iTeam() == LOCAL_E->m_iTeam())
-                continue;
-            if (!tmp->m_bAlivePlayer())
-                continue;
-            if (tmp->m_Type() != ENTITY_PLAYER)
-                continue;
-            float swingrange =
-                re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-            ICollideable *c    = RAW_ENT(tmp)->GetCollideable();
-            const Vector &max2 = c->OBBMaxs() + tmp->m_vecOrigin() +
-                                 Vector(swingrange, swingrange, swingrange);
-            const Vector &min2 = c->OBBMins() + tmp->m_vecOrigin() -
-                                 Vector(swingrange, swingrange, swingrange);
-            if ((min1.x <= max2.x && max1.x >= min2.x) &&
-                (min1.y <= max2.y && max1.y >= min2.y) &&
-                (min1.z <= max2.z && max1.z >= min2.z) &&
-                bestscr > tmp->m_flDistance())
+            if (target->hitboxes.GetHitbox(spine_3)->center.DistTo(
+                    g_pLocalPlayer->v_Eye) <= 200.0f)
             {
-                bestent = tmp->m_IDX;
-                bestscr = tmp->m_flDistance();
+                if (CE_GOOD(besttarget))
+                {
+                    if (target->hitboxes.GetHitbox(spine_3)->center.DistTo(
+                            g_pLocalPlayer->v_Eye) <
+                        besttarget->hitboxes.GetHitbox(spine_3)->center.DistTo(
+                            g_pLocalPlayer->v_Eye))
+                        besttarget = target;
+                }
+                else
+                {
+                    besttarget = target;
+                }
             }
-        }
-        if (bestent > -1)
-            tar = ENTITY(bestent);
-        if (CE_BAD(tar))
-            return;
-        Vector eyeang = g_pLocalPlayer->v_OrigViewangles;
-        for (float i = -180.0f; i < 180.0f; i += 30.0f)
-        {
-            eyeang.y = i;
-            if (CanBackstab(tar, eyeang))
-            {
-                g_pUserCmd->viewangles.y = eyeang.y;
-                g_pUserCmd->buttons |= IN_ATTACK;
-                if (silent)
-                    g_pLocalPlayer->bUseSilentAngles = true;
-            }
-            break;
         }
     }
     else
     {
-        if (!hacks::shared::backtrack::enable)
+        // Run if backtrack is enabled
+        if (backtrack::iBestTarget == -1)
             return;
-        if (hacks::shared::backtrack::iBestTarget == -1)
+        CachedEntity *target = ENTITY(backtrack::iBestTarget);
+        // Various valid entity checks
+        if (CE_BAD(target))
             return;
-        int iBestTarget = hacks::shared::backtrack::iBestTarget;
-        int tickcnt     = 0;
-        int tickus = (float(hacks::shared::backtrack::latency) > 800.0f || float(hacks::shared::backtrack::latency) < 200.0f) ? 12 : 24;
-        for (auto i : hacks::shared::backtrack::headPositions[iBestTarget])
+        if (target == LOCAL_E || target->m_iTeam() == LOCAL_E->m_iTeam() ||
+            !target->m_bAlivePlayer() || target->m_Type() != ENTITY_PLAYER)
+            return;
+        // Check if besttick distance is < 200.0f
+        if (backtrack::headPositions[target->m_IDX][backtrack::BestTick]
+                .hitboxes.at(spine_3)
+                .center.DistTo(g_pLocalPlayer->v_Eye) < 200.0f)
+            besttarget = target;
+    }
+
+    if (CE_GOOD(besttarget))
+    {
+        hacks::shared::anti_anti_aim::resolveEnt(besttarget->m_IDX);
+        Vector angle = NET_VECTOR(RAW_ENT(LOCAL_E), netvar.m_angEyeAngles);
+        if (!backtrack::isBacktrackEnabled)
         {
-            bool good_tick = false;
-            for (int j = 0; j < tickus; ++j)
-                if (tickcnt == hacks::shared::backtrack::sorted_ticks[j].tick &&
-                    hacks::shared::backtrack::sorted_ticks[j].tickcount !=
-                        INT_MAX)
-                    good_tick = true;
-            tickcnt++;
-            if (!good_tick)
-                continue;
-
-            float scr = abs(g_pLocalPlayer->v_OrigViewangles.y - i.viewangles);
-
-            if (scr <= 90.0f &&
-                i.origin.DistTo(g_pLocalPlayer->v_Eye) <=
-                    re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W)))
+            for (angle.y = -180.0f; angle.y < 180.0f; angle.y += 10.0f)
             {
-                CachedEntity *tar = ENTITY(iBestTarget);
-                // ok just in case
-                if (CE_BAD(tar))
+                Vector hitboxLoc =
+                    besttarget->hitboxes
+                        .GetHitbox(ClosestDistanceHitbox(besttarget))
+                        ->center;
+
+                if (!unifiedCanBackstab(
+                        angle,
+                        besttarget->hitboxes
+                            .GetHitbox(ClosestDistanceHitbox(besttarget))
+                            ->min,
+                        besttarget->hitboxes
+                            .GetHitbox(ClosestDistanceHitbox(besttarget))
+                            ->max,
+                        hitboxLoc, besttarget))
                     continue;
-                Vector &angles =
-                    NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-                float &simtime =
-                    NET_FLOAT(RAW_ENT(tar), netvar.m_flSimulationTime);
-                angles.y               = i.viewangles;
-                simtime                = i.simtime;
-                g_pUserCmd->tick_count = i.tickcount;
-                g_pUserCmd->buttons |= IN_ATTACK;
-                break;
+                current_user_cmd->viewangles = angle;
+                current_user_cmd->buttons |= IN_ATTACK;
+                besttarget = nullptr;
+                if (silent)
+                    g_pLocalPlayer->bUseSilentAngles = true;
+                return;
+            }
+        }
+        else
+        {
+            int idx = besttarget->m_IDX;
+            for (auto i : backtrack::headPositions[idx])
+            {
+                if (!backtrack::ValidTick(i, besttarget))
+                    continue;
+                backtrack::hitboxData &hitbox =
+                    i.hitboxes.at(ClosestDistanceHitbox(besttarget, i));
+
+                // Check if we are inside the target (which will in most cases
+                // result in a failstab)
+                std::pair<Vector, Vector> collidableMinMax(
+                    RAW_ENT(LOCAL_E)->GetCollideable()->OBBMins() +
+                        g_pLocalPlayer->v_Origin,
+                    RAW_ENT(LOCAL_E)->GetCollideable()->OBBMaxs() +
+                        g_pLocalPlayer->v_Origin);
+                // Get dist Z to Z
+                float halfHeight =
+                    (hitbox.min.DistTo(
+                        Vector{ hitbox.min.x, hitbox.min.y, hitbox.max.z })) /
+                    2;
+                // Make our first diagonal line
+                std::pair<Vector, Vector> line1(
+                    { hitbox.min.x, hitbox.min.y, hitbox.min.z + halfHeight },
+                    { hitbox.max.x, hitbox.max.y, hitbox.max.z - halfHeight });
+                // Make our second diagonal line
+                std::pair<Vector, Vector> line2(
+                    { line1.second.x, line1.first.y, line1.first.z },
+                    { line1.first.x, line1.second.y, line1.first.z });
+                // Check if one of the lines intersects with our collidable
+                if (LineIntersectsBox(collidableMinMax.first,
+                                      collidableMinMax.second, line1.first,
+                                      line1.second) ||
+                    LineIntersectsBox(collidableMinMax.first,
+                                      collidableMinMax.second, line2.first,
+                                      line2.second))
+                    continue;
+
+                for (angle.y = -180.0f; angle.y < 180.0f; angle.y += 20.0f)
+                {
+                    if (unifiedCanBackstab(angle, hitbox.min, hitbox.max,
+                                           hitbox.center, besttarget))
+                    {
+                        current_user_cmd->tick_count = i.tickcount;
+                        current_user_cmd->viewangles = angle;
+                        current_user_cmd->buttons |= IN_ATTACK;
+                        if (silent)
+                            g_pLocalPlayer->bUseSilentAngles = true;
+                    }
+                }
             }
         }
     }
 }
-}
+} // namespace hacks::tf2::autobackstab

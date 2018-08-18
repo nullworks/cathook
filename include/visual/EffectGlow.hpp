@@ -57,4 +57,4 @@ public:
 
 extern EffectGlow g_EffectGlow;
 extern CScreenSpaceEffectRegistration *g_pEffectGlow;
-}
+} // namespace effect_glow

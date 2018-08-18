@@ -15,4 +15,4 @@ void Draw();
 void CreateMove();
 bool ShouldReflect(CachedEntity *ent);
 bool IsEntStickyBomb(CachedEntity *ent);
-}
+} // namespace hacks::tf::autoreflect

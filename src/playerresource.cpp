@@ -5,6 +5,8 @@
  *      Author: nullifiedcat
  */
 
+#include <playerresource.h>
+
 #include "common.hpp"
 
 void TFPlayerResource::Update()
@@ -91,4 +93,34 @@ int TFPlayerResource::GetClass(CachedEntity *player)
     return *(int *) ((unsigned) ent + netvar.res_iPlayerClass + 4 * idx);
 }
 
-TFPlayerResource *g_pPlayerResource = 0;
+bool TFPlayerResource::isAlive(int idx)
+{
+    IClientEntity *ent = g_IEntityList->GetClientEntity(entity);
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+        return 0;
+    if (idx >= 64 || idx < 0)
+        return false;
+    return *(bool *) ((unsigned) ent + netvar.res_bAlive + idx);
+}
+
+int TFPlayerResource::getClass(int idx)
+{
+    IClientEntity *ent = g_IEntityList->GetClientEntity(entity);
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+        return 0;
+    if (idx >= 64 || idx < 0)
+        return 0;
+    return *(int *) ((unsigned) ent + netvar.res_iPlayerClass + 4 * idx);
+}
+
+int TFPlayerResource::getTeam(int idx)
+{
+    IClientEntity *ent = g_IEntityList->GetClientEntity(entity);
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+        return 0;
+    if (idx >= 64 || idx < 0)
+        return 0;
+    return *(int *) ((unsigned) ent + netvar.res_iTeam + 4 * idx);
+}
+
+TFPlayerResource *g_pPlayerResource{ nullptr };

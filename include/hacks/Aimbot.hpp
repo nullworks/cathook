@@ -15,7 +15,7 @@ class IClientEntity;
 
 namespace hacks::shared::aimbot
 {
-
+bool IsBacktracking();
 // Used to store aimbot data to prevent calculating it again
 struct AimbotCalculatedData_s
 {
@@ -57,4 +57,4 @@ int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);
 bool UpdateAimkey();
 float EffectiveTargetingRange();
-}
+} // namespace hacks::shared::aimbot

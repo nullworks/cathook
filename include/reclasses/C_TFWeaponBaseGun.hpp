@@ -37,4 +37,4 @@ public:
             0)(self);
     }
 };
-}
+} // namespace re

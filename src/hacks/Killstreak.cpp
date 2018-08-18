@@ -5,14 +5,14 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hooks.hpp"
 
+static settings::Bool enable{ "killstreak.enable", "false" };
+
 namespace hacks::tf2::killstreak
 {
-
-static CatVar enabled(CV_SWITCH, "killstreak", "0",
-                      "Enable killstreaks on all weapons");
 
 int killstreak{ 0 };
 
@@ -28,7 +28,7 @@ int current_streak()
 
 void apply_killstreaks()
 {
-    if (!enabled)
+    if (!enable)
         return;
 
     IClientEntity *ent =
@@ -101,7 +101,7 @@ void on_spawn(IGameEvent *event)
 
 void fire_event(IGameEvent *event)
 {
-    if (enabled)
+    if (enable)
     {
         if (0 == strcmp(event->GetName(), "player_death"))
             on_kill(event);
@@ -134,4 +134,4 @@ bool FireEventClientSide(IGameEventManager2 *manager, IGameEvent *event)
 void init()
 {
 }
-}
+} // namespace hacks::tf2::killstreak

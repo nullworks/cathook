@@ -13,4 +13,4 @@ namespace hacks::tf::autosticky
 {
 bool ShouldDetonate(CachedEntity *bomb);
 void CreateMove();
-}
+} // namespace hacks::tf::autosticky

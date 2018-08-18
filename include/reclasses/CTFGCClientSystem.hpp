@@ -25,4 +25,4 @@ public:
     CTFParty *GetParty();
     int JoinMMMatch();
 };
-}
+} // namespace re

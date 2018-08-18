@@ -8,56 +8,37 @@
 #include "common.hpp"
 #include <hacks/AutoReflect.hpp>
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "autoreflect.enable", "false" };
+static settings::Bool idle_only{ "autoreflect.idle-only", "false" };
+static settings::Bool legit{ "autoreflect.legit", "false" };
+static settings::Bool dodgeball{ "autoreflect.dodgeball", "false" };
+static settings::Button blastkey{ "autoreflect.button", "<null>" };
+static settings::Bool stickies{ "autoreflect.stickies", "false" };
+static settings::Bool teammates{ "autoreflect.teammate", "false" };
+static settings::Float fov{ "autoreflect.fov", "85" };
+
+#if ENABLE_VISUALS
+static settings::Bool fov_draw{ "autoreflect.draw-fov", "false" };
+static settings::Float fovcircle_opacity{ "autoreflect.draw-fov-opacity",
+                                          "0.7" };
+#endif
 
 namespace hacks::tf::autoreflect
 {
-
-// Vars for user settings
-static CatVar enabled(CV_SWITCH, "reflect_enabled", "0", "Auto Reflect",
-                      "Master AutoReflect switch");
-static CatVar idle_only(CV_SWITCH, "reflect_only_idle", "0",
-                        "Only when not shooting",
-                        "Don't AutoReflect if you're holding M1");
-static CatVar
-    legit(CV_SWITCH, "reflect_legit", "0", "Legit Reflect",
-          "Only Auto-airblasts projectiles that you can see, doesnt move "
-          "your crosshair");
-static CatVar dodgeball(CV_SWITCH, "reflect_dodgeball", "0", "Dodgeball Mode",
-                        "Allows auto-reflect to work in dodgeball servers");
-static CatVar blastkey(CV_KEY, "reflect_key", "0", "Reflect Key",
-                       "Hold this key to activate auto-airblast");
-static CatVar stickies(CV_SWITCH, "reflect_stickybombs", "0",
-                       "Reflect stickies", "Reflect Stickybombs");
-static CatVar teammates(CV_SWITCH, "reflect_teammates", "0",
-                        "Reflect teammates projectiles",
-                        "Useful in dodgeball with "
-                        "free-for-all enabled");
-static CatVar fov(CV_FLOAT, "reflect_fov", "85", "Reflect FOV", "Reflect FOV",
-                  180.0f);
-static CatVar fov_draw(CV_SWITCH, "reflect_fov_draw", "0", "Draw Fov Ring",
-                       "Draws a ring to represent your current reflect fov");
-static CatVar fovcircle_opacity(CV_FLOAT, "reflect_fov_draw_opacity", "0.7",
-                                "FOV Circle Opacity",
-                                "Defines opacity of FOV circle", 0.0f, 1.0f);
-// TODO setup proj sorting
-// TODO CatVar big_proj(CV_SWITCH, "reflect_big_projectile", "0", "Reflect big
-// projectiles", "Reflect Rockets");
-// TODO CatVar small_proj(CV_SWITCH, "reflect_small_projectile", "0", "Reflect
-// small projectiles", "Reflect Huntsman arrows, Crusaders bolts");
-// TODO CatVar misc_proj(CV_SWITCH, "reflect_misc_projectile", "0", "Reflect
-// other", "Reflect jarate, milk");
 
 // Function called by game for movement
 void CreateMove()
 {
     // Check if user settings allow Auto Reflect
-    if (!enabled)
+    if (!enable)
         return;
-    if (blastkey && !blastkey.KeyDown())
+    if (blastkey && !blastkey.isKeyDown())
         return;
 
     // Check if player is using a flame thrower
-    if (g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFFlameThrower))
+    if (g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFFlameThrower) && CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 528)
         return;
 
     // Check for phlogistinator, which is item 594
@@ -65,7 +46,7 @@ void CreateMove()
         return;
 
     // If user settings allow, return if local player is in attack
-    if (idle_only && (g_pUserCmd->buttons & IN_ATTACK))
+    if (idle_only && (current_user_cmd->buttons & IN_ATTACK))
         return;
 
     // Create some book-keeping vars
@@ -141,16 +122,13 @@ void CreateMove()
     if (!legit)
     {
         // Aim at predicted projectile
-        AimAt(g_pLocalPlayer->v_Eye, closest_vec, g_pUserCmd);
+        AimAt(g_pLocalPlayer->v_Eye, closest_vec, current_user_cmd);
         // Use silent angles
         g_pLocalPlayer->bUseSilentAngles = true;
     }
 
     // Airblast
-    g_pUserCmd->buttons |= IN_ATTACK2;
-
-    // Function is finished, return
-    return;
+    current_user_cmd->buttons |= IN_ATTACK2;
 }
 
 // Function to determine whether an ent is good to reflect
@@ -206,7 +184,7 @@ void Draw()
 {
 #if ENABLE_VISUALS
     // Dont draw to screen when reflect is disabled
-    if (!enabled)
+    if (!enable)
         return;
     // Don't draw to screen when legit is disabled
     if (!legit)
@@ -216,7 +194,7 @@ void Draw()
     if (fov_draw)
     {
         // It cant use fovs greater than 180, so we check for that
-        if (float(fov) > 0.0f && float(fov) < 180)
+        if (*fov > 0.0f && *fov < 180)
         {
             // Dont show ring while player is dead
             if (LOCAL_E->m_bAlivePlayer())
@@ -241,4 +219,4 @@ void Draw()
     }
 #endif
 }
-}
+} // namespace hacks::tf::autoreflect

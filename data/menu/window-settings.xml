@@ -1,0 +1,14 @@
+<Prefab id="window-settings">
+    <ModalContainer width="content" height="content" padding="3 3 3 3">
+        <LabeledObject label="Bar location">
+            <Select id="header-location">
+                <Option name="Top" value="0"/>
+                <Option name="Bottom" value="1"/>
+                <Option name="Hidden" value="2"/>
+            </Select>
+        </LabeledObject>
+        <LabeledObject label="Show in-game" y="20">
+            <Checkbox id="show-in-game"/>
+        </LabeledObject>
+    </ModalContainer>
+</Prefab>

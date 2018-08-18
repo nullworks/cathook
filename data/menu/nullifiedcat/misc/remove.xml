@@ -1,0 +1,9 @@
+<Tab name="Remove" padding="4 4 4 4">
+    <List width="220">
+        <AutoVariable width="fill" target="remove.arms" label="Remove Arms"/>
+        <AutoVariable width="fill" target="remove.cloak" label="Remove Cloak"/>
+        <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
+        <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
+        <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
+    </List>
+</Tab>

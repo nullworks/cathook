@@ -494,6 +494,6 @@ public:
 };
 
 extern css css_list;
-}
+} // namespace client_classes
 
 #endif /* css_AUTOGEN_HPP */

@@ -1,0 +1,11 @@
+<menu>
+    <Include path="color-picker.xml"/>
+    <Include path="window-settings.xml"/>
+    <Include path="player-list-row.xml"/>
+    <Include path="player-list-window.xml"/>
+    <Window width="content" height="content" x="400" y="400" name="All Variables">
+        <ScrollableList id="special-variables" x="0" y="0" width="400" height="600"/>
+    </Window>
+
+    <Include path="nullified-ui.xml"/>
+</menu>

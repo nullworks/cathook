@@ -8,14 +8,17 @@
 #include <hacks/ac/aimbot.hpp>
 #include <hacks/ac/antiaim.hpp>
 #include <hacks/ac/bhop.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hack.hpp"
 
+static settings::Bool enable{ "find-cheaters.enable", "0" };
+static settings::Bool accuse_chat{ "find-cheaters.accuse-in-chat", "0" };
+static settings::Bool autorage{ "find-cheaters.auto-rage", "0" };
+static settings::Bool skip_local{ "find-cheaters.ignore-local", "1" };
+
 namespace hacks::shared::anticheat
 {
-static CatVar enabled(CV_SWITCH, "ac_enabled", "0", "Enable AC");
-static CatVar accuse_chat(CV_SWITCH, "ac_chat", "0", "Accuse in chat");
-static CatVar autorage(CV_SWITCH, "ac_autorage", "0", "Auto Rage");
 
 void Accuse(int eid, const std::string &hack, const std::string &details)
 {
@@ -40,8 +43,6 @@ void Accuse(int eid, const std::string &hack, const std::string &details)
     }
 }
 
-static CatVar skip_local(CV_SWITCH, "ac_ignore_local", "1", "Ignore Local");
-
 void SetRage(player_info_t info)
 {
     if (autorage)
@@ -51,7 +52,7 @@ void SetRage(player_info_t info)
 
 void CreateMove()
 {
-    if (!enabled)
+    if (!enable)
         return;
     angles::Update();
     for (int i = 1; i < 33; i++)
@@ -90,7 +91,7 @@ class ACListener : public IGameEventListener
 public:
     virtual void FireGameEvent(KeyValues *event)
     {
-        if (!enabled)
+        if (!enable)
             return;
         std::string name(event->GetName());
         if (name == "player_activate")
@@ -117,4 +118,4 @@ void Init()
     // FIXME free listener
     g_IGameEventManager->AddListener(&listener, false);
 }
-}
+} // namespace hacks::shared::anticheat

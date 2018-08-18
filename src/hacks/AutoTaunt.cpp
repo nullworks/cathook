@@ -5,24 +5,22 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Float.hpp>
 #include "common.hpp"
 #include "hack.hpp"
 
+static settings::Bool enable{ "autotaunt.enable", "false" };
+static settings::Float chance{ "autotaunt.chance", "8" };
+
 namespace hacks::tf::autotaunt
 {
-
-static CatVar enabled(
-    CV_SWITCH, "autotaunt", "0", "AutoTaunt",
-    "Automatically taunt after killing an enemy, use with walkbots I guess");
-static CatVar chance(CV_FLOAT, "autotaunt_chance", "8", "AutoTaunt chance",
-                     "Chance of taunting after kill. 0 to 100.", 0.0f, 100.0f);
 
 class AutoTauntListener : public IGameEventListener2
 {
 public:
     virtual void FireGameEvent(IGameEvent *event)
     {
-        if (!enabled)
+        if (!enable)
         {
             return;
         }
@@ -43,4 +41,4 @@ AutoTauntListener listener;
 InitRoutine init([]() {
     g_IEventManager2->AddListener(&listener, "player_death", false);
 });
-}
+} // namespace hacks::tf::autotaunt

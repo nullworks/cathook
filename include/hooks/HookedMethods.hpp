@@ -88,7 +88,7 @@ DECLARE_HOOKED_METHOD(SDL_PollEvent, int, SDL_Event *);
 // IUniformRandomStream
 DECLARE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *, int, int);
 #endif
-}
+} // namespace hooked_methods
 
 // TODO
 // wontfix.club

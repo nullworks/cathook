@@ -12,7 +12,5 @@ class bf_read;
 namespace votelogger
 {
 
-void user_message(bf_read &buffer, int type);
-extern Timer antikick;
-extern bool active;
+void dispatchUserMessage(bf_read &buffer, int type);
 }

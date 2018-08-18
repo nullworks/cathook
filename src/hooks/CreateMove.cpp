@@ -8,10 +8,21 @@
 #include "common.hpp"
 #include "hack.hpp"
 #include "MiscTemporary.hpp"
+#include "SeedPrediction.hpp"
 #include <link.h>
 #include <hacks/hacklist.hpp>
+#include <settings/Bool.hpp>
+#include <hacks/AntiAntiAim.hpp>
+#include "NavBot.hpp"
 
 #include "HookedMethods.hpp"
+
+static settings::Bool minigun_jump{ "misc.minigun-jump-tf2c", "false" };
+static settings::Bool roll_speedhack{ "misc.roll-speedhack", "false" };
+static settings::Bool engine_pred{ "misc.engine-prediction", "false" };
+static settings::Bool debug_projectiles{ "debug.projectiles", "false" };
+static settings::Int semiauto{ "misc.semi-auto", "0" };
+static settings::Int fakelag_amount{ "misc.fakelag", "0" };
 
 class CMoveData;
 #if LAGBOT_MODE
@@ -66,7 +77,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     g_GlobalVars->frametime = g_GlobalVars->interval_per_tick;
 
     *g_PredictionRandomSeed =
-        MD5_PseudoRandom(g_pUserCmd->command_number) & 0x7FFFFFFF;
+        MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
     g_IGameMovement->StartTrackPredictionErrors(
         reinterpret_cast<CBasePlayer *>(ent));
     oSetupMove(g_IPrediction, ent, ucmd, NULL, pMoveData);
@@ -83,7 +94,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 
     return;
 }
-}
+} // namespace engine_prediction
 #if not LAGBOT_MODE
 #define antikick_time 35
 #else
@@ -91,6 +102,9 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 #endif
 const char *cmds[7] = { "use",         "voicecommand", "spec_next", "spec_prev",
                         "spec_player", "invprev",      "invnext" };
+
+static int attackticks = 0;
+
 namespace hooked_methods
 {
 
@@ -113,11 +127,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     if (firstcm)
     {
         DelayTimer.update();
+        hacks::tf2::NavBot::Init();
         firstcm = false;
     }
     tickcount++;
-    g_pUserCmd = cmd;
-#if not LAGBOT_MODE
+    current_user_cmd = cmd;
+#if !LAGBOT_MODE
     IF_GAME(IsTF2C())
     {
         if (CE_GOOD(LOCAL_W) && minigun_jump &&
@@ -137,7 +152,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
         return ret;
     }
 
-    if (!cathook)
+    if (!isHackActive())
     {
         g_Settings.is_create_move = false;
         return ret;
@@ -152,12 +167,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
 
     //	PROF_BEGIN();
 
-    if (g_pUserCmd && g_pUserCmd->command_number)
-        last_cmd_number = g_pUserCmd->command_number;
+    if (current_user_cmd && current_user_cmd->command_number)
+        last_cmd_number = current_user_cmd->command_number;
 
     /**bSendPackets = true;
     if (hacks::shared::lagexploit::ExploitActive()) {
-        *bSendPackets = ((g_pUserCmd->command_number % 4) == 0);
+        *bSendPackets = ((current_user_cmd->command_number % 4) == 0);
         //logging::Info("%d", *bSendPackets);
     }*/
 
@@ -167,82 +182,9 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
 
-    hacks::tf2::global::runcfg();
-    static IClientEntity *enti;
-    if (resolver && cathook && CE_GOOD(LOCAL_E))
-    {
-        for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
-        {
-            if (i == g_IEngine->GetLocalPlayer())
-                continue;
-            enti = g_IEntityList->GetClientEntity(i);
-            if (enti && !enti->IsDormant() &&
-                !NET_BYTE(enti, netvar.iLifeState))
-            {
-                float quotat = 0;
-                float quotaf = 0;
-                if (!g_Settings.brute.choke[i].empty())
-                    for (auto it : g_Settings.brute.choke[i])
-                    {
-                        if (it)
-                            quotat++;
-                        else
-                            quotaf++;
-                    }
-                float quota    = quotat / quotaf;
-                Vector &angles = NET_VECTOR(enti, netvar.m_angEyeAngles);
-                static bool brutepitch = false;
-                if (g_Settings.brute.brutenum[i] > 5)
-                {
-                    g_Settings.brute.brutenum[i] = 0;
-                    brutepitch                   = !brutepitch;
-                }
-                angles.y = fmod(angles.y + 180.0f, 360.0f);
-                if (angles.y < 0)
-                    angles.y += 360.0f;
-                angles.y -= 180.0f;
-                if (quota < 0.8f)
-                    switch (g_Settings.brute.brutenum[i])
-                    {
-                    case 0:
-                        break;
-                    case 1:
-                        angles.y += 180.0f;
-                        break;
-                    case 2:
-                        angles.y -= 90.0f;
-                        break;
-                    case 3:
-                        angles.y += 90.0f;
-                        break;
-                    case 4:
-                        angles.y -= 180.0f;
-                        break;
-                    case 5:
-                        angles.y = 0.0f;
-                        break;
-                    }
-                if (brutepitch || quota < 0.8f)
-                    switch (g_Settings.brute.brutenum[i] % 4)
-                    {
-                    case 0:
-                        break;
-                    case 1:
-                        angles.x = -89.0f;
-                        break;
-                    case 2:
-                        angles.x = 89.0f;
-                        break;
-                    case 3:
-                        angles.x = 0.0f;
-                        break;
-                    }
-            }
-        }
-    }
     if (nolerp)
     {
-        // g_pUserCmd->tick_count += 1;
+        // current_user_cmd->tick_count += 1;
         if (sv_client_min_interp_ratio->GetInt() != -1)
         {
             // sv_client_min_interp_ratio->m_nFlags = 0;
@@ -270,7 +212,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     {
         entity_cache::Invalidate();
     }
-
     // Disabled because this causes EXTREME aimbot inaccuracy
     // if (!cmd->command_number) return ret;
     //	PROF_BEGIN();
@@ -289,82 +230,24 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     }
     g_Settings.bInvalid = false;
 
-    hacks::shared::autojoin::Update();
+    hacks::shared::autojoin::update();
+
+    {
+        PROF_SECTION(CM_AAA);
+        hacks::shared::anti_anti_aim::createMove();
+    }
 
 #if ENABLE_IPC
-#if not LAGBOT_MODE
-    static int team_joining_state  = 0;
-    static float last_jointeam_try = 0;
-    CachedEntity *found_entity, *ent;
-
-    if (hacks::shared::followbot::followbot)
+#if !LAGBOT_MODE
+    if (hacks::shared::followbot::isEnabled())
     {
         hacks::shared::followbot::WorldTick();
-        if (g_GlobalVars->curtime < last_jointeam_try)
-        {
-            team_joining_state = 0;
-            last_jointeam_try  = 0.0f;
-        }
-
-        if (!g_pLocalPlayer->team || (g_pLocalPlayer->team == TEAM_SPEC))
-        {
-            // if (!team_joining_state) logging::Info("Bad team, trying to
-            // join...");
-            team_joining_state = 1;
-        }
-        else
-        {
-            if (team_joining_state)
-            {
-                logging::Info("Trying to change CLASS");
-                g_IEngine->ExecuteClientCmd(
-                    format("join_class ", joinclass.GetString()).c_str());
-            }
-            team_joining_state = 0;
-        }
-
-        if (team_joining_state)
-        {
-            found_entity = nullptr;
-            for (int i = 1; i < 32 && i < HIGHEST_ENTITY; i++)
-            {
-                ent = ENTITY(i);
-                if (CE_BAD(ent))
-                    continue;
-                if (ent->player_info.friendsID ==
-                    hacks::shared::followbot::steamid)
-                {
-                    found_entity = ent;
-                    break;
-                }
-            }
-
-            if (found_entity && CE_GOOD(found_entity))
-            {
-                if (jointeam &&
-                    (g_GlobalVars->curtime - last_jointeam_try) > 1.0f)
-                {
-                    last_jointeam_try = g_GlobalVars->curtime;
-                    switch (CE_INT(found_entity, netvar.iTeamNum))
-                    {
-                    case TEAM_RED:
-                        logging::Info("Trying to join team RED");
-                        g_IEngine->ExecuteClientCmd("jointeam red");
-                        break;
-                    case TEAM_BLU:
-                        logging::Info("Trying to join team BLUE");
-                        g_IEngine->ExecuteClientCmd("jointeam blue");
-                        break;
-                    }
-                }
-            }
-        }
     }
 #endif
 #endif
     if (CE_GOOD(g_pLocalPlayer->entity))
     {
-#if not LAGBOT_MODE
+#if !LAGBOT_MODE
         IF_GAME(IsTF2())
         {
             UpdateHoovyList();
@@ -383,10 +266,18 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
 #endif
         if (!g_pLocalPlayer->life_state && CE_GOOD(g_pLocalPlayer->weapon()))
         {
-#if not LAGBOT_MODE
+#if !LAGBOT_MODE
             {
                 PROF_SECTION(CM_walkbot);
                 hacks::shared::walkbot::Move();
+            }
+            {
+                PROF_SECTION(CM_navbot);
+                nav::CreateMove();
+            }
+            {
+                PROF_SECTION(CM_NavParse);
+                hacks::tf2::NavBot::CreateMove();
             }
             // Walkbot can leave game.
             if (!g_IEngine->IsInGame())
@@ -414,7 +305,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
             }
             if (engine_pred)
                 engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E),
-                                                       g_pUserCmd);
+                                                       current_user_cmd);
             {
                 PROF_SECTION(CM_backtracc);
                 hacks::shared::backtrack::Run();
@@ -423,22 +314,21 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
                 PROF_SECTION(CM_aimbot);
                 hacks::shared::aimbot::CreateMove();
             }
-            static int attackticks = 0;
-            if (g_pUserCmd->buttons & IN_ATTACK)
+            if (current_user_cmd->buttons & IN_ATTACK)
                 ++attackticks;
             else
                 attackticks = 0;
             if (semiauto)
-                if (g_pUserCmd->buttons & IN_ATTACK)
-                    if (attackticks % int(semiauto) < int(semiauto) - 1)
-                        g_pUserCmd->buttons &= ~IN_ATTACK;
+                if (current_user_cmd->buttons & IN_ATTACK)
+                    if (attackticks % *semiauto < *semiauto - 1)
+                        current_user_cmd->buttons &= ~IN_ATTACK;
             static int fakelag_queue = 0;
             if (CE_GOOD(LOCAL_E))
                 if (fakelag_amount)
                 {
-                    *bSendPackets = int(fakelag_amount) == fakelag_queue;
+                    *bSendPackets = *fakelag_amount == fakelag_queue;
                     fakelag_queue++;
-                    if (fakelag_queue > int(fakelag_amount))
+                    if (fakelag_queue > *fakelag_amount)
                         fakelag_queue = 0;
                 }
             {
@@ -489,7 +379,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
             Prediction_CreateMove();
 #endif
         }
-#if not LAGBOT_MODE
+#if !LAGBOT_MODE
         {
             PROF_SECTION(CM_misc);
             hacks::shared::misc::CreateMove();
@@ -501,9 +391,9 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
 #endif
         {
             PROF_SECTION(CM_spam);
-            hacks::shared::spam::CreateMove();
+            hacks::shared::spam::createMove();
         }
-#if not LAGBOT_MODE
+#if !LAGBOT_MODE
         {
             PROF_SECTION(CM_AC);
             hacks::shared::anticheat::CreateMove();
@@ -512,23 +402,15 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     }
     if (time_replaced)
         g_GlobalVars->curtime = curtime_old;
-    g_Settings.bInvalid       = false;
-#if not LAGBOT_MODE
+    g_Settings.bInvalid = false;
+#if !LAGBOT_MODE
     {
         PROF_SECTION(CM_chat_stack);
         chat_stack::OnCreateMove();
     }
-    {
-        PROF_SECTION(CM_healarrow);
-        hacks::tf2::healarrow::CreateMove();
-    }
-    {
-        PROF_SECTION(CM_lagexploit);
-        hacks::shared::lagexploit::CreateMove();
-    }
 #endif
 
-// TODO Auto Steam Friend
+    // TODO Auto Steam Friend
 
 #if ENABLE_IPC
     {
@@ -541,14 +423,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
         }
     }
 #endif
-#if not LAGBOT_MODE
+#if !LAGBOT_MODE
     hacks::shared::backtrack::UpdateIncomingSequences();
     if (CE_GOOD(g_pLocalPlayer->entity))
     {
         speedapplied = false;
-        if (roll_speedhack &&
-            g_IInputSystem->IsButtonDown(
-                (ButtonCode_t)((int) roll_speedhack)) &&
+        if (roll_speedhack && cmd->buttons & IN_DUCK &&
             !(cmd->buttons & IN_ATTACK))
         {
             speed = cmd->forwardmove;
@@ -585,10 +465,8 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
 
             ret = false;
         }
-        if (cmd &&
-            (cmd->buttons & IN_ATTACK ||
-             !(hacks::shared::antiaim::enabled &&
-               float(hacks::shared::antiaim::yaw_mode) >= 9 && !*bSendPackets)))
+        if (cmd && (cmd->buttons & IN_ATTACK ||
+                    !(hacks::shared::antiaim::isEnabled() && !*bSendPackets)))
             g_Settings.brute.last_angles[LOCAL_E->m_IDX] = cmd->viewangles;
         for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
         {
@@ -614,88 +492,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
         }
     }
 #endif
-    int nextdata = 0;
-    NET_StringCmd senddata(cmds[nextdata]);
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
 
-    senddata.SetNetChannel(ch);
-    senddata.SetReliable(false);
-    if (servercrash && DelayTimer.check((int) delay * 1000))
-    {
-        for (int i = 0; i < 7800; i += sizeof(cmds[nextdata]))
-        {
-            senddata.m_szCommand = cmds[nextdata];
-            ch->SendNetMsg(senddata);
-            if (nextdata == 6)
-                nextdata = 0;
-            else
-                nextdata++;
-        }
-        ch->Transmit();
-    }
-    if (serverlag_amount || (votelogger::active &&
-                             !votelogger::antikick.check(antikick_time * 1000)))
-    {
-        if (adjust && !votelogger::active)
-        {
-            if ((int) serverlag_amount == 1)
-                serverlag_amount = (int) serverlag_amount + 10;
-            if (ch->GetAvgData(FLOW_INCOMING) == prevflow)
-            {
-                if (prevflowticks > 66 * (int) adjust)
-                    serverlag_amount = (int) serverlag_amount - 1;
-                prevflowticks++;
-            }
-            if (ch->GetAvgData(FLOW_INCOMING) != prevflow)
-            {
-                if (prevflowticks < 66 * (int) adjust)
-                    serverlag_amount = (int) serverlag_amount + 4;
-                prevflowticks        = 0;
-            }
-        }
-        if (votelogger::active &&
-            !votelogger::antikick.check(antikick_time * 1000))
-        {
-            static int additionallag = 1;
-            if (ch->GetAvgData(FLOW_INCOMING) == prevflow)
-            {
-                prevflowticks++;
-            }
-            else
-                prevflowticks = 0;
-            if (prevflowticks <= 10)
-                additionallag *= 0.1f;
-            for (int i = 0; i < 7800 + additionallag;
-                 i += sizeof(cmds[nextdata]))
-            {
-                senddata.m_szCommand = cmds[nextdata];
-                ch->SendNetMsg(senddata, false);
-                if (nextdata == 6)
-                    nextdata = 0;
-                else
-                    nextdata++;
-            }
-            ch->Transmit();
-        }
-        else if (!votelogger::active && serverlag_amount &&
-                 DelayTimer.check((int) delay * 1000))
-        {
-            for (int i = 0; i < (int) serverlag_amount; i++)
-            {
-                senddata.m_szCommand = cmds[nextdata];
-                if (nextdata == 6)
-                    nextdata = 0;
-                else
-                    nextdata++;
-                ch->SendNetMsg(senddata, false);
-            }
-            ch->Transmit();
-        }
-        prevflow = ch->GetAvgData(FLOW_INCOMING);
-    }
-    else if (votelogger::active &&
-             votelogger::antikick.test_and_set(antikick_time * 1000))
-        votelogger::active = false;
     //	PROF_END("CreateMove");
     if (!(cmd->buttons & IN_ATTACK))
     {
@@ -705,7 +502,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
     g_Settings.is_create_move       = false;
     return ret;
 }
-}
+} // namespace hooked_methods
 
 /*float o_curtime;
 float o_frametime;
@@ -716,9 +513,10 @@ void Start() {
     IClientEntity* player = RAW_ENT(LOCAL_E);
     // CPredictableId::ResetInstanceCounters();
     *(reinterpret_cast<CUserCmd*>(reinterpret_cast<uintptr_t>(player) + 1047)) =
-g_pUserCmd; o_curtime = g_GlobalVars->curtime; o_frametime =
+current_user_cmd; o_curtime = g_GlobalVars->curtime; o_frametime =
 g_GlobalVars->frametime; *g_PredictionRandomSeed =
-MD5_PseudoRandom(g_pUserCmd->command_number) & 0x7FFFFFFF; g_GlobalVars->curtime
+MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
+g_GlobalVars->curtime
 = CE_INT(LOCAL_E, netvar.nTickBase) * g_GlobalVars->interval_per_tick;
     g_GlobalVars->frametime = g_GlobalVars->interval_per_tick;
 

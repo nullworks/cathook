@@ -21,4 +21,4 @@ void CreateMove();
 void SetRage(player_info_t info);
 void ResetPlayer(int index);
 void ResetEverything();
-}
+} // namespace hacks::shared::anticheat

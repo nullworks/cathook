@@ -21,9 +21,8 @@ extern const std::vector<std::string> builtin_nonecore;
 extern const std::vector<std::string> builtin_lmaobox;
 extern const std::vector<std::string> builtin_lithium;
 
-extern CatVar spam_source;
-
-void Init();
-void CreateMove();
-void Reload();
-}
+bool isActive();
+void init();
+void createMove();
+void reload();
+} // namespace hacks::shared::spam

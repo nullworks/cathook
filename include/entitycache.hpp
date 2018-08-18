@@ -232,4 +232,4 @@ inline CachedEntity &Get(int idx)
 void Update();
 void Invalidate();
 extern int max;
-}
+} // namespace entity_cache

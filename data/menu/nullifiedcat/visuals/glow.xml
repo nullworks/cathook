@@ -1,0 +1,26 @@
+<Tab name="Glow" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="glow.enable" label="Enable"/>
+        <AutoVariable width="fill" target="glow.blur-scale" label="Blur Scale" min="0" max="10"/>
+        <AutoVariable width="fill" target="glow.health" label="Health"/>
+        <AutoVariable width="fill" target="glow.self" label="Glow Self"/>
+        <AutoVariable width="fill" target="glow.self-rainbow" label="Self Rainbow"/>
+        <AutoVariable width="fill" target="glow.white-weapons" label="White Weapons"/>
+        <LabeledObject width="fill" label="Solid when">
+            <Select target="glow.solid-when">
+                <Option name="Never" value="0"/>
+                <Option name="Always" value="1"/>
+                <Option name="Not visible" value="2"/>
+            </Select>
+        </LabeledObject>
+
+        <AutoVariable width="fill" target="glow.show.players" label="Players"/>
+        <AutoVariable width="fill" target="glow.show.teammates" label="Teammates"/>
+        <AutoVariable width="fill" target="glow.show.buildings" label="Buildings"/>
+        <AutoVariable width="fill" target="glow.show.teammate-buildings" label="Team Buildings"/>
+        <AutoVariable width="fill" target="glow.show.powerups" label="Powerups"/>
+        <AutoVariable width="fill" target="glow.show.stickies" label="Stickies"/>
+        <AutoVariable width="fill" target="glow.show.ammoboxes" label="Ammo Boxes"/>
+        <AutoVariable width="fill" target="glow.show.medkits" label="Health Packs"/>
+    </List>
+</Tab>

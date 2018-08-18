@@ -186,4 +186,4 @@ public:
         return *(float *) (unsigned(self) + 2616u);
     }
 };
-}
+} // namespace re

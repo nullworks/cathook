@@ -5,18 +5,17 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "noisemaker-spam.enable", "false" };
 
 namespace hacks::tf2::noisemaker
 {
 
-static CatVar
-    enabled(CV_SWITCH, "noisemaker", "0", "Noisemaker spam",
-            "Spams noisemakers Infinitly\nWorks with limited use noisemakers");
-
 void CreateMove()
 {
-    if (enabled)
+    if (enable)
     {
         if (g_GlobalVars->framecount % 100 == 0)
         {
@@ -26,6 +25,5 @@ void CreateMove()
             g_IEngine->ServerCmdKeyValues(kv2);
         }
     }
-    return;
 }
-}
+} // namespace hacks::tf2::noisemaker

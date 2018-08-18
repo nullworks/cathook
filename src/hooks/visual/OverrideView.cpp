@@ -4,36 +4,30 @@
 */
 
 #include <MiscTemporary.hpp>
+#include <settings/Float.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar
-    override_fov_zoomed(CV_FLOAT, "fov_zoomed", "0", "FOV override (zoomed)",
-                        "Overrides FOV with this value when zoomed in "
-                        "(default FOV when zoomed is 20)");
-static CatVar override_fov(CV_FLOAT, "fov", "0", "FOV override",
-                           "Overrides FOV with this value");
-
-static CatVar freecam(CV_KEY, "debug_freecam", "0", "Freecam");
+static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
+static settings::Float override_fov{ "visual.fov", "0" };
+static settings::Button freecam{ "visual.freecam-button", "<none>" };
 
 namespace hooked_methods
 {
 
 DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 {
-    static bool zoomed;
     original::OverrideView(this_, setup);
-    if (!cathook)
+
+    if (!isHackActive())
         return;
+
     if (g_pLocalPlayer->bZoomed && override_fov_zoomed)
     {
-        setup->fov = override_fov_zoomed;
+        setup->fov = *override_fov_zoomed;
     }
-    else
+    else if (override_fov)
     {
-        if (override_fov)
-        {
-            setup->fov = override_fov;
-        }
+        setup->fov = *override_fov;
     }
 
     if (spectator_target)
@@ -64,7 +58,7 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     {
         static Vector freecam_origin{ 0 };
         static bool freecam_last{ false };
-        if (freecam.KeyDown())
+        if (freecam.isKeyDown())
         {
             if (not freecam_last)
             {
@@ -85,9 +79,9 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
             freecam_origin += forward;
             setup->origin = freecam_origin;
         }
-        freecam_last = freecam.KeyDown();
+        freecam_last = freecam.isKeyDown();
     }
 
     draw::fov = setup->fov;
 }
-}
+} // namespace hooked_methods

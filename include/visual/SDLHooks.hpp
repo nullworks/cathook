@@ -14,4 +14,4 @@ extern SDL_Window *window;
 
 void applySdlHooks();
 void cleanSdlHooks();
-}
+} // namespace sdl_hooks

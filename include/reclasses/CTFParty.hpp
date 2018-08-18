@@ -23,4 +23,4 @@ public:
         return *((int *) party + 19);
     }
 };
-}
+} // namespace re

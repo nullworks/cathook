@@ -32,9 +32,9 @@ void NetVars::Init()
         "DT_LocalWeaponData", "localdata", "m_iPrimaryAmmoType");
     this->m_iSecondaryAmmoType = gNetvars.get_offset(
         "DT_LocalWeaponData", "localdata", "m_iSecondaryAmmoType");
-    this->m_iClip1 = gNetvars.get_offset("DT_BaseCombatWeapon",
+    this->m_iClip1    = gNetvars.get_offset("DT_BaseCombatWeapon",
                                          "LocalWeaponData", "m_iClip1");
-    this->m_iClip2 = gNetvars.get_offset("DT_BaseCombatWeapon",
+    this->m_iClip2    = gNetvars.get_offset("DT_BaseCombatWeapon",
                                          "LocalWeaponData", "m_iClip2");
     this->m_Collision = gNetvars.get_offset("DT_BaseEntity", "m_Collision");
     m_flSimulationTime =
@@ -43,6 +43,8 @@ void NetVars::Init()
     {
         res_iTeam =
             gNetvars.get_offset("DT_TFPlayerResource", "baseclass", "m_iTeam");
+        res_bAlive =
+            gNetvars.get_offset("DT_TFPlayerResource", "baseclass", "m_bAlive");
         this->res_iMaxBuffedHealth =
             gNetvars.get_offset("DT_TFPlayerResource", "m_iMaxBuffedHealth");
         m_angEyeAngles = gNetvars.get_offset("DT_TFPlayer", "tfnonlocaldata",
@@ -169,7 +171,7 @@ void NetVars::Init()
         "DT_BaseCombatWeapon", "LocalActiveWeaponData", "m_nNextThinkTick");
     this->nTickBase =
         gNetvars.get_offset("DT_BasePlayer", "localdata", "m_nTickBase");
-    this->vecPunchAngle = gNetvars.get_offset("DT_BasePlayer", "localdata",
+    this->vecPunchAngle    = gNetvars.get_offset("DT_BasePlayer", "localdata",
                                               "m_Local", "m_vecPunchAngle");
     this->vecPunchAngleVel = gNetvars.get_offset(
         "DT_BasePlayer", "localdata", "m_Local", "m_vecPunchAngleVel");

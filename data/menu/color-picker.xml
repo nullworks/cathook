@@ -1,0 +1,10 @@
+<Prefab id="color-picker">
+    <ModalContainer width="131" height="85" padding="3 3 3 3">
+        <Slider id="red" min="0" max="255" step="1" type="int" y="0"/>
+        <Slider id="green" min="0" max="255" step="1" type="int" y="15"/>
+        <Slider id="blue" min="0" max="255" step="1" type="int" y="30"/>
+        <Slider id="alpha" min="0" max="255" step="1" type="int" y="45"/>
+        <StringInput id="hex" y="65" x="65"/>
+        <Preview x="65" y="0" size="60"/>
+    </ModalContainer>
+</Prefab>

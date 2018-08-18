@@ -8,7 +8,26 @@
 #include <visual/EffectGlow.hpp>
 #include <MiscTemporary.hpp>
 #include <hacks/Aimbot.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "glow.enable", "false" };
+static settings::Bool health{ "glow.health", "false" };
+static settings::Bool teammates{ "glow.show.teammates", "false" };
+static settings::Bool players{ "glow.show.players", "true" };
+static settings::Bool medkits{ "glow.show.medkits", "false" };
+static settings::Bool ammobox{ "glow.show.ammoboxes", "false" };
+static settings::Bool buildings{ "glow.show.buildings", "true" };
+static settings::Bool stickies{ "glow.show.stickies", "true" };
+static settings::Bool teammate_buildings{ "glow.show.teammate-buildings",
+                                          "false" };
+static settings::Bool show_powerups{ "glow.show.powerups", "true" };
+static settings::Bool weapons_white{ "glow.white-weapons", "true" };
+static settings::Bool glowself{ "glow.self", "true" };
+static settings::Bool rainbow{ "glow.self-rainbow", "true" };
+static settings::Int blur_scale{ "glow.blur-scale", "5" };
+// https://puu.sh/vobH4/5da8367aef.png
+static settings::Int solid_when{ "glow.solid-when", "0" };
 
 IMaterialSystem *materials = nullptr;
 
@@ -29,38 +48,6 @@ CScreenSpaceEffectRegistration::CScreenSpaceEffectRegistration(
 
 namespace effect_glow
 {
-
-static CatVar enable(CV_SWITCH, "glow_enable", "0", "Enable",
-                     "Main glow switch");
-static CatVar health(CV_SWITCH, "glow_health", "0", "Health",
-                     "Change glow color based on their health");
-static CatVar teammates(CV_SWITCH, "glow_teammates", "0", "Teammates",
-                        "Render glow on teammates");
-static CatVar players(CV_SWITCH, "glow_players", "1", "Players",
-                      "Render glow on player models");
-static CatVar medkits(CV_SWITCH, "glow_medkits", "0", "Medkits",
-                      "Render glow on medkits");
-static CatVar ammobox(CV_SWITCH, "glow_ammo", "0", "Ammoboxes",
-                      "Render glow on ammoboxes");
-static CatVar buildings(CV_SWITCH, "glow_buildings", "0", "Buildings",
-                        "Render glow on buildings");
-static CatVar stickies(CV_SWITCH, "glow_stickies", "0", "Stickies",
-                       "Render glow on stickybombs");
-static CatVar teammate_buildings(CV_SWITCH, "glow_teammate_buildings", "0",
-                                 "Teammate Buildings",
-                                 "Render glow on teammates buildings");
-static CatVar powerups(CV_SWITCH, "glow_powerups", "1", "Powerups");
-static CatVar weapons_white(CV_SWITCH, "glow_weapons_white", "1",
-                            "White Weapon Glow", "Weapons will glow white");
-static CatVar glowself(CV_SWITCH, "glow_self", "0", "Enable glow on self");
-static CatVar rainbow(CV_SWITCH, "glow_self_rainbow", "1",
-                      "Enable rainbow glow on self",
-                      "Only visible in thirdperson!");
-static CatVar glowteam(CV_SWITCH, "glow_self_team", "0", "Team chams color");
-static CatVar glowR(CV_INT, "glow_self_r", "200", "Self glow red", "", 0, 255);
-static CatVar glowG(CV_INT, "glow_self_g", "200", "Self glow green", "", 0,
-                    255);
-static CatVar glowB(CV_INT, "glow_self_b", "200", "Self glow blue", "", 0, 255);
 
 struct ShaderStencilState_t
 {
@@ -108,7 +95,7 @@ ITexture *GetBuffer(int i)
     {
         ITexture *fullframe;
         IF_GAME(IsTF2())
-        fullframe = g_IMaterialSystem->FindTexture("_rt_FullFrameFB",
+        fullframe      = g_IMaterialSystem->FindTexture("_rt_FullFrameFB",
                                                    TEXTURE_GROUP_RENDER_TARGET);
         else fullframe = g_IMaterialSystemHL->FindTexture(
             "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
@@ -253,13 +240,11 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
         }
         break;
     case ENTITY_PLAYER:
-        if (ent->m_IDX == LOCAL_E->m_IDX && glowteam)
+        if (ent->m_IDX == LOCAL_E->m_IDX)
             if (LOCAL_E->m_iTeam() == TEAM_BLU)
                 return colors::blu;
             else
                 return colors::red;
-        if (ent->m_IDX == LOCAL_E->m_IDX && glowself && !rainbow)
-            return colors::FromRGBA8(glowR, glowG, glowB, 255);
         if (health && playerlist::IsDefault(ent))
         {
             return colors::Health(ent->m_iHealth(), ent->m_iMaxHealth());
@@ -310,11 +295,11 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
         const auto &type = ent->m_ItemType();
         if (type >= ITEM_HEALTH_SMALL && type <= ITEM_HEALTH_LARGE)
         {
-            return medkits;
+            return *medkits;
         }
         else if (type >= ITEM_AMMO_SMALL && type <= ITEM_AMMO_SMALL)
         {
-            return ammobox;
+            return *ammobox;
         }
         else if (type >= ITEM_POWERUP_FIRST && type <= ITEM_POWERUP_LAST)
         {
@@ -347,13 +332,6 @@ void EffectGlow::EndRenderGlow()
     g_IVModelRender->ForcedMaterialOverride(nullptr);
     ptr->PopRenderTargetAndViewport();
 }
-
-// https://puu.sh/vobH4/5da8367aef.png
-static CatEnum solid_when_enum({ "Never", "Always", "Invisible" });
-static CatVar blur_scale(CV_INT, "glow_blur_scale", "5", "Blur amount",
-                         "Ammount to blur the glow");
-static CatVar solid_when(solid_when_enum, "glow_solid_when", "0", "Solid when",
-                         "Glow will be solid when entity is...");
 
 void EffectGlow::StartStenciling()
 {
@@ -453,7 +431,8 @@ void EffectGlow::Render(int x, int y, int w, int h)
     static IMaterialVar *blury_bloomamount;
     if (!init)
         Init();
-    if (!cathook || (g_IEngine->IsTakingScreenshot() && clean_screenshots) ||
+    if (!isHackActive() ||
+        (g_IEngine->IsTakingScreenshot() && clean_screenshots) ||
         g_Settings.bInvalid)
         return;
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
@@ -509,4 +488,4 @@ void EffectGlow::Render(int x, int y, int w, int h)
 
 EffectGlow g_EffectGlow;
 CScreenSpaceEffectRegistration *g_pEffectGlow = nullptr;
-}
+} // namespace effect_glow

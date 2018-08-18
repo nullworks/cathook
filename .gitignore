@@ -277,3 +277,8 @@ cathook.cbp
 .project
 .cproject
 .settings
+\.directory
+
+\.kdev4/cathook\.kdev4
+
+cathook\.kdev4

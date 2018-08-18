@@ -15,4 +15,4 @@ extern bool noaa;
 void CreateMove();
 
 void PaintTraverse();
-}
+} // namespace hacks::tf2::antibackstab

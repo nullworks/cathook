@@ -1,0 +1,5 @@
+<Tab name="Misc2">
+    <TabContainer width="fill" height="fill">
+        <Include path="nullifiedcat/misc/remove.xml"/>
+    </TabContainer>
+</Tab>

@@ -12,6 +12,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL_video.h>
 #include <SDLHooks.hpp>
+#include <menu/GuiInterface.hpp>
+
 #if EXTERNAL_DRAWING
 #include "xoverlay.h"
 #endif
@@ -70,7 +72,6 @@ void AddCenterString(const std::string &string, const rgba_t &color)
     ++center_strings_count;
 }
 
-// TODO globals
 int draw::width  = 0;
 int draw::height = 0;
 float draw::fov  = 90.0f;
@@ -81,7 +82,7 @@ namespace fonts
 
 std::unique_ptr<glez::font> menu{ nullptr };
 std::unique_ptr<glez::font> esp{ nullptr };
-}
+} // namespace fonts
 
 void draw::Initialize()
 {
@@ -125,15 +126,17 @@ bool draw::WorldToScreen(const Vector &origin, Vector &screen)
     {
         odw      = 1.0f / w;
         screen.x = (draw::width / 2) +
-                   (0.5 * ((wts[0][0] * origin[0] + wts[0][1] * origin[1] +
-                            wts[0][2] * origin[2] + wts[0][3]) *
-                           odw) *
+                   (0.5 *
+                        ((wts[0][0] * origin[0] + wts[0][1] * origin[1] +
+                          wts[0][2] * origin[2] + wts[0][3]) *
+                         odw) *
                         draw::width +
                     0.5);
         screen.y = (draw::height / 2) -
-                   (0.5 * ((wts[1][0] * origin[0] + wts[1][1] * origin[1] +
-                            wts[1][2] * origin[2] + wts[1][3]) *
-                           odw) *
+                   (0.5 *
+                        ((wts[1][0] * origin[0] + wts[1][1] * origin[1] +
+                          wts[1][2] * origin[2] + wts[1][3]) *
+                         odw) *
                         draw::height +
                     0.5);
         return true;
@@ -167,12 +170,15 @@ void draw::InitGL()
     glewInit();
     glez::init(draw::width, draw::height);
 #endif
+
+#if ENABLE_GUI
+    gui::init();
+#endif
 }
 
 void draw::BeginGL()
 {
     glColor3f(1, 1, 1);
-    PROF_SECTION(DRAWEX_draw_begin);
 #if EXTERNAL_DRAWING
     xoverlay_draw_begin();
     {
@@ -184,6 +190,8 @@ void draw::BeginGL()
         glActiveTexture(GL_TEXTURE0);
         PROF_SECTION(draw_begin__glez_begin);
         glez::begin();
+        glDisable(GL_FRAMEBUFFER_SRGB);
+        PROF_SECTION(DRAWEX_draw_begin);
     }
 }
 
@@ -192,6 +200,7 @@ void draw::EndGL()
     PROF_SECTION(DRAWEX_draw_end);
     {
         PROF_SECTION(draw_end__glez_end);
+        glEnable(GL_FRAMEBUFFER_SRGB);
         glez::end();
     }
 #if EXTERNAL_DRAWING

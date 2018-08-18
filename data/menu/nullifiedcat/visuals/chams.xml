@@ -1,0 +1,31 @@
+<Tab name="Chams" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="chams.enable" label="Enable"/>
+        <AutoVariable width="fill" target="chams.legit" label="Legit"/>
+        <AutoVariable width="fill" target="chams.flat" label="Flat"/>
+        <AutoVariable width="fill" target="chams.disco" label="Disco"/>
+        <AutoVariable width="fill" target="chams.health" label="Health"/>
+        <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
+        <AutoVariable width="fill" target="chams.single-pass" label="Single pass"/>
+        <AutoVariable width="fill" target="chams.health" label="Health"/>
+        <AutoVariable width="fill" target="chams.self" label="Chams Self"/>
+        <AutoVariable width="fill" target="chams.self-rainbow" label="Self Rainbow"/>
+        <AutoVariable width="fill" target="chams.white-weapons" label="White Weapons"/>
+        <LabeledObject width="fill" label="Solid when">
+            <Select target="glow.solid-when">
+                <Option name="Never" value="0"/>
+                <Option name="Always" value="1"/>
+                <Option name="Not visible" value="2"/>
+            </Select>
+        </LabeledObject>
+
+        <AutoVariable width="fill" target="chams.show.players" label="Players"/>
+        <AutoVariable width="fill" target="chams.show.teammates" label="Teammates"/>
+        <AutoVariable width="fill" target="chams.show.buildings" label="Buildings"/>
+        <AutoVariable width="fill" target="chams.show.teammate-buildings" label="Team Buildings"/>
+        <AutoVariable width="fill" target="chams.show.powerups" label="Powerups"/>
+        <AutoVariable width="fill" target="chams.show.stickies" label="Stickies"/>
+        <AutoVariable width="fill" target="chams.show.ammoboxes" label="Ammo Boxes"/>
+        <AutoVariable width="fill" target="chams.show.medkits" label="Health Packs"/>
+    </List>
+</Tab>

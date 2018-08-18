@@ -1,0 +1,78 @@
+<Tab name="HvH" padding="4 4 4 4">
+    <Box padding="12 6 6 6" name="Anti-Aim" width="content" height="content">
+        <List width="150">
+            <AutoVariable width="fill" target="antiaim.enable" label="Enable"/>
+            <AutoVariable width="fill" target="antiaim.draw-fakes" label="Draw fakes"/>
+            <AutoVariable width="fill" target="antiaim.fake-crouch" label="Fake crouch"/>
+            <AutoVariable width="fill" target="antiaim.no-clamp" label="No clamping"/>
+            <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed"/>
+            <AutoVariable width="fill" target="antiaim.roll" label="Roll"/>
+            <AutoVariable width="fill" target="antiaim.pitch.static" label="Static pitch"/>
+	    <AutoVariable width="fill" target="misc.fakelag" label="Fakelag"/>
+            <LabeledObject width="fill" label="Pitch mode">
+                <Select target="antiaim.pitch.mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Static" value="1"/>
+                    <Option name="Jitter" value="2"/>
+                    <Option name="Random" value="3"/>
+                    <Option name="Flip" value="4"/>
+                    <Option name="Fakeflip" value="5"/>
+                    <Option name="Fakeup" value="6"/>
+                    <Option name="Fakedown" value="7"/>
+                    <Option name="Fakecenter" value="8"/>
+                    <Option name="Up" value="9"/>
+                    <Option name="Down" value="10"/>
+                    <Option name="Heck" value="11"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="antiaim.yaw.static" label="Static yaw"/>
+            <LabeledObject width="fill" label="Yaw mode">
+                <Select target="antiaim.yaw.mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Static" value="1"/>
+                    <Option name="Jitter" value="2"/>
+                    <Option name="BigRandom" value="3"/>
+                    <Option name="Random" value="4"/>
+                    <Option name="Spin" value="5"/>
+                    <Option name="Offset" value="6"/>
+                    <Option name="Edge" value="7"/>
+                    <Option name="Heck" value="8"/>
+                    <Option name="Fake" value="9"/>
+                    <Option name="FakeStatic" value="10"/>
+                    <Option name="FakeJitter" value="11"/>
+                    <Option name="FakeBRandom" value="12"/>
+                    <Option name="FakeRandom" value="13"/>
+                    <Option name="FakeSpin" value="14"/>
+                    <Option name="FakeOffset" value="15"/>
+                    <Option name="FakeEdge" value="16"/>
+                    <Option name="FakeHeck" value="17"/>
+                    <Option name="FakeSide" value="18"/>
+                    <Option name="FakeLeft" value="19"/>
+                    <Option name="FakeRight" value="20"/>
+                    <Option name="FakeREdge" value="21"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" name="Anti-Anti-Aim" width="content" height="content" x="170" y="162">
+        <List width="150">
+            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" name="Anti-Anti-Anti-Aim" width="content" height="content" x="170">
+        <List width="150">
+            <AutoVariable width="fill" target="antiaim.aaaa.enable" label="Enable"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.flip-key" label="Flip key"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.interval.seconds" label="Enable"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.interval.random-low" label="Random low"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.interval.random-high" label="Random high"/>
+            <LabeledObject width="fill" label="Mode">
+                <Select target="antiaim.aaaa.mode">
+                    <Option name="(Fake)up" value="0"/>
+                    <Option name="(Fake)down" value="1"/>
+                    <Option name="(Fake)center" value="2"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+</Tab>

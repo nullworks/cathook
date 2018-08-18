@@ -5,12 +5,13 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Registered.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "announcer", "false" };
 
 namespace hacks::shared::announcer
 {
-
-static CatVar enabled(CV_SWITCH, "announcer", "0", "Enable announcer");
 
 struct announcer_entry_s
 {
@@ -151,7 +152,7 @@ class AnnouncerEventListener : public IGameEventListener2
 {
     virtual void FireGameEvent(IGameEvent *event)
     {
-        if (!enabled)
+        if (!enable)
             return;
         if (0 == strcmp(event->GetName(), "player_death"))
             on_kill(event);
@@ -176,4 +177,4 @@ void shutdown()
 {
     g_IEventManager2->RemoveListener(&listener());
 }
-}
+} // namespace hacks::shared::announcer

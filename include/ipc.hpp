@@ -16,7 +16,6 @@
 #include <time.h>
 
 class CatCommand;
-class CatVar;
 
 namespace ipc
 {
@@ -30,14 +29,7 @@ constexpr unsigned execute_client_cmd_long = 3;
 constexpr unsigned move_to_vector          = 4;
 constexpr unsigned stop_moving             = 5;
 constexpr unsigned start_moving            = 6;
-}
-
-extern CatCommand connect;
-extern CatCommand disconnect;
-extern CatCommand exec;
-extern CatCommand exec_all;
-extern CatCommand lobby;
-extern CatVar server_name;
+} // namespace commands
 
 constexpr unsigned cathook_magic_number = 0x0DEADCA7;
 
@@ -111,6 +103,6 @@ void UpdateTemporaryData();
 void UpdateServerAddress(bool shutdown = false);
 void StoreClientData();
 void UpdatePlayerlist();
-}
+} // namespace ipc
 
 #endif

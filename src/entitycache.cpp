@@ -8,6 +8,7 @@
 #include "common.hpp"
 
 #include <time.h>
+#include <settings/Float.hpp>
 
 bool IsProjectileACrit(CachedEntity *ent)
 {
@@ -44,10 +45,9 @@ CachedEntity::~CachedEntity()
 {
 }
 
-static CatVar ve_window(CV_FLOAT, "debug_ve_window", "0", "VE Window");
-static CatVar ve_smooth(CV_SWITCH, "debug_ve_smooth", "1", "VE Smoothing");
-static CatVar ve_averager_size(CV_INT, "debug_ve_averaging", "8",
-                               "VE Averaging");
+static settings::Float ve_window{ "debug.ve.window", "0" };
+static settings::Bool ve_smooth{ "debug.ve.smooth", "true" };
+static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 
 void CachedEntity::Update()
 {
@@ -76,8 +76,8 @@ void CachedEntity::Update()
         g_IEngine->GetPlayerInfo(m_IDX, &player_info);
 }
 
-static CatVar fast_vischeck(CV_SWITCH, "fast_vischeck", "0", "Fast VisCheck",
-                            "VisCheck only certain player hitboxes");
+// FIXME maybe disable this by default
+static settings::Bool fast_vischeck{ "debug.fast-vischeck", "true" };
 
 bool CachedEntity::IsVisible()
 {
@@ -159,4 +159,4 @@ void Invalidate()
 }
 
 int max = 0;
-}
+} // namespace entity_cache

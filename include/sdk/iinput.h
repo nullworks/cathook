@@ -37,10 +37,10 @@ public:
     virtual int GetButtonBits(int) = 0;
     // Create movement command
     virtual void CreateMove(int sequence_number, float input_sample_frametime,
-                            bool active) = 0;
-    virtual void ExtraMouseSample(float frametime, bool active) = 0;
+                            bool active)                         = 0;
+    virtual void ExtraMouseSample(float frametime, bool active)  = 0;
     virtual bool WriteUsercmdDeltaToBuffer(bf_write *buf, int from, int to,
-                                           bool isnewcommand) = 0;
+                                           bool isnewcommand)    = 0;
     virtual void EncodeUserCmdToBuffer(bf_write &buf, int slot)  = 0;
     virtual void DecodeUserCmdFromBuffer(bf_read &buf, int slot) = 0;
 
@@ -77,13 +77,13 @@ public:
     // Retrieve mouse position
     virtual void GetFullscreenMousePos(int *mx, int *my, int *unclampedx = 0,
                                        int *unclampedy = 0) = 0;
-    virtual void SetFullscreenMousePos(int mx, int my) = 0;
-    virtual void ResetMouse(void)           = 0;
-    virtual float GetLastForwardMove(void)  = 0;
-    virtual float Joystick_GetForward(void) = 0;
-    virtual float Joystick_GetSide(void)    = 0;
-    virtual float Joystick_GetPitch(void)   = 0;
-    virtual float Joystick_GetYaw(void)     = 0;
+    virtual void SetFullscreenMousePos(int mx, int my)      = 0;
+    virtual void ResetMouse(void)                           = 0;
+    virtual float GetLastForwardMove(void)                  = 0;
+    virtual float Joystick_GetForward(void)                 = 0;
+    virtual float Joystick_GetSide(void)                    = 0;
+    virtual float Joystick_GetPitch(void)                   = 0;
+    virtual float Joystick_GetYaw(void)                     = 0;
 
     // Third Person camera ( TODO/FIXME:  Move this to a separate interface? )
     virtual void CAM_Think(void)            = 0;
@@ -98,8 +98,8 @@ public:
 
     // orthographic camera info	( TODO/FIXME:  Move this to a separate
     // interface? )
-    virtual void CAM_ToOrthographic()       = 0;
-    virtual bool CAM_IsOrthographic() const = 0;
+    virtual void CAM_ToOrthographic()                           = 0;
+    virtual bool CAM_IsOrthographic() const                     = 0;
     virtual void CAM_OrthographicSize(float &w, float &h) const = 0;
 
 #if defined(HL2_CLIENT_DLL)

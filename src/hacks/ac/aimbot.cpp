@@ -7,16 +7,16 @@
 
 #include <hacks/ac/aimbot.hpp>
 #include <hacks/AntiCheat.hpp>
+#include <settings/Float.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "find-cheaters.aimbot.enable", "true" };
+static settings::Float detect_angle{ "find-cheaters.aimbot.angle", "30" };
+static settings::Int detections_warning{ "find-cheaters.aimbot.detections",
+                                         "3" };
 
 namespace ac::aimbot
 {
-
-static CatVar enabled(CV_SWITCH, "ac_aimbot", "1", "Detect Aimbot",
-                      "Is not recommended");
-static CatVar detect_angle(CV_FLOAT, "ac_aimbot_angle", "30", "Aimbot Angle");
-static CatVar detections_warning(CV_INT, "ac_aimbot_detections", "3",
-                                 "Min detections to warn");
 
 ac_data data_table[32];
 int amount[32];
@@ -38,7 +38,7 @@ void Init()
 
 void Update(CachedEntity *player)
 {
-    if (not enabled)
+    if (!enable)
         return;
     auto &data = data_table[player->m_IDX - 1];
     auto &am   = amount[player->m_IDX - 1];
@@ -98,7 +98,7 @@ void Update(CachedEntity *player)
 
 void Event(KeyValues *event)
 {
-    if (not enabled)
+    if (!enable)
         return;
     if (!strcmp(event->GetName(), "player_death") ||
         !strcmp(event->GetName(), "player_hurt"))
@@ -111,12 +111,13 @@ void Event(KeyValues *event)
         {
             CachedEntity *victim   = ENTITY(vid);
             CachedEntity *attacker = ENTITY(eid);
-            if (victim->m_vecOrigin().DistTo(attacker->m_vecOrigin()) > 250)
-            {
-                data_table[eid - 1].check_timer = 1;
-                data_table[eid - 1].last_weapon = event->GetInt("weaponid");
-            }
+            if (CE_GOOD(victim) && CE_GOOD(attacker))
+                if (victim->m_vecOrigin().DistTo(attacker->m_vecOrigin()) > 250)
+                {
+                    data_table[eid - 1].check_timer = 1;
+                    data_table[eid - 1].last_weapon = event->GetInt("weaponid");
+                }
         }
     }
 }
-}
+} // namespace ac::aimbot

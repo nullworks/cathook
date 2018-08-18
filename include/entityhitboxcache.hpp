@@ -67,4 +67,4 @@ inline EntityHitboxCache &Get(unsigned i)
             "Requested out-of-range entity hitbox cache entry!");
     return array[i];
 }
-}
+} // namespace hitbox_cache

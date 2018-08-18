@@ -535,6 +535,6 @@ public:
     static constexpr int CTFPointManager                       = 249;
     static constexpr int CTFFlameManager                       = 205;
 };
-}
+} // namespace client_classes_constexpr
 
 #endif /* tf2_CONSTEXPR_AUTOGEN_HPP */

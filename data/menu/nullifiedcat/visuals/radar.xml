@@ -1,0 +1,17 @@
+<Tab name="Radar" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="radar.enable" label="Enable"/>
+        <AutoVariable width="fill" target="radar.enemies-over-teammates" label="Enemies on top"/>
+        <AutoVariable width="fill" target="radar.healthbar" label="Health bars"/>
+        <AutoVariable width="fill" target="radar.use-icons" label="Use icons"/>
+        <AutoVariable width="fill" target="radar.size" label="Size" min="1" max="480"/>
+        <AutoVariable width="fill" target="radar.icon-size" label="Icon size" min="1" max="48"/>
+        <AutoVariable width="fill" target="radar.x" label="Radar X"/>
+        <AutoVariable width="fill" target="radar.y" label="Radar Y"/>
+        <AutoVariable width="fill" target="radar.zoom" label="Zoom" min="1" max="20"/>
+
+        <AutoVariable width="fill" target="radar.show.ammo" label="Ammo packs"/>
+        <AutoVariable width="fill" target="radar.show.health" label="Health packs"/>
+        <AutoVariable width="fill" target="radar.show.teammates" label="Teammates"/>
+    </List>
+</Tab>

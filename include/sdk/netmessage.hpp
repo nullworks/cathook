@@ -181,7 +181,8 @@ protected:
 
 #define NETMSG_TYPE_BITS 5
 typedef int QueryCvarCookie_t;
-typedef enum {
+typedef enum
+{
     eQueryCvarValueStatus_ValueIntact  = 0, // It got the value fine.
     eQueryCvarValueStatus_CvarNotFound = 1,
     eQueryCvarValueStatus_NotACvar =

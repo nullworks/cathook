@@ -25,4 +25,4 @@ void Init()
             "08 E8 ? ? ? ? 0F B6 45 EC F3 0F 10 45 F0 F3 0F 11 05 ? ? ? ? A2 ? "
             "? ? ? 8B 45 E8 A3 ? ? ? ? 83 C4 20 5B 5E 5D C3");
 }
-}
+} // namespace velocity

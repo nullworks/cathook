@@ -6,17 +6,14 @@
  */
 
 #include <PlayerTools.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "auto-detonator.enable", "0" };
+static settings::Bool legit{ "auto-detonator.ignore-cloaked", "0" };
 
 namespace hacks::tf::autodetonator
 {
-
-// Vars for user settings
-static CatVar enabled(CV_SWITCH, "detonator_enabled", "0",
-                      "Auto-Detonator-detonator",
-                      "Master auto detonator switch");
-static CatVar legit(CV_SWITCH, "detonator_legit", "0", "Ignore invis",
-                    "Ignores invis spies");
 
 // A storage array for ents
 std::vector<CachedEntity *> flares;
@@ -81,7 +78,7 @@ bool IsTarget(CachedEntity *ent)
 void CreateMove()
 {
     // Check user settings if auto detonator is enabled
-    if (!enabled)
+    if (!enable)
         return;
 
     // Check if player is pyro
@@ -123,7 +120,7 @@ void CreateMove()
                 if (VisCheckEntFromEnt(flare, target))
                 {
                     // Detonate
-                    g_pUserCmd->buttons |= IN_ATTACK2;
+                    current_user_cmd->buttons |= IN_ATTACK2;
 
                     return;
                 }
@@ -133,4 +130,4 @@ void CreateMove()
     // End of function, just return
     return;
 }
-}
+} // namespace hacks::tf::autodetonator

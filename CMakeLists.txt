@@ -110,8 +110,6 @@ target_include_directories(cathook SYSTEM PRIVATE
         "external/source-sdk-2013-headers/mp/src/tier1"
         "external/source-sdk-2013-headers/mp/src")
 
-target_include_directories(cathook PRIVATE "external/ucccccp")
-
 if(EnableWarnings)
     target_compile_options(cathook PRIVATE -Wall -Wextra)
 else()
@@ -139,6 +137,7 @@ endif()
 
 add_subdirectory(src)
 add_subdirectory(include)
+add_subdirectory(external)
 
 add_custom_command(TARGET cathook POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook>")

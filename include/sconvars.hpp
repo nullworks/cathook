@@ -26,4 +26,4 @@ public:
     ConVar *original;
     ConVar *spoof;
 };
-}
+} // namespace sconvar

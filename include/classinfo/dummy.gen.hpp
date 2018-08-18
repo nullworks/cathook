@@ -537,6 +537,6 @@ public:
 };
 
 extern dummy dummy_list;
-}
+} // namespace client_classes
 
 #endif /* DUMMY_AUTOGEN_HPP */

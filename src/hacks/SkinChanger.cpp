@@ -10,6 +10,10 @@
 #include <sys/dir.h>
 #include <sys/stat.h>
 #include <hacks/SkinChanger.hpp>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "skinchanger.enable", "false" };
+static settings::Bool debug{ "skinchanger.debug", "false" };
 
 namespace hacks::tf2::skinchanger
 {
@@ -95,7 +99,6 @@ void CAttributeList::SetAttribute(int index, float value)
     */
 }
 
-static CatVar enabled(CV_SWITCH, "skinchanger", "0", "Skin Changer");
 static CatCommand
     set_attr("skinchanger_set", "Set Attribute", [](const CCommand &args) {
         unsigned attrid = strtoul(args.Arg(1), nullptr, 10);
@@ -192,7 +195,7 @@ void FrameStageNotify(int stage)
 
     if (stage != FRAME_NET_UPDATE_POSTDATAUPDATE_START)
         return;
-    if (!enabled)
+    if (!enable)
         return;
     if (CE_BAD(LOCAL_E))
         return;
@@ -246,16 +249,13 @@ void FrameStageNotify(int stage)
     last_weapon_out = my_weapon_ptr;
 }
 
-static CatVar show_debug_info(CV_SWITCH, "skinchanger_debug", "0",
-                              "Debug Skinchanger");
-
 void DrawText()
 {
     CAttributeList *list;
 
-    if (!enabled)
+    if (!enable)
         return;
-    if (!show_debug_info)
+    if (!debug)
         return;
     if (CE_GOOD(LOCAL_W))
     {
@@ -417,7 +417,7 @@ void patched_weapon_cookie::Update(int entity)
     ent = g_IEntityList->GetClientEntity(entity);
     if (!ent || ent->IsDormant())
         return;
-    if (show_debug_info)
+    if (debug)
         logging::Info("Updating cookie for %i", entity); // FIXME DEBUG LOGS!
     list   = (CAttributeList *) ((uintptr_t) ent + netvar.AttributeList);
     attrs  = list->m_Attributes.Size();
@@ -482,7 +482,7 @@ void def_attribute_modifier::Apply(int entity)
         NET_INT(ent, netvar.iItemDefinitionIndex) != defidx_redirect)
     {
         NET_INT(ent, netvar.iItemDefinitionIndex) = defidx_redirect;
-        if (show_debug_info)
+        if (debug)
             logging::Info("Redirect -> %i",
                           NET_INT(ent, netvar.iItemDefinitionIndex));
         GetModifier(defidx_redirect).Apply(entity);
@@ -515,4 +515,4 @@ std::unordered_map<int, def_attribute_modifier> modifier_map{};
 // A map that maps an Entity Index to a cookie
 // std::unordered_map<int, patched_weapon_cookie> cookie_map {};
 patched_weapon_cookie cookie{ 0 };
-}
+} // namespace hacks::tf2::skinchanger

@@ -3,17 +3,12 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
+#include <settings/String.hpp>
 #include "HookedMethods.hpp"
 
-static CatVar ipc_name(CV_STRING, "name_ipc", "", "IPC Name");
-
-static CatEnum namesteal_enum({ "OFF", "PASSIVE", "ACTIVE" });
-static CatVar
-    namesteal(namesteal_enum, "name_stealer", "0", "Name Stealer",
-              "Attemt to steal your teammates names. Usefull for avoiding "
-              "kicks\nPassive only changes when the name stolen is no "
-              "longer the best name to use\nActive Attemps to change the "
-              "name whenever possible");
+static settings::String ipc_name{ "name.ipc", "" };
+static settings::String force_name{ "name.custom", "" };
+static settings::Int namesteal{ "name.namesteal", "0" };
 
 static std::string stolen_name;
 
@@ -112,11 +107,11 @@ DEFINE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *this_,
 #if ENABLE_IPC
     if (ipc::peer)
     {
-        static std::string namestr(ipc_name.GetString());
-        namestr.assign(ipc_name.GetString());
+        std::string namestr(*ipc_name);
         if (namestr.length() > 3)
         {
             ReplaceString(namestr, "%%", std::to_string(ipc::peer->client_id));
+            ReplaceString(namestr, "\\n", "\n");
             return namestr.c_str();
         }
     }
@@ -142,12 +137,10 @@ DEFINE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *this_,
         }
     }
 
-    if ((strlen(force_name.GetString()) > 1) &&
-        steam_id == g_ISteamUser->GetSteamID())
+    if ((*force_name).size() > 1 && steam_id == g_ISteamUser->GetSteamID())
     {
-
-        return force_name_newlined;
+        return force_name.toString().c_str();
     }
     return original::GetFriendPersonaName(this_, steam_id);
 }
-}
+} // namespace hooked_methods

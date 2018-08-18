@@ -12,4 +12,4 @@ namespace hacks::tf2::achievement
 
 void Lock();
 void Unlock();
-}
+} // namespace hacks::tf2::achievement

@@ -43,4 +43,4 @@ CatCommand spoof_convar("spoof", "Spoof ConVar", [](const CCommand &args) {
     }
     convars.push_back(new SpoofedConVar(var));
 });
-}
+} // namespace sconvar

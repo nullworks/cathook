@@ -18,4 +18,4 @@ void CreateMove();
 
 extern const std::vector<std::string> builtin_cathook;
 extern const std::vector<std::string> builtin_nonecore;
-}
+} // namespace hacks::tf::uberspam

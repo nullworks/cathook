@@ -523,6 +523,6 @@ public:
 };
 
 extern dab dab_list;
-}
+} // namespace client_classes
 
 #endif /* dab_AUTOGEN_HPP */

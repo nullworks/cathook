@@ -6,40 +6,30 @@
  */
 
 #include <glez/draw.hpp>
+#include <settings/Int.hpp>
 #include "common.hpp"
 #include "hacks/Radar.hpp"
 
 #ifndef FEATURE_RADAR_DISABLED
 #if ENABLE_VISUALS
 
+static settings::Bool radar_enabled{ "radar.enable", "false" };
+static settings::Int size{ "radar.size", "300" };
+static settings::Float zoom{ "radar.zoom", "20" };
+static settings::Bool healthbar{ "radar.healthbar", "true" };
+static settings::Bool enemies_over_teammates{ "radar.enemies-over-teammates",
+                                              "true" };
+static settings::Int icon_size{ "radar.icon-size", "20" };
+static settings::Int radar_x{ "radar.x", "100" };
+static settings::Int radar_y{ "radar.y", "100" };
+static settings::Bool use_icons{ "radar.use-icons", "true" };
+static settings::Bool show_teammates{ "radar.show.teammates", "true" };
+static settings::Bool show_healthpacks{ "radar.show.health", "true" };
+static settings::Bool show_ammopacks{ "radar.show.ammo", "true" };
+
 namespace hacks::tf::radar
 {
 
-static CatVar size(CV_INT, "radar_size", "300", "Radar size",
-                   "Defines radar size in pixels");
-static CatVar zoom(CV_FLOAT, "radar_zoom", "20", "Radar zoom",
-                   "Defines radar zoom (1px = Xhu)");
-static CatVar healthbar(CV_SWITCH, "radar_health", "1", "Radar healthbar",
-                        "Show radar healthbar");
-static CatVar enemies_over_teammates(
-    CV_SWITCH, "radar_enemies_top", "1", "Show enemies on top",
-    "If true, radar will render enemies on top of teammates");
-static CatVar icon_size(CV_INT, "radar_icon_size", "20", "Icon size",
-                        "Defines radar icon size");
-static CatVar radar_enabled(CV_SWITCH, "radar", "0", "Enable", "Enable Radar");
-static CatVar radar_x(CV_INT, "radar_x", "100", "Radar X",
-                      "Defines radar position (X)");
-static CatVar radar_y(CV_INT, "radar_y", "100", "Radar Y",
-                      "Defines radar position (Y)");
-static CatVar
-    use_icons(CV_SWITCH, "radar_icons", "1", "Use Icons",
-              "Radar will use class icons instead of class portraits");
-static CatVar show_teammates(CV_SWITCH, "radar_teammates", "1",
-                             "Show Teammates");
-static CatVar show_healthpacks(CV_SWITCH, "radar_healthpacks", "1",
-                               "Show Healthpacks");
-static CatVar show_ammopacks(CV_SWITCH, "radar_ammopacks", "1",
-                             "Show Ammopacks");
 Timer invalid{};
 
 std::pair<int, int> WorldToRadar(int x, int y)
@@ -157,7 +147,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                     (int) icon_size, 4, colors::black, 0.5f);
                 glez::draw::rect(x + wtr.first + 1,
                                  y + wtr.second + (int) icon_size + 1,
-                                 ((float) icon_size - 2.0f) * healthp, 2, clr);
+                                 (*icon_size - 2.0f) * healthp, 2, clr);
             }
         }
         else if (ent->m_Type() == ENTITY_BUILDING)
@@ -190,8 +180,8 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             {
                 const auto &wtr =
                     WorldToRadar(ent->m_vecOrigin().x, ent->m_vecOrigin().y);
-                float sz  = float(icon_size) * 0.15f * 0.5f;
-                float sz2 = float(icon_size) * 0.85;
+                float sz  = *icon_size * 0.15f * 0.5f;
+                float sz2 = *icon_size * 0.85;
                 tx_items[0].draw(x + wtr.first + sz, y + wtr.second + sz, sz2,
                                  sz2, colors::white);
             }
@@ -201,8 +191,8 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             {
                 const auto &wtr =
                     WorldToRadar(ent->m_vecOrigin().x, ent->m_vecOrigin().y);
-                float sz  = float(icon_size) * 0.15f * 0.5f;
-                float sz2 = float(icon_size) * 0.85;
+                float sz  = *icon_size * 0.15f * 0.5f;
+                float sz2 = *icon_size * 0.85;
                 tx_items[1].draw(x + wtr.first + sz, y + wtr.second + sz, sz2,
                                  sz2, colors::white);
             }
@@ -225,7 +215,7 @@ void Draw()
 
     x              = (int) radar_x;
     y              = (int) radar_y;
-    int radar_size = size;
+    int radar_size = *size;
     int half_size  = radar_size / 2;
 
     outlineclr = GUIColor();
@@ -275,7 +265,7 @@ void Draw()
     glez::draw::line(x + half_size / 2, y + half_size, half_size, 0,
                      colors::Transparent(GUIColor(), 0.4f), 0.5f);
 }
-}
+} // namespace hacks::tf::radar
 
 #endif
 #endif

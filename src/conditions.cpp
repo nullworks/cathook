@@ -12,7 +12,7 @@ static CatCommand dump_conditions(
     [](const CCommand &args) {
         int id = atoi(args.Arg(1));
         if (!id)
-            id            = LOCAL_E->m_IDX;
+            id = LOCAL_E->m_IDX;
         CachedEntity *ent = ENTITY(id);
         if (CE_BAD(ent))
             return;

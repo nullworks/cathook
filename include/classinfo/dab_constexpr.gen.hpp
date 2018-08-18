@@ -521,6 +521,6 @@ public:
     static constexpr int CBaseGrenadeProjectile                = 12;
     static constexpr int CDAViewModel                          = 28;
 };
-}
+} // namespace client_classes_constexpr
 
 #endif /* dab_CONSTEXPR_AUTOGEN_HPP */

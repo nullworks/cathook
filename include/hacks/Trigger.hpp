@@ -9,8 +9,6 @@
 
 #include "common.hpp"
 
-class CatVar;
-
 namespace hacks::shared::triggerbot
 {
 
@@ -24,4 +22,4 @@ bool UpdateAimkey();
 float EffectiveTargetingRange();
 void Draw();
 bool CheckLineBox(Vector B1, Vector B2, Vector L1, Vector L2, Vector &Hit);
-}
+} // namespace hacks::shared::triggerbot

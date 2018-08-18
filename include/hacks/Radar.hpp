@@ -14,5 +14,5 @@ namespace hacks::tf::radar
 {
 std::pair<int, int> WorldToRadar(int x, int y);
 void Draw();
-}
+} // namespace hacks::tf::radar
 #endif

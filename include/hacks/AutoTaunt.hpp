@@ -7,10 +7,6 @@
 
 #pragma once
 
-class CatVar;
-class InitRoutine;
-
 namespace hacks::tf::autotaunt
 {
-extern InitRoutine init;
 }

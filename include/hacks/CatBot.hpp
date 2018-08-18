@@ -21,4 +21,4 @@ void level_init();
 #if ENABLE_IPC
 void update_ipc_data(ipc::user_data_s &data);
 #endif
-}
+} // namespace hacks::shared::catbot

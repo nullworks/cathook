@@ -48,4 +48,4 @@ void Reset()
 
 std::stack<msg_t> stack;
 float last_say = 0.0f;
-}
+} // namespace chat_stack

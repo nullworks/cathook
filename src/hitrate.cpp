@@ -7,8 +7,11 @@
 
 #include "common.hpp"
 #include <hacks/Aimbot.hpp>
+#include <settings/Bool.hpp>
 #include "MiscTemporary.hpp"
 #include "init.hpp"
+
+static settings::Bool hitrate_check{ "hitrate.enable", "true" };
 
 namespace hitrate
 {
@@ -19,8 +22,6 @@ int lastammo{ 0 };
 int count_shots{ 0 };
 int count_hits{ 0 };
 int count_hits_head{ 0 };
-
-CatVar hitrate_check(CV_SWITCH, "hitrate", "1", "Monitor hitrate");
 
 std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>
     shots{};
@@ -189,4 +190,4 @@ HurtListener &listener()
 InitRoutine init([]() {
     g_IGameEventManager->AddListener(&listener(), false);
 });
-}
+} // namespace hitrate

@@ -137,4 +137,4 @@ void Load(std::string filename, bool merge = false);
 void InvalidateCookie();
 void FrameStageNotify(int stage);
 void DrawText();
-}
+} // namespace hacks::tf2::skinchanger

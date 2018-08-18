@@ -13,4 +13,4 @@ DEFINE_HOOKED_METHOD(FireEvent, bool, IGameEventManager2 *this_,
 {
     return original::FireEvent(this_, event, no_broadcast);
 }
-}
+} // namespace hooked_methods

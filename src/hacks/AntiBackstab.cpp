@@ -5,20 +5,19 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hack.hpp"
+
+static settings::Bool enable{ "antibackstab.enable", "0" };
+static settings::Float distance{ "antibackstab.distance", "200" };
+static settings::Bool silent{ "antibackstab.silent", "1" };
+static settings::Float angle{ "antibackstab.angle", "90" };
+static settings::Bool sayno{ "antibackstab.nope", "0" };
 
 namespace hacks::tf2::antibackstab
 {
 bool noaa = false;
-static CatVar enabled(CV_SWITCH, "antibackstab", "0", "Enable",
-                      "Main anti-backstab switch");
-static CatVar distance(CV_FLOAT, "antibackstab_distance", "200", "Distance",
-                       "Distance Until anti-backstab reacts");
-static CatVar silent(CV_SWITCH, "antibackstab_silent", "1", "Silent",
-                     "Works silently without moving your view");
-static CatVar angle(CV_FLOAT, "antibackstab_angle", "90", "Detection Angle");
-static CatVar sayno(CV_SWITCH, "antibackstab_nope", "0", "Nope!", "Memes");
 
 void SayNope()
 {
@@ -41,7 +40,7 @@ float GetAngle(CachedEntity *spy)
     diff            = (A - B);
     yaw2            = acos(diff.x / diff.Length()) * 180.0f / PI;
     if (diff.y < 0)
-        yaw2  = -yaw2;
+        yaw2 = -yaw2;
     anglediff = yaw - yaw2;
     if (anglediff > 180)
         anglediff -= 360;
@@ -93,7 +92,7 @@ void CreateMove()
     CachedEntity *spy;
     Vector diff;
 
-    if (!enabled)
+    if (!enable)
         return;
     spy                   = ClosestSpy();
     ConVar *pitchdown     = g_ICvar->FindVar("cl_pitchdown");
@@ -102,7 +101,7 @@ void CreateMove()
     {
         noaa = true;
         pitchdown->SetValue(180);
-        g_pUserCmd->viewangles.x = 140.0f;
+        current_user_cmd->viewangles.x = 140.0f;
         if (silent)
             g_pLocalPlayer->bUseSilentAngles = true;
         if (sayno)
@@ -114,4 +113,4 @@ void CreateMove()
         noaa = false;
     }
 }
-}
+} // namespace hacks::tf2::antibackstab

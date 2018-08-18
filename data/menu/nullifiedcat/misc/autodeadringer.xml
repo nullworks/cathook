@@ -1,0 +1,6 @@
+<Tab name="Auto Deadringer" padding="4 4 4 4">
+    <List width="170">
+        <AutoVariable width="fill" target="auto-deadringer.enable" label="Auto Deadringer"/>
+        <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
+    </List>
+</Tab>

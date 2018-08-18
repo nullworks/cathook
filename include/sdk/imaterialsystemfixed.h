@@ -167,7 +167,7 @@ public:
     // Get the image format of the back buffer. . useful when creating render
     // targets, etc.
     virtual void GetBackBufferDimensions(int &width, int &height) const = 0;
-    virtual ImageFormat GetBackBufferFormat() const = 0;
+    virtual ImageFormat GetBackBufferFormat() const                     = 0;
 
     virtual bool SupportsHDRMode(HDRType_t nHDRModede) = 0;
 
@@ -186,8 +186,8 @@ public:
     // Control flow
     // -----------------------------------------------------------
 
-    virtual void BeginFrame(float frameTime) = 0;
-    virtual void EndFrame()                  = 0;
+    virtual void BeginFrame(float frameTime)       = 0;
+    virtual void EndFrame()                        = 0;
     virtual void Flush(bool flushHardware = false) = 0;
 
     /// FIXME: This stuff needs to be cleaned up and abstracted.
@@ -226,7 +226,7 @@ public:
 
     // Used to iterate over all shaders for editing purposes
     // GetShaders returns the number of shaders it actually found
-    virtual int ShaderCount() const = 0;
+    virtual int ShaderCount() const                      = 0;
     virtual int GetShaders(int nFirstShader, int nMaxCount,
                            IShader **ppShaderList) const = 0;
 
@@ -470,15 +470,15 @@ public:
     virtual void ClearBuffers(bool bClearColor, bool bClearDepth,
                               bool bClearStencil = false) = 0;
 
-// -----------------------------------------------------------
-// X360 specifics
-// -----------------------------------------------------------
+    // -----------------------------------------------------------
+    // X360 specifics
+    // -----------------------------------------------------------
 
 #if defined(_X360)
-    virtual void ListUsedMaterials(void) = 0;
+    virtual void ListUsedMaterials(void)                                 = 0;
     virtual HXUIFONT OpenTrueTypeFont(const char *pFontname, int tall,
-                                      int style)   = 0;
-    virtual void CloseTrueTypeFont(HXUIFONT hFont) = 0;
+                                      int style)                         = 0;
+    virtual void CloseTrueTypeFont(HXUIFONT hFont)                       = 0;
     virtual bool GetTrueTypeFontMetrics(HXUIFONT hFont,
                                         XUIFontMetrics * pFontMetrics,
                                         XUICharMetrics charMetrics[256]) = 0;
@@ -536,7 +536,7 @@ public:
     virtual ImageFormat GetNullTextureFormat() = 0;
 
     virtual void AddTextureAlias(const char *pAlias, const char *pRealName) = 0;
-    virtual void RemoveTextureAlias(const char *pAlias) = 0;
+    virtual void RemoveTextureAlias(const char *pAlias)                     = 0;
 
     // returns a lightmap page ID for this allocation, -1 if none available
     // frameID is a number that should be changed every frame to prevent locking
@@ -553,7 +553,7 @@ public:
 
     // For sv_pure mode. The filesystem figures out which files the client needs
     // to reload to be "pure" ala the server's preferences.
-    virtual void ReloadFilesInList(IFileList * pFilesToReload) = 0;
+    virtual void ReloadFilesInList(IFileList * pFilesToReload)   = 0;
     virtual bool AllowThreading(bool bAllow, int nServiceThread) = 0;
 
     // Extended version of FindMaterial().

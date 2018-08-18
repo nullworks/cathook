@@ -1,0 +1,62 @@
+<Tab name="AutoHeal" padding="6 6 6 6">
+    <Box padding="6 6 6 6" width="content" height="content">
+        <List width="150">
+            <AutoVariable width="fill" target="autoheal.enable" label="Enable"/>
+            <AutoVariable width="fill" target="autoheal.silent" label="Silent"/>
+            <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto Uber"/>
+            <AutoVariable width="fill" target="autoheal.uber.share" label="Share Uber"/>
+            <AutoVariable width="fill" target="autoheal.uber.health-below-ratio" label="Uber on health" min="0" max="100"/>
+        </List>
+        <Box padding="12 6 6 6" name="Auto Vaccinator" width="content" height="content" y="100">
+            <List width="150">
+                <AutoVariable width="fill" target="autoheal.vacc.enable" label="Enable"/>
+                <AutoVariable width="fill" target="autoheal.vacc.reset-timer" label="Reset timer"/>
+                <LabeledObject width="fill" label="Default resist">
+                    <Select target="autoheal.vacc.default-resistance">
+                        <Option name="Disable" value="0"/>
+                        <Option name="Bullet" value="1"/>
+                        <Option name="Blast" value="2"/>
+                        <Option name="Fire" value="3"/>
+                    </Select>
+                </LabeledObject>
+            </List>
+            <Box padding="12 6 6 6" name="Bullet" width="content" height="content" x="170">
+                <List width="150">
+                    <AutoVariable width="fill" target="autoheal.vacc.bullet.enable" label="Enable"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.bullet.min-charges" label="Min. charges" min="0" max="4"/>
+                    <LabeledObject width="fill" label="Sniper pop">
+                        <Select target="autoheal.vacc.bullet.sniper-pop">
+                            <Option name="Never" value="0"/>
+                            <Option name="Visible, zoom" value="1"/>
+                            <Option name="Any zoomed" value="2"/>
+                        </Select>
+                    </LabeledObject>
+                </List>
+            </Box>
+            <Box padding="12 6 6 6" name="Blast" width="content" height="content" y="100">
+                <List width="150">
+                    <AutoVariable width="fill" target="autoheal.vacc.blast.enable" label="Enable"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.blast.crit-pop" label="Pop on near crit"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.blast.danger-range" label="Danger range" min="0" max="1000"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.blast.pop-near-rocket-health" label="Rocket health pop" tooltip="Pop ubercharge if rocket is near and health is less than" min="0" max="450"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.blast.min-charges" label="Min. charges" min="0" max="4"/>
+                </List>
+            </Box>
+            <Box padding="12 6 6 6" name="Fire" width="content" height="content" y="100" x="170">
+                <List width="150">
+                    <AutoVariable width="fill" target="autoheal.vacc.fire.enable" label="Enable"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.fire.prevent-afterburn" label="Prevent afterburn"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.fire.pyro-range" label="Danger range"/>
+                    <AutoVariable width="fill" target="autoheal.vacc.fire.min-charges" label="Min. charges" min="0" max="4"/>
+                    <LabeledObject width="fill" label="Pyro pop">
+                        <Select target="autoheal.vacc.fire.pyro-pop">
+                            <Option name="Never" value="0"/>
+                            <Option name="Near, flames" value="1"/>
+                            <Option name="Near, any wep" value="2"/>
+                        </Select>
+                    </LabeledObject>
+                </List>
+            </Box>
+        </Box>
+    </Box>
+</Tab>

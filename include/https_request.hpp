@@ -37,4 +37,4 @@ public:
 };
 
 void initialize();
-}
+} // namespace https

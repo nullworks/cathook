@@ -1,0 +1,6 @@
+<Tab name="Bhop" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="bunnyhop.enable" label="Enable Bhop"/>
+        <AutoVariable width="fill" target="misc.autostrafe" label="Enable Auto strafe"/>
+    </List>
+</Tab>

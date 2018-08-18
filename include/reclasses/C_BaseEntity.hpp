@@ -39,4 +39,4 @@ public:
         return SetAbsOrigin_fn(self, origin);
     }
 };
-}
+} // namespace re

@@ -31,7 +31,7 @@ namespace criticals
 void create_move();
 void draw();
 bool random_crits_enabled();
-}
+} // namespace criticals
 
 #include <unordered_map>
 

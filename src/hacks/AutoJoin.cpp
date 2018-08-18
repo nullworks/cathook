@@ -5,8 +5,15 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Int.hpp>
+#include <hacks/AutoJoin.hpp>
+
 #include "common.hpp"
 #include "hack.hpp"
+
+static settings::Bool autojoin_team{ "autojoin.team", "false" };
+static settings::Int autojoin_class{ "autojoin.class", "0" };
+static settings::Bool auto_queue{ "autojoin.auto-queue", "false" };
 
 namespace hacks::shared::autojoin
 {
@@ -14,18 +21,6 @@ namespace hacks::shared::autojoin
 /*
  * Credits to Blackfire for helping me with auto-requeue!
  */
-
-static CatEnum classes_enum({ "DISABLED", "SCOUT", "SNIPER", "SOLDIER",
-                              "DEMOMAN", "MEDIC", "HEAVY", "PYRO", "SPY",
-                              "ENGINEER" });
-static CatVar autojoin_team(CV_SWITCH, "autojoin_team", "0", "AutoJoin",
-                            "Automatically joins a team");
-static CatVar preferred_class(classes_enum, "autojoin_class", "0",
-                              "AutoJoin class",
-                              "You will pick a class automatically");
-
-CatVar auto_queue(CV_SWITCH, "autoqueue", "0", "AutoQueue",
-                  "Automatically queue in casual matches");
 
 const std::string classnames[] = { "scout",   "sniper", "soldier",
                                    "demoman", "medic",  "heavyweapons",
@@ -38,15 +33,13 @@ bool UnassignedTeam()
 
 bool UnassignedClass()
 {
-    return g_pLocalPlayer->clazz != int(preferred_class);
+    return g_pLocalPlayer->clazz != *autojoin_class;
 }
 
-Timer autoqueue_timer{};
-Timer queuetime{};
-Timer req_timer{};
-/*CatVar party_bypass(CV_SWITCH, "party_bypass", "0", "Party Bypass",
-                    "Bypass Party restrictions");*/
-void UpdateSearch()
+static Timer autoqueue_timer{};
+static Timer queuetime{};
+static Timer req_timer{};
+void updateSearch()
 {
     // segfaults for no reason
     /*static bool calld = false;
@@ -92,17 +85,17 @@ void UpdateSearch()
 
     re::CTFGCClientSystem *gc = re::CTFGCClientSystem::GTFGCClientSystem();
     re::CTFPartyClient *pc    = re::CTFPartyClient::GTFPartyClient();
-    if (g_pUserCmd && gc && gc->BConnectedToMatchServer(false) &&
+    if (current_user_cmd && gc && gc->BConnectedToMatchServer(false) &&
         gc->BHaveLiveMatch())
-        tfmm::queue_leave();
+        tfmm::leaveQueue();
     if (gc && !gc->BConnectedToMatchServer(false) &&
         queuetime.test_and_set(10 * 1000 * 60) && !gc->BHaveLiveMatch())
-        tfmm::queue_leave();
+        tfmm::leaveQueue();
     if (gc && !gc->BConnectedToMatchServer(false) && !gc->BHaveLiveMatch())
-        if (!(pc && pc->BInQueueForMatchGroup(int(tfmm::queue))))
+        if (!(pc && pc->BInQueueForMatchGroup(tfmm::getQueue())))
         {
             logging::Info("Starting queue");
-            tfmm::queue_start();
+            tfmm::startQueue();
         }
 #if LAGBOT_MODE
     if (req_timer.test_and_set(1800000))
@@ -114,24 +107,34 @@ void UpdateSearch()
 #endif
 }
 
-Timer timer{};
-void Update()
+void update()
 {
-#if not LAGBOT_MODE
-    if (timer.test_and_set(500))
+#if !LAGBOT_MODE
+    if (autoqueue_timer.test_and_set(500))
     {
         if (autojoin_team and UnassignedTeam())
         {
             hack::ExecuteCommand("autoteam");
         }
-        else if (preferred_class and UnassignedClass())
+        else if (autojoin_class and UnassignedClass())
         {
-            if (int(preferred_class) < 10)
+            if (int(autojoin_class) < 10)
                 g_IEngine->ExecuteClientCmd(
-                    format("join_class ", classnames[int(preferred_class) - 1])
+                    format("join_class ", classnames[int(autojoin_class) - 1])
                         .c_str());
         }
     }
 #endif
 }
+
+void resetQueueTimer()
+{
+    queuetime.update();
 }
+
+void onShutdown()
+{
+    if (auto_queue)
+        tfmm::startQueue();
+}
+} // namespace hacks::shared::autojoin

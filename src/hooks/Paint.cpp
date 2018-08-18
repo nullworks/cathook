@@ -7,12 +7,12 @@
 
 #include <hacks/hacklist.hpp>
 #include <online/Online.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
 #include "hitrate.hpp"
 #include "hack.hpp"
 
-static CatVar cursor_fix_experimental(CV_SWITCH, "experimental_cursor_fix", "1",
-                                      "Cursor fix");
+static settings::Bool cursor_fix_experimental{ "debug.cursor-fix", "false" };
 
 namespace hooked_methods
 {
@@ -28,10 +28,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
         hacks::tf2::killstreak::apply_killstreaks();
 #endif
         hacks::shared::catbot::update();
-        if (hitrate::hitrate_check)
-        {
-            hitrate::Update();
-        }
+        hitrate::Update();
         online::update();
 #if ENABLE_IPC
         static Timer nametimer{};
@@ -56,7 +53,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
             }
         }
 #endif
-        hacks::shared::autojoin::UpdateSearch();
+        hacks::shared::autojoin::updateSearch();
         if (!hack::command_stack().empty())
         {
             PROF_SECTION(PT_command_stack);
@@ -98,4 +95,4 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
 
     return original::Paint(this_, mode);
 }
-}
+} // namespace hooked_methods

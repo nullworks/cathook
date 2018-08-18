@@ -9,7 +9,7 @@
 
 std::stack<void (*)()> &init_stack()
 {
-    static std::stack<void (*)()> stack;
+    static std::stack<void (*)()> stack{};
     return stack;
 }
 

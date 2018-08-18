@@ -11,13 +11,24 @@
 
 #include <math.h>
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
 
 #ifndef FEATURE_FIDGET_SPINNER_ENABLED
 
-static CatVar enable_spinner(CV_SWITCH, "fidgetspinner", "0", "Fidget Spinner",
-                             "Part of Cathook Autism Awareness program");
-CatVar v9mode(CV_SWITCH, "nullcore_mode", "0", "Nullcore mode",
-              "Part of Cathook Autism Awareness program");
+static settings::Bool enable_spinner{ "visuals.fidget-spinner.enable",
+                                      "false" };
+static settings::Bool v9mode{ "visuals.fidget-spinner.v952-mode", "false" };
+static settings::Float spinner_speed_cap{ "visuals.fidget-spinner.speed-cap",
+                                          "30" };
+static settings::Float spinner_speed_scale{
+    "visuals.fidget-spinner.speed-scale", "0.03"
+};
+static settings::Float spinner_decay_speed{
+    "visuals.fidget-spinner.decay-speed", "0.1"
+};
+static settings::Float spinner_scale{ "visuals.fidget-spinner.scale", "32" };
+static settings::Float spinner_min_speed{ "visuals.fidget-spinner.min-speed",
+                                          "2" };
 
 float spinning_speed = 0.0f;
 float angle          = 0;
@@ -46,23 +57,12 @@ public:
     }
 };
 
-SpinnerListener listener;
+static SpinnerListener listener;
 
 void InitSpinner()
 {
     g_IGameEventManager->AddListener(&listener, false);
 }
-
-static CatVar spinner_speed_cap(CV_FLOAT, "fidgetspinner_speed_cap", "30",
-                                "Speed cap");
-static CatVar spinner_speed_scale(CV_FLOAT, "fidgetspinner_speed_scale", "0.03",
-                                  "Speed scale");
-static CatVar spinner_decay_speed(CV_FLOAT, "fidgetspinner_decay_speed", "0.1",
-                                  "Decay speed");
-static CatVar spinner_scale(CV_FLOAT, "fidgetspinner_scale", "32",
-                            "Spinner Size");
-static CatVar spinner_min_speed(CV_FLOAT, "fidgetspinner_min_speed", "2",
-                                "Spinner Min Speed");
 
 Timer retrytimer{};
 
@@ -77,7 +77,7 @@ void DrawSpinner()
         spinning_speed = float(spinner_min_speed);
     if (spinning_speed > 1000)
         spinning_speed = 1000;
-    float real_speed   = 0;
+    float real_speed = 0;
     const float speed_cap(spinner_speed_cap);
     if (spinning_speed < 250)
         real_speed = speed_cap * (spinning_speed / 250.0f);

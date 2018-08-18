@@ -8,20 +8,18 @@
 #include <boost/algorithm/string.hpp>
 #include <MiscTemporary.hpp>
 #include <hacks/AntiAim.hpp>
+#include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
+
+static settings::Bool clean_chat{ "chat.clean", "false" };
+static settings::Bool dispatch_log{ "debug.log-dispatch-user-msg", "false" };
+static settings::String chat_filter{ "chat.censor.filter", "" };
+static settings::Bool chat_filter_enable{ "chat.censor.enable", "false" };
 
 static bool retrun = false;
 static Timer sendmsg{};
 static Timer gitgud{};
-static CatVar clean_chat(CV_SWITCH, "clean_chat", "0", "Clean chat",
-                         "Removes newlines from chat");
-static CatVar dispatch_log(CV_SWITCH, "debug_log_usermessages", "0",
-                           "Log dispatched user messages");
-static CatVar chat_filter(CV_STRING, "chat_censor", "", "Censor words",
-                          "Spam Chat with newlines if the chosen words are "
-                          "said, seperate with commas");
-static CatVar chat_filter_enabled(CV_SWITCH, "chat_censor_enabled", "0",
-                                  "Enable censor", "Censor Words in chat");
+
 const std::string clear = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
                           "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
                           "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
@@ -36,7 +34,7 @@ namespace hooked_methods
 DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                      bf_read &buf)
 {
-    if (retrun && gitgud.test_and_set(10000))
+    if (retrun && gitgud.test_and_set(100))
     {
         PrintChat("\x07%06X%s\x01: %s", 0xe05938, lastname.c_str(),
                   lastfilter.c_str());
@@ -52,9 +50,9 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
         if (s < 256)
         {
             data = (char *) alloca(s);
-            for (i      = 0; i < s; i++)
+            for (i = 0; i < s; i++)
                 data[i] = buf.ReadByte();
-            j           = 0;
+            j = 0;
             std::string name;
             std::string message;
             for (i = 0; i < 3; i++)
@@ -71,9 +69,9 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                         message.push_back(c);
                 }
             }
-            if (chat_filter_enabled && data[0] != LOCAL_E->m_IDX)
+            if (chat_filter_enable && data[0] != LOCAL_E->m_IDX)
             {
-                if (!strcmp(chat_filter.GetString(), ""))
+                if (sizeof(*chat_filter) < 10)
                 {
                     std::string tmp  = {};
                     std::string tmp2 = {};
@@ -177,8 +175,6 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                     boost::replace_all(message2, "7", "t");
                     for (auto filter : res)
                     {
-                        if (retrun)
-                            break;
                         if (boost::contains(message2, filter))
                         {
                             *bSendPackets = true;
@@ -186,12 +182,13 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                             retrun     = true;
                             lastfilter = format(filter);
                             lastname   = format(name);
+			    gitgud.update();
                         }
                     }
                 }
                 else if (data[0] != LOCAL_E->m_IDX)
                 {
-                    std::string input = chat_filter.GetString();
+                    std::string input = *chat_filter;
                     boost::to_lower(input);
                     std::string message2 = message;
                     std::vector<std::string> result{};
@@ -213,14 +210,15 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                             retrun     = true;
                             lastfilter = format(filter);
                             lastname   = format(name);
+			    gitgud.update();
                         }
                     }
                 }
             }
-#if not LAGBOT_MODE
-            if (sendmsg.test_and_set(300000) &&
-                hacks::shared::antiaim::communicate)
-                chat_stack::Say("!!meow");
+#if !LAGBOT_MODE
+/*if (sendmsg.test_and_set(300000) &&
+    hacks::shared::antiaim::communicate)
+    chat_stack::Say("!!meow");*/
 #endif
             if (crypt_chat)
             {
@@ -228,8 +226,8 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                 {
                     if (ucccccp::validate(message))
                     {
-#if not LAGBOT_MODE
-                        if (ucccccp::decrypt(message) == "meow" &&
+#if !LAGBOT_MODE
+/*                        if (ucccccp::decrypt(message) == "meow" &&
                             hacks::shared::antiaim::communicate &&
                             data[0] != LOCAL_E->m_IDX &&
                             playerlist::AccessData(ENTITY(data[0])).state !=
@@ -238,7 +236,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
                             playerlist::AccessData(ENTITY(data[0])).state =
                                 playerlist::k_EState::CAT;
                             chat_stack::Say("!!meow");
-                        }
+                        }*/
 #endif
                         PrintChat("\x07%06X%s\x01: %s", 0xe05938, name.c_str(),
                                   ucccccp::decrypt(message).c_str());
@@ -263,7 +261,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type,
         logging::Info("MESSAGE %d, DATA = [ %s ]", type, str.str().c_str());
         buf.Seek(0);
     }
-    votelogger::user_message(buf, type);
+    votelogger::dispatchUserMessage(buf, type);
     return original::DispatchUserMessage(this_, type, buf);
 }
-}
+} // namespace hooked_methods

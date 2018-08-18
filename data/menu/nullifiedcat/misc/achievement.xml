@@ -1,0 +1,5 @@
+<Tab name="Achievment" padding="4 4 4 4">
+    <List width="150">
+        <AutoVariable width="fill" target="achievement.safety" label="Achievement safety"/>
+    </List>
+</Tab>

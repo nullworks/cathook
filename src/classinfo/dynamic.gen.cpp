@@ -570,9 +570,9 @@ void dynamic::Populate()
         std::string name(cc->GetName());
         if (classid_mapping.find(name) != classid_mapping.end())
             *classid_mapping[name] = cc->m_ClassID;
-        cc                         = cc->m_pNext;
+        cc = cc->m_pNext;
     }
 }
 
 dynamic dynamic_list;
-}
+} // namespace client_classes

@@ -5,13 +5,12 @@
 
 #include <ucccccp.hpp>
 #include <MiscTemporary.hpp>
+#include <settings/Int.hpp>
 #include "HookedMethods.hpp"
+#include <MiscTemporary.hpp>
 
-static CatVar newlines_msg(CV_INT, "chat_newlines", "0", "Prefix newlines",
-                           "Add # newlines before each your message", 0, 24);
-
-static CatVar log_sent(CV_SWITCH, "debug_log_sent_messages", "0",
-                       "Log sent messages");
+static settings::Int newlines_msg{ "chat.prefix-newlines", "0" };
+static settings::Bool log_sent{ "debug.log-sent-chat", "false" };
 
 namespace hooked_methods
 {
@@ -87,4 +86,4 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg,
     }
     return original::SendNetMsg(this_, msg, force_reliable, voice);
 }
-}
+} // namespace hooked_methods

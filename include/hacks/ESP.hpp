@@ -58,4 +58,4 @@ void AddEntityString(CachedEntity *entity, const std::string &string,
                      const rgba_t &color = colors::empty);
 void SetEntityColor(CachedEntity *entity, const rgba_t &color);
 void ResetEntityStrings();
-}
+} // namespace hacks::shared::esp

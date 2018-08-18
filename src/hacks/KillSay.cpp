@@ -6,21 +6,17 @@
  */
 
 #include <hacks/KillSay.hpp>
+#include <settings/Int.hpp>
 #include "common.hpp"
+
+static settings::Int killsay_mode{ "killsay.mode", "0" };
+static settings::String filename{ "killsay.file", "killsays.txt" };
+
+static CatCommand reload_command("killsay_reload", "Reload killsays",
+                                 []() { hacks::shared::killsay::reload(); });
 
 namespace hacks::shared::killsay
 {
-
-static CatEnum killsay_enum({ "NONE", "CUSTOM", "DEFAULT", "NCC - OFFENSIVE",
-                              "NCC - MLG" });
-static CatVar killsay_mode(killsay_enum, "killsay", "0", "Killsay",
-                           "Defines source of killsay lines. CUSTOM killsay "
-                           "file must be set in cat_killsay_file and loaded "
-                           "with cat_killsay_reload (Use console!)");
-static CatVar
-    filename(CV_STRING, "killsay_file", "killsays.txt", "Killsay file",
-             "Killsay file name. Should be located in cathook data folder");
-static CatCommand reload("killsay_reload", "Reload killsays", Reload);
 
 const std::string tf_classes_killsay[] = { "class",   "scout",   "sniper",
                                            "soldier", "demoman", "medic",
@@ -84,30 +80,36 @@ std::string ComposeKillSay(IGameEvent *event)
     return msg;
 }
 
-KillSayEventListener &getListener()
+class KillSayEventListener : public IGameEventListener2
 {
-    static KillSayEventListener listener;
-    return listener;
+    void FireGameEvent(IGameEvent *event) override
+    {
+        if (!killsay_mode)
+            return;
+        std::string message = hacks::shared::killsay::ComposeKillSay(event);
+        if (message.size())
+        {
+            chat_stack::Say(message, false);
+        }
+    }
+};
+
+static KillSayEventListener listener{};
+
+void reload()
+{
+    file.Load(*filename);
 }
 
-void Reload()
+void init()
 {
-    file.Load(std::string(filename.GetString()));
-}
-
-void Init()
-{
-    g_IEventManager2->AddListener(&getListener(), (const char *) "player_death",
+    g_IEventManager2->AddListener(&listener, (const char *) "player_death",
                                   false);
-    filename.InstallChangeCallback(
-        [](IConVar *var, const char *pszOV, float flOV) {
-            file.TryLoad(std::string(filename.GetString()));
-        });
 }
 
-void Shutdown()
+void shutdown()
 {
-    g_IEventManager2->RemoveListener(&getListener());
+    g_IEventManager2->RemoveListener(&listener);
 }
 
 // Thanks HellJustFroze for linking me http://daviseford.com/shittalk/
@@ -156,15 +158,4 @@ const std::vector<std::string> builtin_nonecore_mlg = {
     "GET REKT U SCRUB",     "GET REKT M8",       "U GOT NOSCOPED M8",
     "U GOT QUICKSCOPED M8", "2 FAST 4 U, SCRUB", "U GOT REKT, M8"
 };
-}
-
-void KillSayEventListener::FireGameEvent(IGameEvent *event)
-{
-    if (!hacks::shared::killsay::killsay_mode)
-        return;
-    std::string message = hacks::shared::killsay::ComposeKillSay(event);
-    if (message.size())
-    {
-        chat_stack::Say(message, false);
-    }
-}
+} // namespace hacks::shared::killsay

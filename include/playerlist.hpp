@@ -26,7 +26,7 @@ enum class k_EState
 };
 
 extern rgba_t k_Colors[];
-const std::string k_Names[] = { "DEFAULT", "FRIEND", "RAGE", "IPC",
+const std::string k_Names[]    = { "DEFAULT", "FRIEND", "RAGE", "IPC",
                                 "DEVELOPER" };
 const char *const k_pszNames[] = { "DEFAULT", "FRIEND", "RAGE", "IPC",
                                    "DEVELOPER" };
@@ -57,4 +57,4 @@ userdata &AccessData(unsigned steamid);
 userdata &AccessData(CachedEntity *player);
 bool IsDefault(unsigned steamid);
 bool IsDefault(CachedEntity *player);
-}
+} // namespace playerlist

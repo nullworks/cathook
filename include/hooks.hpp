@@ -73,4 +73,4 @@ extern VMTHook materialsystem;
 extern VMTHook enginevgui;
 extern VMTHook vstd;
 extern VMTHook eventmanager2;
-}
+} // namespace hooks

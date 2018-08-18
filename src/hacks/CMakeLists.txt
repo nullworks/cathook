@@ -9,6 +9,7 @@ if(NOT LagbotMode)
         "${CMAKE_CURRENT_LIST_DIR}/Aimbot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Announcer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiAim.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/AntiAntiAim.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiBackstab.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiCheat.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AntiDisguise.cpp"
@@ -23,12 +24,11 @@ if(NOT LagbotMode)
         "${CMAKE_CURRENT_LIST_DIR}/Bunnyhop.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Backtrack.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/FollowBot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/HealArrows.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/KillSay.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Killstreak.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/LagExploit.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/LightESP.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Misc.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/NavBot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Noisemaker.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Trigger.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/UberSpam.cpp"
@@ -41,5 +41,6 @@ if(EnableVisuals)
             "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/Radar.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/SkinChanger.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/SpyAlert.cpp")
+            "${CMAKE_CURRENT_LIST_DIR}/SpyAlert.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/Thirdperson.cpp")
 endif()

@@ -10,9 +10,6 @@
 #include <visual/atlas.hpp>
 #include "common.hpp"
 
-class CatVar;
-
 extern std::array<textures::sprite, 4> spinner_states;
-extern CatVar v9mode;
 void InitSpinner();
 void DrawSpinner();

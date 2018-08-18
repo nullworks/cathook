@@ -54,4 +54,4 @@ public:
 
 extern EffectChams g_EffectChams;
 extern CScreenSpaceEffectRegistration *g_pEffectChams;
-}
+} // namespace effect_chams

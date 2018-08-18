@@ -1,0 +1,15 @@
+<Tab name="Anticheat" padding="4 4 4 4">
+    <Box height="content" width="content" padding="12 6 6 6">
+        <List width="220">
+            <AutoVariable width="fill" target="find-cheaters.enable" label="Enable AntiCheat"/>
+            <AutoVariable width="fill" target="find-cheaters.accuse-in-chat" label="Accuse in chat"/>
+            <AutoVariable width="fill" target="find-cheaters.ignore-local" label="Ignore Local"/>
+            <AutoVariable width="fill" target="find-cheaters.auto-rage" label="Auto rage"/>
+            <AutoVariable width="fill" target="find-cheaters.aimbot.enable" label="Aimbot Detection"/>
+            <AutoVariable width="fill" target="find-cheaters.aimbot.angle" label="Aimbot Detection Angle"/>
+            <AutoVariable width="fill" target="find-cheaters.aimbot.detections" label="Minimum Aimbot Detections"/>
+            <AutoVariable width="fill" target="find-cheaters.antiaim.enable" label="AntiAim detection"/>
+            <AutoVariable width="fill" target="find-cheaters.bunnyhop.detections" label="Minimum Bhop detections"/>
+        </List>
+    </Box>
+</Tab>

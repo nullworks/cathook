@@ -11,16 +11,14 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <hacks/Spam.hpp>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "chat-log.enable", "false" };
+static settings::Bool no_spam{ "chat-log.no-spam", "true" };
+static settings::Bool no_ipc{ "chat-log.no-ipc", "true" };
 
 namespace chatlog
 {
-
-static CatVar enabled(CV_SWITCH, "chat_log", "0", "Chat log",
-                      "Log chat to file");
-static CatVar dont_log_spam(CV_SWITCH, "chat_log_nospam", "1", "No Spam",
-                            "Don't log your messages if spam is active");
-static CatVar dont_log_ipc(CV_SWITCH, "chat_log_noipc", "1", "No IPC",
-                           "Don't log messages sent by bots");
 
 class csv_stream
 {
@@ -107,19 +105,18 @@ csv_stream &logger()
 
 void LogMessage(int eid, std::string message)
 {
-    if (!enabled)
+    if (!enable)
     {
         return;
     }
-    if (dont_log_spam && hacks::shared::spam::spam_source and
+    if (no_spam && hacks::shared::spam::isActive() and
         eid == g_IEngine->GetLocalPlayer())
         return;
-    player_info_s info;
+    player_info_s info{};
     if (not g_IEngine->GetPlayerInfo(eid, &info))
         return;
-    if (dont_log_ipc &&
-        playerlist::AccessData(info.friendsID).state ==
-            playerlist::k_EState::IPC)
+    if (no_ipc && playerlist::AccessData(info.friendsID).state ==
+                      playerlist::k_EState::IPC)
         return;
 
     std::string name(info.name);
@@ -140,4 +137,4 @@ void LogMessage(int eid, std::string message)
 #endif
              << csv_stream::end;
 }
-}
+} // namespace chatlog

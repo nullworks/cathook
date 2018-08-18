@@ -8,42 +8,66 @@
 #include "common.hpp"
 #include <hacks/AutoHeal.hpp>
 #include <hacks/FollowBot.hpp>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "autoheal.enable", "false" };
+static settings::Bool silent{ "autoheal.silent", "true" };
+static settings::Bool pop_uber_auto{ "autoheal.uber.enable", "true" };
+static settings::Float pop_uber_percent{ "autoheal.uber.health-below-ratio",
+                                         "0" };
+static settings::Bool share_uber{ "autoheal.uber.share", "true" };
+
+static settings::Bool auto_vacc{ "autoheal.vacc.enable", "false" };
+
+static settings::Bool auto_vacc_bullets{ "autoheal.vacc.bullet.enable",
+                                         "true" };
+static settings::Int vacc_sniper{ "autoheal.vacc.bullet.sniper-pop", "true" };
+
+static settings::Bool auto_vacc_fire_checking{ "autoheal.vacc.fire.enable",
+                                               "true" };
+static settings::Int auto_vacc_pop_if_pyro{ "autoheal.vacc.fire.pyro-pop",
+                                            "1" };
+static settings::Bool auto_vacc_check_on_fire{
+    "autoheal.vacc.fire.prevent-afterburn", "true"
+};
+static settings::Int auto_vacc_pyro_range{ "autoheal.vacc.fire.pyro-range",
+                                           "450" };
+
+static settings::Bool auto_vacc_blast_checking{ "autoheal.vacc.blast.enable",
+                                                "true" };
+static settings::Bool auto_vacc_blast_crit_pop{ "autoheal.vacc.blast.crit-pop",
+                                                "true" };
+static settings::Int auto_vacc_blast_health{
+    "autoheal.vacc.blast.pop-near-rocket-health", "80"
+};
+static settings::Int auto_vacc_proj_danger_range{
+    "autoheal.vacc.blast.danger-range", "650"
+};
+
+static settings::Int change_timer{ "autoheal.vacc.reset-timer", "200" };
+
+static settings::Int auto_vacc_bullet_pop_ubers{
+    "autoheal.vacc.bullet.min-charges", "0"
+};
+static settings::Int auto_vacc_fire_pop_ubers{ "autoheal.vacc.fire.min-charges",
+                                               "0" };
+static settings::Int auto_vacc_blast_pop_ubers{
+    "autoheal.vacc.blast.min-charges", "0"
+};
+
+static settings::Int default_resistance{ "autoheal.vacc.default-resistance",
+                                         "0" };
 
 namespace hacks::tf::autoheal
 {
 
-static CatVar enabled(CV_SWITCH, "autoheal_enabled", "0", "AutoHeal",
-                      "Automatically heals nearby teammates");
-static CatVar silent(CV_SWITCH, "autoheal_silent", "1", "Silent AutoHeal",
-                     "Silent AutoHeal. Disable this to make ghetto followbot");
-// extern CatVar target_only;
-
 int m_iCurrentHealingTarget{ -1 };
 int m_iNewTarget{ 0 };
-
-static CatVar pop_uber_auto(CV_SWITCH, "autoheal_uber", "1", "AutoUber",
-                            "Use ubercharge automatically");
-static CatVar
-    pop_uber_percent(CV_FLOAT, "autoheal_uber_health", "0",
-                     "Pop uber if health% <",
-                     "When under a percentage of health, use ubercharge");
-static CatVar share_uber(
-    CV_SWITCH, "autoheal_share_uber", "1", "Share ubercharge",
-    "Aimbot will attempt to share uber charge with un-ubered players");
 
 int vaccinator_change_stage = 0;
 int vaccinator_change_ticks = 0;
 int vaccinator_ideal_resist = 0;
 int vaccinator_change_timer = 0;
-
-static CatVar auto_vacc_bullets(CV_SWITCH, "auto_vacc_bullets", "1",
-                                "Check bullet danger");
-static CatEnum vacc_sniper_enum({ "NEVER", "ZOOM & VISIBLE", "ANY ZOOMED" });
-static CatVar vacc_sniper(vacc_sniper_enum, "auto_vacc_sniper_pop", "1",
-                          "Pop if Sniper",
-                          "Defines Auto-Vacc behaviour with snipers");
-static CatVar ignore(CV_STRING, "autoheal_ignore", "", "Ignore",
-                     "Ignore people with this name");
 
 int ChargeCount()
 {
@@ -71,23 +95,16 @@ int BulletDangerValue(CachedEntity *patient)
         any_zoomed_snipers = true;
         // TODO VisCheck from patient.
         if ((int) vacc_sniper == 1)
-            if (!IsEntityVisible(ent, head))
+            if (!IsEntityVisible(ent, head) &&
+                !IsVectorVisible(ENTITY(m_iCurrentHealingTarget)
+                                     ->hitboxes.GetHitbox(head)
+                                     ->center,
+                                 ent->hitboxes.GetHitbox(head)->center, true))
                 continue;
         return vacc_sniper ? 2 : 1;
     }
     return any_zoomed_snipers;
 }
-
-static CatVar auto_vacc_fire_checking(CV_SWITCH, "auto_vacc_fire", "1",
-                                      "Check fire danger");
-static CatEnum pyro_enum({ "NEVER", "PRIMARY OUT", "ALWAYS" });
-static CatVar auto_vacc_pop_if_pyro(pyro_enum, "auto_vacc_fire_pop_pyro", "1",
-                                    "Pop if pyro is near",
-                                    "Defines Auto-Vacc behaviour with pyros");
-static CatVar auto_vacc_check_on_fire(CV_SWITCH, "auto_vacc_afterburn", "1",
-                                      "Anti-Afterburn");
-static CatVar auto_vacc_pyro_range(CV_INT, "auto_vacc_pyro_range", "450",
-                                   "Pyro Danger Range");
 
 int FireDangerValue(CachedEntity *patient)
 {
@@ -114,9 +131,8 @@ int FireDangerValue(CachedEntity *patient)
                 return 2;
             IClientEntity *pyro_weapon = g_IEntityList->GetClientEntity(
                 CE_INT(ent, netvar.hActiveWeapon) & 0xFFF);
-            return (pyro_weapon &&
-                    pyro_weapon->GetClientClass()->m_ClassID ==
-                        CL_CLASS(CTFFlameThrower))
+            return (pyro_weapon && pyro_weapon->GetClientClass()->m_ClassID ==
+                                       CL_CLASS(CTFFlameThrower))
                        ? 2
                        : 0;
         }
@@ -135,18 +151,6 @@ struct proj_data_s
 };
 
 std::vector<proj_data_s> proj_data_array;
-
-static CatVar auto_vacc_blast_health(CV_INT, "auto_vacc_blast_pop_health", "80",
-                                     "Pop Blast if rocket & HP <");
-static CatVar auto_vacc_blast_crit_pop(CV_SWITCH, "auto_vacc_blast_pop_crit",
-                                       "1", "Pop Blast if crit rocket near");
-static CatVar auto_vacc_blast_checking(CV_SWITCH, "auto_vacc_blast", "1",
-                                       "Check blast danger");
-static CatVar auto_vacc_proj_danger_range(CV_INT, "auto_vacc_rocket_range",
-                                          "650", "Rocket Danger Range",
-                                          "This range should be high enough to "
-                                          "give more time to change "
-                                          "resistances.");
 
 int BlastDangerValue(CachedEntity *patient)
 {
@@ -167,7 +171,7 @@ int BlastDangerValue(CachedEntity *patient)
             {
                 if (ent->m_bCritProjectile())
                     hasCritRockets = true;
-                hasRockets         = true;
+                hasRockets = true;
             }
             it++;
         }
@@ -209,21 +213,6 @@ int CurrentResistance()
         return 0;
     return CE_INT(LOCAL_W, netvar.m_nChargeResistType);
 }
-
-static CatVar change_timer(CV_INT, "auto_vacc_reset_timer", "200",
-                           "Reset Timer",
-                           "If no dangers were detected for # ticks, "
-                           "resistance will be reset to default, 0 to disable");
-
-static CatVar auto_vacc_bullet_pop_ubers(
-    CV_INT, "auto_vacc_bullet_pop_ubers", "0", "Pop Bullet if Ubers >=",
-    "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
-static CatVar auto_vacc_fire_pop_ubers(
-    CV_INT, "auto_vacc_fire_pop_ubers", "0", "Pop Fire if Ubers >=",
-    "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
-static CatVar auto_vacc_blast_pop_ubers(
-    CV_INT, "auto_vacc_blast_pop_ubers", "0", "Pop Blast if Ubers >=",
-    "Only pop an uber if you have >= # Ubercharges in your Vaccinator", 0, 4);
 
 bool IsProjectile(CachedEntity *ent)
 {
@@ -284,11 +273,6 @@ int OptimalResistance(CachedEntity *patient, bool *shouldPop)
     return -1;
 }
 
-static CatEnum resistances_enum({ "BULLET", "BLAST", "FIRE" });
-static CatVar default_resistance(resistances_enum, "auto_vacc_default_resist",
-                                 "0", "Default Resistance",
-                                 "Select default resistance type");
-
 void SetResistance(int resistance)
 {
     resistance              = _clamp(0, 2, resistance);
@@ -321,7 +305,7 @@ void DoResistSwitching()
         vaccinator_change_stage = 0;
         return;
     }
-    if (g_pUserCmd->buttons & IN_RELOAD)
+    if (current_user_cmd->buttons & IN_RELOAD)
     {
         vaccinator_change_ticks = 8;
         return;
@@ -330,7 +314,7 @@ void DoResistSwitching()
     {
         if (vaccinator_change_ticks <= 0)
         {
-            g_pUserCmd->buttons |= IN_RELOAD;
+            current_user_cmd->buttons |= IN_RELOAD;
             vaccinator_change_stage--;
             vaccinator_change_ticks = 8;
         }
@@ -428,9 +412,6 @@ bool IsVaccinator()
     return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 998;
 }
 
-static CatVar auto_vacc(CV_SWITCH, "auto_vacc", "0", "Auto Vaccinator",
-                        "Pick resistance for incoming damage types");
-
 void CreateMove()
 {
     bool pop = false;
@@ -444,10 +425,10 @@ void CreateMove()
         }
         if (pop && CurrentResistance() == my_opt)
         {
-            g_pUserCmd->buttons |= IN_ATTACK2;
+            current_user_cmd->buttons |= IN_ATTACK2;
         }
     }
-    if (!force_healing_target && !enabled)
+    if (!force_healing_target && !enable)
         return;
     if (GetWeaponMode() != weapon_medigun)
         return;
@@ -458,11 +439,11 @@ void CreateMove()
         {
             Vector out;
             GetHitbox(target, 7, out);
-            AimAt(g_pLocalPlayer->v_Eye, out, g_pUserCmd);
-            g_pUserCmd->buttons |= IN_ATTACK;
+            AimAt(g_pLocalPlayer->v_Eye, out, current_user_cmd);
+            current_user_cmd->buttons |= IN_ATTACK;
         }
     }
-    if (!enabled)
+    if (!enable)
         return;
     UpdateData();
     int old_target          = m_iCurrentHealingTarget;
@@ -471,7 +452,7 @@ void CreateMove()
         m_iNewTarget++;
     else
         m_iNewTarget = 0;
-    bool new_target  = (old_target != m_iCurrentHealingTarget);
+    bool new_target = (old_target != m_iCurrentHealingTarget);
     if (new_target)
     {
         m_iNewTarget = 1;
@@ -482,15 +463,15 @@ void CreateMove()
     Vector out;
     GetHitbox(target, 7, out);
 
-    AimAt(g_pLocalPlayer->v_Eye, out, g_pUserCmd);
+    AimAt(g_pLocalPlayer->v_Eye, out, current_user_cmd);
     if (silent)
         g_pLocalPlayer->bUseSilentAngles = true;
     if (!m_iNewTarget && (g_GlobalVars->tickcount % 300))
-        g_pUserCmd->buttons |= IN_ATTACK;
+        current_user_cmd->buttons |= IN_ATTACK;
     /*if (m_iNewTarget || !(g_GlobalVars->tickcount % 300)) {
         if (silent) g_pLocalPlayer->bUseSilentAngles = true;
-        AimAt(g_pLocalPlayer->v_Eye, out, g_pUserCmd);
-        g_pUserCmd->buttons |= IN_ATTACK;
+        AimAt(g_pLocalPlayer->v_Eye, out, current_user_cmd);
+        current_user_cmd->buttons |= IN_ATTACK;
     }*/
     if (IsVaccinator() && CE_GOOD(target) && auto_vacc)
     {
@@ -499,15 +480,14 @@ void CreateMove()
             SetResistance(opt);
         if (pop && CurrentResistance() == opt)
         {
-            g_pUserCmd->buttons |= IN_ATTACK2;
+            current_user_cmd->buttons |= IN_ATTACK2;
         }
     }
     else
     {
         if (pop_uber_auto && ShouldPop())
-            g_pUserCmd->buttons |= IN_ATTACK2;
+            current_user_cmd->buttons |= IN_ATTACK2;
     }
-    return;
 }
 
 std::vector<patient_data_s> data(32);
@@ -537,7 +517,7 @@ void UpdateData()
                     data[i].accum_damage += (last_health - health);
                     if (!data[i].accum_damage_start)
                         data[i].accum_damage_start = g_GlobalVars->curtime;
-                    data[i].last_damage            = g_GlobalVars->curtime;
+                    data[i].last_damage = g_GlobalVars->curtime;
                 }
             }
         }
@@ -596,18 +576,18 @@ int HealingPriority(int idx)
 #if ENABLE_IPC
     if (ipc::peer)
     {
-        if (hacks::shared::followbot::followbot &&
-            hacks::shared::followbot::follow_target == idx)
+        if (hacks::shared::followbot::isEnabled() &&
+            hacks::shared::followbot::getTarget() == idx)
         {
             priority *= 6.0f;
         }
     }
 #endif
-    player_info_s info;
-    g_IEngine->GetPlayerInfo(idx, &info);
-    info.name[31] = 0;
-    if (strcasestr(info.name, ignore.GetString()))
-        priority = 0.0f;
+    /*    player_info_s info;
+        g_IEngine->GetPlayerInfo(idx, &info);
+        info.name[31] = 0;
+        if (strcasestr(info.name, ignore.GetString()))
+            priority = 0.0f;*/
     return priority;
 }
 
@@ -635,4 +615,4 @@ bool CanHeal(int idx)
         return false;
     return true;
 }
-}
+} // namespace hacks::tf::autoheal

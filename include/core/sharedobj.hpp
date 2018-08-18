@@ -52,4 +52,4 @@ SharedObject &libsdl();
 #endif
 
 void LoadAllSharedObjects();
-}
+} // namespace sharedobj

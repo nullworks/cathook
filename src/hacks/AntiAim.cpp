@@ -7,60 +7,39 @@
 
 #include <hacks/hacklist.hpp>
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
+#include <hacks/AntiAim.hpp>
+
 #include "common.hpp"
+
+static settings::Bool enable{ "antiaim.enable", "0" };
+static settings::Bool crouch{ "antiaim.crouch", "0" };
+static settings::Int dur{ "antiaim.crouch.dur", "15" };
+static settings::Int dursneak{ "antiaim.crouch.dursneak", "15" };
+static settings::Float yaw{ "antiaim.yaw.static", "0" };
+static settings::Int yaw_mode{ "antiaim.yaw.mode", "0" };
+
+static settings::Float pitch{ "antiaim.pitch.static", "0" };
+static settings::Int pitch_mode{ "antiaim.pitch.mode", "0" };
+
+static settings::Float roll{ "antiaim.roll", "0" };
+static settings::Bool no_clamping{ "antiaim.no-clamp", "0" };
+static settings::Float spin{ "antiaim.spin-speed", "10" };
+
+static settings::Bool aaaa_enable{ "antiaim.aaaa.enable", "0" };
+static settings::Float aaaa_interval{ "antiaim.aaaa.interval.seconds", "0" };
+static settings::Float aaaa_interval_random_high{
+    "antiaim.aaaa.interval.random-high", "10"
+};
+static settings::Float aaaa_interval_random_low{
+    "antiaim.aaaa.interval.random-low", "2"
+};
+static settings::Int aaaa_mode{ "antiaim.aaaa.mode", "0" };
+static settings::Button aaaa_flip_key{ "antiaim.aaaa.flip-key", "<null>" };
 
 namespace hacks::shared::antiaim
 {
-CatVar communicate(CV_SWITCH, "identify", "0", "identify",
-                   "Auto identify for other cathook users");
-CatVar enabled(CV_SWITCH, "aa_enabled", "0", "Anti-Aim",
-               "Master AntiAim switch");
-CatVar draw_fakes(CV_SWITCH, "aa_drawfakes", "1", "Draw Fakes",
-                  "Draw a nice box around the head hitboxes");
-static CatVar crouch(CV_SWITCH, "aa_fakecrouch", "0", "Fake Crouch",
-                     "Fake crouch");
-static CatVar yaw(CV_FLOAT, "aa_yaw", "0.0", "Yaw", "Static yaw (left/right)",
-                  360.0);
-static CatVar pitch(CV_FLOAT, "aa_pitch", "-89.0", "Pitch",
-                    "Static pitch (up/down)", -89.0, 89.0);
-static CatEnum yaw_mode_enum({ "KEEP",           "STATIC",     "JITTER",
-                               "BIGRANDOM",      "RANDOM",     "SPIN",
-                               "OFFSETKEEP",     "EDGE",       "HECK",
-                               "FAKEKEEP",       "FAKESTATIC", "FAKEJITTER",
-                               "FAKEBIGRANDOM",  "FAKERANDOM", "FAKESPIN",
-                               "FAKEOFFSETKEEP", "FAKEEDGE",   "FAKEHECK",
-                               "FAKESIDEWAYS",   "FAKELEFT",   "FAKERIGHT",
-                               "FAKEREVERSEEDGE" });
-static CatEnum pitch_mode_enum({ "KEEP", "STATIC", "JITTER", "RANDOM", "FLIP",
-                                 "FAKEFLIP", "FAKEUP", "FAKEDOWN", "FAKECENTER",
-                                 "UP", "DOWN", "HECK" });
-CatVar yaw_mode(yaw_mode_enum, "aa_yaw_mode", "0", "Yaw mode", "Yaw mode");
-static CatVar pitch_mode(pitch_mode_enum, "aa_pitch_mode", "0", "Pitch mode",
-                         "Pitch mode");
-static CatVar roll(CV_FLOAT, "aa_roll", "0", "Roll",
-                   "Roll angle (viewangles.z)", -180, 180);
-static CatVar
-    no_clamping(CV_SWITCH, "aa_no_clamp", "0", "Don't clamp angles",
-                "Use this with STATIC mode for unclamped manual angles");
-static CatVar spin(CV_FLOAT, "aa_spin", "10.0", "Spin speed",
-                   "Spin speed (degrees/second)");
 
-static CatVar aaaa_enabled(CV_SWITCH, "aa_aaaa_enabled", "0", "Enable AAAA",
-                           "Enable Anti-Anti-Anti-Aim (Overrides AA Pitch)");
-static CatVar aaaa_interval(CV_FLOAT, "aa_aaaa_interval", "0", "Interval",
-                            "Interval in seconds, 0 = random");
-static CatVar aaaa_interval_random_high(CV_FLOAT, "aa_aaaa_interval_high", "15",
-                                        "Interval Ceiling",
-                                        "Upper bound for random AAAA interval");
-static CatVar aaaa_interval_random_low(CV_FLOAT, "aa_aaaa_interval_low", "3",
-                                       "Interval Floor",
-                                       "Lower bound for random AAAA interval");
-static CatEnum aaaa_modes_enum({ "(FAKE)UP", "(FAKE)DOWN", "(FAKE)CENTER" });
-static CatVar aaaa_mode(aaaa_modes_enum, "aa_aaaa_mode", "0", "Mode",
-                        "Anti-Anti-Anti-Aim Mode");
-static CatVar aaaa_flip_key(CV_KEY, "aa_aaaa_flip_key", "0", "Flip key",
-                            "If you press that key, current AA will change");
-static CatVar test(CV_KEY, "aa_test", "0", "debug", "test");
 float cur_yaw  = 0.0f;
 int safe_space = 0;
 
@@ -108,7 +87,7 @@ void NextAAAA()
 
 void UpdateAAAAKey()
 {
-    if (g_IInputSystem->IsButtonDown((ButtonCode_t)(int) aaaa_flip_key))
+    if (aaaa_flip_key.isKeyDown())
     {
         if (!aaaa_key_pressed)
         {
@@ -359,7 +338,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) -90;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 90;
-        edgeTest    = false;
+        edgeTest = false;
     }
     if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true)
     {
@@ -367,7 +346,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 0;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 179;
-        edgeTest    = false;
+        edgeTest = false;
     }
     if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true)
     {
@@ -375,7 +354,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 90;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) -90;
-        edgeTest    = false;
+        edgeTest = false;
     }
     if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true)
     {
@@ -383,7 +362,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 179;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 0;
-        edgeTest    = false;
+        edgeTest = false;
     }
     // return with the angle choosen
     return edgeYaw;
@@ -394,39 +373,38 @@ int val       = 0;
 int value[32] = { 0 };
 void FakeCrouch(CUserCmd *cmd)
 {
-    if (!crouch)
+    if (!crouch || !(cmd->buttons & IN_DUCK))
         return;
-    if (cmd->buttons & IN_ATTACK)
-    {
-        *bSendPackets = true;
-        return;
-    }
-    static bool bDuck = false;
+    static bool bDoCrouch   = false;
+    static int iCrouchCount = 0;
 
-    static int waittime = 0;
-
-    if (waittime)
+    if (iCrouchCount == *dur)
     {
-        waittime--;
-        return;
-    }
-    bDuck = !bDuck;
-
-    if (bDuck)
-    {
-        cmd->buttons |= IN_DUCK;
-        *bSendPackets = false;
-        waittime      = 15;
+        iCrouchCount = 0;
+        bDoCrouch    = !bDoCrouch;
     }
     else
     {
-        cmd->buttons &= ~IN_DUCK;
+        iCrouchCount++;
+    }
+    if (bDoCrouch)
+    {
+        cmd->buttons |= IN_DUCK;
         *bSendPackets = true;
     }
+    else
+    {
+        if (iCrouchCount + *dursneak < *dur)
+            cmd->buttons &= ~IN_DUCK;
+        *bSendPackets = false;
+    }
+
+    if ((cmd->buttons & IN_ATTACK))
+        *bSendPackets = true;
 }
 void ProcessUserCmd(CUserCmd *cmd)
 {
-    if (!enabled)
+    if (!enable)
     {
         *bSendPackets = true;
         return;
@@ -440,13 +418,6 @@ void ProcessUserCmd(CUserCmd *cmd)
     static bool flip      = false;
     static bool bsendflip = true;
     bool clamp            = !no_clamping;
-    if (test)
-    {
-        cmd->viewangles.x                = FLT_MAX;
-        cmd->viewangles.y                = FLT_MAX;
-        g_pLocalPlayer->bUseSilentAngles = true;
-        return;
-    }
     switch ((int) yaw_mode)
     {
     case 1: // FIXED
@@ -468,10 +439,10 @@ void ProcessUserCmd(CUserCmd *cmd)
     case 5: // SPIN
         cur_yaw += (float) spin;
         if (cur_yaw > 180)
-            cur_yaw = -180;
+            cur_yaw += -180;
         if (cur_yaw < -180)
-            cur_yaw = 180;
-        y           = cur_yaw;
+            cur_yaw += 180;
+        y = cur_yaw;
         break;
     case 6: // OFFSETKEEP
         y += (float) yaw;
@@ -490,10 +461,10 @@ void ProcessUserCmd(CUserCmd *cmd)
         {
             cur_yaw += (float) spin;
             if (cur_yaw > 180)
-                cur_yaw = -180;
+                cur_yaw += -180;
             if (cur_yaw < -180)
-                cur_yaw = 180;
-            y           = cur_yaw;
+                cur_yaw += 180;
+            y = cur_yaw;
         }
         else if (!keepmode && !*bSendPackets)
         {
@@ -534,10 +505,10 @@ void ProcessUserCmd(CUserCmd *cmd)
         {
             cur_yaw += (float) spin;
             if (cur_yaw > 180)
-                cur_yaw = -180;
+                cur_yaw += -180;
             if (cur_yaw < -180)
-                cur_yaw = 180;
-            y           = cur_yaw;
+                cur_yaw += 180;
+            y = cur_yaw;
         }
         break;
     case 15: // Fake offsetkeep
@@ -628,7 +599,7 @@ void ProcessUserCmd(CUserCmd *cmd)
         fClampAngle(cmd->viewangles);
     if (roll)
         cmd->viewangles.z = float(roll);
-    if (aaaa_enabled)
+    if (aaaa_enable)
     {
         UpdateAAAAKey();
         UpdateAAAATimer();
@@ -637,4 +608,9 @@ void ProcessUserCmd(CUserCmd *cmd)
     g_pLocalPlayer->bUseSilentAngles = true;
     FakeCrouch(cmd);
 }
+
+bool isEnabled()
+{
+    return *enable;
 }
+} // namespace hacks::shared::antiaim

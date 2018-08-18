@@ -6,12 +6,14 @@
  */
 
 #include <hacks/AntiCheat.hpp>
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool enable{ "find-cheaters.antiaim.enable", "true" };
 
 namespace ac::antiaim
 {
 
-static CatVar enabled(CV_SWITCH, "ac_antiaim", "1", "Detect Antiaim");
 unsigned long last_accusation[32]{ 0 };
 
 void ResetEverything()
@@ -31,7 +33,7 @@ void Init()
 
 void Update(CachedEntity *player)
 {
-    if (!enabled)
+    if (!enable)
         return;
     int amount[32];
     auto &am = amount[player->m_IDX - 1];
@@ -73,4 +75,4 @@ void Update(CachedEntity *player)
 void Event(KeyValues *event)
 {
 }
-}
+} // namespace ac::antiaim

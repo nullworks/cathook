@@ -1,0 +1,117 @@
+<Tab name="Aimbot" padding="6 6 6 6">
+    <Box padding="6 6 6 6" width="content" height="content">
+        <List width="150">
+            <AutoVariable width="fill" target="aimbot.enable" label="Enable Aimbot"/>
+            <AutoVariable width="fill" target="aimbot.backtrack" label="Backtracking"/>
+            <AutoVariable width="fill" target="aimbot.aimkey.button" label="Aimkey"/>
+            <LabeledObject width="fill" label="Aimkey mode">
+                <Select target="aimbot.aimkey.mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Pressed" value="1"/>
+                    <Option name="Not pressed" value="2"/>
+                    <Option name="Toggle" value="3"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="aimbot.autoshoot" label="Autoshoot"/>
+            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Disguised autoshoot"/>
+            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge"/>
+            <AutoVariable width="fill" target="aimbot.can-shoot-only" label="CanShoot check"/>
+            <AutoVariable width="fill" target="aimbot.silent" label="Silent"/>
+            <AutoVariable width="fill" target="aimbot.fov" label="FOV"/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV Circle"/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity"/>
+            <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"/>
+            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto spin-up"/>
+            <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"/>
+            <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"/>
+            <LabeledObject width="fill" label="Hitbox">
+                <Select target="aimbot.hitbox">
+                    <Option name="Head" value="0"/>
+                    <Option name="Pelvis" value="1"/>
+                    <Option name="Spine 0" value="2"/>
+                    <Option name="Spine 1" value="3"/>
+                    <Option name="Spine 2" value="4"/>
+                    <Option name="Spine 3" value="5"/>
+                    <Option name="Upper left arm" value="6"/>
+                    <Option name="Lower left arm" value="7"/>
+                    <Option name="Left hand" value="8"/>
+                    <Option name="Upper right arm" value="9"/>
+                    <Option name="Lower right arm" value="10"/>
+                    <Option name="Right hand" value="11"/>
+                    <Option name="Left hip" value="12"/>
+                    <Option name="Left knee" value="13"/>
+                    <Option name="Left Foot" value="14"/>
+                    <Option name="Right Hip" value="15"/>
+                    <Option name="Right Knee" value="16"/>
+                    <Option name="Right Foot" value="17"/>
+                </Select>
+            </LabeledObject>
+            <LabeledObject width="fill" label="Hitbox Mode">
+                <Select target="aimbot.hitbox-mode">
+                    <Option name="Auto" value="0"/>
+                    <Option name="Auto closest" value="1"/>
+                    <Option name="Static" value="2"/>
+                </Select>
+            </LabeledObject>
+        </List>
+        <List width="200" x="162">
+            <AutoVariable width="fill" target="aimbot.lock-target" label="Lock Target"/>
+            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss chance"/>
+            <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
+            <LabeledObject width="fill" label="Priority Mode">
+                <Select target="aimbot.priority-mode">
+                    <Option name="Smart" value="0"/>
+                    <Option name="FOV" value="1"/>
+                    <Option name="Distance" value="2"/>
+                    <Option name="Health" value="3"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="aimbot.target.max-range" label="Max Range" min="0" max="4096"/>
+            <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable Projectile Aimbot"/>
+            <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Arrow autoshoot charge"/>
+            <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky autoshoot charge"/>
+            <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
+            <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
+            <AutoVariable width="fill" target="aimbot.debug" label="Debug"/>
+            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug Engine PP"/>
+            <AutoVariable width="fill" target="aimbot.slow" label="Slow Aimbot"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Target Options" x="380">
+        <List width="150">
+            <AutoVariable width="fill" target="aimbot.target.sentry" label="Sentry guns"/>
+            <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Stickybombs"/>
+            <LabeledObject width="fill" label="Target Team">
+                <Select target="aimbot.target.teammates">
+                    <Option name="Enemies" value="0"/>
+                    <Option name="Teammates" value="1"/>
+                    <Option name="All" value="2"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="NOT Cloaked Spies"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="NOT Dead Ringer Spies"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="NOT Vaccinator"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only"/>
+            <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Other buildings"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Backtrack" y="140" x="380">
+        <List width="150">
+            <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtrack"/>
+            <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>
+            <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000"/>
+            <LabeledObject width="fill" label="Backtrack Slots">
+                <Select target="backtrack.slots">
+                    <Option name="All" value="0"/>
+                    <Option name="Primary" value="1"/>
+                    <Option name="Secondary" value="2"/>
+                    <Option name="Melee" value="3"/>
+                    <Option name="Primary + Secondary" value="4"/>
+                    <Option name="Primary + Melee" value="5"/>
+                    <Option name="Secondary + Melee" value="6"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+</Tab>

@@ -13,7 +13,6 @@ namespace hitrate
 extern int count_shots;
 extern int count_hits;
 extern int count_hits_head;
-extern CatVar hitrate_check;
 
 void Update();
-}
+} // namespace hitrate

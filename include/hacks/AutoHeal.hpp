@@ -11,7 +11,7 @@
 
 namespace hacks::tf::autoheal
 {
-// TODO extern CatVar target_only;
+
 void CreateMove();
 
 struct patient_data_s
@@ -30,4 +30,4 @@ void UpdateData();
 int BestTarget();
 int HealingPriority(int idx);
 bool CanHeal(int idx);
-}
+} // namespace hacks::tf::autoheal

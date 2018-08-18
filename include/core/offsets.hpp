@@ -70,6 +70,10 @@ struct offsets
     {
         return PlatformOffset(4, undefined, undefined);
     }
+    static constexpr uint32_t ProcessMovement()
+    {
+        return PlatformOffset(1, undefined, undefined);
+    }
     static constexpr uint32_t ProcessGetCvarValue()
     {
         return PlatformOffset(29, undefined, undefined);
@@ -164,7 +168,7 @@ struct offsets
     }
     static constexpr uint32_t PreDataUpdate()
     {
-    	return PlatformOffset(14, undefined, undefined);
+        return PlatformOffset(14, undefined, undefined);
     }
     static constexpr uint32_t Paint()
     {

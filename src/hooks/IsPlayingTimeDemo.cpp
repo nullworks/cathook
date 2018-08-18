@@ -16,4 +16,4 @@ DEFINE_HOOKED_METHOD(IsPlayingTimeDemo, bool)
     else
         return original::IsPlayingTimeDemo();
 }
-}
+} // namespace hooked_methods

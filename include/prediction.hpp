@@ -1,9 +1,9 @@
 /*
-*prediction.h
-*
-* Created on: Dec 5, 2016
-*     Author: nullifiedcat
-*/
+ *prediction.h
+ *
+ * Created on: Dec 5, 2016
+ *     Author: nullifiedcat
+ */
 
 #pragma once
 

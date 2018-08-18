@@ -13,4 +13,4 @@ DEFINE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *this_,
 {
     return original::FireEventClientSide(this_, event);
 }
-}
+} // namespace hooked_methods

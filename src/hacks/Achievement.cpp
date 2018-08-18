@@ -5,13 +5,13 @@
  *      Author: nullifiedcat
  */
 
+#include <settings/Bool.hpp>
 #include "common.hpp"
+
+static settings::Bool safety{ "achievement.safety", "true" };
 
 namespace hacks::tf2::achievement
 {
-
-static CatVar safety(CV_SWITCH, "achievement_safety", "1",
-                     "Achievement commands safety switch");
 
 void Lock()
 {
@@ -89,25 +89,27 @@ CatCommand unlock_single("achievement_unlock_single",
                              }
                          });
 // For some reason it SEGV's when I try to GetAchievementByID();
-CatCommand
-    lock_single("achievement_lock_single", "Locks single achievement by INDEX!",
-                [](const CCommand &args) {
-                    char *out = nullptr;
-                    int index = atoi(args.Arg(1));
-                    if (out == args.Arg(1))
-                    {
-                        logging::Info("NaN achievement INDEX!");
-                        return;
-                    }
-                    IAchievement *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByIndex(index));
-                    if (ach)
-                    {
-                        g_ISteamUserStats->RequestCurrentStats();
-                        g_ISteamUserStats->ClearAchievement(g_IAchievementMgr->GetAchievementByIndex(index)->GetName());
-                        g_ISteamUserStats->StoreStats();
-                        g_ISteamUserStats->RequestCurrentStats();
-                    }
-                });
+CatCommand lock_single(
+    "achievement_lock_single", "Locks single achievement by INDEX!",
+    [](const CCommand &args) {
+        char *out = nullptr;
+        int index = atoi(args.Arg(1));
+        if (out == args.Arg(1))
+        {
+            logging::Info("NaN achievement INDEX!");
+            return;
+        }
+        IAchievement *ach = reinterpret_cast<IAchievement *>(
+            g_IAchievementMgr->GetAchievementByIndex(index));
+        if (ach)
+        {
+            g_ISteamUserStats->RequestCurrentStats();
+            g_ISteamUserStats->ClearAchievement(
+                g_IAchievementMgr->GetAchievementByIndex(index)->GetName());
+            g_ISteamUserStats->StoreStats();
+            g_ISteamUserStats->RequestCurrentStats();
+        }
+    });
 CatCommand lock("achievement_lock", "Lock all achievements", Lock);
 CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
-}
+} // namespace hacks::tf2::achievement

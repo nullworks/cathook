@@ -6,29 +6,29 @@
  */
 
 #include "common.hpp"
+#include "hacks/Aimbot.hpp"
 #include "hacks/Backtrack.hpp"
 #include <boost/circular_buffer.hpp>
 #include <glez/draw.hpp>
+#include <settings/Bool.hpp>
+#include <hacks/Backtrack.hpp>
+
+static settings::Bool enable{ "backtrack.enable", "false" };
+static settings::Bool draw_bt{ "backtrack.draw", "false" };
+static settings::Int latency{ "backtrack.latency", "0" };
+static settings::Float mindistance{ "backtrack.min-distance", "60" };
+static settings::Int slots{ "backtrack.slots", "0" };
+
 namespace hacks::shared::backtrack
 {
-CatVar enable(CV_SWITCH, "backtrack", "0", "Enable backtrack",
-              "For legit play only as of right now.");
-static CatVar draw_bt(CV_SWITCH, "backtrack_draw", "0", "Draw",
-                      "Draw backtrack ticks");
-CatVar latency(CV_FLOAT, "backtrack_latency", "0", "fake lantency",
-               "Set fake latency to this many ms");
-static CatVar mindistance(CV_FLOAT, "mindistance", "60", "mindistance");
-static CatEnum slots_enum({ "All", "Primary", "Secondary", "Melee",
-                            "Primary Secondary", "Primary Melee",
-                            "Secondary Melee" });
-static CatVar slots(slots_enum, "backtrack_slots", "0", "Enabled Slots",
-                    "Select what slots backtrack should be enabled on.");
+void EmptyBacktrackData(BacktrackData &i);
+std::pair<int, int> getBestEntBestTick();
+bool shouldBacktrack();
 
 BacktrackData headPositions[32][66]{};
-BestTickData sorted_ticks[66]{};
 int highesttick[32]{};
 int lastincomingsequencenumber = 0;
-static bool shouldDrawBt;
+bool isBacktrackEnabled        = false;
 
 circular_buf sequences{ 2048 };
 void UpdateIncomingSequences()
@@ -51,6 +51,8 @@ void UpdateIncomingSequences()
 }
 void AddLatencyToNetchan(INetChannel *ch, float Latency)
 {
+    if (!isBacktrackEnabled)
+        return;
     if (Latency > 200.0f)
         Latency -= ch->GetLatency(MAX_FLOWS);
     for (auto &seq : sequences)
@@ -63,50 +65,43 @@ void AddLatencyToNetchan(INetChannel *ch, float Latency)
         }
     }
 }
-bool installed = false;
-int ticks      = 12;
 void Init()
 {
     for (int i = 0; i < 32; i++)
         for (int j = 0; j < 66; j++)
-            headPositions[i][j] =
-                BacktrackData{ 0,           { 0, 0, 0 }, { 0, 0, 0 },
-                               { 0, 0, 0 }, { 0, 0, 0 }, 0,
-                               0,           { 0, 0, 0 } };
-    if (!installed)
-    {
-        latency.InstallChangeCallback(
-            [](IConVar *var, const char *pszOldValue, float flOldValue) {
-                ticks = max(min(int((float) latency) / 15, 65), 12);
-            });
-        installed = true;
-    }
+            EmptyBacktrackData(headPositions[i][j]);
 }
 
 int BestTick    = 0;
 int iBestTarget = -1;
+bool istickvalid[32][66]{};
+bool istickinvalid[32][66]{};
 void Run()
 {
-    if (!enable)
+    if (!shouldBacktrack())
+    {
+        isBacktrackEnabled = false;
         return;
+    }
+    isBacktrackEnabled = true;
 
     if (CE_BAD(LOCAL_E))
         return;
 
-    if (!shouldBacktrack())
-    {
-        shouldDrawBt = false;
-        return;
-    }
-    shouldDrawBt = true;
-
-    CUserCmd *cmd = g_pUserCmd;
+    for (auto &a : istickvalid)
+        for (auto &b : a)
+            b = false;
+    for (auto &a : istickinvalid)
+        for (auto &b : a)
+            b = false;
+    CUserCmd *cmd = current_user_cmd;
     float bestFov = 99999;
-    BestTick      = 0;
-    iBestTarget   = -1;
-    bool IsMelee  = GetWeaponMode() == weapon_melee;
 
     float prev_distance = 9999;
+
+    auto bestEntBestTick = getBestEntBestTick();
+    BestTick             = bestEntBestTick.second;
+    iBestTarget          = bestEntBestTick.first;
 
     for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
     {
@@ -115,9 +110,7 @@ void Run()
         if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
         {
             for (BacktrackData &btd : headPositions[i])
-                btd = BacktrackData{ 0,           { 0, 0, 0 }, { 0, 0, 0 },
-                                     { 0, 0, 0 }, { 0, 0, 0 }, 0,
-                                     0,           { 0, 0, 0 } };
+                EmptyBacktrackData(btd);
             continue;
         }
         if (pEntity->m_iTeam() == LOCAL_E->m_iTeam())
@@ -126,122 +119,65 @@ void Run()
             continue;
         if (!pEntity->hitboxes.GetHitbox(0))
             continue;
-        Vector hitboxpos = pEntity->hitboxes.GetHitbox(0)->center;
-        Vector min       = pEntity->hitboxes.GetHitbox(0)->min;
-        Vector max       = pEntity->hitboxes.GetHitbox(0)->max;
-        float _viewangles =
-            NET_VECTOR(RAW_ENT(pEntity), netvar.m_angEyeAngles).y;
+        float _viewangles = CE_VECTOR(pEntity, netvar.m_angEyeAngles).y;
         float viewangles =
             (_viewangles > 180) ? _viewangles - 360 : _viewangles;
-        float simtime       = CE_FLOAT(pEntity, netvar.m_flSimulationTime);
-        Vector hitbox_spine = pEntity->hitboxes.GetHitbox(3)->center;
-        Vector ent_orig     = pEntity->InternalEntity()->GetAbsOrigin();
+        float simtime = CE_FLOAT(pEntity, netvar.m_flSimulationTime);
+        std::array<hitboxData, 18> hbdArray;
+        for (size_t i = 0; i < hbdArray.max_size(); i++)
+        {
+            hbdArray.at(i).center = pEntity->hitboxes.GetHitbox(i)->center;
+            hbdArray.at(i).min    = pEntity->hitboxes.GetHitbox(i)->min;
+            hbdArray.at(i).max    = pEntity->hitboxes.GetHitbox(i)->max;
+        }
+        Vector ent_orig = pEntity->InternalEntity()->GetAbsOrigin();
         auto hdr = g_IModelInfo->GetStudiomodel(RAW_ENT(pEntity)->GetModel());
-        headPositions[i][cmd->command_number % ticks] =
-            BacktrackData{ cmd->tick_count, hitboxpos,  min,     max,
-                           hitbox_spine,    viewangles, simtime, ent_orig };
-        float FOVDistance = GetFov(g_pLocalPlayer->v_OrigViewangles,
-                                   g_pLocalPlayer->v_Eye, hitboxpos);
-        float distance = g_pLocalPlayer->v_Eye.DistTo(hitbox_spine);
-        if (!IsMelee && bestFov > FOVDistance && FOVDistance < 60.0f)
-        {
-            bestFov     = FOVDistance;
-            iBestTarget = i;
-        }
-        if (IsMelee && distance < prev_distance)
-        {
-            prev_distance = distance;
-            iBestTarget   = i;
-        }
+        headPositions[i][cmd->command_number % getTicks()] =
+            BacktrackData{ cmd->tick_count, hbdArray,
+                           viewangles,      simtime,
+                           ent_orig,        cmd->command_number % getTicks() };
     }
     if (iBestTarget != -1 && CanShoot())
     {
-        int bestTick  = 0;
-        float tempFOV = 9999;
-        float bestFOV = 180.0f;
-        float distance, prev_distance_ticks = 9999;
-
-        for (int i          = 0; i < ticks; ++i)
-            sorted_ticks[i] = BestTickData{ INT_MAX, i };
-        for (int t = 0; t < ticks; ++t)
+        CachedEntity *tar = ENTITY(iBestTarget);
+        if (CE_GOOD(tar))
         {
-            if (headPositions[iBestTarget][t].tickcount)
-                sorted_ticks[t] =
-                    BestTickData{ headPositions[iBestTarget][t].tickcount, t };
-        }
-        std::sort(sorted_ticks, sorted_ticks + ticks);
-        int tickus = (float(latency) > 800.0f || float(latency) < 200.0f) ? 12 : 24;
-        for (int t = 0; t < ticks; ++t)
-        {
-            bool good_tick = false;
-
-            for (int i = 0; i < tickus; ++i)
-                if (t == sorted_ticks[i].tick &&
-                    sorted_ticks[i].tickcount != INT_MAX &&
-                    sorted_ticks[i].tickcount)
-                    good_tick = true;
-            if (!good_tick)
-                continue;
-            tempFOV =
-                GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye,
-                       headPositions[iBestTarget][t].hitboxpos);
-            if (IsMelee)
+            if (cmd->buttons & IN_ATTACK)
             {
-                distance = g_pLocalPlayer->v_Eye.DistTo(
-                    headPositions[iBestTarget][t].origin);
-                if (distance < (float) mindistance)
-                    continue;
-                if (distance < prev_distance_ticks && tempFOV < 90.0f)
-                    prev_distance_ticks = distance, bestTick = t;
+                // ok just in case
+                if (CE_BAD(tar))
+                    return;
+                auto i          = headPositions[iBestTarget][BestTick];
+                cmd->tick_count = i.tickcount;
+                Vector &angles =
+                    NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
+                float &simtime =
+                    NET_FLOAT(RAW_ENT(tar), netvar.m_flSimulationTime);
+                angles.y = i.viewangles;
+                simtime  = i.simtime;
             }
-            else
-            {
-                if (bestFOV > tempFOV)
-                    bestTick = t, bestFOV = tempFOV;
-            }
-        }
-
-        BestTick = bestTick;
-        if (cmd->buttons & IN_ATTACK)
-        {
-            CachedEntity *tar = ENTITY(iBestTarget);
-            // ok just in case
-            if (CE_BAD(tar))
-                return;
-            auto i          = headPositions[iBestTarget][bestTick];
-            cmd->tick_count = i.tickcount;
-            Vector &angles  = NET_VECTOR(RAW_ENT(tar), netvar.m_angEyeAngles);
-            float &simtime = NET_FLOAT(RAW_ENT(tar), netvar.m_flSimulationTime);
-            angles.y       = i.viewangles;
-            simtime        = i.simtime;
         }
     }
 }
 void Draw()
 {
 #if ENABLE_VISUALS
-    if (!enable)
+    if (!isBacktrackEnabled)
         return;
     if (!draw_bt)
         return;
-    if (!shouldDrawBt)
-        return;
-    int tickus = (float(latency) > 800.0f || float(latency) < 200.0f) ? 12 : 24;
     for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
     {
-        for (int j = 0; j < ticks; j++)
+        CachedEntity *ent = ENTITY(i);
+        if (CE_BAD(ent))
+            continue;
+        for (int j = 0; j < getTicks(); j++)
         {
-            bool good_tick = false;
-
-            for (int i = 0; i < tickus; ++i)
-                if (j == sorted_ticks[i].tick)
-                    good_tick = true;
-            if (!good_tick)
+            if (!ValidTick(headPositions[i][j], ent))
                 continue;
-            auto hbpos    = headPositions[i][j].hitboxpos;
-            auto tickount = headPositions[i][j].tickcount;
-            auto min      = headPositions[i][j].min;
-            auto max      = headPositions[i][j].max;
+            auto hbpos = headPositions[i][j].hitboxes.at(head).center;
+            auto min   = headPositions[i][j].hitboxes.at(head).min;
+            auto max   = headPositions[i][j].hitboxes.at(head).max;
             if (!hbpos.x && !hbpos.y && !hbpos.z)
                 continue;
             Vector out;
@@ -265,10 +201,15 @@ void Draw()
 #endif
 }
 
+// Internal only, use isBacktrackEnabled var instead
 bool shouldBacktrack()
 {
-    int slot =
-        re::C_BaseCombatWeapon::GetSlot(RAW_ENT(g_pLocalPlayer->weapon()));
+    if (!*enable)
+        return false;
+    CachedEntity *wep = g_pLocalPlayer->weapon();
+    if (CE_BAD(wep))
+        return false;
+    int slot = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(wep));
     switch ((int) slots)
     {
     case 0:
@@ -301,4 +242,112 @@ bool shouldBacktrack()
     }
     return false;
 }
+
+float getLatency()
+{
+    return *latency;
 }
+
+int getTicks()
+{
+    return max(min(int(*latency / 200.0f * 13.0f) + 12, 65), 12);
+}
+
+bool ValidTick(BacktrackData &i, CachedEntity *ent)
+{
+    if (istickvalid[ent->m_IDX][i.index])
+        return true;
+    if (istickinvalid[ent->m_IDX][i.index])
+        return false;
+    if (hacks::shared::aimbot::IsBacktracking()) {
+        if (IsVectorVisible(g_pLocalPlayer->v_Eye, i.hitboxes[head].center, true))
+            if (fabsf(NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) * 1000.0f -
+                      getLatency() - i.simtime * 1000.0f) <= 200.0f) {
+                istickvalid[ent->m_IDX][i.index] = true;
+                return true;
+            }
+    }
+    else if (fabsf(NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) * 1000.0f -
+              getLatency() - i.simtime * 1000.0f) <= 200.0f) {
+        istickvalid[ent->m_IDX][i.index] = true;
+        return true;
+    }
+    istickinvalid[ent->m_IDX][i.index] = true;
+    return false;
+}
+
+void EmptyBacktrackData(BacktrackData &i)
+{
+    i = {};
+}
+
+// This func is internal only
+std::pair<int, int> getBestEntBestTick()
+{
+    int bestEnt  = -1;
+    int bestTick = -1;
+    if (GetWeaponMode() == weapon_melee)
+    {
+        float bestDist = 9999.0f;
+        for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
+        {
+            CachedEntity *tar = ENTITY(i);
+            if (CE_GOOD(tar))
+            {
+                if (tar != LOCAL_E && tar->m_bEnemy())
+                {
+
+                    for (int j = 0; j < getTicks(); j++)
+                    {
+                        if (ValidTick(headPositions[i][j], ENTITY(i)))
+                        {
+                            float dist =
+                                headPositions[i][j]
+                                    .hitboxes.at(spine_3)
+                                    .center.DistTo(g_pLocalPlayer->v_Eye);
+                            if (dist < bestDist && dist > *mindistance)
+                            {
+                                bestEnt  = i;
+                                bestTick = j;
+                                bestDist = dist;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        float bestFov = 180.0f;
+        for (int i = 0; i < g_IEngine->GetMaxClients(); i++)
+        {
+            CachedEntity *tar = ENTITY(i);
+            if (CE_GOOD(tar))
+            {
+                if (tar != LOCAL_E && tar->m_bEnemy())
+                {
+                    for (int j = 0; j < getTicks(); j++)
+                    {
+                        if (ValidTick(headPositions[i][j], tar))
+                        {
+                            float FOVDistance = GetFov(
+                                g_pLocalPlayer->v_OrigViewangles,
+                                g_pLocalPlayer->v_Eye,
+                                headPositions[i][j].hitboxes.at(head).center);
+                            if (bestFov > FOVDistance)
+                            {
+                                bestFov  = FOVDistance;
+                                bestEnt  = i;
+                                bestTick = j;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return std::make_pair(bestEnt, bestTick);
+}
+
+} // namespace hacks::shared::backtrack

@@ -20,4 +20,4 @@ public:
         return false;
     }
 };
-}
+} // namespace re

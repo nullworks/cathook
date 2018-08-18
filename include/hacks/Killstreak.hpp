@@ -17,4 +17,4 @@ void init();
 void shutdown();
 void fire_event(IGameEvent *event);
 void apply_killstreaks();
-}
+} // namespace hacks::tf2::killstreak

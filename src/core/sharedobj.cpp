@@ -169,4 +169,4 @@ SharedObject &libsdl()
     return obj;
 }
 #endif
-}
+} // namespace sharedobj

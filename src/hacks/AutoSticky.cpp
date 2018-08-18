@@ -8,18 +8,14 @@
 #include "common.hpp"
 #include <hacks/AutoSticky.hpp>
 #include <PlayerTools.hpp>
+#include <settings/Bool.hpp>
+
+static settings::Bool enable{ "autosticky.enable", "false" };
+static settings::Bool buildings{ "autosticky.buildings", "true" };
+static settings::Bool legit{ "autosticky.legit", "false" };
 
 namespace hacks::tf::autosticky
 {
-
-// Vars for user settings
-static CatVar enabled(CV_SWITCH, "sticky_enabled", "0", "AutoSticky",
-                      "Master AutoSticky switch");
-static CatVar buildings(CV_SWITCH, "sticky_buildings", "1",
-                        "Detonate buildings", "Stickies react to buildings");
-static CatVar
-    legit(CV_SWITCH, "sticky_legit", "0", "Legit",
-          "Stickys only detonate when you see them\nAlso ignores invis spies");
 
 // A storage array for ents
 std::vector<CachedEntity *> bombs;
@@ -87,7 +83,7 @@ bool IsTarget(CachedEntity *ent)
     }
     else if (ent->m_Type() == ENTITY_BUILDING)
     {
-        return buildings;
+        return *buildings;
     }
 
     // Target isnt a good type
@@ -97,7 +93,7 @@ bool IsTarget(CachedEntity *ent)
 void CreateMove()
 {
     // Check user settings if auto-sticky is enabled
-    if (!enabled)
+    if (!enable)
         return;
 
     // Check if game is a tf game
@@ -152,12 +148,12 @@ void CreateMove()
                     {
                         // Aim at bomb
                         AimAt(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(),
-                              g_pUserCmd);
+                              current_user_cmd);
                         // Use silent
                         g_pLocalPlayer->bUseSilentAngles = true;
 
                         // Detonate
-                        g_pUserCmd->buttons |= IN_ATTACK2;
+                        current_user_cmd->buttons |= IN_ATTACK2;
 
                         // Return as its a waste to check anymore, we detonated
                         // and all the rest of the stickys are gone
@@ -170,12 +166,12 @@ void CreateMove()
                     {
                         // Aim at bomb
                         AimAt(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(),
-                              g_pUserCmd);
+                              current_user_cmd);
                         // Use silent
                         g_pLocalPlayer->bUseSilentAngles = true;
 
                         // Detonate
-                        g_pUserCmd->buttons |= IN_ATTACK2;
+                        current_user_cmd->buttons |= IN_ATTACK2;
 
                         // Return as its a waste to check anymore, we detonated
                         // and all the rest of the stickys are gone
@@ -185,7 +181,5 @@ void CreateMove()
             }
         }
     }
-    // End of function, just return
-    return;
 }
-}
+} // namespace hacks::tf::autosticky

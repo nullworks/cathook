@@ -19,6 +19,10 @@ public:
     int GetTeam(int idx);
     int GetScore(int idx);
 
+    int getClass(int idx);
+    int getTeam(int idx);
+    bool isAlive(int idx);
+
     int entity;
 };
 

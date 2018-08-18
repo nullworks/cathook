@@ -29,4 +29,4 @@ void ResetPlayer(int idx);
 void Init();
 void Update(CachedEntity *player);
 void Event(KeyValues *event);
-}
+} // namespace ac::aimbot

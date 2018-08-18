@@ -7,8 +7,6 @@
 
 #pragma once
 
-class CatVar;
-
 namespace backpacktf
 {
 
@@ -34,4 +32,4 @@ struct backpack_data_s
 const backpack_data_s &get_data(unsigned id);
 void init();
 bool enabled();
-}
+} // namespace backpacktf

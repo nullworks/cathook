@@ -45,59 +45,40 @@ CatCommand set_value("set", "Set value", [](const CCommand &args) {
 #endif
 namespace engine_prediction
 {
-
-void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
-{
-    if (!ent)
-        return;
-
-    typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *,
-                                class IMoveHelper *, CMoveData *);
-    typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *,
-                                 CMoveData *);
+void StartEnginePrediction(IClientEntity *ent, CUserCmd *ucmd) {
+	if(!ent)
+		return
+    typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
+    typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
     void **predictionVtable = *((void ***) g_IPrediction);
-    SetupMoveFn oSetupMove =
-        (SetupMoveFn)(*(unsigned *) (predictionVtable + 19));
-    FinishMoveFn oFinishMove =
-        (FinishMoveFn)(*(unsigned *) (predictionVtable + 20));
+    SetupMoveFn oSetupMove = (SetupMoveFn)(*(unsigned *) (predictionVtable + 19));
+    FinishMoveFn oFinishMove = (FinishMoveFn)(*(unsigned *) (predictionVtable + 20));
 
-    // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
-    // 0x1F69C0C);  CMoveData movedata {};
     char object[165];
     CMoveData *pMoveData = (CMoveData *) object;
 
     float frameTime = g_GlobalVars->frametime;
     float curTime   = g_GlobalVars->curtime;
-    CUserCmd defaultCmd;
-    if (ucmd == NULL)
-    {
-        ucmd = &defaultCmd;
-    }
 
     NET_VAR(ent, 4188, CUserCmd *) = ucmd;
 
-    g_GlobalVars->curtime =
-        g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
+    g_GlobalVars->curtime = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = g_GlobalVars->interval_per_tick;
 
-    *g_PredictionRandomSeed =
-        MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
-    g_IGameMovement->StartTrackPredictionErrors(
-        reinterpret_cast<CBasePlayer *>(ent));
+    *g_PredictionRandomSeed = MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
+    g_IGameMovement->StartTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
     oSetupMove(g_IPrediction, ent, ucmd, NULL, pMoveData);
-    g_IGameMovement->ProcessMovement(reinterpret_cast<CBasePlayer *>(ent),
-                                     pMoveData);
+    g_IGameMovement->ProcessMovement(reinterpret_cast<CBasePlayer *>(ent), pMoveData);
     oFinishMove(g_IPrediction, ent, ucmd, pMoveData);
-    g_IGameMovement->FinishTrackPredictionErrors(
-        reinterpret_cast<CBasePlayer *>(ent));
-
+    g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
+}
+//Run stuff like aimbot between this 2 func calls
+void EndEnginePrediction(IClientEntity *ent, CUserCmd *ucmd) {
     NET_VAR(ent, 4188, CUserCmd *) = nullptr;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
-
-    return;
 }
 } // namespace engine_prediction
 #if not LAGBOT_MODE
@@ -301,9 +282,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time,
                 PROF_SECTION(CM_bunnyhop);
                 hacks::shared::bunnyhop::CreateMove();
             }
-            if (engine_pred)
-                engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E),
-                                                       current_user_cmd);
             {
                 PROF_SECTION(CM_backtracc);
                 hacks::shared::backtrack::Run();

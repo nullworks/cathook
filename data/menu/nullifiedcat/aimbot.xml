@@ -102,7 +102,7 @@
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtrack"/>
             <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>
-            <AutoVariable width="fill" target="backtrack.draw-skeleon" label="Draw Skeleton"/>
+            <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw Skeleton"/>
             <AutoVariable width="fill" target="backtrack.chams_glow" label="Chams/Glow Support"/>
             <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000" step="25"/>
             <LabeledObject width="fill" label="Backtrack Slots">

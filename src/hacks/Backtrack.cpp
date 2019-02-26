@@ -15,7 +15,7 @@
 
 static settings::Bool enable{ "backtrack.enable", "false" };
 static settings::Bool draw_bt{ "backtrack.draw", "false" };
-static settings::Bool draw_skeleton{ "backtrack.draw-skeleon", "false" };
+static settings::Bool draw_skeleton{ "backtrack.draw-skeleton", "false" };
 static settings::Float mindistance{ "backtrack.min-distance", "60" };
 
 static settings::Int slots{ "backtrack.slots", "0" };

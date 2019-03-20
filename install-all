@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+sudo apt install build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-7-multilib gcc-7 g++-7 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev libfreetype6-dev:i386 cmake cmake gcc-multilib g++-multilib -y#!/usr/bin/env bash
 
 if [ $EUID == 0 ]; then
     echo "This script must not be run as root"
@@ -13,7 +13,7 @@ if [ -x "$(command -v pacman)" ]; then
 else
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     sudo apt update
-    sudo apt install build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-7-multilib gcc-7 g++-7 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev libfreetype6-dev:i386 cmake cmake gcc-multilib g++-multilib -y
+    sudo apt install build-essential git gcc-multilib g++-multilib software-properties-common gcc-snapshot g++-7-multilib gcc-7 g++-7 libboost-all-dev libc6-dev:i386 gdb libsdl2-dev libglew-dev:i386 libglew-dev libfreetype6-dev libfreetype6-dev:i386 cmake gcc-multilib g++-multilib -y
 fi
 #
 # Update cathook

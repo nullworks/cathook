@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-sudo echo "got me some sudo?" > /dev/null
-
 if [ $SUDO_USER ]; then
     sudo -u $SUDO_USER ./scripts/updater
 else
-    ./scripts/updater
+    exec sudo /bin/bash "$0" "$@"
 fi

@@ -51,11 +51,7 @@
 //---- Define constructor and implicit cast operators to convert back<>forth from your math types and ImVec2/ImVec4.
 // This will be inlined as part of ImVec2 and ImVec4 class declarations.
 
-#define IM_VEC2_CLASS_EXTRA              \
-    ImVec2 operator+(const ImVec2 &f)    \
-    {                                    \
-        return ImVec2(x + f.x, y + f.y); \
-    }
+#define IMGUI_DEFINE_MATH_OPERATORS
 /*
 #define IM_VEC4_CLASS_EXTRA                                                 \
         ImVec4(const MyVec4& f) { x = f.x; y = f.y; z = f.z; w = f.w; }     \

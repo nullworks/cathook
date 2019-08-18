@@ -663,6 +663,52 @@ static InitRoutine init([]() {
     patch_scoreboardcolor2->Patch();
 });
 } // namespace ScoreboardColoring
+
+typedef void (*UpdateLocalPlayerVisionFlags_t)();
+UpdateLocalPlayerVisionFlags_t UpdateLocalPlayerVisionFlags_fn;
+
+int *g_nLocalPlayerVisionFlags;
+int *g_nLocalPlayerVisionFlagsWeaponsCheck;
+// If you wish then change this to some other flag you want to apply/remove
+#define PYROVISION 1
+
+static settings::Int force_pyrovision("visual.force-pyrovision", "0");
+
+void UpdateLocalPlayerVisionFlags()
+{
+    UpdateLocalPlayerVisionFlags_fn();
+    if (!force_pyrovision)
+        return;
+    if (*force_pyrovision == 2)
+    {
+        *g_nLocalPlayerVisionFlags &= ~PYROVISION;
+        *g_nLocalPlayerVisionFlagsWeaponsCheck &= ~PYROVISION;
+    }
+    else
+    {
+        *g_nLocalPlayerVisionFlags |= PYROVISION;
+        *g_nLocalPlayerVisionFlagsWeaponsCheck |= PYROVISION;
+    }
+}
+#define access_ptr(p, i) ((unsigned char *) &p)[i]
+
+static InitRoutine init_pyrovision([]() {
+    uintptr_t addr                        = gSignatures.GetClientSignature("8B 35 ? ? ? ? 75 27");
+    g_nLocalPlayerVisionFlags             = *reinterpret_cast<int **>(addr + 2);
+    g_nLocalPlayerVisionFlagsWeaponsCheck = *reinterpret_cast<int **>(addr + 8 + 2);
+    addr                                  = gSignatures.GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
+    if (!addr)
+        return;
+    addr += 17;
+    UpdateLocalPlayerVisionFlags_fn = UpdateLocalPlayerVisionFlags_t(e8call_direct(addr));
+
+    auto relAddr = ((uintptr_t) UpdateLocalPlayerVisionFlags - (uintptr_t) addr) - 5;
+
+    static BytePatch patch{ addr, { 0xE8, access_ptr(relAddr, 0), access_ptr(relAddr, 1), access_ptr(relAddr, 2), access_ptr(relAddr, 3) } };
+    patch.Patch();
+    EC::Register(
+        EC::Shutdown, []() { patch.Shutdown(); }, "shutdown_pyrovis");
+});
 #endif
 
 static CatCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
@@ -693,15 +739,20 @@ static InitRoutine init([]() {
     render_zoomed.installChangeCallback(tryPatchLocalPlayerShouldDraw);
     EC::Register(EC::Draw, DrawText, "draw_misc_hacks", EC::average);
 #if !ENFORCE_STREAM_SAFETY
-    patch_playerpanel = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 DF", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
-    uintptr_t addr    = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
-    patch_scoreboard1 = std::make_unique<BytePatch>(addr, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, 0x08, 0x46, 0x10, 0x00, 0xE9, 0xC9, 0x06, 0x00, 0x00 });
-    patch_scoreboard2 = std::make_unique<BytePatch>(addr + 0xA0, std::vector<unsigned char>{ 0xE9, 0x5D, 0xFF, 0xFF, 0xFF });
-    patch_scoreboard3 = std::make_unique<BytePatch>(addr + 0x84A, std::vector<unsigned char>{ 0x87, 0xFE });
+    patch_playerpanel     = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 DF", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
+    uintptr_t addr_scrbrd = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
+    patch_scoreboard1     = std::make_unique<BytePatch>(addr_scrbrd, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, 0x08, 0x46, 0x10, 0x00, 0xE9, 0xC9, 0x06, 0x00, 0x00 });
+    patch_scoreboard2     = std::make_unique<BytePatch>(addr_scrbrd + 0xA0, std::vector<unsigned char>{ 0xE9, 0x5D, 0xFF, 0xFF, 0xFF });
+    patch_scoreboard3     = std::make_unique<BytePatch>(addr_scrbrd + 0x84A, std::vector<unsigned char>{ 0x87, 0xFE });
     patch_playerpanel->Patch();
     patch_scoreboard1->Patch();
     patch_scoreboard2->Patch();
     patch_scoreboard3->Patch();
+
+    static BytePatch stealth_kill{ gSignatures.GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
+    stealth_kill.Patch();
+    EC::Register(
+        EC::Shutdown, []() { stealth_kill.Shutdown(); }, "shutdown_stealthkill");
 #endif
 #endif
 });

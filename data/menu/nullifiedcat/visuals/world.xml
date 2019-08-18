@@ -30,6 +30,13 @@
             <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
             <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
+            <LabeledObject width="fill" label="Pyro Vision">
+                <Select target="visual.force-pyrovision">
+                    <Option name="Auto" value="0"/>
+                    <Option name="ON" value="1"/>
+                    <Option name="OFF" value="2"/>
+                </Select>
+            </LabeledObject>
         </List>
     </Box>
 </Tab>

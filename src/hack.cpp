@@ -363,7 +363,7 @@ static void UnHookFs()
     if (g_IBaseClient)
         g_IBaseClient->InvalidateMdlCache();
 }
-#if TEXTMODE
+#if !ENABLE_VISUALS
 static InitRoutineEarly nullify_textmode([]() {
     ReduceRamUsage();
     static auto addr1 = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84 ? ? ? ?")) + 0x18;

@@ -89,7 +89,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
         EC::run(EC::Paint);
     }
 
-#if !ENABLE_VISUALS
+#if TEXTMODE
     return;
 #else
     return original::Paint(this_, mode);

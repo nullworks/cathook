@@ -23,6 +23,7 @@ set(ignore_files ${ignore_files} CACHE INTERNAL "")
 
 if(EnableVisuals)
     add_subdirectory(visual)
-elseif(Textmode)
+endif()
+if(Textmode)
     add_subdirectory(textmode)
 endif()

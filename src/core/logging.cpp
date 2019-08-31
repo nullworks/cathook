@@ -34,8 +34,8 @@ void logging::Info(const char *fmt, ...)
 #if ENABLE_LOGGING
     if (shut_down)
         return;
-    logging::Initialize();
-
+    if (!handle.is_open())
+        logging::Initialize();
     // Argument list
     va_list list;
     va_start(list, fmt);
@@ -58,7 +58,7 @@ void logging::Info(const char *fmt, ...)
     std::string to_log = result.get();
     to_log             = strfmt("[%s] ", timeString).get() + to_log + "\n";
     logging::handle << to_log;
-    logging::handle.close();
+    logging::handle.flush();
 #if ENABLE_VISUALS
     if (!hack::shutdown)
     {

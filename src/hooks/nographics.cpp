@@ -58,7 +58,7 @@ static settings::Boolean debug_framerate("debug.framerate", "false");
 static float framerate = 0.0f;
 static Timer send_timer{};
 static InitRoutine init_nographics([]() {
-#if !ENABLE_VISUALS
+#if TEXTMODE
     NullHook();
 #endif
     EC::Register(

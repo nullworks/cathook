@@ -33,6 +33,7 @@ static settings::Boolean afk{ "follow-bot.switch-afk", "true" };
 static settings::Int afktime{ "follow-bot.afk-time", "15000" };
 static settings::Boolean corneractivate{ "follow-bot.corners", "true" };
 static settings::Int steam_var{ "follow-bot.steamid", "0" };
+static settings::Boolean ignore_textmode{ "follow-bot.ignore-textmode", "true" };
 
 namespace nb = hacks::tf2::NavBot;
 
@@ -88,6 +89,15 @@ static void checkAFK()
         {
             afkTicks[i].update();
         }
+#if ENABLE_TEXTMODE
+        auto entity = ENTITY(i);
+        if (CE_BAD(entity))
+            continue;
+        if (!CE_VECTOR(entity, netvar.vVelocity).IsZero(60.0f))
+        {
+            afkTicks[i].update();
+        }
+#endif
     }
 }
 
@@ -166,6 +176,7 @@ static void addCrumbPair(CachedEntity *player1, CachedEntity *player2, std::pair
  *   tf_engineer = 9
  */
 
+// Higher number = higher priority.
 static constexpr int priority_list[10][10] = {
     /*0  1  2  3  4  5  6  7  8  9 */
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // No class
@@ -190,7 +201,7 @@ int ClassPriority(CachedEntity *ent)
 static int lastent = 0;
 static Timer waittime{};
 static Timer navinactivity{};
-static int navtarget = 0;
+static bool navtarget = false;
 
 static bool startFollow(CachedEntity *entity, bool useNavbot)
 {
@@ -211,10 +222,12 @@ static bool startFollow(CachedEntity *entity, bool useNavbot)
                 // addCrumbs(LOCAL_E, corners.first);
                 // addCrumbs(entity, corners.second);
                 addCrumbPair(LOCAL_E, entity, corners);
+                navtarget = false;
                 return true;
             }
             if (indirectOrigin.z)
             {
+                navtarget = false;
                 addCrumbs(entity, indirectOrigin);
                 return true;
             }
@@ -223,6 +236,7 @@ static bool startFollow(CachedEntity *entity, bool useNavbot)
         {
             if (VisCheckEntFromEnt(LOCAL_E, entity))
             {
+                navtarget = false;
                 return true;
             }
         }
@@ -231,7 +245,7 @@ static bool startFollow(CachedEntity *entity, bool useNavbot)
     {
         if (nav::navTo(entity->m_vecOrigin(), 8, true, false))
         {
-            navtarget = entity->m_IDX;
+            navtarget = true;
             return true;
         }
     }
@@ -258,6 +272,8 @@ static bool isValidTarget(CachedEntity *entity)
         return false;
     // Don't follow target that was determined afk
     if (afk && afkTicks[entity->m_IDX].check(*afktime))
+        return false;
+    if (ignore_textmode && playerlist::AccessData(entity).state == playerlist::k_EState::TEXTMODE)
         return false;
     return true;
 }
@@ -297,14 +313,14 @@ static void cm()
     if (!follow_target)
         breadcrumbs.clear(); // no target == no path
 
-    bool isNavBotCM           = navBotInterval.test_and_set(3000);
+    bool isNavBotCM           = navBotInterval.test_and_set(3000) && nav::prepare();
     bool foundPreferredTarget = false;
 
     // Target Selection
     // TODO: Reduce code duplication
     if (steamid || follow_friends || follow_party_leader)
     {
-        auto valid_target = navtarget ? navtarget : follow_target;
+        auto &valid_target = follow_target;
         // Find a target with the steam id, as it is prioritized
         auto ent_count = g_IEngine->GetMaxClients();
         if (steamid)
@@ -322,8 +338,7 @@ static void cm()
                     if (startFollow(entity, isNavBotCM))
                     {
                         navinactivity.update();
-                        follow_target = entity->m_IDX;
-                        afkTicks[i].update();
+                        follow_target        = entity->m_IDX;
                         foundPreferredTarget = true;
                         break;
                     }
@@ -358,8 +373,7 @@ static void cm()
                         if (startFollow(entity, isNavBotCM))
                         {
                             navinactivity.update();
-                            follow_target = entity->m_IDX;
-                            afkTicks[i].update();
+                            follow_target        = entity->m_IDX;
                             foundPreferredTarget = true;
                             break;
                         }
@@ -372,7 +386,7 @@ static void cm()
 
         if (follow_friends && !foundPreferredTarget)
         {
-            if (playerlist::AccessData(ENTITY(valid_target)).state != playerlist::k_EState::FRIEND)
+            if (!playerlist::IsFriend(ENTITY(valid_target)))
             {
                 for (int i = 1; i <= ent_count; i++)
                 {
@@ -381,13 +395,12 @@ static void cm()
                         continue;
                     if (entity->m_bEnemy())
                         continue;
-                    if (playerlist::AccessData(entity).state != playerlist::k_EState::FRIEND)
+                    if (!playerlist::IsFriend(entity))
                         continue;
                     if (startFollow(entity, isNavBotCM))
                     {
                         navinactivity.update();
-                        follow_target = entity->m_IDX;
-                        afkTicks[i].update();
+                        follow_target        = entity->m_IDX;
                         foundPreferredTarget = true;
                         break;
                     }
@@ -403,7 +416,7 @@ static void cm()
 
     // If we dont have a follow target from that, we look again for someone
     // else who is suitable
-    if (roambot && !navtarget && !foundPreferredTarget && (!follow_target || change || ClassPriority(ENTITY(navtarget ? navtarget : follow_target)) < 6))
+    if (roambot && !foundPreferredTarget && (!follow_target || change || ClassPriority(ENTITY(follow_target)) < 6))
     {
         // Try to get a new target
         auto ent_count = followcart ? HIGHEST_ENTITY : g_IEngine->GetMaxClients();
@@ -461,25 +474,27 @@ static void cm()
     if (lastent > g_IEngine->GetMaxClients())
         lastent = 1;
 
+    if (!follow_target)
+        navtarget = false;
     if (navtarget)
     {
-        auto ent = ENTITY(navtarget);
-        if (CE_GOOD(ent) && startFollow(ent, false))
+        auto ent = ENTITY(follow_target);
+        if (!nav::prepare())
         {
-            follow_target = navtarget;
+            follow_target = 0;
             navtarget     = 0;
         }
-        else
+
+        if (!CE_GOOD(ent) || !startFollow(ent, false))
         {
             breadcrumbs.clear();
-            follow_target = 0;
             static Timer navtimer{};
             if (CE_VALID(ent))
             {
                 auto pos = ent->m_vecDormantOrigin();
                 if (!g_pPlayerResource->isAlive(ent->m_IDX))
                 {
-                    navtarget = 0;
+                    follow_target = 0;
                 }
                 if (pos && navtimer.test_and_set(800))
                 {
@@ -489,7 +504,7 @@ static void cm()
             }
             if (navinactivity.check(5000))
             {
-                navtarget = 0;
+                follow_target = 0;
             }
             nb::task::current_task = nb::task::followbot;
             return;
@@ -503,6 +518,7 @@ static void cm()
             nb::task::current_task = nb::task::none;
         return;
     }
+
     nb::task::current_task = nb::task::followbot;
     nav::clearInstructions();
 

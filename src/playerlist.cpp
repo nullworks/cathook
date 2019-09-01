@@ -18,19 +18,19 @@ namespace playerlist
 
 std::unordered_map<unsigned, userdata> data{};
 
-const std::string k_Names[]                                       = { "DEFAULT", "FRIEND", "RAGE", "IPC", "INVALID", "CAT" };
-const char *const k_pszNames[]                                    = { "DEFAULT", "FRIEND", "RAGE", "IPC", "INVALID", "CAT" };
-const std::array<std::pair<k_EState, size_t>, 5> k_arrValidStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 }, { k_EState::IPC, 3 }, { k_EState::CAT, 5 } };
+const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };
+const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };
+const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 const userdata null_data{};
 #if ENABLE_VISUALS
-rgba_t k_Colors[] = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty };
+rgba_t k_Colors[] = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(99, 226, 161, 255) };
 #endif
 bool ShouldSave(const userdata &data)
 {
 #if ENABLE_VISUALS
-    return data.color || (data.state != k_EState::DEFAULT);
+    return data.color || data.state == k_EState::FRIEND || data.state == k_EState::RAGE;
 #endif
-    return (data.state != k_EState::DEFAULT);
+    return data.state == k_EState::FRIEND || data.state == k_EState::RAGE;
 }
 
 void Save()
@@ -165,6 +165,19 @@ bool IsDefault(CachedEntity *entity)
     return true;
 }
 
+bool IsFriend(unsigned steamid)
+{
+    const userdata &data = AccessData(steamid);
+    return data.state == k_EState::PARTY || data.state == k_EState::FRIEND;
+}
+
+bool IsFriend(CachedEntity *entity)
+{
+    if (entity && entity->player_info.friendsID)
+        return IsFriend(entity->player_info.friendsID);
+    return false;
+}
+
 bool ChangeState(unsigned int steamid, k_EState state, bool force)
 {
     auto &data = AccessData(steamid);
@@ -177,8 +190,24 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
     {
     case k_EState::FRIEND:
         return false;
+    case k_EState::TEXTMODE:
+        if (state == k_EState::IPC || state == k_EState::FRIEND)
+        {
+            ChangeState(steamid, state, true);
+            return true;
+        }
+        else
+            return false;
+    case k_EState::PARTY:
+        if (state == k_EState::TEXTMODE || state == k_EState::FRIEND)
+        {
+            ChangeState(steamid, state, true);
+            return true;
+        }
+        else
+            return false;
     case k_EState::IPC:
-        if (state == k_EState::FRIEND)
+        if (state == k_EState::FRIEND || state == k_EState::TEXTMODE || state == k_EState::PARTY)
         {
             ChangeState(steamid, state, true);
             return true;
@@ -186,7 +215,7 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
         else
             return false;
     case k_EState::CAT:
-        if (state == k_EState::FRIEND || state == k_EState::IPC)
+        if (state == k_EState::FRIEND || state == k_EState::IPC || state == k_EState::TEXTMODE || state == k_EState::PARTY)
         {
             ChangeState(steamid, state, true);
             return true;

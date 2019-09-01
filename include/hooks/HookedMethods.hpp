@@ -59,7 +59,7 @@ DECLARE_HOOKED_METHOD(FireEvent, bool, IGameEventManager2 *, IGameEvent *, bool)
 DECLARE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *, IGameEvent *);
 // g_IEngine
 DECLARE_HOOKED_METHOD(ServerCmdKeyValues, void, IVEngineClient013 *, KeyValues *);
-#if ENABLE_VISUALS || TEXTMODE
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
 // vgui::IPanel
 DECLARE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *, unsigned int, bool, bool);
 #endif
@@ -83,7 +83,7 @@ DECLARE_HOOKED_METHOD(SDL_SetClipboardText, int, const char *);
 // IUniformRandomStream
 DECLARE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *, int, int);
 #endif
-#if ENABLE_VISUALS || TEXTMODE
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
 DECLARE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *, const DrawModelState_t &, const ModelRenderInfo_t &, matrix3x4_t *);
 #endif
 } // namespace hooked_methods

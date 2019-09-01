@@ -42,6 +42,7 @@ struct user_data_s
 {
     char name[32];
     unsigned friendid;
+    bool textmode;
 
     bool connected;
 

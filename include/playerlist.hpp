@@ -21,9 +21,10 @@ enum class k_EState
     FRIEND,
     RAGE,
     IPC,
-    // Developer state removed from this line.
-    CAT        = IPC + 2,
-    STATE_LAST = CAT
+    TEXTMODE,
+    CAT,
+    PARTY,
+    STATE_LAST = PARTY
 };
 #if ENABLE_VISUALS
 extern rgba_t k_Colors[];
@@ -31,7 +32,7 @@ static_assert(sizeof(rgba_t) == sizeof(float) * 4, "player list is going to be i
 #endif
 extern const std::string k_Names[];
 extern const char *const k_pszNames[];
-extern const std::array<std::pair<k_EState, size_t>, 5> k_arrValidStates;
+extern const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates;
 
 struct userdata
 {
@@ -63,6 +64,8 @@ userdata &AccessData(unsigned steamid);
 userdata &AccessData(CachedEntity *player);
 bool IsDefault(unsigned steamid);
 bool IsDefault(CachedEntity *player);
+bool IsFriend(unsigned steamid);
+bool IsFriend(CachedEntity *player);
 bool ChangeState(unsigned int steamid, k_EState state, bool force = false);
 bool ChangeState(CachedEntity *entity, k_EState state, bool force = false);
 } // namespace playerlist

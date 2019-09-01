@@ -289,7 +289,7 @@ free(logname);*/
 #endif
     hooks::client.Apply();
 
-#if ENABLE_VISUALS || TEXTMODE
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
     hooks::panel.Set(g_IPanel);
     hooks::panel.HookMethod(hooked_methods::methods::PaintTraverse, offsets::PaintTraverse(), &hooked_methods::original::PaintTraverse);
     hooks::panel.Apply();
@@ -314,7 +314,7 @@ free(logname);*/
     hooks::input.HookMethod(HOOK_ARGS(GetUserCmd));
     hooks::input.Apply();
 
-#if ENABLE_VISUALS || TEXTMODE
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
     hooks::modelrender.Set(g_IVModelRender);
     hooks::modelrender.HookMethod(HOOK_ARGS(DrawModelExecute));
     hooks::modelrender.Apply();
@@ -371,7 +371,7 @@ free(logname);*/
         init_stack().pop();
     }
     logging::Info("Initializer stack done");
-#if TEXTMODE
+#if ENABLE_TEXTMODE
     hack::command_stack().push("exec cat_autoexec_textmode");
 #else
     hack::command_stack().push("exec cat_autoexec");

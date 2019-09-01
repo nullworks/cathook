@@ -98,16 +98,16 @@ static void initPlayerlist()
         });
         controller->setChangeStateCallback([](unsigned steam, int userid) {
             auto &pl = playerlist::AccessData(steam);
-            for (unsigned i = 0; i < playerlist::k_arrValidStates.size() - 1; i++)
+            for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; i++)
             {
-                if (pl.state == playerlist::k_arrValidStates.at(i).first)
+                if (pl.state == playerlist::k_arrGUIStates.at(i).first)
                 {
-                    pl.state = playerlist::k_arrValidStates.at(i + 1).first;
+                    pl.state = playerlist::k_arrGUIStates.at(i + 1).first;
                     controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
                     return;
                 }
             }
-            pl.state = playerlist::k_arrValidStates.front().first;
+            pl.state = playerlist::k_arrGUIStates.front().first;
             controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
         });
     }

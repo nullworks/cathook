@@ -128,7 +128,7 @@ matrix3x4_t *EntityHitboxCache::GetBones()
     {
         if (g_Settings.is_create_move)
         {
-#if TEXTMODE
+#if ENABLE_TEXTMODE
             if (!*bonecache_enabled || parent_ref->m_Type() != ENTITY_PLAYER || IsPlayerInvisible(parent_ref))
             {
                 PROF_SECTION(bone_setup);

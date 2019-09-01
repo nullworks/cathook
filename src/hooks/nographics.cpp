@@ -7,7 +7,7 @@
 
 #include "common.hpp"
 
-#if !TEXTMODE
+#if !ENABLE_TEXTMODE
 static settings::Boolean null_graphics("hack.nullgraphics", "false");
 #else
 static settings::Boolean null_graphics("hack.nullgraphics", "true");
@@ -63,7 +63,7 @@ static settings::Boolean debug_framerate("debug.framerate", "false");
 static float framerate = 0.0f;
 static Timer send_timer{};
 static InitRoutine init_nographics([]() {
-#if TEXTMODE
+#if ENABLE_TEXTMODE
     NullHook();
 #endif
     EC::Register(
@@ -263,7 +263,7 @@ static void UnHookFs()
     if (g_IBaseClient)
         g_IBaseClient->InvalidateMdlCache();
 }
-#if TEXTMODE
+#if ENABLE_TEXTMODE
 static InitRoutineEarly nullify_textmode([]() {
     ReduceRamUsage();
     static auto addr1 = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84 ? ? ? ?")) + 0x18;
@@ -277,7 +277,7 @@ static InitRoutineEarly nullify_textmode([]() {
 });
 #endif
 static InitRoutine nullifiy_textmode2([]() {
-#if TEXTMODE
+#if ENABLE_TEXTMODE
     ReduceRamUsage();
 #endif
     null_graphics.installChangeCallback([](settings::VariableBase<bool> &, bool after) {

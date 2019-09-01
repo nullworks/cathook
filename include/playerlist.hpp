@@ -54,7 +54,7 @@ void Load();
 
 constexpr bool IsFriendly(k_EState state)
 {
-    return state == k_EState::FRIEND || state == k_EState::IPC;
+    return state != k_EState::RAGE && state != k_EState::DEFAULT && state != k_EState::CAT;
 }
 #if ENABLE_VISUALS
 rgba_t Color(unsigned steamid);

@@ -104,21 +104,11 @@ bool StolenName()
 
 std::string GetNamestealName(CSteamID steam_id)
 {
-#if ENABLE_IPC
-    if (ipc::peer)
-    {
-        std::string namestr(*ipc_name);
-        if (namestr.length() > 3)
-        {
-            ReplaceString(namestr, "%%", std::to_string(ipc::peer->client_id));
-            ReplaceSpecials(namestr);
-            return namestr;
-        }
-    }
-#endif
+    if (steam_id != g_ISteamUser->GetSteamID())
+        return std::string();
 
     // Check User settings if namesteal is allowed
-    if (namesteal && steam_id == g_ISteamUser->GetSteamID())
+    if (namesteal)
     {
 
         // We dont want to steal names while not in-game as there are no targets
@@ -137,14 +127,27 @@ std::string GetNamestealName(CSteamID steam_id)
         }
     }
 
-    if ((*force_name).size() > 1 && steam_id == g_ISteamUser->GetSteamID())
+#if ENABLE_IPC
+    if (ipc::peer)
+    {
+        std::string namestr(*ipc_name);
+        if (namestr.length() > 3)
+        {
+            ReplaceString(namestr, "%%", std::to_string(ipc::peer->client_id));
+            ReplaceSpecials(namestr);
+            return namestr;
+        }
+    }
+#endif
+
+    if ((*force_name).size() > 1)
     {
         auto new_name = force_name.toString();
         ReplaceSpecials(new_name);
 
         return new_name;
     }
-    if (name_forced.size() > 1 && steam_id == g_ISteamUser->GetSteamID())
+    if (name_forced.size() > 1)
     {
         auto new_name = name_forced;
         ReplaceSpecials(new_name);

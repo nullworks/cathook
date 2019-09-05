@@ -10,7 +10,7 @@
 #define DATA_PATH "@DataPath@"
 #define ENABLE_VAC_BYPASS @VACBypass@
 #define ENABLE_TEXTMODE_STDIN @EnableTextmodeStdin@
-#define TEXTMODE @Textmode@
+#define ENABLE_TEXTMODE @Textmode@
 #define ENABLE_PROFILER @EnableProfiler@
 #define ENABLE_ONLINE @EnableOnlineFeatures@
 #define ENABLE_IRC @EnableIRC@

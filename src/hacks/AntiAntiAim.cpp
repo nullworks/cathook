@@ -41,7 +41,8 @@ void resolveEnt(int IDX, IClientEntity *entity)
                     quotaf++;
             }
         float quota            = quotat / quotaf;
-        Vector &angles         = NET_VECTOR(entity, netvar.m_angEyeAngles);
+        Vector &netangles      = NET_VECTOR(entity, netvar.m_angEyeAngles);
+        Vector angles          = QAngleToVector(entity->GetAbsAngles());
         static bool brutepitch = false;
         if (g_Settings.brute.brutenum[IDX] > 5)
         {
@@ -94,6 +95,8 @@ void resolveEnt(int IDX, IClientEntity *entity)
                 angles.x = 0.0f;
                 break;
             }
+        const_cast<QAngle &>(entity->GetAbsAngles()) = VectorToQAngle(angles);
+        netangles                                    = angles;
     }
 }
 

@@ -117,10 +117,10 @@ static CatCommand chatcommands_add("chatcommands_add", "chatcommands_add <chat c
     chatcomamnd.addcommand(command);
 });
 
-static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in /opt/cathook/data/chatcommands>", [](const CCommand &args) {
+static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " DATA_PATH "/chatcommands>", [](const CCommand &args) {
     if (args.ArgC() != 3)
     {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "usage: chatcommands_add <chat command> <filename in /opt/cathook/data/chatcommands>\n");
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "usage: chatcommands_add <chat command> <filename in " DATA_PATH "/chatcommands>\n");
         return;
     }
     std::string prefix = args.Arg(1);

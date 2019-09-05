@@ -41,7 +41,7 @@ static Timer spy_path{};
 // What is the bot currently doing
 namespace task
 {
-task current_task;
+Task current_task = task::none;
 }
 constexpr bot_class_config DIST_SPY{ 10.0f, 50.0f, 1000.0f };
 constexpr bot_class_config DIST_OTHER{ 100.0f, 200.0f, 300.0f };
@@ -54,7 +54,7 @@ static void CreateMove()
     if (!init(false))
         return;
     // blocking actions implement their own functions and shouldn't be interrupted by anything else
-    bool blocking = std::find(task::blocking_tasks.begin(), task::blocking_tasks.end(), task::current_task) != task::blocking_tasks.end();
+    bool blocking = std::find(task::blocking_tasks.begin(), task::blocking_tasks.end(), task::current_task.id) != task::blocking_tasks.end();
 
     if (!nav::ReadyForCommands || blocking)
         wait_until_path.update();
@@ -67,11 +67,12 @@ static void CreateMove()
         updateSlot();
 
     if (get_health)
+    {
         if (getDispenserHealthAndAmmo())
             return;
-    if (get_health)
         if (getHealthAndAmmo())
             return;
+    }
     if (blocking)
         return;
 
@@ -156,10 +157,9 @@ static bool navToSniperSpot()
         if (!nav::isSafe(random.base()->first))
             continue;
         // Try to nav there
-        if (nav::navTo(random.base()->second, 5, true, true, false))
+        if (nav::navTo(random.base()->second, 1, true, true, false))
         {
-            current_task = task::sniper_spot;
-            return true;
+            current_task = { task::sniper_spot, 1 };
         }
     }
     return false;
@@ -371,7 +371,7 @@ static bool stayNear()
     }
     // Are we doing nothing? Check if our current location can still attack our
     // last target
-    if (current_task == task::none && (CE_GOOD(last_target) || valid_dormant) && g_pPlayerResource->isAlive(last_target->m_IDX) && last_target->m_bEnemy())
+    if (current_task != task::stay_near && (CE_GOOD(last_target) || valid_dormant) && g_pPlayerResource->isAlive(last_target->m_IDX) && last_target->m_bEnemy())
     {
         if (hacks::shared::aimbot::ignore_cloak && IsPlayerInvisible(last_target))
             spy_cloak[last_target->m_IDX].update();
@@ -451,127 +451,142 @@ static bool getDispenserHealthAndAmmo()
     static Timer dispenser_timeout{};
     // Cooldown after standing next to one for too long
     static Timer dispenser_cooldown{};
-    // Will return in GetHealthAndAmmo() anyways
-    if (current_task == task::health || current_task == task::ammo)
-        return true;
-    // On Cooldown
-    if (!dispenser_cooldown.check(10000))
-        return false;
-
-    // Heal and get ammo
-    if (current_task == task::none)
-        // If Health/AMmo Low enough
-        if (static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth() < 0.64f || hasLowAmmo())
-            // If near enough to dispenser
-            if (getDispensers().size() && getDispensers()[0].DistTo(g_pLocalPlayer->v_Origin) < 60.0f)
-            {
-                // You've been standing next to this bloddy dispenser for 10 seconds, move!
-                if (dispenser_timeout.check(10000))
-                {
-                    dispenser_cooldown.update();
-                    return false;
-                }
-                return true;
-            }
-
-    // Already pathing
+    float health = static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth();
+    bool lowAmmo = hasLowAmmo();
+    // Check if we should cancel this task
     if (current_task == task::dispenser)
     {
-        std::vector<Vector> dispensers = getDispensers();
-        // Update standing next to timeout thing while pathing
-        if (dispensers.size())
-            if (g_pLocalPlayer->v_Origin.DistTo(dispensers[0]) > 60.0f)
-                dispenser_timeout.update();
-        return true;
+        if (health > 0.99f && !lowAmmo)
+        {
+            nav::clearInstructions();
+            current_task = task::none;
+            return false;
+        }
+        if (health > 0.64f && !lowAmmo)
+            current_task.priority = 3;
+    }
+
+    // Check if we're standing next to a dispenser for too long.
+    if (current_task == task::dispenser)
+    {
+        auto dispensers = getDispensers();
+        // If near enough to dispenser
+        if (dispensers.size() && dispensers[0].DistTo(g_pLocalPlayer->v_Origin) < 60.0f)
+        {
+            // Standing next to it for too long
+            if (dispenser_timeout.check(10000))
+            {
+                dispenser_cooldown.update();
+                current_task = task::none;
+                nav::clearInstructions();
+                return false;
+            }
+        }
+        else
+        {
+            dispenser_timeout.update();
+        }
     }
 
     // If Low ammo/Health
-    if (static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth() < 0.64f || hasLowAmmo())
-    {
-        std::vector<Vector> dispensers = getDispensers();
-
-        for (auto &pack : dispensers)
+    if (current_task != task::dispenser)
+        if (health < 0.64f || (current_task.priority < 3 && health < 0.99f) || lowAmmo)
         {
-            // Nav To Dispenser
-            if (nav::navTo(pack, 11, true, false))
+            std::vector<Vector> dispensers = getDispensers();
+
+            for (auto &dispenser : dispensers)
             {
-                // On Success, update task and timeout for pathing
-                current_task = task::dispenser;
-                if (g_pLocalPlayer->v_Origin.DistTo(pack) > 60.0f)
-                    dispenser_timeout.update();
-                return true;
+                // Nav To Dispenser
+                if (nav::navTo(dispenser, health < 0.64f || lowAmmo ? 11 : 3, true, false))
+                {
+                    // On Success, update task
+                    current_task = { task::dispenser, health < 0.64f || lowAmmo ? 10 : 3 };
+                }
             }
         }
-    }
-    return false;
+    if (current_task == task::dispenser && current_task.priority == 10)
+        return true;
+    else
+        return false;
 }
+
 static bool getHealthAndAmmo()
 {
-    static Timer health_ammo_timer{};
-    if (!health_ammo_timer.test_and_set(2000))
-        return false;
-    if (current_task == task::health && static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth() >= 0.64f)
+    float health = static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth();
+    bool lowAmmo = hasLowAmmo();
+    // Check if we should cancel this task
+    if (current_task == task::health || current_task == task::ammo)
     {
-        nav::clearInstructions();
-        current_task = task::none;
-    }
-    if (current_task == task::health)
-        return true;
-
-    if (static_cast<float>(LOCAL_E->m_iHealth()) / LOCAL_E->m_iMaxHealth() < 0.64f)
-    {
-        std::vector<Vector> healthpacks;
-        for (int i = 1; i <= HIGHEST_ENTITY; i++)
+        if (health > 0.99f && !lowAmmo)
         {
-            CachedEntity *ent = ENTITY(i);
-            if (CE_BAD(ent))
-                continue;
-            if (ent->m_ItemType() != ITEM_HEALTH_SMALL && ent->m_ItemType() != ITEM_HEALTH_MEDIUM && ent->m_ItemType() != ITEM_HEALTH_LARGE)
-                continue;
-            healthpacks.push_back(ent->m_vecOrigin());
+            nav::clearInstructions();
+            current_task = task::none;
+            return false;
         }
-        std::sort(healthpacks.begin(), healthpacks.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) < g_pLocalPlayer->v_Origin.DistTo(b); });
-        for (auto &pack : healthpacks)
-        {
-            if (nav::navTo(pack, 10, true, false))
-            {
-                current_task = task::health;
-                return true;
-            }
-        }
+        if (health > 0.64f && !lowAmmo)
+            current_task.priority = 3;
     }
 
-    if (current_task == task::ammo && !hasLowAmmo())
-    {
-        nav::clearInstructions();
-        current_task = task::none;
-        return false;
-    }
-    if (current_task == task::ammo)
-        return true;
-    if (hasLowAmmo())
-    {
-        std::vector<Vector> ammopacks;
-        for (int i = 1; i <= HIGHEST_ENTITY; i++)
+    // If Low Ammo/Health
+    if (current_task != task::health && current_task != task::ammo)
+        if (health < 0.64f || (current_task.priority < 3 && health < 0.99f) || lowAmmo)
         {
-            CachedEntity *ent = ENTITY(i);
-            if (CE_BAD(ent))
-                continue;
-            if (ent->m_ItemType() != ITEM_AMMO_SMALL && ent->m_ItemType() != ITEM_AMMO_MEDIUM && ent->m_ItemType() != ITEM_AMMO_LARGE)
-                continue;
-            ammopacks.push_back(ent->m_vecOrigin());
-        }
-        std::sort(ammopacks.begin(), ammopacks.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) < g_pLocalPlayer->v_Origin.DistTo(b); });
-        for (auto &pack : ammopacks)
-        {
-            if (nav::navTo(pack, 9, true, false))
+            bool gethealth;
+            if (health < 0.64f)
+                gethealth = true;
+            else if (lowAmmo)
+                gethealth = false;
+            else
+                gethealth = true;
+
+            if (gethealth)
             {
-                current_task = task::ammo;
-                return true;
+                std::vector<Vector> healthpacks;
+                for (int i = 1; i <= HIGHEST_ENTITY; i++)
+                {
+                    CachedEntity *ent = ENTITY(i);
+                    if (CE_BAD(ent))
+                        continue;
+                    if (ent->m_ItemType() != ITEM_HEALTH_SMALL && ent->m_ItemType() != ITEM_HEALTH_MEDIUM && ent->m_ItemType() != ITEM_HEALTH_LARGE)
+                        continue;
+                    healthpacks.push_back(ent->m_vecOrigin());
+                }
+                std::sort(healthpacks.begin(), healthpacks.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) > g_pLocalPlayer->v_Origin.DistTo(b); });
+                for (auto &pack : healthpacks)
+                {
+                    if (nav::navTo(pack, health < 0.64f || lowAmmo ? 10 : 3, true, false))
+                    {
+                        current_task = { task::health, health < 0.64f ? 10 : 3 };
+                    }
+                }
+            }
+            else
+            {
+                std::vector<Vector> ammopacks;
+                for (int i = 1; i <= HIGHEST_ENTITY; i++)
+                {
+                    CachedEntity *ent = ENTITY(i);
+                    if (CE_BAD(ent))
+                        continue;
+                    if (ent->m_ItemType() != ITEM_AMMO_SMALL && ent->m_ItemType() != ITEM_AMMO_MEDIUM && ent->m_ItemType() != ITEM_AMMO_LARGE)
+                        continue;
+                    ammopacks.push_back(ent->m_vecOrigin());
+                }
+                std::sort(ammopacks.begin(), ammopacks.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) > g_pLocalPlayer->v_Origin.DistTo(b); });
+                for (auto &pack : ammopacks)
+                {
+                    if (nav::navTo(pack, health < 0.64f || lowAmmo ? 9 : 3, true, false))
+                    {
+                        current_task = { task::ammo, 10 };
+                        return true;
+                    }
+                }
             }
         }
-    }
-    return false;
+    if ((current_task == task::health || current_task == task::ammo) && current_task.priority == 10)
+        return true;
+    else
+        return false;
 }
 
 static void autoJump()

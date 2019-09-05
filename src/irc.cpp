@@ -101,11 +101,7 @@ void authreq(std::string &msg)
         if (tarhash == steamidhash)
         {
             // Use actual steamid to set cat status
-            auto &playerlistdata = playerlist::AccessData(tarsteamid);
-            if (playerlistdata.state == playerlist::k_EState::DEFAULT)
-            {
-                playerlistdata.state = playerlist::k_EState::CAT;
-            }
+            playerlist::ChangeState(tarsteamid, playerlist::k_EState::CAT);
             // Avoid replying to a reply
             if (isreply)
                 // We are done here. Steamid duplicates don't exist.

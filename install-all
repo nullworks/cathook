@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-if [ $EUID == 0 ]; then
-    echo "This script must not be run as root"
-    exit
-fi
+RUNUSER="sudo -u $LOGNAME"
 
 #
 # Install git in case this is a install-all only install
@@ -21,12 +18,12 @@ fi
 # Update cathook
 #
 if [ ! -d "./.git" ]; then
-    git init
-    git remote add origin https://github.com/nullworks/cathook
+    $RUNUSER git init
+    $RUNUSER git remote add origin https://github.com/nullworks/cathook
 fi
 
-git fetch --force --depth 1 origin refs/tags/latest:refs/tags/latest && git reset --hard latest # pull changes from github
-git submodule update --depth 1 --init --recursive # update/init submodules
+$RUNUSER git fetch --force --depth 1 origin refs/tags/latest:refs/tags/latest && $RUNUSER git reset --hard latest # pull changes from github
+$RUNUSER git submodule update --depth 1 --init --recursive # update/init submodules
 
 # install all dependencies and allow non interactive install
 ./scripts/dependencycheck true
@@ -35,14 +32,13 @@ git submodule update --depth 1 --init --recursive # update/init submodules
 # Set config version for update script
 #
 
-. ./scripts/config.shlib
-cfg_write ./scripts/updater-preferences version 1
+$RUNUSER bash -c ". ./scripts/config.shlib; cfg_write ./scripts/updater-preferences version 1"
 
 #
 # Build cathook
 #
 
-mkdir -p ./build; pushd build #create a directory for building cathook
-cmake ..;make -j$(grep -c '^processor' /proc/cpuinfo) # create makefile and build using all available threads
+$RUNUSER mkdir -p ./build; pushd build #create a directory for building cathook
+$RUNUSER cmake ..;$RUNUSER make -j$(grep -c '^processor' /proc/cpuinfo) # create makefile and build using all available threads
 sudo make data # create /opt/cathook/data
 popd; cd ..

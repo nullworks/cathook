@@ -958,7 +958,9 @@ Vector GetBuildingPosition(CachedEntity *ent)
     // Get the collideable origin of ent and get min and max of collideable
     // OBBMins and OBBMaxs are offsets from origin
     auto raw = RAW_ENT(ent);
-    return (raw->GetCollideable()->OBBMins() + raw->GetCollideable()->OBBMaxs()) / 2 + raw->GetCollideable()->GetCollisionOrigin();
+    Vector min, max;
+    RAW_ENT(ent)->GetRenderBounds(min, max);
+    return (min + max) / 2 + raw->GetCollideable()->GetCollisionOrigin();
 }
 
 bool IsBuildingVisible(CachedEntity *ent)

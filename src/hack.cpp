@@ -169,50 +169,6 @@ void critical_error_handler(int signum)
 }
 #endif
 
-static bool blacklist_file(const char *filename)
-{
-    const static char *blacklist[] = { ".vtx", ".vtf", ".pcf", ".mdl" };
-    if (!filename || !std::strcmp(filename, "models/error.mdl") || !std::strncmp(filename, "models/buildables", 17) || !std::strcmp(filename, "models/vgui/competitive_badge.mdl") || !std::strcmp(filename, "models/vgui/12v12_badge.mdl") || !std::strncmp(filename, "models/player/", 14) || !std::strncmp(filename, "models/weapons/", 15))
-        return false;
-
-    std::size_t len = std::strlen(filename);
-    if (len > 3)
-    {
-        auto ext_p = filename + len - 4;
-        for (int i = 0; i < sizeof(blacklist) / sizeof(blacklist[0]); ++i)
-            if (!std::strcmp(ext_p, blacklist[i]))
-                return true;
-    }
-    return false;
-}
-
-static bool (*FSorig_ReadFile)(void *, const char *, const char *, void *, int, int, void *);
-static bool FSHook_ReadFile(void *this_, const char *pFileName, const char *pPath, void *buf, int nMaxBytes, int nStartingByte, void *pfnAlloc)
-{
-    // fprintf(stderr, "ReadFile: %s\n", pFileName);
-    if (blacklist_file(pFileName))
-        return false;
-    return FSorig_ReadFile(this_, pFileName, pPath, buf, nMaxBytes, nStartingByte, pfnAlloc);
-}
-
-static hooks::VMTHook /*fs_hook,*/ fs_hook2;
-static void ReduceRamUsage()
-{
-    fs_hook2.Set(reinterpret_cast<void *>(g_IFileSystem), 4);
-    fs_hook2.HookMethod(FSHook_ReadFile, 14, &FSorig_ReadFile);
-    fs_hook2.Apply();
-
-    /* ERROR: Must be called from texture thread */
-    // g_IMaterialSystem->ReloadTextures();
-    g_IBaseClient->InvalidateMdlCache();
-}
-
-static void UnHookFs()
-{
-    fs_hook2.Release();
-    g_IBaseClient->InvalidateMdlCache();
-}
-
 static void InitRandom()
 {
     int rand_seed;
@@ -268,15 +224,18 @@ free(logname);*/
 #endif /* TEXTMODE */
     logging::Info("Initializing...");
     InitRandom();
+    sharedobj::LoadEarlyObjects();
+    CreateEarlyInterfaces();
+    logging::Info("Clearing Early initializer stack");
+    while (!init_stack_early().empty())
+    {
+        init_stack_early().top()();
+        init_stack_early().pop();
+    }
+    logging::Info("Early Initializer stack done");
     sharedobj::LoadAllSharedObjects();
     CreateInterfaces();
     CDumper dumper;
-    null_graphics.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        if (after)
-            ReduceRamUsage();
-        else
-            UnHookFs();
-    });
     dumper.SaveDump();
     logging::Info("Is TF2? %d", IsTF2());
     logging::Info("Is TF2C? %d", IsTF2C());
@@ -330,14 +289,16 @@ free(logname);*/
 #endif
     hooks::client.Apply();
 
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
+    hooks::panel.Set(g_IPanel);
+    hooks::panel.HookMethod(hooked_methods::methods::PaintTraverse, offsets::PaintTraverse(), &hooked_methods::original::PaintTraverse);
+    hooks::panel.Apply();
+#endif
+
 #if ENABLE_VISUALS
     hooks::vstd.Set((void *) g_pUniformStream);
     hooks::vstd.HookMethod(HOOK_ARGS(RandomInt));
     hooks::vstd.Apply();
-
-    hooks::panel.Set(g_IPanel);
-    hooks::panel.HookMethod(hooked_methods::methods::PaintTraverse, offsets::PaintTraverse(), &hooked_methods::original::PaintTraverse);
-    hooks::panel.Apply();
 
     auto chat_hud = g_CHUD->FindElement("CHudChat");
     while (!(chat_hud = g_CHUD->FindElement("CHudChat")))
@@ -353,13 +314,18 @@ free(logname);*/
     hooks::input.HookMethod(HOOK_ARGS(GetUserCmd));
     hooks::input.Apply();
 
+#if ENABLE_VISUALS || ENABLE_TEXTMODE
     hooks::modelrender.Set(g_IVModelRender);
     hooks::modelrender.HookMethod(HOOK_ARGS(DrawModelExecute));
     hooks::modelrender.Apply();
-
+#endif
     hooks::enginevgui.Set(g_IEngineVGui);
     hooks::enginevgui.HookMethod(HOOK_ARGS(Paint));
     hooks::enginevgui.Apply();
+
+    hooks::engine.Set(g_IEngine);
+    hooks::engine.HookMethod(HOOK_ARGS(ServerCmdKeyValues));
+    hooks::engine.Apply();
 
     hooks::eventmanager2.Set(g_IEventManager2);
     hooks::eventmanager2.HookMethod(HOOK_ARGS(FireEvent));
@@ -405,7 +371,7 @@ free(logname);*/
         init_stack().pop();
     }
     logging::Info("Initializer stack done");
-#if not ENABLE_VISUALS
+#if ENABLE_TEXTMODE
     hack::command_stack().push("exec cat_autoexec_textmode");
 #else
     hack::command_stack().push("exec cat_autoexec");
@@ -446,9 +412,11 @@ void hack::Shutdown()
 #endif
     logging::Info("Unregistering convars..");
     ConVar_Unregister();
-    logging::Info("Shutting down killsay...");
+    logging::Info("Unloading sharedobjects..");
+    sharedobj::UnloadAllSharedObjects();
     if (!hack::game_shutdown)
     {
+        logging::Info("Running shutdown handlers");
         EC::run(EC::Shutdown);
 #if ENABLE_VISUALS
         g_pScreenSpaceEffects->DisableScreenSpaceEffect("_cathook_glow");
@@ -458,5 +426,7 @@ void hack::Shutdown()
 #endif
 #endif
     }
+    logging::Info("Releasing VMT hooks..");
+    hooks::ReleaseAllHooks();
     logging::Info("Success..");
 }

@@ -188,8 +188,12 @@ struct offsets
     {
         return PlatformOffset(24, undefined, undefined);
     }
-    static const uint32_t ChatPrintf()
+    static constexpr uint32_t ChatPrintf()
     {
         return PlatformOffset(22, undefined, undefined);
+    }
+    static constexpr uint32_t ServerCmdKeyValues()
+    {
+        return PlatformOffset(128, undefined, undefined);
     }
 };

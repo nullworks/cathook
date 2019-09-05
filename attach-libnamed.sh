@@ -3,11 +3,9 @@
 # Thank you LWSS
 # https://github.com/LWSS/Fuzion/commit/a53b6c634cde0ed47b08dd587ba40a3806adf3fe
 
-if [ $SUDO_USER ]; then
-    sudo -u $SUDO_USER ./scripts/updater --autoupdater
-else
-    ./scripts/updater
-fi
+RUNUSER="sudo -u $(logname)"
+$RUNUSER bash ./scripts/updater --autoupdater
+
 line=$(pgrep -u $SUDO_USER hl2_linux)
 arr=($line)
 inst=$1
@@ -32,8 +30,8 @@ echo Attaching to "$proc"
 
 # pBypass for crash dumps being sent
 # You may also want to consider using -nobreakpad in your launch options.
-sudo rm -rf /tmp/dumps # Remove if it exists
-sudo mkdir /tmp/dumps # Make it as root
+sudo mkdir -p /tmp/dumps # Make it as root if it doesnt exist
+sudo chown root:root /tmp/dumps # Claim it as root
 sudo chmod 000 /tmp/dumps # No permissions
 
 # Get a Random name from the build_names file.

@@ -23,7 +23,6 @@ enum class IgnoreReason
     LOCAL_PLAYER_LIST,
     ONLINE_NO_TARGET,
     ONLINE_FRIENDLY_SOFTWARE,
-    DEVELOPER,
     OTHER
 };
 

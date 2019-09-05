@@ -9,8 +9,6 @@ namespace hooked_methods
 
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    if (*null_graphics)
-        return;
-    return original::DrawModelExecute(this_, state, info, bone);
+    return;
 }
 } // namespace hooked_methods

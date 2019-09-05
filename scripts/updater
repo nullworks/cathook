@@ -27,7 +27,7 @@ cfg_haskey $configfile version || exists=false
 if [ "$exists" == false ]; then
     if [ -f $configfile ]; then
         value=$(cat $configfile)
-        sudo rm $configfile
+        rm $configfile
     fi  
     echo "" > $configfile
     cfg_write $configfile version 1
@@ -48,13 +48,16 @@ if [ ! -x "$(command -v dialog)" ]; then
     tui=false
     echo -e "\033[1;31mTerminal UI NOT supported! Install \"dialog\"! \033[0m"
 fi
+if [ ! -t 0 ]; then
+    tui=false
+fi
 
 exists=true
 cfg_haskey $configfile autoupdater || exists=false
 if [ "$tui" == true ] && [ "$exists" == false ]; then
     value=true
     response=255
-    while [ "$response" == 255 ]; do
+    while [ "$response" != 0 ] && [ "$response" != 1 ]; do
         dialog --keep-tite --title "Updater"  --yesno "Do you want to enable the cathook auto updater?" 10 25 || { response=$?; continue; }
         response=$?
     done
@@ -70,8 +73,10 @@ if [ "$exists" == false ]; then
     cfg_write $configfile update_channel stable
 fi
 
+exists=true
+cfg_haskey $configfile autoupdater || exists=false
 if [ "$1" == "--autoupdater" ]; then
-    if [ "$(cfg_read $configfile autoupdater)" == false ]; then
+    if [ $exists == false ] || [ "$(cfg_read $configfile autoupdater)" == false ]; then
         exit 0;
     fi
     AUTOUPDATER=true
@@ -113,7 +118,7 @@ function performupdate() {
     # Update cathook
     cd build && cmake .. && cmake --build . --target cathook -- -j$proccount || { echo -e "\033[1;31m \n \nFailed to compile cathook\n\033[0m"; exit 1; }
     # Update data
-    sudo cmake --build . --target data || { echo -e "\033[1;31m\nFailed to update /opt/cathook/data directory\n\033[0m"; exit 1; }
+    cmake --build . --target data || { echo -e "\033[1;31m\nFailed to update /opt/cathook/data directory! Trying with root rights!\n\033[0m"; sudo cmake --build . --target data || { echo -e "\033[1;31m\nFailed to update /opt/cathook/data directory\n\033[0m"; exit 1; } }
     echo -e "\n\033[1;34mCathook updated successfully\n\033[0m"
     rm -f ${LOCKFILE}
 }

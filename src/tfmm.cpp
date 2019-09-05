@@ -172,8 +172,8 @@ void friend_party()
         {
             std::vector<unsigned> valid_steam_ids = pc->GetPartySteamIDs();
             for (auto steamid : valid_steam_ids)
-                if (steamid && playerlist::IsDefault(steamid))
-                    playerlist::AccessData(steamid).state = playerlist::k_EState::FRIEND;
+                if (steamid)
+                    playerlist::ChangeState(steamid, playerlist::k_EState::PARTY);
         }
     }
 }

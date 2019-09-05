@@ -235,6 +235,7 @@ void StoreClientData()
     user_data_s &data = peer->memory->peer_user_data[peer->client_id];
     data.friendid     = g_ISteamUser->GetSteamID().GetAccountID();
     data.ts_injected  = time_injected;
+    data.textmode     = ENABLE_TEXTMODE;
     strncpy(data.name, hooked_methods::methods::GetFriendPersonaName(g_ISteamFriends, g_ISteamUser->GetSteamID()), sizeof(data.name));
 }
 
@@ -252,9 +253,7 @@ void UpdatePlayerlist()
         {
             if (!peer->memory->peer_data[i].free)
             {
-                playerlist::userdata &info = playerlist::AccessData(peer->memory->peer_user_data[i].friendid);
-                if (info.state == playerlist::k_EState::DEFAULT || info.state == playerlist::k_EState::FRIEND || info.state == playerlist::k_EState::CAT)
-                    info.state = playerlist::k_EState::IPC;
+                playerlist::ChangeState(peer->memory->peer_user_data[i].friendid, peer->memory->peer_user_data[i].textmode ? playerlist::k_EState::TEXTMODE : playerlist::k_EState::IPC);
             }
         }
     }

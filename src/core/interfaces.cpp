@@ -84,6 +84,11 @@ template <typename T> T *BruteforceInterface(std::string name, sharedobj::Shared
 extern "C" typedef HSteamPipe (*GetHSteamPipe_t)();
 extern "C" typedef HSteamUser (*GetHSteamUser_t)();
 
+void CreateEarlyInterfaces()
+{
+    g_IFileSystem = BruteforceInterface<IFileSystem>("VFileSystem", sharedobj::filesystem_stdio());
+}
+
 void CreateInterfaces()
 {
     g_ICvar             = BruteforceInterface<ICvar>("VEngineCvar", sharedobj::vstdlib());
@@ -152,13 +157,12 @@ void CreateInterfaces()
         g_pGameRules               = *reinterpret_cast<CGameRules **>(g_pGameRules_sig + 8);
     }
     g_IMaterialSystem = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
-    g_IFileSystem     = BruteforceInterface<IFileSystem>("VFileSystem", sharedobj::filesystem_stdio());
     g_IMDLCache       = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());
 
+    g_IPanel = BruteforceInterface<vgui::IPanel>("VGUI_Panel", sharedobj::vgui2());
 #if ENABLE_VISUALS
     g_pUniformStream    = **(IUniformRandomStream ***) (gSignatures.GetVstdSignature("A3 ? ? ? ? C3 89 F6") + 0x1);
     g_IVDebugOverlay    = BruteforceInterface<IVDebugOverlay>("VDebugOverlay", sharedobj::engine());
-    g_IPanel            = BruteforceInterface<vgui::IPanel>("VGUI_Panel", sharedobj::vgui2());
     g_ISurface          = BruteforceInterface<vgui::ISurface>("VGUI_Surface", sharedobj::vguimatsurface());
     g_IStudioRender     = BruteforceInterface<IStudioRender>("VStudioRender", sharedobj::studiorender());
     g_IVRenderView      = BruteforceInterface<IVRenderView>("VEngineRenderView", sharedobj::engine());

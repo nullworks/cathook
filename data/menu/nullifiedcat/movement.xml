@@ -21,8 +21,8 @@
             <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit"/>
             <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
             <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to follow"/>
-            <AutoVariable width="fill" target="follow-bot.friendsonly" label="Follow Only Friends"/>
-            <AutoVariable width="fill" target="follow-bot.follow-party-leader-only" label="Follow Only Party Leader"/>
+            <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize Friends"/>
+            <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the Party Leader"/>
             <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw Crumbs"/>
         </List>
     </Box>

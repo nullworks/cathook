@@ -35,8 +35,20 @@ static settings::Int equip_secondary{ "achievement.equip-secondary", "0" };
 static settings::Int equip_melee{ "achievement.equip-melee", "0" };
 static settings::Int equip_pda2{ "achievement.equip-pda2", "0" };
 
+bool checkachmngr()
+{
+    if (!g_IAchievementMgr)
+    {
+        g_IAchievementMgr = g_IEngine->GetAchievementMgr();
+        if (!g_IAchievementMgr)
+            return false;
+    }
+    return true;
+}
 void Lock()
 {
+    if (!checkachmngr())
+        return;
     if (safety)
     {
         ConColorMsg({ 255, 0, 0, 255 }, "Switch `cat set achievement.safety` to false before using any achievement commands!\n");
@@ -53,6 +65,8 @@ void Lock()
 
 void Unlock()
 {
+    if (!checkachmngr())
+        return;
     /*auto Invmng = re::CTFInventoryManager::GTFInventoryManager();
     auto Inv = re::CTFPlayerInventory::GTFPlayerInventory();
     auto Item = Inv->GetFirstItemOfItemDef(59);
@@ -70,6 +84,8 @@ void Unlock()
 }
 
 CatCommand dump_achievement("achievement_dump", "Dump achievements to file (development)", []() {
+    if (!checkachmngr())
+        return;
     std::ofstream out("/tmp/cathook_achievements.txt", std::ios::out);
     if (out.bad())
         return;
@@ -80,6 +96,8 @@ CatCommand dump_achievement("achievement_dump", "Dump achievements to file (deve
     out.close();
 });
 CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievement by ID", [](const CCommand &args) {
+    if (!checkachmngr())
+        return;
     char *out = nullptr;
     int id    = strtol(args.Arg(1), &out, 10);
     if (out == args.Arg(1))
@@ -95,6 +113,8 @@ CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievemen
 });
 // For some reason it SEGV's when I try to GetAchievementByID();
 CatCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!", [](const CCommand &args) {
+    if (!checkachmngr())
+        return;
     if (args.ArgC() < 1)
     {
         logging::Info("Actually provide an index");
@@ -143,6 +163,8 @@ std::vector<Autoequip_unlock_list> equip_queue;
 
 void unlock_achievements_and_accept(std::vector<int> items)
 {
+    if (!checkachmngr())
+        return;
     for (auto id : items)
     {
         IAchievement *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByID(id));

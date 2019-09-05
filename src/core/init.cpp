@@ -17,3 +17,14 @@ InitRoutine::InitRoutine(void (*func)())
 {
     init_stack().push(func);
 }
+
+std::stack<void (*)()> &init_stack_early()
+{
+    static std::stack<void (*)()> stack{};
+    return stack;
+}
+
+InitRoutineEarly::InitRoutineEarly(void (*func)())
+{
+    init_stack_early().push(func);
+}

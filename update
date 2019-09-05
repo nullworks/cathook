@@ -1,6 +1,3 @@
 #!/usr/bin/env bash
-if [ $SUDO_USER ]; then
-    sudo -u $SUDO_USER ./scripts/updater
-else
-    ./scripts/updater
-fi
+RUNUSER="sudo -u $LOGNAME"
+$RUNUSER bash ./scripts/updater

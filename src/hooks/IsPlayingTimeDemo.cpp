@@ -11,10 +11,10 @@ static settings::Boolean enable_debug_servercmd{ "debug.servercmdkeyvalues", "fa
 namespace hooked_methods
 {
 std::vector<KeyValues *> Iterate(KeyValues *event, int depth);
-DEFINE_HOOKED_METHOD(ServerCmdKeyValues, void, KeyValues *kv)
+DEFINE_HOOKED_METHOD(ServerCmdKeyValues, void, IVEngineClient013 *_this, KeyValues *kv)
 {
     if (!enable_debug_servercmd)
-        return original::ServerCmdKeyValues(kv);
+        return original::ServerCmdKeyValues(_this, kv);
     logging::Info("START SERVERCMD KEYVALUES");
     auto peer_list = hooked_methods::Iterate(kv, 10);
     // loop through all our peers
@@ -80,6 +80,6 @@ DEFINE_HOOKED_METHOD(ServerCmdKeyValues, void, KeyValues *kv)
         }
     }
     logging::Info("END SERVERCMD KEYVALUES");
-    original::ServerCmdKeyValues(kv);
+    original::ServerCmdKeyValues(_this, kv);
 }
 } // namespace hooked_methods

@@ -96,3 +96,4 @@ extern IFileSystem *g_IFileSystem;
 extern IMDLCache *g_IMDLCache;
 
 void CreateInterfaces();
+void CreateEarlyInterfaces();

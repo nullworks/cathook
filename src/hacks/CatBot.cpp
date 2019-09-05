@@ -813,7 +813,7 @@ void update()
         int count_ipc   = 0;
         int count_total = 0;
 
-        for (int i = 1; i <= g_GlobalVars->maxClients; ++i)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
             if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
@@ -823,8 +823,10 @@ void update()
             player_info_s info{};
             if (!g_IEngine->GetPlayerInfo(i, &info))
                 continue;
+            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT)
+                --count_total;
 
-            if (is_a_catbot(info.friendsID))
+            if (is_a_catbot(info.friendsID) || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC)
                 ++count_bots;
 
             if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC)

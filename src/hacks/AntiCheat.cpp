@@ -42,7 +42,7 @@ void Accuse(int eid, const std::string &hack, const std::string &details)
 void SetRage(player_info_t info)
 {
     if (autorage)
-        playerlist::AccessData(info.friendsID).state = playerlist::k_EState::RAGE;
+        playerlist::ChangeState(info.friendsID, playerlist::k_EState::RAGE);
 }
 
 void CreateMove()

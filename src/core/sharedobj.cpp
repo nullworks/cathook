@@ -67,6 +67,16 @@ void SharedObject::Load()
     }
 }
 
+void SharedObject::Unload()
+{
+    if (lmap)
+    {
+        dlclose(lmap);
+        lmap = nullptr;
+    }
+    fptr = nullptr;
+}
+
 char *SharedObject::Pointer(uintptr_t offset) const
 {
     if (this->lmap != nullptr)
@@ -84,23 +94,34 @@ void *SharedObject::CreateInterface(const std::string &interface)
     return (void *) (fptr(interface.c_str(), nullptr));
 }
 
+void LoadEarlyObjects()
+{
+    try
+    {
+        engine().Load();
+        filesystem_stdio().Load();
+        tier0().Load();
+        materialsystem().Load();
+    }
+    catch (std::exception &ex)
+    {
+        logging::Info("Exception: %s", ex.what());
+    }
+}
+
 void LoadAllSharedObjects()
 {
     try
     {
         steamclient().Load();
         client().Load();
-        engine().Load();
         steamapi().Load();
         vstdlib().Load();
-        tier0().Load();
         inputsystem().Load();
-        materialsystem().Load();
-        filesystem_stdio().Load();
         datacache().Load();
+        vgui2().Load();
 #if ENABLE_VISUALS
         vguimatsurface().Load();
-        vgui2().Load();
         studiorender().Load();
         libsdl().Load();
 #endif
@@ -109,6 +130,26 @@ void LoadAllSharedObjects()
     {
         logging::Info("Exception: %s", ex.what());
     }
+}
+
+void UnloadAllSharedObjects()
+{
+    steamclient().Unload();
+    client().Unload();
+    steamapi().Unload();
+    vstdlib().Unload();
+    inputsystem().Unload();
+    datacache().Unload();
+    vgui2().Unload();
+#if ENABLE_VISUALS
+    vguimatsurface().Unload();
+    studiorender().Unload();
+    libsdl().Unload();
+#endif
+    engine().Unload();
+    filesystem_stdio().Unload();
+    tier0().Unload();
+    materialsystem().Unload();
 }
 
 SharedObject &steamclient()
@@ -162,15 +203,17 @@ SharedObject &datacache()
     static SharedObject obj("datacache.so", true);
     return obj;
 }
+
+SharedObject &vgui2()
+{
+    static SharedObject obj("vgui2.so", true);
+    return obj;
+}
+
 #if ENABLE_VISUALS
 SharedObject &vguimatsurface()
 {
     static SharedObject obj("vguimatsurface.so", true);
-    return obj;
-}
-SharedObject &vgui2()
-{
-    static SharedObject obj("vgui2.so", true);
     return obj;
 }
 SharedObject &studiorender()

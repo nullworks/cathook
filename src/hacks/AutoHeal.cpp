@@ -539,6 +539,7 @@ int HealingPriority(int idx)
     float healpp = **class_list[g_pPlayerResource->GetClass(ent) - 1];
     switch (playerlist::AccessData(ent).state)
     {
+    case playerlist::k_EState::PARTY:
     case playerlist::k_EState::FRIEND:
         // "Normal" default is 40 while friend default is 70, 70 = 40 * (1 + 3/4)
         priority += healpp * (1 + 3 / 4) * (1 - healthp);

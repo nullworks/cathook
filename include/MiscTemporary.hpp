@@ -38,7 +38,6 @@ extern settings::Int print_g;
 extern settings::Int print_b;
 extern Color menu_color;
 extern int stored_buttons;
-extern settings::Boolean null_graphics;
 #if ENABLE_VISUALS
 extern bool freecam_is_toggled;
 #endif

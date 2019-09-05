@@ -18,7 +18,7 @@ namespace settings
 struct Key
 {
     int mouse{ 0 };
-    SDL_Scancode scan{ static_cast<SDL_Scancode>(0) };
+    int keycode{ 0 };
 };
 
 template <> class Variable<Key> : public VariableBase<Key>
@@ -47,13 +47,13 @@ public:
         }
         else if (string.find("Key ") != std::string::npos)
         {
-            key.scan = static_cast<SDL_Scancode>(std::strtol(string.c_str() + 4, nullptr, 10));
+            key.keycode = SDL_GetKeyFromScancode(static_cast<SDL_Scancode>(std::strtol(string.c_str() + 4, nullptr, 10)));
         }
         else
         {
             auto code = SDL_GetKeyFromName(string.c_str());
             if (code != SDLK_UNKNOWN)
-                key.scan = SDL_GetScancodeFromKey(code);
+                key.keycode = code;
         }
 
         setInternal(key);
@@ -74,7 +74,7 @@ public:
     void key(SDL_Scancode key)
     {
         Key k{};
-        k.scan = key;
+        k.keycode = SDL_GetScancodeFromKey(key);
         setInternal(k);
     }
 
@@ -97,7 +97,7 @@ public:
 
     inline explicit operator bool() const
     {
-        return value.mouse || value.scan;
+        return value.mouse || value.keycode;
     }
 
     inline bool isKeyDown() const
@@ -108,10 +108,10 @@ public:
             if (flag & SDL_BUTTON(value.mouse))
                 return true;
         }
-        else if (value.scan)
+        else if (value.keycode)
         {
             auto keys = SDL_GetKeyboardState(nullptr);
-            if (keys[value.scan])
+            if (keys[SDL_GetScancodeFromKey(value.keycode)])
                 return true;
         }
         return false;
@@ -124,13 +124,13 @@ protected:
             string = "Mouse" + std::to_string(next.mouse);
         else
         {
-            if (next.scan == static_cast<SDL_Scancode>(0))
+            if (SDL_GetScancodeFromKey(next.keycode) == static_cast<SDL_Scancode>(0))
                 string = "<null>";
             else
             {
-                const char *s = SDL_GetKeyName(SDL_GetKeyFromScancode(next.scan));
+                const char *s = SDL_GetKeyName(next.keycode);
                 if (!s || *s == 0)
-                    string = "Key " + std::to_string(next.scan);
+                    string = "Key " + std::to_string(SDL_GetScancodeFromKey(next.keycode));
                 else
                     string = s;
             }

@@ -25,6 +25,7 @@ typedef method_table_t &table_ref_t;
 constexpr size_t ptr_size = sizeof(ptr_t);
 
 unsigned CountMethods(method_table_t table);
+void ReleaseAllHooks();
 table_ref_t GetVMT(ptr_t inst, uint32_t offset = 0);
 
 class VMTHook

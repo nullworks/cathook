@@ -8,6 +8,7 @@
         <Include path="nullifiedcat/visuals/radar.xml"/>
         <Include path="nullifiedcat/visuals/playerinfo.xml"/>
         <Include path="nullifiedcat/visuals/ui.xml"/>
+        <Include path="nullifiedcat/visuals/bullettracers.xml"/>
         <Include path="nullifiedcat/visuals/world.xml"/>
     </TabContainer>
 </Tab>

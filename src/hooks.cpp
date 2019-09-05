@@ -21,6 +21,16 @@ unsigned CountMethods(method_table_t table)
     return i;
 }
 
+std::vector<VMTHook *> hooks;
+
+void ReleaseAllHooks()
+{
+    for (auto hook : hooks)
+    {
+        hook->Release();
+    }
+}
+
 table_ref_t GetVMT(ptr_t inst, uint32_t offset)
 {
     return *reinterpret_cast<table_ptr_t>((uint32_t) inst + offset);
@@ -34,6 +44,7 @@ bool VMTHook::IsHooked(ptr_t inst)
 VMTHook::VMTHook()
 {
     static_assert(ptr_size == 4, "Pointer size must be DWORD.");
+    hooks.push_back(this);
 };
 
 VMTHook::~VMTHook()
@@ -93,7 +104,6 @@ VMTHook panel{};
 VMTHook client{};
 VMTHook chathud{};
 VMTHook engine{};
-VMTHook ctfpartyclient;
 VMTHook netchannel{};
 VMTHook firebullets{};
 VMTHook clientdll{};

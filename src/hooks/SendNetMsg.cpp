@@ -70,12 +70,8 @@ void ProcessAchievement(IGameEvent *ach)
             queue_ca8_timer.update();
             queue_ca8 = true;
         }
-        auto &state = playerlist::AccessData(info.friendsID).state;
-        if (state == playerlist::k_EState::DEFAULT)
-        {
-            state = playerlist::k_EState::CAT;
-            PrintChat("\x07%06X%s\x01 Marked as CAT", 0xe05938, info.name);
-        }
+        if (playerlist::ChangeState(info.friendsID, playerlist::k_EState::CAT))
+            PrintChat("\x07%06X%s\x01 Marked as CAT (Cathook user)", 0xe05938, info.name);
     }
 }
 

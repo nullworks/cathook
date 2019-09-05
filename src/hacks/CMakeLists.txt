@@ -41,7 +41,8 @@ set(ignore_files ${ignore_files} CACHE INTERNAL "")
 
 add_subdirectory(ac)
 if(EnableVisuals)
-    set(files "${CMAKE_CURRENT_LIST_DIR}/DominateMark.cpp"
+    set(files "${CMAKE_CURRENT_LIST_DIR}/BulletTracers.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/DominateMark.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/ExplosionCircles.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/KillfeedColor.cpp"

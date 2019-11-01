@@ -11,7 +11,7 @@ static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
 static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
-static settings : Boolean vm_aimbot{ "visual.vm-aimbot", "false" };
+static settings:: Boolean vm_aimbot{ "visual.vm-aimbot", "false" };
 
 bool freecam_is_toggled{ false };
 

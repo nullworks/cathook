@@ -37,7 +37,7 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     if (vm_aimbot && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
     {
         static Vector oViewmodelAimbotAngle = Vector(0, 0, 0);
-        Vector ViewmodelAimbotAngle         = Vector(0, 0, 0);
+        static Vector ViewmodelAimbotAngle  = Vector(0, 0, 0);
         bool first                          = true;
         static Vector oAngle                = Vector(0, 0, 0);
         static float timeremaining          = 1000.f;

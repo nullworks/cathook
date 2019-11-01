@@ -76,7 +76,7 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 
         auto deltaAngle = ViewmodelAimbotAngle - setup->angles;
 
-        ClampAngles(deltaAngle);
+        fClampAngle(deltaAngle);
 
         Viewmodel->SetAbsAngles(setup->angles + deltaAngle);
 

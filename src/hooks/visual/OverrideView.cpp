@@ -51,6 +51,8 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 
         if (!ViewmodelAimbotAngle.IsValid() || ViewmodelAimbotAngle.IsZero())
             return;
+      
+        QAngle QViewmodelAimbotAngle = VectorToQAngle(ViewmodelAimbotAngle);
 
         if ((setup->angles - ViewmodelAimbotAngle).Length() < 1.f || timeremaining < 0.f)
         {

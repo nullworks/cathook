@@ -99,8 +99,8 @@ bool canReachVector(Vector loc, Vector dest = { 0, 0, 0 });
 
 bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax);
 
-void ShortAngleDist(Vector from, Vector to);
-void AngleLerp(Vector from, Vector to, float time);
+float Lerp(float a, float b, float lerpFactor);
+float AngleLerp(float a, float b, float lerpFactor) ;
 
 float DistToSqr(CachedEntity *entity);
 void fClampAngle(Vector &qaAng);

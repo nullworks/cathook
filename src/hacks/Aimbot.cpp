@@ -820,6 +820,7 @@ void Aim(CachedEntity *entity)
 
     // Set angles
     current_user_cmd->viewangles = angles;
+    aim_angles                   = angles;
 
     if (silent && !slow_aim)
         g_pLocalPlayer->bUseSilentAngles = true;

@@ -7,6 +7,7 @@
 std::array<Timer, 32> timers{};
 std::array<int, 32> bruteint{};
 
+std::optional<Vector> aim_angles;
 int spectator_target;
 CLC_VoiceData *voicecrash{};
 bool firstcm = false;

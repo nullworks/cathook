@@ -11,6 +11,7 @@
 #define MENU_COLOR (menu_color)
 
 // This is a temporary file to put code that needs moving/refactoring in.
+extern std::optional<Vector> aim_angles;
 extern bool *bSendPackets;
 extern bool ignoreKeys;
 extern std::array<int, 32> bruteint;

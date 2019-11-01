@@ -685,6 +685,18 @@ bool GetHitbox(CachedEntity *entity, int hb, Vector &out)
     return true;
 }
 
+void ShortAngleDist(Vector from, Vector to)
+{
+    auto max = PI * 2;
+    auto da  = (to - from) % max;
+    return 2 * da % max - da;
+}
+
+void AngleLerp(Vector from, Vector to, float time)
+{
+    return from + ShortAngleDist(from, to) * time;
+}
+
 void VectorAngles(Vector &forward, Vector &angles)
 {
     float tmp, yaw, pitch;

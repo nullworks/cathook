@@ -17,7 +17,7 @@ DEFINE_HOOKED_METHOD(SendDatagram, int, INetChannel *ch, bf_write *buf)
     int state = ch->m_nInReliableState;
     hacks::shared::backtrack::AddLatencyToNetchan(ch);
 
-    int ret = original::SendDatagram(ch, buf);
+    int ret                = original::SendDatagram(ch, buf);
     ch->m_nInSequenceNr    = in;
     ch->m_nInReliableState = state;
 

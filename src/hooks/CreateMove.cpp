@@ -289,7 +289,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 if (current_user_cmd->buttons & IN_ATTACK)
                     if (attackticks % *fullauto + 1 < *fullauto)
                         current_user_cmd->buttons &= ~IN_ATTACK;
-            static int fakelag_queue = 0;
+            static int fakelag_queue      = 0;
             g_pLocalPlayer->isFakeAngleCM = false;
             if (CE_GOOD(LOCAL_E))
                 if (fakelag_amount || (hacks::shared::antiaim::force_fakelag && hacks::shared::antiaim::isEnabled()))

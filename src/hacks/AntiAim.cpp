@@ -373,10 +373,11 @@ void ProcessUserCmd(CUserCmd *cmd)
     bool clamp            = !no_clamping;
 
     static int ticksUntilSwap = 0;
-    static bool swap = true;
+    static bool swap          = true;
 
-    if (ticksUntilSwap > 0 && *yaw_mode != 18) {
-        swap = true;
+    if (ticksUntilSwap > 0 && *yaw_mode != 18)
+    {
+        swap           = true;
         ticksUntilSwap = 0;
     }
     switch ((int) yaw_mode)
@@ -492,9 +493,10 @@ void ProcessUserCmd(CUserCmd *cmd)
         }
         break;
     case 18: // Fake sideways
-        if (g_pLocalPlayer->isFakeAngleCM && ticksUntilSwap--) {
+        if (g_pLocalPlayer->isFakeAngleCM && ticksUntilSwap--)
+        {
             ticksUntilSwap = UniformRandomInt(*yaw_sideways_min, *yaw_sideways_max);
-            swap = !swap;
+            swap           = !swap;
         }
         y += g_pLocalPlayer->isFakeAngleCM ^ swap ? 90.0f : -90.0f;
         break;

@@ -11,6 +11,8 @@ static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
 static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
+static settings : Boolean vm_aimbot{ "visual.vm-aimbot", "false" };
+
 bool freecam_is_toggled{ false };
 
 namespace hooked_methods
@@ -30,6 +32,59 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     else if (override_fov)
     {
         setup->fov = *override_fov;
+    }
+
+    if (vm_aimbot && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+    {
+        static Vector oViewmodelAimbotAngle = Vector(0, 0, 0);
+        Vector ViewmodelAimbotAngle         = Vector(0, 0, 0);
+        bool first                          = true;
+        static Vector oAngle                = Vector(0, 0, 0);
+        static float timeremaining          = 1000.f;
+        static float maxtime                = 0.4f;
+
+        auto viewangles = current_user_cmd->viewangles;
+
+        ViewmodelAimbotAngle = viewangles;
+
+        auto &angle = CE_VECTOR(LOCAL_E, netvar.m_angEyeAngles);
+
+        if (!ViewmodelAimbotAngle.IsValid() || ViewmodelAimbotAngle.IsZero())
+            return;
+
+        if ((setup->angles - ViewmodelAimbotAngle).Length() < 1.f || timeremaining < 0.f)
+        {
+            ViewmodelAimbotAngle = oViewmodelAimbotAngle = oAngle = Vector(0, 0, 0);
+            first                                                 = true;
+            timeremaining                                         = 1000.f;
+            return;
+        } // reset
+
+        auto Viewmodel = (IClientEntity *) g_IEntityList->GetClientEntityFromHandle(CE_INT(LOCAL_E, netvar.hViewModel));
+
+        if (!Viewmodel)
+        {
+            return;
+        }
+
+        if (first || oAngle != oViewmodelAimbotAngle)
+        {
+            oAngle        = ViewmodelAimbotAngle;
+            first         = false;
+            timeremaining = maxtime;
+        }
+
+        auto deltaAngle = ViewmodelAimbotAngle - setup->angles;
+
+        ClampAngles(deltaAngle);
+
+        Viewmodel->SetAbsAngles(setup->angles + deltaAngle);
+
+        timeremaining -= g_GlobalVars->frametime;
+
+        ViewmodelAimbotAngle = AngleLerp(setup->angles, oAngle, timeremaining / maxtime);
+
+        fClampAngle(ViewmodelAimbotAngle);
     }
 
     if (spectator_target)

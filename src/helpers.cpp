@@ -685,16 +685,43 @@ bool GetHitbox(CachedEntity *entity, int hb, Vector &out)
     return true;
 }
 
-void ShortAngleDist(Vector from, Vector to)
+float Lerp(float a, float b, float lerpFactor)
 {
-    auto max = PI * 2;
-    auto da  = (to - from) % max;
-    return 2 * da % max - da;
+    float result = ((1.f - lerpFactor) * a) + (lerpFactor * b);
+    return result;
 }
 
-void AngleLerp(Vector from, Vector to, float time)
+float AngleLerp(float a, float b, float lerpFactor) // Lerps from angle a to b (both between 0.f and 360.f), taking the shortest path
 {
-    return from + ShortAngleDist(from, to) * time;
+    float result;
+    float diff = b - a;
+    if (diff < -180.f)
+    {
+        // lerp upwards past 360
+        b += 360.f;
+        result = Lerp(a, b, lerpFactor);
+        if (result >= 360.f)
+        {
+            result -= 360.f;
+        }
+    }
+    else if (diff > 180.f)
+    {
+        // lerp downwards past 0
+        b -= 360.f;
+        result = Lerp(a, b, lerpFactor);
+        if (result < 0.f)
+        {
+            result += 360.f;
+        }
+    }
+    else
+    {
+        // straight lerp
+        result = Lerp(a, b, lerpFactor);
+    }
+
+    return result;
 }
 
 void VectorAngles(Vector &forward, Vector &angles)

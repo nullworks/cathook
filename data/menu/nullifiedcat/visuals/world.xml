@@ -17,6 +17,11 @@
             <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in thirdperson"/>
         </List>
     </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="fuck me" y="165">
+        <List width="180">
+            <AutoVariable width="fill" target="visual.vm-aimbot.enable" label="Enable VM aimbot"/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195">
         <List width="180">
             <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="100"/>

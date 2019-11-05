@@ -41,6 +41,8 @@ extern Color menu_color;
 extern int stored_buttons;
 #if ENABLE_VISUALS
 extern bool freecam_is_toggled;
+extern Vector ViewmodelAimbotAngle;
+extern settings::Boolean vm_aimbot;
 #endif
 namespace hooked_methods
 {

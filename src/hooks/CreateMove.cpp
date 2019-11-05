@@ -162,6 +162,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         g_Settings.is_create_move = false;
         return ret;
     }
+    aim_angles = current_user_cmd->viewangles;
 
     if (!isHackActive())
     {
@@ -198,8 +199,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     // if (!cmd) return ret;
 
     time_replaced = false;
-    aim_angles.reset();
-    curtime_old = g_GlobalVars->curtime;
+    curtime_old   = g_GlobalVars->curtime;
 
     INetChannel *ch;
     ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
@@ -397,6 +397,8 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
             ret = false;
         }
+        else
+            current_user_cmd->viewangles = cmd->viewangles;
         for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
         {
 

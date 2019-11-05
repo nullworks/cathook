@@ -88,8 +88,23 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
             fire = fire->m_pNext;
         }
     }*/
+
     if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
     {
+        if (vm_aimbot)
+        {
+            if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+                if (ViewmodelAimbotAngle.IsValid() && !ViewmodelAimbotAngle.IsZero())
+                {
+                    auto Viewmodel = (IClientEntity *) g_IEntityList->GetClientEntityFromHandle(CE_INT(LOCAL_E, netvar.hViewModel));
+
+                    if (Viewmodel)
+                    {
+                        QAngle &write = const_cast<QAngle &>(Viewmodel->GetAbsAngles());
+                        write         = VectorToQAngle(ViewmodelAimbotAngle);
+                    }
+                }
+        }
         IF_GAME(IsTF())
         {
             if (no_shake && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
@@ -101,5 +116,5 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
         hacks::tf::thirdperson::frameStageNotify();
     }
     return original::FrameStageNotify(this_, stage);
-}
+} // namespace hooked_methods
 } // namespace hooked_methods

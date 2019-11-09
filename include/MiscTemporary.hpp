@@ -40,6 +40,8 @@ extern Color menu_color;
 extern int stored_buttons;
 #if ENABLE_VISUALS
 extern bool freecam_is_toggled;
+extern std::optional<Vector> aim_angles;
+extern std::optional<Vector> original_aim_angles;
 #endif
 namespace hooked_methods
 {

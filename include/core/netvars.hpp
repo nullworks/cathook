@@ -45,6 +45,7 @@ public:
     offset_t iTeamNum;
     offset_t iFlags;
     offset_t iHealth;
+    offset_t m_hViewModel;
     offset_t iLifeState;
     offset_t iCond;
     offset_t iCond1;

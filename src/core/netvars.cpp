@@ -14,7 +14,7 @@ void NetVars::Init()
 {
     this->iFlags               = gNetvars.get_offset("DT_BasePlayer", "m_fFlags");
     this->iHealth              = gNetvars.get_offset("DT_BasePlayer", "m_iHealth");
-    this->m_hViewModel         = gNetvars.get_offset("DT_BasePlayer", "m_hViewModel[0]");
+    this->hViewModel           = gNetvars.get_offset("DT_BasePlayer", "m_hViewModel[0]");
     this->iLifeState           = gNetvars.get_offset("DT_BasePlayer", "m_lifeState");
     this->iTeamNum             = gNetvars.get_offset("DT_BaseEntity", "m_iTeamNum");
     this->vViewOffset          = gNetvars.get_offset("DT_BasePlayer", "localdata", "m_vecViewOffset[0]");

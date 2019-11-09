@@ -99,6 +99,9 @@ bool canReachVector(Vector loc, Vector dest = { 0, 0, 0 });
 
 bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax);
 
+float Lerp(float a, float b, float lerpFactor);
+float AngleLerp(float a, float b, float lerpFactor) ;
+
 float DistToSqr(CachedEntity *entity);
 void fClampAngle(Vector &qaAng);
 // const char* MakeInfoString(IClientEntity* player);

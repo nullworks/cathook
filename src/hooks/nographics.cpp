@@ -87,10 +87,7 @@ static bool blacklist_file(const char *&filename)
     if (len <= 3)
         return false;
 
-    auto ext_p = strrchr(filename, '.');
-    if (!ext_p)
-        return false;
-
+    auto ext_p = filename + len - 4;
     if (!std::strcmp(ext_p, ".vmt"))
     {
         /* Not loading it causes extreme console spam */
@@ -102,8 +99,6 @@ static bool blacklist_file(const char *&filename)
 
         return true;
     }
-    if (!std::strncmp(filename, "sound/player/footsteps", 22))
-        return false;
     if (!std::strcmp(ext_p, ".mdl"))
     {
         return false;

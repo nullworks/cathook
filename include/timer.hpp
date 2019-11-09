@@ -5,8 +5,8 @@
  *      Author: nullifiedcat
  */
 
-#ifndef   CH_TIMER_HPP
-#define   CH_TIMER_HPP
+#ifndef CH_TIMER_HPP
+#define CH_TIMER_HPP
 #include <chrono>
 
 class Timer

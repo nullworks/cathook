@@ -41,6 +41,8 @@ bool hack::game_shutdown = true;
 bool hack::shutdown      = false;
 bool hack::initialized   = false;
 
+
+
 const std::string &hack::GetVersion()
 {
     static std::string version("Unknown Version");

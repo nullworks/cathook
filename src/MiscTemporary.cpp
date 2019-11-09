@@ -7,6 +7,7 @@
 std::array<Timer, 32> timers{};
 std::array<int, 32> bruteint{};
 
+std::optional<Vector> aim_angles;
 int spectator_target;
 CLC_VoiceData *voicecrash{};
 bool firstcm = false;
@@ -30,8 +31,6 @@ settings::Int print_r{ "print.rgb.r", "183" };
 settings::Int print_g{ "print.rgb.b", "27" };
 settings::Int print_b{ "print.rgb.g", "139" };
 Color menu_color{ *print_r, *print_g, *print_b, 255 };
-std::optional<Vector> aim_angles;
-std::optional<Vector> original_aim_angles;
 
 void color_callback(settings::VariableBase<int> &, int)
 {

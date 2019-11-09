@@ -208,8 +208,4 @@ struct offsets
     {
         return PlatformOffset(6, undefined, undefined);
     }
-    static constexpr uint32_t GetMaxItemCount()
-    {
-        return PlatformOffset(10, undefined, undefined);
-    }
 };

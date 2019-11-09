@@ -6,7 +6,8 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/checksum_md5.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/tier1.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/utlbuffer.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UtlString.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/netmessage.cpp")
+    "${CMAKE_CURRENT_LIST_DIR}/netmessage.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/quaternions.cpp")
 target_sources(cathook PRIVATE ${files})
 list(REMOVE_ITEM ignore_files ${files})
 set(ignore_files ${ignore_files} CACHE INTERNAL "")

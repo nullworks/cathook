@@ -22,7 +22,7 @@ bool settings::SettingsWriter::saveTo(std::string path, bool autosave)
     {
         logging::Info("cat_save: Saving to %s", path.c_str());
     }
-    
+
     this->only_changed = true;
 
     stream.open(path, std::ios::out);

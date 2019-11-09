@@ -3,73 +3,24 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include "MiscTemporary.hpp"
+#include <MiscTemporary.hpp>
 #include <settings/Float.hpp>
+#include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 
 static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
 static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
+static settings::Boolean vm_aimbot{ "visual.vm-aimbot.enabled", "true" };
+
 bool freecam_is_toggled{ false };
-
-void viewmodel_aimbot(CViewSetup *vsView)
-{
-    if (!CE_GOOD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
-        return;
-
-    static bool first          = true;
-    static Vector oAngle       = Vector(0, 0, 0);
-    static float timeremaining = 1000.f;
-    static float maxtime       = 0.4f;
-    if (!(*aim_angles).IsValid() || (*aim_angles).IsZero())
-        return;
-    if ((QAngleToVector(vsView->angles) - *aim_angles).Length() < 1.f || timeremaining < 0.f)
-    {
-        aim_angles = original_aim_angles = oAngle = Vector(0, 0, 0);
-        first                                     = true;
-        timeremaining                             = 1000.f;
-        return;
-    } // reset
-    auto Viewmodel = g_IEntityList->GetClientEntityFromHandle(CE_INT(LOCAL_E, netvar.m_hViewModel));
-    if (!Viewmodel)
-    {
-        return;
-    }
-    if (first || oAngle != original_aim_angles)
-    { // if we just set the angle or if we started aimboting someone else reset
-        oAngle        = *aim_angles;
-        first         = false;
-        timeremaining = maxtime;
-    }
-
-    auto deltaAngle = *aim_angles - QAngleToVector(vsView->angles);
-    fClampAngle(deltaAngle);
-
-    static auto address_setabsang = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 55 C4 8B 02"));
-    typedef void (*SetAbsAngles_t)(IClientEntity *, Vector *);
-    SetAbsAngles_t SetAbsAngles_fn = SetAbsAngles_t(address_setabsang);
-
-    auto &eye_angles1 = NET_VECTOR(Viewmodel, netvar.m_angEyeAngles);
-    auto &eye_angles2 = NET_VECTOR(Viewmodel, netvar.m_angEyeAnglesLocal);
-
-    Vector vec = QAngleToVector(vsView->angles) + deltaAngle;
-
-    SetAbsAngles_fn(Viewmodel, &vec);
-    eye_angles1 = vec;
-    eye_angles2 = vec;
-
-    timeremaining -= g_GlobalVars->absoluteframetime;
-
-    aim_angles = Lerp(timeremaining / maxtime, QAngleToVector(vsView->angles), oAngle);
-    fClampAngle(*aim_angles);
-}
 
 namespace hooked_methods
 {
 
 DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
-{
+{    
     original::OverrideView(this_, setup);
 
     if (!isHackActive() || g_Settings.bInvalid || CE_BAD(LOCAL_E))
@@ -84,15 +35,67 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
         setup->fov = *override_fov;
     }
 
-    viewmodel_aimbot(setup);
-    if (spectator_target)
+    if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
     {
-        CachedEntity *spec = ENTITY(spectator_target);
-        if (CE_GOOD(spec) && !CE_BYTE(spec, netvar.iLifeState))
+        static Vector oViewmodelAimbotAngle = Vector(0, 0, 0);
+        static Vector ViewmodelAimbotAngle  = Vector(0, 0, 0);
+        bool first                          = true;
+        static Vector oAngle                = Vector(0, 0, 0);
+        static float timeremaining          = 1000.f;
+        static float maxtime                = 0.4f;
+
+        ViewmodelAimbotAngle = *aim_angles;
+
+        if (ViewmodelAimbotAngle.IsValid() && !ViewmodelAimbotAngle.IsZero())
         {
-            setup->origin = spec->m_vecOrigin() + CE_VECTOR(spec, netvar.vViewOffset);
-            // why not spectate yourself
-            if (spec == LOCAL_E)
+            Vector vec_setup_angles = *(Vector *) &setup->angles;
+
+            if ((vec_setup_angles - ViewmodelAimbotAngle).Length() < 1.f || timeremaining < 0.f)
+            {
+                ViewmodelAimbotAngle = oViewmodelAimbotAngle = oAngle = Vector(0, 0, 0);
+                first                                                 = true;
+                timeremaining                                         = 1000.f;
+
+            } // reset
+            else
+            {
+                auto Viewmodel = (IClientEntity *) g_IEntityList->GetClientEntityFromHandle(CE_INT(LOCAL_E, netvar.hViewModel));
+                if (Viewmodel)
+                {
+
+                    if (first && oAngle != oViewmodelAimbotAngle)
+                    {
+                        oAngle        = ViewmodelAimbotAngle;
+                        first         = false;
+                        timeremaining = maxtime;
+                    }
+
+                    auto deltaAngle = ViewmodelAimbotAngle - vec_setup_angles;
+
+                    fClampAngle(deltaAngle);
+
+                    QAngle &write = const_cast<QAngle &>(Viewmodel->GetAbsAngles());
+
+                    write         = VectorToQAngle(vec_setup_angles + deltaAngle);
+
+                    timeremaining -= g_GlobalVars->frametime;
+
+                    ViewmodelAimbotAngle = QAngleToVector(Lerp<QAngle>(timeremaining / maxtime, setup->angles, VectorToQAngle(oAngle)));
+
+                    fClampAngle(ViewmodelAimbotAngle);
+                }
+            }
+        }
+}
+
+if (spectator_target)
+{
+    CachedEntity *spec = ENTITY(spectator_target);
+    if (CE_GOOD(spec) && !CE_BYTE(spec, netvar.iLifeState))
+    {
+        setup->origin = spec->m_vecOrigin() + CE_VECTOR(spec, netvar.vViewOffset);
+        // why not spectate yourself
+        if (spec == LOCAL_E)
             {
                 setup->angles = CE_VAR(spec, netvar.m_angEyeAnglesLocal, QAngle);
             }

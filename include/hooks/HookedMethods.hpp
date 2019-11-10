@@ -92,7 +92,8 @@ DECLARE_HOOKED_METHOD(GetMaxItemCount, int, int *);
 DECLARE_HOOKED_METHOD(EmitSound1, void, void *, IRecipientFilter &, int, int, const char *, float, float, int, int, int, const Vector *, const Vector *, CUtlVector<Vector> *, bool, float, int);
 DECLARE_HOOKED_METHOD(EmitSound2, void, void *, IRecipientFilter &, int, int, const char *, float, soundlevel_t, int, int, int, const Vector *, const Vector *, CUtlVector<Vector> *, bool, float, int);
 DECLARE_HOOKED_METHOD(EmitSound3, void, void *, IRecipientFilter &, int, int, int, float, soundlevel_t, int, int, int, const Vector *, const Vector *, CUtlVector<Vector> *, bool, float, int);
-
+// Viewmodel
+DECLARE_HOOKED_METHOD(CalcViewModelView, void, IClientEntity *, IClientEntity *, Vector &, QAngle &);
 } // namespace hooked_methods
 
 // TODO

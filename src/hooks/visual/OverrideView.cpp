@@ -12,61 +12,86 @@ static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
 bool freecam_is_toggled{ false };
-
-void viewmodel_aimbot(CViewSetup *vsView)
+static std::optional<Vector> vec;
+std::optional<Vector> viewmodel_aimbot(Vector angles)
 {
-    if (!CE_GOOD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
-        return;
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+        return std::nullopt;
 
     static bool first          = true;
     static Vector oAngle       = Vector(0, 0, 0);
     static float timeremaining = 1000.f;
     static float maxtime       = 0.4f;
     if (!(*aim_angles).IsValid() || (*aim_angles).IsZero())
-        return;
-    if ((QAngleToVector(vsView->angles) - *aim_angles).Length() < 1.f || timeremaining < 0.f)
+        return std::nullopt;
+
+    Vector view_angles = angles;
+    if ((view_angles - *aim_angles).Length() < 1.f || timeremaining < 0.f)
     {
-        aim_angles = original_aim_angles = oAngle = Vector(0, 0, 0);
-        first                                     = true;
-        timeremaining                             = 1000.f;
-        return;
+        *aim_angles = *original_aim_angles = oAngle = Vector(0, 0, 0);
+        first                                       = true;
+        timeremaining                               = 1000.f;
+        return std::nullopt;
     } // reset
-    auto Viewmodel = g_IEntityList->GetClientEntityFromHandle(CE_INT(LOCAL_E, netvar.m_hViewModel));
+    auto Viewmodel = g_IEntityList->GetClientEntity(HandleToIDX(CE_INT(LOCAL_E, netvar.m_hViewModel)));
     if (!Viewmodel)
     {
-        return;
+        return std::nullopt;
     }
-    if (first || oAngle != original_aim_angles)
+    if (first || oAngle != *original_aim_angles)
     { // if we just set the angle or if we started aimboting someone else reset
         oAngle        = *aim_angles;
         first         = false;
         timeremaining = maxtime;
     }
 
-    auto deltaAngle = *aim_angles - QAngleToVector(vsView->angles);
+    auto deltaAngle = *aim_angles - view_angles;
     fClampAngle(deltaAngle);
 
     static auto address_setabsang = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 55 C4 8B 02"));
     typedef void (*SetAbsAngles_t)(IClientEntity *, Vector *);
     SetAbsAngles_t SetAbsAngles_fn = SetAbsAngles_t(address_setabsang);
 
-    auto &eye_angles1 = NET_VECTOR(Viewmodel, netvar.m_angEyeAngles);
-    auto &eye_angles2 = NET_VECTOR(Viewmodel, netvar.m_angEyeAnglesLocal);
+    vec = view_angles + deltaAngle;
 
-    Vector vec = QAngleToVector(vsView->angles) + deltaAngle;
-
-    SetAbsAngles_fn(Viewmodel, &vec);
-    eye_angles1 = vec;
-    eye_angles2 = vec;
+    SetAbsAngles_fn(Viewmodel, &*vec);
+    NET_VECTOR(Viewmodel, netvar.m_angEyeAngles)      = *vec;
+    NET_VECTOR(Viewmodel, netvar.m_angEyeAnglesLocal) = *vec;
 
     timeremaining -= g_GlobalVars->absoluteframetime;
 
-    aim_angles = Lerp(timeremaining / maxtime, QAngleToVector(vsView->angles), oAngle);
+    aim_angles = Lerp(timeremaining / maxtime, view_angles, oAngle);
     fClampAngle(*aim_angles);
+    return vec;
 }
 
 namespace hooked_methods
 {
+
+DEFINE_HOOKED_METHOD(CalcViewModelView, void, IClientEntity *_this, IClientEntity *player, Vector &eyePos, QAngle &eyeAng)
+{
+    if (vec)
+        eyeAng = VectorToQAngle(*vec);
+    return original::CalcViewModelView(_this, player, eyePos, eyeAng);
+}
+
+static InitRoutine hook_calcviewmodelview([]() {
+    EC::Register(
+        EC::Shutdown, []() { hooks::viewmodel.Release(); }, "init_calcmodel");
+    EC::Register(
+        EC::CreateMove,
+        []() {
+            if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+                return;
+            auto Viewmodel = g_IEntityList->GetClientEntity(HandleToIDX(CE_INT(LOCAL_E, netvar.m_hViewModel)));
+            if (!Viewmodel || hooks::viewmodel.IsHooked(Viewmodel))
+                return;
+            hooks::viewmodel.Set(Viewmodel);
+            hooks::viewmodel.HookMethod(HOOK_ARGS(CalcViewModelView));
+            hooks::viewmodel.Apply();
+        },
+        "calcviewmodel_hook");
+});
 
 DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 {
@@ -74,6 +99,9 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 
     if (!isHackActive() || g_Settings.bInvalid || CE_BAD(LOCAL_E))
         return;
+
+    if (!viewmodel_aimbot(QAngleToVector(setup->angles)))
+        vec = std::nullopt;
 
     if (g_pLocalPlayer->bZoomed && override_fov_zoomed)
     {
@@ -84,7 +112,6 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
         setup->fov = *override_fov;
     }
 
-    viewmodel_aimbot(setup);
     if (spectator_target)
     {
         CachedEntity *spec = ENTITY(spectator_target);

@@ -117,4 +117,5 @@ VMTHook soundclient{};
 VMTHook enginevgui{};
 VMTHook vstd{};
 VMTHook eventmanager2{};
+VMTHook viewmodel{};
 } // namespace hooks

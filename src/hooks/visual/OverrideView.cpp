@@ -35,9 +35,7 @@ std::optional<Vector> viewmodel_aimbot(Vector angles)
     } // reset
     auto Viewmodel = g_IEntityList->GetClientEntity(HandleToIDX(CE_INT(LOCAL_E, netvar.m_hViewModel)));
     if (!Viewmodel)
-    {
         return std::nullopt;
-    }
     if (first || oAngle != *original_aim_angles)
     { // if we just set the angle or if we started aimboting someone else reset
         oAngle        = *aim_angles;
@@ -48,15 +46,7 @@ std::optional<Vector> viewmodel_aimbot(Vector angles)
     auto deltaAngle = *aim_angles - view_angles;
     fClampAngle(deltaAngle);
 
-    static auto address_setabsang = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 55 C4 8B 02"));
-    typedef void (*SetAbsAngles_t)(IClientEntity *, Vector *);
-    SetAbsAngles_t SetAbsAngles_fn = SetAbsAngles_t(address_setabsang);
-
     vec = view_angles + deltaAngle;
-
-    SetAbsAngles_fn(Viewmodel, &*vec);
-    NET_VECTOR(Viewmodel, netvar.m_angEyeAngles)      = *vec;
-    NET_VECTOR(Viewmodel, netvar.m_angEyeAnglesLocal) = *vec;
 
     timeremaining -= g_GlobalVars->absoluteframetime;
 

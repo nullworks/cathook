@@ -11,6 +11,8 @@ static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
 static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
+static settings::Boolean vm_aimbot{ "visual.vm-aimbot.enable", "false" };
+
 bool freecam_is_toggled{ false };
 static std::optional<Vector> vec;
 std::optional<Vector> viewmodel_aimbot(Vector angles)
@@ -60,7 +62,7 @@ namespace hooked_methods
 
 DEFINE_HOOKED_METHOD(CalcViewModelView, void, IClientEntity *_this, IClientEntity *player, Vector &eyePos, QAngle &eyeAng)
 {
-    if (vec)
+    if (vm_aimbot && vec)
         eyeAng = VectorToQAngle(*vec);
     return original::CalcViewModelView(_this, player, eyePos, eyeAng);
 }
@@ -71,7 +73,7 @@ static InitRoutine hook_calcviewmodelview([]() {
     EC::Register(
         EC::CreateMove,
         []() {
-            if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+            if (!vm_aimbot || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
                 return;
             auto Viewmodel = g_IEntityList->GetClientEntity(HandleToIDX(CE_INT(LOCAL_E, netvar.m_hViewModel)));
             if (!Viewmodel || hooks::viewmodel.IsHooked(Viewmodel))
@@ -90,8 +92,9 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     if (!isHackActive() || g_Settings.bInvalid || CE_BAD(LOCAL_E))
         return;
 
-    if (!viewmodel_aimbot(QAngleToVector(setup->angles)))
-        vec = std::nullopt;
+    if (vm_aimbot)
+        if (!viewmodel_aimbot(QAngleToVector(setup->angles)))
+            vec = std::nullopt;
 
     if (g_pLocalPlayer->bZoomed && override_fov_zoomed)
     {

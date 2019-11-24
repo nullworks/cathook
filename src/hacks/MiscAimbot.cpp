@@ -286,10 +286,95 @@ static settings::Boolean autoupgrade_enabled("autoupgrade.enabled", "false");
 static settings::Boolean autoupgrade_sentry("autoupgrade.sentry", "false");
 static settings::Boolean autoupgrade_dispenser("autoupgrade.dispenser", "false");
 static settings::Boolean autoupgrade_teleport("autoupgrade.teleport", "false");
+static settings::Int autoupgrade_sentry_level("autoupgrade.sentry.level", "3");
+static settings::Int autoupgrade_dispenser_level("autoupgrade.dispenser.level", "3");
+static settings::Int autoupgrade_teleport_level("autoupgrade.teleport.level", "2");
 
-static void RepairAimbot()
+static bool ShouldHitBuilding(CachedEntity *ent)
 {
-    if (!autorepair_enabled)
+    if (!autoupgrade_enabled && !autorepair_enabled)
+        return false;
+    // Current Metal
+    int cur_ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 12);
+    // Autorepair is on
+    if (autorepair_enabled)
+    {
+        // Special Sentry logic
+        if (ent->m_iClassID() == CL_CLASS(CObjectSentrygun))
+        {
+            // Current sentry ammo
+            int sentry_ammo = CE_INT(ent, netvar.m_iAmmoShells);
+            // Max Sentry ammo
+            int max_ammo = 0;
+
+            // Set Ammo depending on level
+            switch (CE_INT(ent, netvar.iUpgradeLevel))
+            {
+            case 1:
+                max_ammo = 150;
+                break;
+            case 2:
+            case 3:
+                max_ammo = 200;
+            }
+
+            // Sentry needs ammo
+            if (sentry_ammo < max_ammo)
+                return true;
+        }
+        // Sentry needs to be repaired
+        if (cur_ammo && ent->m_iHealth() != ent->m_iMaxHealth())
+            return true;
+    }
+    // Autoupgrade is on
+    if (autoupgrade_enabled)
+    {
+        // Upgrade lvel
+        int upgrade_level = CE_INT(ent, netvar.iUpgradeLevel);
+
+        // Don't upgrade mini sentries
+        if (CE_BYTE(ent, netvar.m_bMiniBuilding))
+            return false;
+
+        // Rvar to check
+        auto check_rvar = autoupgrade_sentry_level;
+
+        // Pick The right rvar to check depending on building type
+        switch (ent->m_iClassID())
+        {
+
+        case CL_CLASS(CObjectSentrygun):
+            // Enabled check
+            if (!autoupgrade_sentry)
+                return false;
+            check_rvar = autoupgrade_sentry_level;
+            break;
+
+        case CL_CLASS(CObjectDispenser):
+            // Enabled check
+            if (!autoupgrade_dispenser)
+                return false;
+            check_rvar = autoupgrade_dispenser_level;
+            break;
+
+        case CL_CLASS(CObjectTeleporter):
+            // Enabled check
+            if (!autoupgrade_teleport)
+                return false;
+            check_rvar = autoupgrade_teleport_level;
+            break;
+        }
+
+        // Can be upgraded
+        if (upgrade_level < *check_rvar && cur_ammo)
+            return true;
+    }
+    return false;
+}
+
+static void BuildingAimbot()
+{
+    if (!autorepair_enabled && !autoupgrade_enabled)
         return;
 
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
@@ -297,7 +382,11 @@ static void RepairAimbot()
 
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
-    int cur_ammo         = CE_INT(LOCAL_E, netvar.m_iAmmo + 12);
+    // Metal
+    int cur_ammo       = CE_INT(LOCAL_E, netvar.m_iAmmo + 12);
+    float wrench_range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+    // Center is further away than actual hit range for buildings, so add some more
+    wrench_range += (float) 50.f;
 
     if (cur_ammo == 0)
         return;
@@ -308,149 +397,96 @@ static void RepairAimbot()
     if (GetWeaponMode() != weaponmode::weapon_melee)
         return;
 
-    for (int i = 0; i < entity_cache::max; i++) // loop
+    bool first_run = false;
+    if (autorepair_priority)
+        first_run = true;
+
+    // Run this loop twice if we have priority set
+    for (int idx = 0; idx < (*autorepair_priority ? 2 : 1); idx++)
     {
-        CachedEntity *ent = ENTITY(i);
-
-        if (CE_BAD(ent))
-            continue;
-
-        if (ent->m_Type() != ENTITY_BUILDING)
-            continue;
-
-        if (ent->m_bEnemy())
-            continue;
-
-        float new_distance = g_pLocalPlayer->v_Eye.DistTo(GetBuildingPosition(ent));
-
-        if (distance <= new_distance)
-            continue;
-
-        // if ( ent->m_iHealth() == ent->m_iMaxHealth() )
-        // continue;
-
-        auto id = ent->m_iClassID();
-
-        float wrench_range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-        wrench_range += (float) 50.f;
-
-        switch (id)
+        if (idx && target)
+            break;
+        for (int i = 0; i < entity_cache::max; i++)
         {
-        case CL_CLASS(CObjectSentrygun):
-        { // start
+            CachedEntity *ent = ENTITY(i);
 
-            if (!autorepair_repair_sentry)
+            if (CE_BAD(ent))
+                continue;
+
+            // can't exactly repair Merasmus
+            if (ent->m_Type() != ENTITY_BUILDING)
+                continue;
+
+            // yes, repair enemy buildings
+            if (ent->m_bEnemy())
+                continue;
+
+            float new_distance = g_pLocalPlayer->v_Eye.DistTo(GetBuildingPosition(ent));
+
+            // Further away than old one
+            if (distance <= new_distance)
+                continue;
+
+            auto id = ent->m_iClassID();
+
+            switch (id)
+            {
+
+            case CL_CLASS(CObjectSentrygun):
+            {
+                if (first_run && *autorepair_priority != 1)
+                    continue;
+                // Don't repair sentries
+                if (!autorepair_repair_sentry && !autoupgrade_sentry)
+                    continue;
                 break;
+            }
 
-            static bool sentry_need_repair = false;
+            case CL_CLASS(CObjectDispenser):
+            {
+                if (first_run && *autorepair_priority != 2)
+                    continue;
+                // Repair Dispensers check
+                if (!autorepair_repair_dispenser && !autoupgrade_dispenser)
+                    continue;
+                break;
+            }
 
-            int sentry_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
+            case CL_CLASS(CObjectTeleporter):
+            {
+                if (first_run && *autorepair_priority != 3)
+                    continue;
+                // Repair Teleporters check
+                if (!autorepair_repair_teleport && !autoupgrade_teleport)
+                    continue;
+                break;
+            }
+
+            default:
+                continue;
+            }
 
             float s_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
 
-            if (ent->m_iHealth() == ent->m_iMaxHealth())
-                break;
+            if (!ShouldHitBuilding(ent))
+                continue;
 
             if (s_distance > wrench_range)
-                break;
+                continue;
 
-            if (ent->m_iHealth() < ent->m_iMaxHealth())
-            {
-                sentry_need_repair = true;
-                target             = ent;
-            }
-            else
-            {
-                sentry_need_repair = false;
-                target             = nullptr;
-            }
+            target = ent;
 
-            if (!sentry_need_repair)
-                break;
+            distance = new_distance;
+        }
+        first_run = false;
+    }
 
-        } // end
-        case CL_CLASS(CObjectDispenser):
-        { // start
-
-            if (!autorepair_repair_dispenser)
-                break;
-
-            static bool dispenser_need_repair = false;
-
-            int dispenser_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
-            float d_distance                = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
-
-            if (ent->m_iHealth() == ent->m_iMaxHealth())
-                break;
-
-            if (d_distance > wrench_range)
-                break;
-
-            if (ent->m_iHealth() < ent->m_iMaxHealth())
-            {
-                dispenser_need_repair = true;
-                target                = ent;
-            }
-            else
-            {
-                dispenser_need_repair = false;
-                target                = nullptr;
-            }
-
-            if (dispenser_need_repair == false)
-                break;
-
-        } // end
-        case CL_CLASS(CObjectTeleporter):
-        { // start
-
-            if (!autorepair_repair_teleport)
-                break;
-            ;
-
-            static bool teleport_need_repair = false;
-
-            int teleport_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
-            float t_distance               = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
-
-            if (ent->m_iHealth() == ent->m_iMaxHealth())
-                break;
-
-            if (t_distance > wrench_range)
-                break;
-
-            if (ent->m_iHealth() < ent->m_iMaxHealth())
-            {
-                teleport_need_repair = true;
-                target               = ent;
-            }
-            else
-            {
-                teleport_need_repair = false;
-                target               = nullptr;
-            }
-
-            if (teleport_need_repair == false)
-                break;
-
-        } // end
-
-        default:
-            continue;
-        } // end
-
-        distance = new_distance;
-        // target   = ent;
-
-    } // end of loop
-
-    if (target) // target is set
+    // We have a target
+    if (target)
     {
-        float range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-        range += (float) 50.f;
 
         Vector angle   = GetAimAtAngles(g_pLocalPlayer->v_Eye, GetBuildingPosition(target));
-        Vector forward = GetForwardVector(g_pLocalPlayer->v_Eye, angle, range);
+        Vector forward = GetForwardVector(g_pLocalPlayer->v_Eye, angle, wrench_range);
 
         trace_t trace;
 
@@ -472,7 +508,7 @@ static void CreateMove()
     SandwichAim();
     ChargeAimbot();
     SapperAimbot();
-    RepairAimbot();
+    BuildingAimbot();
 }
 
 static InitRoutine init([]() {

@@ -46,6 +46,15 @@ public:
     offset_t iFlags;
     offset_t iHealth;
     offset_t m_hViewModel;
+
+    // sentry
+    offset_t m_iAmmoShells; // sentry shells
+    offset_t m_iAmmoRockets; // use only with if (GetLevel() == 3)
+    offset_t m_iSentryState; // sentry state
+
+    // dispenser
+    offset_t m_iAmmoMetal; // dispenser metal reserve
+
     offset_t iLifeState;
     offset_t iCond;
     offset_t iCond1;
@@ -55,7 +64,11 @@ public:
     offset_t vViewOffset;
     offset_t hActiveWeapon;
     offset_t flChargedDamage;
-    offset_t iUpgradeLevel;
+
+    // any building
+    offset_t m_iUpgradeMetal; // upgrade metal on any building
+    offset_t m_flPercentageConstructed; // use only with        if (IsBuilding())
+    offset_t iUpgradeLevel; // any building
     offset_t m_hBuilder;
     offset_t m_bCanPlace;
     offset_t m_iObjectType;
@@ -63,12 +76,15 @@ public:
     offset_t m_bHasSapper;
     offset_t m_bPlacing;
     offset_t m_bBuilding;
-    offset_t m_iTeleState;
+
+    // teleporter
+    offset_t m_iTeleState; // teleport state [1 = idle, 2 = active, 3 = teleporting, 4 = charging]
     offset_t m_flTeleRechargeTime;
     offset_t m_flTeleCurrentRechargeDuration;
     offset_t m_iTeleTimesUsed;
     offset_t m_flTeleYawToExit;
     offset_t m_bMatchBuilding;
+
     offset_t iPipeType;
     offset_t iBuildingHealth;
     offset_t iBuildingMaxHealth;

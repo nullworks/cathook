@@ -8,6 +8,7 @@
 #include "settings/Key.hpp"
 #include "PlayerTools.hpp"
 #include "hacks/Trigger.hpp"
+#include "hacks/Achievement.hpp"
 
 namespace hacks::tf2::misc_aimbot
 {
@@ -18,6 +19,7 @@ static settings::Int sandwichaim_aimkey_mode{ "sandwichaim.aimkey-mode", "0" };
 float sandwich_speed = 350.0f;
 float grav           = 0.25f;
 int prevent          = -1;
+
 std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck)
 {
     CachedEntity *bestent = nullptr;
@@ -190,9 +192,11 @@ static void SandwichAim()
         g_pLocalPlayer->bUseSilentAngles = true;
     }
 }
+
 static bool charge_aimbotted = false;
 static settings::Boolean charge_aim{ "chargeaim.enable", "false" };
 static settings::Button charge_key{ "chargeaim.key", "<null>" };
+
 static void ChargeAimbot()
 {
     charge_aimbotted = false;
@@ -269,12 +273,203 @@ static void SapperAimbot()
         }
     }
 }
+// auto repair
+static settings::Int autorepair_priority{ "autorepair.priority", "0" };
+static settings::Boolean autorepair_enabled("autorepair.enabled", "false");
+static settings::Boolean autorepair_silent("autorepair.silent", "true");
+static settings::Boolean autorepair_autoequip("autorepair.autoequip", "false");
+static settings::Boolean autorepair_repair_sentry("autorepair.sentry", "false");
+static settings::Boolean autorepair_repair_dispenser("autorepair.dispenser", "false");
+static settings::Boolean autorepair_repair_teleport("autorepair.teleport", "false");
+// auto upgrade
+static settings::Boolean autoupgrade_enabled("autoupgrade.enabled", "false");
+static settings::Boolean autoupgrade_sentry("autoupgrade.sentry", "false");
+static settings::Boolean autoupgrade_dispenser("autoupgrade.dispenser", "false");
+static settings::Boolean autoupgrade_teleport("autoupgrade.teleport", "false");
+
+static void RepairAimbot()
+{
+    if (!autorepair_enabled)
+        return;
+
+    if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
+        return;
+
+    CachedEntity *target = nullptr;
+    float distance       = FLT_MAX;
+    int cur_ammo         = CE_INT(LOCAL_E, netvar.m_iAmmo + 12);
+
+    if ( cur_ammo == 0 )
+        return;
+
+    if ( g_pLocalPlayer->clazz != tf_engineer )
+        return;
+
+    if ( GetWeaponMode() != weaponmode::weapon_melee )
+        return;
+
+    for ( int i = 0; i < entity_cache::max; i++ ) // loop
+    {
+        CachedEntity *ent = ENTITY(i);
+
+        if ( CE_BAD(ent) )
+            continue;
+
+        if ( ent->m_Type() != ENTITY_BUILDING )
+            continue;
+
+        if ( ent->m_bEnemy() )
+            continue;
+
+        float new_distance = g_pLocalPlayer->v_Eye.DistTo(GetBuildingPosition(ent));
+
+        if (distance <= new_distance)
+            continue;
+
+        //if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+            //continue;
+
+        auto id = ent->m_iClassID();
+
+        float wrench_range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+        wrench_range += (float)50.f;
+
+        switch ( id ) {
+        case CL_CLASS( CObjectSentrygun ): { // start
+
+            if ( !autorepair_repair_sentry )
+                break;
+
+            static bool sentry_need_repair = false;
+
+            int sentry_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
+
+            float s_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
+
+            if (ent->m_iHealth() == ent->m_iMaxHealth())
+                break;
+
+            if (s_distance > wrench_range)
+                break;
+
+            if (ent->m_iHealth() < ent->m_iMaxHealth())
+            {
+                sentry_need_repair = true;
+                target = ent;
+            }
+            else
+            {
+                sentry_need_repair = false;
+                target = nullptr;
+            }
+
+            if (!sentry_need_repair)
+                break;
+
+        } // end
+        case CL_CLASS(CObjectDispenser): { // start
+
+            if ( !autorepair_repair_dispenser )
+                break;
+
+            static bool dispenser_need_repair = false;
+
+            int dispenser_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
+            float d_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
+
+            if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+                break;
+
+            if ( d_distance > wrench_range )
+                break;
+
+            if ( ent->m_iHealth() < ent->m_iMaxHealth() )
+            {
+                dispenser_need_repair = true;
+                target = ent;
+            }
+            else
+            {
+                dispenser_need_repair = false;
+                target = nullptr;
+            }
+
+            if( dispenser_need_repair == false)
+                break;
+
+        } // end
+        case CL_CLASS(CObjectTeleporter): { // start
+
+            if ( !autorepair_repair_teleport )
+                break;;
+
+            static bool teleport_need_repair = false;
+
+            int teleport_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
+            float t_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
+
+            if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+                break;
+
+            if (t_distance > wrench_range)
+                break;
+
+            if (ent->m_iHealth() < ent->m_iMaxHealth() )
+            {
+                teleport_need_repair = true;
+                target = ent;
+            }
+            else
+            {
+                teleport_need_repair = false;
+                target = nullptr;
+            }
+
+            if ( teleport_need_repair == false )
+                break;
+
+        } // end
+
+        default:
+            continue;
+      } // end
+
+        distance = new_distance;
+        //target   = ent;
+
+    } // end of loop
+
+
+
+    if (target) // target is set
+    {
+        float range    = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+        range         += (float)50.f;
+
+        Vector angle   = GetAimAtAngles(g_pLocalPlayer->v_Eye, GetBuildingPosition(target));
+        Vector forward = GetForwardVector(g_pLocalPlayer->v_Eye, angle, range);
+
+        trace_t trace;
+
+        if (IsEntityVectorVisible(target, forward, MASK_SHOT, &trace))
+        {
+            if (trace.DidHit() && (IClientEntity *) trace.m_pEnt == RAW_ENT(target))
+            {
+                current_user_cmd->viewangles = angle;
+                if (autorepair_silent)
+                    g_pLocalPlayer->bUseSilentAngles = true;
+                current_user_cmd->buttons |= IN_ATTACK;
+            }
+        }
+    }
+}
 
 static void CreateMove()
 {
     SandwichAim();
     ChargeAimbot();
     SapperAimbot();
+    RepairAimbot();
 }
 
 static InitRoutine init([]() {

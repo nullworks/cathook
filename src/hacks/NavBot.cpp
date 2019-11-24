@@ -433,16 +433,42 @@ static std::vector<Vector> getDispensers()
         CachedEntity *ent = ENTITY(i);
         if (CE_INVALID(ent))
             continue;
+
         if (!ent->m_vecDormantOrigin())
             continue;
+
         if (ent->m_iClassID() != CL_CLASS(CObjectDispenser) || ent->m_bEnemy())
             continue;
+
         if (CE_BYTE(ent, netvar.m_bHasSapper))
             continue;
+
         dispensers.push_back(*ent->m_vecDormantOrigin());
     }
     std::sort(dispensers.begin(), dispensers.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) < g_pLocalPlayer->v_Origin.DistTo(b); });
     return dispensers;
+}
+
+static std::vector<Vector> getSentries()
+{
+    std::vector<Vector> sentries;
+    for (int i = 1; i <= HIGHEST_ENTITY; i++)
+    {
+        CachedEntity *ent = ENTITY(i);
+
+        if (CE_INVALID(ent))
+            continue;
+
+        if (!ent->m_vecDormantOrigin())
+            continue;
+
+        if (ent->m_iClassID() != CL_CLASS(CObjectSentrygun) || ent->m_bEnemy())
+            continue;
+
+        sentries.push_back(*ent->m_vecDormantOrigin());
+    }
+    std::sort(sentries.begin(), sentries.end(), [](Vector &a, Vector &b) { return g_pLocalPlayer->v_Origin.DistTo(a) < g_pLocalPlayer->v_Origin.DistTo(b); });
+    return sentries;
 }
 
 static bool getDispenserHealthAndAmmo()
@@ -592,7 +618,7 @@ static bool getHealthAndAmmo()
 static void autoJump()
 {
     static Timer last_jump{};
-    if (!last_jump.test_and_set(200))
+    if (!last_jump.test_and_set(150))
         return;
 
     if (getNearestPlayerDistance().second <= *jump_distance)

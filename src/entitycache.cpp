@@ -26,6 +26,7 @@ CachedEntity::CachedEntity() : m_IDX(int(((unsigned) this - (unsigned) &entity_c
     m_fLastUpdate = 0.0f;
 }
 
+
 void CachedEntity::Reset()
 {
     m_bAnyHitboxVisible = false;

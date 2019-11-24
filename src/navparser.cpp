@@ -667,7 +667,7 @@ static void drawcrumbs()
         o1 = &crumbs[i]->m_center;
         if (draw::WorldToScreen(*o1, wts1) && draw::WorldToScreen(*o2, wts2))
         {
-            draw::Line(wts1.x, wts1.y, wts2.x - wts1.x, wts2.y - wts1.y, colors::white, 0.3f);
+            draw::Line(wts1.x, wts1.y, wts2.x - wts1.x, wts2.y - wts1.y, colors::red, 0.2f);
         }
     }
     Vector wts;

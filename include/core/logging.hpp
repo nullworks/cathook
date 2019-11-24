@@ -18,4 +18,4 @@ void Initialize();
 void Shutdown();
 void Info(const char *fmt, ...);
 void File(const char *fmt, ...);
-}
+} // namespace logging

@@ -21,28 +21,25 @@ namespace hacks::tf2::explosioncircles
 {
 static settings::Boolean enabled("explosionspheres.enabled", "false");
 
+// too lazy to make my own http://www.cplusplus.com/forum/general/65476/
 void draw_sphere(Vector center, double r, std::vector<Vector> &spherePoints)
 {
     Vector screen, screen2;
-
-    for (double phi = 0.; phi < 2 * PI; phi += PI / 10.)
+    // Iterate through phi, theta then convert r,theta,phi to  XYZ
+    for (double phi = 0.; phi < 2 * PI; phi += PI / 10.) // Azimuth [0, 2PI]
     {
         spherePoints.clear();
-
-        for (double theta = 0.; theta < PI; theta += PI / 10.)
-            spherePoints.emplace_back(r * cos ( theta ) * sin ( phi ) + center.x, r * sin ( theta ) * sin ( phi ) + center.y, r * cos ( phi ) + center.z);
-
+        for (double theta = 0.; theta < PI; theta += PI / 10.) // Elevation [0, PI]
+            spherePoints.emplace_back(r * cos(phi) * sin(theta) + center.x, r * sin(phi) * sin(theta) + center.y, r * cos(theta) + center.z);
+        // Add the missing point on the bottom
         spherePoints.emplace_back(center.x, center.y, center.z - r);
-
         int vecsize = spherePoints.size();
-
         Vector prev = spherePoints.front();
-
         for (int i = 1; i < vecsize; i++)
         {
             if (draw::WorldToScreen(prev, screen) && draw::WorldToScreen(spherePoints[i], screen2))
             {
-                draw::Line(screen.x, screen.y, screen2.x - screen.x, screen2.y - screen.y, colors::FromRGBA8(30, 30, 30, 80), 2);
+                draw::Line(screen.x, screen.y, screen2.x - screen.x, screen2.y - screen.y, colors::FromRGBA8(255, 120, 0, 50), 2);
             }
             prev = spherePoints[i];
         }

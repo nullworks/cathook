@@ -48,7 +48,7 @@ public:
     offset_t m_hViewModel;
 
     // sentry
-    offset_t m_iAmmoShells; // sentry shells
+    offset_t m_iAmmoShells;  // sentry shells
     offset_t m_iAmmoRockets; // use only with if (GetLevel() == 3)
     offset_t m_iSentryState; // sentry state
 
@@ -66,9 +66,9 @@ public:
     offset_t flChargedDamage;
 
     // any building
-    offset_t m_iUpgradeMetal; // upgrade metal on any building
+    offset_t m_iUpgradeMetal;           // upgrade metal on any building
     offset_t m_flPercentageConstructed; // use only with        if (IsBuilding())
-    offset_t iUpgradeLevel; // any building
+    offset_t iUpgradeLevel;             // any building
     offset_t m_hBuilder;
     offset_t m_bCanPlace;
     offset_t m_iObjectType;

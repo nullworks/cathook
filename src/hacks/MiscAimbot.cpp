@@ -299,26 +299,26 @@ static void RepairAimbot()
     float distance       = FLT_MAX;
     int cur_ammo         = CE_INT(LOCAL_E, netvar.m_iAmmo + 12);
 
-    if ( cur_ammo == 0 )
+    if (cur_ammo == 0)
         return;
 
-    if ( g_pLocalPlayer->clazz != tf_engineer )
+    if (g_pLocalPlayer->clazz != tf_engineer)
         return;
 
-    if ( GetWeaponMode() != weaponmode::weapon_melee )
+    if (GetWeaponMode() != weaponmode::weapon_melee)
         return;
 
-    for ( int i = 0; i < entity_cache::max; i++ ) // loop
+    for (int i = 0; i < entity_cache::max; i++) // loop
     {
         CachedEntity *ent = ENTITY(i);
 
-        if ( CE_BAD(ent) )
+        if (CE_BAD(ent))
             continue;
 
-        if ( ent->m_Type() != ENTITY_BUILDING )
+        if (ent->m_Type() != ENTITY_BUILDING)
             continue;
 
-        if ( ent->m_bEnemy() )
+        if (ent->m_bEnemy())
             continue;
 
         float new_distance = g_pLocalPlayer->v_Eye.DistTo(GetBuildingPosition(ent));
@@ -326,18 +326,20 @@ static void RepairAimbot()
         if (distance <= new_distance)
             continue;
 
-        //if ( ent->m_iHealth() == ent->m_iMaxHealth() )
-            //continue;
+        // if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+        // continue;
 
         auto id = ent->m_iClassID();
 
         float wrench_range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-        wrench_range += (float)50.f;
+        wrench_range += (float) 50.f;
 
-        switch ( id ) {
-        case CL_CLASS( CObjectSentrygun ): { // start
+        switch (id)
+        {
+        case CL_CLASS(CObjectSentrygun):
+        { // start
 
-            if ( !autorepair_repair_sentry )
+            if (!autorepair_repair_sentry)
                 break;
 
             static bool sentry_need_repair = false;
@@ -355,96 +357,97 @@ static void RepairAimbot()
             if (ent->m_iHealth() < ent->m_iMaxHealth())
             {
                 sentry_need_repair = true;
-                target = ent;
+                target             = ent;
             }
             else
             {
                 sentry_need_repair = false;
-                target = nullptr;
+                target             = nullptr;
             }
 
             if (!sentry_need_repair)
                 break;
 
         } // end
-        case CL_CLASS(CObjectDispenser): { // start
+        case CL_CLASS(CObjectDispenser):
+        { // start
 
-            if ( !autorepair_repair_dispenser )
+            if (!autorepair_repair_dispenser)
                 break;
 
             static bool dispenser_need_repair = false;
 
             int dispenser_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
-            float d_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
+            float d_distance                = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
 
-            if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+            if (ent->m_iHealth() == ent->m_iMaxHealth())
                 break;
 
-            if ( d_distance > wrench_range )
+            if (d_distance > wrench_range)
                 break;
 
-            if ( ent->m_iHealth() < ent->m_iMaxHealth() )
+            if (ent->m_iHealth() < ent->m_iMaxHealth())
             {
                 dispenser_need_repair = true;
-                target = ent;
+                target                = ent;
             }
             else
             {
                 dispenser_need_repair = false;
-                target = nullptr;
+                target                = nullptr;
             }
 
-            if( dispenser_need_repair == false)
+            if (dispenser_need_repair == false)
                 break;
 
         } // end
-        case CL_CLASS(CObjectTeleporter): { // start
+        case CL_CLASS(CObjectTeleporter):
+        { // start
 
-            if ( !autorepair_repair_teleport )
-                break;;
+            if (!autorepair_repair_teleport)
+                break;
+            ;
 
             static bool teleport_need_repair = false;
 
             int teleport_health_percentage = ent->m_iHealth() / ent->m_iMaxHealth();
-            float t_distance = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
+            float t_distance               = ent->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin());
 
-            if ( ent->m_iHealth() == ent->m_iMaxHealth() )
+            if (ent->m_iHealth() == ent->m_iMaxHealth())
                 break;
 
             if (t_distance > wrench_range)
                 break;
 
-            if (ent->m_iHealth() < ent->m_iMaxHealth() )
+            if (ent->m_iHealth() < ent->m_iMaxHealth())
             {
                 teleport_need_repair = true;
-                target = ent;
+                target               = ent;
             }
             else
             {
                 teleport_need_repair = false;
-                target = nullptr;
+                target               = nullptr;
             }
 
-            if ( teleport_need_repair == false )
+            if (teleport_need_repair == false)
                 break;
 
         } // end
 
         default:
             continue;
-      } // end
+        } // end
 
         distance = new_distance;
-        //target   = ent;
+        // target   = ent;
 
     } // end of loop
 
-
-
     if (target) // target is set
     {
-        float range    = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-        range         += (float)50.f;
+        float range = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+        range += (float) 50.f;
 
         Vector angle   = GetAimAtAngles(g_pLocalPlayer->v_Eye, GetBuildingPosition(target));
         Vector forward = GetForwardVector(g_pLocalPlayer->v_Eye, angle, range);

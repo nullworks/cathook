@@ -43,7 +43,7 @@ public:
     bool bAttackLastTick;
 
     bool isFakeAngleCM = false;
-    Vector realAngles{0.0f, 0.0f, 0.0f};
+    Vector realAngles{ 0.0f, 0.0f, 0.0f };
 };
 
 #define LOCAL_E g_pLocalPlayer->entity

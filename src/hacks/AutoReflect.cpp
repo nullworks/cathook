@@ -119,7 +119,7 @@ bool IsEntSentryRocket(CachedEntity *ent)
 
 bool IsEntBall(CachedEntity *ent)
 {
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_BallOfFire) || ent->m_iClassID() == CL_CLASS(CTFProjectile_EnergyBall))
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_StunBall || CTFProjectile_BallOrnament))
         return true;
     else
         return false;
@@ -127,7 +127,7 @@ bool IsEntBall(CachedEntity *ent)
 
 bool IsEntCleaver(CachedEntity *ent)
 {
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_BallOfFire) || ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
+    if (ent->m_iClassID() == CL_CLASS(ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
         return true;
     else
         return false;

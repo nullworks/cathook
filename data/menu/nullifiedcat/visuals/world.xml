@@ -49,7 +49,7 @@
                     <Option name="OFF" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable KIllfeed Coloring"/>
+            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable Killfeed Coloring"/>
         </List>
     </Box>
 </Tab>

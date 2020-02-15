@@ -118,7 +118,7 @@ bool IsEntSentryRocket(CachedEntity *ent)
 
 bool IsEntCleaver(CachedEntity *ent)
 {
-    if (ent->m_iClassID() == CL_CLASS(ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
         return true;
     else
         return false;
@@ -178,7 +178,7 @@ bool ShouldReflect(CachedEntity *ent)
     else if (IsEntSentryRocket(ent) && !sentryrockets)
         return false;
 
-    else if (IsEntCleaver(ent) && !balls)
+    else if (IsEntCleaver(ent) && !cleavers)
         return false;
 
     // Target passed the test, return true

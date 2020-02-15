@@ -24,6 +24,7 @@ static settings::Boolean jars{ "autoreflect.jars", "false"};
 static settings::Boolean healingbolts{ "autoreflect.healingbolts", "false"};
 static settings::Boolean rockets{ "autoreflect.rockets", "false"};
 static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "false"};
+static settings::Boolean balls{ "autoreflect.balls", "false"};
 static settings::Boolean cleavers{ "autoreflect.cleavers", "false"};
 static settings::Boolean teammates{ "autoreflect.teammate", "false" };
 
@@ -116,6 +117,14 @@ bool IsEntSentryRocket(CachedEntity *ent)
         return false;
 }
 
+bool IsEntBall(CachedEntity *ent)
+{
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_StunBall || CTFProjectile_BallOrnament))
+        return true;
+    else
+        return false;
+}
+
 bool IsEntCleaver(CachedEntity *ent)
 {
     if (ent->m_iClassID() == CL_CLASS(ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
@@ -176,6 +185,9 @@ bool ShouldReflect(CachedEntity *ent)
         return false;
 
     else if (IsEntSentryRocket(ent) && !sentryrockets)
+        return false;
+
+    else if (IsEntBall(ent) && !balls)
         return false;
 
     else if (IsEntCleaver(ent) && !balls)

@@ -25,7 +25,7 @@ static settings::Boolean stickies{ "chams.show.stickies", "true" };
 static settings::Boolean teammate_buildings{ "chams.show.teammate-buildings", "false" };
 static settings::Boolean recursive{ "chams.recursive", "true" };
 static settings::Boolean weapons_white{ "chams.white-weapons", "true" };
-static settings::Boolean legit{ "chams.legit", "false" };
+static settings::Boolean legit{ "chams.legit", "true" };
 static settings::Boolean singlepass{ "chams.single-pass", "false" };
 static settings::Boolean chamsself{ "chams.self", "true" };
 static settings::Boolean disco_chams{ "chams.disco", "false" };

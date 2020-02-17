@@ -234,7 +234,7 @@ bool EffectChams::ShouldRenderChams(IClientEntity *entity)
     case ENTITY_PLAYER:
         if (!players)
             return false;
-        if (!disguised && (IsPlayerDisguised(ent)))
+        if (!disguised && IsPlayerDisguised(ent))
             return false;
         if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent))
             return false;

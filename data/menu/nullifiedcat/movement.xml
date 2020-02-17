@@ -9,19 +9,19 @@
         <List width="180">
             <AutoVariable width="fill" target="follow-bot.enable" label="Enable FollowBot"/>
             <AutoVariable width="fill" target="follow-bot.roaming" label="Roaming"/>
-            <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change when possible"/>
-            <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump if stuck"/>
-            <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced taunts"/>
-            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation range"/>
+            <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change When Possible"/>
+            <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump If Stuck"/>
+            <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced Taunts"/>
+            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation Range"/>
             <AutoVariable width="fill" target="follow-bot.distance" label="Follow distance"/>
-            <AutoVariable width="fill" target="follow-bot.ipc-distance" label="IRC additive distance"/>
-            <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic slot"/>
-            <AutoVariable width="fill" target="follow-bot.mimic-crouch" label="Mimic crouch"/>
+            <AutoVariable width="fill" target="follow-bot.ipc-distance" label="IRC Additive Distance"/>
+            <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic Slot"/>
+            <AutoVariable width="fill" target="follow-bot.mimic-crouch" label="Mimic Crouch"/>
             <AutoVariable width="fill" target="follow-bot.always-medigun" label="Always Medigun"/>
             <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK Switch"/>
-            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit"/>
-            <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
-            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to follow"/>
+            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK Limit"/>
+            <AutoVariable width="fill" target="follow-bot.corners" label="Corner Activate"/>
+            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to Follow"/>
             <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize Friends"/>
             <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the Party Leader"/>
             <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw Crumbs"/>
@@ -33,16 +33,16 @@
 	        <AutoVariable width="fill" target="misc.pathing.draw" label="Draw Path"/>
             <AutoVariable width="fill" target="misc.pathing.look-at-path" label="Look at Path"/>
             <AutoVariable width="fill" target="navbot.enabled" label="Enable Navbot"/>
-            <AutoVariable width="fill" target="navbot.engineer-mode" label="Enable Engineer mode"/>
+            <AutoVariable width="fill" target="navbot.engineer-mode" label="Enable Engineer Mode"/>
             <AutoVariable width="fill" target="navbot.get-health-and-ammo" label="Get Health and Ammo"/>
             <AutoVariable width="fill" target="navbot.spy-mode" label="Enable Spy Mode"/>
             <AutoVariable width="fill" target="navbot.other-mode" label="General Mode"/>
-            <AutoVariable width="fill" target="navbot.primary-only" label="Best Weapon only"/>
+            <AutoVariable width="fill" target="navbot.primary-only" label="Best Weapon Only"/>
             <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable Autojump"/>
             <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump Distance"/>
             <!--AutoVariable width="fill" target="navbot.target-sentry" label="Try to target sentries"/-->
-            <AutoVariable width="fill" target="navbot.stay-near" label="Zone enemies (stay near)"/>
-            <AutoVariable width="fill" target="navbot.spy-ignore-time" label="Spy ignore time"/>
+            <AutoVariable width="fill" target="navbot.stay-near" label="Zone Enemies (Stay Near)"/>
+            <AutoVariable width="fill" target="navbot.spy-ignore-time" label="Spy ignore Time"/>
             <!-- <!AutoVariable width="fill" target="navbot.take-teleporters" label="take teleporters"/> -->
         </List>
     </Box>

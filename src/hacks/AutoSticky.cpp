@@ -16,7 +16,7 @@ static settings::Boolean enable{ "autosticky.enable", "false" };
 static settings::Boolean buildings{ "autosticky.buildings", "true" };
 static settings::Boolean legit{ "autosticky.legit", "false" };
 static settings::Boolean dontblowmeup{ "autosticky.dontblowmeup", "true" };
-static settings::Boolean maximize_damage{ "autosticky.damage", "false" };
+static settings::Int min_dist{ "autosticky.min-dist", "130" };
 
 // A storage array for ents
 static std::vector<CachedEntity *> bombs;
@@ -160,14 +160,8 @@ void CreateMove()
 
             position = *position + (collideable->OBBMins() + collideable->OBBMaxs()) / 2;
 
-            int min_dist;
-            if (maximize_damage)
-                min_dist = 80;
-            else
-                min_dist = 130;
-            
             if (!found)
-                if (bomb->m_vecOrigin().DistTo(*position) < min_dist)
+                if (bomb->m_vecOrigin().DistTo(*position) < *min_dist)
                 {
                     // Vis check the target from the bomb
                     if (IsVectorVisible(bomb->m_vecOrigin(), *position, true))

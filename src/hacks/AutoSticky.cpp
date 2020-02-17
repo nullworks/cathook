@@ -162,7 +162,7 @@ void CreateMove()
 
             int min_dist;
             if (maximize_damage)
-                min_dist = 70;
+                min_dist = 80;
             else
                 min_dist = 130;
             

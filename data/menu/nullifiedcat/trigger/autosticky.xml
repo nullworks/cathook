@@ -5,7 +5,7 @@
             <AutoVariable width="fill" target="autosticky.buildings" label="Detonate On Buildings"/>
             <AutoVariable width="fill" target="autosticky.legit" label="Legit Mode"/>
             <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't Blow Me Up"/>
-            <AutoVariable width="fill" target="autosticky.damage" label="Maximize Damage"/>
+            <AutoVariable width="fill" target="autosticky.min-dist" label="Min Distance" min="0" max="130" step="5"/>
         </List>
     </Box>
 </Tab>

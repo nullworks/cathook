@@ -11,6 +11,7 @@
 namespace hacks::shared::bunnyhop
 {
 static settings::Boolean enable{ "bunnyhop.enable", "false" };
+static settings::Int bhop_chance{ "bunnyhop.chance", "100" };
 
 // Var for user settings
 
@@ -30,6 +31,10 @@ static void CreateMove()
     if (!current_user_cmd->command_number)
         return;
 
+    // Bhop likelihood
+    if (UniformRandomInt(0, 99) > *bhop_chance)
+        return;
+    
     // var for "if on ground" from the flags netvar
     bool ground = CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & (1 << 0);
     // Var for if the player is pressing jump

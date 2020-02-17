@@ -2,6 +2,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Bunny Hop">
         <List width="150">
             <AutoVariable width="fill" target="bunnyhop.enable" label="Enable Bunny Hop"/>
+	    <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop Chance"/>
             <AutoVariable width="fill" target="misc.autostrafe" label="Enable Auto strafe"/>
         </List>
     </Box>
@@ -27,7 +28,7 @@
             <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw Crumbs"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="NavBot" y="50">
+    <Box padding="12 6 6 6" width="content" height="content" name="NavBot" y="65">
         <List width="150">
             <AutoVariable width="fill" target="misc.pathing" label="Enable Pathing"/>
 	        <AutoVariable width="fill" target="misc.pathing.draw" label="Draw Path"/>

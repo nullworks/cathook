@@ -5,6 +5,7 @@
             <AutoVariable width="fill" target="autosticky.buildings" label="Detonate On Buildings"/>
             <AutoVariable width="fill" target="autosticky.legit" label="Legit Mode"/>
             <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't Blow Me Up"/>
+            <AutoVariable width="fill" target="autosticky.damage" label="Maximize Damage"/>
         </List>
     </Box>
 </Tab>

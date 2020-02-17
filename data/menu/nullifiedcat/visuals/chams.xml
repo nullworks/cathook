@@ -22,6 +22,7 @@
         <List width="150">
             <AutoVariable width="fill" target="chams.show.players" label="Players"/>
             <AutoVariable width="fill" target="chams.show.teammates" label="Teammates"/>
+            <AutoVariable width="fill" target="chams.show.disguised" label="Disguised"/>
             <AutoVariable width="fill" target="chams.self" label="Chams Self"/>
             <AutoVariable width="fill" target="chams.show.buildings" label="Buildings"/>
             <AutoVariable width="fill" target="chams.show.teammate-buildings" label="Team Buildings"/>

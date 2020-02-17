@@ -16,6 +16,7 @@ namespace effect_chams
 static settings::Boolean flat{ "chams.flat", "false" };
 static settings::Boolean health{ "chams.health", "false" };
 static settings::Boolean teammates{ "chams.show.teammates", "false" };
+static settings::Boolean disguised{ "chams.show.disguised", "true" };
 static settings::Boolean players{ "chams.show.players", "true" };
 static settings::Boolean medkits{ "chams.show.medkits", "false" };
 static settings::Boolean ammobox{ "chams.show.ammoboxes", "false" };
@@ -232,6 +233,8 @@ bool EffectChams::ShouldRenderChams(IClientEntity *entity)
         return true;
     case ENTITY_PLAYER:
         if (!players)
+            return false;
+        if (!disguised && (IsPlayerDisguised(ent)))
             return false;
         if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent))
             return false;

@@ -1,0 +1,22 @@
+<Tab name="Auto Pyro" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Reflect">
+        <List width="150">
+            <AutoVariable width="fill" target="autoreflect.enable" label="Enable Auto Reflect"/>
+            <AutoVariable width="fill" target="autoreflect.button" label="Reflect Button"/>
+	    <AutoVariable width="fill" target="autoreflect.legit" label="Enable Legit Mode"/>
+            <AutoVariable width="fill" target="autoreflect.fov" label="FOV"/>
+            <!-- <AutoVariable width="fill" target="autoreflect.draw-fov" label="draw FOV"/> -->
+            <!-- <AutoVariable width="fill" target="autoreflect.draw-fov-opacity" label="FOV opacity"/> -->
+            <AutoVariable width="fill" target="autoreflect.idle-only" label="Only Reflect When Able"/>
+            <AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball Mode"/>
+            <AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
+            <AutoVariable width="fill" target="autoreflect.teammate" label="Teammate Projectiles"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="165">
+        <List width="150">
+            <AutoVariable width="fill" target="auto-detonator.enable" label="Enable Auto Detonator"/>
+            <AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore Cloaked"/>
+        </List>
+    </Box>
+</Tab>

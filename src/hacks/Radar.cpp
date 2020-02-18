@@ -15,6 +15,7 @@ namespace hacks::tf::radar
 static settings::Boolean radar_enabled{ "radar.enable", "false" };
 static settings::Int size{ "radar.size", "300" };
 static settings::Float zoom{ "radar.zoom", "10" };
+static settings::Float opacity{ "radar.opacity", "0.4" };
 static settings::Boolean healthbar{ "radar.healthbar", "true" };
 static settings::Boolean enemies_over_teammates{ "radar.enemies-over-teammates", "true" };
 static settings::Int icon_size{ "radar.icon-size", "20" };
@@ -197,7 +198,7 @@ void Draw()
 
     outlineclr = GUIColor();
 
-    draw::Rectangle(x, y, radar_size, radar_size, colors::Transparent(colors::black, 0.4f));
+    draw::Rectangle(x, y, radar_size, radar_size, colors::Transparent(colors::black, *opacity));
     draw::RectangleOutlined(x, y, radar_size, radar_size, outlineclr, 0.5f);
 
     if (enemies_over_teammates)

@@ -115,7 +115,7 @@
             <AutoVariable width="fill" target="esp.online.software" label="Online: Software"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="185">
+    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="140">
         <List width="150">
             <LabeledObject width="fill" label="Mode">
                 <Select target="esp.emoji.mode">

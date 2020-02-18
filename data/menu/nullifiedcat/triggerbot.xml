@@ -39,10 +39,8 @@
             </Box>
         </Tab>
         <Include path="nullifiedcat/trigger/autoheal.xml"/>
-        <Include path="nullifiedcat/trigger/autodetonator.xml"/>
-        <Include path="nullifiedcat/trigger/autobackstab.xml"/>
-        <Include path="nullifiedcat/trigger/autoreflect.xml"/>
+        <Include path="nullifiedcat/trigger/autopyro.xml"/>
         <Include path="nullifiedcat/trigger/autosticky.xml"/>
-        <Include path="nullifiedcat/trigger/autodeadringer.xml"/>
+        <Include path="nullifiedcat/trigger/autospy.xml"/>
     </TabContainer>
 </Tab>

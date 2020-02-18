@@ -1,8 +1,0 @@
-<Tab name="Auto Detonator" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator">
-        <List width="150">
-            <AutoVariable width="fill" target="auto-detonator.enable" label="Enable Auto Detonator"/>
-            <AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore Cloaked"/>
-        </List>
-    </Box>
-</Tab>

@@ -16,16 +16,16 @@ static settings::Boolean legit{ "autoreflect.legit", "false" };
 static settings::Boolean dodgeball{ "autoreflect.dodgeball", "false" };
 static settings::Button blastkey{ "autoreflect.button", "<null>" };
 
-static settings::Boolean stickies{ "autoreflect.stickies", "false" };
-static settings::Boolean pipes{ "autoreflect.pipes", "false" };
+static settings::Boolean stickies{ "autoreflect.stickies", "true" };
+static settings::Boolean pipes{ "autoreflect.pipes", "true" };
 static settings::Boolean flares{ "autoreflect.flares", "false"};
 static settings::Boolean arrows{ "autoreflect.arrows", "false"};
 static settings::Boolean jars{ "autoreflect.jars", "false"};
 static settings::Boolean healingbolts{ "autoreflect.healingbolts", "false"};
-static settings::Boolean rockets{ "autoreflect.rockets", "false"};
-static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "false"};
+static settings::Boolean rockets{ "autoreflect.rockets", "true"};
+static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "true"};
 static settings::Boolean cleavers{ "autoreflect.cleavers", "false"};
-static settings::Boolean teammates{ "autoreflect.teammate", "false" };
+static settings::Boolean teammates{ "autoreflect.teammate", "true" };
 
 static settings::Float fov{ "autoreflect.fov", "85" };
 
@@ -35,97 +35,9 @@ static settings::Boolean fov_draw{ "autoreflect.draw-fov", "false" };
 static settings::Float fovcircle_opacity{ "autoreflect.draw-fov-opacity", "0.7" };
 #endif
 
-bool IsEntStickyBomb(CachedEntity *ent)
-{
-    // Check if the projectile is a sticky bomb
-    if (ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-    {
-        if (CE_INT(ent, netvar.iPipeType) == 1)
-        {
-            // Ent passed and should be reflected
-            return true;
-        }
-    }
-    // Ent didnt pass the test so return false
-    return false;
-}
-
-bool IsEntPipeBomb(CachedEntity *ent)
-{
-    // Check if the projectile is a sticky bomb
-    if (ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-    {
-        if (CE_INT(ent, netvar.iPipeType) == 0)
-        {
-            // Ent passed and should be reflected
-            return true;
-        }
-    }
-    // Ent didnt pass the test so return false
-    return false;
-}
-
-//Same as above but for other projectiles
-
-bool IsEntFlare(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Flare))
-        return true;
-    else
-        return false;
-}
-
-bool IsEntArrow(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Arrow))
-        return true;
-    else
-        return false;
-}
-
-bool IsEntJar(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Jar) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk))
-        return true;
-    else
-        return false;
-}
-
-bool IsEntHealingBolt(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_HealingBolt))
-        return true;
-    else
-        return false;
-}
-
-
-bool IsEntRocket(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Rocket))
-        return true;
-    else
-        return false;
-}
-
-bool IsEntSentryRocket(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_SentryRocket))
-        return true;
-    else
-        return false;
-}
-
-bool IsEntCleaver(CachedEntity *ent)
-{
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
-        return true;
-    else
-        return false;
-}
 
 // Function to determine whether an ent is good to reflect
-bool ShouldReflect(CachedEntity *ent)
+static bool ShouldReflect(CachedEntity *ent)
 {
     // Check if the entity is a projectile
     if (ent->m_Type() != ENTITY_PROJECTILE)
@@ -149,36 +61,39 @@ bool ShouldReflect(CachedEntity *ent)
             return false;
     }
 
-    // Check if the projectile is a sticky bomb and if the user settings allow
-    // it to be reflected
 
 
-    if (IsEntStickyBomb(ent) && !stickies)
+    // Checks if the projectile is x and if the user settings allow it to be reflected
+    // If not, returns false
+
+    if (!stickies && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+        //Checks the demoguy projectile type (both stickies and pipes are combined under PipeBombProjectile)
+        if (CE_INT(ent, netvar.iPipeType) == 1)
+            return false;
+
+    if (!pipes && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+        if (CE_INT(ent, netvar.iPipeType) == 0)
+            return false;
+
+    if (!flares && ent->m_iClassID() == CL_CLASS(CTFProjectile_Flare))
         return false;
 
-    //Same as above but for other projectile types
-    else if (IsEntPipeBomb(ent) && !pipes)
+    if (!arrows && ent->m_iClassID() == CL_CLASS(CTFProjectile_Arrow))
         return false;
 
-    else if (IsEntFlare(ent) && !flares)
+    if (!jars && (ent->m_iClassID() == CL_CLASS(CTFProjectile_Jar)) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk))
         return false;
 
-    else if (IsEntArrow(ent) && !arrows)
+    if (!healingbolts && ent->m_iClassID() == CL_CLASS(CTFProjectile_HealingBolt))
         return false;
 
-    else if (IsEntJar(ent) && !jars)
+    if (!rockets &&  ent->m_iClassID() == CL_CLASS(CTFProjectile_Rocket))
         return false;
 
-    else if (IsEntHealingBolt(ent) && !healingbolts)
+    if (!sentryrockets && ent->m_iClassID() == CL_CLASS(CTFProjectile_SentryRocket))
         return false;
 
-    else if (IsEntRocket(ent) && !rockets)
-        return false;
-
-    else if (IsEntSentryRocket(ent) && !sentryrockets)
-        return false;
-
-    else if (IsEntCleaver(ent) && !cleavers)
+    if (!cleavers && ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
         return false;
 
     // Target passed the test, return true
@@ -233,11 +148,14 @@ void CreateMove()
         Vector predicted_proj = ent->m_vecOrigin() + (velocity * latency);
 
         // Dont vischeck if ent is stickybomb or if dodgeball mode is enabled
-        if (!IsEntStickyBomb(ent) && !dodgeball)
+        if (ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) && !dodgeball)
         {
-            // Vis check the predicted vector
-            if (!IsVectorVisible(g_pLocalPlayer->v_Origin, predicted_proj))
-                continue;
+            if (CE_INT(ent, netvar.iPipeType) == 1)
+            {
+                // Vis check the predicted vector
+                if (!IsVectorVisible(g_pLocalPlayer->v_Origin, predicted_proj))
+                    continue;
+            }
         }
 
          /*else {

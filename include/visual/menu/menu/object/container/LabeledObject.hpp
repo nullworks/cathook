@@ -27,7 +27,7 @@ public:
 
     void setObject(std::unique_ptr<BaseMenuObject> &&object);
 
-    void setLabel(std::string text, std::string text2);
+    void setLabel(std::string text1, std::string text2);
 
     void createLabel();
 

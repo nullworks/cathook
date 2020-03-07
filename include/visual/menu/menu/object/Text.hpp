@@ -48,6 +48,8 @@ public:
     void setOwnColor(rgba_t color);
 
     void set(std::string text);
+    
+    void setWithLabel(std::string text1, std::string text2);
 
     const std::string &get() const;
 

@@ -33,6 +33,8 @@ public:
 
     void render() override;
 
+    void renderForTooltip();
+
     void recalculateSize() override;
 
     bool handleSdlEvent(SDL_Event *event) override;

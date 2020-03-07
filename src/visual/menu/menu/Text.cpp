@@ -20,6 +20,19 @@ void zerokernel::Text::render()
     BaseMenuObject::render();
 }
 
+void zerokernel::Text::renderForTooltip()
+{
+    renderBackground(*zerokernel_tooltip::color_background);
+    renderBorder(*zerokernel_tooltip::color_border);
+#if ENABLE_IMGUI_DRAWING // needed, sorry
+    draw::String(bb.getContentBox().left() + text_x, bb.getContentBox().top() + text_y - 1, *color_text, data.c_str(), resource::font::base);
+#else
+    draw::String(bb.getContentBox().left() + text_x, bb.getContentBox().top() + text_y + 1, *color_text, data.c_str(), resource::font::base);
+#endif
+
+    BaseMenuObject::render();
+}
+
 void zerokernel::Text::set(std::string text)
 {
     if (text == data)

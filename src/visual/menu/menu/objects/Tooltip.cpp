@@ -28,10 +28,7 @@ void Tooltip::render()
     x += 6;
     move(x, y);
 
-    renderBackground(*zerokernel_tooltip::color_background);
-    renderBorder(*zerokernel_tooltip::color_border);
-
-    text.render();
+    text.renderForTooltip();
 
     BaseMenuObject::render();
 }

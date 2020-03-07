@@ -37,7 +37,7 @@ void zerokernel::LabeledObject::createLabel()
     addObject(std::move(label));
 }
 
-void zerokernel::LabeledObject::setLabel(std::string text)
+void zerokernel::LabeledObject::setLabel(std::string text, std::string tt)
 {
     if (label == nullptr)
     {

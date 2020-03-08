@@ -1,9 +1,9 @@
 <Tab name="Aimbot" padding="6 6 6 6">
     <Box padding="12 6 6 6" width="content" height="content" name="Aimbot">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.enable" label="Enable Aimbot"/>
-            <AutoVariable width="fill" target="aimbot.aimkey.button" label="Aim Key"/>
-            <LabeledObject width="fill" label="Aim Key Mode">
+            <AutoVariable width="fill" target="aimbot.enable" label="Enable Aimbot" tooltip="Controls If the Aimbot Is Active"/>
+            <AutoVariable width="fill" target="aimbot.aimkey.button" label="Aim Key" tooltip="Sets the Aimkey"/>
+            <LabeledObject width="fill" label="Aim Key Mode" tooltip="Controls What the Aimkey Does">
                 <Select target="aimbot.aimkey.mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Pressed" value="1"/>
@@ -11,23 +11,23 @@
                     <Option name="Toggle" value="3"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.silent" label="Silent"/>
-            <AutoVariable width="fill" target="aimbot.slow" label="Slow Aimbot" min="0" max="30"/>
-            <AutoVariable width="fill" target="aimbot.fov" label="FOV"/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV Circle"/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.05"/>
+            <AutoVariable width="fill" target="aimbot.silent" label="Silent" tooltip="Hides Aimbot's Crosshair Movement. Doesn't Work on Specators"/>
+            <AutoVariable width="fill" target="aimbot.slow" label="Slow Aimbot" min="0" max="30" tooltip="Slows the Aimbot's Movement"/>
+            <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the Aimbot to a Certain FOV From the Crosshair"/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV Circle" tooltip="Shows the Aimbot's FOV"/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.1" tooltip="Controls the FOV Circle's Opactity"/>
             <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only Shoot When Able"/>
-            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss Chance"/>
+            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss Chance" tooltip="Percent Chance the Aimbot Will Miss"/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
-            <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed Only"/>
+            <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed Only" tooltip="If Applicable Will Only Shoot When Sniper Is Scoped"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="340">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable Autoshoot"/>
-            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for Charge"/>
-            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot Disguised"/>
-            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto Spin-up"/>
+            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for Charge" tooltip="Wait to Fire Until Charge Allows a One Shot Kill"/>
+            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot Disguised" tooltip="Allows Autoshooting When You Are Disguised"/>
+            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto Spin-up" tooltip="Allows Spinning up Even If No Enemies Are in FOV Circle"/>
             <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto Zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto Unzoom"/>
         </List>

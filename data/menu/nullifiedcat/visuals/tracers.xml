@@ -3,9 +3,9 @@
         <List width="150">
             <AutoVariable width="fill" target="tracers.enabled" label="Enabled"/>
             <AutoVariable width="fill" target="tracers.buildings" label="Enable Building Tracers"/>
-            <AutoVariable width="fill" target="tracers.green-distance" label="Green Distance"/>
+            <AutoVariable width="fill" target="tracers.green-distance" label="Green Distance" tooltip="Distance Enemy Must Be for Green Tracers" min="0" max="10001" step="100"/>
             <AutoVariable width="fill" target="tracers.line-thickness" label="Line Thickness"/>
-            <AutoVariable width="fill" target="tracers.line-opaqueness" label="Line Opaqueness"/>
+            <AutoVariable width="fill" target="tracers.line-opaqueness" label="Line Opacity" min="0" max="1.01" step="0.05"/>
             <AutoVariable width="fill" target="tracers.min-fov" label="Min FOV"/>
             <AutoVariable width="fill" target="tracers.max-dist" label="Max Distance"/>
             <LabeledObject width="fill" label="Show Friends">

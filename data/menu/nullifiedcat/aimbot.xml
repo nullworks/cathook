@@ -15,9 +15,9 @@
             <AutoVariable width="fill" target="aimbot.slow" label="Slow Aimbot" min="0" max="30" tooltip="Slows the Aimbot's Movement"/>
             <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the Aimbot to a Certain FOV From the Crosshair"/>
             <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV Circle" tooltip="Shows the Aimbot's FOV"/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.1" tooltip="Controls the FOV Circle's Opactity"/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.05" tooltip="Controls the FOV Circle's Opacity"/>
             <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only Shoot When Able"/>
-            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss Chance" tooltip="Percent Chance the Aimbot Will Miss"/>
+            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss Chance" tooltip="% Chance the Aimbot Will Miss"/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed Only" tooltip="If Applicable Will Only Shoot When Sniper Is Scoped"/>
         </List>
@@ -83,7 +83,7 @@
             <AutoVariable width="fill" target="aimbot.target.max-range" label="Max Range"/>
             <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
             <AutoVariable width="fill" target="aimbot.lock-target" label="Lock Target"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage Only"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage Only" tooltip="Only Aimbot Enemies Set to Rage"/>
             <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim at Stickybombs"/>
             <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim at Sentry Guns"/>
             <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim at Other Buildings"/>
@@ -124,7 +124,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Sandvich Aimbot" x="170" y="240">
         <List width="150">
-            <AutoVariable width="fill" target="sandwichaim.enable" label="Enable Sandvich Aimbot"/>
+            <AutoVariable width="fill" target="sandwichaim.enable" label="Enable Sandvich Aimbot" tooltip="'I Wish They Stopped Here' -LuckyStar"/>
             <AutoVariable width="fill" target="sandwichaim.aimkey" label="Aimkey"/>
             <LabeledObject width="fill" label="Aimkey Mode">
                 <Select target="sandwichaim.aimkey-mode">

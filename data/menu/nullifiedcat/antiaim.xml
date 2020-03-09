@@ -6,7 +6,7 @@
             <AutoVariable width="fill" target="antiaim.crouch" label="Fake Crouch"/>
             <AutoVariable width="fill" target="antiaim.no-clamp" label="No Clamping"/>
             <AutoVariable width="fill" target="misc.fakelag" label="Fakelag" min="0" max="15"/>
-            <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" min="-45" max="45"/>
+            <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" min="-45" max="45" step="0.1"/>
             <AutoVariable width="fill" target="antiaim.roll" label="Roll"/>
             <AutoVariable width="fill" target="antiaim.pitch.static" label="Custom Pitch"/>
             <AutoVariable width="fill" target="antiaim.yaw.static" label="Custom Yaw"/>
@@ -55,14 +55,14 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Anti-Anti-Aim" x="170">
+    <Box padding="12 6 6 6" width="content" height="content" name="Resolver" x="170">
         <List width="150">
-            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable"/>
+            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Enable Anti-Anti-Aim"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" name="Anti-Anti-Anti-Aim" width="content" height="content" x="340">
+    <Box padding="12 6 6 6" name="Anti-Resolver" width="content" height="content" x="340">
         <List width="150">
-            <AutoVariable width="fill" target="antiaim.aaaa.enable" label="Enable"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.enable" label="Enable" tooltip="Enable Anti-Anti-Anti-Aim"/>
             <AutoVariable width="fill" target="antiaim.aaaa.flip-key" label="Flip Key"/>
             <AutoVariable width="fill" target="antiaim.aaaa.interval.seconds" label="Enable"/>
             <AutoVariable width="fill" target="antiaim.aaaa.interval.random-low" label="Random Low"/>

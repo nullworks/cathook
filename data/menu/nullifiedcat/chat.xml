@@ -1,7 +1,7 @@
 <Tab name="Chat" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chat Spam">
         <List width="150">
-            <LabeledObject width="fill" label="Spam Mode">
+            <LabeledObject width="fill" label="Spam Mode" tooltip="Set Which Text Is Spammed in the Chat">
                 <Select target="spam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Custom" value="1"/>
@@ -19,22 +19,37 @@
             <AutoVariable width="fill" target="spam.teamchat" label="Spam in teamchat"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Chat Log" y="105">
+    <Box name="Voice Spam" width="content" height="content" padding="12 6 6 6" y="100">
+        <List width="150">
+            <LabeledObject width="fill" label="Voice Spam" tooltip="Spam Character Voice Lines">
+                <Select target="spam.voicecommand">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Random" value="1"/>
+                    <Option name="Medic" value="2"/>
+                    <Option name="Thanks" value="3"/>
+		    <Option name="Nice Shot" value="4"/>
+                    <Option name="Cheers" value="5"/>
+                    <Option name="Jeers" value="6"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Chat Log" y="135">
         <List width="150">
             <AutoVariable width="fill" target="chat-log.enable" label="Enable Chat Log"/>
             <AutoVariable width="fill" target="chat-log.no-ipc" label="Ignore IPC"/>
             <AutoVariable width="fill" target="chat-log.no-spam" label="Anti Spam"/>
         </List>
     </Box>
-    <Box name="Chat Censor" width="content" height="content" padding="12 6 6 6" y="170">
+    <Box name="Chat Censor" width="content" height="content" padding="12 6 6 6" y="200">
         <List width="150">
-            <AutoVariable width="fill" target="chat.censor.enable" label="Enable Chat Censor"/>
+            <AutoVariable width="fill" target="chat.censor.enable" label="Enable Chat Censor" tooltip="Censors Cheating Accusations"/>
             <AutoVariable width="fill" target="chat.censor.filter" label="Filter"/>
         </List>
     </Box>
     <Box name="Killsay" width="177" height="content" padding="12 6 6 6" x="170">
         <List width="150">
-            <LabeledObject width="fill" label="Killsay Mode">
+            <LabeledObject width="fill" label="Killsay Mode" tooltip="Set Which Text Is After a Kill">
                 <Select target="killsay.mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Custom" value="1"/>
@@ -47,7 +62,7 @@
             <AutoVariable width="fill" target="killsay.delay" label="Killsay Delay"/>
             <Box name="Critsay" width="165" height="content" padding="12 6 6 6">
                 <List width="150">
-                    <LabeledObject width="fill" label="Critsay Mode">
+                    <LabeledObject width="fill" label="Critsay Mode" tooltip="Set Which Text Is Spammed After a Crit Kill">
                         <Select target="critsay.mode">
                             <Option name="Disable" value="0"/>
                             <Option name="Custom" value="1"/>
@@ -62,7 +77,7 @@
     </Box>
     <Box name="Uber Spam" width="content" height="content" padding="12 6 6 6" x="352">
         <List width="150">
-            <LabeledObject width="fill" label="Source">
+            <LabeledObject width="fill" label="Source" tooltip="Prints in Chat Your Uber %. Default Team Only">
                 <Select target="uberspam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Default" value="1"/>
@@ -99,7 +114,7 @@
         </List>
     </Box>
     <Box name="IRC" width="content" height="content" padding="12 6 6 6" x="170" y="140">
-        <List width="150">
+        <List width="155">
             <AutoVariable width="fill" target="irc.enabled" label="Enabled"/>
             <AutoVariable width="fill" target="irc.anon" label="Hide Real Name"/>
             <AutoVariable width="fill" target="irc.auth" label="Reveal to Cathook Users"/>
@@ -109,7 +124,7 @@
         </List>
     </Box>
     <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="250">
-        <List width="150">
+        <List width="155">
             <AutoVariable width="fill" target="votelogger.autovote.yes" label="Autovote Yes"/>
             <AutoVariable width="fill" target="votelogger.autovote.no" label="Autovote No"/>
             <AutoVariable width="fill" target="votelogger.autovote.no.rage" label="Kick RAGE status"/>
@@ -119,7 +134,7 @@
             <AutoVariable width="fill" target="votelogger.restart-on-kick" label="Crash When Kicked"/>
         </List>
     </Box>
-    <Box name="Command & Control" width="content" height="content" padding="12 6 6 6" y="205">
+    <Box name="Command & Control" width="content" height="content" padding="12 6 6 6" y="235">
         <List width="150">
             <AutoVariable width="fill" target="irc.cc.channel" label="Channel"/>
             <AutoVariable width="fill" target="irc.cc.password" label="Password"/>

@@ -1,5 +1,5 @@
 <Tab name="Collective" padding="4 4 4 4">
-    <Box height="content" width="content" padding="12 6 6 6">
+    <Box height="content" width="content" padding="12 6 6 6" name="Collective">
         <List width="220">
             <AutoVariable width="fill" target="misc.anti-afk" label="Enable Antiafk"/>
             <AutoVariable width="fill" target="misc.auto-abandon" label="Enable Auto Abandon"/>
@@ -56,7 +56,10 @@
             </LabeledObject>
             <AutoVariable width="fill" target="misc.tauntslide" label="Tauntslide"/>
             <AutoVariable width="fill" target="misc.tauntslide-tf2c" label="TF2C Tauntslide"/>
-            <AutoVariable width="fill" target="name.custom" label="Custom Name"/>
+	    <AutoVariable width="fill" target="announcer" label="Enable Announcer"/>
+        </List>
+        <List width="220" x="232">
+	    <AutoVariable width="fill" target="name.custom" label="Custom Name"/>
             <AutoVariable width="fill" target="name.custom.ipc" label="IPC Name"/>
             <LabeledObject width="fill" label="Namesteal">
                 <Select target="name.namesteal">
@@ -66,8 +69,6 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="misc.random-name" label="Random Name"/>
-        </List>
-        <List width="220" x="232">
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker Spam"/>
             <AutoVariable width="fill" target="online.enable" label="Enable Cathook Online"/>
             <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal Limit"/>

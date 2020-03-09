@@ -3,9 +3,9 @@
         <List width="150">
             <AutoVariable width="fill" target="autosticky.enable" label="Enable Auto Sticky"/>
             <AutoVariable width="fill" target="autosticky.buildings" label="Detonate On Buildings"/>
-            <AutoVariable width="fill" target="autosticky.legit" label="Legit Mode"/>
+            <AutoVariable width="fill" target="autosticky.legit" label="Legit Mode" tooltip="Require Line of Sight and Ignore Invisible Spies"/>
             <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't Blow Me Up"/>
-            <AutoVariable width="fill" target="autosticky.min-dist" label="Min Distance" min="0" max="130" step="5"/>
+            <AutoVariable width="fill" target="autosticky.min-dist" label="Min Distance" tooltip="Min Distance to Detonate on Enemy" min="0" max="130" step="5"/>
         </List>
     </Box>
 </Tab>

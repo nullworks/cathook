@@ -5,7 +5,7 @@
             <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean Screenshots"/>
             <AutoVariable width="fill" target="visual.disable" label="Disable Visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guranteed Medal Flip"/>
-            <LabeledObject width="fill" label="Software cursor mode">
+            <LabeledObject width="fill" label="Software Cursor Mode">
                 <Select target="visual.software-cursor-mode">
                     <Option name="Keep" value="0"/>
                     <Option name="Always" value="1"/>

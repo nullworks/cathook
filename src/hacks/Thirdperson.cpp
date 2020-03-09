@@ -12,6 +12,7 @@
 namespace hacks::tf::thirdperson
 {
 static settings::Boolean enable{ "visual.thirdperson.enable", "false" };
+static settings::Button thirdperson_key{ "visual.thirdperson-button", "<null>" };
 static settings::Boolean real_angles{ "visual.thirdperson.real-angles", "false" };
 static bool was_enabled{ false };
 
@@ -19,6 +20,18 @@ void frameStageNotify()
 {
     if (CE_BAD(LOCAL_E))
         return;
+
+    static bool tp_key_down{ false };
+    if (thirdperson_key && thirdperson_key.isKeyDown() && !tp_key_down)
+    {
+        enable = !enable;
+	tp_key_down = true;
+    }
+
+    if (thirdperson_key && !thirdperson_key.isKeyDown() && tp_key_down)
+    {
+	tp_key_down = false;
+    }
 
     if (enable)
     {
@@ -31,7 +44,7 @@ void frameStageNotify()
     {
         // Remove thirdperson
         CE_INT(LOCAL_E, netvar.nForceTauntCam) = 0;
-        was_enabled                            = false;
+        was_enabled = false;
     }
     if (real_angles && g_IInput->CAM_IsThirdPerson())
     {

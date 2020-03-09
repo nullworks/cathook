@@ -14,7 +14,6 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-	    <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button"/>
             <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Antiaim Angles in Third Person"/>
         </List>
     </Box>

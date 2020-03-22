@@ -306,7 +306,7 @@ free(logname);*/
         std::vector<std::string> essential = { "fonts/tf2build.ttf" };
         for (const auto &s : essential)
         {
-            std::ifstream exists(DATA_PATH "/" + s, std::ios::in);
+            std::ifstream exists(paths::getDataPath("/" + s), std::ios::in);
             if (not exists)
             {
                 Error(("Missing essential file: " + s +

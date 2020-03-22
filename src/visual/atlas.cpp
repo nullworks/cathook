@@ -29,7 +29,7 @@ sprite texture_atlas::create_sprite(float x, float y, float sx, float sy)
 
 texture_atlas &atlas()
 {
-    static texture_atlas object{ DATA_PATH "/textures/atlas.png", 1024, 512 };
+    static texture_atlas object{ paths::getDataPath("/textures/atlas.png"), 1024, 512 };
     return object;
 }
 } // namespace textures

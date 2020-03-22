@@ -438,7 +438,7 @@ void generate_schema()
 {
     std::ifstream in("tf/scripts/items/items_game.txt");
     std::string outS((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    std::ofstream out(DATA_PATH "/items_game.txt");
+    std::ofstream out(paths::getDataPath("/items_game.txt"));
     std::regex a("\"equip_regions?\".*?\".*?\"");
     std::regex b("\"equip_regions?\"\\s*?\\n\\s*?\\{[\\s\\S\\n]*?\\}");
     outS = std::regex_replace(outS, a, "");
@@ -455,7 +455,7 @@ void Schema_Reload()
     static auto BInitTextBuffer = reinterpret_cast<bool (*)(void *, CUtlBuffer &, int)>(gSignatures.GetClientSignature("55 89 E5 57 56 53 8D 9D ? ? ? ? 81 EC ? ? ? ? 8B 7D ? 89 1C 24 "));
     void *schema                = (void *) ((unsigned) GetItemSchema() + 0x4);
 
-    FILE *file = fopen(DATA_PATH "/items_game.txt", "r");
+    FILE *file = fopen(paths::getDataPath("/items_game.txt").c_str(), "r");
     if (!file || ferror(file) != 0)
     {
         logging::Info("Error loading file");

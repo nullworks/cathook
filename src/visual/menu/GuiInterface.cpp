@@ -119,7 +119,7 @@ static void initPlayerlist()
 
 static void load()
 {
-    zerokernel::Menu::instance->loadFromFile(DATA_PATH "/menu", "menu.xml");
+    zerokernel::Menu::instance->loadFromFile(paths::getDataPath("/menu"), "menu.xml");
 
     zerokernel::Container *sv = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("special-variables"));
     if (sv)

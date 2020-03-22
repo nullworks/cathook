@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Radar.cpp
  *
  *  Created on: Mar 28, 2017
@@ -13,10 +13,12 @@
 namespace hacks::tf::radar
 {
 static settings::Boolean radar_enabled{ "radar.enable", "false" };
+static settings::Int shape{ "radar.shape", "0" };
 static settings::Int size{ "radar.size", "300" };
 static settings::Float zoom{ "radar.zoom", "10" };
 static settings::Float opacity{ "radar.opacity", "0.4" };
-static settings::Boolean healthbar{ "radar.healthbar", "true" };
+static settings::Boolean show_cross{ "radar.show-cross", "true" };
+static settings::Int healthbar{ "radar.healthbar", "2" };
 static settings::Boolean enemies_over_teammates{ "radar.enemies-over-teammates", "true" };
 static settings::Int icon_size{ "radar.icon-size", "20" };
 static settings::Int radar_x{ "radar.x", "100" };
@@ -52,16 +54,37 @@ std::pair<int, int> WorldToRadar(int x, int y)
 
     halfsize = (int) size / 2;
 
-    if (nx < -halfsize)
-        nx = -halfsize;
-    if (nx > halfsize)
-        nx = halfsize;
-    if (ny < -halfsize)
-        ny = -halfsize;
-    if (ny > halfsize)
-        ny = halfsize;
+    if (*shape == 0)
+    {
+	if (nx < -halfsize)
+	    nx = -halfsize;
+	if (nx > halfsize)
+	    nx = halfsize;
+	if (ny < -halfsize)
+	    ny = -halfsize;
+	if (ny > halfsize)
+	    ny = halfsize;
 
-    return { nx + halfsize - (int) icon_size / 2, ny + halfsize - (int) icon_size / 2 };
+	return { nx + halfsize - (int) icon_size / 2, ny + halfsize - (int) icon_size / 2 };
+    }
+
+    else if (*shape == 1)
+    {
+	float PI = 3.14159265;
+
+	float theta = atan2(ny,nx);
+
+	if (nx > halfsize * std::cos(theta) && nx > 0)
+	    nx = halfsize * std::cos(theta);
+	if (nx < halfsize * std::cos(theta) && nx < 0)
+	    nx = halfsize * std::cos(theta);
+	if (ny > halfsize * std::sin(theta) && ny > 0)
+	    ny = halfsize * std::sin(theta);
+	if (ny < halfsize * std::sin(theta) && ny < 0)
+	    ny = halfsize * std::sin(theta);
+	
+	return { nx + halfsize - (int) icon_size / 2, ny + halfsize - (int) icon_size / 2 };
+    }
 }
 bool loaded = false;
 
@@ -105,14 +128,14 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                 draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, idx ? colors::blu_v : colors::red_v, 1.0f);
             }
 
-            if (ent->m_iMaxHealth() && healthbar)
+            if (ent->m_iMaxHealth() && *healthbar > 0)
             {
                 healthp = (float) ent->m_iHealth() / (float) ent->m_iMaxHealth();
                 clr     = colors::Health(ent->m_iHealth(), ent->m_iMaxHealth());
                 if (healthp > 1.0f)
                     healthp = 1.0f;
                 draw::RectangleOutlined(x + wtr.first, y + wtr.second + (int) icon_size, (int) icon_size, 4, colors::black, 0.5f);
-                draw::Rectangle(x + wtr.first + 1, y + wtr.second + (int) icon_size + 1, (*icon_size - 2.0f) * healthp, 2, clr);
+                draw::Rectangle(x + wtr.first + 1, y + wtr.second + (int) icon_size + 1, (*icon_size - 2.0f) * healthp, *healthbar, clr);
             }
         }
         else if (ent->m_Type() == ENTITY_BUILDING)
@@ -145,14 +168,14 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                     break;
                 }
                 }
-                if (ent->m_iMaxHealth() && healthbar)
+                if (ent->m_iMaxHealth() && *healthbar > 0)
                 {
                     healthp = (float) ent->m_iHealth() / (float) ent->m_iMaxHealth();
                     clr     = colors::Health(ent->m_iHealth(), ent->m_iMaxHealth());
                     if (healthp > 1.0f)
                         healthp = 1.0f;
                     draw::RectangleOutlined(x + wtr.first, y + wtr.second + (int) icon_size * 1.5f, (int) icon_size * 1.5f, 4, colors::black, 0.5f);
-                    draw::Rectangle(x + wtr.first + 1, y + wtr.second + ((int) icon_size + 1) * 1.5f, (*icon_size * 1.5f - 2.0f) * healthp, 2, clr);
+                    draw::Rectangle(x + wtr.first + 1, y + wtr.second + ((int) icon_size + 1) * 1.5f, (*icon_size * 1.5f - 2.0f) * healthp, *healthbar, clr);
                 }
             }
         }
@@ -191,15 +214,25 @@ void Draw()
     std::vector<CachedEntity *> enemies{};
     CachedEntity *ent;
 
-    x              = (int) radar_x;
-    y              = (int) radar_y;
+    x = (int) radar_x;
+    y = (int) radar_y;
     int radar_size = *size;
-    int half_size  = radar_size / 2;
+    int half_size = radar_size / 2;
 
     outlineclr = GUIColor();
 
-    draw::Rectangle(x, y, radar_size, radar_size, colors::Transparent(colors::black, *opacity));
-    draw::RectangleOutlined(x, y, radar_size, radar_size, outlineclr, 0.5f);
+    if (*shape == 0)
+    {
+    	draw::Rectangle(x, y, radar_size, radar_size, colors::Transparent(colors::black, *opacity));
+    	draw::RectangleOutlined(x, y, radar_size, radar_size, outlineclr, 0.5f);
+    }
+    else if (*shape == 1)
+    {
+	int center_x = x + half_size;
+	int center_y = y + half_size;
+    	draw::Circle(center_x, center_y, half_size, outlineclr, 1, 100);
+	draw::Circle(center_x, center_y, half_size / 2, colors::Transparent(colors::black, *opacity), half_size, 100);
+    }
 
     if (enemies_over_teammates)
         enemies.clear();
@@ -237,8 +270,11 @@ void Draw()
             draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), GUIColor(), 0.5f);
     }
 
-    draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(GUIColor(), 0.4f), 0.5f);
-    draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(GUIColor(), 0.4f), 0.5f);
+    if (show_cross)
+    {
+    	draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(GUIColor(), 0.4f), 0.5f);
+    	draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(GUIColor(), 0.4f), 0.5f);
+    }
 }
 
 static InitRoutine init([]() {

@@ -84,7 +84,7 @@ bool hasEnding(std::string const &fullString, std::string const &ending)
 
 std::vector<std::string> config_list(std::string in)
 {
-    std::string complete_in = format(DATA_PATH, "/configs/", in);
+    std::string complete_in = paths::getConfigPath() + "/" + in;
     if (!hasEnding(complete_in, ".conf"))
         complete_in = complete_in + ".conf";
     std::vector<std::string> config_vec;
@@ -120,7 +120,7 @@ std::vector<std::string> config_list(std::string in)
 
     for (i = 0; i < results.gl_pathc; i++)
         // /configs/ is 9 extra chars i have to remove
-        config_vec.push_back(std::string(results.gl_pathv[i]).substr(std::string(DATA_PATH).length() + 9));
+        config_vec.push_back(std::string(results.gl_pathv[i]).substr(paths::getDataPath().length() + 9));
 
     globfree(&results);
     return config_vec;

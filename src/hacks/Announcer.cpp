@@ -44,7 +44,7 @@ void playsound(const std::string &sound)
 {
     // yes
     char command[128];
-    snprintf(command, 128, "aplay %s/sound/%s &", DATA_PATH, sound.c_str());
+    snprintf(command, 128, "aplay %s/sound/%s &", paths::getDataPath().c_str(), sound.c_str());
     logging::Info("system(%s)", command);
     system(command);
     // g_ISurface->PlaySound(std::string("announcer/" + sound).c_str());

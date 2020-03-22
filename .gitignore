@@ -279,6 +279,7 @@ cathook.cbp
 .cproject
 .settings
 \.directory
+.cmake
 
 scripts/updater-preferences
 
@@ -286,7 +287,5 @@ scripts/updater-preferences
 /modules/*/
 !/modules/readme.md
 !/modules/CMakeLists.txt
-
-scripts/partybypass-preferences
 
 *.autosave

@@ -9,6 +9,48 @@
 
 #include <stdio.h>
 
+// Cached data path
+std::optional<std::string> cached_data_path;
+
+namespace paths
+{
+// Example: getDataPath("/foo") -> "/opt/bar/data/foo"
+std::string getDataPath(std::string subpath)
+{
+    if (!cached_data_path)
+    {
+        DIR *dir;
+        if (std::getenv("CH_DATA_PATH"))
+        {
+            cached_data_path = std::getenv("CH_DATA_PATH");
+        }
+        else if ((dir = opendir(DATA_PATH)))
+        {
+            cached_data_path = DATA_PATH;
+            closedir(dir);
+        }
+        else
+        {
+            std::string xdg_data_dir;
+            if (std::getenv("XDG_DATA_HOME"))
+                xdg_data_dir = std::getenv("XDG_DATA_HOME");
+            else if (std::getenv("HOME"))
+                xdg_data_dir = std::string(std::getenv("HOME")) + "/.local/share";
+            else
+                xdg_data_dir = DATA_PATH;
+            cached_data_path = xdg_data_dir + "/cathook/data";
+            logging::Info("Data path: %s", cached_data_path->c_str());
+        }
+    }
+    return *cached_data_path + subpath;
+}
+std::string getConfigPath()
+{
+    return getDataPath("/configs");
+}
+} // namespace paths
+
+// Textfile class functions
 TextFile::TextFile() : lines{}
 {
 }
@@ -63,3 +105,4 @@ const std::string &TextFile::Line(size_t id) const
 {
     return lines.at(id);
 }
+// Textfile class functions end

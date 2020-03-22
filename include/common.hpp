@@ -63,7 +63,7 @@
 #include <prediction.hpp>
 #include <itemtypes.hpp>
 #include <chatstack.hpp>
-#include "textfile.hpp"
+#include "pathio.hpp"
 #include "ipc.hpp"
 #include "tfmm.hpp"
 #include "hooks/HookedMethods.hpp"

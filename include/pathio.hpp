@@ -10,6 +10,12 @@
 #include <string>
 #include <vector>
 
+namespace paths
+{
+std::string getDataPath(std::string subpath = "");
+std::string getConfigPath();
+} // namespace paths
+
 class TextFile
 {
 public:

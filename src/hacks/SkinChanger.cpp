@@ -318,17 +318,17 @@ void DrawText()
 
 void Save(std::string filename)
 {
-    DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
+    DIR *cathook_directory = opendir(paths::getDataPath("/skinchanger").c_str());
     if (!cathook_directory)
     {
         logging::Info("Skinchanger directory doesn't exist, creating one!");
-        mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
+        mkdir(paths::getDataPath("/skinchanger").c_str(), S_IRWXU | S_IRWXG);
     }
     else
         closedir(cathook_directory);
     try
     {
-        std::ofstream file(DATA_PATH "/skinchanger/" + filename, std::ios::out | std::ios::binary);
+        std::ofstream file(paths::getDataPath("/skinchanger/" + filename), std::ios::out | std::ios::binary);
         BINARY_FILE_WRITE(file, SERIALIZE_VERSION);
         size_t size = modifier_map.size();
         BINARY_FILE_WRITE(file, size);
@@ -358,17 +358,17 @@ void Save(std::string filename)
 
 void Load(std::string filename, bool merge)
 {
-    DIR *cathook_directory = opendir(DATA_PATH "/skinchanger");
+    DIR *cathook_directory = opendir(paths::getDataPath("/skinchanger").c_str());
     if (!cathook_directory)
     {
         logging::Info("Skinchanger directory doesn't exist, creating one!");
-        mkdir(DATA_PATH "/skinchanger", S_IRWXU | S_IRWXG);
+        mkdir(paths::getDataPath("/skinchanger").c_str(), S_IRWXU | S_IRWXG);
     }
     else
         closedir(cathook_directory);
     try
     {
-        std::ifstream file(DATA_PATH "/skinchanger/" + filename, std::ios::in | std::ios::binary);
+        std::ifstream file(paths::getDataPath("/skinchanger/" + filename), std::ios::in | std::ios::binary);
         unsigned file_serialize = 0;
         BINARY_FILE_READ(file, file_serialize);
         if (file_serialize != SERIALIZE_VERSION)

@@ -34,25 +34,25 @@ static std::string getAutoSaveConfigPath()
     time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M", time_info);
 
-    DIR *config_directory = opendir(DATA_PATH "/configs");
+    DIR *config_directory = opendir(paths::getConfigPath().c_str());
     if (!config_directory)
     {
         logging::Info("Configs directory doesn't exist, creating one!");
-        mkdir(DATA_PATH "/configs", S_IRWXU | S_IRWXG);
+        mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
     }
     else
         closedir(config_directory);
 
-    config_directory = opendir(DATA_PATH "/configs/autosaves");
+    config_directory = opendir((paths::getConfigPath() + "/autosaves").c_str());
     if (!config_directory)
     {
         logging::Info("Autosave directory doesn't exist, creating one!");
-        mkdir(DATA_PATH "/configs/autosaves", S_IRWXU | S_IRWXG);
+        mkdir((paths::getConfigPath() + "/autosaves").c_str(), S_IRWXU | S_IRWXG);
     }
     else
         closedir(config_directory);
 
-    return path = std::string(DATA_PATH "/configs/autosaves/") + timeString + ".conf";
+    return path = paths::getConfigPath() + "/autosaves/" + timeString + ".conf";
 }
 
 static CatCommand cat("cat", "", [](const CCommand &args) {
@@ -126,20 +126,20 @@ static CatCommand toggle("toggle", "", [](const CCommand &args) {
 static CatCommand save("save", "", [](const CCommand &args) {
     settings::SettingsWriter writer{ settings::Manager::instance() };
 
-    DIR *config_directory = opendir(DATA_PATH "/configs");
+    DIR *config_directory = opendir(paths::getConfigPath().c_str());
     if (!config_directory)
     {
         logging::Info("Configs directory doesn't exist, creating one!");
-        mkdir(DATA_PATH "/configs", S_IRWXU | S_IRWXG);
+        mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
     }
 
     if (args.ArgC() == 1)
     {
-        writer.saveTo(DATA_PATH "/configs/default.conf");
+        writer.saveTo((paths::getConfigPath() + "/default.conf").c_str());
     }
     else
     {
-        writer.saveTo(std::string(DATA_PATH "/configs/") + args.Arg(1) + ".conf");
+        writer.saveTo(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
     }
     logging::Info("cat_save: Sorting configs...");
     getAndSortAllConfigs();
@@ -151,11 +151,11 @@ static CatCommand load("load", "", [](const CCommand &args) {
     settings::SettingsReader loader{ settings::Manager::instance() };
     if (args.ArgC() == 1)
     {
-        loader.loadFrom(DATA_PATH "/configs/default.conf");
+        loader.loadFrom((paths::getConfigPath() + "/default.conf").c_str());
     }
     else
     {
-        loader.loadFrom(std::string(DATA_PATH "/configs/") + args.Arg(1) + ".conf");
+        loader.loadFrom(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
     }
 });
 
@@ -190,7 +190,7 @@ std::vector<std::string> sortedConfigs{};
 
 static void getAndSortAllConfigs()
 {
-    DIR *config_directory = opendir(DATA_PATH "/configs");
+    DIR *config_directory = opendir(paths::getConfigPath().c_str());
     if (!config_directory)
     {
         logging::Info("Config directoy does not exist.");

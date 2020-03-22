@@ -1,10 +1,12 @@
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include "visual/imgui/imgui_impl.h"
 #include "visual/drawing.hpp"
 #include "visual/imgui/imgui.h"
 #include "visual/imgui/imgui_freetype.h"
 #include <GL/gl.h>
+
+#include "pathio.hpp"
 
 static Uint64 g_Time                                      = 0;
 static bool g_MousePressed[3]                             = { false, false, false };
@@ -36,7 +38,7 @@ void ImGui_Impl_Render(ImDrawData *draw_data)
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
@@ -282,7 +284,7 @@ bool ImGui_ImplSdl_Init()
     g_MouseCursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
     g_MouseCursors[ImGuiMouseCursor_Hand]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 
-    io.Fonts->AddFontFromFileTTF(DATA_PATH "/fonts/tf2build.ttf", 13, NULL, io.Fonts->GetGlyphRangesDefault());
+    io.Fonts->AddFontFromFileTTF(paths::getDataPath("/fonts/tf2build.ttf").c_str(), 13, NULL, io.Fonts->GetGlyphRangesDefault());
     ImGuiFreeType::BuildFontAtlas(io.Fonts, 0x0);
     ImGui_Impl_CreateFontsTexture(io.Fonts);
 

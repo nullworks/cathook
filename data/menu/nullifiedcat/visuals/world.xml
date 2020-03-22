@@ -14,12 +14,23 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Antiaim Angles in Third Person"/>
+	          <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
+            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Real Antiaim Angles in Third Person"/>
+	          <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195">
+    <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">
         <List width="180">
-            <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="50.01" step="0.1"/>
+            <AutoVariable width="fill" target="remove.arms" label="Remove Arms"/>
+            <AutoVariable width="fill" target="remove.cloak" label="Remove Cloak"/>
+            <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
+            <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
+            <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="95">
+        <List width="180">
+            <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="50" step="0.1"/>
             <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>
             <LabeledObject width="fill" label="Ragdoll Override">
                 <Select target="visual.ragdoll-mode">
@@ -33,15 +44,6 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only Override Local Player Kills"/>
-        </List>
-    </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195" y="85">
-        <List width="180">
-            <AutoVariable width="fill" target="remove.arms" label="Remove Arms"/>
-            <AutoVariable width="fill" target="remove.cloak" label="Remove Cloak"/>
-            <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
-            <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
-            <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
             <LabeledObject width="fill" label="Pyro Vision">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>
@@ -49,7 +51,7 @@
                     <Option name="OFF" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable Killfeed Coloring"/>
+            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable Killfeed Coloring" tooltip="Colors Names in Killfeed to Reflect Player States Eg: Rage"/>
         </List>
     </Box>
 </Tab>

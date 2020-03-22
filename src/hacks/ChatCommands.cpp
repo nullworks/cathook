@@ -32,7 +32,7 @@ struct ChatCommand
     }
     bool readFile(std::string filename)
     {
-        auto stream = std::ifstream(DATA_PATH "/chatcommands/" + filename);
+        auto stream = std::ifstream(paths::getDataPath("/chatcommands/" + filename));
         if (!stream)
             return false;
         for (std::string line; getline(stream, line);)
@@ -117,10 +117,10 @@ static CatCommand chatcommands_add("chatcommands_add", "chatcommands_add <chat c
     chatcomamnd.addcommand(command);
 });
 
-static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " DATA_PATH "/chatcommands>", [](const CCommand &args) {
+static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>", [](const CCommand &args) {
     if (args.ArgC() != 3)
     {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "usage: chatcommands_add <chat command> <filename in " DATA_PATH "/chatcommands>\n");
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, ("usage: chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>\n").c_str());
         return;
     }
     std::string prefix = args.Arg(1);

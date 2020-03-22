@@ -293,8 +293,8 @@ static void cm()
     }
 }
 
-static draw::Texture atlas{ DATA_PATH "/textures/atlas.png" };
-static draw::Texture idspec{ DATA_PATH "/textures/idspec.png" };
+static draw::Texture atlas{ paths::getDataPath("/textures/atlas.png") };
+static draw::Texture idspec{ paths::getDataPath("/textures/idspec.png") };
 
 Timer retry{};
 void Init()

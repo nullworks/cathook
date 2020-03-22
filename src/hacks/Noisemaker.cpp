@@ -20,7 +20,7 @@ static settings::Boolean enable{ "noisemaker-spam.enable", "false" };
 
 static void CreateMove()
 {
-    if (enable && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+    if (enable && CE_GOOD(LOCAL_E))
     {
         if (g_GlobalVars->framecount % 100 == 0)
         {

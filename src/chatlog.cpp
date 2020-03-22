@@ -46,7 +46,9 @@ public:
         {
             uname = std::string(pw->pw_name);
         }
-        stream.open(DATA_PATH "/chat-" + uname + ".csv", std::ios::out | std::ios::app);
+        else
+            uname = "unknown";
+        stream.open(paths::getDataPath("/chat-" + uname + ".csv"), std::ios::out | std::ios::app);
         return stream.good();
     }
 

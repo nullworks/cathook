@@ -1,7 +1,7 @@
 <Tab name="Radar" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Radar">
         <List width="150">
-            <AutoVariable width="fill" target="radar.enable" label="Enable"/>
+            <AutoVariable width="fill" target="radar.enable" label="Enable" tooltip="Shows a Highly Customizable Radar"/>
 	    <LabeledObject width="fill" label="Radar Shape" tooltip="Sets the Radar's Shape">
 	        <Select target="radar.shape">
 	            <Option name="Square" value="0"/>
@@ -14,10 +14,10 @@
             <AutoVariable width="fill" target="radar.use-icons" label="Use Icons"/>
             <AutoVariable width="fill" target="radar.size" label="Size" min="1" max="480" step="5"/>
             <AutoVariable width="fill" target="radar.icon-size" label="Icon Size" min="1" max="48"/>
-            <AutoVariable width="fill" target="radar.x" label="Radar X"/>
-            <AutoVariable width="fill" target="radar.y" label="Radar Y"/>
-            <AutoVariable width="fill" target="radar.zoom" label="Zoom" min="1" max="20" step="0.1"/>
-            <AutoVariable width="fill" target="radar.opacity" label="Opacity" min="0" max="1.01" step="0.1"/>
+            <AutoVariable width="fill" target="radar.x" label="Radar X" tooltip="Sets the Radar's X Value From the Left Side of the Window"/>
+            <AutoVariable width="fill" target="radar.y" label="Radar Y" tooltip="Sets the Radar's Y Value From the Top of the Window"/>
+            <AutoVariable width="fill" target="radar.zoom" label="Zoom" tooltip="Controls the Zoom. Higher Value Means Less Zoomed" min="1" max="20" step="0.1"/>
+            <AutoVariable width="fill" target="radar.opacity" label="Opacity" tooltip="Sets the Radar's Background Opacity" min="0" max="1.01" step="0.1"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="170">

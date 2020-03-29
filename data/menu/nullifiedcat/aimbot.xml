@@ -34,7 +34,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Target Selection" x="170">
         <List width="150">
-            <LabeledObject width="fill" label="Priority Mode">
+            <LabeledObject width="fill" label="Priority Mode" tooltip="Select Which Enemy to Target If Multiple Are in FOV">
                 <Select target="aimbot.priority-mode">
                     <Option name="Smart" value="0"/>
                     <Option name="FOV" value="1"/>
@@ -80,7 +80,7 @@
                     <Option name="Right Foot" value="17"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.target.max-range" label="Max Range"/>
+            <AutoVariable width="fill" target="aimbot.target.max-range" label="Max Range" tooltip="Max Range That Aimbot Will Work In"/>
             <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
             <AutoVariable width="fill" target="aimbot.lock-target" label="Lock Target" tooltip="Lock Onto a Target Until They Die or Leave Your Screen"/>
             <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage Only" tooltip="Only Aimbot Enemies Set to Rage"/>
@@ -103,7 +103,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="110">
         <List width="150">
-            <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtracking"/>
+            <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtracking" tooltip="Use Lag Compensation to Hit Enemies Where They Were in the Past"/>
             <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at Backtracking"/>
             <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000" step="25"/>
             <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>

@@ -44,7 +44,7 @@
                     <Option name="Health (Highest)" value="5"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Target Team">
+            <LabeledObject width="fill" label="Target Team" tooltip="Set Which Team Aimbot Works On">
                 <Select target="aimbot.target.teammates">
                     <Option name="Enemies" value="0"/>
                     <Option name="Teammates" value="1"/>

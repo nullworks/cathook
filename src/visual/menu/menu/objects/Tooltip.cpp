@@ -8,7 +8,7 @@
 
 namespace zerokernel_tooltip
 {
-static settings::RVariable<rgba_t> color_background{ "zk.style.tooltip.background", "00000055" };
+static settings::RVariable<rgba_t> color_background{ "zk.style.tooltip.background", "1d2f40" };
 static settings::RVariable<rgba_t> color_border{ "zk.style.tooltip.border", "446498ff" };
 } // namespace zerokernel_tooltip
 namespace zerokernel
@@ -41,7 +41,7 @@ void Tooltip::setText(std::string text)
     lastText = text;
     int lc;
     int width;
-    text = utility::wrapString(text, resource::font::base, 400, &width, &lc);
+    text = utility::wrapString(text, resource::font::base, 420, &width, &lc);
     this->text.set(text);
 }
 

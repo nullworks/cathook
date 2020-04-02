@@ -13,10 +13,10 @@
                         </Select>
                     </LabeledObject>
                     <AutoVariable width="fill" target="trigger.key.button" label="Aim Key"/>
-                    <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for Charge"/>
+                    <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for Charge" tooltip="Wait to Fire Until Charge Allows a One Shot Kill"/>
                     <AutoVariable width="fill" target="trigger.zoomed-only" label="Zoomed Only"/>
-                    <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy Mode" min="0" max="10"/>
-                    <AutoVariable width="fill" target="trigger.delay" label="Delay" min="0" max="1"/>
+                    <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy Mode" tooltip="Shrink Usable Hitbox to Improve Accuracy" min="0" max="10"/>
+                    <AutoVariable width="fill" target="trigger.delay" label="Delay" tooltip="Add a Delay (milliseconds) to Triggerbot" min="0" max="1"/>
                 </List>
             </Box>
             <Box padding="12 6 6 6" width="content" height="content" name="Target Selection" x="170">

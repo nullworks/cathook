@@ -28,6 +28,7 @@
             <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for Charge" tooltip="Wait to Fire Until Charge Allows a One Shot Kill"/>
             <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot Disguised" tooltip="Allows Autoshooting When You Are Disguised"/>
             <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto Spin-up" tooltip="Allows Spinning up Even If No Enemies Are in FOV Circle"/>
+            <AutoVariable width="fill" target="aimbot.auto.tapfire" label="Tapfire Minigun"/>
             <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto Zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto Unzoom"/>
         </List>

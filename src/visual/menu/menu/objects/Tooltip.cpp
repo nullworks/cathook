@@ -25,7 +25,7 @@ void Tooltip::render()
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
-    x += 6;
+    x += 9;
     move(x, y);
 
     text.renderForTooltip();

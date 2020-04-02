@@ -27,9 +27,9 @@ public:
 
     void setObject(std::unique_ptr<BaseMenuObject> &&object);
 
-    void setWithoutTooltip(std::string text1);
+    void setLabel(std::string text1);
 
-    void setWithTooltip(std::string text1, std::string text2);
+    void setLabel(std::string text1, std::string text2);
 
     void createLabel();
 

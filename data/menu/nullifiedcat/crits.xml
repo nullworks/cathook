@@ -3,7 +3,7 @@
         <List width="200">
             <AutoVariable width="fill" target="crit.key" label="Crit Key"/>
 	    <AutoVariable width="fill" target="crit.auto" label="Always Crit (Ignore Crit Key)"/>
-            <AutoVariable width="fill" target="crit.info" label="Crit Info"/>
+            <AutoVariable width="fill" target="crit.info" label="Crit Info" tooltip="Displays Info About Crit Hack"/>
             <AutoVariable width="fill" target="crit.experimental" label="Instant Crits"/>
             <AutoVariable width="fill" target="crit.melee" label="Melee Crits"/>
             <AutoVariable width="fill" target="crit.experimental.melee" label="Experimental Melee Crits"/>

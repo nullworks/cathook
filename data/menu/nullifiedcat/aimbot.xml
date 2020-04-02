@@ -103,12 +103,12 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="110">
         <List width="150">
-            <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtracking" tooltip="Use Lag Compensation to Hit Enemies Where They Were in the Past"/>
+            <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtracking" tooltip="Use Fake Lag to Hit Enemies Where They Were in the Past"/>
             <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at Backtracking"/>
             <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000" step="25"/>
             <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>
-            <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw Skeleton"/>
-            <AutoVariable width="fill" target="backtrack.chams_glow" label="Chams/Glow Support"/>
+            <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw Skeleton" tooltip="Draw Bones ESP of the Last Backtrack Tick"/>
+            <AutoVariable width="fill" target="backtrack.chams_glow" label="Chams/Glow Support" tooltip="Draw the Chams/Glow of the Last Backtrack Tick"/>
             <LabeledObject width="fill" label="Backtrack Slots">
                 <Select target="backtrack.slots">
                     <Option name="All" value="0"/>

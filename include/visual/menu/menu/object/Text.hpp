@@ -51,7 +51,7 @@ public:
 
     void set(std::string text);
     
-    void setWithLabel(std::string text1, std::string text2);
+    void set(std::string text1, std::string text2);
 
     const std::string &get() const;
 

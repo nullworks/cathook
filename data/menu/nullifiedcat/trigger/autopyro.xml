@@ -1,13 +1,14 @@
 <Tab name="Auto Pyro" padding="4 4 4 4">
 	<Box padding="12 6 6 6" width="content" height="content" name="Auto Reflect">
-		<List width="content">
+		<List width="202">
 			<AutoVariable width="fill" target="autoreflect.enable" label="Enable Auto Reflect"/>
 			<AutoVariable width="fill" target="autoreflect.button" label="Reflect Button"/>
 			<AutoVariable width="fill" target="autoreflect.idle-only" label="Only Reflect When Able"/>
 			<AutoVariable width="fill" target="autoreflect.teammate" label="Teammate Projectiles"/>
 			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball Mode"/>
+			<AutoVariable width="fill" target="autoreflect.legit" label="Legit Mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
 		</List>
-		<Box padding="12 6 6 6" name="Projectiles" width="content" height="content" y="80">
+		<Box padding="12 6 6 6" name="Projectiles" width="content" height="content" y="100">
 			<Box padding="12 6 6 6" name="Big" width="content" height="content">
 				<List width="95">
 					<AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
@@ -21,12 +22,12 @@
 				<List width="85">
 					<AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
 					<AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
-					<AutoVariable width="fill" target="autoreflect.balls" label="Balls"/>
 					<AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
 					<AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing Bolts"/>
 					<AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"/>
 				</List>
 			</Box>
+			<AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should Autoreflect still try to reflect it?"/>
 		</Box>
 	</Box>
 	<Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="235">

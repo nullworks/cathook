@@ -16,25 +16,24 @@ static settings::Boolean legit{ "autoreflect.legit", "false" };
 static settings::Boolean dodgeball{ "autoreflect.dodgeball", "false" };
 static settings::Button blastkey{ "autoreflect.button", "<null>" };
 
+static settings::Boolean proj_default{ "autoreflect.default", "false" };
 static settings::Boolean stickies{ "autoreflect.stickies", "true" };
 static settings::Boolean pipes{ "autoreflect.pipes", "true" };
-static settings::Boolean flares{ "autoreflect.flares", "false"};
-static settings::Boolean arrows{ "autoreflect.arrows", "false"};
-static settings::Boolean jars{ "autoreflect.jars", "false"};
-static settings::Boolean healingbolts{ "autoreflect.healingbolts", "false"};
-static settings::Boolean rockets{ "autoreflect.rockets", "true"};
-static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "true"};
-static settings::Boolean cleavers{ "autoreflect.cleavers", "false"};
-static settings::Boolean teammates{ "autoreflect.teammate", "true" };
+static settings::Boolean flares{ "autoreflect.flares", "false" };
+static settings::Boolean arrows{ "autoreflect.arrows", "false" };
+static settings::Boolean jars{ "autoreflect.jars", "false" };
+static settings::Boolean healingbolts{ "autoreflect.healingbolts", "false" };
+static settings::Boolean rockets{ "autoreflect.rockets", "true" };
+static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "true" };
+static settings::Boolean cleavers{ "autoreflect.cleavers", "false" };
+static settings::Boolean teammates{ "autoreflect.teammate", "false" };
 
 static settings::Float fov{ "autoreflect.fov", "85" };
-
 
 #if ENABLE_VISUALS
 static settings::Boolean fov_draw{ "autoreflect.draw-fov", "false" };
 static settings::Float fovcircle_opacity{ "autoreflect.draw-fov-opacity", "0.7" };
 #endif
-
 
 // Function to determine whether an ent is good to reflect
 static bool ShouldReflect(CachedEntity *ent)
@@ -61,43 +60,41 @@ static bool ShouldReflect(CachedEntity *ent)
             return false;
     }
 
-
-
     // Checks if the projectile is x and if the user settings allow it to be reflected
     // If not, returns false
 
-    if (!stickies && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-        //Checks the demoguy projectile type (both stickies and pipes are combined under PipeBombProjectile)
+    if (ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+    {
+        // Checks the demoman projectile type (both stickies and pipes are combined under PipeBombProjectile)
         if (CE_INT(ent, netvar.iPipeType) == 1)
-            return false;
-
-    if (!pipes && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+            return *stickies;
         if (CE_INT(ent, netvar.iPipeType) == 0)
-            return false;
+            return *pipes;
+    }
 
-    if (!flares && ent->m_iClassID() == CL_CLASS(CTFProjectile_Flare))
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Arrow))
+        return *arrows;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Jar) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk))
+        return *jars;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_HealingBolt))
+        return *healingbolts;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Rocket))
+        return *rockets;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_SentryRocket))
+        return *sentryrockets;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
+        return *cleavers;
+
+    if (ent->m_iClassID() == CL_CLASS(CTFGrapplingHook))
         return false;
 
-    if (!arrows && ent->m_iClassID() == CL_CLASS(CTFProjectile_Arrow))
-        return false;
-
-    if (!jars && (ent->m_iClassID() == CL_CLASS(CTFProjectile_Jar)) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk))
-        return false;
-
-    if (!healingbolts && ent->m_iClassID() == CL_CLASS(CTFProjectile_HealingBolt))
-        return false;
-
-    if (!rockets &&  ent->m_iClassID() == CL_CLASS(CTFProjectile_Rocket))
-        return false;
-
-    if (!sentryrockets && ent->m_iClassID() == CL_CLASS(CTFProjectile_SentryRocket))
-        return false;
-
-    if (!cleavers && ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
-        return false;
-
-    // Target passed the test, return true
-    return true;
+    // Target is not known, return default value
+    return *proj_default;
 }
 
 // Function called by game for movement
@@ -158,11 +155,11 @@ void CreateMove()
             }
         }
 
-         /*else {
-            // Stickys are weird, we use a different way to vis check them
-            // Vis checking stickys are wonky, I quit, just ignore the check >_>
-            //if (!VisCheckEntFromEnt(ent, LOCAL_E)) continue;
-        }*/
+        /*else {
+           // Stickys are weird, we use a different way to vis check them
+           // Vis checking stickys are wonky, I quit, just ignore the check >_>
+           //if (!VisCheckEntFromEnt(ent, LOCAL_E)) continue;
+       }*/
 
         // Calculate distance
         float dist = predicted_proj.DistToSqr(g_pLocalPlayer->v_Origin);

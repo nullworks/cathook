@@ -25,6 +25,7 @@ extern settings::Boolean enable;
 namespace hacks::shared::backtrack
 {
 extern settings::Boolean backtrack_chams_glow;
+extern settings::Boolean many_chams;
 }
 namespace hooked_methods
 {
@@ -161,8 +162,18 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             ptr->DepthRange(0.0f, 1.0f);
                             // Apply our material
                             g_IVModelRender->ForcedMaterialOverride(mat_dme_chams);
-                            // Run Original
-                            original::DrawModelExecute(this_, state, info, usable[0].bones);
+							              // Run Original for many chams
+							              if (hacks::shared::backtrack::many_chams)
+							              {
+								              for (int j = 0; j < usable.size(); j++)
+								              {
+									              if (j % 5 == 0)
+                            			original::DrawModelExecute(this_, state, info, usable[j].bones);
+								                }
+							               }
+                            // Run Original for only one chams
+							              else
+                            	original::DrawModelExecute(this_, state, info, usable[0].bones);
                             // Revert
                             g_IVRenderView->SetColorModulation(mod_original.rgba);
                             g_IVModelRender->ForcedMaterialOverride(nullptr);

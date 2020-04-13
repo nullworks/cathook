@@ -24,6 +24,7 @@ static settings::Int slots{ "backtrack.slots", "0" };
 
 settings::Boolean enable{ "backtrack.enable", "false" };
 settings::Boolean backtrack_chams_glow{ "backtrack.chams_glow", "true" };
+settings::Boolean many_chams{ "backtrack.many.chams", "false" };
 settings::Int latency{ "backtrack.latency", "0" };
 settings::Boolean enable_latency_rampup{ "backtrack.latency.rampup", "true" };
 

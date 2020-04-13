@@ -25,6 +25,7 @@
             <AutoVariable width="fill" target="radar.show.ammo" label="Ammo Packs"/>
             <AutoVariable width="fill" target="radar.show.health" label="Health Packs"/>
             <AutoVariable width="fill" target="radar.show.teammates" label="Teammates"/>
+	    <AutoVariable width="fill" target="radar.show.teambuildings" label="Team Buildings"/>
         </List>
     </Box>
 </Tab>

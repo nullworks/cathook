@@ -7,8 +7,8 @@
                 <Select target="chams.visual.mode">
                     <Option name="Normal" value="0"/>
                     <Option name="Flat" value="1"/>
-                    <Option name="Skin" value="2"/>
-                    <Option name="Bright Skin" value="3"/>
+                    <Option name="Painted" value="2"/>
+                    <Option name="Skin" value="3"/>
                 </Select>
             </LabeledObject>            
             <AutoVariable width="fill" target="chams.disco" label="Disco" tooltip="Rainbow Mode"/>

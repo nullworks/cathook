@@ -2,7 +2,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="FOV">
         <List width="180">
             <AutoVariable width="fill" target="visual.fov" label="FOV"/>
-            <AutoVariable width="fill" target="visual.fov-zoomed" label="FOV Zoomed"/>
+            <AutoVariable width="fill" target="remove.zoom" label="Apply if zoomed"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Freecam" y="55">
@@ -26,9 +26,11 @@
             <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
             <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove Zoom/Keep Rifle"/>
+	    <AutoVariable width="fill" target="remove.taunts" label="Remove Taunts"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="95">
+    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="125">
         <List width="180">
             <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="50" step="0.1"/>
             <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>

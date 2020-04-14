@@ -327,19 +327,22 @@ void EffectChams::RenderChams(IClientEntity *entity)
         {
             mat_unlit_z->AlphaModulate(1.0f);
             ptr->DepthRange(0.0f, 0.01f);
-			switch(*visual_mode)
-			{
-			case 0:
+	    switch(*visual_mode)
+	    {
+	    case 0:
             	g_IVRenderView->SetColorModulation(color_2);
             	g_IVModelRender->ForcedMaterialOverride(mat_lit_z);
-				break;
-			case 1:
+		break;
+	    case 1:
             	g_IVRenderView->SetColorModulation(color_2);
             	g_IVModelRender->ForcedMaterialOverride(mat_unlit_z);
-				break;
-			case 2:
-				break;
-			}
+		break;
+	    case 2:
+            	g_IVRenderView->SetColorModulation(color_2);
+		break;
+	    case 3:
+		break;
+	    }
             RenderChamsRecursive(entity);
         }
 
@@ -347,18 +350,21 @@ void EffectChams::RenderChams(IClientEntity *entity)
         {
             mat_unlit->AlphaModulate(1.0f);
             ptr->DepthRange(0.0f, 1.0f);
-			switch(*visual_mode)
-			{
-			case 0:
+	    switch(*visual_mode)
+	    {
+	    case 0:
             	g_IVRenderView->SetColorModulation(color);
             	g_IVModelRender->ForcedMaterialOverride(mat_lit);
-				break;
-			case 1:
+		break;
+	    case 1:
             	g_IVRenderView->SetColorModulation(color);
             	g_IVModelRender->ForcedMaterialOverride(mat_unlit);
-				break;
-			case 2:
-				break;
+		break;
+	    case 2:
+            	g_IVRenderView->SetColorModulation(color);
+		break;
+	    case 3:
+		break;
 			}
             RenderChamsRecursive(entity);
         }

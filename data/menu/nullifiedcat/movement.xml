@@ -2,13 +2,13 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Bunny Hop">
         <List width="150">
             <AutoVariable width="fill" target="bunnyhop.enable" label="Enable Bunny Hop"/>
-	    <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop Chance"/>
+	    <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop Chance" tooltip="% chance of a successful bunnyhop"/>
             <AutoVariable width="fill" target="misc.autostrafe" label="Enable Auto strafe"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="FollowBot" x="170">
         <List width="180">
-            <AutoVariable width="fill" target="follow-bot.enable" label="Enable FollowBot"/>
+            <AutoVariable width="fill" target="follow-bot.enable" label="Enable FollowBot" tooltip="Automatically follow other players"/>
             <AutoVariable width="fill" target="follow-bot.roaming" label="Roaming"/>
             <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change When Possible"/>
             <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump If Stuck"/>
@@ -22,7 +22,7 @@
             <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK Switch"/>
             <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK Limit"/>
             <AutoVariable width="fill" target="follow-bot.corners" label="Corner Activate"/>
-            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to Follow"/>
+            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to Follow" tooltip="Steamid of player to follow (optional)"/>
             <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize Friends"/>
             <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the Party Leader"/>
             <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw Crumbs"/>

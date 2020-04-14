@@ -93,6 +93,8 @@ void authedplayers(std::vector<std::string> steamids)
 void updateServer(NullNexus::UserSettings &settings)
 {
     INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    // Additional currently inactive security measure, may be activated at any time
+    static int *gHostSpawnCount = *reinterpret_cast<int **>(gSignatures.GetEngineSignature("A3 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 FF 52 ? 83 C4 2C") + sizeof(char));
     if (ch && *authenticate)
     {
         auto addr = ch->GetRemoteAddress();
@@ -110,7 +112,7 @@ void updateServer(NullNexus::UserSettings &settings)
                 for (auto i : result.bits)
                     ss << std::setw(2) << std::setfill('0') << (int) i;
                 steamidhash        = ss.str();
-                settings.tf2server = { true, addr.ToString(true), std::to_string(addr.port), steamidhash };
+                settings.tf2server = { true, addr.ToString(true), std::to_string(addr.port), steamidhash, *gHostSpawnCount };
                 return;
             }
         }
@@ -166,9 +168,9 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
         if (*enabled)
         {
             if (*proxyenabled)
-                nexus.connectunix(*proxysocket, *endpoint);
+                nexus.connectunix(*proxysocket, *endpoint, true);
             else
-                nexus.connect(*address, *port, *endpoint);
+                nexus.connect(*address, *port, *endpoint, true);
         }
         else
             nexus.disconnect();
@@ -206,9 +208,9 @@ static InitRoutine init([]() {
     if (*connect)
     {
         if (*proxyenabled)
-            nexus.connectunix(*proxysocket, *endpoint);
+            nexus.connectunix(*proxysocket, *endpoint, true);
         else
-            nexus.connect(*address, *port, *endpoint);
+            nexus.connect(*address, *port, *endpoint, true);
     }
 
     EC::Register(

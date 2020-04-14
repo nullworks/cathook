@@ -25,31 +25,31 @@ void frameStageNotify()
     static bool tp_key_down{ false };
     if (thirdperson_key && thirdperson_key.isKeyDown() && !tp_key_down)
     {
-        enable = !enable;
-	tp_key_down = true;
+        enable      = !enable;
+        tp_key_down = true;
     }
     if (thirdperson_key && !thirdperson_key.isKeyDown() && tp_key_down)
     {
-	tp_key_down = false;
+        tp_key_down = false;
     }
 
     static bool was_tp{ false };
     if (enable && disable_zoomed && g_pLocalPlayer->holding_sniper_rifle)
     {
         if (g_pLocalPlayer->bZoomed)
-	{
-	    was_tp = true;
-	    enable = false;
-	}
-    }    
+        {
+            was_tp = true;
+            enable = false;
+        }
+    }
     if (was_tp && disable_zoomed && g_pLocalPlayer->holding_sniper_rifle)
     {
         if (!g_pLocalPlayer->bZoomed)
-	{
-	    was_tp = false;
-	    enable = true;
-	}
-    } 
+        {
+            was_tp = false;
+            enable = true;
+        }
+    }
 
     if (enable)
     {
@@ -62,7 +62,7 @@ void frameStageNotify()
     {
         // Remove thirdperson
         CE_INT(LOCAL_E, netvar.nForceTauntCam) = 0;
-        was_enabled = false;
+        was_enabled                            = false;
     }
     if (real_angles && g_IInput->CAM_IsThirdPerson())
     {

@@ -10,7 +10,7 @@
                     <Option name="Painted" value="2"/>
                     <Option name="Skin" value="3"/>
                 </Select>
-            </LabeledObject>            
+            </LabeledObject> 
             <AutoVariable width="fill" target="chams.disco" label="Disco" tooltip="Rainbow Mode"/>
             <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>

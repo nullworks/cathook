@@ -27,7 +27,7 @@
             <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
             <AutoVariable width="fill" target="remove.zoom" label="Remove Zoom/Keep Rifle"/>
-	    <AutoVariable width="fill" target="remove.taunts" label="Remove Taunts"/>
+			<AutoVariable width="fill" target="remove.taunts" label="Remove Taunts"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="125">

@@ -2,12 +2,12 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Crits">
         <List width="200">
             <AutoVariable width="fill" target="crit.key" label="Crit Key"/>
+	    <AutoVariable width="fill" target="crit.auto" label="Always Crit (Ignore Crit Key)"/>
             <AutoVariable width="fill" target="crit.info" label="Crit Info"/>
             <AutoVariable width="fill" target="crit.experimental" label="Instant Crits"/>
             <AutoVariable width="fill" target="crit.melee" label="Melee Crits"/>
             <AutoVariable width="fill" target="crit.experimental.melee" label="Experimental Melee Crits"/>
             <AutoVariable width="fill" target="crit.force-gameplay" label="Do Not Hinder Gameplay"/>
-            <AutoVariable width="fill" target="crit.auto" label="Always Crit (Ignores Crit Key)"/>
         </List>
     </Box>
 </Tab>

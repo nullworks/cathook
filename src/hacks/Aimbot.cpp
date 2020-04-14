@@ -294,9 +294,10 @@ static void CreateMove()
         else if (GetWeaponMode() == weapon_melee)
         {
             DoAutoshoot();
-            Aim(target_entity);
+            if (g_pLocalPlayer->weapon_melee_damage_tick)
+                Aim(target_entity);
         }
-        else if (CanShoot() && CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) != 0)
+        else if (CanShoot() && CE_INT(LOCAL_W, netvar.m_iClip1) != 0)
         {
             Aim(target_entity);
             DoAutoshoot(target_entity);
@@ -334,6 +335,9 @@ bool ShouldAim()
         return false;
     // Check if using action slot item
     if (g_pLocalPlayer->using_action_slot_item)
+        return false;
+    // Using a forbidden weapon?
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife))
         return false;
 
     IF_GAME(IsTF2())
@@ -928,10 +932,6 @@ void DoAutoshoot(CachedEntity *target_entity)
         }
     }
 
-    // Forbidden weapons check
-    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife))
-        attack = false;
-
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it
     // can
     if (slow_aim && !slow_can_shoot)
@@ -954,7 +954,6 @@ void DoAutoshoot(CachedEntity *target_entity)
     }
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
-    hacks::shared::antiaim::SetSafeSpace(1);
 }
 
 // Grab a vector for a specific ent

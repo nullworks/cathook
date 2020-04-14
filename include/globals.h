@@ -16,6 +16,7 @@ class CUserCmd;
 class ConVar;
 
 extern int g_AppID;
+// Amount of createmove ticks since cheat inject. This value ONLY GOES UP.
 extern unsigned long tickcount;
 
 extern ConVar *sv_client_min_interp_ratio;

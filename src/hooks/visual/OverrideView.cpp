@@ -7,7 +7,6 @@
 #include <settings/Float.hpp>
 #include "HookedMethods.hpp"
 
-static settings::Float override_fov_zoomed{ "visual.fov-zoomed", "0" };
 static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
@@ -23,11 +22,13 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     if (!isHackActive() || g_Settings.bInvalid || CE_BAD(LOCAL_E))
         return;
 
-    if (g_pLocalPlayer->bZoomed && override_fov_zoomed)
+    bool zoomed = setup->fov < CE_INT(LOCAL_E, netvar.iDefaultFOV) || g_pLocalPlayer->bZoomed;
+    if (*no_zoom && zoomed)
     {
-        setup->fov = *override_fov_zoomed;
+        auto fov   = g_ICvar->FindVar("fov_desired");
+        setup->fov = override_fov ? *override_fov : fov->GetInt();
     }
-    else if (override_fov)
+    else if (override_fov && !zoomed)
     {
         setup->fov = *override_fov;
     }

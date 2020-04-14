@@ -3,7 +3,6 @@
         <Include path="nullifiedcat/visuals/esp.xml"/>
         <Include path="nullifiedcat/visuals/glow.xml"/>
         <Include path="nullifiedcat/visuals/chams.xml"/>
-        <Include path="nullifiedcat/visuals/dominatemark.xml"/>
         <Include path="nullifiedcat/visuals/tracers.xml"/>
         <Include path="nullifiedcat/visuals/radar.xml"/>
         <Include path="nullifiedcat/visuals/playerinfo.xml"/>

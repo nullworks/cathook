@@ -1,5 +1,0 @@
-<Tab name="Announcer" padding="4 4 4 4">
-    <List width="150">
-        <AutoVariable width="fill" target="announcer" label="Enable Announcer"/>
-    </List>
-</Tab>

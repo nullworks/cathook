@@ -13,10 +13,10 @@
                         </Select>
                     </LabeledObject>
                     <AutoVariable width="fill" target="trigger.key.button" label="Aim Key"/>
-                    <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for charge"/>
+                    <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for Charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
                     <AutoVariable width="fill" target="trigger.zoomed-only" label="Zoomed Only"/>
-                    <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy Mode" min="0" max="10"/>
-                    <AutoVariable width="fill" target="trigger.delay" label="Delay" min="0" max="1"/>
+                    <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy Mode" tooltip="Shrink hitbox to improve accuracy." min="0" max="10"/>
+                    <AutoVariable width="fill" target="trigger.delay" label="Delay" tooltip="Add a delay (in milliseconds) to Triggerbot" min="0" max="1"/>
                 </List>
             </Box>
             <Box padding="12 6 6 6" width="content" height="content" name="Target Selection" x="170">
@@ -38,9 +38,9 @@
                 </List>
             </Box>
         </Tab>
-        <Include path="nullifiedcat/trigger/autoheal.xml"/>
         <Include path="nullifiedcat/trigger/autopyro.xml"/>
         <Include path="nullifiedcat/trigger/autosticky.xml"/>
+	<Include path="nullifiedcat/trigger/autoheal.xml"/>
         <Include path="nullifiedcat/trigger/autospy.xml"/>
     </TabContainer>
 </Tab>

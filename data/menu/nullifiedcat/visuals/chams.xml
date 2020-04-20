@@ -3,7 +3,14 @@
         <List width="150">
             <AutoVariable width="fill" target="chams.enable" label="Enable Chams"/>
             <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show Chams through walls."/>
-            <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't show shadows on chams."/>
+            <LabeledObject width="fill" label="Visual Mode">
+                <Select target="chams.visual.mode">
+                    <Option name="Normal" value="0"/>
+                    <Option name="Flat" value="1"/>
+                    <Option name="Painted" value="2"/>
+                    <Option name="Skin" value="3"/>
+                </Select>
+            </LabeledObject> 
             <AutoVariable width="fill" target="chams.disco" label="Disco" tooltip="Rainbow Mode"/>
             <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>

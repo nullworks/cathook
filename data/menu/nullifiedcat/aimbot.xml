@@ -110,6 +110,7 @@
             <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>
             <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw Skeleton"/>
             <AutoVariable width="fill" target="backtrack.chams_glow" label="Chams/Glow Support"/>
+            <AutoVariable width="fill" target="backtrack.many.chams" label="Multiple Chams" tooltip="Creates backtrack chams for multiple ticks."/>
             <LabeledObject width="fill" label="Backtrack Slots">
                 <Select target="backtrack.slots">
                     <Option name="All" value="0"/>

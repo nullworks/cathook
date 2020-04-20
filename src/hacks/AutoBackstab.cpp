@@ -126,7 +126,7 @@ static bool doLegitBackstab()
         return false;
     int index = reinterpret_cast<IClientEntity *>(trace.m_pEnt)->entindex();
     auto ent  = ENTITY(index);
-    if (index == 0 || index > g_IEngine->GetMaxClients() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
+    if (index == 0 || index > g_IEngine->GetMaxClients() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
         return false;
     if (angleCheck(ENTITY(index), std::nullopt, g_pLocalPlayer->v_OrigViewangles) || canFaceStab(ENTITY(index)))
     {
@@ -146,7 +146,7 @@ static bool doRageBackstab()
         for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
         {
             auto ent = ENTITY(i);
-            if (CE_BAD(ent) || ent->m_flDistance() > swingrange * 4 || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || g_pLocalPlayer->entity_idx == ent->m_IDX)
+            if (CE_BAD(ent) || ent->m_flDistance() > swingrange * 4 || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || g_pLocalPlayer->entity_idx == ent->m_IDX || IsPlayerInvulnerable(ent))
                 continue;
             if (!player_tools::shouldTarget(ent))
                 continue;
@@ -192,7 +192,7 @@ static bool doRageBackstab()
             {
                 int index = reinterpret_cast<IClientEntity *>(trace.m_pEnt)->entindex();
                 auto ent  = ENTITY(index);
-                if (index == 0 || index > g_IEngine->GetMaxClients() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
+                if (index == 0 || index > g_IEngine->GetMaxClients() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
                     continue;
                 if (angleCheck(ent, std::nullopt, newangle))
                 {
@@ -221,7 +221,7 @@ static bool doBacktrackStab()
         return false;
     // Get the best ent decided by backtrack (no reason to do work twice)
     ent = ENTITY(hacks::shared::backtrack::iBestTarget);
-    if (!ent->m_bEnemy() || !player_tools::shouldTarget(ent))
+    if (!ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
         return false;
     // Get the ent's backtrack ticks
     auto &btd = hacks::shared::backtrack::headPositions[ent->m_IDX];
@@ -269,7 +269,7 @@ static bool doLegitBacktrackStab() // lol
     if (hacks::shared::backtrack::iBestTarget < 1)
         return false;
     ent = ENTITY(hacks::shared::backtrack::iBestTarget);
-    if (!ent->m_bEnemy() || !player_tools::shouldTarget(ent))
+    if (!ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
         return false;
     auto &btd       = hacks::shared::backtrack::headPositions[ent->m_IDX];
     Vector newangle = g_pLocalPlayer->v_OrigViewangles;

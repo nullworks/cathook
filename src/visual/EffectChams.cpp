@@ -1,3 +1,4 @@
+
 /*
  * EffectChams.cpp
  *
@@ -13,7 +14,7 @@
 
 namespace effect_chams
 {
-static settings::Boolean flat{ "chams.flat", "false" };
+static settings::Int visual_mode{ "chams.visual.mode", "0" };
 static settings::Boolean health{ "chams.health", "false" };
 static settings::Boolean teammates{ "chams.show.teammates", "false" };
 static settings::Boolean disguised{ "chams.show.disguised", "true" };
@@ -326,17 +327,45 @@ void EffectChams::RenderChams(IClientEntity *entity)
         {
             mat_unlit_z->AlphaModulate(1.0f);
             ptr->DepthRange(0.0f, 0.01f);
-            g_IVRenderView->SetColorModulation(color_2);
-            g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit_z : mat_lit_z);
+	    switch(*visual_mode)
+	    {
+	    case 0:
+            	g_IVRenderView->SetColorModulation(color_2);
+            	g_IVModelRender->ForcedMaterialOverride(mat_lit_z);
+		break;
+	    case 1:
+            	g_IVRenderView->SetColorModulation(color_2);
+            	g_IVModelRender->ForcedMaterialOverride(mat_unlit_z);
+		break;
+	    case 2:
+            	g_IVRenderView->SetColorModulation(color_2);
+		break;
+	    case 3:
+		break;
+	    }
             RenderChamsRecursive(entity);
         }
 
         if (legit || !singlepass)
         {
             mat_unlit->AlphaModulate(1.0f);
-            g_IVRenderView->SetColorModulation(color);
             ptr->DepthRange(0.0f, 1.0f);
-            g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit : mat_lit);
+	    switch(*visual_mode)
+	    {
+	    case 0:
+            	g_IVRenderView->SetColorModulation(color);
+            	g_IVModelRender->ForcedMaterialOverride(mat_lit);
+		break;
+	    case 1:
+            	g_IVRenderView->SetColorModulation(color);
+            	g_IVModelRender->ForcedMaterialOverride(mat_unlit);
+		break;
+	    case 2:
+            	g_IVRenderView->SetColorModulation(color);
+		break;
+	    case 3:
+		break;
+			}
             RenderChamsRecursive(entity);
         }
     }

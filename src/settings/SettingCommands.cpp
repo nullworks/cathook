@@ -4,13 +4,17 @@
 #include <init.hpp>
 #include <settings/SettingsIO.hpp>
 #include <dirent.h>
+#include <stdio.h> 
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <thread>
 #include <MiscTemporary.hpp>
+#include <settings/String.hpp>
+#include "common.hpp"
 #if ENABLE_VISUALS
 #include "Menu.hpp"
 #include "special/SettingsManagerList.hpp"
+#include <menu/menu/special/ConfigsManagerList.hpp>
 #include "settings/Bool.hpp"
 #endif
 /*
@@ -20,6 +24,17 @@
 namespace settings::commands
 {
 static settings::Boolean autosave{ "settings.autosave", "true" };
+
+void refreshConfigList()
+{
+    zerokernel::Container *cl = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("cfg-list"));
+    if (cl)
+    {
+        zerokernel::special::ConfigsManagerList list(*cl);
+        list.construct();
+        printf("CL found\n");
+    }
+}
 
 static void getAndSortAllConfigs();
 static std::string getAutoSaveConfigPath()
@@ -136,10 +151,12 @@ static CatCommand save("save", "", [](const CCommand &args) {
     if (args.ArgC() == 1)
     {
         writer.saveTo((paths::getConfigPath() + "/default.conf").c_str());
+		refreshConfigList();
     }
     else
     {
         writer.saveTo(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
+		refreshConfigList();
     }
     logging::Info("cat_save: Sorting configs...");
     getAndSortAllConfigs();
@@ -157,6 +174,49 @@ static CatCommand load("load", "", [](const CCommand &args) {
     {
         loader.loadFrom(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
     }
+});
+
+static CatCommand config_delete("config_delete", "", [](const CCommand &args) {
+    if (args.ArgC() != 1)
+    {
+        remove((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str());
+		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
+    	refreshConfigList();
+    }
+	else
+	{
+		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
+	}
+});
+
+static CatCommand config_list("config_list", "", [](const CCommand &args) {
+    DIR           *dirp;
+    struct dirent *directory;
+
+    dirp = opendir(std::string(DATA_PATH "/configs/").c_str());
+    if (dirp)
+    {
+        while ((directory = readdir(dirp)) != NULL)
+        {
+			if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
+				g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
+        }
+
+        closedir(dirp);
+    }
+});
+
+static CatCommand config_rename("config_rename", "", [](const CCommand &args) {
+    if (args.ArgC() == 3)
+    {
+        rename((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str(), (paths::getConfigPath() + "/" + args.Arg(2) + ".conf").c_str());
+		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Config Renamed!\n");
+    	refreshConfigList();
+    }
+	else
+	{
+		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Not Enough Arguments!\n");
+	}
 });
 
 static std::vector<std::string> sortedVariables{};

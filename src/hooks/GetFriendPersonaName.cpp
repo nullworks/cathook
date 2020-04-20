@@ -48,11 +48,13 @@ bool StolenName()
             continue;
         if (ent->m_bEnemy())
             continue;
-
         // Check if name is current one
         player_info_s info;
         if (g_IEngine->GetPlayerInfo(ent->m_IDX, &info))
         {
+            // Should be ignored
+            if (!player_tools::shouldTargetSteamId(info.friendsID))
+                continue;
             // Invisible character won't fit into name with max. length
             if (std::strlen(info.name) >= 31)
                 continue;

@@ -15,17 +15,7 @@ void zerokernel::Text::render()
     draw::String(bb.getContentBox().left() + text_x, bb.getContentBox().top() + text_y + 1, *color_text, data.c_str(), resource::font::base);
 #endif
 
-    if (tooltip.has_value() && isHovered())
-	      Menu::instance->showTooltip(*tooltip);
     BaseMenuObject::render();
-}
-
-void zerokernel::Text::renderForTooltip()
-{
-    renderBackground(*zerokernel_tooltip::color_background);
-    renderBorder(*zerokernel_tooltip::color_border);
-
-    zerokernel::Text::render();
 }
 
 void zerokernel::Text::set(std::string text)
@@ -33,20 +23,6 @@ void zerokernel::Text::set(std::string text)
     if (text == data)
         return;
     data   = std::move(text);
-    int ow = bb.border_box.width;
-    int oh = bb.border_box.height;
-    recalculateSize();
-    calculate();
-    if (ow != bb.border_box.width || oh != bb.border_box.height)
-        BaseMenuObject::emitSizeUpdate();
-}
-
-void zerokernel::Text::set(std::string text, std::string tt)
-{
-    if (text == data)
-        return;
-    tooltip = tt;
-    data = std::move(text);
     int ow = bb.border_box.width;
     int oh = bb.border_box.height;
     recalculateSize();

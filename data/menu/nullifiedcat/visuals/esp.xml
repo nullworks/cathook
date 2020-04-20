@@ -1,8 +1,8 @@
 <Tab name="ESP" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="ESP">
         <List width="150">
-            <AutoVariable width="fill" target="esp.enable" label="Enable ESP"/>
-            <AutoVariable width="fill" target="esp.legit" label="Legit Mode"/>
+            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable Extrasensory Perception"/>
+            <AutoVariable width="fill" target="esp.legit" label="Legit Mode" tooltip="Dont Show ESP of Enemies Behind Walls"/>
             <AutoVariable width="fill" target="esp.range" label="Max Range"/>
             <AutoVariable width="fill" target="lightesp.enable" label="Enable Light ESP"/>
         </List>
@@ -69,7 +69,7 @@
             <AutoVariable width="fill" target="esp.expand" label="Expand"/>
             <LabeledObject width="fill" label="Text Position">
                 <Select target="esp.text-position">
-                    <Option name="Top right" value="0"/>
+                    <Option name="Top Right" value="0"/>
                     <Option name="Bottom Right" value="1"/>
                     <Option name="Center" value="2"/>
                     <Option name="Above" value="3"/>
@@ -87,15 +87,15 @@
                 <Select target="esp.tracers-mode">
                     <Option name="Off" value="0"/>
                     <Option name="Center" value="1"/>
-                    <Option name="bottom" value="2"/>
+                    <Option name="Bottom" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Health Mode">
-                <Select target="esp.health-mode">
+            <LabeledObject width="fill" label="Health Mode" tooltip="Sets the Healthbar Mode">
+                <Select target="esp.health-bar">
                     <Option name="None" value="0"/>
-                    <Option name="Text" value="1"/>
-                    <Option name="Healthbar" value="2"/>
-                    <Option name="Both" value="3"/>
+                    <Option name="Top Horizontal" value="1"/>
+                    <Option name="Bottom Horizontal" value="2"/>
+                    <Option name="Vertical" value="3"/>
                 </Select>
             </LabeledObject>
         </List>
@@ -103,6 +103,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Strings" x="340">
         <List width="150">
             <AutoVariable width="fill" target="esp.info.name" label="Name"/>
+            <AutoVariable width="fill" target="esp.info.health" label="Health"/>
             <AutoVariable width="fill" target="esp.info.distance" label="Distance"/>
             <AutoVariable width="fill" target="esp.info.class" label="Class"/>
             <AutoVariable width="fill" target="esp.info.conditions" label="Conditions"/>
@@ -115,7 +116,7 @@
             <AutoVariable width="fill" target="esp.online.software" label="Online: Software"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="140">
+    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="155">
         <List width="150">
             <LabeledObject width="fill" label="Mode">
                 <Select target="esp.emoji.mode">

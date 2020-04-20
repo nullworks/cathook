@@ -77,9 +77,10 @@ void LocalPlayer::Update()
         team = 0;
         return;
     }
-    holding_sniper_rifle = false;
-    holding_sapper       = false;
-    wep                  = weapon();
+    holding_sniper_rifle     = false;
+    holding_sapper           = false;
+    weapon_melee_damage_tick = false;
+    wep                      = weapon();
     if (CE_GOOD(wep))
     {
         weapon_mode = GetWeaponModeloc();
@@ -87,6 +88,20 @@ void LocalPlayer::Update()
             holding_sniper_rifle = true;
         if (wep->m_iClassID() == CL_CLASS(CTFWeaponBuilder) || wep->m_iClassID() == CL_CLASS(CTFWeaponSapper))
             holding_sapper = true;
+        // Detect when a melee hit will result in damage, useful for aimbot and antiaim
+        if (CE_FLOAT(wep, netvar.flNextPrimaryAttack) > g_GlobalVars->curtime && weapon_mode == weapon_melee)
+        {
+            if (melee_damagetick == tickcount)
+            {
+                weapon_melee_damage_tick = true;
+                melee_damagetick         = ULONG_MAX;
+            }
+            else if (bAttackLastTick && (long long) melee_damagetick - (long long) tickcount < 0)
+                // Thirteen ticks after attack detection = damage tick
+                melee_damagetick = tickcount + TIME_TO_TICKS(0.195f);
+        }
+        else
+            melee_damagetick = 0;
     }
     team                   = CE_INT(entity, netvar.iTeamNum);
     life_state             = CE_BYTE(entity, netvar.iLifeState);
@@ -97,7 +112,7 @@ void LocalPlayer::Update()
     clazz                  = CE_INT(entity, netvar.iClass);
     health                 = CE_INT(entity, netvar.iHealth);
     this->bUseSilentAngles = false;
-    bZoomed                = CE_INT(entity, netvar.iFOV) == 20.0f; //!= NET_INT(entity, netvar.iDefaultFOV);
+    bZoomed                = HasCondition<TFCond_Zoomed>(entity);
     if (bZoomed)
     {
         if (flZoomBegin == 0.0f)
@@ -113,6 +128,7 @@ void LocalPlayer::UpdateEnd()
 {
     if (!isFakeAngleCM)
         realAngles = current_user_cmd->viewangles;
+    bAttackLastTick = (current_user_cmd->buttons & IN_ATTACK);
 }
 
 CachedEntity *LocalPlayer::weapon()

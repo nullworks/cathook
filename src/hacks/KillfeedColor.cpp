@@ -172,6 +172,5 @@ mov [esp], ecx
         }
     });
 });
-
-#endif
 }
+#endif

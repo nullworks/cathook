@@ -160,7 +160,7 @@ static void CreateMove()
         if (engineerLogic())
             return;
     }
-    // Reset Engi task stzff if not engineer
+    // Reset Engi task stuff if not engineer
     else if (!engineer_mode && task::current_task == task::engineer)
     {
         task::current_task          = task::none;

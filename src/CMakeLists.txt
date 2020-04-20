@@ -26,12 +26,11 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/angles.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/textmode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tfmm.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/trace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/ucccccp_cmds.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/velocity.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/votelogger.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/MiscTemporary.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/navparser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/irc.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/nullnexus.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/PlayerTools.cpp")
 
 target_sources(cathook PRIVATE ${files})

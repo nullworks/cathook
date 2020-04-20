@@ -151,7 +151,7 @@ void handle_melee_crit(IClientEntity *weapon)
 {
     // Should i crit or save my crits?
     bool in_range = false;
-    for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         // We already found out we should crit
         if (in_range)

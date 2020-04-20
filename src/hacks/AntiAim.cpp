@@ -208,13 +208,14 @@ bool ShouldAA(CUserCmd *cmd)
     if (cmd->buttons & IN_USE)
         return false;
     int classid = LOCAL_W->m_iClassID();
-    if ((cmd->buttons & IN_ATTACK) && !(IsTF2() && classid == CL_CLASS(CTFCompoundBow)) && CanShoot())
+    auto mode   = GetWeaponMode();
+    if ((cmd->buttons & IN_ATTACK) && !(IsTF2() && (classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee)) && CanShoot())
     {
         return false;
     }
     if ((cmd->buttons & IN_ATTACK2) && classid == CL_CLASS(CTFLunchBox))
         return false;
-    switch (GetWeaponMode())
+    switch (mode)
     {
     case weapon_projectile:
         if (classid == CL_CLASS(CTFCompoundBow))
@@ -227,7 +228,6 @@ bool ShouldAA(CUserCmd *cmd)
             break;
         }
     /* no break */
-    case weapon_melee:
     case weapon_throwable:
         if ((cmd->buttons & (IN_ATTACK | IN_ATTACK2)) || g_pLocalPlayer->bAttackLastTick)
         {
@@ -235,6 +235,12 @@ bool ShouldAA(CUserCmd *cmd)
             return false;
         }
         break;
+    case weapon_melee:
+        if (g_pLocalPlayer->weapon_melee_damage_tick)
+            return false;
+        // Spy knife needs special treatment. There is no delay between IN_ATTACK and a hit
+        if (g_pLocalPlayer->clazz == tf_class::tf_spy && cmd->buttons & IN_ATTACK && CanShoot())
+            return false;
     default:
         break;
     }

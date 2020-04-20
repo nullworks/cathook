@@ -594,7 +594,7 @@ void reportall()
 
 CatCommand report("report_all", "Report all players", []() { reportall(); });
 CatCommand report_uid("report_steamid", "Report with steamid", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
         return;
     unsigned steamid = 0;
     try

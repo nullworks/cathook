@@ -1,13 +1,13 @@
 <Tab name="Chams" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chams">
         <List width="150">
-            <AutoVariable width="fill" target="chams.enable" label="Enable Chams" tooltip="Changes the Texture of Entities for Higher Visibility"/>
-            <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't Show Chams Through Walls"/>
-            <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't Show Shadows on Chams"/>
+            <AutoVariable width="fill" target="chams.enable" label="Enable Chams"/>
+            <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show Chams through walls."/>
+            <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't show shadows on chams."/>
             <AutoVariable width="fill" target="chams.disco" label="Disco" tooltip="Rainbow Mode"/>
-            <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color Chams According to Health"/>
+            <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
-            <AutoVariable width="fill" target="chams.single-pass" label="Single Pass" tooltip="Change Color of Entities Behind Walls. Requires Legit to Be Off"/>
+            <AutoVariable width="fill" target="chams.single-pass" label="Single Pass"/>
             <AutoVariable width="fill" target="chams.white-weapons" label="White Weapons"/>
         </List>
     </Box>

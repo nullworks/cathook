@@ -9,12 +9,7 @@ void zerokernel::LabeledObject::loadFromXml(const tinyxml2::XMLElement *data)
     Container::loadFromXml(data);
 
     const char *label_text;
-    const char *tooltip_text;
-    if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("label", &label_text) && tinyxml2::XML_SUCCESS == data->QueryStringAttribute("tooltip", &tooltip_text))
-    {
-        setLabel(label_text, tooltip_text);
-    }
-    else if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("label", &label_text))
+    if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("label", &label_text))
     {
         setLabel(label_text);
     }
@@ -44,15 +39,6 @@ void zerokernel::LabeledObject::setLabel(std::string text)
         createLabel();
     }
     label->set(std::move(text));
-}
-
-void zerokernel::LabeledObject::setLabel(std::string text, std::string tt)
-{
-    if (label == nullptr)
-    {
-        createLabel();
-    }
-    label->set(std::move(text), std::move(tt));
 }
 
 void zerokernel::LabeledObject::reorderElements()

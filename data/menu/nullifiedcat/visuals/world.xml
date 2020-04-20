@@ -2,7 +2,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="FOV">
         <List width="180">
             <AutoVariable width="fill" target="visual.fov" label="FOV"/>
-            <AutoVariable width="fill" target="visual.fov-zoomed" label="FOV Zoomed"/>
+            <AutoVariable width="fill" target="remove.zoom" label="Apply if zoomed"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Freecam" y="55">
@@ -14,9 +14,9 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-	          <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
+	    <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
             <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Real Antiaim Angles in Third Person"/>
-	          <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
+	    <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">
@@ -26,9 +26,10 @@
             <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
             <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove Zoom/Keep Rifle"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="95">
+    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.night-mode" label="Nightmode" min="0" max="50" step="0.1"/>
             <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>

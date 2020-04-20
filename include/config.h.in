@@ -12,7 +12,7 @@
 #define ENABLE_TEXTMODE_STDIN @EnableTextmodeStdin@
 #define ENABLE_TEXTMODE @Textmode@
 #define ENABLE_PROFILER @EnableProfiler@
-#define ENABLE_IRC @EnableIRC@
+#define ENABLE_NULLNEXUS @EnableNullNexus@
 #define ENABLE_LOGGING @EnableLogging@
 #define ENABLE_CLIP @EnableClip@
 

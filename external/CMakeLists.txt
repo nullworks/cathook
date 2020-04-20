@@ -9,10 +9,5 @@ if(EnableClip AND EnableVisuals)
 endif()
 
 target_include_directories(cathook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/MicroPather")
-target_include_directories(cathook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/ucccccp")
 target_include_directories(cathook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/TF2_NavFile_Reader")
 target_include_directories(cathook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/clip/includes")
-
-if(EnableIRC)
-    add_subdirectory(chirc)
-endif()

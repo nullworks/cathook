@@ -57,12 +57,12 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Resolver" x="170">
         <List width="150">
-            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Enable Anti-Anti-Aim"/>
+            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Attempt to bruteforce enemy antiaim."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" name="Anti-Resolver" width="content" height="content" x="340">
         <List width="150">
-            <AutoVariable width="fill" target="antiaim.aaaa.enable" label="Enable" tooltip="Enable Anti-Anti-Anti-Aim"/>
+            <AutoVariable width="fill" target="antiaim.aaaa.enable" label="Enable"/>
             <AutoVariable width="fill" target="antiaim.aaaa.flip-key" label="Flip Key"/>
             <AutoVariable width="fill" target="antiaim.aaaa.interval.seconds" label="Enable"/>
             <AutoVariable width="fill" target="antiaim.aaaa.interval.random-low" label="Random Low"/>

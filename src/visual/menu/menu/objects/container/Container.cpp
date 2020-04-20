@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018 nullworks. All rights reserved.
+  Copyright (c) 2020 nullworks. All rights reserved.
 */
 
 #include <menu/object/container/Container.hpp>
@@ -104,6 +104,7 @@ void Container::render()
         if (!object->isHidden())
             object->render();
     }
+    BaseMenuObject::render();
 }
 
 void Container::update()

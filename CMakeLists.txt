@@ -86,7 +86,7 @@ set(DataPath "/opt/cathook/data" CACHE FILEPATH "Data location")
 set(VACBypass 0 CACHE BOOL "Textmode VAC bypass")
 set(EnableTextmodeStdin 0 CACHE BOOL "Textmode Stdin -> Console bridge (EXPERIMENTAL)")
 set(EnableWarnings 0 CACHE BOOL "Enable compile warnings")
-set(EnableIRC 1 CACHE BOOL "Enable IRC for messaging and ignore-cathook")
+set(EnableNullNexus 1 CACHE BOOL "Enable NullNexus chat and other features")
 set(EnableLogging 1 CACHE BOOL "Enable logging to /tmp/")
 set(EnableClip 1 CACHE BOOL "Enable anti electron/chromium freezing")
 set(Unity_ZeroKernel 1 CACHE BOOL "Use a unity build for zerokernel files")
@@ -105,11 +105,16 @@ if (EnableVisuals)
 endif()
 
 find_package(Git REQUIRED)
-find_package(Boost REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)
-
-# cat packages
+find_package(Boost 1.70.0)
+if (NOT ${Boost_FOUND})
+    set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
+    add_subdirectory(external/boost-cmake)
+    SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.70 REQUIRED)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 execute_process(COMMAND
         "${GIT_EXECUTABLE}" log -1 --pretty=\"%h\"
@@ -129,6 +134,11 @@ find_library(ValveLibraryVStdLib NAMES vstdlib PATHS "${PROJECT_SOURCE_DIR}/lib"
 if(EnableIPC)
     add_subdirectory(external/simple-ipc)
     target_link_libraries(cathook SimpleIPC)
+endif()
+
+if(EnableNullNexus)
+    add_subdirectory(external/libnullnexus)
+    target_link_libraries(cathook libnullnexus)
 endif()
 
 if(EnableVisuals)

@@ -1,0 +1,66 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+strategy:
+  matrix:
+    Linux-GCC:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Linux'
+      BUILD_COMPILER: 'GCC'
+    Linux-Clang:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Linux'
+      BUILD_COMPILER: 'Clang'
+    Android-arm64:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Android'
+      BUILD_ARCH: 'arm64-v8a'
+    Android-arm:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Android'
+      BUILD_ARCH: 'armeabi-v7a'
+    Android-x86:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Android'
+      BUILD_ARCH: 'x86'
+    Android-x86_64:
+      imageName: 'ubuntu-16.04'
+      BUILD_TARGET: 'Android'
+      BUILD_ARCH: 'x86_64'
+    macOS:
+      imageName: 'macos-10.13'
+      BUILD_TARGET: 'macOS'
+    iOS:
+      imageName: 'macos-10.13'
+      BUILD_TARGET: 'iOS'
+    Windows-v141-amd64:
+      imageName: 'vs2017-win2016'
+      BUILD_TARGET: 'Windows'
+      BUILD_TOOLCHAIN: 'amd64'
+    Windows-v141-x86:
+      imageName: 'vs2017-win2016'
+      BUILD_TARGET: 'Windows'
+      BUILD_TOOLCHAIN: 'amd64_x86'
+
+trigger:
+- master
+
+pool:
+  vmImage: $(imageName)
+
+steps:
+- bash: |
+    export
+  displayName: 'Check environment'
+
+- bash: |
+    bash build.sh
+  displayName: 'Build'
+  env:
+    BUILD_TARGET: $(BUILD_TARGET)
+    BUILD_COMPILER: $(BUILD_COMPILER)
+    BUILD_ARCH: $(BUILD_ARCH)
+    BUILD_TOOLCHAIN: $(BUILD_TOOLCHAIN)
+    CCACHE_DISABLE: 1

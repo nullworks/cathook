@@ -12,6 +12,7 @@
 #include <settings/Bool.hpp>
 #include "PlayerTools.hpp"
 #include <hacks/Backtrack.hpp>
+#include "MiscTemporary.hpp"
 
 namespace hacks::shared::backtrack
 {
@@ -147,6 +148,19 @@ static void Run()
                 hbd.simtime       = CE_FLOAT(pEntity, netvar.m_flSimulationTime);
                 hbd.entorigin     = pEntity->InternalEntity()->GetAbsOrigin();
                 hbd.tickcount     = cmd->tick_count;
+                if (nolerp)
+                {
+                    static const ConVar *pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+                    if (!pUpdateRate)
+                        pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+                    else
+                    {
+
+                        float interp = MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / pUpdateRate->GetFloat());
+                        hbd.tickcount += TIME_TO_TICKS(interp);
+                        hbd.simtime += interp;
+                    }
+                }
 
                 pEntity->hitboxes.InvalidateCache();
                 for (size_t i = 0; i < 18; i++)
@@ -334,11 +348,19 @@ float getRealLatency()
     float Latency             = ch->GetLatency(FLOW_OUTGOING);
     static auto cl_updaterate = g_ICvar->FindVar("cl_updaterate");
     if (cl_updaterate && cl_updaterate->GetFloat() > 0.001f)
+    {
         Latency += -0.5f / cl_updaterate->GetFloat();
+        if (nolerp)
+        {
+            float interp = MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / cl_updaterate->GetFloat());
+            Latency += interp;
+        }
+    }
     else if (!cl_updaterate)
         cl_updaterate = g_ICvar->FindVar("cl_updaterate");
     return MAX(0.0f, Latency) * 1000.f;
 }
+
 float getLatency()
 {
     auto ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
@@ -350,17 +372,25 @@ float getLatency()
     Latency = std::max(Latency, 0.0f);
     if (enable_latency_rampup)
         Latency = Latency * latency_rampup;
+    Latency = ROUND_TO_TICKS(Latency / 1000.0f) * 1000.0f;
     return Latency;
 }
 
 int getTicks()
 {
-    return max(min(int(getLatency() / 200.0f * 13.0f) + 12, 65), 12);
+    // Get Latency in seconds
+    float latency = getLatency() / 1000.0f;
+    // Latency in ticks
+    int ticks = TIME_TO_TICKS(latency);
+    // We can backtrack 200ms into the future of the latency
+    ticks += TIME_TO_TICKS(0.2f);
+    // Clamp between 0.2s and 1s in ticks (12-66)
+    return clamp(ticks, TIME_TO_TICKS(0.2f), TIME_TO_TICKS(1.0f));
 }
 
 bool ValidTick(BacktrackData &i, CachedEntity *ent)
 {
-    if (!(fabsf(NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) * 1000.0f - getLatency() - i.simtime * 1000.0f) < 200.0f))
+    if (!(fabsf(NET_FLOAT(RAW_ENT(ent), netvar.m_flSimulationTime) * 1000.0f - getLatency() - i.simtime * 1000.0f) < ROUND_TO_TICKS(200.0f)))
         return false;
     return true;
 }

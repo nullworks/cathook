@@ -139,6 +139,20 @@ static void updateDanger()
                 else
                     continue;
             }
+            // It's still building, ignore
+            else if (CE_BYTE(ent, netvar.m_bBuilding) || CE_BYTE(ent, netvar.m_bPlacing))
+                continue;
+
+            // Keep track of good spots
+            std::vector<CNavArea *> spot_list{};
+
+            // Don't blacklist if local player is standing in it
+            bool local_player_in_range = false;
+
+            // Local player's nav area
+            auto local_area = findClosestNavSquare(LOCAL_E->m_vecOrigin());
+
+            // Actual building check
             for (auto &i : navfile->m_areas)
             {
                 Vector area = i.m_center;
@@ -148,7 +162,23 @@ static void updateDanger()
                 // Check if sentry can see us
                 if (!IsVectorVisible(loc, area, true))
                     continue;
-                ignoredata &data = ignores[{ &i, nullptr }];
+                // local player's nav area?
+                if (local_area == &i)
+                {
+                    local_player_in_range = true;
+                    break;
+                }
+                spot_list.push_back(&i);
+            }
+
+            // Local player is in the sentry range, let him nav
+            if (local_player_in_range)
+                continue;
+
+            // Ignore these
+            for (auto &i : spot_list)
+            {
+                ignoredata &data = ignores[{ i, nullptr }];
                 data.status      = danger_found;
                 data.ignoreTimeout.update();
                 data.ignoreTimeout.last -= std::chrono::seconds(17);
@@ -161,16 +191,43 @@ static void updateDanger()
             if (CE_INT(ent, netvar.iPipeType) == 1)
                 continue;
             Vector loc = ent->m_vecOrigin();
+
+            // Keep track of good spots
+            std::vector<CNavArea *> spot_list{};
+
+            // Don't blacklist if local player is standing in it
+            bool local_player_in_range = false;
+
+            // Local player's nav area
+            auto local_area = findClosestNavSquare(LOCAL_E->m_vecOrigin());
+
+            // Actual Sticky check
             for (auto &i : navfile->m_areas)
             {
                 Vector area = i.m_center;
+                area.z += 41.5f;
                 if (loc.DistTo(area) > 130)
                     continue;
-                area.z += 41.5f;
-                // Check if We can see stickies
+                // Check if in Sticky vis range
                 if (!IsVectorVisible(loc, area, true))
                     continue;
-                ignoredata &data = ignores[{ &i, nullptr }];
+                // local player's nav area?
+                if (local_area == &i)
+                {
+                    local_player_in_range = true;
+                    break;
+                }
+                spot_list.push_back(&i);
+            }
+
+            // Local player is in the sentry range, let him nav
+            if (local_player_in_range)
+                continue;
+
+            // Ignore these
+            for (auto &i : spot_list)
+            {
+                ignoredata &data = ignores[{ i, nullptr }];
                 data.status      = danger_found;
                 data.ignoreTimeout.update();
                 data.ignoreTimeout.last -= std::chrono::seconds(17);

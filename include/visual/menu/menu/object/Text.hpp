@@ -33,8 +33,6 @@ public:
 
     void render() override;
 
-    void renderForTooltip();
-
     void recalculateSize() override;
 
     bool handleSdlEvent(SDL_Event *event) override;
@@ -50,8 +48,6 @@ public:
     void setOwnColor(rgba_t color);
 
     void set(std::string text);
-    
-    void set(std::string text1, std::string text2);
 
     const std::string &get() const;
 

@@ -29,7 +29,12 @@ struct Autoequip_unlock_list
         slot           = _slot;
     }
 };
+
+// Keep track of possible achievement items
 static std::vector<Autoequip_unlock_list> primary, secondary, melee, pda2;
+// Keep track of stock items
+static std::array<bool, 4> equip_stock;
+
 static settings::Int equip_primary{ "achievement.equip-primary", "0" };
 static settings::Int equip_secondary{ "achievement.equip-secondary", "0" };
 static settings::Int equip_melee{ "achievement.equip-melee", "0" };
@@ -121,7 +126,7 @@ CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievemen
 CatCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!", [](const CCommand &args) {
     if (!checkachmngr())
         return;
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         logging::Info("Actually provide an index");
         return;
@@ -208,13 +213,23 @@ static std::deque<queue_struct> gc_queue;
 
 bool equip_item(int clazz, int slot, int id)
 {
-    auto invmng    = re::CTFInventoryManager::GTFInventoryManager();
-    auto inv       = invmng->GTFPlayerInventory();
-    auto item_view = inv->GetFirstItemOfItemDef(id);
-    if (item_view)
+    auto invmng = re::CTFInventoryManager::GTFInventoryManager();
+    auto inv    = invmng->GTFPlayerInventory();
+    // Request to equip a stock item
+    if (id == -1)
     {
-        gc_queue.push_front({ clazz, slot, item_view->UUID() });
+        // -1 in Unsigned long long would be the maximum value
+        gc_queue.push_front({ clazz, slot, ULLONG_MAX });
         return true;
+    }
+    else
+    {
+        auto item_view = inv->GetFirstItemOfItemDef(id);
+        if (item_view)
+        {
+            gc_queue.push_front({ clazz, slot, item_view->UUID() });
+            return true;
+        }
     }
     return false;
 }
@@ -239,6 +254,11 @@ static std::vector<int> hat_list = { 302, 940, 941 };
 // TNE didn't want me to put "epic_" infront of it :(
 static Timer hat_steal_timer{};
 static Timer gc_timer{};
+// We need this incase a bot joins one class due to being stuck
+// and then switches to the other while the stock equip is on
+static std::array<Timer, 4> stock_equip_reset{};
+// We also need a delay between each attempt to not spam gc
+static Timer stock_equip_wait{};
 
 void CreateMove()
 {
@@ -252,10 +272,44 @@ void CreateMove()
             gc_queue.pop_back();
         }
     }
-    if (!hat_troll)
+    if (CE_BAD(LOCAL_E))
         return;
 
-    if (CE_BAD(LOCAL_E))
+    // Wait 500ms between each call
+    if (LOCAL_E->m_bAlivePlayer() && stock_equip_wait.test_and_set(500))
+        for (int i = 0; i < 4; i++)
+        {
+            // We should equip our stock weapons
+            if (equip_stock[i])
+            {
+                tf_class player_class = (tf_class) g_pLocalPlayer->clazz;
+                // This is pretty much always true, however, there are exceptions.
+                int slot = i;
+                // Non spy can't change PDA (and engineer doesn't need to)
+                if (i == 3 && player_class != tf_spy)
+                {
+                    equip_stock[i] = false;
+                    continue;
+                }
+                // For spy the primary is in reality a secondary. No idea why they did that
+                if (player_class == tf_spy && slot == 0)
+                    slot = 1;
+                // PDA slot ids are way different, adjust
+                if (slot == 3)
+                    slot = 6;
+
+                // If the timer is running for longer than 10s this is the first call after update
+                stock_equip_reset[i].test_and_set(10000);
+
+                // After 3 seconds we should stop equipping
+                if (stock_equip_reset[i].check(3000))
+                    equip_stock[i] = false;
+
+                // Equip the item (-1 for stock)
+                equip_item(player_class, slot, -1);
+            }
+        }
+    if (!hat_troll)
         return;
 
     if (hat_steal_timer.test_and_set(15000))
@@ -270,6 +324,9 @@ void Callback(int after, int type)
     if (!after)
         return;
     std::vector<Autoequip_unlock_list> equip_from;
+    // Equip stock weapons
+    if (after == 100 && type <= 3)
+        equip_stock[type] = true;
     // Store the needed array
     switch (type)
     {

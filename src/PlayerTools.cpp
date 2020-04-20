@@ -9,11 +9,13 @@
 #include "PlayerTools.hpp"
 #include "entitycache.hpp"
 #include "settings/Bool.hpp"
+#include "MiscTemporary.hpp"
 
 namespace player_tools
 {
 
 static settings::Int betrayal_limit{ "player-tools.betrayal-limit", "2" };
+static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true" };
 
 static settings::Boolean taunting{ "player-tools.ignore.taunting", "true" };
 static settings::Boolean hoovy{ "player-tools.ignore.hoovy", "true" };
@@ -36,6 +38,7 @@ bool shouldTargetSteamId(unsigned id)
         return false;
     return true;
 }
+
 bool shouldTarget(CachedEntity *entity)
 {
     if (entity->m_Type() == ENTITY_PLAYER)
@@ -51,7 +54,6 @@ bool shouldTarget(CachedEntity *entity)
 
     return true;
 }
-
 bool shouldAlwaysRenderEspSteamId(unsigned id)
 {
     if (id == 0)
@@ -104,8 +106,38 @@ void onKilledBy(unsigned id)
         if (betrayal_list.find(id) == betrayal_list.end())
             betrayal_list[id] = 0;
         betrayal_list[id]++;
+        // Notify other bots
+        if (id && betrayal_list[id] == *betrayal_limit && betrayal_sync)
+        {
+            if (ipc::peer && ipc::peer->connected)
+            {
+                std::string command = "cat_ipc_exec_all cat_pl_mark_betrayal " + std::to_string(id);
+                if (command.length() >= 63)
+                    ipc::peer->SendMessage(0, 0, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
+                else
+                    ipc::peer->SendMessage(command.c_str(), 0, ipc::commands::execute_client_cmd, 0, 0);
+            }
+        }
     }
 }
+
+static CatCommand mark_betrayal("pl_mark_betrayal", "Mark a steamid32 as betrayal", [](const CCommand &args) {
+    if (args.ArgC() < 2)
+    {
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please provide a valid steamid32!");
+        return;
+    }
+    try
+    {
+        // Grab steamid
+        unsigned steamid       = std::stoul(args.Arg(1));
+        betrayal_list[steamid] = *betrayal_limit;
+    }
+    catch (std::invalid_argument)
+    {
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid Steamid32 provided.");
+    }
+});
 
 void onKilledBy(CachedEntity *entity)
 {

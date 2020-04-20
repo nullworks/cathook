@@ -28,7 +28,21 @@ extern settings::Boolean backtrack_chams_glow;
 }
 namespace hooked_methods
 {
-
+// Global scope so we can deconstruct on shutdown
+static bool init_mat = false;
+static CMaterialReference mat_dme_chams;
+static InitRoutine init_dme([]() {
+    EC::Register(
+        EC::LevelShutdown,
+        []() {
+            if (init_mat)
+            {
+                mat_dme_chams.Shutdown();
+                init_mat = false;
+            }
+        },
+        "dme_lvl_shutdown");
+});
 bool aa_draw = false;
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
@@ -65,15 +79,13 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     }
 
     // Used for fakes and for backtrack chams/glow
-    static CMaterialReference mat_unlit;
-    static bool init = false;
-    if (!init)
+    if (!init_mat)
     {
         KeyValues *kv = new KeyValues("UnlitGeneric");
         kv->SetString("$basetexture", "vgui/white_additive");
         kv->SetInt("$ignorez", 0);
-        mat_unlit.Init("__cathook_glow_unlit", kv);
-        init = true;
+        mat_dme_chams.Init("__cathook_glow_unlit", kv);
+        init_mat = true;
     }
 
     // Maybe one day i'll get this working
@@ -136,7 +148,6 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                         // Crash much?
                         if (usable.size())
                         {
-
                             // Sort
                             std::sort(usable.begin(), usable.end(), [](hacks::shared::backtrack::BacktrackData &a, hacks::shared::backtrack::BacktrackData &b) { return a.tickcount < b.tickcount; });
                             // Make our own Chamsish Material
@@ -149,7 +160,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             // Important for Depth
                             ptr->DepthRange(0.0f, 1.0f);
                             // Apply our material
-                            g_IVModelRender->ForcedMaterialOverride(mat_unlit);
+                            g_IVModelRender->ForcedMaterialOverride(mat_dme_chams);
                             // Run Original
                             original::DrawModelExecute(this_, state, info, usable[0].bones);
                             // Revert

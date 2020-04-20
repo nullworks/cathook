@@ -1,7 +1,7 @@
 <Tab name="Chat" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chat Spam">
         <List width="150">
-            <LabeledObject width="fill" label="Spam Mode" tooltip="Set Which Text Is Spammed in the Chat">
+            <LabeledObject width="fill" label="Spam Mode">
                 <Select target="spam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Custom" value="1"/>
@@ -21,13 +21,13 @@
     </Box>
     <Box name="Voice Spam" width="content" height="content" padding="12 6 6 6" y="100">
         <List width="150">
-            <LabeledObject width="fill" label="Voice Spam" tooltip="Spam Character Voice Lines">
+            <LabeledObject width="fill" label="Voice Spam" tooltip="Spam character voicelines.">
                 <Select target="spam.voicecommand">
                     <Option name="Disable" value="0"/>
                     <Option name="Random" value="1"/>
                     <Option name="Medic" value="2"/>
                     <Option name="Thanks" value="3"/>
-		    <Option name="Nice Shot" value="4"/>
+		            <Option name="Nice Shot" value="4"/>
                     <Option name="Cheers" value="5"/>
                     <Option name="Jeers" value="6"/>
                 </Select>
@@ -43,13 +43,13 @@
     </Box>
     <Box name="Chat Censor" width="content" height="content" padding="12 6 6 6" y="200">
         <List width="150">
-            <AutoVariable width="fill" target="chat.censor.enable" label="Enable Chat Censor" tooltip="Censors Cheating Accusations"/>
+            <AutoVariable width="fill" target="chat.censor.enable" label="Enable Chat Censor" tooltip="Censors cheating accusations."/>
             <AutoVariable width="fill" target="chat.censor.filter" label="Filter"/>
         </List>
     </Box>
     <Box name="Killsay" width="177" height="content" padding="12 6 6 6" x="170">
         <List width="150">
-            <LabeledObject width="fill" label="Killsay Mode" tooltip="Set Which Text Is After a Kill">
+            <LabeledObject width="fill" label="Killsay Mode">
                 <Select target="killsay.mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Custom" value="1"/>
@@ -62,7 +62,7 @@
             <AutoVariable width="fill" target="killsay.delay" label="Killsay Delay"/>
             <Box name="Critsay" width="165" height="content" padding="12 6 6 6">
                 <List width="150">
-                    <LabeledObject width="fill" label="Critsay Mode" tooltip="Set Which Text Is Spammed After a Crit Kill">
+                    <LabeledObject width="fill" label="Critsay Mode">
                         <Select target="critsay.mode">
                             <Option name="Disable" value="0"/>
                             <Option name="Custom" value="1"/>
@@ -77,7 +77,7 @@
     </Box>
     <Box name="Uber Spam" width="content" height="content" padding="12 6 6 6" x="352">
         <List width="150">
-            <LabeledObject width="fill" label="Source" tooltip="Prints in Chat Your Uber %. Default Team Only">
+            <LabeledObject width="fill" label="Source" tooltip="Automatically send uber % in chat.">
                 <Select target="uberspam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Default" value="1"/>
@@ -113,17 +113,7 @@
             <AutoVariable width="fill" target="chat.identify.answer" label="Counter Identify"/>
         </List>
     </Box>
-    <Box name="IRC" width="content" height="content" padding="12 6 6 6" x="170" y="140">
-        <List width="155">
-            <AutoVariable width="fill" target="irc.enabled" label="Enabled"/>
-            <AutoVariable width="fill" target="irc.anon" label="Hide Real Name"/>
-            <AutoVariable width="fill" target="irc.auth" label="Reveal to Cathook Users"/>
-            <AutoVariable width="fill" target="irc.address" label="Address"/>
-            <AutoVariable width="fill" target="irc.port" label="Port"/>
-            <AutoVariable width="fill" target="irc.channel" label="Channel"/>
-        </List>
-    </Box>
-    <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="250">
+    <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="140">
         <List width="155">
             <AutoVariable width="fill" target="votelogger.autovote.yes" label="Autovote Yes"/>
             <AutoVariable width="fill" target="votelogger.autovote.no" label="Autovote No"/>

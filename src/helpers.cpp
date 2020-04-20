@@ -1344,6 +1344,44 @@ bool IsPlayerDisguised(CachedEntity *player)
     return HasConditionMask<KDisguisedMask.cond_0, KDisguisedMask.cond_1, KDisguisedMask.cond_2, KDisguisedMask.cond_3>(player);
 }
 
+bool IsPlayerResistantToCurrentWeapon(CachedEntity *player)
+{
+    switch (LOCAL_W->m_iClassID())
+    {
+    case CL_CLASS(CTFRocketLauncher_DirectHit):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFRocketLauncher_Mortar): // doesn't exist yet
+    case CL_CLASS(CTFRocketLauncher):
+    case CL_CLASS(CTFParticleCannon):
+    case CL_CLASS(CTFGrenadeLauncher):
+    case CL_CLASS(CTFPipebombLauncher):
+        if (HasCondition<TFCond_UberBlastResist>(player))
+            return true;
+        break;
+    case CL_CLASS(CTFCompoundBow):
+    case CL_CLASS(CTFSyringeGun):
+    case CL_CLASS(CTFCrossbow):
+    case CL_CLASS(CTFShotgunBuildingRescue):
+    case CL_CLASS(CTFDRGPomson):
+    case CL_CLASS(CTFRaygun):
+        if (HasCondition<TFCond_UberBulletResist>(player))
+            return true;
+        break;
+    case CL_CLASS(CTFWeaponFlameBall):
+    case CL_CLASS(CTFFlareGun):
+    case CL_CLASS(CTFFlareGun_Revenge):
+    case CL_CLASS(CTFFlameRocket):
+    case CL_CLASS(CTFFlameThrower):
+        if (HasCondition<TFCond_UberFireResist>(player))
+            return true;
+        break;
+    default:
+        if (g_pLocalPlayer->weapon_mode == weaponmode::weapon_hitscan && HasCondition<TFCond_UberBulletResist>(player))
+            return true;
+    }
+    return false;
+}
+
 // F1 c&p
 Vector CalcAngle(Vector src, Vector dst)
 {

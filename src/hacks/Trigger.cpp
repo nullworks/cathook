@@ -269,9 +269,8 @@ bool IsTargetStateGood(CachedEntity *entity, bool backtrack)
             if (ignore_cloak && IsPlayerInvisible(entity))
                 return false;
             // If settings allow, dont target vaccinated players
-            if (g_pLocalPlayer->weapon_mode == weaponmode::weapon_hitscan || LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow))
-                if (ignore_vaccinator && HasCondition<TFCond_UberBulletResist>(entity))
-                    return false;
+            if (ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
+                return false;
         }
 
         // Head hitbox detection

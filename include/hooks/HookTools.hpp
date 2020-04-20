@@ -20,6 +20,7 @@ enum ec_types
 #endif
     Paint,
     LevelInit,
+    FirstCM,
     LevelShutdown,
     Shutdown,
     /* Append new event above this line. Line below declares amount of events */

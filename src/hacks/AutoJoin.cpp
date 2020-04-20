@@ -111,7 +111,7 @@ void updateSearch()
 }
 static void update()
 {
-    if (autoteam_timer.test_and_set(500))
+    if (autoteam_timer.test_and_set(5000))
     {
         if (autojoin_team and UnassignedTeam())
         {

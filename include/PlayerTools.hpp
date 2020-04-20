@@ -15,14 +15,6 @@ class CachedEntity;
 
 namespace player_tools
 {
-enum class IgnoreReason
-{
-    DO_NOT_IGNORE,
-    IS_HOOVY,
-    IS_TAUNTING,
-    LOCAL_PLAYER_LIST,
-    OTHER
-};
 
 bool shouldTargetSteamId(unsigned id);
 bool shouldTarget(CachedEntity *player);

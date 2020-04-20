@@ -73,6 +73,7 @@ bool IsPlayerInvulnerable(CachedEntity *player);
 bool IsPlayerCritBoosted(CachedEntity *player);
 bool IsPlayerInvisible(CachedEntity *player);
 bool IsPlayerDisguised(CachedEntity *player);
+bool IsPlayerResistantToCurrentWeapon(CachedEntity *player);
 
 const char *GetBuildingName(CachedEntity *ent);
 Vector GetBuildingPosition(CachedEntity *ent);

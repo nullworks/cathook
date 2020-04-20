@@ -21,7 +21,7 @@ extern settings::Boolean minecraftHP;
 int spamdur = 0;
 Timer joinspam{};
 CatCommand join_spam("join_spam", "Spam joins server for X seconds", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
         return;
     int id = atoi(args.Arg(1));
     joinspam.update();

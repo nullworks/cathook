@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2018 nullworks. All rights reserved.
+  Copyright (c) 2020 nullworks. All rights reserved.
 */
 
 #include <menu/BaseMenuObject.hpp>
@@ -109,8 +109,6 @@ void BaseMenuObject::emit(Message &msg, bool is_relayed)
 
 void BaseMenuObject::loadFromXml(const tinyxml2::XMLElement *data)
 {
-    std::cout << "Loading object " << data->Name() << "\n";
-
     data->QueryIntAttribute("x", &xOffset);
     data->QueryIntAttribute("y", &yOffset);
 
@@ -162,13 +160,11 @@ void BaseMenuObject::loadFromXml(const tinyxml2::XMLElement *data)
         }
     }
 
-    const char *tt;
-    if (!data->QueryStringAttribute("tooltip", &tt))
-        tooltip = tt;
+    if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("tooltip", &str))
+        tooltip = str;
 
-    const char *id;
-    if (!data->QueryStringAttribute("id", &id))
-        string_id = id;
+    if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("id", &str))
+        string_id = str;
 
     auto attribute = data->FirstAttribute();
     while (attribute)

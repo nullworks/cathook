@@ -1,0 +1,47 @@
+From 26b61a67cf1d384796e5ae2f207c5b6fa56015e5 Mon Sep 17 00:00:00 2001
+From: Oliver Kowalke <oliver.kowalke@gmail.com>
+Date: Thu, 5 Jan 2017 10:38:47 -0800
+Subject: [PATCH] remove directive '.cpu' for ARM64/AAPCS/ELF
+
+---
+ src/asm/jump_arm64_aapcs_elf_gas.S  | 1 -
+ src/asm/make_arm64_aapcs_elf_gas.S  | 1 -
+ src/asm/ontop_arm64_aapcs_elf_gas.S | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S b/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S
+index 7c0c2fa..1b8ce9e 100644
+--- a/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S
++++ b/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S
+@@ -51,7 +51,6 @@
+  *                                                     *
+  *******************************************************/
+ 
+-.cpu    generic+fp+simd
+ .text
+ .align  2
+ .global jump_fcontext
+diff --git a/libs/context/src/asm/make_arm64_aapcs_elf_gas.S b/libs/context/src/asm/make_arm64_aapcs_elf_gas.S
+index e71a91c..c1fa843 100644
+--- a/libs/context/src/asm/make_arm64_aapcs_elf_gas.S
++++ b/libs/context/src/asm/make_arm64_aapcs_elf_gas.S
+@@ -51,7 +51,6 @@
+  *                                                     *
+  *******************************************************/
+ 
+-.cpu    generic+fp+simd
+ .text
+ .align  2
+ .global make_fcontext
+diff --git a/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S b/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S
+index 7e3b047..02a3b07 100644
+--- a/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S
++++ b/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S
+@@ -51,7 +51,6 @@
+  *                                                     *
+  *******************************************************/
+ 
+-.cpu    generic+fp+simd
+ .text
+ .align  2
+ .global ontop_fcontext

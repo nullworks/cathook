@@ -27,12 +27,8 @@ std::unique_ptr<BaseMenuObject> ObjectFactory::createObjectFromXml(const tinyxml
     if (element == nullptr)
         return nullptr;
 
-    std::cout << "Loading an element\n";
-
     std::unique_ptr<BaseMenuObject> result{ nullptr };
     std::string type = element->Name();
-
-    std::cout << "Type: " << type << '\n';
 
     if (type == "TabContainer")
         result = std::make_unique<TabContainer>();

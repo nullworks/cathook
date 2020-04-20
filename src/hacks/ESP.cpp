@@ -28,7 +28,7 @@ static settings::Int emoji_esp_size{ "esp.emoji.size", "32" };
 static settings::Boolean emoji_esp_scaling{ "esp.emoji.scaling", "true" };
 static settings::Int emoji_min_size{ "esp.emoji.min-size", "20" };
 
-static settings::Int show_health{ "esp.health-mode", "3" };
+static settings::Int healthbar{ "esp.health-bar", "3" };
 static settings::Boolean draw_bones{ "esp.bones", "false" };
 static settings::Int sightlines{ "esp.sightlines", "0" };
 static settings::Int esp_text_position{ "esp.text-position", "0" };
@@ -43,6 +43,7 @@ static settings::Boolean tank{ "esp.show.tank", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
+static settings::Boolean show_health{ "esp.info.health", "true" };
 static settings::Boolean show_name{ "esp.info.name", "true" };
 static settings::Boolean show_class{ "esp.info.class", "true" };
 static settings::Boolean show_conditions{ "esp.info.conditions", "true" };
@@ -295,7 +296,8 @@ static void cm()
 
 static draw::Texture atlas{ paths::getDataPath("/textures/atlas.png") };
 static draw::Texture idspec{ paths::getDataPath("/textures/idspec.png") };
-
+    
+    
 Timer retry{};
 void Init()
 {
@@ -624,8 +626,100 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         }
     }
 
-    // Healthbar
-    if ((int) show_health >= 2)
+    // Top horizontal health bar
+    if (*healthbar == 1)
+    {
+
+        // We only want health bars on players and buildings
+        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
+        {
+
+            // Get collidable from the cache
+            if (GetCollide(ent))
+            {
+
+                // Pull the cached collide info
+                int max_x = ent_data.collide_max.x;
+                int max_y = ent_data.collide_max.y;
+                int min_x = ent_data.collide_min.x;
+                int min_y = ent_data.collide_min.y;
+
+                // Get health values
+                int health    = 0;
+                int healthmax = 0;
+                switch (type)
+                {
+                case ENTITY_PLAYER:
+                    health    = g_pPlayerResource->GetHealth(ent);
+                    healthmax = g_pPlayerResource->GetMaxHealth(ent);
+                    break;
+                case ENTITY_BUILDING:
+                    health    = CE_INT(ent, netvar.iBuildingHealth);
+                    healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
+                    break;
+                }
+
+                // Get Colors
+                rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
+                rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
+                // Get bar width
+                int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
+
+                // Draw
+                draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
+                draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
+            }
+        }
+    }
+
+    // Bottom horizontal health bar
+    else if (*healthbar == 2)
+    {
+
+        // We only want health bars on players and buildings
+        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
+        {
+
+            // Get collidable from the cache
+            if (GetCollide(ent))
+            {
+
+                // Pull the cached collide info
+                int max_x = ent_data.collide_max.x;
+                int max_y = ent_data.collide_max.y;
+                int min_x = ent_data.collide_min.x;
+                int min_y = ent_data.collide_min.y;
+
+                // Get health values
+                int health    = 0;
+                int healthmax = 0;
+                switch (type)
+                {
+                case ENTITY_PLAYER:
+                    health    = g_pPlayerResource->GetHealth(ent);
+                    healthmax = g_pPlayerResource->GetMaxHealth(ent);
+                    break;
+                case ENTITY_BUILDING:
+                    health    = CE_INT(ent, netvar.iBuildingHealth);
+                    healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
+                    break;
+                }
+
+                // Get Colors
+                rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
+                rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
+                // Get bar width
+                int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
+
+                // Draw
+                draw::RectangleOutlined(min_x, max_y, max_x - min_x + 1, 7, border, 0.5f);
+                draw::Rectangle(min_x + hbw, max_y + 1, -hbw, 5, hp);
+            }
+        }
+    }
+
+    // Vertical health bar
+    else if (*healthbar == 3)
     {
 
         // We only want health bars on players and buildings
@@ -1073,7 +1167,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
         }
         // If text health is true, then add a string with the health
-        if ((int) show_health == 1 || (int) show_health == 3)
+        if (show_health)
         {
             AddEntityString(ent, format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), " HP"), colors::Health(ent->m_iHealth(), ent->m_iMaxHealth()));
         }
@@ -1150,7 +1244,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
 #endif
             // Health esp
-            if ((int) show_health == 1 || (int) show_health == 3)
+            if (show_health)
             {
                 AddEntityString(ent, format(g_pPlayerResource->GetHealth(ent), '/', g_pPlayerResource->GetMaxHealth(ent), " HP"), colors::Health(g_pPlayerResource->GetHealth(ent), g_pPlayerResource->GetMaxHealth(ent)));
             }
@@ -1209,11 +1303,27 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     // Vaccinator
                     if (HasCondition<TFCond_UberBulletResist>(ent))
                     {
-                        AddEntityString(ent, "*VACCINATOR*");
+                        AddEntityString(ent, "*BULLET VACCINATOR*", colors::FromRGBA8(220, 220, 220, 255));
                     }
                     else if (HasCondition<TFCond_SmallBulletResist>(ent))
                     {
-                        AddEntityString(ent, "*PASSIVE RESIST*");
+                        AddEntityString(ent, "*BULLET PASSIVE*");
+                    }
+                    if (HasCondition<TFCond_UberFireResist>(ent))
+                    {
+                        AddEntityString(ent, "*FIRE VACCINATOR*", colors::FromRGBA8(220, 220, 220, 255));
+                    }
+                    else if (HasCondition<TFCond_SmallFireResist>(ent))
+                    {
+                        AddEntityString(ent, "*FIRE PASSIVE*");
+                    }
+                    if (HasCondition<TFCond_UberBlastResist>(ent))
+                    {
+                        AddEntityString(ent, "*BLAST VACCINATOR*", colors::FromRGBA8(220, 220, 220, 255));
+                    }
+                    else if (HasCondition<TFCond_SmallBlastResist>(ent))
+                    {
+                        AddEntityString(ent, "*BLAST PASSIVE*");
                     }
                     // Crit
                     if (IsPlayerCritBoosted(ent))

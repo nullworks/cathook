@@ -30,7 +30,8 @@ settings::Boolean nolerp{ "misc.no-lerp", "true" };
 settings::Boolean nolerp{ "misc.no-lerp", "false" };
 #endif
 float backup_lerp = 0.0f;
-static settings::Boolean no_zoom{ "remove.scope", "false" };
+settings::Boolean no_zoom{ "remove.zoom", "false" };
+settings::Boolean no_scope{ "remove.scope", "false" };
 settings::Boolean disable_visuals{ "visual.disable", "false" };
 settings::Int print_r{ "print.rgb.r", "183" };
 settings::Int print_g{ "print.rgb.b", "27" };
@@ -42,12 +43,46 @@ void color_callback(settings::VariableBase<int> &, int)
     menu_color = Color(*print_r, *print_g, *print_b, 255);
 }
 static InitRoutine misc_init([]() {
+    static std::optional<BytePatch> patch;
+    static std::optional<BytePatch> patch2;
     print_r.installChangeCallback(color_callback);
     print_g.installChangeCallback(color_callback);
     print_b.installChangeCallback(color_callback);
+    no_scope.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
+        if (!patch)
+        {
+            // Remove scope
+            patch = BytePatch(gSignatures.GetClientSignature, "81 EC ? ? ? ? A1 ? ? ? ? 8B 7D 08 8B 10 89 04 24 FF 92", 0x0, { 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
+            // Keep rifle visible
+            patch2 = BytePatch(gSignatures.GetClientSignature, "74 ? A1 ? ? ? ? 8B 40 ? 85 C0 75 ? C9", 0x0, { 0x70 });
+        }
+        if (after)
+        {
+            patch->Patch();
+            if (no_zoom)
+                patch2->Patch();
+        }
+        else
+        {
+            patch->Shutdown();
+            if (patch2)
+                patch2->Shutdown();
+        }
+    });
     no_zoom.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        static BytePatch patch(gSignatures.GetClientSignature, "81 EC ? ? ? ? A1 ? ? ? ? 8B 7D 08 8B 10 89 04 24 FF 92", 0x0, { 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
-        after ? patch.Patch() : patch.Shutdown();
+        // std::optional so the addresses are searched when needed, not on inject
+        if (!patch2)
+            // Keep rifle visible
+            patch2 = BytePatch(gSignatures.GetClientSignature, "74 ? A1 ? ? ? ? 8B 40 ? 85 C0 75 ? C9", 0x0, { 0x70 });
+        if (after)
+        {
+            if (no_scope)
+                patch2->Patch();
+        }
+        else
+        {
+            patch2->Shutdown();
+        }
     });
     nolerp.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
         if (!after)
@@ -74,6 +109,8 @@ static InitRoutine misc_init([]() {
                 cl_interp->SetValue(backup_lerp);
                 backup_lerp = 0.0f;
             }
+            patch.reset();
+            patch2.reset();
         },
         "misctemp_shutdown");
 #if ENABLE_TEXTMODE

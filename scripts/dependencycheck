@@ -6,8 +6,8 @@ GIT=${1:-false}
 SUDO=${CH_SUDO:-sudo}
 
 arch_packages=(git boost cmake make gcc gdb lib32-sdl2 lib32-glew lib32-freetype2 rsync lib32-libglvnd dialog)
-ubuntu_packages=(software-properties-common build-essential git g++ g++-multilib libboost-all-dev gdb libsdl2-dev:i386 libglew-dev:i386 libfreetype6-dev:i386 cmake dialog rsync)
-fedora_packages=(cmake dialog make gcc-c++ glibc-devel.i686 freetype-devel.i686 SDL2-devel.i686 glew-devel.i686 boost-devel.i686 rsync gdb git)
+ubuntu_packages=(software-properties-common build-essential git g++ g++-multilib libboost-dev gdb libsdl2-dev:i386 libglew-dev:i386 libfreetype6-dev:i386 cmake dialog rsync)
+fedora_packages=(cmake dialog make gcc-c++ glibc-devel.i686 freetype-devel.i686 SDL2-devel.i686 glew-devel.i686 boost-devel rsync gdb git)
 
 # Check if we should only install git
 if [ "$GIT" == true ]; then
@@ -64,10 +64,20 @@ if [ "$OS" == "arch" ]; then
 elif [ "$OS" == "ubuntu" ]; then
     dpkg -s "${ubuntu_packages[@]}" > /dev/null 2>&1
     out=$?
+    if [ "$out" == 0 ]; then
+        dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+        out=$?
+    fi
     if [ "$out" == 1 ]; then
         requestPermissions "${ubuntu_packages[@]}"
         pkgs="${ubuntu_packages[@]}"
         $SUDO bash -c "apt-get update;apt-get install -y software-properties-common;add-apt-repository ppa:ubuntu-toolchain-r/test -y;dpkg --add-architecture i386;apt-get update;apt-get install -y $pkgs"
+        # Check if cmake is up to date enough
+        dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+        out=$?
+        if [ "$out" == 1 ]; then
+            $SUDO bash -c "wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -; apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main'; apt-get install -y cmake"
+        fi
     fi
 elif [ "$OS" == "fedora" ]; then
     rpm -q "${fedora_packages[@]}" > /dev/null 2>&1

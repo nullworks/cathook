@@ -10,21 +10,21 @@
 [submodule "simple-ipc"]
 	path = external/simple-ipc
 	url = https://github.com/nullworks/simple-ipc
-[submodule "ucccccp"]
-	path = external/ucccccp
-	url = https://github.com/nullworks/ucccccp.git
 [submodule "external/MicroPather"]
 	path = external/MicroPather
 	url = https://github.com/nullworks/MicroPather
 [submodule "external/TF2_NavFile_Reader"]
 	path = external/TF2_NavFile_Reader
 	url = https://github.com/nullworks/TF2_NavFile_Reader
-[submodule "external/chirc"]
-	path = external/chirc
-	url = https://github.com/nullworks/ChIRC
 [submodule "external/cotire"]
 	path = external/cotire
 	url = https://github.com/sakra/cotire
 [submodule "external/clip"]
 	path = external/clip
 	url = https://github.com/nullworks/clip
+[submodule "external/libnullnexus"]
+	path = external/libnullnexus
+	url = https://github.com/nullworks/libnullnexus
+[submodule "external/boost-cmake"]
+	path = external/boost-cmake
+	url = https://github.com/Orphis/boost-cmake.git

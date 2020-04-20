@@ -111,7 +111,7 @@ static CatCommand australize("australize", "Make everything australium", []() {
     InvalidateCookie();
 });
 static CatCommand set_attr("skinchanger_set", "Set Attribute", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
         return;
@@ -132,7 +132,7 @@ static CatCommand set_attr("skinchanger_set", "Set Attribute", [](const CCommand
     }
 });
 static CatCommand remove_attr("skinchanger_remove", "Remove attribute", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
         return;
@@ -152,7 +152,7 @@ static CatCommand remove_attr("skinchanger_remove", "Remove attribute", [](const
     }
 });
 static CatCommand set_redirect("skinchanger_redirect", "Set Redirect", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
         return;
@@ -216,7 +216,7 @@ static CatCommand load_merge("skinchanger_load_merge", "Load with merge", [](con
     Load(filename, true);
 });
 static CatCommand remove_redirect("skinchanger_remove_redirect", "Remove redirect", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an argument\n");
     }

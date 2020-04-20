@@ -35,7 +35,9 @@ do
         elif [ "$response" == 2 ]; then
             cfg_write $configfile update_channel master
         elif [ "$response" == 3 ]; then
-            ./scripts/developer
+            pushd scripts
+            ./developer
+            popd
         else
             continue
         fi

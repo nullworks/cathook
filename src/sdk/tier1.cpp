@@ -60,3 +60,52 @@ void DisconnectTier1Libraries()
     g_pProcessUtils = NULL;
     s_bConnected    = false;
 }
+
+// Function definitions for netadr.h
+#include "tier1/netadr.h"
+#include <arpa/inet.h>
+
+const char *netadr_s::ToString(bool onlyBase) const
+{
+    static char s[64];
+
+    strncpy(s, "unknown", sizeof(s));
+
+    if (type == NA_LOOPBACK)
+    {
+        strncpy(s, "loopback", sizeof(s));
+    }
+    else if (type == NA_BROADCAST)
+    {
+        strncpy(s, "broadcast", sizeof(s));
+    }
+    else if (type == NA_IP)
+    {
+        if (onlyBase)
+        {
+            snprintf(s, sizeof(s), "%i.%i.%i.%i", ip[0], ip[1], ip[2], ip[3]);
+        }
+        else
+        {
+            snprintf(s, sizeof(s), "%i.%i.%i.%i:%i", ip[0], ip[1], ip[2], ip[3], ntohs(port));
+        }
+    }
+
+    return s;
+}
+
+bool netadr_t::IsReservedAdr() const
+{
+    if (type == NA_LOOPBACK)
+        return true;
+
+    if (type == NA_IP)
+    {
+        if ((ip[0] == 10) ||                                // 10.x.x.x is reserved
+            (ip[0] == 127) ||                               // 127.x.x.x
+            (ip[0] == 172 && ip[1] >= 16 && ip[1] <= 31) || // 172.16.x.x  - 172.31.x.x
+            (ip[0] == 192 && ip[1] >= 168))                 // 192.168.x.x
+            return true;
+    }
+    return false;
+}

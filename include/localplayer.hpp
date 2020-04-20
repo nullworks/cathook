@@ -14,6 +14,8 @@ class CachedEntity;
 
 class LocalPlayer
 {
+    unsigned long melee_damagetick = 0;
+
 public:
     // Start of CM
     void Update();
@@ -37,6 +39,7 @@ public:
     int entity_idx;
     CachedEntity *entity{ 0 };
     CachedEntity *weapon();
+    bool weapon_melee_damage_tick;
     Vector v_OrigViewangles;
     Vector v_SilentAngles;
     bool bUseSilentAngles;

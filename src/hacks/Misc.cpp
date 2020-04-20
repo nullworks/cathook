@@ -71,10 +71,10 @@ static void updateAntiAfk()
         else if (afk_timer->m_nValue != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
         {
             // Just duck tf
-            if (current_user_cmd->buttons & IN_DUCK)
-                current_user_cmd->buttons &= ~IN_DUCK;
+            if (current_user_cmd->buttons & (IN_DUCK | IN_JUMP))
+                current_user_cmd->buttons &= ~(IN_DUCK | IN_JUMP);
             else
-                current_user_cmd->buttons = IN_DUCK;
+                current_user_cmd->buttons = IN_DUCK | IN_JUMP;
             if (anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 + 1000))
             {
                 anti_afk_timer.update();
@@ -583,7 +583,7 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
 
 // CatCommand to dumb netvar info
 static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
         return;
     if (!atoi(args[1]))
         return;
@@ -597,7 +597,7 @@ static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](c
     DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
 });
 static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
         return;
     std::string name(args.Arg(1));
     for (int i = 0; i <= HIGHEST_ENTITY; i++)

@@ -26,7 +26,6 @@ std::vector<Vector> Predict(Vector pos, float offset, Vector vel, Vector acceler
 float PlayerGravityMod(CachedEntity *player);
 
 Vector EnginePrediction(CachedEntity *player, float time);
-void Prediction_CreateMove();
 #if ENABLE_VISUALS
 void Prediction_PaintTraverse();
 #endif

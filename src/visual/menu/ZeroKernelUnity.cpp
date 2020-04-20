@@ -46,6 +46,7 @@
 #include "./menu/special/ModalFactory.cpp"
 #include "./menu/special/TreeListCollapsible.cpp"
 #include "./menu/special/PlayerListController.cpp"
+#include "./menu/special/ConfigsManagerList.cpp"
 #include "./menu/special/SettingsManagerList.cpp"
 #include "./menu/BoundingBox.cpp"
 #endif

@@ -1,0 +1,20 @@
+<Tab name="Config" padding="6 6 6 6">
+    <Box padding="12 6 6 6" width="content" height="content" name="Config List">
+        <List width="170">
+            <ScrollableList id="cfg-list" x="0" y="0" width="170" height="350"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Config" x="190">
+        <List width="150">
+            <AutoVariable width="fill" target="cfg.save" label="Save Config" tooltip="Type in a name (no .conf) to save your config."/>
+	    	<AutoVariable width="fill" target="cfg.load" label="Load Config" tooltip="Type in a name (no .conf) to load a config."/>
+            <AutoVariable width="fill" target="cfg.delete" label="Delete Config" tooltip="Type in a name (no .conf) to delete a config."/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Rename Tool" x="170" y="70">
+        <List width="150">
+            <AutoVariable width="fill" target="cfg.name.old" label="Old Name" tooltip="Type in the current name (no .conf)."/>
+	    	<AutoVariable width="fill" target="cfg.name.new" label="New Name" tooltip="Type in the desired name (no .conf)."/>
+        </List>
+    </Box>
+</Tab>

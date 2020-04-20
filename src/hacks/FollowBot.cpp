@@ -43,7 +43,7 @@ static Timer navBotInterval{};
 static unsigned steamid = 0x0;
 
 static CatCommand follow_steam("fb_steam", "Follow Steam Id", [](const CCommand &args) {
-    if (args.ArgC() < 1)
+    if (args.ArgC() < 2)
     {
         steam_var = 0;
         return;

@@ -4,7 +4,7 @@
 # $2 INIT
 # $3 Pre update
 
-CURR_VERSION=3
+CURR_VERSION=4
 
 TUI=${1:-false}
 INIT=${2:-false}
@@ -66,9 +66,9 @@ function migrations() {
         cfg_write $configfile version $CURR_VERSION
     fi
 
-    # Hack to fix compile error between version 1 and version 3. Version 2 was set on installs on accident.
-    if [ "$version" == 1 ] || [ "$version" == 2 ]; then
-        cfg_write $configfile version 3
+    # Hack to fix compile error in version 1 to 3 caused by CoTiRe.
+    if [ "$version" -lt 4 ]; then
+        cfg_write $configfile version 4
         if [ -d "./build/CMakeFiles/cathook.dir" ]; then
             rm -r ./build/CMakeFiles/cathook.dir
         fi

@@ -12,6 +12,7 @@
                     <Option name="Huntsman" value="6"/>
                     <Option name="Ambassador" value="7"/>
                     <Option name="Direct Hit" value="8"/>
+                    <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Autoequip Secondary">
@@ -27,6 +28,7 @@
                     <Option name="Kritzkrieg" value="8"/>
                     <Option name="Jarate" value="9"/>
                     <Option name="Razorback" value="10"/>
+                    <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Autoequip Melee">
@@ -39,6 +41,7 @@
                     <Option name="Killing Gloves Of Boxing" value="5"/>
                     <Option name="Gunslinger" value="6"/>
                     <Option name="Ubersaw" value="7"/>
+                    <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Autoequip PDA2">
@@ -46,6 +49,7 @@
                     <Option name="None" value="0"/>
                     <Option name="Cloak and Dagger" value="1"/>
                     <Option name="Deadringer" value="2"/>
+                    <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
         </List>

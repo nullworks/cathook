@@ -180,13 +180,13 @@ static CatCommand config_delete("config_delete", "", [](const CCommand &args) {
     if (args.ArgC() != 1)
     {
         remove((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str());
-		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
-    	refreshConfigList();
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
+        refreshConfigList();
     }
-	else
-	{
-		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
-	}
+    else
+    {
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
+    }
 });
 
 static CatCommand config_list("config_list", "", [](const CCommand &args) {
@@ -198,8 +198,8 @@ static CatCommand config_list("config_list", "", [](const CCommand &args) {
     {
         while ((directory = readdir(dirp)) != NULL)
         {
-			if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
-				g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
+            if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
+                g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
         }
 
         closedir(dirp);
@@ -210,13 +210,13 @@ static CatCommand config_rename("config_rename", "", [](const CCommand &args) {
     if (args.ArgC() == 3)
     {
         rename((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str(), (paths::getConfigPath() + "/" + args.Arg(2) + ".conf").c_str());
-		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Config Renamed!\n");
-    	refreshConfigList();
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Config Renamed!\n");
+        refreshConfigList();
     }
-	else
-	{
-		g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Not Enough Arguments!\n");
-	}
+    else
+    {
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_rename: Not Enough Arguments!\n");
+    }
 });
 
 static std::vector<std::string> sortedVariables{};

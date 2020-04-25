@@ -31,49 +31,49 @@ void refreshConfigList()
 
 void Draw()
 {
-	if (*cfg_save != "")
-	{
-    	settings::SettingsWriter writer{ settings::Manager::instance() };
+    if (*cfg_save != "")
+    {
+        settings::SettingsWriter writer{ settings::Manager::instance() };
 
         DIR *config_directory = opendir(paths::getConfigPath().c_str());
-    	if (!config_directory)
-    	{
-    		logging::Info("Configs directory doesn't exist, creating one!");
-     	    mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
-    	}
+        if (!config_directory)
+        {
+            logging::Info("Configs directory doesn't exist, creating one!");
+            mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
+        }
 
         writer.saveTo(paths::getConfigPath() + "/" + *cfg_save + ".conf");
 
-    	logging::Info("cat_save: Sorting configs...");
-    	void getAndSortAllConfigs();
-    	logging::Info("cat_save: Closing dir...");
-    	closedir(config_directory);
+        logging::Info("cat_save: Sorting configs...");
+        void getAndSortAllConfigs();
+        logging::Info("cat_save: Closing dir...");
+        closedir(config_directory);
         refreshConfigList();
 
-    	cfg_save = "";
-	}
+        cfg_save = "";
+    }
     if (*cfg_load != "")
-	{
-    	settings::SettingsReader loader{ settings::Manager::instance() };
-		loader.loadFrom(paths::getConfigPath() + "/" + *cfg_load + ".conf");
-	
+    {
+        settings::SettingsReader loader{ settings::Manager::instance() };
+        loader.loadFrom(paths::getConfigPath() + "/" + *cfg_load + ".conf");
+        
         cfg_load = "";
-	}
+    }
     if (*cfg_delete != "")
-	{
-		remove((paths::getConfigPath() + "/" + *cfg_delete + ".conf").c_str());
+    {
+        remove((paths::getConfigPath() + "/" + *cfg_delete + ".conf").c_str());
         refreshConfigList();
 
         cfg_delete = "";
-	}
+    }
     if (*cfg_name_old != "" && *cfg_name_new != "")
-	{
+    {
         rename((paths::getConfigPath() + "/" + *cfg_name_old + ".conf").c_str(), (paths::getConfigPath() + "/" + *cfg_name_new + ".conf").c_str());
         refreshConfigList();
 
         cfg_name_old = "";
-		cfg_name_new = "";
-	}
+        cfg_name_new = "";
+    }
 }
 
 static InitRoutine init([]() {

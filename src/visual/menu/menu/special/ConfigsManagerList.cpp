@@ -28,17 +28,17 @@ void zerokernel::special::ConfigsManagerList::construct()
     {
         while ((directory = readdir(dirp)) != NULL)
         {
-			if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
-			{
-				auto name      = explodeVariableName(directory->d_name);
-        		TreeNode *node = &root;
-        		for (auto &n : name)
-        		{
-         		   node = &((*node)[n]);
-        		}
-        		node->full_name = directory->d_name;
-				addVariable(std::string (directory->d_name), true);
-			}
+            if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
+            {
+                auto name      = explodeVariableName(directory->d_name);
+                TreeNode *node = &root;
+                for (auto &n : name)
+                {
+                    node = &((*node)[n]);
+                }
+                node->full_name = directory->d_name;
+                addVariable(std::string (directory->d_name), true);
+            }
         }
 
         closedir(dirp);

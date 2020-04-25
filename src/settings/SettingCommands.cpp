@@ -151,12 +151,12 @@ static CatCommand save("save", "", [](const CCommand &args) {
     if (args.ArgC() == 1)
     {
         writer.saveTo((paths::getConfigPath() + "/default.conf").c_str());
-		refreshConfigList();
+        refreshConfigList();
     }
     else
     {
         writer.saveTo(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
-		refreshConfigList();
+        refreshConfigList();
     }
     logging::Info("cat_save: Sorting configs...");
     getAndSortAllConfigs();
@@ -193,7 +193,7 @@ static CatCommand config_list("config_list", "", [](const CCommand &args) {
     DIR           *dirp;
     struct dirent *directory;
 
-    dirp = opendir(std::string(DATA_PATH "/configs/").c_str());
+    dirp = opendir(paths::getConfigPath().c_str());
     if (dirp)
     {
         while ((directory = readdir(dirp)) != NULL)

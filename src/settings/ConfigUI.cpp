@@ -35,41 +35,41 @@ void Draw()
 	{
     	settings::SettingsWriter writer{ settings::Manager::instance() };
 
-    	DIR *config_directory = opendir(DATA_PATH "/configs");
+        DIR *config_directory = opendir(paths::getConfigPath().c_str());
     	if (!config_directory)
     	{
     		logging::Info("Configs directory doesn't exist, creating one!");
-     	    mkdir(DATA_PATH "/configs", S_IRWXU | S_IRWXG);
+     	    mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
     	}
 
-    	writer.saveTo(std::string(DATA_PATH "/configs/") + *cfg_save + ".conf");
+        writer.saveTo(paths::getConfigPath() + "/" + *cfg_save + ".conf");
 
     	logging::Info("cat_save: Sorting configs...");
     	void getAndSortAllConfigs();
     	logging::Info("cat_save: Closing dir...");
     	closedir(config_directory);
-    	refreshConfigList();
+        refreshConfigList();
 
     	cfg_save = "";
 	}
     if (*cfg_load != "")
 	{
     	settings::SettingsReader loader{ settings::Manager::instance() };
-    	loader.loadFrom(std::string(DATA_PATH "/configs/") + *cfg_load + ".conf");
+		loader.loadFrom(paths::getConfigPath() + "/" + *cfg_load + ".conf");
 	
         cfg_load = "";
 	}
     if (*cfg_delete != "")
 	{
-    	remove((std::string(DATA_PATH "/configs/") + *cfg_delete + ".conf").c_str());
-    	refreshConfigList();
+		remove((paths::getConfigPath() + "/" + *cfg_delete + ".conf").c_str());
+        refreshConfigList();
 
         cfg_delete = "";
 	}
     if (*cfg_name_old != "" && *cfg_name_new != "")
 	{
         rename((paths::getConfigPath() + "/" + *cfg_name_old + ".conf").c_str(), (paths::getConfigPath() + "/" + *cfg_name_new + ".conf").c_str());
-    	refreshConfigList();
+        refreshConfigList();
 
         cfg_name_old = "";
 		cfg_name_new = "";

@@ -15,6 +15,7 @@ namespace hacks::tf2::warp
 static settings::Boolean enabled{ "warp.enabled", "false" };
 static settings::Boolean draw{ "warp.draw", "false" };
 static settings::Button warp_key{ "warp.key", "<null>" };
+static settings::Float warp_amount_var{ "warp.amount", "10" };
 static settings::Boolean charge_passively{ "warp.charge-passively", "true" };
 static settings::Boolean charge_in_jump{ "warp.charge-passively.jump", "true" };
 static settings::Boolean charge_no_input{ "warp.charge-passively.no-inputs", "false" };
@@ -53,10 +54,32 @@ public:
     bf_write m_DataOut;
 };
 
+static unsigned update_tick = 0;
+static float current_excess = 0.0f;
 int GetWarpAmount()
 {
+    // Remove excess
+    if (update_tick != tickcount)
+        current_excess -= std::floor(current_excess);
+
     static auto sv_max_dropped_packets_to_process = g_ICvar->FindVar("sv_max_dropped_packets_to_process");
-    return warp_override ? warp_override : sv_max_dropped_packets_to_process->GetInt();
+    float warp_amt                                = std::clamp(*warp_amount_var, 0.01f, (float) sv_max_dropped_packets_to_process->GetInt());
+
+    if (update_tick != tickcount)
+    {
+        // Add remainder to excess counter
+        current_excess += warp_amt - std::floor(warp_amt);
+        current_excess = std::clamp(current_excess, 0.0f, FLT_MAX);
+    }
+
+    int warp_ticks = std::floor(warp_amt);
+
+    // Add excess to ticks
+    warp_ticks += std::floor(current_excess);
+
+    update_tick = tickcount;
+
+    return warp_override ? warp_override : warp_ticks;
 }
 
 static bool should_warp = true;
@@ -136,13 +159,20 @@ void SendNetMessage(INetMessage &msg)
     should_charge = false;
 }
 
-static bool move_last_tick        = true;
-static bool warp_last_tick        = false;
-static bool should_warp_last_tick = false;
-static bool was_hurt_last_tick    = false;
-static int ground_ticks           = 0;
+static bool move_last_tick     = true;
+static bool was_hurt_last_tick = false;
+static int ground_ticks        = 0;
 // Left and right by default
 static std::vector<float> yaw_selections{ 90.0f, -90.0f };
+
+enum peek_state
+{
+    WAIT_MOVE = 0,
+    WARP_TOWARDS,
+    WAIT_TICK,
+    WARP_BACK,
+    STOP
+};
 
 enum charge_state
 {
@@ -152,7 +182,9 @@ enum charge_state
     DONE
 };
 
-charge_state current_state = ATTACK;
+charge_state current_demo_state = ATTACK;
+peek_state current_peek_state   = WAIT_MOVE;
+Vector peek_vel;
 void CreateMove()
 {
     if (!enabled)
@@ -160,8 +192,8 @@ void CreateMove()
     warp_override = 0;
     if (!warp_key.isKeyDown() && !was_hurt)
     {
-        warp_last_tick = false;
-        current_state  = ATTACK;
+        current_demo_state = ATTACK;
+        current_peek_state = WAIT_MOVE;
 
         Vector velocity{};
         velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), velocity);
@@ -217,26 +249,26 @@ void CreateMove()
     // Demoknight Warp
     else if (warp_demoknight)
     {
-        switch (current_state)
+        switch (current_demo_state)
         {
         case ATTACK:
         {
             current_user_cmd->buttons |= IN_ATTACK;
-            current_state = CHARGE;
-            should_warp   = false;
+            current_demo_state = CHARGE;
+            should_warp        = false;
             break;
         }
         case CHARGE:
         {
             current_user_cmd->buttons |= IN_ATTACK2;
-            current_state = WARP;
-            should_warp   = false;
+            current_demo_state = WARP;
+            should_warp        = false;
             break;
         }
         case WARP:
         {
-            should_warp   = true;
-            current_state = DONE;
+            should_warp        = true;
+            current_demo_state = DONE;
             break;
         }
         default:
@@ -246,34 +278,62 @@ void CreateMove()
     // Warp peaking
     else if (warp_peek)
     {
-        // We have Warp
-        if (warp_amount)
+        switch (current_peek_state)
         {
-            // Warped last tick, time to reverse
-            if (warp_last_tick)
+        // Wait for movement
+        case WAIT_MOVE:
+        {
+            // Check for movement
+            Vector vel;
+            velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
+            if (!vel.IsZero(0.1f))
             {
-                // Wait 1 tick before warping back
-                if (should_warp && !should_warp_last_tick)
-                {
-                    should_warp_last_tick = true;
-                    should_warp           = false;
-                }
-                else
-                    should_warp_last_tick = false;
-
-                // Inverse direction
-                current_user_cmd->forwardmove = -current_user_cmd->forwardmove;
-                current_user_cmd->sidemove    = -current_user_cmd->sidemove;
+                peek_vel           = vel;
+                current_peek_state = WARP_TOWARDS;
             }
             else
-                warp_override = warp_amount / 2;
-            warp_last_tick = true;
+                should_warp = false;
+            break;
         }
-        // Prevent movement so you don't overshoot when you don't want to
-        else
+        // Warp forwards
+        case WARP_TOWARDS:
+        {
+            warp_override      = std::min(10, warp_amount / 2);
+            current_peek_state = WAIT_TICK;
+            break;
+        }
+        // Just wait this tick
+        case WAIT_TICK:
+        {
+            should_warp        = false;
+            current_peek_state = WARP_BACK;
+            break;
+        }
+        // Reverse and warp back
+        case WARP_BACK:
+        {
+            current_user_cmd->forwardmove *= -1;
+            current_user_cmd->sidemove *= -1;
+            Vector vel;
+            velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
+            should_warp = false;
+            // Wait until vel is about opposite of peek_vel. (meaning that a = -b, meaning that a+b=0)
+            if ((peek_vel + vel).IsZero(10.0f))
+            {
+                should_warp        = true;
+                current_peek_state = STOP;
+                warp_override      = std::min(10, warp_amount / 2);
+            }
+            break;
+        }
+        // Don't Move now
+        case STOP:
         {
             current_user_cmd->forwardmove = 0.0f;
             current_user_cmd->sidemove    = 0.0f;
+            should_warp                   = false;
+            break;
+        }
         }
     }
     was_hurt_last_tick = was_hurt;

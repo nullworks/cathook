@@ -11,7 +11,7 @@
 namespace hacks::shared::killsay
 {
 static settings::Int killsay_mode{ "killsay.mode", "0" };
-static settings::String filename{ "killsay.file", "killsays.txt" };
+static settings::String filename{ "killsay.file", "killsay.txt" };
 static settings::Int delay{ "killsay.delay", "100" };
 
 struct KillsayStorage
@@ -100,7 +100,7 @@ std::string ComposeKillSay(IGameEvent *event)
     if (g_IEngine->GetPlayerForUserID(kid) != g_IEngine->GetLocalPlayer())
         return "";
     std::string msg = source->at(rand() % source->size());
-    //	checks if the killsays.txt file is not 1 line. 100% sure it's going
+    //	checks if the killsay.txt file is not 1 line. 100% sure it's going
     // to crash if it is.
     while (msg == lastmsg && source->size() > 1)
         msg = source->at(rand() % source->size());

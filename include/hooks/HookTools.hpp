@@ -11,10 +11,10 @@ enum ec_types
 {
     /* Note: engine prediction is run on this kind of CreateMove */
     CreateMove = 0,
-    /* Note: this is the CreatMove one layer higher, and should only be used for things that mess with command number*/
+    /* Note: this is the CreateMove one layer higher, and should only be used for things that mess with command number*/
     CreateMoveEarly,
     /* This kind of CreateMove will run earlier than all CreateMove events
-     * and guranteed to run before EnginePrediction
+     * and guaranteed to run before EnginePrediction
      */
     CreateMove_NoEnginePred,
 #if ENABLE_VISUALS

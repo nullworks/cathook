@@ -162,14 +162,6 @@ void DrawWireframeHitbox(wireframe_data data)
     g_IVDebugOverlay->AddBoxOverlay2(data.origin, data.raw_min, data.raw_max, VectorToQAngle(data.rotation), Color(0, 0, 0, 0), Color(255, 0, 0, 255), g_GlobalVars->interval_per_tick * 2);
 }
 
-void ReducePing()
-{
-    ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
-    cmdrate->m_fMaxVal = 999999999.9f;
-    cmdrate->m_fMinVal = -999999999.9f;
-    cmdrate->SetValue(-1);
-}
-
 #endif
 void CreateMove()
 {
@@ -280,19 +272,19 @@ void CreateMove()
         if (ping_reducer)
         {
             ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            if (*force_ping > 0)
+            int ping        = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
+            if (*force_ping <= ping)
             {
-                int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
-                if (*force_ping <= ping)
-                    ReducePing();
-                else
-                    cmdrate->SetValue(oldCmdRate);
+                cmdrate->m_fMaxVal = 999999999.9f;
+                cmdrate->m_fMinVal = -999999999.9f;
+                cmdrate->SetValue(-1);
             }
             else
-                ReducePing();
+                cmdrate->SetValue(oldCmdRate);
         }
     }
 }
+} // namespace hacks::shared::misc
 
 #if ENABLE_VISUALS
 // Timer ussr{};

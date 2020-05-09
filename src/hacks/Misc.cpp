@@ -56,6 +56,7 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
 
+static int oldCmdRate;
 static int currentCmdRate()
 {
     static ConVar *cl_cmdrate = g_ICvar->FindVar("cl_cmdrate");
@@ -340,18 +341,6 @@ void Draw()
                 AddSideString(format(info.name, " ", observermode));
             }
         }
-    }
-    if (ping_reducer && currentCmdRate() != -1)
-    {
-        ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
-        cmdrate->m_fMaxVal = 999999999.9f;
-        cmdrate->m_fMinVal = -999999999.9f;
-        cmdrate->SetValue(-1);
-    }
-    if (!ping_reducer && currentCmdRate() != 66) // Hopefully everyone is using 66 its 2020 ffs
-    {
-        ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-        cmdrate->SetValue(66);
     }
     if (!debug_info)
         return;
@@ -813,6 +802,24 @@ static InitRoutine init_pyrovision([]() {
             cart_patch1.Shutdown();
             cart_patch2.Shutdown();
         }
+    });
+    ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
+        if (after && currentCmdRate() != -1)
+        {
+            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            oldCmdRate = cmdrate->GetInt();
+
+            cmdrate->m_fMaxVal = 999999999.9f;
+            cmdrate->m_fMinVal = -999999999.9f;
+            cmdrate->SetValue(-1);
+        }
+        if (!after && currentCmdRate() != oldCmdRate)
+        {
+            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            cmdrate->SetValue(oldCmdRate);
+        }
+        if (!oldCmdRate)
+            oldCmdRate = currentCmdRate();
     });
 #endif
 });

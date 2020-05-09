@@ -284,7 +284,6 @@ void CreateMove()
         }
     }
 }
-} // namespace hacks::shared::misc
 
 #if ENABLE_VISUALS
 // Timer ussr{};

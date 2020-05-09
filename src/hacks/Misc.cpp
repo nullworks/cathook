@@ -35,7 +35,7 @@ static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills"
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 
-settings::Int force_ping{ "misc.ping-reducer.target", "" };
+static settings::Int force_ping{ "misc.ping-reducer.target", "" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };

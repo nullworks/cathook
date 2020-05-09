@@ -35,7 +35,7 @@ static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills"
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 
-static settings::Int force_ping{ "misc.ping-reducer.target", "" };
+static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };
@@ -57,13 +57,7 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
-
 static int oldCmdRate;
-static int currentCmdRate()
-{
-    static ConVar *cl_cmdrate = g_ICvar->FindVar("cl_cmdrate");
-    return cl_cmdrate->GetInt();
-}
 
 static void updateAntiAfk()
 {
@@ -167,6 +161,15 @@ void DrawWireframeHitbox(wireframe_data data)
 {
     g_IVDebugOverlay->AddBoxOverlay2(data.origin, data.raw_min, data.raw_max, VectorToQAngle(data.rotation), Color(0, 0, 0, 0), Color(255, 0, 0, 255), g_GlobalVars->interval_per_tick * 2);
 }
+
+void ReducePing()
+{
+    ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
+    cmdrate->m_fMaxVal = 999999999.9f;
+    cmdrate->m_fMinVal = -999999999.9f;
+    cmdrate->SetValue(-1);
+}
+
 #endif
 void CreateMove()
 {
@@ -273,19 +276,20 @@ void CreateMove()
         else
             teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
 
-        // Custom forced ping
-        if (ping_reducer && *force_ping > 0)
+        // Ping Reducer
+        if (ping_reducer)
         {
             ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            int ping        = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
-            if (*force_ping <= ping)
+            if (*force_ping > 0)
             {
-                cmdrate->m_fMaxVal = 999999999.9f;
-                cmdrate->m_fMinVal = -999999999.9f;
-                cmdrate->SetValue(-1);
+                int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
+                if (*force_ping <= ping)
+                    ReducePing();
+                else
+                    cmdrate->SetValue(oldCmdRate);
             }
             else
-                cmdrate->SetValue(oldCmdRate);
+                ReducePing();
         }
     }
 }
@@ -727,6 +731,7 @@ static InitRoutine init([]() {
         patch1.push_back(0x90);
 
     // Construct BytePatch2
+    // Construct BytePatch2
     std::vector<unsigned char> patch2 = { 0xE8 };
     for (int i = 0; i < sizeof(uintptr_t); i++)
         patch2.push_back(((unsigned char *) &relAddr2)[i]);
@@ -821,16 +826,11 @@ static InitRoutine init_pyrovision([]() {
         }
     });
     ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        if (after && currentCmdRate() != -1)
+        ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+        if (!oldCmdRate)
+            oldCmdRate = cmdrate->GetInt();
+        if (!after && cmdrate->GetInt() != oldCmdRate)
         {
-            ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
-            cmdrate->m_fMaxVal = 999999999.9f;
-            cmdrate->m_fMinVal = -999999999.9f;
-            cmdrate->SetValue(-1);
-        }
-        if (!after && currentCmdRate() != oldCmdRate)
-        {
-            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
             cmdrate->SetValue(oldCmdRate);
         }
     });

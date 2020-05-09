@@ -813,13 +813,13 @@ static InitRoutine init_pyrovision([]() {
             cmdrate->m_fMinVal = -999999999.9f;
             cmdrate->SetValue(-1);
         }
+        if (!oldCmdRate)
+            oldCmdRate = currentCmdRate();
         if (!after && currentCmdRate() != oldCmdRate)
         {
             ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
             cmdrate->SetValue(oldCmdRate);
         }
-        if (!oldCmdRate)
-            oldCmdRate = currentCmdRate();
     });
 #endif
 });

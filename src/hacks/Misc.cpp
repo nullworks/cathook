@@ -59,7 +59,6 @@ static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
 
 static int oldCmdRate;
-static int counter = 0;
 static int currentCmdRate()
 {
     static ConVar *cl_cmdrate = g_ICvar->FindVar("cl_cmdrate");
@@ -273,14 +272,6 @@ void CreateMove()
         }
         else
             teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
-
-        // We only want this to run one time so we can get the right cmdrate.
-        if (counter == 0)
-        {
-            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            oldCmdRate      = cmdrate->GetInt();
-            counter++;
-        }
 
         // Custom forced ping
         if (ping_reducer && *force_ping > 0)
@@ -869,6 +860,7 @@ void Shutdown()
 
 static InitRoutine init([]() {
     teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
+    oldCmdRate        = g_ICvar->FindVar("cl_cmdrate")->GetInt();
     EC::Register(EC::Shutdown, Shutdown, "draw_local_player", EC::average);
     EC::Register(EC::CreateMove, CreateMove, "cm_misc_hacks", EC::average);
 #if ENABLE_VISUALS

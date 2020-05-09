@@ -33,7 +33,9 @@ static settings::Boolean auto_balance_spam{ "misc.auto-balance-spam", "false" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
-static settings::Boolean ping_reducer{ "misc.ping-reducer", "false" };
+static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
+
+settings::Int force_ping{ "misc.ping-reducer.target", "" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };
@@ -57,6 +59,7 @@ static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
 
 static int oldCmdRate;
+static int counter = 0;
 static int currentCmdRate()
 {
     static ConVar *cl_cmdrate = g_ICvar->FindVar("cl_cmdrate");
@@ -270,6 +273,29 @@ void CreateMove()
         }
         else
             teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
+
+        // We only want this to run one time so we can get the right cmdrate.
+        if (counter == 0)
+        {
+            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            oldCmdRate      = cmdrate->GetInt();
+            counter++;
+        }
+
+        // Custom forced ping
+        if (ping_reducer && *force_ping > 0)
+        {
+            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            int ping        = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
+            if (*force_ping <= ping)
+            {
+                cmdrate->m_fMaxVal = 999999999.9f;
+                cmdrate->m_fMinVal = -999999999.9f;
+                cmdrate->SetValue(-1);
+            }
+            else
+                cmdrate->SetValue(oldCmdRate);
+        }
     }
 }
 
@@ -806,15 +832,11 @@ static InitRoutine init_pyrovision([]() {
     ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
         if (after && currentCmdRate() != -1)
         {
-            ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            oldCmdRate = cmdrate->GetInt();
-
+            ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
             cmdrate->m_fMaxVal = 999999999.9f;
             cmdrate->m_fMinVal = -999999999.9f;
             cmdrate->SetValue(-1);
         }
-        if (!oldCmdRate)
-            oldCmdRate = currentCmdRate();
         if (!after && currentCmdRate() != oldCmdRate)
         {
             ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");

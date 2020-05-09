@@ -108,6 +108,8 @@
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enable" label="Enable Backtracking" tooltip="Allow hitting enemies in the past."/>
             <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at Backtracking"/>
+            <AutoVariable width="fill" target="misc.ping-reducer.enable" label="Ping Reducer"/>
+            <AutoVariable width="fill" target="misc.ping-reducer.target" label="Target Ping"/>
             <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000" step="25"/>
             <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack"/>
             <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw Skeleton"/>

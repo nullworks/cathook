@@ -79,7 +79,6 @@
             <AutoVariable width="fill" target="player-tools.ignore.online.only-verified-accounts" label="Only ignore Verified Accounts"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore Taunting Players"/>
             <AutoVariable width="fill" target="killstreak.enable" label="Enable Killstreak"/>
-            <AutoVariable width="fill" target="misc.ping-reducer" label="Ping Reducer"/>
             <AutoVariable width="fill" target="misc.backpack-expander.enabled" label="Expand Backpack"/>
             <AutoVariable width="fill" target="misc.backpack-expander.slot-count" label="Backpack Slots" min="1" max="3000"/>
         </List>

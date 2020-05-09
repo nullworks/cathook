@@ -56,10 +56,10 @@
             </LabeledObject>
             <AutoVariable width="fill" target="misc.tauntslide" label="Tauntslide"/>
             <AutoVariable width="fill" target="misc.tauntslide-tf2c" label="TF2C Tauntslide"/>
-	    <AutoVariable width="fill" target="announcer" label="Enable Announcer"/>
+            <AutoVariable width="fill" target="announcer" label="Enable Announcer"/>
         </List>
         <List width="220" x="232">
-	    <AutoVariable width="fill" target="name.custom" label="Custom Name"/>
+            <AutoVariable width="fill" target="name.custom" label="Custom Name"/>
             <AutoVariable width="fill" target="name.custom.ipc" label="IPC Name"/>
             <LabeledObject width="fill" label="Namesteal">
                 <Select target="name.namesteal">
@@ -79,6 +79,7 @@
             <AutoVariable width="fill" target="player-tools.ignore.online.only-verified-accounts" label="Only ignore Verified Accounts"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore Taunting Players"/>
             <AutoVariable width="fill" target="killstreak.enable" label="Enable Killstreak"/>
+            <AutoVariable width="fill" target="misc.ping-reducer" label="Ping Reducer"/>
             <AutoVariable width="fill" target="misc.backpack-expander.enabled" label="Expand Backpack"/>
             <AutoVariable width="fill" target="misc.backpack-expander.slot-count" label="Backpack Slots" min="1" max="3000"/>
         </List>

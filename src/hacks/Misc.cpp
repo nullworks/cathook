@@ -33,6 +33,7 @@ static settings::Boolean auto_balance_spam{ "misc.auto-balance-spam", "false" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
+static settings::Boolean ping_reducer{ "misc.ping-reducer", "false" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };
@@ -54,6 +55,12 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
+
+static int currentCmdRate()
+{
+    static ConVar *cl_cmdrate = g_ICvar->FindVar("cl_cmdrate");
+    return cl_cmdrate->GetInt();
+}
 
 static void updateAntiAfk()
 {
@@ -333,6 +340,18 @@ void Draw()
                 AddSideString(format(info.name, " ", observermode));
             }
         }
+    }
+    if (ping_reducer && currentCmdRate() != -1)
+    {
+        ConVar *cmdrate    = g_ICvar->FindVar("cl_cmdrate");
+        cmdrate->m_fMaxVal = 999999999.9f;
+        cmdrate->m_fMinVal = -999999999.9f;
+        cmdrate->SetValue(-1);
+    }
+    if (!ping_reducer && currentCmdRate() != 66) // Hopefully everyone is using 66 its 2020 ffs
+    {
+        ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+        cmdrate->SetValue(66);
     }
     if (!debug_info)
         return;

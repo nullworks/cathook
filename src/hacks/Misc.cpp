@@ -273,13 +273,14 @@ void CreateMove()
         {
             ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
             int ping        = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
-            if (*force_ping <= ping)
+            if (*force_ping <= ping && cmdrate->GetInt() != -1)
             {
+                oldCmdRate = cmdrate->GetInt();
                 cmdrate->m_fMaxVal = 999999999.9f;
                 cmdrate->m_fMinVal = -999999999.9f;
                 cmdrate->SetValue(-1);
             }
-            else
+            else if (*force_ping > ping)
                 cmdrate->SetValue(oldCmdRate);
         }
     }

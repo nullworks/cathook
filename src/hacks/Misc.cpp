@@ -822,18 +822,14 @@ static InitRoutine init_pyrovision([]() {
         }
     });
     ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+        static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
         if (cmdrate == nullptr)
         {
           cmdrate = g_ICvar->FindVar("cl_cmdrate");
           return;
         }
-        if (!oldCmdRate)
-            oldCmdRate = cmdrate->GetInt();
         if (!after && cmdrate->GetInt() != oldCmdRate)
-        {
             cmdrate->SetValue(oldCmdRate);
-        }
     });;
 #endif
 });

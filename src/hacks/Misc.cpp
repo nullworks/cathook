@@ -57,7 +57,7 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
-static int oldCmdRate;
+static int oldCmdRate = 0;
 
 static void updateAntiAfk()
 {
@@ -722,7 +722,6 @@ static InitRoutine init([]() {
         patch1.push_back(0x90);
 
     // Construct BytePatch2
-    // Construct BytePatch2
     std::vector<unsigned char> patch2 = { 0xE8 };
     for (int i = 0; i < sizeof(uintptr_t); i++)
         patch2.push_back(((unsigned char *) &relAddr2)[i]);
@@ -818,8 +817,6 @@ static InitRoutine init_pyrovision([]() {
     });
     ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
         ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-        if (!oldCmdRate)
-            oldCmdRate = cmdrate->GetInt();
         if (!after && cmdrate->GetInt() != oldCmdRate)
         {
             cmdrate->SetValue(oldCmdRate);

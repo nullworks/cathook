@@ -46,10 +46,10 @@ static bool isRapidFire(IClientEntity *wep)
     return ret || wep->GetClientClass()->m_ClassID == CL_CLASS(CTFMinigun);
 }
 
-static int getBucketCap()
+static float getBucketCap()
 {
     static ConVar *tf_weapon_criticals_bucket_cap = g_ICvar->FindVar("tf_weapon_criticals_bucket_cap");
-    return tf_weapon_criticals_bucket_cap->GetInt();
+    return tf_weapon_criticals_bucket_cap->GetFloat();
 }
 
 static float getWithdrawMult(IClientEntity *wep)
@@ -68,23 +68,39 @@ static float getWithdrawMult(IClientEntity *wep)
     return flToRemove;
 }
 
+// How much is taken per critical shot
+float getWithdrawAmount(IClientEntity *wep)
+{
+    float amount = added_per_shot * getWithdrawMult(wep);
+
+    if (isRapidFire(wep))
+    {
+        // Hey Mantissa, could you like, COOPERATE?
+        // For real though, on minigun the last bit of mantissa is falsely 1 sometimes. So we remove that last bit
+        amount = taken_per_crit * getWithdrawMult(wep);
+        reinterpret_cast<int &>(amount) &= ~1;
+    }
+    return amount;
+}
+
 // This simply checks if we can withdraw the specified damage from the bucket or not.
 // add_damage parameter simply specifies if we also kind of simulate the damage that gets added before
 // the function gets ran in the game.
-static bool isAllowedToWithdrawFromBucket(IClientEntity *wep, float flDamage, bool add_damage = true)
+static bool isAllowedToWithdrawFromBucket(IClientEntity *wep, bool add_damage = true)
 {
     weapon_info info(wep);
     if (add_damage)
     {
-        info.crit_bucket += flDamage;
-        if (info.crit_bucket > getBucketCap())
-            info.crit_bucket = getBucketCap();
+        // Regulate crit frequency to reduce client-side seed hacking
+        if (info.crit_bucket < getBucketCap())
+        {
+            // Treat raw damage as the resource by which we add or subtract from the bucket
+            info.crit_bucket += added_per_shot;
+            info.crit_bucket = std::min(info.crit_bucket, getBucketCap());
+        }
     }
-    float flToRemove = getWithdrawMult(wep) * flDamage;
-    if (isRapidFire(wep))
-        flToRemove = taken_per_crit * getWithdrawMult(wep);
-    // Can remove
-    if (std::floor(flToRemove) > info.crit_bucket)
+    // Can't remove
+    if (getWithdrawAmount(wep) > info.crit_bucket)
         return false;
 
     return true;
@@ -94,9 +110,13 @@ static bool isAllowedToWithdrawFromBucket(IClientEntity *wep, float flDamage, bo
 static void simulateNormalShot(IClientEntity *wep, float flDamage)
 {
     weapon_info info(wep);
-    info.crit_bucket += flDamage;
-    if (info.crit_bucket > getBucketCap())
-        info.crit_bucket = getBucketCap();
+    // Regulate crit frequency to reduce client-side seed hacking
+    if (info.crit_bucket < getBucketCap())
+    {
+        // Treat raw damage as the resource by which we add or subtract from the bucket
+        info.crit_bucket += flDamage;
+        info.crit_bucket = std::min(info.crit_bucket, getBucketCap());
+    }
     // Write other values important for iteration
     info.crit_attempts++;
     info.restore_data(wep);
@@ -111,7 +131,7 @@ static int shotsUntilCrit(IClientEntity *wep)
     // Use shots til bucket is full for reference
     for (shots = 0; shots < shots_to_fill_bucket + 1; shots++)
     {
-        if (isAllowedToWithdrawFromBucket(wep, added_per_shot, true))
+        if (isAllowedToWithdrawFromBucket(wep, true))
             break;
         // Do calculations
         simulateNormalShot(wep, added_per_shot);
@@ -330,7 +350,7 @@ bool canWeaponCrit(bool canShootCheck = true)
         return false;
 
     // Misc checks
-    if (!isAllowedToWithdrawFromBucket(weapon, added_per_shot))
+    if (!isAllowedToWithdrawFromBucket(weapon))
         return false;
     if (canShootCheck && !CanShoot() && !isRapidFire(weapon))
         return false;
@@ -504,9 +524,11 @@ static void updateCmds()
                         // Size of one WeaponMode_t is 0x40, 0x70c is the offset to Fire delay
                         taken_per_crit *= 2.0f / *(float *) (WeaponData + 0x70c + WeaponMode * 0x40);
 
+                        // Yes this looks dumb but i want to ensure that it matches with valve code
+                        int bucket_cap_recasted = (int) getBucketCap();
                         // Never try to drain more than cap
-                        if (taken_per_crit * 3.0f > getBucketCap())
-                            taken_per_crit = (float) getBucketCap() / 3.0f;
+                        if (taken_per_crit * 3.0f > bucket_cap_recasted)
+                            taken_per_crit = (float) bucket_cap_recasted / 3.0f;
                     }
                 }
                 // We found a cmd, store it
@@ -810,10 +832,8 @@ void Draw()
                 if (bucket_percentage_post_crit > getBucketCap())
                     bucket_percentage_post_crit = getBucketCap();
 
-                if (isRapidFire(wep))
-                    bucket_percentage_post_crit -= taken_per_crit * getWithdrawMult(wep);
-                else
-                    bucket_percentage_post_crit -= added_per_shot * getWithdrawMult(wep);
+                bucket_percentage_post_crit -= getWithdrawAmount(wep);
+
                 if (bucket_percentage_post_crit < 0.0f)
                     bucket_percentage_post_crit = 0.0f;
 
@@ -1030,9 +1050,9 @@ static CatCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch 
         logging::Info("Needed Crit chance: %f", critMultInfo(wep).second);
         logging::Info("Added per shot: %f", added_per_shot);
         if (isRapidFire(wep))
-            logging::Info("Subtracted per Rapidfire crit: %f", taken_per_crit * getWithdrawMult(wep));
+            logging::Info("Subtracted per Rapidfire crit: %f", getWithdrawAmount(wep));
         else
-            logging::Info("Subtracted per crit: %f", added_per_shot * getWithdrawMult(wep));
+            logging::Info("Subtracted per crit: %f", getWithdrawAmount(wep));
         logging::Info("Damage Until crit: %d", damageUntilToCrit(wep));
         logging::Info("Shots until crit: %d", shotsUntilCrit(wep));
     }

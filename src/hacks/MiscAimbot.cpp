@@ -9,6 +9,7 @@
 #include "PlayerTools.hpp"
 #include "hacks/Trigger.hpp"
 #include "MiscAimbot.hpp"
+#include "DetourHook.hpp"
 
 namespace hacks::tf2::misc_aimbot
 {
@@ -535,26 +536,16 @@ static void CreateMove()
     BuildingAimbot();
 }
 
+DetourHook CAM_CapYaw_detour;
+typedef float (*CAM_CapYaw_t)(IInput *, float);
 // Fix client side limit being applied weirdly, Note that most of this is taken from the source leak directly
-float CAM_CapYaw_Hook(IInput *, float fVal)
+float CAM_CapYaw_Hook(IInput *this_, float fVal)
 {
-    if (CE_INVALID(LOCAL_E))
-        return fVal;
-
-    if (HasCondition<TFCond_Charging>(LOCAL_E))
-    {
-        float flChargeYawCap = re::CTFPlayerShared::CalculateChargeCap(re::CTFPlayerShared::GetPlayerShared(RAW_ENT(LOCAL_E)));
-
-        // Our only change
-        flChargeYawCap *= 2.5f;
-
-        if (fVal > flChargeYawCap)
-            return flChargeYawCap;
-        else if (fVal < -flChargeYawCap)
-            return -flChargeYawCap;
-    }
-
-    return fVal;
+    CAM_CapYaw_t original = (CAM_CapYaw_t) CAM_CapYaw_detour.GetOriginalFunc();
+    float ret_val         = original(this_, fVal);
+    CAM_CapYaw_detour.RestorePatch();
+    // Server uses 2.5 what client has
+    return ret_val * 2.5f;
 }
 
 #define foffset(p, i) ((unsigned char *) &p)[i]
@@ -562,18 +553,9 @@ static InitRoutine init([]() {
     EC::Register(EC::CreateMove, CreateMove, "cm_miscaimbot", EC::average);
 
     static auto signature = gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 E8 ? ? ? ? 85 C0 74 ? 8D 98 ? ? ? ? C7 44 24 ? 11 00 00 00");
-    static auto rel_addr  = ((uintptr_t) CAM_CapYaw_Hook - ((uintptr_t) signature)) - 5;
 
-    // Length of function
-    int function_length = 0x7F;
-
-    // Detour (JMP Hook)
-    static std::vector<unsigned char> patch_arr{ 0xE9, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3) };
-    // Nop the rest
-    for (int i = patch_arr.size(); i < function_length; i++)
-        patch_arr.push_back(0x90);
-    static BytePatch patch(signature, patch_arr);
-
-    patch.Patch();
+    CAM_CapYaw_detour.Init(signature, (void *) CAM_CapYaw_Hook);
+    EC::Register(
+        EC::Shutdown, []() { CAM_CapYaw_detour.Shutdown(); }, "chargeaim_shutdown");
 });
 } // namespace hacks::tf2::misc_aimbot

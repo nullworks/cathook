@@ -55,9 +55,9 @@ public:
             void *end_page      = (void *) (((uint64_t)(addr) + size) & ~0xFFF);
             uintptr_t mprot_len = (uint64_t) end_page - (uint64_t) page + 0xFFF;
 
-            logging::Info("mprotect: %d", mprotect(page, mprot_len, PROT_READ | PROT_WRITE | PROT_EXEC));
+            mprotect(page, mprot_len, PROT_READ | PROT_WRITE | PROT_EXEC);
             memcpy(addr, &patch_bytes[0], size);
-            logging::Info("mprotect reverse: %d", mprotect(page, mprot_len, PROT_EXEC));
+            mprotect(page, mprot_len, PROT_EXEC);
             patched = true;
         }
     }
@@ -69,9 +69,9 @@ public:
             void *end_page      = (void *) (((uint64_t)(addr) + size) & ~0xFFF);
             uintptr_t mprot_len = (uint64_t) end_page - (uint64_t) page + 0xFFF;
 
-            logging::Info("mprotect: %d", mprotect(page, mprot_len, PROT_READ | PROT_WRITE | PROT_EXEC));
+            mprotect(page, mprot_len, PROT_READ | PROT_WRITE | PROT_EXEC);
             memcpy(addr, &original[0], size);
-            logging::Info("mprotect reverse: %d", mprotect(page, mprot_len, PROT_EXEC));
+            mprotect(page, mprot_len, PROT_EXEC);
             patched = false;
         }
     }

@@ -1,7 +1,7 @@
 <Tab name="Debug" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Debug">
         <List width="200">
-            <AutoVariable width="fill" target="debug.cursor-fix" label="Cursofix"/>
+            <AutoVariable width="fill" target="debug.cursor-fix" label="Cursor Fix"/>
             <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine Pred Others"/>
             <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast Vischeck"/>
             <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam Wait Time"/>

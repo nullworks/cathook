@@ -3,7 +3,7 @@
         <List width="160">
             <AutoVariable width="fill" target="autoheal.enable" label="Enable Auto Heal"/>
             <AutoVariable width="fill" target="autoheal.silent" label="Silent"/>
-            <AutoVariable width="fill" target="autoheal.steam-only" label="Heal Steamid Only"/>
+            <AutoVariable width="fill" target="autoheal.steam-only" label="Heal SteamID Only"/>
             <AutoVariable width="fill" target="autoheal.steamid" label="SteamID"/>
             <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto Uber"/>
             <AutoVariable width="fill" target="autoheal.uber.share" label="Share Uber"/>

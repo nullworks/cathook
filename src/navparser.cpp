@@ -678,7 +678,10 @@ static void cm()
     // Detect when jumping is necessary
     if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && crumb_vec->z - g_pLocalPlayer->v_Origin.z > 18 && last_jump.test_and_set(200)) || (last_jump.test_and_set(200) && inactivity.check(*stuck_time / 2)))
     {
-        current_user_cmd->buttons |= IN_JUMP;
+        auto local = findClosestNavSquare(g_pLocalPlayer->v_Origin);
+        // Check if current area allows jumping
+        if (!local || !(local->m_attributeFlags & NAV_MESH_NO_JUMP))
+            current_user_cmd->buttons |= (IN_JUMP | IN_DUCK);
     }
     // Walk to next crumb
     WalkTo(*crumb_vec);

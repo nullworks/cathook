@@ -126,8 +126,6 @@ namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUserCmd *cmd)
 {
-    bSendPackets = reinterpret_cast<bool *>((uintptr_t) __builtin_frame_address(3) - 8);
-
     g_Settings.is_create_move = true;
     bool time_replaced, ret, speedapplied;
     float curtime_old, servertime, speed, yaw;
@@ -423,6 +421,7 @@ void WriteCmd(IInput *input, CUserCmd *cmd, int sequence_nr)
 // This gets called before the other CreateMove, but since we run original first in here all the stuff gets called after normal CreateMove is done
 DEFINE_HOOKED_METHOD(CreateMoveEarly, void, IInput *this_, int sequence_nr, float input_sample_time, bool arg3)
 {
+    bSendPackets = reinterpret_cast<bool *>((uintptr_t) __builtin_frame_address(1) - 8);
     // Call original function, includes Normal CreateMove
     original::CreateMoveEarly(this_, sequence_nr, input_sample_time, arg3);
 

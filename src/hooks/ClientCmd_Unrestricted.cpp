@@ -8,10 +8,10 @@ namespace hooked_methods
 
 DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013* _this, const char* command)
 {
-    if (hacks::shared::catbot::abandon_if_ipc_bots_gte) {
+    if (ipc::peer && hacks::shared::catbot::abandon_if_ipc_bots_gte) {
         std::string command_str(command);
         
-        if (ipc::peer && command_str.length() >= 20 && command_str.substr(0, 7) == "connect") {
+        if (command_str.length() >= 20 && command_str.substr(0, 7) == "connect") {
             unsigned count_ipc = 0;
 
             if (command_str.substr(command_str.length() - 11, 11) == "matchmaking") {

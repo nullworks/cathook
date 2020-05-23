@@ -1,4 +1,5 @@
 set(files "${CMAKE_CURRENT_LIST_DIR}/CanPacket.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/ClientCmd_Unrestricted.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/CreateMove.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/DispatchUserMessage.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/EmitSound.cpp"

@@ -204,6 +204,10 @@ struct offsets
     {
         return PlatformOffset(128, undefined, undefined);
     }
+    static constexpr uint32_t ClientCmd_Unrestricted()
+    {
+        return PlatformOffset(106, undefined, undefined);
+    }
     static constexpr uint32_t EmitSound1()
     {
         return PlatformOffset(4, undefined, undefined);

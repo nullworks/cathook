@@ -788,8 +788,11 @@ void update()
         ipc_list.clear();
         int count_total = 0;
 
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+        for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
         {
+            if (g_IEngine->GetLocalPlayer() == i)
+                continue;
+
             if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
             else

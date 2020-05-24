@@ -23,7 +23,7 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013* _this, con
                     if (i != ipc::peer->client_id && !peer_mem->peer_data[i].free && peer_mem->peer_user_data[i].connected && peer_mem->peer_user_data[i].ingame.server) {
 
                         std::string remote_server_ip(peer_mem->peer_user_data[i].ingame.server);
-                        if (remote_server_ip.compare(server_ip) == 0) {
+                        if (remote_server_ip == server_ip) {
                             count_ipc++;
                         }
                     }
@@ -31,11 +31,7 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013* _this, con
             }
 
             if (count_ipc > 0 && count_ipc >= (int)hacks::shared::catbot::abandon_if_ipc_bots_gte)
-            {
-                // if (hacks::shared::catbot::auto-requeue)
-                tfmm::startQueue();
                 return;
-            }
         }
     }
 

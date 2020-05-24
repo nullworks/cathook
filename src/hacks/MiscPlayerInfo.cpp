@@ -52,7 +52,7 @@ void Paint()
 {
     if (!*draw_kda && !*mafia_city)
         return;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))

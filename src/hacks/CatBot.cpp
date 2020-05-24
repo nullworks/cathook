@@ -638,7 +638,7 @@ void smart_crouch()
     static bool crouch = false;
     if (crouchcdr.test_and_set(2000))
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
         {
             auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER || ent->m_iTeam() == LOCAL_E->m_iTeam() || !(ent->hitboxes.GetHitbox(0)) || !(ent->m_bAlivePlayer()) || !player_tools::shouldTarget(ent) || should_ignore_player(ent))
@@ -788,7 +788,7 @@ void update()
         ipc_list.clear();
         int count_total = 0;
 
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
             if (g_IEngine->GetLocalPlayer() == i)
                 continue;

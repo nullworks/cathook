@@ -595,7 +595,7 @@ void CreateMove()
     cached_damage = g_pPlayerResource->GetDamage(g_pLocalPlayer->entity_idx) - melee_damage;
 
     // We need to update player states regardless, else we can't sync the observed crit chance
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_VALID(ent) && ent->m_bAlivePlayer() && g_pPlayerResource->GetHealth(ent))

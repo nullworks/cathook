@@ -296,7 +296,7 @@ void Draw()
     if (CE_BAD(LOCAL_E))
         return;
 
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         auto data = getGoodTicks(i);
         if (data.empty())
@@ -524,7 +524,7 @@ std::optional<std::pair<CachedEntity *, BacktrackData>> getClosestTick(Vector ve
 
     std::optional<std::pair<CachedEntity *, BacktrackData>> return_val;
 
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *ent = ENTITY(i);
         // These checks are always present

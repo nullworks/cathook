@@ -62,7 +62,7 @@ static CatCommand follow_steam("fb_steam", "Follow Steam Id", [](const CCommand 
 });
 
 static CatCommand steam_debug("debug_steamid", "Print steamids", []() {
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         auto ent = ENTITY(i);
         logging::Info("%u", ent->player_info.friendsID);

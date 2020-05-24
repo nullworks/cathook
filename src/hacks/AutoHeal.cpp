@@ -21,6 +21,7 @@ static settings::Boolean pop_uber_auto{ "autoheal.uber.enable", "true" };
 static settings::Boolean pop_uber_voice{ "autoheal.popvoice", "true" };
 static settings::Float pop_uber_percent{ "autoheal.uber.health-below-ratio", "0" };
 static settings::Boolean share_uber{ "autoheal.uber.share", "false" };
+static settings::Boolean look_at_target{ "autoheal.look-at-target", "false" };
 
 static settings::Boolean auto_vacc{ "autoheal.vacc.enable", "false" };
 
@@ -647,10 +648,12 @@ void CreateMove()
     if (CurrentHealingTargetIDX && (CE_BAD(ENTITY(CurrentHealingTargetIDX)) || !CanHeal(CurrentHealingTargetIDX)))
         CurrentHealingTargetIDX = 0;
 
+    int ActualHealingTargetIDX = HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget));
+
     if (enable)
     {
-        // if no target or after 2 seconds, pick new target
-        if (!CurrentHealingTargetIDX || ((g_GlobalVars->tickcount % 132) == 0 && !healing_steamid))
+        // if no target or actually healing wrong target (actually happens for some reason) or after 2 seconds, pick new target
+        if (((!CurrentHealingTargetIDX || CurrentHealingTargetIDX != ActualHealingTargetIDX) && ((g_GlobalVars->tickcount % 132) == 0)) && !healing_steamid)
         {
             CurrentHealingTargetIDX = BestTarget();
         }
@@ -663,7 +666,7 @@ void CreateMove()
 
     CachedEntity *target = ENTITY(CurrentHealingTargetIDX);
 
-    if (HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) != CurrentHealingTargetIDX)
+    if (look_at_target && CE_GOOD(target))
     {
         auto out = target->hitboxes.GetHitbox(spine_2);
         if (out)

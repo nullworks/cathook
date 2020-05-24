@@ -666,7 +666,7 @@ void CreateMove()
 
     CachedEntity *target = ENTITY(CurrentHealingTargetIDX);
 
-    if (look_at_target && CE_GOOD(target))
+    if ((look_at_target && CE_GOOD(target)) || HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) != CurrentHealingTargetIDX)
     {
         auto out = target->hitboxes.GetHitbox(spine_2);
         if (out)

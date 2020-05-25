@@ -14,6 +14,7 @@
 #include <inetmsghandler.h>
 #include <KeyValues.h>
 #include "bitvec.h"
+#include "CSignature.h"
 
 #define DECLARE_BASE_MESSAGE(msgtype)     \
 public:                                   \
@@ -98,6 +99,26 @@ public:
         return false;
     }; // no handler set
 
+public:
+    // I don't get what it does but we need it
+    virtual bool BIncomingMessageForProcessing(double param_1, int param_2)
+    {
+        // Call original to be sure nothing breaks
+        typedef bool (*BIncomingMessageForProcessing_t)(CNetMessage *, double, int);
+        static auto addr = gSignatures.GetEngineSignature("55 89 E5 56 53 83 EC 10 8B 5D ? F2 0F 10 45");
+        BIncomingMessageForProcessing_t BIncomingMessageForProcessing_fn = (BIncomingMessageForProcessing_t)addr;
+        return BIncomingMessageForProcessing_fn(this, param_1, param_2);
+    };
+    // I don't get what it does but we need it
+    virtual void SetRatePolicy()
+    {
+        // Call original to be sure nothing breaks
+        typedef bool (*SetRatePolicy_t)(CNetMessage *);
+        static auto addr = gSignatures.GetEngineSignature("55 89 E5 83 EC 18 C7 04 24 2C 00 00 00");
+        SetRatePolicy_t SetRatePolicy_fn = (SetRatePolicy_t)addr;
+        SetRatePolicy_fn(this);
+    };
+
 protected:
     bool m_bReliable;          // true if message should be send reliable
     INetChannel *m_NetChannel; // netchannel this message is from/for
@@ -177,7 +198,7 @@ protected:
 
 #define MAX_OSPATH 260
 
-#define NETMSG_TYPE_BITS 5
+#define NETMSG_TYPE_BITS 6
 typedef int QueryCvarCookie_t;
 typedef enum
 {

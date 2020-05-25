@@ -66,6 +66,8 @@ DECLARE_HOOKED_METHOD(ServerCmdKeyValues, void, IVEngineClient013 *, KeyValues *
 // vgui::IPanel
 DECLARE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *, unsigned int, bool, bool);
 #endif
+// IUniformRandomStream
+DECLARE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *, int, int);
 #if ENABLE_VISUALS
 // CHudChat
 DECLARE_HOOKED_METHOD(StartMessageMode, int, CHudBaseChat *, int);
@@ -81,8 +83,6 @@ DECLARE_HOOKED_METHOD(SDL_PollEvent, int, SDL_Event *);
 #if ENABLE_CLIP
 DECLARE_HOOKED_METHOD(SDL_SetClipboardText, int, const char *);
 #endif
-// IUniformRandomStream
-DECLARE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *, int, int);
 #endif
 #if ENABLE_VISUALS || ENABLE_TEXTMODE
 DECLARE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *, const DrawModelState_t &, const ModelRenderInfo_t &, matrix3x4_t *);

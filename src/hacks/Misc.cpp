@@ -72,7 +72,7 @@ static void updateAntiAfk()
         if (!afk_timer)
             afk_timer = g_ICvar->FindVar("mp_idlemaxtime");
         // Trigger 10 seconds before kick
-        else if (afk_timer->m_nValue != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
+        else if (afk_timer->GetInt() != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
         {
             // Just duck tf
             if (current_user_cmd->buttons & (IN_DUCK | IN_JUMP))
@@ -85,7 +85,7 @@ static void updateAntiAfk()
             current_late_user_cmd->buttons |= flip ? IN_FORWARD : IN_BACK;
             // Flip flip
             flip = !flip;
-            if (anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 + 1000))
+            if (anti_afk_timer.check(afk_timer->GetInt() * 60 * 1000 + 1000))
             {
                 anti_afk_timer.update();
             }

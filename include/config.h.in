@@ -11,6 +11,7 @@
 #define ENABLE_VAC_BYPASS @VACBypass@
 #define ENABLE_TEXTMODE_STDIN @EnableTextmodeStdin@
 #define ENABLE_TEXTMODE @Textmode@
+#define ENABLE_BINARYMODE @Internal_Binarymode@
 #define ENABLE_PROFILER @EnableProfiler@
 #define ENABLE_NULLNEXUS @EnableNullNexus@
 #define ENABLE_LOGGING @EnableLogging@

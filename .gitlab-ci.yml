@@ -1,0 +1,26 @@
+# File responsible for building the cathook "binary package"
+
+image: "nullworks/cathook-ci-ubuntu:latest"
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+stages:
+  - build
+
+pages:
+  script:
+    # Build cathook
+    - mkdir build_cathook && pushd build_cathook && cmake -DInternal_Binarymode=true .. && make && popd
+    # Create the "package" containing everything needed
+    - mkdir package && mv ./bin/libcathook.so ./package/libcathook.so && mv ./data ./package/data && mv ./config_data ./package/config_data && mv ./scripts/binarypackage/install ./package/install && mv ./scripts/binarypackage/attach ./package/attach
+    # Build a static gdb
+    - mkdir build_gdb && pushd build_gdb && wget http://ftp.gnu.org/gnu/gdb/gdb-9.1.tar.xz -O gdb.tar.xz && tar xf gdb.tar.xz --strip-components 1 && mkdir build && pushd build && ../configure --prefix=<> --enable-static=yes --enable-inprocess-agent=no CFLAGS="-static -Os -s" CXXFLAGS="-Os -s -static" && make && popd && popd
+    # Create public directory
+    - mkdir public && tar -czf ./public/package.tar.gz ./package/ && mv ./build_gdb/build/gdb/gdb ./public/gdb
+  artifacts:
+    paths:
+    - public
+    expire_in: 1 weeks
+  stage: build
+  only:
+    - stable

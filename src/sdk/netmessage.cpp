@@ -498,7 +498,7 @@ const char *CLC_ListenEvents::ToString(void) const
 
 const char *CLC_Move::ToString(void) const
 {
-    return strfmt("%s: backup %i, new %i, bytes %i", GetName(), m_nNewCommands, m_nBackupCommands, Bits2Bytes(m_nLength)).release();
+    return "";
 }
 
 bool CLC_Move::WriteToBuffer(bf_write &buffer)

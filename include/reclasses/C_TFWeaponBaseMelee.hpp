@@ -24,8 +24,26 @@ public:
     {
         if (g_pLocalPlayer->holding_sapper)
             return 115;
+        IClientEntity *owner = re::C_TFWeaponBase::GetOwnerViaInterface(self);
+        bool add_charging    = false;
+        if (owner)
+        {
+            CachedEntity *owner_ce = ENTITY(owner->entindex());
+            if (HasCondition<TFCond_Charging>(owner_ce))
+            {
+                CondBitSet<TFCond_Charging, false>(CE_VAR(owner_ce, netvar.iCond, condition_data_s));
+                add_charging = true;
+            }
+        }
         typedef int (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(521, offsets::undefined, 521), 0)(self);
+        int return_value = vfunc<fn_t>(self, offsets::PlatformOffset(521, offsets::undefined, 521), 0)(self);
+
+        if (add_charging)
+        {
+            CachedEntity *owner_ce = ENTITY(owner->entindex());
+            CondBitSet<TFCond_Charging, true>(CE_VAR(owner_ce, netvar.iCond, condition_data_s));
+        }
+        return return_value;
     }
 };
 } // namespace re

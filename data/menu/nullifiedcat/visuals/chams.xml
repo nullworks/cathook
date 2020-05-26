@@ -1,14 +1,14 @@
 <Tab name="Chams" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chams">
         <List width="150">
-            <AutoVariable width="fill" target="chams.enable" label="Enable chams"/>
-            <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show chams through walls."/>
+            <AutoVariable width="fill" target="chams.enable" label="Enable Chams"/>
+            <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show Chams through walls."/>
             <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't show shadows on chams."/>
             <AutoVariable width="fill" target="chams.disco" label="Disco" tooltip="Rainbow Mode"/>
             <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
-            <AutoVariable width="fill" target="chams.single-pass" label="Single pass"/>
-            <AutoVariable width="fill" target="chams.white-weapons" label="White weapons"/>
+            <AutoVariable width="fill" target="chams.single-pass" label="Single Pass"/>
+            <AutoVariable width="fill" target="chams.white-weapons" label="White Weapons"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="170">
@@ -16,13 +16,13 @@
             <AutoVariable width="fill" target="chams.show.players" label="Players"/>
             <AutoVariable width="fill" target="chams.show.teammates" label="Teammates"/>
             <AutoVariable width="fill" target="chams.show.disguised" label="Disguised"/>
-            <AutoVariable width="fill" target="chams.self" label="Chams self"/>
+            <AutoVariable width="fill" target="chams.self" label="Chams Self"/>
             <AutoVariable width="fill" target="chams.show.buildings" label="Buildings"/>
-            <AutoVariable width="fill" target="chams.show.teammate-buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="chams.show.teammate-buildings" label="Team Buildings"/>
             <AutoVariable width="fill" target="chams.show.powerups" label="Powerups"/>
             <AutoVariable width="fill" target="chams.show.stickies" label="Stickies"/>
-            <AutoVariable width="fill" target="chams.show.ammoboxes" label="Ammo boxes"/>
-            <AutoVariable width="fill" target="chams.show.medkits" label="Health packs"/>
+            <AutoVariable width="fill" target="chams.show.ammoboxes" label="Ammo Boxes"/>
+            <AutoVariable width="fill" target="chams.show.medkits" label="Health Packs"/>
         </List>
     </Box>
 </Tab>

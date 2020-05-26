@@ -9,12 +9,9 @@
 #include <menu/ObjectFactory.hpp>
 
 #include <menu/Menu.hpp>
-namespace zerokernel_box
-{
 
-static settings::RVariable<rgba_t> color_border{ "zk.style.box.color.border", "446498ff" };
+extern settings::RVariable<rgba_t> color_border;
 
-}
 void zerokernel::Box::render()
 {
     // Render the frame
@@ -29,16 +26,16 @@ void zerokernel::Box::render()
         int tht = bb.getBorderBox().top() + ht;
 
         // Top left
-        draw::Line(lhl, tht, hl, 0, *zerokernel_box::color_border, 1);
+        draw::Line(lhl, tht, hl, 0, *color_border, 1);
         // Top right
         int title_width = title.getBoundingBox().getFullBox().width;
-        draw::Line(bb.getBorderBox().left() + bb.padding.left + title_width, tht, bb.getBorderBox().width - bb.padding.left - title_width - hr, 0, *zerokernel_box::color_border, 1);
+        draw::Line(bb.getBorderBox().left() + bb.padding.left + title_width, tht, bb.getBorderBox().width - bb.padding.left - title_width - hr, 0, *color_border, 1);
         // Left
-        draw::Line(lhl, tht, 0, bb.getBorderBox().height - ht - hb, *zerokernel_box::color_border, 1);
+        draw::Line(lhl, tht, 0, bb.getBorderBox().height - ht - hb, *color_border, 1);
         // Bottom
-        draw::Line(lhl, bb.getBorderBox().bottom() - hb, bb.getBorderBox().width - hl - hr, 0, *zerokernel_box::color_border, 1);
+        draw::Line(lhl, bb.getBorderBox().bottom() - hb, bb.getBorderBox().width - hl - hr, 0, *color_border, 1);
         // Right
-        draw::Line(bb.getBorderBox().right() - hr, tht, 0, bb.getBorderBox().height - ht - hb, *zerokernel_box::color_border, 1);
+        draw::Line(bb.getBorderBox().right() - hr, tht, 0, bb.getBorderBox().height - ht - hb, *color_border, 1);
     }
     else
     {
@@ -47,7 +44,7 @@ void zerokernel::Box::render()
         int ht = bb.padding.top / 2;
         int hb = bb.padding.bottom / 2;
 
-        draw::RectangleOutlined(bb.getBorderBox().left() + hl, bb.getBorderBox().top() + ht, bb.getBorderBox().width - hl - hr, bb.getBorderBox().height - ht - hb, *zerokernel_box::color_border, 1);
+        draw::RectangleOutlined(bb.getBorderBox().left() + hl, bb.getBorderBox().top() + ht, bb.getBorderBox().width - hl - hr, bb.getBorderBox().height - ht - hb, *color_border, 1);
     }
 
     // Render the title

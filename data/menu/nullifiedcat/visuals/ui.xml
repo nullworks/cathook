@@ -1,11 +1,11 @@
 <Tab name="UI" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="UI">
         <List width="180">
-            <AutoVariable width="fill" target="visual.open-gui-button" label="GUI button"/>
-            <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean screenshots"/>
-            <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
-            <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>
-            <LabeledObject width="fill" label="Software cursor mode">
+            <AutoVariable width="fill" target="visual.open-gui-button" label="GUI Button"/>
+            <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean Screenshots"/>
+            <AutoVariable width="fill" target="visual.disable" label="Disable Visuals"/>
+            <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed Medal Flip"/>
+            <LabeledObject width="fill" label="Software Cursor Mode">
                 <Select target="visual.software-cursor-mode">
                     <Option name="Keep" value="0"/>
                     <Option name="Always" value="1"/>
@@ -13,15 +13,15 @@
                     <Option name="Menu on" value="3"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.snowflakes" label="Enable snowflakes"/>
-            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.min" label="Minimum fall speed"/>
-            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.max" label="Maximum fall speed"/>
-            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.min" label="Minimum sidemove speed"/>
-            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.max" label="Maximum sidemove speed"/>
-            <AutoVariable width="fill" target="visual.font_size.esp" label="Main font size"/>
-            <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
-            <AutoVariable width="fill" target="mc_health.enable" label="Enable MC healthbar"/>
-            <AutoVariable width="fill" target="mc_health.size" label="MC healthbar size"/>
+            <AutoVariable width="fill" target="visual.snowflakes" label="Enable Snowflakes"/>
+            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.min" label="Minimum Fall Speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.max" label="Maximum Fall Speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.min" label="Minimum Sidemove Speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.max" label="Maximum Sidemove Speed"/>
+            <AutoVariable width="fill" target="visual.font_size.esp" label="Main Font Size"/>
+            <AutoVariable width="fill" target="visual.font_size.center_size" label="Center String Font Size"/>
+            <AutoVariable width="fill" target="mc_health.enable" label="Enable MC Healthbar"/>
+            <AutoVariable width="fill" target="mc_health.size" label="MC Healthbar Size"/>
         </List>
     </Box>
 </Tab>

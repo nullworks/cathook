@@ -5,27 +5,25 @@
 #include <menu/object/container/Table.hpp>
 #include <menu/Menu.hpp>
 
-namespace zerokernel_table
-{
-static settings::RVariable<rgba_t> color_border{ "zk.style.table.color.border", "446498ff" };
-}
+extern settings::RVariable<rgba_t> color_border;
+
 void zerokernel::Table::render()
 {
     Container::render();
 
     // Main border
-    renderBorder(*zerokernel_table::color_border);
+    renderBorder(*color_border);
     // Vertical separators
     int acc{ 1 };
     for (size_t i = 0; i < columns.size() - 1; ++i)
     {
-        draw::Line(bb.getBorderBox().left() + columns[i].width + acc, bb.getBorderBox().top(), 0, bb.getBorderBox().height, *zerokernel_table::color_border, 1);
+        draw::Line(bb.getBorderBox().left() + columns[i].width + acc, bb.getBorderBox().top(), 0, bb.getBorderBox().height, *color_border, 1);
         acc += columns[i].width + 1;
     }
     // Horizontal separators
     for (size_t i = 1; i < objects.size(); ++i)
     {
-        draw::Line(bb.getBorderBox().left(), objects[i]->getBoundingBox().getBorderBox().top() - 1, bb.getBorderBox().width, 0, *zerokernel_table::color_border, 1);
+        draw::Line(bb.getBorderBox().left(), objects[i]->getBoundingBox().getBorderBox().top() - 1, bb.getBorderBox().width, 0, *color_border, 1);
     }
 }
 

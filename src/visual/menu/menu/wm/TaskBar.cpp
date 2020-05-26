@@ -7,11 +7,8 @@
 #include <menu/wm/Task.hpp>
 #include <menu/Menu.hpp>
 
-namespace zerokernel_taskbar
-{
-static settings::RVariable<rgba_t> color_background{ "zk.style.taskbar.color.background", "1d2f40" };
-static settings::RVariable<rgba_t> color_border{ "zk.style.taskbar.color.border", "446498ff" };
-} // namespace zerokernel_taskbar
+extern settings::RVariable<rgba_t> color_border;
+extern settings::RVariable<rgba_t> color_background;
 
 void zerokernel::TaskBar::reorderElements()
 {
@@ -42,8 +39,8 @@ void zerokernel::TaskBar::addWindowButton(zerokernel::WMWindow &window)
 
 void zerokernel::TaskBar::render()
 {
-    renderBackground(*zerokernel_taskbar::color_background);
-    renderBorder(*zerokernel_taskbar::color_border);
+    renderBackground(*color_background);
+    renderBorder(*color_border);
 
     Container::render();
 }

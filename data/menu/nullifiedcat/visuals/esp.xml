@@ -1,30 +1,30 @@
 <Tab name="ESP" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="ESP">
         <List width="150">
-            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception."/>
-            <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Dont Show ESP of enemies behind walls."/>
-            <AutoVariable width="fill" target="esp.range" label="Max range"/>
-            <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP"/>
+            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable Extrasensory Perception"/>
+            <AutoVariable width="fill" target="esp.legit" label="Legit Mode" tooltip="Dont Show ESP of Enemies Behind Walls"/>
+            <AutoVariable width="fill" target="esp.range" label="Max Range"/>
+            <AutoVariable width="fill" target="lightesp.enable" label="Enable Light ESP"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="81">
         <List width="150">
             <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP"/>
-            <AutoVariable width="fill" target="esp.show.local" label="Self ESP"/>
+            <AutoVariable width="fill" target="esp.show.local" label="ESP on Local Player"/>
             <AutoVariable width="fill" target="esp.show.buildings" label="Building ESP"/>
-            <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
-            <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
-            <AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP"/>
-            <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP"/>
-            <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
+            <AutoVariable width="fill" target="esp.item.health" label="Health Packs"/>
+            <AutoVariable width="fill" target="esp.item.ammo" label="Ammo Packs"/>
+            <AutoVariable width="fill" target="esp.item.enable" label="Enable Item ESP"/>
+            <AutoVariable width="fill" target="esp.projectile.enable" label="Enable Projectile ESP"/>
+            <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only Enemy projectiles"/>
             <AutoVariable width="fill" target="esp.show.tank" label="Tank ESP"/>
-            <AutoVariable width="fill" target="esp.item.money" label="MvM money"/>
-            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money will automatically be acquired."/>
-            <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
+            <AutoVariable width="fill" target="esp.item.money" label="MvM Money"/>
+            <AutoVariable width="fill" target="esp.item.money-red" label="MvM Red Money"/>
+            <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower Powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
-            <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
-            <AutoVariable width="fill" target="esp.item.adrenaline" label="TF2C adrenaline"/>
-            <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C weapon spawner"/>
+            <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM Weapons"/>
+            <AutoVariable width="fill" target="esp.item.adrenaline" label="TF2C Adrenaline"/>
+            <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C Weapon Spawner"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectiles" x="170">
@@ -59,43 +59,43 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="ESP settings" x="170" y="90">
+    <Box padding="12 6 6 6" width="content" height="content" name="ESP Settings" x="170" y="90">
         <List width="150">
-            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players"/>
-            <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
-            <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
+            <AutoVariable width="fill" target="esp.box.player-3d" label="3D Players"/>
+            <AutoVariable width="fill" target="esp.box.building-3d" label="3D Buildings"/>
+            <AutoVariable width="fill" target="esp.box.corner-size" label="Corner Size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
-            <AutoVariable width="fill" target="esp.bones.color" label="Bone color"/>
+            <AutoVariable width="fill" target="esp.bones.color" label="Bone Color"/>
             <AutoVariable width="fill" target="esp.sightlines" label="Sightlines"/>
             <AutoVariable width="fill" target="esp.expand" label="Expand"/>
-            <LabeledObject width="fill" label="Text position">
+            <LabeledObject width="fill" label="Text Position">
                 <Select target="esp.text-position">
-                    <Option name="Top right" value="0"/>
-                    <Option name="Bottom right" value="1"/>
+                    <Option name="Top Right" value="0"/>
+                    <Option name="Bottom Right" value="1"/>
                     <Option name="Center" value="2"/>
                     <Option name="Above" value="3"/>
                     <Option name="Below" value="4"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Box mode">
+            <LabeledObject width="fill" label="Box Mode">
                 <Select target="esp.box.mode">
                     <Option name="None" value="0"/>
                     <Option name="Normal" value="1"/>
                     <Option name="Corners" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Tracer mode">
+            <LabeledObject width="fill" label="Tracer Mode">
                 <Select target="esp.tracers-mode">
                     <Option name="Off" value="0"/>
                     <Option name="Center" value="1"/>
                     <Option name="Bottom" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Health node" tooltip="Sets the healthbar mode">
+            <LabeledObject width="fill" label="Health Mode" tooltip="Sets the Healthbar Mode">
                 <Select target="esp.health-bar">
                     <Option name="None" value="0"/>
-                    <Option name="Top horizontal" value="1"/>
-                    <Option name="Bottom horizontal" value="2"/>
+                    <Option name="Top Horizontal" value="1"/>
+                    <Option name="Bottom Horizontal" value="2"/>
                     <Option name="Vertical" value="3"/>
                 </Select>
             </LabeledObject>
@@ -112,9 +112,9 @@
             <AutoVariable width="fill" target="esp.info.powerup" label="Powerup"/>
             <AutoVariable width="fill" target="esp.info.bot-id" label="Bot ID"/>
             <AutoVariable width="fill" target="esp.info.weapon" label="Weapon"/>
-            <AutoVariable width="fill" target="esp.online.enable" label="Online: enable"/>
-            <AutoVariable width="fill" target="esp.online.groups" label="Online: groups"/>
-            <AutoVariable width="fill" target="esp.online.software" label="Online: software"/>
+            <AutoVariable width="fill" target="esp.online.enable" label="Online: Enable"/>
+            <AutoVariable width="fill" target="esp.online.groups" label="Online: Groups"/>
+            <AutoVariable width="fill" target="esp.online.software" label="Online: Software"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="155">
@@ -126,7 +126,7 @@
                     <Option name="Thinking" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="esp.emoji.min-size" label="Min size"/>
+            <AutoVariable width="fill" target="esp.emoji.min-size" label="Min Size"/>
             <AutoVariable width="fill" target="esp.emoji.scaling" label="Scaling"/>
             <AutoVariable width="fill" target="esp.emoji.size" label="Size"/>
         </List>

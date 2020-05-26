@@ -4,12 +4,13 @@
 #include <menu/object/input/InputKey.hpp>
 #include <menu/menu/special/SettingsManagerList.hpp>
 
+extern settings::RVariable<rgba_t> color_border;
+
 namespace zerokernel_inputkey
 {
 static settings::RVariable<int> default_width{ "zk.style.input.key.width", "60" };
 static settings::RVariable<int> default_height{ "zk.style.input.key.height", "14" };
 
-static settings::RVariable<rgba_t> color_border{ "zk.style.input.key.color.border", "446498ff" };
 static settings::RVariable<rgba_t> color_background_capturing{ "zk.style.input.key.color.background.capturing", "38b28f88" };
 } // namespace zerokernel_inputkey
 zerokernel::InputKey::InputKey() : BaseMenuObject{}
@@ -73,7 +74,7 @@ void zerokernel::InputKey::render()
     {
         if (capturing)
             renderBackground(*zerokernel_inputkey::color_background_capturing);
-        renderBorder(*zerokernel_inputkey::color_border);
+        renderBorder(*color_border);
         if (capturing)
         {
             text.set("<...>");

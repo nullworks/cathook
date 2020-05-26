@@ -5,11 +5,11 @@
 #include <menu/object/input/Checkbox.hpp>
 #include <menu/menu/special/SettingsManagerList.hpp>
 
+extern settings::RVariable<rgba_t> color_border;
+
 namespace zerokernel_checkbox
 {
 static settings::RVariable<int> checkbox_size{ "zk.style.checkbox.size", "12" };
-static settings::RVariable<rgba_t> color_border{ "zk.style.checkbox.color.border", "446498ff" };
-static settings::RVariable<rgba_t> color_checked{ "zk.style.checkbox.color.checked", "446498ff" };
 static settings::RVariable<rgba_t> color_hover{ "zk.style.checkbox.color.hover", "00a098ff" };
 } // namespace zerokernel_checkbox
 
@@ -38,10 +38,10 @@ void zerokernel::Checkbox::render()
 {
     if (nullptr != option)
     {
-        renderBorder(*zerokernel_checkbox::color_border);
+        renderBorder(*color_border);
         auto cb = bb.getContentBox();
         if (**option)
-            draw::Rectangle(cb.x, cb.y, cb.width, cb.height, *zerokernel_checkbox::color_checked);
+            draw::Rectangle(cb.x, cb.y, cb.width, cb.height, *color_border);
         else if (isHovered())
             draw::Rectangle(cb.x, cb.y, cb.width, cb.height, *zerokernel_checkbox::color_hover);
     }

@@ -1,12 +1,12 @@
 <Tab name="Auto Pyro" padding="4 4 4 4">
-	<Box padding="12 6 6 6" width="content" height="content" name="Auto reflect">
+	<Box padding="12 6 6 6" width="content" height="content" name="Auto Reflect">
 		<List width="202">
-			<AutoVariable width="fill" target="autoreflect.enable" label="Enable auto reflect"/>
-			<AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
-			<AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able"/>
-			<AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles"/>
-			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode"/>
-			<AutoVariable width="fill" target="autoreflect.legit" label="Legit mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
+			<AutoVariable width="fill" target="autoreflect.enable" label="Enable Auto Reflect"/>
+			<AutoVariable width="fill" target="autoreflect.button" label="Reflect Button"/>
+			<AutoVariable width="fill" target="autoreflect.idle-only" label="Only Reflect When Able"/>
+			<AutoVariable width="fill" target="autoreflect.teammate" label="Teammate Projectiles"/>
+			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball Mode"/>
+			<AutoVariable width="fill" target="autoreflect.legit" label="Legit Mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
 		</List>
 		<Box padding="12 6 6 6" name="Projectiles" width="content" height="content" y="100">
 			<Box padding="12 6 6 6" name="Big" width="content" height="content">
@@ -14,7 +14,7 @@
 					<AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
 					<AutoVariable width="fill" target="autoreflect.pipes" label="Pipes"/>
 					<AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
-					<AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
+					<AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry Rockets"/>
 				</List>
 			</Box>
 
@@ -23,17 +23,17 @@
 					<AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
 					<AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
 					<AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
-					<AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing bolts"/>
+					<AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing Bolts"/>
 					<AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"/>
 				</List>
 			</Box>
-			<AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should autoreflect still try to reflect it?"/>
+			<AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should Autoreflect still try to reflect it?"/>
 		</Box>
 	</Box>
 	<Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="235">
 		<List width="150">
-			<AutoVariable width="fill" target="auto-detonator.enable" label="Enable auto Detonator"/>
-			<AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore cloaked"/>
+			<AutoVariable width="fill" target="auto-detonator.enable" label="Enable Auto Detonator"/>
+			<AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore Cloaked"/>
 		</List>
 	</Box>
 </Tab>

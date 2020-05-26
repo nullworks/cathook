@@ -1,11 +1,11 @@
 <Tab name="Auto Sticky" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto sticky">
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Sticky">
         <List width="150">
-            <AutoVariable width="fill" target="autosticky.enable" label="Enable auto sticky" tooltip="Auto detonate stickies."/>
-            <AutoVariable width="fill" target="autosticky.buildings" label="Detonate on buildings"/>
-            <AutoVariable width="fill" target="autosticky.legit" label="Legit mode" tooltip="Require line of sight and ignores invisible spies."/>
-            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't blow me up"/>
-            <AutoVariable width="fill" target="autosticky.min-dist" label="Min distance" min="0" max="130" step="5"/>
+            <AutoVariable width="fill" target="autosticky.enable" label="Enable Auto Sticky" tooltip="Auto detonate stickies."/>
+            <AutoVariable width="fill" target="autosticky.buildings" label="Detonate On Buildings"/>
+            <AutoVariable width="fill" target="autosticky.legit" label="Legit Mode" tooltip="Require line of sight and ignores invisible spies."/>
+            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't Blow Me Up"/>
+            <AutoVariable width="fill" target="autosticky.min-dist" label="Min Distance" tooltip="Min distance to enemy for detonation." min="0" max="130" step="5"/>
         </List>
     </Box>
 </Tab>

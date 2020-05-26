@@ -1,9 +1,9 @@
 <Tab name="Aimbot" padding="6 6 6 6">
     <Box padding="12 6 6 6" width="content" height="content" name="Aimbot">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.enable" label="Enable aimbot"/>
-            <AutoVariable width="fill" target="aimbot.aimkey.button" label="Aim key" tooltip="Key which needs to be pressed to activate the action below."/>
-            <LabeledObject width="fill" label="Aim key mode" tooltip="Controls what the aimkey does.">
+            <AutoVariable width="fill" target="aimbot.enable" label="Enable Aimbot"/>
+            <AutoVariable width="fill" target="aimbot.aimkey.button" label="Aim Key" tooltip="Key which needs to be pressed to activate the action below."/>
+            <LabeledObject width="fill" label="Aim Key Mode" tooltip="Controls what the aimkey does.">
                 <Select target="aimbot.aimkey.mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Pressed" value="1"/>
@@ -12,54 +12,54 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen."/>
-            <LabeledObject width="fill" label="Spectator mode" tooltip="Firstperson: disable if at least one spectator is in firstperson. Spectated: disable if you are being spectated at all.">
+            <LabeledObject width="fill" label="Spectator mode" tooltip="How should aimbot react to spectators?">
                 <Select target="aimbot.spectator-mode">
                     <Option name="Always on" value="0"/>
-                    <Option name="Firstperson" value="1"/>
-                    <Option name="Spectated" value="2"/>
+                    <Option name="Firstperson" value="1" tooltip="Disable if at least one spectator is in firstperson."/>
+                    <Option name="Spectated" value="2" tooltip="Disable if you are being spectated in first- or thirdperson."/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.slow" label="Slow aimbot" min="0" max="30"/>
-            <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the aimbot to a certain FOV from the crosshair."/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle" tooltip="Shows the aimbot's FOV."/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV opacity" min="0" max="1" step="0.05"/>
-            <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only shoot when able"/>
-            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss chance" tooltip="% chance the aimbot will miss on purpose."/>
+            <AutoVariable width="fill" target="aimbot.slow" label="Slow Aimbot" min="0" max="30"/>
+            <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the Aimbot to a certain FOV from the crosshair."/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV Circle" tooltip="Shows the Aimbot's FOV."/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.05" tooltip="Controls the FOV circle's opacity."/>
+            <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only Shoot When Able"/>
+            <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss Chance" tooltip="% chance the aimbot will miss on purpose."/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
-            <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
+            <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed Only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="340">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"/>
-            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
-            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot disguised" tooltip="Allow autoshoot while disguised"/>
-            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto spin-up" tooltip="Spin up the minigun automatically if an enemy is found."/>
-            <AutoVariable width="fill" target="aimbot.auto.tapfire" label="Tapfire minigun"/>
-            <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"/>
-            <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"/>
+            <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable Autoshoot"/>
+            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for Charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
+            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot Disguised" tooltip="Allow autoshoot while disguised"/>
+            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto Spin-up" tooltip="Spin up the minigun automatically if an enemy is found."/>
+            <AutoVariable width="fill" target="aimbot.auto.tapfire" label="Tapfire Minigun"/>
+            <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto Zoom"/>
+            <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto Unzoom"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Target selection" x="170">
+    <Box padding="12 6 6 6" width="content" height="content" name="Target Selection" x="170">
         <List width="150">
-            <LabeledObject width="fill" label="Priority mode" tootlip="If multiple enemies are in FOV, who should be targeted.">
+            <LabeledObject width="fill" label="Priority Mode">
                 <Select target="aimbot.priority-mode">
                     <Option name="Smart" value="0"/>
                     <Option name="FOV" value="1"/>
-                    <Option name="Distance (furthest)" value="2"/>
-                    <Option name="Distance (highest)" value="4"/>
-                    <Option name="Health (lowest)" value="3"/>
-                    <Option name="Health (highest)" value="5"/>
+                    <Option name="Distance (Closest)" value="2"/>
+                    <Option name="Distance (Highest)" value="4"/>
+                    <Option name="Health (Lowest)" value="3"/>
+                    <Option name="Health (Highest)" value="5"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Target team">
+            <LabeledObject width="fill" label="Target Team">
                 <Select target="aimbot.target.teammates">
                     <Option name="Enemies" value="0"/>
                     <Option name="Teammates" value="1"/>
                     <Option name="All" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Hitbox mode">
+            <LabeledObject width="fill" label="Hitbox Mode">
                 <Select target="aimbot.hitbox-mode">
                     <Option name="Auto" value="0"/>
                     <Option name="Auto closest" value="1"/>
@@ -88,27 +88,27 @@
                     <Option name="Right Foot" value="17"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.target.max-range" label="Max range"/>
+            <AutoVariable width="fill" target="aimbot.target.max-range" label="Max Range"/>
             <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
-            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only" tooltip="Aimbot is only active if your mouse has moved in the last half second."/>
-            <AutoVariable width="fill" target="aimbot.lock-target" label="Lock target" tooltip="Lock onto a target until they die or leave your fov."/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only" tooltip="Aimbot will only activate on players set to RAGE."/>
-            <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim at stickybombs"/>
-            <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim at sentry guns"/>
-            <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim at other buildings"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore cloaked spies"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore vaccinator uber"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore dead ringer spies"/>
+            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance Only" tooltip="Aimbot is only active if your mouse has moved in the last half second."/>
+            <AutoVariable width="fill" target="aimbot.lock-target" label="Lock Target" tooltip="Lock onto a target until they die or leave your fov."/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage Only"/>
+            <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim at Stickybombs"/>
+            <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim at Sentry Guns"/>
+            <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim at Other Buildings"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore Cloaked Spies"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore Vaccinator Uber"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore Dead Ringer Spies"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="225">
+    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="225">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.no-spread" label="No spread" tooltip="Projectiles won't have any spread. Independent of aimbot."/>
-            <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
-            <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
-            <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
-            <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Bow threshold"/>
-            <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky threshold"/>
+            <AutoVariable width="fill" target="aimbot.no-spread" label="No Spread" tooltip="Projectiles won't have any spread. Independant of aimbot."/>
+            <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable Projectile Aimbot"/>
+            <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity Override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity Override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Bow Threshold"/>
+            <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky Threshold"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="125">
@@ -122,27 +122,25 @@
             <AutoVariable width="fill" target="backtrack.chams" label="Backtrack Chams" tooltip="Draw Chams for the ticks (Note that transparent viewmodels make them transparent if the entity being backtracked walks off-screen)"/>
             <AutoVariable width="fill" target="backtrack.chams.ticks" label="Chams Amount" tooltip="How many ticks to draw (WARNING, this can cause lag)"/>
             <AutoVariable width="fill" target="backtrack.chams.color" label="Chams Color" tooltip="Color for the chams."/>
-            <AutoVariable width="fill" target="backtrack.chams.color.solid" label="Solid Color" tooltip="Draw a solid color instead of tinting the model"/>
+            <AutoVariable width="fill" target="backtrack.chams.color.solid" label="Solid Color" tooltip="Draw a Solid color instead of tinting the model"/>
             <LabeledObject width="fill" label="Backtrack Slots">
                 <Select target="backtrack.slots">
                     <Option name="All" value="0"/>
                     <Option name="Primary" value="1"/>
                     <Option name="Secondary" value="2"/>
                     <Option name="Melee" value="3"/>
-                    <Option name="Primary + secondary" value="4"/>
-                    <Option name="Primary + melee" value="5"/>
-                    <Option name="Secondary + melee" value="6"/>
+                    <Option name="Primary + Secondary" value="4"/>
+                    <Option name="Primary + Melee" value="5"/>
+                    <Option name="Secondary + Melee" value="6"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="misc.ping-reducer.enable" label="Ping reducer"/>
-            <AutoVariable width="fill" target="misc.ping-reducer.target" label="Target ping"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="170" y="255">
+    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich Aimbot" x="170" y="255">
         <List width="150">
-            <AutoVariable width="fill" target="sandwichaim.enable" label="Enable sandvich aimbot"/>
+            <AutoVariable width="fill" target="sandwichaim.enable" label="Enable Sandvich Aimbot"/>
             <AutoVariable width="fill" target="sandwichaim.aimkey" label="Aimkey"/>
-            <LabeledObject width="fill" label="Aimkey mode">
+            <LabeledObject width="fill" label="Aimkey Mode">
                 <Select target="sandwichaim.aimkey-mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Pressed" value="1"/>

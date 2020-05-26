@@ -1,21 +1,21 @@
 <Tab name="Auto Spy" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto backstab">
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Backstab">
         <List width="170">
-            <AutoVariable width="fill" target="autobackstab.enabled" label="Enable auto backstab"/>
-            <LabeledObject width="fill" label="Auto backstab mode">
+            <AutoVariable width="fill" target="autobackstab.enabled" label="Enable Auto Backstab"/>
+            <LabeledObject width="fill" label="Auto Backstab Mode">
                 <Select target="autobackstab.mode">
                     <Option name="Legit" value="0"/>
                     <Option name="Rage" value="1"/>
                     <Option name="Backtrack" value="2"/>
-                    <Option name="Legit backtrack" value="3"/>
+                    <Option name="Legit Backtrack" value="3"/>
                 </Select>
             </LabeledObject>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Auto Dead Ringer" x="185">
         <List width="150">
-            <AutoVariable width="fill" target="auto-deadringer.enable" label="Enable auto Dead Ringer"/>
-        <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
+            <AutoVariable width="fill" target="auto-deadringer.enable" label="Enable Auto Dead Ringer"/>
+        <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at Health"/>
         </List>
     </Box>
 </Tab>

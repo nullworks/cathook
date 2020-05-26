@@ -4,13 +4,10 @@
 
 #include <menu/object/TabButton.hpp>
 
-static settings::RVariable<rgba_t> color_selected{ "zk.style.tab-button.color.selected.background", "446498ff" };
-static settings::RVariable<rgba_t> color_separator{ "zk.style.tab-button.color.separator", "446498ff" };
-static settings::RVariable<rgba_t> color_hover_underline{ "zk.style.tab-button.color.hover.underline", "446498ff" };
-static settings::RVariable<rgba_t> color_selected_underline{ "zk.style.tab-button.color.selected.underline", "446498ff" };
-
-static settings::RVariable<rgba_t> color_text_selected{ "zk.style.tab-button.color.text.selected", "ffffff" };
-static settings::RVariable<rgba_t> color_text{ "zk.style.tab-button.color.text.inactive", "cccccc" };
+extern settings::RVariable<rgba_t> color_border;
+extern settings::RVariable<rgba_t> color_background;
+extern settings::RVariable<rgba_t> color_focused;
+extern settings::RVariable<rgba_t> color_open;
 
 namespace zerokernel
 {
@@ -34,18 +31,16 @@ void TabButton::render()
     bool selected = (parent.active == id);
     if (selected)
     {
-        renderBackground(*color_selected);
-        // TODO magic numbers?
-        draw::Line(bb.getBorderBox().x + 6, bb.getBorderBox().bottom() - 3, bb.getBorderBox().width - 12, 0, *color_selected_underline, 1);
+        renderBackground(*color_border);
     }
     else if (isHovered())
     {
-        draw::Line(bb.getBorderBox().x + 6, bb.getBorderBox().bottom() - 3, bb.getBorderBox().width - 12, 0, *color_hover_underline, 1);
+        draw::Line(bb.getBorderBox().x + 6, bb.getBorderBox().bottom() - 3, bb.getBorderBox().width - 12, 0, *color_border, 1);
     }
 
-    draw::Line(bb.getBorderBox().right(), bb.getBorderBox().top() - 1, 0, bb.getBorderBox().height, *color_separator, 1);
+    draw::Line(bb.getBorderBox().right(), bb.getBorderBox().top(), 0, bb.getBorderBox().height, *color_border, 1);
 
-    text.setColorText(selected ? &*color_text_selected : &*color_text);
+    text.setColorText(selected ? &*color_focused : &*color_open);
     text.render();
 }
 

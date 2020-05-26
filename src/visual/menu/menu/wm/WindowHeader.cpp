@@ -7,12 +7,13 @@
 /*
   Created on 06.07.18.
 */
+
+extern settings::RVariable<rgba_t> color_border;
+extern settings::RVariable<rgba_t> color_background;
+
 namespace zerokernel_windowheader
 {
 static settings::RVariable<rgba_t> color_background{ "zk.style.window-header.color.background.inactive", "00000000" };
-static settings::RVariable<rgba_t> color_background_focused{ "zk.style.window-header.color.background.active", "446498ff" };
-static settings::RVariable<rgba_t> color_border{ "zk.style.window-header.color.border.inactive", "446498ff" };
-static settings::RVariable<rgba_t> color_border_focused{ "zk.style.window-header.color.border.active", "446498ff" };
 } // namespace zerokernel_windowheader
 
 zerokernel::WindowHeader::WindowHeader(WMWindow &window) : BaseMenuObject(), window(window), close()
@@ -55,11 +56,11 @@ bool zerokernel::WindowHeader::handleSdlEvent(SDL_Event *event)
 
 void zerokernel::WindowHeader::render()
 {
-    renderBackground(window.isFocused() ? *zerokernel_windowheader::color_background_focused : *zerokernel_windowheader::color_background);
+    renderBackground(window.isFocused() ? *color_border : *zerokernel_windowheader::color_background);
     // glez::draw::line(bb.getBorderBox().left(), bb.getBorderBox().bottom() -
-    // 1, bb.getBorderBox().width, 0, window.focused ? *color_border_focused :
+    // 1, bb.getBorderBox().width, 0, window.focused ? *color_border :
     // *color_border, 1);
-    renderBorder(window.isFocused() ? *zerokernel_windowheader::color_border_focused : *zerokernel_windowheader::color_border);
+    renderBorder(*color_border);
 
     Container::render();
 }

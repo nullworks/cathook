@@ -1,19 +1,19 @@
 <Tab name="Bullet Tracers" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Bullet tracers">
+    <Box padding="12 6 6 6" width="content" height="content" name="Player Info">
         <List width="150">
             <AutoVariable width="fill" target="visual.bullet-tracers.enable" label="Enable"/>
-            <AutoVariable width="fill" target="visual.bullet-tracers.sniper-only" label="Sniperrifles only"/>
-            <AutoVariable width="fill" target="visual.bullet-tracers.local-only" label="Don't draw other players"/>
-            <AutoVariable width="fill" target="visual.bullet-tracers.draw-local" label="Draw local beams"/>
-            <AutoVariable width="fill" target="visual.bullet-tracers.sentry" label="Sentry tracers"/>
-            <LabeledObject width="fill" label="Team mode">
+            <AutoVariable width="fill" target="visual.bullet-tracers.sniper-only" label="Sniperrifles Only"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.local-only" label="Don't Draw Other Players"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.draw-local" label="Draw Local Beams"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.sentry" label="Sentry Tracers"/>
+            <LabeledObject width="fill" label="Team Mode">
                 <Select target="visual.bullet-tracers.teammode">
                     <Option name="All" value="0"/>
                     <Option name="Enemies" value="1"/>
                     <Option name="Teammates" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.bullet-tracers.one-trace-only" label="Single beam only"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.one-trace-only" label="Single Beam Only"/>
         </List>
     </Box>
 </Tab>

@@ -1,13 +1,13 @@
-<Tab name="Spy Alert" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Spy alert">
+<Tab name="Spy alert" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Spy Alert">
         <List width="200">
             <AutoVariable width="fill" target="spy-alert.enable" label="Enable"/>
-            <AutoVariable width="fill" target="spy-alert.voicemenu" label="Call out Spy"/>
+            <AutoVariable width="fill" target="spy-alert.voicemenu" label="Call Out Spy"/>
             <AutoVariable width="fill" target="spy-alert.sound" label="Sound"/>
             <AutoVariable width="fill" target="spy-alert.alert-interval" label="Interval"/>
-            <AutoVariable width="fill" target="spy-alert.alert-for-invisible" label="Alert for invis Spies"/>
-            <AutoVariable width="fill" target="spy-alert.distance.alert" label="Alert distance"/>
-            <AutoVariable width="fill" target="spy-alert.distance.warning" label="Backstab warning distance"/>
+            <AutoVariable width="fill" target="spy-alert.alert-for-invisible" label="Alert for Invis Spies"/>
+            <AutoVariable width="fill" target="spy-alert.distance.alert" label="Alert Distance"/>
+            <AutoVariable width="fill" target="spy-alert.distance.warning" label="Backstab Warning Distance"/>
         </List>
     </Box>
 </Tab>

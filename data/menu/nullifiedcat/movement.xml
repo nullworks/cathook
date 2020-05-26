@@ -1,81 +1,81 @@
 <Tab name="Movement" padding="6 6 6 6">
-    <Box padding="12 6 6 6" width="content" height="content" name="Bunny hop">
+    <Box padding="12 6 6 6" width="content" height="content" name="Bunny Hop">
         <List width="150">
-            <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunny hop"/>
-	    <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop chance"/>
-            <AutoVariable width="fill" target="misc.autostrafe" label="Enable auto strafe"/>
+            <AutoVariable width="fill" target="bunnyhop.enable" label="Enable Bunny Hop"/>
+	    <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop Chance" tooltip="% chance of a successful bunnyhop"/>
+            <AutoVariable width="fill" target="misc.autostrafe" label="Enable Auto strafe"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Follow-Bot" x="170">
+    <Box padding="12 6 6 6" width="content" height="content" name="FollowBot" x="170">
         <List width="180">
-            <AutoVariable width="fill" target="follow-bot.enable" label="Enable follow-bot" tooltip="Automatically follow other players"/>
+            <AutoVariable width="fill" target="follow-bot.enable" label="Enable FollowBot" tooltip="Automatically follow other players"/>
             <AutoVariable width="fill" target="follow-bot.roaming" label="Roaming"/>
-            <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change when possible"/>
-            <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump if stuck"/>
-            <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced taunts"/>
-            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation range"/>
+            <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change When Possible"/>
+            <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump If Stuck"/>
+            <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced Taunts"/>
+            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation Range"/>
             <AutoVariable width="fill" target="follow-bot.distance" label="Follow distance"/>
-            <AutoVariable width="fill" target="follow-bot.ipc-distance" label="IRC additive distance"/>
-            <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic slot"/>
-            <AutoVariable width="fill" target="follow-bot.mimic-crouch" label="Mimic crouch"/>
-            <AutoVariable width="fill" target="follow-bot.always-medigun" label="Always medigun"/>
-            <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK switch"/>
-            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit"/>
-            <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
-            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to follow" tooltip="Steamid of player to follow (optional)"/>
-            <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize friends"/>
-            <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the party leader"/>
-            <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw crumbs"/>
+            <AutoVariable width="fill" target="follow-bot.ipc-distance" label="IRC Additive Distance"/>
+            <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic Slot"/>
+            <AutoVariable width="fill" target="follow-bot.mimic-crouch" label="Mimic Crouch"/>
+            <AutoVariable width="fill" target="follow-bot.always-medigun" label="Always Medigun"/>
+            <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK Switch"/>
+            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK Limit"/>
+            <AutoVariable width="fill" target="follow-bot.corners" label="Corner Activate"/>
+            <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to Follow" tooltip="Steamid of player to follow (optional)"/>
+            <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize Friends"/>
+            <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the Party Leader"/>
+            <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw Crumbs"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Nav-Bot" y="65">
+    <Box padding="12 6 6 6" width="content" height="content" name="NavBot" y="65">
         <List width="150">
-            <AutoVariable width="fill" target="misc.pathing" label="Enable pathing"/>
-	        <AutoVariable width="fill" target="misc.pathing.draw" label="Draw path"/>
-            <AutoVariable width="fill" target="misc.pathing.look-at-path" label="Look at path"/>
-            <AutoVariable width="fill" target="navbot.enabled" label="Enable navbot"/>
-            <AutoVariable width="fill" target="navbot.engineer-mode" label="Enable engineer mode"/>
-            <AutoVariable width="fill" target="navbot.get-health-and-ammo" label="Get health and ammo"/>
-            <AutoVariable width="fill" target="navbot.spy-mode" label="Enable spy mode"/>
-            <AutoVariable width="fill" target="navbot.other-mode" label="General mode"/>
-            <AutoVariable width="fill" target="navbot.primary-only" label="Best weapon only"/>
-            <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable autojump"/>
-            <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump distance"/>
+            <AutoVariable width="fill" target="misc.pathing" label="Enable Pathing"/>
+	        <AutoVariable width="fill" target="misc.pathing.draw" label="Draw Path"/>
+            <AutoVariable width="fill" target="misc.pathing.look-at-path" label="Look at Path"/>
+            <AutoVariable width="fill" target="navbot.enabled" label="Enable Navbot"/>
+            <AutoVariable width="fill" target="navbot.engineer-mode" label="Enable Engineer Mode"/>
+            <AutoVariable width="fill" target="navbot.get-health-and-ammo" label="Get Health and Ammo"/>
+            <AutoVariable width="fill" target="navbot.spy-mode" label="Enable Spy Mode"/>
+            <AutoVariable width="fill" target="navbot.other-mode" label="General Mode"/>
+            <AutoVariable width="fill" target="navbot.primary-only" label="Best Weapon Only"/>
+            <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable Autojump"/>
+            <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump Distance"/>
             <!--AutoVariable width="fill" target="navbot.target-sentry" label="Try to target sentries"/-->
-            <AutoVariable width="fill" target="navbot.stay-near" label="Zone enemies (stay near)"/>
-            <AutoVariable width="fill" target="navbot.spy-ignore-time" label="Spy ignore time"/>
+            <AutoVariable width="fill" target="navbot.stay-near" label="Zone Enemies (Stay Near)"/>
+            <AutoVariable width="fill" target="navbot.spy-ignore-time" label="Spy ignore Time"/>
             <!-- <!AutoVariable width="fill" target="navbot.take-teleporters" label="take teleporters"/> -->
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Anti-backstab" x="370">
+    <Box padding="12 6 6 6" width="content" height="content" name="Anti-Backstab" x="370">
         <List width="180">
-            <AutoVariable width="fill" target="antibackstab.enable" label="Enable anti-backstab"/>
-            <AutoVariable width="fill" target="antibackstab.angle" label="Detection angle"/>
-            <AutoVariable width="fill" target="antibackstab.distance" label="Detection distance"/>
+            <AutoVariable width="fill" target="antibackstab.enable" label="Enable Anti-Backstab"/>
+            <AutoVariable width="fill" target="antibackstab.angle" label="Detection Angle"/>
+            <AutoVariable width="fill" target="antibackstab.distance" label="Detection Distance"/>
             <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
             <AutoVariable width="fill" target="antibackstab.nope" label="Nope!"/>
         </List>
     </Box>
         <Box padding="12 6 6 6" width="content" height="content" name="Warp" x="370" y="65">
         <List width="180">
-            <AutoVariable width="fill" target="warp.enabled" label="Enable warp" tooltip="Allows you to charge a burst of speed."/>
-            <AutoVariable width="fill" target="warp.speed" label="Warp speed" tooltip="The discharge speed (0.5 = +50%, 2 = +200%, +2300% is the maximum possible)."/>
-            <AutoVariable width="fill" target="warp.key" label="Warp key" tooltip="Pressing this key will use all stored ticks to accelerate you."/>
-            <AutoVariable width="fill" target="warp.draw" label="Draw warp" tooltip="Draws a bar indicating your warp readyness."/>
-            <AutoVariable width="fill" target="warp.bar-size" label="Bar size"/>
-            <AutoVariable width="fill" target="warp.bar-x" label="X position"/>
-            <AutoVariable width="fill" target="warp.bar-y" label="Y position"/>
-            <AutoVariable width="fill" target="warp.charge-passively" label="Charge passively" tooltip="Charge warp passively (e.g. when moving)."/>
-            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump; this will make you fall slower."/>
-            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys."/>
-            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp."/>
-            <AutoVariable width="fill" target="warp.demoknight" label="Demoknight mode" tooltip="This will make you do a swing charge with warp(attack, charge, warp)."/>
-            <AutoVariable width="fill" target="warp.peek" label="Peek mode" tooltip="This will teleport you for a tick and then teleport you back."/>
-            <AutoVariable width="fill" target="warp.on-hit" label="Warp when hit" tooltip="Whenever someone melees you or shoots you with hitscan, warp"/>
-            <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp forwards" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp backwards" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
+            <AutoVariable width="fill" target="warp.enabled" label="Enable Warp" tooltip="Allows you to charge a burst of speed"/>
+            <AutoVariable width="fill" target="warp.speed" label="Warp speed" tooltip="The Discharge speed (0.5 = +50%, 2 = +200%, +2300% is the maximum possible)"/>
+            <AutoVariable width="fill" target="warp.key" label="Warp Key" tooltip="Pressing this key will use all stored ticks to accelerate you"/>
+            <AutoVariable width="fill" target="warp.draw" label="Draw Warp" tooltip="Draws a bar indicating your warp readyness"/>
+            <AutoVariable width="fill" target="warp.bar-size" label="Bar Size"/>
+            <AutoVariable width="fill" target="warp.bar-x" label="X Position"/>
+            <AutoVariable width="fill" target="warp.bar-y" label="Y Position"/>
+            <AutoVariable width="fill" target="warp.charge-passively" label="Charge Passively" tooltip="Charge Warp passively, e.g. when moving"/>
+            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in Jump" tooltip="Charge passively in jump, This will make you fall slower"/>
+            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge When keys released" tooltip="Charge passively before full stop after releasing movement keys"/>
+            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement Ratio" tooltip="Every Xth movement tick is passively converted to warp"/>
+            <AutoVariable width="fill" target="warp.demoknight" label="Demoknight Mode" tooltip="This will make you do a Swing charge with warp, (Attack, charge, warp)"/>
+            <AutoVariable width="fill" target="warp.peek" label="Peek Mode" tooltip="This will teleport you for a tick and then teleport you back"/>
+            <AutoVariable width="fill" target="warp.on-hit" label="Warp When hit" tooltip="Whenever Someone Melees you or shoots you with hitscan, Warp"/>
+            <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp Forwards" tooltip="Warp When hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp Backwards" tooltip="Warp When hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.left" label="Warp Left" tooltip="Warp When hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.right" label="Warp Right" tooltip="Warp When hit option"/>
         </List>
     </Box>
 </Tab>

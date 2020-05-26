@@ -1,10 +1,10 @@
 <Tab name="Glow" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Glow">
         <List width="150">
-            <AutoVariable width="fill" target="glow.enable" label="Enable glow"/>
-            <AutoVariable width="fill" target="glow.blur-scale" label="Blur scale" min="1" max="20"/>
+            <AutoVariable width="fill" target="glow.enable" label="Enable Glow"/>
+            <AutoVariable width="fill" target="glow.blur-scale" label="Blur Scale" min="1" max="20"/>
             <AutoVariable width="fill" target="glow.health" label="Health"/>
-            <LabeledObject width="fill" label="Solid when">
+            <LabeledObject width="fill" label="Solid When">
                 <Select target="glow.solid-when">
                     <Option name="Never" value="0"/>
                     <Option name="Always" value="1"/>
@@ -18,13 +18,13 @@
             <AutoVariable width="fill" target="glow.show.players" label="Players"/>
             <AutoVariable width="fill" target="glow.show.teammates" label="Teammates"/>
             <AutoVariable width="fill" target="glow.show.disguised" label="Disguised"/>
-            <AutoVariable width="fill" target="glow.self" label="Local player"/>
+            <AutoVariable width="fill" target="glow.self" label="Local Player"/>
             <AutoVariable width="fill" target="glow.show.buildings" label="Buildings"/>
-            <AutoVariable width="fill" target="glow.show.teammate-buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="glow.show.teammate-buildings" label="Team Buildings"/>
             <AutoVariable width="fill" target="glow.show.powerups" label="Powerups"/>
             <AutoVariable width="fill" target="glow.show.stickies" label="Stickies"/>
-            <AutoVariable width="fill" target="glow.show.ammoboxes" label="Ammo boxes"/>
-            <AutoVariable width="fill" target="glow.show.medkits" label="Health packs"/>
+            <AutoVariable width="fill" target="glow.show.ammoboxes" label="Ammo Boxes"/>
+            <AutoVariable width="fill" target="glow.show.medkits" label="Health Packs"/>
             <AutoVariable width="fill" target="glow.white-weapons" label="Weapons"/>
         </List>
     </Box>

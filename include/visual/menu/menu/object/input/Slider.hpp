@@ -11,6 +11,9 @@
 #include <menu/BaseMenuObject.hpp>
 #include <menu/object/ModalSpinner.hpp>
 
+extern settings::RVariable<rgba_t> color_border;
+extern settings::RVariable<rgba_t> color_background;
+
 namespace zerokernel
 {
 
@@ -26,7 +29,6 @@ public:
 
     static settings::RVariable<rgba_t> handle_body;
     static settings::RVariable<rgba_t> handle_border;
-    static settings::RVariable<rgba_t> bar_color;
 };
 
 template <typename T> class Slider : public BaseMenuObject
@@ -84,12 +86,12 @@ public:
         else
         {
             // Bar
-            draw::Rectangle(bb.getBorderBox().left() + *SliderStyle::handle_width / 2, bb.getBorderBox().top() + (bb.getBorderBox().height - *SliderStyle::bar_width) / 2, bb.getBorderBox().width - *SliderStyle::handle_width, *SliderStyle::bar_width, option ? *SliderStyle::bar_color : *style::colors::error);
+            draw::Rectangle(bb.getBorderBox().left() + *SliderStyle::handle_width / 2, bb.getBorderBox().top() + (bb.getBorderBox().height - *SliderStyle::bar_width) / 2, bb.getBorderBox().width - *SliderStyle::handle_width, *SliderStyle::bar_width, option ? *color_border : *style::colors::error);
             // Handle body
             auto offset = handleOffset() * (bb.getBorderBox().width - *SliderStyle::handle_width);
-            draw::Rectangle(bb.getBorderBox().left() + offset, bb.getBorderBox().top(), *SliderStyle::handle_width, bb.getBorderBox().height, *SliderStyle::handle_body);
+            draw::Rectangle(bb.getBorderBox().left() + offset, bb.getBorderBox().top(), *SliderStyle::handle_width, bb.getBorderBox().height, *color_background);
             // Handle outline
-            draw::RectangleOutlined(bb.getBorderBox().left() + offset, bb.getBorderBox().top(), *SliderStyle::handle_width, bb.getBorderBox().height, *SliderStyle::handle_border, 1);
+            draw::RectangleOutlined(bb.getBorderBox().left() + offset, bb.getBorderBox().top(), *SliderStyle::handle_width, bb.getBorderBox().height, *color_border, 1);
         }
 
         BaseMenuObject::render();

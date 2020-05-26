@@ -2,9 +2,9 @@
     <Box height="content" width="content" padding="12 6 6 6" name="Cathook">
         <List width="150">
             <AutoVariable width="fill" target="hack.enable" label="Enable Cathook"/>
-            <AutoVariable width="fill" target="hack.log-console" label="Log debug info"/>
-            <AutoVariable width="fill" target="hack-info.enable" label="Enable Cathook label" tooltip="Toggles label in top left corner of screen."/>
-            <AutoVariable width="fill" target="hack-info.minimal" label="Minimal Cathook label"/>
+            <AutoVariable width="fill" target="hack.log-console" label="Log Debug Info"/>
+            <AutoVariable width="fill" target="hack-info.enable" label="Enable Cathook Label"/>
+            <AutoVariable width="fill" target="hack-info.minimal" label="Minimal Cathook Label"/>
         </List>
     </Box>
 </Tab>

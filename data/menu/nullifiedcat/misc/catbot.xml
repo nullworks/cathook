@@ -1,12 +1,12 @@
-<Tab name="CatBot" padding="4 4 4 4">
+<Tab name="Cat-Bot" padding="4 4 4 4">
     <Box name="Autojoin and taunt" width="content" height="content" padding="12 6 6 6">
         <List width="200">
-            <AutoVariable width="fill" target="autojoin.auto-queue" label="Auto queue"/>
-            <AutoVariable width="fill" target="autojoin.auto-requeue" label="Auto requeue"/>
-            <AutoVariable width="fill" target="autoqueue.mode" label="Autoqueue mode" min="0" max="12"/>
-            <AutoVariable width="fill" target="hack.requeue-on-kick" label="Requeue on kick"/>
-            <AutoVariable width="fill" target="autotaunt.enable" label="Autotaunt enabled"/>
-            <LabeledObject width="fill" label="Autotaunt weapon">
+            <AutoVariable width="fill" target="autojoin.auto-queue" label="Auto Queue"/>
+            <AutoVariable width="fill" target="autojoin.auto-requeue" label="Auto Requeue"/>
+            <AutoVariable width="fill" target="autoqueue.mode" label="Autoqueue Mode" min="0" max="12"/>
+            <AutoVariable width="fill" target="hack.requeue-on-kick" label="Requeue on Kick"/>
+            <AutoVariable width="fill" target="autotaunt.enable" label="Autotaunt Enabled"/>
+            <LabeledObject width="fill" label="Autotaunt Weapon">
                 <Select target="autotaunt.auto-weapon">
                     <Option name="None" value="0"/>
                     <Option name="Primary" value="1"/>
@@ -17,8 +17,8 @@
                     <Option name="Destruction PDA" value="5"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt chance" min="0" max="100"/>
-            <AutoVariable width="fill" target="autotaunt.safety-distance" label="Autotaunt safety distance"/>
+            <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt Chance" min="0" max="100"/>
+            <AutoVariable width="fill" target="autotaunt.safety-distance" label="Autotaunt Safety Distance"/>
             <LabeledObject width="fill" label="Autojoin Class">
                 <Select target="autojoin.class">
                     <Option name="None" value="0"/>
@@ -33,31 +33,31 @@
                     <Option name="Engineer" value="9"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="autojoin.team" label="Autojoin team" min="0" max="1"/>
+            <AutoVariable width="fill" target="autojoin.team" label="Autojoin Team" min="0" max="1"/>
         </List>
     </Box>
     <Box name="Utilities" width="content" height="content" padding="12 6 6 6" x="215">
         <List width="200">
-            <AutoVariable width="fill" target="cat-bot.enable" label="Enable utilities"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.bots-gte" label="Abandon if bots Gte"/>
+            <AutoVariable width="fill" target="cat-bot.enable" label="Enable Utilities"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.bots-gte" label="Abandon if Bots Gte"/>
             <AutoVariable width="fill" target="cat-bot.abandon-if.ipc-bots-gte" label="Abandon if IPC bots Gte"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.humans-lte" label="Abandon if humans Lte"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.players-lte" label="Abandon if players Lte"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.humans-lte" label="Abandon if Humans Lte"/>
+            <AutoVariable width="fill" target="cat-bot.abandon-if.players-lte" label="Abandon if Players Lte"/>
             <AutoVariable width="fill" target="cat-bot.auto-crouch" label="Autocrouch"/>
-            <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark human after kills"/>
+            <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark Human After Kills"/>
             <AutoVariable width="fill" target="cat-bot.micspam.enable" label="Micspam"/>
-            <AutoVariable width="fill" target="cat-bot.micspam.interval-off" label="Micspam interval off"/>
-            <AutoVariable width="fill" target="cat-bot.micspam.interval-on" label="Micspam interval on"/>
-            <AutoVariable width="fill" target="cat-bot.votekicks" label="Random votekicks"/>
-            <AutoVariable width="fill" target="cat-bot.votekicks.rage-only" label="Rage only votekicks"/>
-            <AutoVariable width="fill" target="cat-bot.always-crouch" label="Always crouch"/>
+            <AutoVariable width="fill" target="cat-bot.micspam.interval-off" label="Micspam Interval Off"/>
+            <AutoVariable width="fill" target="cat-bot.micspam.interval-on" label="Micspam Interval On"/>
+            <AutoVariable width="fill" target="cat-bot.votekicks" label="Random Votekicks"/>
+            <AutoVariable width="fill" target="cat-bot.votekicks.rage-only" label="Rage Only votekicks"/>
+            <AutoVariable width="fill" target="cat-bot.always-crouch" label="Always Crouch"/>
             <AutoVariable width="fill" target="cat-bot.autoreport" label="Autoreport"/>
-            <AutoVariable width="fill" target="cat-bot.anti-autobalance" label="Anti auto balance"/>
+            <AutoVariable width="fill" target="cat-bot.anti-autobalance" label="Anti Auto Balance"/>
             <AutoVariable width="fill" target="misc.autodisguise" label="Autodisguise"/>
             <AutoVariable width="fill" target="cat-bot.anti-motd" label="Anti MOTD"/>
-            <AutoVariable width="fill" target="cat-bot.autovote-map" label="Autovote for current map"/>
-            <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
-            <AutoVariable width="fill" target="misc.auto-noisemaker" label="Auto equip and unlock noisemakers"/>
+            <AutoVariable width="fill" target="cat-bot.autovote-map" label="Autovote for Current Map"/>
+            <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker Spam"/>
+            <AutoVariable width="fill" target="misc.auto-noisemaker" label="Auto Equip and Unlock Noisemakers"/>
         </List>
     </Box>
 </Tab>

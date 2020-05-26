@@ -1,15 +1,15 @@
 <Tab name="Player Info" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Player Info">
         <List width="150">
-            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D over head"/>
-            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's how mafia works"/>
+            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D Over Head"/>
+            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's How Mafia Works"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="170">
         <List width="150">
             <AutoVariable width="fill" target="dominatemark.enable" label="Enable"/>
-            <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
-            <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
+            <AutoVariable width="fill" target="dominatemark.min-size" label="Draw Min Size"/>
+            <AutoVariable width="fill" target="dominatemark.max-size" label="Draw Max Size"/>
         </List>
     </Box>
 </Tab>

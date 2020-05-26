@@ -1,4 +1,4 @@
-<Tab name="CatBot" padding="4 4 4 4">
+<Tab name="Cat-Bot" padding="4 4 4 4">
     <Box name="Autojoin and taunt" width="content" height="content" padding="12 6 6 6">
         <List width="200">
             <AutoVariable width="fill" target="autojoin.auto-queue" label="Auto queue"/>
@@ -17,9 +17,9 @@
                     <Option name="Destruction PDA" value="5"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt chance" min="0" max="100"/>
+            <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt chance" min="0" max="100.1" step="1"/>
             <AutoVariable width="fill" target="autotaunt.safety-distance" label="Autotaunt safety distance"/>
-            <LabeledObject width="fill" label="Autojoin Class">
+            <LabeledObject width="fill" label="Autojoin class" tooltip="Automatically pick a class.">
                 <Select target="autojoin.class">
                     <Option name="None" value="0"/>
                     <Option name="Scout" value="1"/>
@@ -33,7 +33,7 @@
                     <Option name="Engineer" value="9"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="autojoin.team" label="Autojoin team" min="0" max="1"/>
+            <AutoVariable width="fill" target="autojoin.team" label="Autojoin team" tooltip="Automatically join a team."/>
         </List>
     </Box>
     <Box name="Utilities" width="content" height="content" padding="12 6 6 6" x="215">
@@ -57,7 +57,7 @@
             <AutoVariable width="fill" target="cat-bot.anti-motd" label="Anti MOTD"/>
             <AutoVariable width="fill" target="cat-bot.autovote-map" label="Autovote for current map"/>
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
-            <AutoVariable width="fill" target="misc.auto-noisemaker" label="Auto equip and unlock noisemakers"/>
+            <AutoVariable width="fill" target="misc.auto-noisemaker" label="Auto unlock and equip noisemakers"/>
         </List>
     </Box>
 </Tab>

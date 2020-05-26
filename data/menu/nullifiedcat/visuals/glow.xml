@@ -3,8 +3,8 @@
         <List width="150">
             <AutoVariable width="fill" target="glow.enable" label="Enable glow"/>
             <AutoVariable width="fill" target="glow.blur-scale" label="Blur scale" min="1" max="20"/>
-            <AutoVariable width="fill" target="glow.health" label="Health"/>
-            <LabeledObject width="fill" label="Solid when">
+            <AutoVariable width="fill" target="glow.health" label="Health" tooltip="Color glow according to player health."/>
+            <LabeledObject width="fill" label="Solid When">
                 <Select target="glow.solid-when">
                     <Option name="Never" value="0"/>
                     <Option name="Always" value="1"/>

@@ -15,6 +15,7 @@
 #include <hacks/AntiAntiAim.hpp>
 #include "NavBot.hpp"
 #include "HookTools.hpp"
+#include "teamroundtimer.hpp"
 
 #include "HookedMethods.hpp"
 #include "PreDataUpdate.hpp"

@@ -7,6 +7,7 @@
 #include "soundcache.hpp"
 #include "Misc.hpp"
 #include "MiscTemporary.hpp"
+#include "teamroundtimer.hpp"
 
 namespace hacks::tf2::NavBot
 {
@@ -101,7 +102,7 @@ constexpr bot_class_config DIST_SNIPER{ 1000.0f, 1500.0f, 3000.0f };
 constexpr bot_class_config DIST_ENGINEER{ 600.0f, 1000.0f, 2500.0f };
 
 // Gunslinger Engineers really don't care at all
-constexpr bot_class_config DIST_GUNSLINGER_ENGINEER{ 100.0f, 300.0f, 500.0f };
+constexpr bot_class_config DIST_GUNSLINGER_ENGINEER{ 50.0f, 200.0f, 900.0f };
 
 inline bool HasGunslinger(CachedEntity *ent)
 {
@@ -120,6 +121,19 @@ static void CreateMove()
         wait_until_path.update();
     else
         current_task = task::none;
+    // Check if we should path at all
+    if (!blocking || task::current_task == task::engineer)
+    {
+        round_states round_state = g_pTeamRoundTimer->GetRoundState();
+        // Still in setuptime, if on fitting team, then do not path yet
+        if (round_state == RT_STATE_SETUP && g_pLocalPlayer->team == TEAM_BLU)
+        {
+            // Clear instructions
+            if (!nav::ReadyForCommands)
+                nav::clearInstructions();
+            return;
+        }
+    }
 
     if (autojump)
         autoJump();
@@ -467,7 +481,7 @@ static success_build buildBuilding()
         build_attempts++;
         // Put building in hand if not already
         if (hacks::shared::misc::getCarriedBuilding() == -1 && build_command_timer.test_and_set(50))
-            g_IEngine->ClientCmd_Unrestricted(format("build ", building).c_str());
+            g_IEngine->ClientCmd_Unrestricted(("build " + std::to_string(building)).c_str());
     }
     else if (rotation_timer.check(200))
     {
@@ -541,9 +555,47 @@ static bool engineerLogic()
                             return true;
                     }
 
-            // Let's terrify some people (gunslinger engineer)
+            // Gunslinger engineer should run at people, given their building isn't too far away
             if (HasGunslinger(LOCAL_E))
+            {
+                // Deconstruct too far away buildings
+                for (auto &building : local_buildings)
+                {
+                    // Too far away, destroy it
+                    if (building->m_vecOrigin().DistTo(LOCAL_E->m_vecOrigin()) >= 1800.0f)
+                    {
+                        Building building_type = None;
+                        switch (building->m_iClassID())
+                        {
+                        case CL_CLASS(CObjectDispenser):
+                        {
+                            building_type = Dispenser;
+                            break;
+                        }
+                        case CL_CLASS(CObjectTeleporter):
+                        {
+                            // We cannot reliably detect entrance and exit, so just destruct both but mark as "Entrance"
+                            building_type = TP_Entrace;
+                            break;
+                        }
+                        case CL_CLASS(CObjectSentrygun):
+                        {
+                            building_type = Sentry;
+                            break;
+                        }
+                        }
+                        // If we have a valid building
+                        if (building_type != None)
+                        {
+                            // Destroy exit too because we have no idea what is what
+                            if (building_type == TP_Entrace)
+                                g_IEngine->ClientCmd_Unrestricted("destroy 3");
+                            g_IEngine->ClientCmd_Unrestricted(("destroy " + std::to_string(building_type)).c_str());
+                        }
+                    }
+                }
                 stayNearEngineer();
+            }
 
             else if (selectBuilding() != None)
             {
@@ -643,10 +695,7 @@ static bool engineerLogic()
         else if (engineer_recheck.test_and_set(15000))
         {
             if (navToBuildingSpot())
-            {
-                engineer_recheck.update();
                 return true;
-            }
         }
         break;
     }
@@ -712,6 +761,9 @@ static bool isValidNearPosition(Vector vec, Vector target, const bot_class_confi
     if (dist < config.min || dist > config.max)
         return false;
     if (!IsVectorVisible(vec, target, true, LOCAL_E, MASK_PLAYERSOLID))
+        return false;
+    // Check if safe
+    if (!nav::isSafe(nav::findClosestNavSquare(target)))
         return false;
     return true;
 }
@@ -904,10 +956,8 @@ static bool stayNearEngineer()
     }
 
     static Timer wait_until_stay_near{};
-    if (current_task == task::engineer_task::staynear_engineer)
-    {
+    if (current_engineer_task == task::engineer_task::staynear_engineer)
         return true;
-    }
     else if (wait_until_stay_near.test_and_set(4000))
     {
         // We're doing nothing? Do something!
@@ -1189,6 +1239,7 @@ static bool getHealthAndAmmo(int metal)
                     if (nav::navTo(pack, health < 0.64f || lowAmmo ? 10 : 3, true, false))
                     {
                         current_task = { task::health, health < 0.64f ? 10 : 3 };
+                        return true;
                     }
                 }
             }

@@ -84,7 +84,7 @@
             <AutoVariable width="fill" target="zk.style.task.color.border" label="Border"/>
             <AutoVariable width="fill" target="zk.style.task.color.background.hover" label="Hover"/>
             <AutoVariable width="fill" target="zk.style.task.color.text.focused" label="Text focused"/>
-            <AutoVariable width="fill" target="zk.style.task.color.text.open" label="Text open"/>
+            <AutoVariable width="fill" target="zk.style.task.color.text.open" label="Text Open"/>
             <AutoVariable width="fill" target="zk.style.task.color.text.closed" label="Text closed"/>
         </List>
     </Box>

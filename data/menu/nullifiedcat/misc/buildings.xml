@@ -1,5 +1,5 @@
-<Tab name="Buildings" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Buildings">
+<Tab name="Engineer-Bot" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Engineer-Bot">
         <List width="200">
             <AutoVariable width="fill" target="autorepair.enabled" label="Enable auto repair"/> 
             <AutoVariable width="fill" target="autorepair.silent" label="Silent"/> 

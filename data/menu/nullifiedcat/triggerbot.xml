@@ -1,10 +1,10 @@
 <Tab name="Trigger">
     <TabContainer width="fill" height="fill">
-        <Tab name="Trigger Bot" padding="6 6 6 6">
-            <Box name="Trigger Bot" padding="12 6 6 6" width="content" height="content">
+        <Tab name="Trigger bot" padding="6 6 6 6">
+            <Box name="Trigger bot" padding="12 6 6 6" width="content" height="content">
                 <List width="150">
                     <AutoVariable width="fill" target="trigger.enable" label="Enable trigger bot"/>
-                    <LabeledObject width="fill" label="Trigger key mode">
+                    <LabeledObject width="fill" label="Trigger key mode" tooltip="Optional: what should the key set below do?">
                         <Select target="trigger.key.mode">
                             <Option name="Disable" value="0"/>
                             <Option name="Pressed" value="1"/>
@@ -14,7 +14,7 @@
                     </LabeledObject>
                     <AutoVariable width="fill" target="trigger.key.button" label="Aim key"/>
                     <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
-                    <AutoVariable width="fill" target="trigger.zoomed-only" label="Zoomed only"/>
+                    <AutoVariable width="fill" target="trigger.zoomed-only" label="Zoomed only" tooltip="When applicable, only fire when zoomed."/>
                     <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy mode" min="0" max="10"/>
                     <AutoVariable width="fill" target="trigger.delay" label="Delay" min="0" max="1"/>
                 </List>
@@ -29,12 +29,12 @@
                         </Select>
                     </LabeledObject>
                     <AutoVariable width="fill" target="trigger.target.max-range" label="Max range"/>
-                    <AutoVariable width="fill" target="trigger.target.teammates" label="Teammates"/>
-                    <AutoVariable width="fill" target="trigger.target.stickybombs" label="Stickybombs"/>
+                    <AutoVariable width="fill" target="trigger.target.teammates" label="Teammates" tooltip="Fire on teammates."/>
+                    <AutoVariable width="fill" target="trigger.target.stickybombs" label="Stickybombs" tooltip="Fire upon stickybombs."/>
                     <AutoVariable width="fill" target="trigger.target.buildings-sentry" label="Sentry guns"/>
                     <AutoVariable width="fill" target="trigger.target.buildings-other" label="Other buildings"/>
-                    <AutoVariable width="fill" target="trigger.target.ignore-cloaked-spies" label="Ignore cloaked spies"/>
-                    <AutoVariable width="fill" target="trigger.target.ignore-vaccinator" label="Ignore vaccinator uber"/>
+                    <AutoVariable width="fill" target="trigger.target.ignore-cloaked-spies" label="Ignore Cloaked Spies"/>
+                    <AutoVariable width="fill" target="trigger.target.ignore-vaccinator" label="Ignore Vaccinator uber"/>
                 </List>
             </Box>
         </Tab>

@@ -1338,7 +1338,6 @@ netvar.iHealth));
 
 bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedEntity *self, unsigned int mask)
 {
-
     if (!enviroment_only)
     {
         trace_t trace_visible;
@@ -1361,6 +1360,17 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_entity, &trace_visible);
         return (trace_visible.fraction == 1.0f);
     }
+}
+
+bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
+{
+    trace_t trace_visible;
+    Ray_t ray;
+
+    ray.Init(origin, target);
+    PROF_SECTION(IEVV_TraceRay);
+    g_ITrace->TraceRay(ray, mask, &trace::filter_navigation, &trace_visible);
+    return (trace_visible.fraction == 1.0f);
 }
 
 void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)

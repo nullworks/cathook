@@ -6,7 +6,7 @@
             <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>
             <LabeledObject width="fill" label="Software cursor mode">
-                <Select target="visual.software-cursor-mode">
+                <Select target="visual.software-cursor-mode" tooltip="Advanced users only">
                     <Option name="Keep" value="0"/>
                     <Option name="Always" value="1"/>
                     <Option name="Never" value="2"/>

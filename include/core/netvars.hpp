@@ -54,6 +54,10 @@ public:
     // dispenser
     offset_t m_iAmmoMetal; // dispenser metal reserve
 
+    // round timer
+    offset_t m_nSetupTimeLength;
+    offset_t m_nState;
+
     offset_t iLifeState;
     offset_t iCond;
     offset_t iCond1;

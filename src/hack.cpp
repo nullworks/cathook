@@ -21,6 +21,7 @@
 #include <pwd.h>
 
 #include <hacks/hacklist.hpp>
+#include "teamroundtimer.hpp"
 #if EXTERNAL_DRAWING
 #include "xoverlay.h"
 #endif
@@ -336,6 +337,7 @@ free(logname);*/
     InitNetVars();
     g_pLocalPlayer    = new LocalPlayer();
     g_pPlayerResource = new TFPlayerResource();
+    g_pTeamRoundTimer = new CTeamRoundTimer();
 
     velocity::Init();
     playerlist::Load();
@@ -394,6 +396,10 @@ void hack::Shutdown()
     ConVar_Unregister();
     logging::Info("Unloading sharedobjects..");
     sharedobj::UnloadAllSharedObjects();
+    logging::Info("Deleting global interfaces...");
+    delete g_pLocalPlayer;
+    delete g_pTeamRoundTimer;
+    delete g_pPlayerResource;
     if (!hack::game_shutdown)
     {
         logging::Info("Running shutdown handlers");

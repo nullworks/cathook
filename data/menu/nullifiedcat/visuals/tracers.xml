@@ -8,7 +8,7 @@
             <AutoVariable width="fill" target="tracers.line-opaqueness" label="Line opacity" min="0" max="1.01" step="0.05"/>
             <AutoVariable width="fill" target="tracers.min-fov" label="Min FOV"/>
             <AutoVariable width="fill" target="tracers.max-dist" label="Max distance"/>
-            <LabeledObject width="fill" label="Show Friends">
+            <LabeledObject width="fill" label="Show friends">
                 <Select width="150" target="tracers.draw-friends">
                     <Option name="Don't show friends" value="0"/>
                     <Option name="Friends in enemy team" value="1"/>

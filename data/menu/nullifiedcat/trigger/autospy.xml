@@ -15,7 +15,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Auto Dead Ringer" x="185">
         <List width="150">
             <AutoVariable width="fill" target="auto-deadringer.enable" label="Enable auto Dead Ringer"/>
-        <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
+            <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
         </List>
     </Box>
 </Tab>

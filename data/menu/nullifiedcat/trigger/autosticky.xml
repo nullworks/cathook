@@ -4,7 +4,7 @@
             <AutoVariable width="fill" target="autosticky.enable" label="Enable auto sticky" tooltip="Auto detonate stickies."/>
             <AutoVariable width="fill" target="autosticky.buildings" label="Detonate on buildings"/>
             <AutoVariable width="fill" target="autosticky.legit" label="Legit mode" tooltip="Require line of sight and ignores invisible spies."/>
-            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't blow me up"/>
+            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't blow me up" tooltip="Don't detonate if you would recieve damage."/>
             <AutoVariable width="fill" target="autosticky.min-dist" label="Min distance" min="0" max="130" step="5"/>
         </List>
     </Box>

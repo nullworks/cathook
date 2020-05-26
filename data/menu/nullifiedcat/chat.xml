@@ -15,8 +15,8 @@
             </LabeledObject>
             <AutoVariable width="fill" target="spam.filename" label="Custom spam"/>
             <AutoVariable width="fill" target="spam.random" label="Randomize"/>
-            <AutoVariable width="fill" target="spam.delay" label="Spam delay"/>
-            <AutoVariable width="fill" target="spam.teamchat" label="Spam in teamchat"/>
+            <AutoVariable width="fill" target="spam.delay" label="Spam delay" tooltip="Delay in milliseconds"/>
+            <AutoVariable width="fill" target="spam.teamchat" label="Spam in teamchat" tooltip="Spam in teamchat instead of game chat"/>
         </List>
     </Box>
     <Box name="Voice spam" width="content" height="content" padding="12 6 6 6" y="100">
@@ -27,24 +27,24 @@
                     <Option name="Random" value="1"/>
                     <Option name="Medic" value="2"/>
                     <Option name="Thanks" value="3"/>
-                    <Option name="Nice shot" value="4"/>
+		    <Option name="Nice shot" value="4"/>
                     <Option name="Cheers" value="5"/>
                     <Option name="Jeers" value="6"/>
                 </Select>
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Chat Log" y="135">
+    <Box padding="12 6 6 6" width="content" height="content" name="Chat log" y="135">
         <List width="150">
             <AutoVariable width="fill" target="chat-log.enable" label="Enable chat log"/>
-            <AutoVariable width="fill" target="chat-log.no-ipc" label="Ignore IPC"/>
-            <AutoVariable width="fill" target="chat-log.no-spam" label="Anti spam"/>
+            <AutoVariable width="fill" target="chat-log.no-ipc" label="Ignore IPC" tooltip="Don't save IPC chat."/>
+            <AutoVariable width="fill" target="chat-log.no-spam" label="Anti spam" tooltip="Don't save your chat spam to the log"/>
         </List>
     </Box>
     <Box name="Chat censor" width="content" height="content" padding="12 6 6 6" y="200">
         <List width="150">
-            <AutoVariable width="fill" target="chat.censor.enable" label="Enable chat censor" tooltip="Censors cheating accusations."/>
-            <AutoVariable width="fill" target="chat.censor.filter" label="filter"/>
+            <AutoVariable width="fill" target="chat.censor.enable" label="Enable chat censor" tooltip="Censors cheating accusations. Hides phrases like 'cheat' and 'kick'."/>
+            <AutoVariable width="fill" target="chat.censor.filter" label="Filter"/>
         </List>
     </Box>
     <Box name="Killsay" width="177" height="content" padding="12 6 6 6" x="170">
@@ -59,7 +59,7 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="killsay.file" label="Custom killsay"/>
-            <AutoVariable width="fill" target="killsay.delay" label="Killsay delay"/>
+            <AutoVariable width="fill" target="killsay.delay" label="Killsay delay" tooltip="Delay in milliseconds"/>
             <Box name="Critsay" width="165" height="content" padding="12 6 6 6">
                 <List width="150">
                     <LabeledObject width="fill" label="Critsay mode">
@@ -75,9 +75,9 @@
             </Box>
         </List>
     </Box>
-    <Box name="Uber spam" width="content" height="content" padding="12 6 6 6" x="352">
+    <Box name="Uber chat" width="content" height="content" padding="12 6 6 6" x="352">
         <List width="150">
-            <LabeledObject width="fill" label="Source" tooltip="Automatically send uber % in chat.">
+            <LabeledObject width="fill" label="Source" tooltip="Automatically sends uber % to chat.">
                 <Select target="uberspam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Default" value="1"/>
@@ -85,19 +85,19 @@
                     <Option name="Custom" value="3"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="uberspam.file" label="Custom spam"/>
-            <AutoVariable width="fill" target="uberspam.team-chat" label="Team chat"/>
-            <AutoVariable width="fill" target="uberspam.triggers.ended" label="Uber end"/>
-            <AutoVariable width="fill" target="uberspam.triggers.ready" label="Uber ready"/>
-            <AutoVariable width="fill" target="uberspam.triggers.used" label="Uber used"/>
-            <AutoVariable width="fill" target="uberspam.triggers.every-n-percent" label="Every %"/>
+            <AutoVariable width="fill" target="uberspam.file" label="Custom uber chat"/>
+            <AutoVariable width="fill" target="uberspam.team-chat" label="Team Chat" tooltip="Only send uber chat to teamchat."/>
+            <AutoVariable width="fill" target="uberspam.triggers.ended" label="Uber End"/>
+            <AutoVariable width="fill" target="uberspam.triggers.ready" label="Uber Ready"/>
+            <AutoVariable width="fill" target="uberspam.triggers.used" label="Uber Used"/>
+            <AutoVariable width="fill" target="uberspam.triggers.every-n-percent" label="Every %" tooltip="Increment of percent of uber to send info to chat."/>
             <!-- FIXME add button -->
         </List>
     </Box>
     <Box name="Misc" width="content" height="content" padding="12 6 6 6" x="352" y="130">
         <List width="150">
-            <AutoVariable width="fill" target="chat.clean" label="Remove newlines"/>
-            <AutoVariable width="fill" target="chat.anti-spam" label="Anti-spam"/>
+            <AutoVariable width="fill" target="chat.clean" label="Remove newlines" tooltip="Hides newline spam."/>
+            <AutoVariable width="fill" target="chat.anti-spam" label="Anti-spam" tooltip="Hides chat spam."/>
             <AutoVariable width="fill" target="chat.crypto" label="Crypto chat"/>
             <AutoVariable width="fill" target="chat.prefix-newlines" label="Newlines"/>
             <AutoVariable width="fill" target="chat.log-events" label="Event logger"/>
@@ -109,7 +109,7 @@
             <AutoVariable width="fill" target="chat.log-events.death" label="Log death events"/>
             <AutoVariable width="fill" target="chat.log-events.spawn" label="Log (re)spawn events"/>
             <AutoVariable width="fill" target="chat.log-events.changeclass" label="Log class change events"/>
-            <AutoVariable width="fill" target="chat.identify" label="Identify"/>
+            <AutoVariable width="fill" target="chat.identify" label="Identify" tooltip="Identify Cathook users."/>
             <AutoVariable width="fill" target="chat.identify.answer" label="Counter identify"/>
         </List>
     </Box>
@@ -125,7 +125,7 @@
             <AutoVariable width="fill" target="votelogger.restart-on-kick" label="Crash when kicked"/>
         </List>
     </Box>
-    <Box name="Command & control" width="content" height="content" padding="12 6 6 6" y="235">
+    <Box name="Command & Control" width="content" height="content" padding="12 6 6 6" y="235">
         <List width="150">
             <AutoVariable width="fill" target="irc.cc.channel" label="Channel"/>
             <AutoVariable width="fill" target="irc.cc.password" label="Password"/>

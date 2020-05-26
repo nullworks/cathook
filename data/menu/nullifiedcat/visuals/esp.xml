@@ -1,8 +1,8 @@
 <Tab name="ESP" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="ESP">
         <List width="150">
-            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception."/>
-            <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Dont Show ESP of enemies behind walls."/>
+            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception"/>
+            <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Dont show ESP of enemies behind walls"/>
             <AutoVariable width="fill" target="esp.range" label="Max range"/>
             <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP"/>
         </List>
@@ -10,7 +10,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="81">
         <List width="150">
             <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP"/>
-            <AutoVariable width="fill" target="esp.show.local" label="Self ESP"/>
+            <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Toggles ESP on self."/>
             <AutoVariable width="fill" target="esp.show.buildings" label="Building ESP"/>
             <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
             <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
@@ -19,7 +19,7 @@
             <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
             <AutoVariable width="fill" target="esp.show.tank" label="Tank ESP"/>
             <AutoVariable width="fill" target="esp.item.money" label="MvM money"/>
-            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money will automatically be acquired."/>
+            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money is automatically collected."/>
             <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
             <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
@@ -65,9 +65,9 @@
             <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
-            <AutoVariable width="fill" target="esp.bones.color" label="Bone color"/>
+            <AutoVariable width="fill" target="esp.bones.color" label="Bone color" tooltip="Colors bones according to player state."/>
             <AutoVariable width="fill" target="esp.sightlines" label="Sightlines"/>
-            <AutoVariable width="fill" target="esp.expand" label="Expand"/>
+            <AutoVariable width="fill" target="esp.expand" label="Expand" tooltip="Make ESP larger or smaller."/>
             <LabeledObject width="fill" label="Text position">
                 <Select target="esp.text-position">
                     <Option name="Top right" value="0"/>
@@ -91,7 +91,7 @@
                     <Option name="Bottom" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Health node" tooltip="Sets the healthbar mode">
+            <LabeledObject width="fill" label="Health mode" tooltip="Sets the healthbar mode.">
                 <Select target="esp.health-bar">
                     <Option name="None" value="0"/>
                     <Option name="Top horizontal" value="1"/>

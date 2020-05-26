@@ -104,20 +104,21 @@ static void spectatorUpdate()
         // Disable if being spectated in first person
     case 1:
         if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->FIRSTPERSON)
+        {
             enable = *specenable;
             slow_aim = *specslow;
             fov = *specfov;
-            return;
+        }
         break;
         // Disable if being spectated
     case 2:
         if (g_pLocalPlayer->spectator_state != g_pLocalPlayer->NONE)
+        {
             enable = *specenable;
             slow_aim = *specslow;
             fov = *specfov;
-            return;
+        }
     };
-    return;
 }
 
 #if ENABLE_VISUALS

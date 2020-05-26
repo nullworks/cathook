@@ -15,14 +15,14 @@
             <AutoVariable width="fill" target="aimbot.slow" label="Slow aimbot" min="0" max="30"/>
             <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the aimbot to a certain FOV from the crosshair."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle" tooltip="Shows the Aimbot's FOV."/>
-            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV Opacity" min="0" max="1" step="0.05" tooltip="Controls the FOV circle's opacity."/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV opacity" min="0" max="1" step="0.05" tooltip="Controls the FOV circle's opacity."/>
             <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only shoot when able"/>
             <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss chance" tooltip="% chance the aimbot will miss on purpose."/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="340">
+    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" y="215">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"/>
             <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
@@ -83,7 +83,7 @@
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.target.max-range" label="Max range"/>
             <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
-            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance Only" tooltip="Aimbot is only active if your mouse has moved in the last half second."/>
+            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only" tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
             <AutoVariable width="fill" target="aimbot.lock-target" label="Lock Target" tooltip="Lock onto a target until they die or leave your fov."/>
             <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only"/>
             <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim at stickybombs"/>
@@ -94,7 +94,7 @@
             <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore Dead Ringer Spies"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="215">
+    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" x="170" y="255">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.no-spread" label="No Spread" tooltip="Projectiles won't have any spread. Independant of aimbot."/>
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
@@ -104,9 +104,9 @@
             <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky threshold"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340" y="125">
+    <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">
         <List width="150">
-            <LabeledObject width="fill" label="Spectator mode" tooltip="Firstperson: disable if at least one spectator is in firstperson. Spectated: disable if you are being spectated at all.">
+            <LabeledObject width="fill" label="Spectator mode" tooltip="Always on: the settings below will never override main aimbot settings. Firstperson: enable below settings if at least one person is spectating you in first person. Spectated: enable below settings if you are being spectated at all.">
                 <Select target="aimbot.spectator-mode">
                     <Option name="Always on" value="0"/>
                     <Option name="Firstperson" value="1"/>
@@ -115,10 +115,10 @@
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.spectator.enable" label="Aimbot enable" tooltip="Should the aimbot be enabled based on the above?"/>
             <AutoVariable width="fill" target="aimbot.spectator.fov" label="Spectated FOV" tooltip="FOV for the aimbot when in spectated mode."/>
-            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow" tooltip="Smoothing for the aimbot when in spectated mode." min="0" max="30"/>
+            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow" min="0" max="30"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="210">
+    <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking" tooltip="Allow hitting enemies in the past."/>
             <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at backtracking" tooltip="Aim at backtrack ticks"/>
@@ -143,7 +143,7 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="170" y="255">
+    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="340" y="280">
         <List width="150">
             <AutoVariable width="fill" target="sandwichaim.enable" label="Enable Sandvich aimbot"/>
             <AutoVariable width="fill" target="sandwichaim.aimkey" label="Aimkey"/>

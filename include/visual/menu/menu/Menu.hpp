@@ -25,7 +25,7 @@ namespace style::colors
 {
 using color_type = settings::RVariable<rgba_t>;
 
-extern settings::RVariable<rgba_t> color_open;
+extern color_type text;
 extern color_type text_shadow;
 extern color_type error;
 } // namespace style::colors

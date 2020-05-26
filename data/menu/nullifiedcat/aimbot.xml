@@ -113,13 +113,17 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="125">
         <List width="150">
-            <AutoVariable width="fill" target="backtrack.enable" label="Enable backtracking" tooltip="Allow hitting enemies where they were in the past."/>
-            <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at backtracking"/>
-            <AutoVariable width="fill" target="backtrack.latency" label="Fake latency" min="0" max="1000" step="25"/>
-            <AutoVariable width="fill" target="backtrack.draw" label="Draw backtrack"/>
-            <AutoVariable width="fill" target="backtrack.draw-skeleton" label="Draw skeleton"/>
-            <AutoVariable width="fill" target="backtrack.chams_glow" label="Chams/glow support"/>
-            <LabeledObject width="fill" label="Backtrack slots">
+            <AutoVariable width="fill" target="backtrack.enabled" label="Enable Backtracking" tooltip="Allow hitting enemies in the past."/>
+            <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at Backtracking" tooltip="Aim at Backtrack ticks"/>
+            <AutoVariable width="fill" target="misc.ping-reducer.enable" label="Ping Reducer"/>
+            <AutoVariable width="fill" target="misc.ping-reducer.target" label="Target Ping"/>
+            <AutoVariable width="fill" target="backtrack.latency" label="Fake Latency" min="0" max="1000" step="25"/>
+            <AutoVariable width="fill" target="backtrack.draw" label="Draw Backtrack" tooltip="Draw ticks on screen"/>
+            <AutoVariable width="fill" target="backtrack.chams" label="Backtrack Chams" tooltip="Draw Chams for the ticks (Note that transparent viewmodels make them transparent if the entity being backtracked walks off-screen)"/>
+            <AutoVariable width="fill" target="backtrack.chams.ticks" label="Chams Amount" tooltip="How many ticks to draw (WARNING, this can cause lag)"/>
+            <AutoVariable width="fill" target="backtrack.chams.color" label="Chams Color" tooltip="Color for the chams."/>
+            <AutoVariable width="fill" target="backtrack.chams.color.solid" label="Solid Color" tooltip="Draw a Solid color instead of tinting the model"/>
+            <LabeledObject width="fill" label="Backtrack Slots">
                 <Select target="backtrack.slots">
                     <Option name="All" value="0"/>
                     <Option name="Primary" value="1"/>

@@ -68,18 +68,34 @@ static void updateAntiAfk()
     }
     else
     {
+        Vector vel(0.0f);
+        if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+            velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
+        // We are moving, make the timer a bit longer (only a bit to avoid issues with random movement)
+        if (!vel.IsZero(1.0f))
+        {
+            anti_afk_timer.last += std::chrono::milliseconds(400);
+            if (anti_afk_timer.last > std::chrono::system_clock::now())
+                anti_afk_timer.update();
+        }
         static auto afk_timer = g_ICvar->FindVar("mp_idlemaxtime");
         if (!afk_timer)
             afk_timer = g_ICvar->FindVar("mp_idlemaxtime");
         // Trigger 10 seconds before kick
-        else if (afk_timer->m_nValue != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
+        else if (afk_timer->GetInt() != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
         {
             // Just duck tf
             if (current_user_cmd->buttons & (IN_DUCK | IN_JUMP))
                 current_user_cmd->buttons &= ~(IN_DUCK | IN_JUMP);
             else
                 current_user_cmd->buttons = IN_DUCK | IN_JUMP;
-            if (anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 + 1000))
+
+            // Game also checks if you move if you are in spawn, so spam movement keys alternatingly
+            bool flip = false;
+            current_user_cmd->buttons |= flip ? IN_FORWARD : IN_BACK;
+            // Flip flip
+            flip = !flip;
+            if (anti_afk_timer.check(afk_timer->GetInt() * 60 * 1000 + 1000))
             {
                 anti_afk_timer.update();
             }
@@ -277,10 +293,10 @@ void CreateMove()
                 cmdrate = g_ICvar->FindVar("cl_cmdrate");
                 return;
             }
-            int ping        = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
+            int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
             if (*force_ping <= ping && cmdrate->GetInt() != -1)
             {
-                oldCmdRate = cmdrate->GetInt();
+                oldCmdRate         = cmdrate->GetInt();
                 cmdrate->m_fMaxVal = 999999999.9f;
                 cmdrate->m_fMinVal = -999999999.9f;
                 cmdrate->SetValue(-1);
@@ -821,16 +837,23 @@ static InitRoutine init_pyrovision([]() {
             cart_patch2.Shutdown();
         }
     });
+    EC::Register(
+        EC::Shutdown,
+        []() {
+            cart_patch1.Shutdown();
+            cart_patch2.Shutdown();
+        },
+        "cartpatch_shutdown");
     ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
         static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
         if (cmdrate == nullptr)
         {
-          cmdrate = g_ICvar->FindVar("cl_cmdrate");
-          return;
+            cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            return;
         }
         if (!after && cmdrate->GetInt() != oldCmdRate)
             cmdrate->SetValue(oldCmdRate);
-    });;
+    });
 #endif
 });
 #endif
@@ -838,8 +861,6 @@ static InitRoutine init_pyrovision([]() {
 static CatCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
 void Shutdown()
 {
-    if (CE_BAD(LOCAL_E))
-        return;
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
     // unpatching local player
     render_zoomed = false;
@@ -885,6 +906,7 @@ static InitRoutine init([]() {
         []() {
             stealth_kill.Shutdown();
             cyoa_patch.Shutdown();
+            tryPatchLocalPlayerShouldDraw(false);
         },
         "shutdown_stealthkill");
     dont_hide_stealth_kills.installChangeCallback([](settings::VariableBase<bool> &, bool after) {

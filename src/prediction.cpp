@@ -19,7 +19,9 @@ Vector SimpleLatencyPrediction(CachedEntity *ent, int hb)
     Vector result;
     GetHitbox(ent, hb, result);
     float latency = g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_INCOMING);
-    result += CE_VECTOR(ent, netvar.vVelocity) * latency;
+    Vector velocity;
+    velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
+    result += velocity * latency;
     return result;
 }
 
@@ -140,7 +142,9 @@ void Prediction_PaintTraverse()
             auto ent = ENTITY(i);
             if (CE_BAD(ent) || !ent->m_bAlivePlayer())
                 continue;
-            auto data = Predict(ent->m_vecOrigin(), 0.0f, CE_VECTOR(ent, netvar.vVelocity), Vector(0, 0, -sv_gravity->GetFloat()), std::make_pair(RAW_ENT(ent)->GetCollideable()->OBBMins(), RAW_ENT(ent)->GetCollideable()->OBBMaxs()), 0.0f, 32);
+            Vector velocity;
+            velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
+            auto data = Predict(ent->m_vecOrigin(), 0.0f, velocity, Vector(0, 0, -sv_gravity->GetFloat()), std::make_pair(RAW_ENT(ent)->GetCollideable()->OBBMins(), RAW_ENT(ent)->GetCollideable()->OBBMaxs()), 0.0f, 32);
             Vector previous_screen;
             if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
                 continue;
@@ -185,7 +189,8 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     CUserCmd fakecmd{};
     memset(&fakecmd, 0, sizeof(CUserCmd));
 
-    Vector vel             = CE_VECTOR(entity, netvar.vVelocity);
+    Vector vel;
+    velocity::EstimateAbsVelocity(RAW_ENT(entity), vel);
     fakecmd.command_number = last_cmd_number;
     fakecmd.forwardmove    = vel.x;
     fakecmd.sidemove       = -vel.y;
@@ -364,7 +369,8 @@ Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravit
             onground = true;
     }
 
-    Vector velocity           = CE_VECTOR(ent, netvar.vVelocity);
+    Vector velocity;
+    velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
     static ConVar *sv_gravity = g_ICvar->FindVar("sv_gravity");
     Vector acceleration       = { 0.0f, 0.0f, -(sv_gravity->GetFloat() * entgmod) };
     float steplength          = ((float) (2 * range) / (float) maxsteps);

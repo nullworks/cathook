@@ -6,21 +6,25 @@ GIT=${1:-false}
 SUDO=${CH_SUDO:-sudo}
 FORCEYES=${CH_DEPENDENCYCHECK_FORCEYES:-false}
 
+gentoo_packages=(dev-vcs/git dev-libs/boost dev-util/cmake sys-devel/gcc sys-devel/gdb media-libs/libsdl2 media-libs/glew media-libs/freetype net-misc/rsync media-libs/libglvnd dev-util/dialog)
 arch_packages=(git boost cmake make gcc gdb lib32-sdl2 lib32-glew lib32-freetype2 rsync lib32-libglvnd dialog)
 ubuntu_packages=(build-essential git g++ g++-multilib libboost-dev gdb libsdl2-dev:i386 libfreetype6-dev:i386 cmake dialog rsync)
 fedora_packages=(cmake dialog make gcc-c++ glibc-devel.i686 freetype-devel.i686 SDL2-devel.i686 glew-devel.i686 boost-devel rsync gdb git)
 
 # Check if we should only install git
 if [ "$GIT" == true ]; then
+    gentoo_packages=(dev-vcs/git)
     arch_packages=(git)
     ubuntu_packages=(git)
     fedora_packages=(git)
 fi
 
-function requestPermissions {
-    string=$@
+requestPermissions()
+{
+#TODO: This should be in a switch case as well.
+    string=$*
+    # Ayy
     if [ "$FORCEYES" == "true" ]; then
-        # Ayy
         return
     # Prefer GUI question
     elif [ -x "$(command -v zenity)" ] && xset q &>/dev/null; then
@@ -29,7 +33,7 @@ function requestPermissions {
         if [ "$out" != 0 ]; then
             exit
         fi
-        # Fall back to terminal
+    # Fall back to terminal
     elif [ -t 0 ]; then
         read -p "Do you want to install the following packages required for cathook? ${string} y/n " -r
         if ! [[ $REPLY =~ ^[Yy]$ ]]
@@ -43,53 +47,75 @@ function requestPermissions {
 }
 
 # Determine distro
-OSR="$(awk -F= '$1=="ID" { print $2 ;}' /etc/os-release)"
-if [[ ("$OSR" == "manjaro" || "$OSR" == "arch") && -x "$(command -v pacman)" ]]; then
-    OS="arch"
-elif [ "$OSR" == "ubuntu" ] && [ -x "$(command -v apt-get)" ]; then
-    OS="ubuntu"
-elif [ "$OSR" == "fedora" ] && [ -x "$(command -v dnf)" ] && [ -x "$(command -v rpm)" ]; then
-    OS="fedora"
-elif [ -x "$(command -v pacman)" ]; then
-    OS="arch"
-elif [ -x "$(command -v apt-get)" ]; then
-    OS="ubuntu"
-elif [ -x "$(command -v dnf)" ] && [ -x "$(command -v rpm)" ]; then
-    OS="fedora"
-fi
+# TODO: Bedrock Linux should also be supported.
+# TODO: $(command -v rpm) was removed and not replaced; I don't use Fedora, do it yourself.
+#
+DISTRO="$(awk -F= '$1=="ID" { print $2 ;}' /etc/os-release)"
+case "$DISTRO" in
+    "gentoo")
+        [ "$(type emerge)" ] || { printf "/etc/os-release outputs 'ID=gentoo' but Portage is not present, exiting.."; exit; }
+        OS="gentoo"
+    ;;
+    "manjaro")
+        [ "$(type pacman)" ] || { printf "/etc/os-release outputs 'ID=manjaro' but Pacman is not present, exiting.."; exit; }
+        OS="arch"
+    ;;
+    "arch")
+        [ "$(type pacman)" ] || { printf "/etc/os-release outputs 'ID=arch' but Pacman is not present, exiting.."; exit; }
+        OS="arch"
+    ;;
+    "ubuntu")
+        [ "$(type apt-get)" ] || { printf "/etc/os-release outputs 'ID=ubuntu' but APT is not present, exiting.."; exit; }
+        OS="ubuntu"
+    ;;
+    "fedora")
+        [ "$(type dnf)" ] || { printf "/etc/os-release outputs 'ID=fedora' but DNF is not present, exiting.."; exit; }
+        OS="fedora"
+    ;;
+esac
 
-if [ "$OS" == "arch" ]; then
-    pacman -Qi "${arch_packages[@]}" > /dev/null 2>&1
-    out=$?
-    if [ "$out" == 1 ]; then
-        requestPermissions "${arch_packages[@]}"
-        $SUDO pacman -S --noconfirm --needed "${arch_packages[@]}"
-    fi
-elif [ "$OS" == "ubuntu" ]; then
-    dpkg -s "${ubuntu_packages[@]}" > /dev/null 2>&1
-    out=$?
-    if [ "$out" == 0 ]; then
-        dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+case "$OS" in
+    "gentoo")
+        requestPermissions "${gentoo_packages[@]}"
+        # -U (--newuse): Installed packages that have no changes are excluded.
+        USE=abi_x86_32 $SUDO emerge -avU "${gentoo_packages[@]}"
+    ;;
+    "arch")
+        pacman -Qi "${arch_packages[@]}" > /dev/null 2>&1
         out=$?
-    fi
-    if [ "$out" == 1 ]; then
-        requestPermissions "${ubuntu_packages[@]}"
-        pkgs="${ubuntu_packages[@]}"
-        $SUDO bash -c "apt-get update;dpkg --add-architecture i386;apt-get update;apt-get install -y $pkgs"
-        # Check if cmake is up to date enough
-        dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
-        out=$?
-        if [ "$out" == 1 ]; then
-            $SUDO bash -c "apt install -y software-properties-common && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main' && apt-get install -y cmake"
+        if [ "$out" = 1 ]; then
+            requestPermissions "${arch_packages[@]}"
+            $SUDO pacman -S --noconfirm --needed "${arch_packages[@]}"
         fi
-    fi
-elif [ "$OS" == "fedora" ]; then
-    rpm -q "${fedora_packages[@]}" > /dev/null 2>&1
-    out=$?
-    if [ "$out" != 0 ]; then
-        requestPermissions "${fedora_packages[@]}"
-        $SUDO dnf install -y ${fedora_packages[@]}
-    fi
-else
-    echo -e "\033[1;33m\nWarning! Automatic package installation is not supported!\n\033[0m"
-fi
+    ;;
+    "ubuntu")
+        dpkg -s "${ubuntu_packages[@]}" > /dev/null 2>&1
+        out=$?
+        if [ "$out" = 0 ]; then
+            dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+            out=$?
+        fi
+        if [ "$out" = 1 ]; then
+            requestPermissions "${ubuntu_packages[@]}"
+            pkgs="${ubuntu_packages[*]}"
+            $SUDO bash -c "apt-get update;dpkg --add-architecture i386;apt-get update;apt-get install -y $pkgs"
+            # Check if cmake is up to date enough
+            dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+            out=$?
+            if [ "$out" = 1 ]; then
+                $SUDO bash -c "apt install -y software-properties-common && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main' && apt-get install -y cmake"
+            fi
+        fi
+    ;;
+    "fedora")
+        rpm -q "${fedora_packages[@]}" > /dev/null 2>&1
+        out=$?
+        if [ "$out" != 0 ]; then
+            requestPermissions "${fedora_packages[@]}"
+            $SUDO dnf install -y "${fedora_packages[@]}"
+        fi
+    ;;
+    "*")
+    printf "\033[1;33m\nWarning! Automatic package installation is not supported!\n\033[0m"
+    ;;
+esac

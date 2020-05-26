@@ -19,27 +19,25 @@ std::string getDataPath(std::string subpath)
 {
     if (!cached_data_path)
     {
-        DIR *dir;
         if (std::getenv("CH_DATA_PATH"))
         {
             cached_data_path = std::getenv("CH_DATA_PATH");
         }
-        else if ((dir = opendir(DATA_PATH)))
-        {
-            cached_data_path = DATA_PATH;
-            closedir(dir);
-        }
         else
         {
+#if ENABLE_BINARYMODE
             std::string xdg_data_dir;
             if (std::getenv("XDG_DATA_HOME"))
                 xdg_data_dir = std::getenv("XDG_DATA_HOME");
             else if (std::getenv("HOME"))
                 xdg_data_dir = std::string(std::getenv("HOME")) + "/.local/share";
+            if (xdg_data_dir.empty())
+                cached_data_path = DATA_PATH;
             else
-                xdg_data_dir = DATA_PATH;
-            cached_data_path = xdg_data_dir + "/cathook/data";
-            logging::Info("Data path: %s", cached_data_path->c_str());
+                cached_data_path = xdg_data_dir + "/cathook/data";
+#else
+            cached_data_path = DATA_PATH;
+#endif
         }
     }
     return *cached_data_path + subpath;

@@ -289,3 +289,4 @@ scripts/updater-preferences
 !/modules/CMakeLists.txt
 
 *.autosave
+

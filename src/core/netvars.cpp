@@ -88,6 +88,10 @@ void NetVars::Init()
         // dispenser
         this->m_iAmmoMetal = gNetvars.get_offset("DT_ObjectDispenser", "m_iAmmoMetal");
 
+        // Round timer
+        this->m_nSetupTimeLength = gNetvars.get_offset("DT_TeamRoundTimer", "m_nSetupTimeLength");
+        this->m_nState           = gNetvars.get_offset("DT_TeamRoundTimer", "m_nState");
+
         // any building
         this->m_iUpgradeMetal           = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeMetal");
         this->m_flPercentageConstructed = gNetvars.get_offset("DT_BaseObject", "m_flPercentageConstructed");

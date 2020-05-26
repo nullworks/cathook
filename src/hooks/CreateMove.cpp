@@ -15,6 +15,7 @@
 #include <hacks/AntiAntiAim.hpp>
 #include "NavBot.hpp"
 #include "HookTools.hpp"
+#include "teamroundtimer.hpp"
 
 #include "HookedMethods.hpp"
 #include "PreDataUpdate.hpp"
@@ -395,14 +396,13 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         // LoadSavedState();
     }
     g_Settings.is_create_move = false;
-    if (nolerp && !hacks::shared::backtrack::isBacktrackEnabled)
+    if (nolerp)
     {
         static const ConVar *pUpdateRate = g_pCVar->FindVar("cl_updaterate");
         if (!pUpdateRate)
             pUpdateRate = g_pCVar->FindVar("cl_updaterate");
         else
         {
-
             float interp = MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / pUpdateRate->GetFloat());
             cmd->tick_count += TIME_TO_TICKS(interp);
         }

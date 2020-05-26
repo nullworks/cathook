@@ -11,6 +11,7 @@
 #include <hacks/Backtrack.hpp>
 #include <PlayerTools.hpp>
 #include <settings/Bool.hpp>
+#include "Backtrack.hpp"
 
 namespace hacks::shared::triggerbot
 {
@@ -38,57 +39,50 @@ float target_time = 0.0f;
 
 int last_hb_traced = 0;
 Vector forward;
-void DoBacktrack()
+
+// Filters for backtrack
+bool tick_filter(CachedEntity *entity, hacks::tf2::backtrack::BacktrackData tick)
 {
-    namespace bt = hacks::shared::backtrack;
+    // Check if it intersects any hitbox
+    int num_hitboxes = 18;
 
-    CachedEntity *tar = (bt::iBestTarget != -1) ? ENTITY(bt::iBestTarget) : nullptr;
-    if (CE_BAD(tar))
-        return;
-    if (bt::BestTick == -1)
-        return;
-    if (!IsTargetStateGood(tar, true))
-        return;
-    auto &tick = bt::headPositions[bt::iBestTarget][bt::BestTick];
-
-    if (!ValidTick(tick, tar))
-        return;
-    auto min = tick.hitboxes.at(head).min;
-    auto max = tick.hitboxes.at(head).max;
-    if (!min.x && !max.x)
-        return;
-
-    // Get the min and max for the hitbox
-    Vector minz(fminf(min.x, max.x), fminf(min.y, max.y), fminf(min.z, max.z));
-    Vector maxz(fmaxf(min.x, max.x), fmaxf(min.y, max.y), fmaxf(min.z, max.z));
-
-    // Shrink the hitbox here
-    Vector size = maxz - minz;
-    Vector smod = size * 0.05f * (int) accuracy;
-
-    // Save the changes to the vectors
-    minz += smod;
-    maxz -= smod;
-
-    // Trace and test if it hits the smaller hitbox, if it fails
-    // we
-    // return false
-    Vector hit;
-
-    if (!IsVectorVisible(g_pLocalPlayer->v_Eye, minz) && !IsVectorVisible(g_pLocalPlayer->v_Eye, maxz))
-        return;
-    if (CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
+    // Only need head hitbox
+    if (HeadPreferable(entity))
+        num_hitboxes = 1;
+    for (int i = 0; i < num_hitboxes; i++)
     {
-        current_user_cmd->tick_count = tick.tickcount;
-        current_user_cmd->buttons |= IN_ATTACK;
-        return;
+        auto hitbox = tick.hitboxes.at(i);
+        auto min    = hitbox.min;
+        auto max    = hitbox.max;
+        // Get the min and max for the hitbox
+        Vector minz(fminf(min.x, max.x), fminf(min.y, max.y), fminf(min.z, max.z));
+        Vector maxz(fmaxf(min.x, max.x), fmaxf(min.y, max.y), fmaxf(min.z, max.z));
+
+        // Shrink the hitbox here
+        Vector size = maxz - minz;
+        // Use entire hitbox if accuracy unset
+        Vector smod = size * 0.05f * (*accuracy > 0 ? *accuracy : 20);
+
+        // Save the changes to the vectors
+        minz += smod;
+        maxz -= smod;
+
+        // Trace and test if it hits the smaller hitbox, if it hits we can return true
+        Vector hit;
+        // Found a good one
+        if (CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
+        {
+            // Is tick visible
+            if (IsVectorVisible(g_pLocalPlayer->v_Eye, hitbox.center))
+                return true;
+        }
     }
+    return false;
 }
 
 // The main function of the triggerbot
 void CreateMove()
 {
-
     float backup_time = target_time;
     target_time       = 0;
 
@@ -99,26 +93,51 @@ void CreateMove()
     // Reset our last hitbox traced
     last_hb_traced = -1;
 
-    // Get and ent in front of the player
-    CachedEntity *ent = FindEntInSight(EffectiveTargetingRange());
+    // Get an ent in front of the player
+    CachedEntity *ent = nullptr;
+    std::optional<hacks::tf2::backtrack::BacktrackData> bt_data;
 
-    // Check if can backtrack, shoot if we can
-    if (hacks::shared::backtrack::isBacktrackEnabled)
+    if (!hacks::tf2::backtrack::isBacktrackEnabled)
+        ent = FindEntInSight(EffectiveTargetingRange());
+    // Backtrack, use custom filter to check if tick is in crosshair
+    else
     {
-        // We need to return because we can't hit non backtrackable ticks if we
-        // have backtrack latency.
-        DoBacktrack();
-        return;
+        // Set up forward Vector
+        float sp, sy, cp, cy;
+        QAngle angle;
+        g_IEngine->GetViewAngles(angle);
+        sy        = sinf(DEG2RAD(angle[1]));
+        cy        = cosf(DEG2RAD(angle[1]));
+        sp        = sinf(DEG2RAD(angle[0]));
+        cp        = cosf(DEG2RAD(angle[0]));
+        forward.x = cp * cy;
+        forward.y = cp * sy;
+        forward.z = -sp;
+        forward   = forward * EffectiveTargetingRange() + g_pLocalPlayer->v_Eye;
+
+        // Call closest tick with our Tick filter func
+        auto closest_data = hacks::tf2::backtrack::getClosestTick(g_pLocalPlayer->v_Eye, hacks::tf2::backtrack::defaultEntFilter, tick_filter);
+
+        // No results, try to grab a building
+        if (!closest_data)
+        {
+            ent = FindEntInSight(EffectiveTargetingRange(), true);
+        }
+        else
+        {
+            // Assign entity
+            ent     = (*closest_data).first;
+            bt_data = (*closest_data).second;
+            hacks::tf2::backtrack::SetBacktrackData(ent, *bt_data);
+        }
     }
 
     // Check if dormant or null to prevent crashes
     if (CE_BAD(ent))
-    {
         return;
-    }
 
     // Determine whether the triggerbot should shoot, then act accordingly
-    if (IsTargetStateGood(ent))
+    if (IsTargetStateGood(ent, bt_data ? &*bt_data : nullptr))
     {
         target_time = backup_time;
         if (delay)
@@ -224,9 +243,8 @@ bool ShouldShoot()
 }
 
 // A second check to determine whether a target is good enough to be aimed at
-bool IsTargetStateGood(CachedEntity *entity, bool backtrack)
+bool IsTargetStateGood(CachedEntity *entity, hacks::tf2::backtrack::BacktrackData *tick)
 {
-
     // Check for Players
     if (entity->m_Type() == ENTITY_PLAYER)
     {
@@ -273,44 +291,47 @@ bool IsTargetStateGood(CachedEntity *entity, bool backtrack)
                 return false;
         }
 
-        // Head hitbox detection
-        if (HeadPreferable(entity) && !backtrack)
+        // Backtrack did these in the tick check
+        if (!tick)
         {
-            if (last_hb_traced != hitbox_t::head)
-                return false;
-        }
-
-        // If usersettings tell us to use accuracy improvements and the cached
-        // hitbox isnt null, then we check if it hits here
-        if (*accuracy && !backtrack)
-        {
-
-            // Get a cached hitbox for the one traced
-            hitbox_cache::CachedHitbox *hb = entity->hitboxes.GetHitbox(last_hb_traced);
-            // Check for null
-            if (hb)
+            // Head hitbox detection
+            if (HeadPreferable(entity))
             {
-                // Get the min and max for the hitbox
-                Vector minz(fminf(hb->min.x, hb->max.x), fminf(hb->min.y, hb->max.y), fminf(hb->min.z, hb->max.z));
-                Vector maxz(fmaxf(hb->min.x, hb->max.x), fmaxf(hb->min.y, hb->max.y), fmaxf(hb->min.z, hb->max.z));
-
-                // Shrink the hitbox here
-                Vector size = maxz - minz;
-                Vector smod = size * 0.05f * *accuracy;
-
-                // Save the changes to the vectors
-                minz += smod;
-                maxz -= smod;
-
-                // Trace and test if it hits the smaller hitbox, if it fails
-                // we
-                // return false
-                Vector hit;
-                if (!CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
+                if (last_hb_traced != hitbox_t::head)
                     return false;
             }
-        }
 
+            // If usersettings tell us to use accuracy improvements and the cached
+            // hitbox isnt null, then we check if it hits here
+            if (*accuracy)
+            {
+
+                // Get a cached hitbox for the one traced
+                hitbox_cache::CachedHitbox *hb = entity->hitboxes.GetHitbox(last_hb_traced);
+                // Check for null
+                if (hb)
+                {
+                    // Get the min and max for the hitbox
+                    Vector minz(fminf(hb->min.x, hb->max.x), fminf(hb->min.y, hb->max.y), fminf(hb->min.z, hb->max.z));
+                    Vector maxz(fmaxf(hb->min.x, hb->max.x), fmaxf(hb->min.y, hb->max.y), fmaxf(hb->min.z, hb->max.z));
+
+                    // Shrink the hitbox here
+                    Vector size = maxz - minz;
+                    Vector smod = size * 0.05f * *accuracy;
+
+                    // Save the changes to the vectors
+                    minz += smod;
+                    maxz -= smod;
+
+                    // Trace and test if it hits the smaller hitbox, if it fails
+                    // we
+                    // return false
+                    Vector hit;
+                    if (!CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
+                        return false;
+                }
+            }
+        }
         // Target passed the tests so return true
         return true;
 
@@ -376,9 +397,8 @@ bool IsTargetStateGood(CachedEntity *entity, bool backtrack)
 }
 
 // A function to return a potential entity in front of the player
-CachedEntity *FindEntInSight(float range)
+CachedEntity *FindEntInSight(float range, bool no_players)
 {
-
     // We dont want to hit ourself so we set an ignore
     trace_t trace;
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
@@ -407,9 +427,11 @@ CachedEntity *FindEntInSight(float range)
     // Return an ent if that is what we hit
     if (trace.m_pEnt)
     {
-
-        last_hb_traced = trace.hitbox;
-        return ENTITY(((IClientEntity *) trace.m_pEnt)->entindex());
+        last_hb_traced    = trace.hitbox;
+        CachedEntity *ent = ENTITY(((IClientEntity *) trace.m_pEnt)->entindex());
+        // Player check
+        if (!no_players || ent->m_Type() != ENTITY_PLAYER)
+            return ent;
     }
 
     // Since we didnt hit and entity, the vis check failed so return 0

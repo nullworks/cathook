@@ -22,6 +22,11 @@ public:
         typedef bool (*fn_t)(IClientEntity *);
         return vfunc<fn_t>(self, offsets::PlatformOffset(184, offsets::undefined, 184), 0)(self);
     }
+    inline static bool ShouldCollide(IClientEntity *self, int collisionGroup, int contentsMask)
+    {
+        typedef bool (*fn_t)(IClientEntity *, int, int);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(198, offsets::undefined, 198), 0)(self, collisionGroup, contentsMask);
+    }
     inline static int &m_nPredictionRandomSeed()
     {
         static int placeholder = 0;

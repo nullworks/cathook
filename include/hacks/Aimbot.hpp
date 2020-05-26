@@ -14,7 +14,6 @@ class IClientEntity;
 
 namespace hacks::shared::aimbot
 {
-bool IsBacktracking();
 extern settings::Boolean ignore_cloak;
 
 // Used to store aimbot data to prevent calculating it again
@@ -30,7 +29,7 @@ struct AimbotCalculatedData_s
 
 // Functions used to calculate aimbot data, and if already calculated use it
 const Vector &PredictEntity(CachedEntity *entity);
-bool VischeckPredictedEntity(CachedEntity *entity, bool Backtracking);
+bool VischeckPredictedEntity(CachedEntity *entity);
 bool BacktrackVisCheck(CachedEntity *entity);
 
 // Variable used to tell when the aimbot has found a target
@@ -45,7 +44,7 @@ void Reset();
 // Stuff to make storing functions easy
 CachedEntity *CurrentTarget();
 bool ShouldAim();
-CachedEntity *RetrieveBestTarget(bool aimkey_state, bool Backtracking = false);
+CachedEntity *RetrieveBestTarget(bool aimkey_state);
 bool IsTargetStateGood(CachedEntity *entity);
 void Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);

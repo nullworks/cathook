@@ -275,34 +275,26 @@ bool shouldMeleeCrit()
 {
     if (!melee || g_pLocalPlayer->weapon_mode != weapon_melee)
         return false;
-    namespace bt = hacks::shared::backtrack;
-    if (bt::isBacktrackEnabled)
+    if (hacks::tf2::backtrack::isBacktrackEnabled)
     {
-        int target = bt::iBestTarget;
+        // Closest tick for melee (default filter carry)
+        auto closest_tick = hacks::tf2::backtrack::getClosestTick(LOCAL_E->m_vecOrigin(), hacks::tf2::backtrack::defaultEntFilter, hacks::tf2::backtrack::defaultTickFilter);
         // Valid backtrack target
-        if (target > 1)
+        if (closest_tick)
         {
-            // Closest tick for melee
-            int besttick = bt::BestTick;
             // Out of range, don't crit
-            if (bt::headPositions[target][besttick].entorigin.DistTo(LOCAL_E->m_vecOrigin()) >= re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W)) + 150.0f)
-            {
+            if ((*closest_tick).second.m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin()) >= re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W)) + 150.0f)
                 return false;
-            }
         }
         else
-        {
             return false;
-        }
     }
     // Normal check, get closest entity and check distance
     else
     {
         auto ent = getClosestEntity(LOCAL_E->m_vecOrigin());
         if (!ent || ent->m_flDistance() >= re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W)) + 150.0f)
-        {
             return false;
-        }
     }
     return true;
 }
@@ -364,14 +356,15 @@ bool canWeaponCrit(bool canShootCheck = true)
 }
 
 // We cycle between the crit cmds so we want to store where we are currently at
-std::vector<int> crit_cmds;
+int current_index = 0;
+// Cache Weapons
+std::map<int, std::vector<int>> crit_cmds;
 
 // We need to store a bunch of data for when we kill someone with a crit
 struct player_status
 {
     int health{};
 };
-int current_index = 0;
 static std::array<player_status, 33> player_status_list{};
 
 // Function for preventing a crit
@@ -399,13 +392,13 @@ void force_crit()
     if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
     {
         // We have valid crit command numbers
-        if (crit_cmds.size())
+        if (crit_cmds.size() && crit_cmds.find(LOCAL_W->m_IDX) != crit_cmds.end() && crit_cmds.find(LOCAL_W->m_IDX)->second.size())
         {
-            if (current_index >= crit_cmds.size())
+            if (current_index >= crit_cmds.at(LOCAL_W->m_IDX).size())
                 current_index = 0;
 
             // Magic crit cmds get used to force a crit
-            current_late_user_cmd->command_number = crit_cmds[current_index];
+            current_late_user_cmd->command_number = crit_cmds.at(LOCAL_W->m_IDX).at(current_index);
             current_late_user_cmd->random_seed    = MD5_PseudoRandom(current_late_user_cmd->command_number) & 0x7FFFFFFF;
             current_index++;
         }
@@ -435,6 +428,7 @@ void force_crit()
             current_late_user_cmd->random_seed    = MD5_PseudoRandom(next_crit) & 0x7FFFFFFF;
         }
     }
+    force_crit_this_tick = false;
 }
 
 // Update the magic crit commands numbers
@@ -447,20 +441,31 @@ void force_crit()
 
 static void updateCmds()
 {
-    auto weapon = RAW_ENT(LOCAL_W);
-    static int last_weapon;
+    auto weapon                = RAW_ENT(LOCAL_W);
+    static int previous_weapon = 0;
 
     // Current command number
     int cur_cmdnum = current_late_user_cmd->command_number;
 
     // Are the cmds too old?
     bool old_cmds = false;
-    for (auto &cmd : crit_cmds)
-        if (cmd < cur_cmdnum)
-            old_cmds = true;
 
-    // Did we switch weapons or the commands are too old?
-    if (weapon->entindex() != last_weapon || old_cmds)
+    // Try to find current weapon
+    auto weapon_cmds = crit_cmds.find(weapon->entindex());
+
+    // Nothing indexed, mark as outdated
+    if (weapon_cmds == crit_cmds.end())
+        old_cmds = true;
+    // Else check if outdated
+    else
+    {
+        for (auto &cmd : weapon_cmds->second)
+            if (cmd < cur_cmdnum)
+                old_cmds = true;
+    }
+
+    // Are the commands too old?
+    if (old_cmds)
     {
         // Used later for the seed
         int xor_dat = (weapon->entindex() << 8 | LOCAL_E->m_IDX);
@@ -468,7 +473,7 @@ static void updateCmds()
             xor_dat = (weapon->entindex() << 16 | LOCAL_E->m_IDX << 8);
 
         // Clear old data
-        crit_cmds.clear();
+        crit_cmds[weapon->entindex()].clear();
         added_per_shot = 0.0f;
 
         // 100000 should be fine performance wise, as they are very spread out
@@ -489,54 +494,55 @@ static void updateCmds()
             if (iResult == 0 && i > cur_cmdnum + 200)
             {
                 // Add to magic crit array
-                crit_cmds.push_back(i);
-
-                // We haven't calculated the amount added to the bucket yet
-                if (added_per_shot == 0.0f)
-                {
-                    weapon_info info(weapon);
-                    typedef float (*AttribHookFloat_t)(float, const char *, IClientEntity *, void *, bool);
-
-                    // Need this to get some stats from weapon
-                    static uintptr_t AttribHookFloat = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 6C C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 8B 75 ? 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 31 DB 89 54 24");
-                    static auto AttribHookFloat_fn   = AttribHookFloat_t(AttribHookFloat);
-
-                    // m_pWeaponInfo->GetWeaponData(m_iWeaponMode).m_nBulletsPerShot;
-
-                    int WeaponData = info.weapon_data;
-                    int WeaponMode = info.weapon_mode;
-                    // Size of one WeaponMode_t is 0x40, 0x6fc is the offset to projectiles per shot
-                    int nProjectilesPerShot = *(int *) (WeaponData + 0x6fc + WeaponMode * 0x40);
-                    if (nProjectilesPerShot >= 1)
-                        nProjectilesPerShot = AttribHookFloat_fn(nProjectilesPerShot, "mult_bullets_per_shot", weapon, 0x0, true);
-                    else
-                        nProjectilesPerShot = 1;
-
-                    // Size of one WeaponMode_t is 0x40, 0x6f8 is the offset to damage
-                    added_per_shot = *(int *) (WeaponData + 0x6f8 + WeaponMode * 0x40);
-                    added_per_shot = AttribHookFloat_fn(added_per_shot, "mult_dmg", weapon, 0x0, true);
-                    added_per_shot *= nProjectilesPerShot;
-                    shots_to_fill_bucket = getBucketCap() / added_per_shot;
-                    // Special boi
-                    if (isRapidFire(weapon))
-                    {
-                        taken_per_crit = added_per_shot;
-                        // Size of one WeaponMode_t is 0x40, 0x70c is the offset to Fire delay
-                        taken_per_crit *= 2.0f / *(float *) (WeaponData + 0x70c + WeaponMode * 0x40);
-
-                        // Yes this looks dumb but i want to ensure that it matches with valve code
-                        int bucket_cap_recasted = (int) getBucketCap();
-                        // Never try to drain more than cap
-                        if (taken_per_crit * 3.0f > bucket_cap_recasted)
-                            taken_per_crit = (float) bucket_cap_recasted / 3.0f;
-                    }
-                }
+                crit_cmds[weapon->entindex()].push_back(i);
                 // We found a cmd, store it
                 j--;
             }
         }
     }
-    last_weapon = weapon->entindex();
+
+    // We haven't calculated the amount added to the bucket yet
+    if (added_per_shot == 0.0f || previous_weapon != weapon->entindex())
+    {
+        weapon_info info(weapon);
+        typedef float (*AttribHookFloat_t)(float, const char *, IClientEntity *, void *, bool);
+
+        // Need this to get some stats from weapon
+        static uintptr_t AttribHookFloat = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 6C C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 8B 75 ? 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 31 DB 89 54 24");
+        static auto AttribHookFloat_fn   = AttribHookFloat_t(AttribHookFloat);
+
+        // m_pWeaponInfo->GetWeaponData(m_iWeaponMode).m_nBulletsPerShot;
+
+        int WeaponData = info.weapon_data;
+        int WeaponMode = info.weapon_mode;
+        // Size of one WeaponMode_t is 0x40, 0x6fc is the offset to projectiles per shot
+        int nProjectilesPerShot = *(int *) (WeaponData + 0x6fc + WeaponMode * 0x40);
+        if (nProjectilesPerShot >= 1)
+            nProjectilesPerShot = AttribHookFloat_fn(nProjectilesPerShot, "mult_bullets_per_shot", weapon, 0x0, true);
+        else
+            nProjectilesPerShot = 1;
+
+        // Size of one WeaponMode_t is 0x40, 0x6f8 is the offset to damage
+        added_per_shot = *(int *) (WeaponData + 0x6f8 + WeaponMode * 0x40);
+        added_per_shot = AttribHookFloat_fn(added_per_shot, "mult_dmg", weapon, 0x0, true);
+        added_per_shot *= nProjectilesPerShot;
+        shots_to_fill_bucket = getBucketCap() / added_per_shot;
+        // Special boi
+        if (isRapidFire(weapon))
+        {
+            taken_per_crit = added_per_shot;
+            // Size of one WeaponMode_t is 0x40, 0x70c is the offset to Fire delay
+            taken_per_crit *= 2.0f / *(float *) (WeaponData + 0x70c + WeaponMode * 0x40);
+
+            // Yes this looks dumb but i want to ensure that it matches with valve code
+            int bucket_cap_recasted = (int) getBucketCap();
+            // Never try to drain more than cap
+            if (taken_per_crit * 3.0f > bucket_cap_recasted)
+                taken_per_crit = (float) bucket_cap_recasted / 3.0f;
+        }
+    }
+
+    previous_weapon = weapon->entindex();
 }
 
 // Fix observed crit chance
@@ -554,10 +560,6 @@ void fixBucket(IClientEntity *weapon, CUserCmd *cmd)
 {
     INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     if (!ch)
-        return;
-    auto addr = ch->GetRemoteAddress();
-    // Local server needs no fixing
-    if (addr.type == NA_LOOPBACK)
         return;
 
     static int last_weapon;
@@ -1029,6 +1031,8 @@ void LevelShutdown()
     last_bucket_fix = -1;
     round_damage    = 0;
     is_out_of_sync  = false;
+    crit_cmds.clear();
+    current_index = 0;
 }
 
 // Prints basically everything you need to know about crits

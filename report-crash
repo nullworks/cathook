@@ -80,7 +80,7 @@ if [ $SYMBOLS == false ]; then
     proccount=$(grep -c '^processor' /proc/cpuinfo)
     \cp ./build/CMakeCache.txt ./scripts/CMakeCacheBackup.txt
     pushd build
-    cmake -Dsymbolize=true .. && cmake --build . --target cathook -- -j$proccount
+    cmake -DInternal_Symbolized=true .. && cmake --build . --target cathook -- -j$proccount
     popd
 fi
 

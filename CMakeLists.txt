@@ -32,6 +32,10 @@ if (EnableCotire)
     set(ignore_files ${ignore_files} CACHE INTERNAL "")
 endif()
 
+#
+# Config stuff
+#
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 endif()
@@ -90,10 +94,22 @@ set(EnableNullNexus 1 CACHE BOOL "Enable NullNexus chat and other features")
 set(EnableLogging 1 CACHE BOOL "Enable logging to /tmp/")
 set(EnableClip 1 CACHE BOOL "Enable anti electron/chromium freezing")
 set(Unity_ZeroKernel 1 CACHE BOOL "Use a unity build for zerokernel files")
-
 if(NOT EnableVisuals)
     set(EnableGUI 0)
 endif()
+
+# Internal variables
+# INTERNAL implies "FORCE" by default, so don't set if already set
+if (NOT DEFINED Internal_Binarymode)
+    set(Internal_Binarymode 0 CACHE INTERNAL "Build cathook to be used in 'binary mode'")
+endif()
+if (NOT DEFINED Internal_Symbolized)
+    set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent")
+endif()
+
+#
+# End of config stuff
+#
 
 if (EnableVisuals)
     set(OpenGL_GL_PREFERENCE "LEGACY")
@@ -167,7 +183,7 @@ configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
 set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -fno-gnu-unique -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-rdynamic -ggdb -Og")
-if (symbolize)
+if (Internal_Symbolized)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s -fvisibility=hidden -fvisibility-inlines-hidden")
@@ -231,12 +247,12 @@ elseif(EnablePrecompiledHeaders AND NativePrecompiledHeaders)
     target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
 endif()
 
-if (NOT symbolize)
+if (NOT Internal_Symbolized)
     add_custom_command(TARGET cathook POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook>")
 else()
     message("Symbolized build")
-    unset(symbolize CACHE)
+    set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent" FORCE)
 endif()
 if (EnableCotire)
     add_custom_command(TARGET cathook_unity POST_BUILD

@@ -23,13 +23,13 @@ void CreateMove()
     // Set up Random Seed
     int cmd_num = current_user_cmd->command_number;
     // Crithack uses different things
-    if (criticals::isEnabled() && g_pLocalPlayer->weapon_mode != weapon_melee && criticals::crit_cmds.size())
+    if (criticals::isEnabled() && g_pLocalPlayer->weapon_mode != weapon_melee && criticals::crit_cmds.find(LOCAL_W->m_IDX) != criticals::crit_cmds.end() && criticals::crit_cmds.find(LOCAL_W->m_IDX)->second.size())
     {
         int array_index = criticals::current_index;
-        if (array_index >= criticals::crit_cmds.size())
+        if (array_index >= criticals::crit_cmds.at(LOCAL_W->m_IDX).size())
             array_index = 0;
         // Adjust for nospread
-        cmd_num = criticals::crit_cmds[array_index];
+        cmd_num = criticals::crit_cmds.at(LOCAL_W->m_IDX).at(array_index);
     }
     RandomSeed(MD5_PseudoRandom(cmd_num) & 0x7FFFFFFF);
     SharedRandomInt(MD5_PseudoRandom(cmd_num) & 0x7FFFFFFF, "SelectWeightedSequence", 0, 0, 0);

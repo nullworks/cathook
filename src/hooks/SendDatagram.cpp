@@ -5,17 +5,18 @@
  *      Author: bencat07
  */
 #include "HookedMethods.hpp"
-#include "hacks/Backtrack.hpp"
+#include "Backtrack.hpp"
 namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(SendDatagram, int, INetChannel *ch, bf_write *buf)
 {
-    if (!isHackActive() || !ch || CE_BAD(LOCAL_E) || !round(*hacks::shared::backtrack::latency))
+    if (!isHackActive() || !ch || CE_BAD(LOCAL_E) || std::floor(*hacks::tf2::backtrack::latency) == 0)
         return original::SendDatagram(ch, buf);
 
     int in    = ch->m_nInSequenceNr;
     int state = ch->m_nInReliableState;
-    hacks::shared::backtrack::AddLatencyToNetchan(ch);
+    // Do backtrack things
+    hacks::tf2::backtrack::adjustPing(ch);
 
     int ret                = original::SendDatagram(ch, buf);
     ch->m_nInSequenceNr    = in;

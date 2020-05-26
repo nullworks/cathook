@@ -199,7 +199,7 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
         else
             return false;
     case k_EState::PARTY:
-        if (state == k_EState::TEXTMODE || state == k_EState::FRIEND)
+        if (state == k_EState::FRIEND)
         {
             ChangeState(steamid, state, true);
             return true;

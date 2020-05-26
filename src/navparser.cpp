@@ -21,7 +21,10 @@ static settings::Boolean draw{ "misc.pathing.draw", "false" };
 static settings::Boolean look{ "misc.pathing.look-at-path", "false" };
 static settings::Int stuck_time{ "misc.pathing.stuck-time", "4000" };
 static settings::Int unreachable_time{ "misc.pathing.unreachable-time", "1000" };
+static settings::Boolean log_pathing{ "misc.pathing.log", "false" };
 
+// Score based on how much the area was used by other players, in seconds
+static std::unordered_map<int, float> area_score;
 static std::vector<CNavArea *> crumbs;
 static Vector startPoint, endPoint;
 
@@ -33,6 +36,8 @@ enum ignore_status : uint8_t
     const_ignored,
     // LOS between areas is given
     vischeck_success,
+    // LOS if we ignore entities
+    vischeck_blockedentity,
     // No LOS between areas
     vischeck_failed,
     // Failed to actually walk thru connection
@@ -95,24 +100,31 @@ float getZBetweenAreas(CNavArea *start, CNavArea *end)
 static std::unordered_map<std::pair<CNavArea *, CNavArea *>, ignoredata, boost::hash<std::pair<CNavArea *, CNavArea *>>> ignores;
 namespace ignoremanager
 {
-static bool vischeck(CNavArea *begin, CNavArea *end)
+static ignore_status vischeck(CNavArea *begin, CNavArea *end)
 {
     Vector first  = begin->m_center;
     Vector second = end->m_center;
-    first.z += 42;
-    second.z += 42;
-    return IsVectorVisible(first, second, true, LOCAL_E, MASK_PLAYERSOLID);
+    first.z += 70;
+    second.z += 70;
+    // Is world blocking it?
+    if (IsVectorVisibleNavigation(first, second, MASK_PLAYERSOLID))
+    {
+        // Is something else blocking it?
+        if (!IsVectorVisible(first, second, true, LOCAL_E, MASK_PLAYERSOLID))
+            return vischeck_blockedentity;
+        else
+            return vischeck_success;
+    }
+    return vischeck_failed;
 }
 static ignore_status runIgnoreChecks(CNavArea *begin, CNavArea *end)
 {
-    if (getZBetweenAreas(begin, end) > 42)
+    // No z check Should be done for stairs as they can go very far up
+    if (getZBetweenAreas(begin, end) > 70)
         return const_ignored;
     if (!vischecks)
         return vischeck_success;
-    if (vischeck(begin, end))
-        return vischeck_success;
-    else
-        return vischeck_failed;
+    return vischeck(begin, end);
 }
 static void updateDanger()
 {
@@ -249,9 +261,18 @@ static void checkPath()
         ignoredata &data = ignores[{ begin, end }];
         if (data.status == vischeck_failed)
             return;
-        if (!vischeck(begin, end))
+        if (data.status == vischeck_blockedentity && vischeckBlock)
+            return;
+        auto vis_status = vischeck(begin, end);
+        if (vis_status == vischeck_failed)
         {
             data.status = vischeck_failed;
+            data.ignoreTimeout.update();
+            perform_repath = true;
+        }
+        else if (vis_status == vischeck_blockedentity && vischeckBlock)
+        {
+            data.status = vischeck_blockedentity;
             data.ignoreTimeout.update();
             perform_repath = true;
         }
@@ -273,7 +294,7 @@ static int isIgnored(CNavArea *begin, CNavArea *end)
         status = runIgnoreChecks(begin, end);
     if (status == vischeck_success)
         return 0;
-    else if (status == vischeck_failed)
+    else if (status == vischeck_blockedentity && !vischeckBlock)
         return 1;
     else
         return 2;
@@ -351,6 +372,7 @@ static void updateIgnores()
                 }
                 break;
             case vischeck_failed:
+            case vischeck_blockedentity:
             case vischeck_success:
             default:
                 if (i.second.ignoreTimeout.check(30000))
@@ -399,11 +421,16 @@ struct Graph : public micropather::Graph
                 continue;
             float distance = center->m_center.DistTo(i.area->m_center);
             if (isIgnored == 1)
+                distance += 2000;
+            // Check priority based on usage
+            else
             {
-                if (*vischeckBlock)
-                    continue;
-                distance += 50000;
+                float score = area_score[neighbour->m_id];
+                // Formula to calculate by how much % to reduce the distance by (https://xaktly.com/LogisticFunctions.html)
+                float multiplier = 2.0f * ((0.9f) / (1.0f + exp(-0.8f * score)) - 0.45f);
+                distance *= 1.0f - multiplier;
             }
+
             adjacent->emplace_back(micropather::StateCost{ reinterpret_cast<void *>(neighbour), distance });
         }
     }
@@ -460,6 +487,7 @@ void initThread()
 
 void init()
 {
+    area_score.clear();
     endPoint.Invalidate();
     ignoremanager::reset();
     status = initing;
@@ -509,7 +537,7 @@ CNavArea *findClosestNavSquare(const Vector &vec)
             bestSquare = &i;
         }
         // Check if we are within x and y bounds of an area
-        if (ovBestDist >= dist || !i.IsOverlapping(vec) || !IsVectorVisible(vec, i.m_center, true, LOCAL_E, MASK_PLAYERSOLID))
+        if (ovBestDist >= dist || !i.IsOverlapping(vec) || !IsVectorVisibleNavigation(vec, i.m_center, MASK_PLAYERSOLID))
         {
             continue;
         }
@@ -536,15 +564,19 @@ std::vector<CNavArea *> findPath(const Vector &start, const Vector &end)
     if (!(local = findClosestNavSquare(start)) || !(dest = findClosestNavSquare(end)))
         return {};
 
-    logging::Info("Start: (%f,%f,%f)", local->m_center.x, local->m_center.y, local->m_center.z);
-    logging::Info("End: (%f,%f,%f)", dest->m_center.x, dest->m_center.y, dest->m_center.z);
+    if (log_pathing)
+    {
+        logging::Info("Start: (%f,%f,%f)", local->m_center.x, local->m_center.y, local->m_center.z);
+        logging::Info("End: (%f,%f,%f)", dest->m_center.x, dest->m_center.y, dest->m_center.z);
+    }
     float cost;
     std::vector<CNavArea *> pathNodes;
 
     time_point begin_pathing = high_resolution_clock::now();
     int result               = Map.pather->Solve(reinterpret_cast<void *>(local), reinterpret_cast<void *>(dest), reinterpret_cast<std::vector<void *> *>(&pathNodes), &cost);
     long long timetaken      = duration_cast<nanoseconds>(high_resolution_clock::now() - begin_pathing).count();
-    logging::Info("Pathing: Pather result: %i. Time taken (NS): %lld", result, timetaken);
+    if (log_pathing)
+        logging::Info("Pathing: Pather result: %i. Time taken (NS): %lld", result, timetaken);
     // If no result found, return empty Vector
     if (result == micropather::MicroPather::NO_SOLUTION)
         return {};
@@ -612,12 +644,39 @@ void repath()
     navTo(last, curr_priority, true, true, true);
 }
 
+// Track pather resets
+static Timer reset_pather_timer{};
+// Update area score to prefer paths used by actual players a bit more
+void updateAreaScore()
+{
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    {
+        CachedEntity *ent = ENTITY(i);
+        if (i == g_pLocalPlayer->entity_idx || CE_INVALID(ent) || !g_pPlayerResource->isAlive(i))
+            continue;
+
+        // Get area
+        CNavArea *closest_area = nullptr;
+        if (ent->m_vecDormantOrigin())
+            findClosestNavSquare(*ent->m_vecDormantOrigin());
+
+        // Add usage to area if valid
+        if (closest_area)
+            area_score[closest_area->m_id] += g_GlobalVars->interval_per_tick;
+    }
+    if (reset_pather_timer.test_and_set(10000))
+        ResetPather();
+}
+
 static Timer last_jump{};
 // Main movement function, gets path from NavTo
 static void cm()
 {
     if (!enabled || status != on)
         return;
+    // Run the logic for Nav area score
+    updateAreaScore();
+
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return;
     if (!LOCAL_E->m_bAlivePlayer())
@@ -627,6 +686,7 @@ static void cm()
         return;
     }
     ignoremanager::updateIgnores();
+
     auto crumb = crumbs.begin();
     const Vector *crumb_vec;
     // Crumbs empty, prepare for next instruction
@@ -676,12 +736,21 @@ static void cm()
         current_user_cmd->viewangles = next;
     }
     // Detect when jumping is necessary
-    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && crumb_vec->z - g_pLocalPlayer->v_Origin.z > 18 && last_jump.test_and_set(200)) || (last_jump.test_and_set(200) && inactivity.check(*stuck_time / 2)))
+    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && crumb_vec->z - g_pLocalPlayer->v_Origin.z > 18 && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
         auto local = findClosestNavSquare(g_pLocalPlayer->v_Origin);
         // Check if current area allows jumping
-        if (!local || !(local->m_attributeFlags & NAV_MESH_NO_JUMP))
-            current_user_cmd->buttons |= (IN_JUMP | IN_DUCK);
+        if (!local || !(local->m_attributeFlags & (NAV_MESH_NO_JUMP | NAV_MESH_STAIRS)))
+        {
+            static bool flip_action = false;
+            // Make it crouch the second tick
+            current_user_cmd->buttons |= flip_action ? IN_DUCK : IN_JUMP;
+
+            // Update jump timer now
+            if (flip_action)
+                last_jump.update();
+            flip_action = !flip_action;
+        }
     }
     // Walk to next crumb
     WalkTo(*crumb_vec);

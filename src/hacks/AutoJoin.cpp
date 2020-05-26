@@ -152,8 +152,15 @@ static InitRoutine init([]() {
         else
         {
             p.Shutdown();
-            p2.Patch();
+            p2.Shutdown();
         }
     });
+    EC::Register(
+        EC::Shutdown,
+        []() {
+            p.Shutdown();
+            p2.Shutdown();
+        },
+        "shutdown_autojoin");
 });
 } // namespace hacks::shared::autojoin

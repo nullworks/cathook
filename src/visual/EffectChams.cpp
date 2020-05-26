@@ -348,13 +348,33 @@ void EffectChams::Render(int x, int y, int w, int h)
     PROF_SECTION(DRAW_chams);
     if (!isHackActive() || disable_visuals)
         return;
-    if (!effect_chams::enable)
+    if (!effect_chams::enable && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled))
         return;
     if (g_Settings.bInvalid)
         return;
-    if (!init)
+    if (!init && effect_chams::enable)
         Init();
     if (!isHackActive() || (g_IEngine->IsTakingScreenshot() && clean_screenshots))
+        return;
+    if (hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)
+    {
+        CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
+        BeginRenderChams();
+        // Don't mark as normal chams drawing
+        drawing = false;
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        {
+            CachedEntity *ent = ENTITY(i);
+            if (CE_BAD(ent) || i == g_IEngine->GetLocalPlayer() || !ent->m_bAlivePlayer() || ent->m_Type() != ENTITY_PLAYER)
+                continue;
+            // Entity won't draw in some cases so help the chams a bit
+            hacks::tf2::backtrack::isDrawing = true;
+            RAW_ENT(ent)->DrawModel(1);
+            hacks::tf2::backtrack::isDrawing = false;
+        }
+        EndRenderChams();
+    }
+    if (!effect_chams::enable)
         return;
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     BeginRenderChams();

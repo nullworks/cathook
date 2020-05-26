@@ -108,6 +108,47 @@ TraceType_t trace::FilterNoPlayer::GetTraceType() const
 {
     return TRACE_EVERYTHING;
 }
+
+/* Navigation filter */
+
+trace::FilterNavigation::FilterNavigation(){};
+
+trace::FilterNavigation::~FilterNavigation(){};
+
+#define MOVEMENT_COLLISION_GROUP 8
+#define RED_CONTENTS_MASK 0x800
+#define BLU_CONTENTS_MASK 0x1000
+bool trace::FilterNavigation::ShouldHitEntity(IHandleEntity *handle, int mask)
+{
+    IClientEntity *entity;
+    ClientClass *clazz;
+
+    if (!handle)
+        return false;
+    entity = (IClientEntity *) handle;
+    clazz  = entity->GetClientClass();
+
+    // Ignore everything that is not the world or a CBaseEntity
+    if (entity->entindex() != 0 && clazz->m_ClassID != CL_CLASS(CBaseEntity))
+    {
+        // Besides respawn room areas, we want to explicitly ignore those if they are not on our team
+        if (clazz->m_ClassID == CL_CLASS(CFuncRespawnRoomVisualizer))
+            if (CE_GOOD(LOCAL_E) && (g_pLocalPlayer->team == TEAM_RED || g_pLocalPlayer->team == TEAM_BLU))
+            {
+                // If we can't collide, hit it
+                if (!re::C_BaseEntity::ShouldCollide(entity, MOVEMENT_COLLISION_GROUP, g_pLocalPlayer->team == TEAM_RED ? RED_CONTENTS_MASK : BLU_CONTENTS_MASK))
+                    return true;
+            }
+        return false;
+    }
+    return true;
+}
+
+TraceType_t trace::FilterNavigation::GetTraceType() const
+{
+    return TRACE_EVERYTHING;
+}
+
 /* No-Entity filter */
 
 trace::FilterNoEntity::FilterNoEntity()
@@ -215,5 +256,6 @@ void trace::FilterPenetration::Reset()
 
 trace::FilterDefault trace::filter_default{};
 trace::FilterNoPlayer trace::filter_no_player{};
+trace::FilterNavigation trace::filter_navigation{};
 trace::FilterNoEntity trace::filter_no_entity{};
 trace::FilterPenetration trace::filter_penetration{};

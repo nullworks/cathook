@@ -58,17 +58,18 @@
     </Box>
         <Box padding="12 6 6 6" width="content" height="content" name="Warp" x="370" y="65">
         <List width="180">
-            <AutoVariable width="fill" target="warp.enabled" label="Enable warp" tooltip="Allows you to charge a burst of speed"/>
-            <AutoVariable width="fill" target="warp.key" label="Warp key" tooltip="Pressing this key will use all stored ticks to accelerate you"/>
-            <AutoVariable width="fill" target="warp.draw" label="Draw warp" tooltip="Draws a bar indicating your warp readyness"/>
-            <AutoVariable width="fill" target="warp.bar-size" label="Bar size"/>
-            <AutoVariable width="fill" target="warp.bar-x" label="X position"/>
-            <AutoVariable width="fill" target="warp.bar-y" label="Y position"/>
-            <AutoVariable width="fill" target="warp.charge-passively" label="Charge passively" tooltip="Charge warp passively, e.g. when moving"/>
-            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump, This will make you fall slower"/>
-            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys"/>
-            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp"/>
-            <AutoVariable width="fill" target="warp.demoknight" label="Demoknight mode" tooltip="This will make you do a swing charge with warp, (Attack, charge, warp)"/>
+            <AutoVariable width="fill" target="warp.enabled" label="Enable Warp" tooltip="Allows you to charge a burst of speed"/>
+            <AutoVariable width="fill" target="warp.speed" label="Warp speed" tooltip="The Discharge speed (0.5 = +50%, 2 = +200%, +2300% is the maximum possible)"/>
+            <AutoVariable width="fill" target="warp.key" label="Warp Key" tooltip="Pressing this key will use all stored ticks to accelerate you"/>
+            <AutoVariable width="fill" target="warp.draw" label="Draw Warp" tooltip="Draws a bar indicating your warp readyness"/>
+            <AutoVariable width="fill" target="warp.bar-size" label="Bar Size"/>
+            <AutoVariable width="fill" target="warp.bar-x" label="X Position"/>
+            <AutoVariable width="fill" target="warp.bar-y" label="Y Position"/>
+            <AutoVariable width="fill" target="warp.charge-passively" label="Charge Passively" tooltip="Charge Warp passively, e.g. when moving"/>
+            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in Jump" tooltip="Charge passively in jump, This will make you fall slower"/>
+            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge When keys released" tooltip="Charge passively before full stop after releasing movement keys"/>
+            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement Ratio" tooltip="Every Xth movement tick is passively converted to warp"/>
+            <AutoVariable width="fill" target="warp.demoknight" label="Demoknight Mode" tooltip="This will make you do a Swing charge with warp, (Attack, charge, warp)"/>
             <AutoVariable width="fill" target="warp.peek" label="Peek Mode" tooltip="This will teleport you for a tick and then teleport you back"/>
             <AutoVariable width="fill" target="warp.on-hit" label="Warp When hit" tooltip="Whenever someone melees you or shoots you with hitscan, warp"/>
             <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp forwards" tooltip="Warp when hit option"/>

@@ -10,6 +10,7 @@
 #include "hacks/Trigger.hpp"
 #include "MiscAimbot.hpp"
 #include "DetourHook.hpp"
+#include "Backtrack.hpp"
 
 namespace hacks::tf2::misc_aimbot
 {
@@ -23,7 +24,7 @@ int prevent          = -1;
 static Timer previous_entity_delay{};
 
 // TODO: Refactor this jank
-std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck, bool fov_check, float range)
+std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck, bool demoknight_mode, float range)
 {
     CachedEntity *bestent = nullptr;
     float bestscr         = FLT_MAX;
@@ -49,13 +50,25 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
                 target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent));
             else
                 target = ent->hitboxes.GetHitbox(1)->center;
-            if (!IsEntityVectorVisible(ent, target))
+            if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))
                 continue;
             if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
                 continue;
             float scr = ent->m_flDistance();
+            if (hacks::tf2::backtrack::isBacktrackEnabled && demoknight_mode)
+            {
+                auto data = hacks::tf2::backtrack::getClosestEntTick(ent, LOCAL_E->m_vecOrigin(), hacks::tf2::backtrack::defaultTickFilter);
+                // No entity
+                if (!data)
+                    scr = FLT_MAX;
+                else
+                {
+                    target = (*data).m_vecOrigin;
+                    scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+                }
+            }
             // Demoknight
-            if (fov_check)
+            if (demoknight_mode)
             {
                 if (scr >= range)
                     continue;
@@ -95,19 +108,31 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent));
         else
             target = ent->hitboxes.GetHitbox(1)->center;
-        if (!IsEntityVectorVisible(ent, target))
+        if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))
             continue;
         if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
             continue;
         float scr = ent->m_flDistance();
+        if (hacks::tf2::backtrack::isBacktrackEnabled && demoknight_mode)
+        {
+            auto data = hacks::tf2::backtrack::getClosestEntTick(ent, LOCAL_E->m_vecOrigin(), hacks::tf2::backtrack::defaultTickFilter);
+            // No entity
+            if (!data)
+                scr = FLT_MAX;
+            else
+            {
+                target = (*data).m_vecOrigin;
+                scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+            }
+        }
         // Demoknight
-        if (fov_check)
+        if (demoknight_mode)
         {
             if (scr >= range)
                 continue;
             scr = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, ent->m_vecOrigin());
             // Don't turn too harshly
-            if (scr >= 140.0f)
+            if (scr >= 90.0f)
                 continue;
         }
         if (g_pPlayerResource->GetClass(ent) == tf_medic)

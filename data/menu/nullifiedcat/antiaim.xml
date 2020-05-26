@@ -2,10 +2,10 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Anti-aim">
         <List width="150">
             <AutoVariable width="fill" target="antiaim.enable" label="Enable"/>
-            <AutoVariable width="fill" target="antiaim.draw-fakes" label="Draw fakes"/>
-            <AutoVariable width="fill" target="antiaim.crouch" label="Fake crouch"/>
-            <AutoVariable width="fill" target="antiaim.no-clamp" label="No clamping"/>
-            <AutoVariable width="fill" target="misc.fakelag" label="Fakelag" min="0" max="15"/>
+            <AutoVariable width="fill" target="antiaim.draw-fakes" label="Draw Fakes"/>
+            <AutoVariable width="fill" target="antiaim.crouch" label="Fake Crouch"/>
+            <AutoVariable width="fill" target="antiaim.no-clamp" label="No Clamping"/>
+            <AutoVariable width="fill" target="misc.fakelag" label="Fakelag" min="0" max="22"/>
             <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" min="-45" max="45" step="0.1"/>
             <AutoVariable width="fill" target="antiaim.roll" label="Roll"/>
             <AutoVariable width="fill" target="antiaim.pitch.static" label="Custom pitch"/>

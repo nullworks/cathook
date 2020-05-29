@@ -51,7 +51,7 @@ void Tooltip::setText(std::string text)
     lastText = text;
     int lc;
     int width;
-    text = utility::wrapString(text, resource::font::base, 400, &width, &lc);
+    text = utility::wrapString(text, resource::font::base, 300, &width, &lc);
     if (!this->text)
         createText();
     this->text->set(text);

@@ -138,6 +138,6 @@ HurtListener &listener()
 InitRoutine init([]() {
     g_IGameEventManager->AddListener(&listener(), false);
     EC::Register(
-        EC::Shutdown, []() {}, "shutdown_hitrate");
+        EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&listener()); }, "shutdown_hitrate");
 });
 } // namespace hitrate

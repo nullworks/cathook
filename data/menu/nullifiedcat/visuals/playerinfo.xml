@@ -7,9 +7,9 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="170">
         <List width="150">
-            <AutoVariable width="fill" target="dominatemark.enable" label="Enable"/>
-            <AutoVariable width="fill" target="dominatemark.min-size" label="Draw Min Size"/>
-            <AutoVariable width="fill" target="dominatemark.max-size" label="Draw Max Size"/>
+            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to one if you are being dominated by someone else."/>
+            <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
+            <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
         </List>
     </Box>
 </Tab>

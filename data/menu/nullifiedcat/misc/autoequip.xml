@@ -1,7 +1,7 @@
-<Tab name="Auto equip" padding="4 4 4 4">
+<Tab name="Auto Equip" padding="4 4 4 4">
     <Box name="Auto equip" width="content" height="content" padding="12 6 6 6">
         <List width="200">
-            <LabeledObject width="fill" label="Autoequip Primary">
+            <LabeledObject width="fill" label="Autoequip primary">
                 <Select target="achievement.equip-primary">
                     <Option name="None" value="0"/>
                     <Option name="Force-A-Nature" value="1"/>
@@ -15,7 +15,7 @@
                     <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Autoequip Secondary">
+            <LabeledObject width="fill" label="Autoequip secondary">
                 <Select target="achievement.equip-secondary">
                     <Option name="None" value="0"/>
                     <Option name="Bonk! Atomic punch" value="1"/>
@@ -31,7 +31,7 @@
                     <Option name="Stock" value="100"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Autoequip Melee">
+            <LabeledObject width="fill" label="Autoequip melee">
                 <Select target="achievement.equip-melee">
                     <Option name="None" value="0"/>
                     <Option name="Sandman" value="1"/>

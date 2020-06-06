@@ -720,7 +720,10 @@ bool IsTargetStateGood(CachedEntity *entity)
         }
 
         // Preform hitbox prediction
-        int hitbox                 = BestHitbox(entity);
+        int hitbox = BestHitbox(entity);
+        // Bad hitbox
+        if (hitbox == -1)
+            return false;
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         cd.hitbox                  = hitbox;
 

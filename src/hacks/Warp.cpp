@@ -174,20 +174,30 @@ void SendNetMessage(INetMessage &msg)
 }
 
 // Approximate demoknight shield speed at a given tick
-float approximateSpeedAtTick(int ticks_since_start, float initial_speed)
+float approximateSpeedAtTick(int ticks_since_start, float initial_speed, float max_speed)
 {
     // Formula only holds up until like 20 ticks
-    float speed = ticks_since_start >= 20 ? 750.0f : (ticks_since_start * (113.8f - 2.8f * ticks_since_start) + 1.0f);
-    return std::min(750.0f * g_GlobalVars->interval_per_tick, initial_speed * g_GlobalVars->interval_per_tick + speed * g_GlobalVars->interval_per_tick);
+    float speed = ticks_since_start >= 20 ? max_speed : (ticks_since_start * (113.8f - 2.8f * ticks_since_start) + 1.0f);
+    return std::min(max_speed * g_GlobalVars->interval_per_tick, initial_speed * g_GlobalVars->interval_per_tick + speed * g_GlobalVars->interval_per_tick);
 }
 
 // Approximate the amount of ticks needed for a given distance as demoknight
 int approximateTicksForDist(float distance, float initial_speed, int max_ticks)
 {
+    bool is_skullcutter = false;
+    bool has_booties    = false;
+    if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer() && CE_GOOD(LOCAL_W))
+    {
+        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 172)
+            is_skullcutter = true;
+        if (HasWeapon(LOCAL_E, 405) || HasWeapon(LOCAL_E, 608))
+            has_booties = true;
+    }
     float travelled_dist = 0.0f;
     for (int i = 0; i <= max_ticks; i++)
     {
-        travelled_dist += approximateSpeedAtTick(i, initial_speed);
+        // Compensate for the skullcutter (booties don't speed up, besides with skullcutter)
+        travelled_dist += approximateSpeedAtTick(i, initial_speed, is_skullcutter ? (has_booties ? 701.0f : 637.0f) : 750.0f);
 
         // We hit the needed range
         if (travelled_dist >= distance)
@@ -327,14 +337,12 @@ void CreateMove()
                 {
                     float distance = LOCAL_E->m_vecOrigin().DistTo(result.first->m_vecOrigin());
 
-                    // We want to hit their bounding box, not their center
-                    distance -= 40.0f;
-
                     // This approximates the ticks needed for the distance
                     Vector vel;
                     velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
-                    // +11 to account for the melee delay
-                    int charge_ticks = approximateTicksForDist(distance, vel.Length(), GetMaxWarpTicks() + 11);
+                    // +11 to account for the melee delay, the -40.0f is so we don't just aim for the center, which would
+                    // Make our range artifically shorter
+                    int charge_ticks = approximateTicksForDist(distance - 40.0f, vel.Length(), GetMaxWarpTicks() + 11);
 
                     // Not in range, try again with melee range taken into compensation
                     if (charge_ticks <= 0)

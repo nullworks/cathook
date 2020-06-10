@@ -1354,90 +1354,69 @@ bool VischeckPredictedEntity(CachedEntity *entity)
     return cd.visible;
 }
 
+static float slow_change_dist_p = 0;
+static float slow_change_dist_y = 0;
+
 // A helper function to find a user angle that isnt directly on the target
 // angle, effectively slowing the aiming process
 void DoSlowAim(Vector &input_angle)
 {
     LookAtPathTimer.update();
-    slow_can_shoot  = false;
-    auto old_input  = input_angle;
     auto viewangles = current_user_cmd->viewangles;
 
-    // Get difference
-    float delta_x = input_angle.x - viewangles.x;
-    float delta_y = input_angle.y - viewangles.y;
-
-    // Clamp
-    while (delta_x > 89)
-        delta_x -= 180;
-    while (delta_x < -89)
-        delta_x += 180;
-    while (delta_y > 180)
-        delta_y -= 360;
-    while (delta_y < -180)
-        delta_y += 360;
-
-    // Determine which direction to steer in
-    bool flip_pitch = delta_x < 0.0f;
-    bool flip_yaw   = delta_y < 0.0f;
-
-    // Set the step distance based on slow_aim variable
-    float step_amount = 40.0f / std::max(1, slow_aim);
-
-    if (input_angle.x != viewangles.x)
+    // Yaw
+    if (viewangles.y != input_angle.y)
     {
-        float new_pitch;
-        // Check if closer than step amount, in that case slow down until it's slow enough or we hit the bottom cap
-        if (fabsf(delta_x) <= step_amount)
-        {
-            float pitch_amount = step_amount;
-            // Smoothen attempts scale anti-proportional to slow_aim aswell
-            for (int i = 0; i <= 5.0f / slow_aim; i++)
-            {
-                pitch_amount /= 2.0f;
-                if (fabsf(delta_x) <= pitch_amount)
-                    break;
-            }
-            // Pitch still too high
-            if (fabsf(delta_x) <= pitch_amount)
-                new_pitch = input_angle.x;
-            else
-                new_pitch = viewangles.x + (flip_pitch ? -1.0f : 1.0f) * pitch_amount;
-        }
-        else
-            new_pitch = viewangles.x + (flip_pitch ? -1.0f : 1.0f) * step_amount;
 
-        input_angle.x = new_pitch;
+        // Check if input angle and user angle are on opposing sides of yaw so
+        // we can correct for that
+        bool slow_opposing = false;
+        if (input_angle.y < -90 && viewangles.y > 90 || input_angle.y > 90 && viewangles.y < -90)
+            slow_opposing = true;
+
+        // Direction
+        bool slow_dir = false;
+        if (slow_opposing)
+        {
+            if (input_angle.y > 90 && viewangles.y < -90)
+                slow_dir = true;
+        }
+        else if (viewangles.y > input_angle.y)
+            slow_dir = true;
+
+        // Speed, check if opposing. We dont get a new distance due to the
+        // opposing sides making the distance spike, so just cheap out and reuse
+        // our last one.
+        if (!slow_opposing)
+            slow_change_dist_y = std::abs(viewangles.y - input_angle.y) / (int) slow_aim;
+
+        // Move in the direction of the input angle
+        if (slow_dir)
+            input_angle.y = viewangles.y - slow_change_dist_y;
+        else
+            input_angle.y = viewangles.y + slow_change_dist_y;
     }
 
-    if (input_angle.y != viewangles.y)
+    // Pitch
+    if (viewangles.x != input_angle.x)
     {
-        float new_yaw;
-        // Check if closer than step amount, in that case slow down until it's slow enough or we hit the bottom cap
-        if (fabsf(delta_y) <= step_amount)
-        {
-            float yaw_amount = step_amount;
-            // Smoothen attempts scale anti-proportional to slow_aim aswell
-            for (int i = 0; i <= 5.0f / slow_aim; i++)
-            {
-                yaw_amount /= 2.0f;
-                if (fabsf(delta_y) <= yaw_amount)
-                    break;
-            }
-            // Yaw still too high
-            if (fabsf(delta_y) <= yaw_amount)
-                new_yaw = input_angle.y;
-            else
-                new_yaw = viewangles.y + (flip_yaw ? -1.0f : 1.0f) * yaw_amount;
-        }
-        else
-            new_yaw = viewangles.y + (flip_yaw ? -1.0f : 1.0f) * step_amount;
+        // Get speed
+        slow_change_dist_p = std::abs(viewangles.x - input_angle.x) / (int) slow_aim;
 
-        input_angle.y = new_yaw;
+        // Move in the direction of the input angle
+        if (viewangles.x > input_angle.x)
+            input_angle.x = viewangles.x - slow_change_dist_p;
+        else
+            input_angle.x = viewangles.x + slow_change_dist_p;
     }
-    fClampAngle(input_angle);
-    if (input_angle.x == old_input.x && input_angle.y == old_input.y)
+
+    // 0.17 is a good amount in general
+    slow_can_shoot = false;
+    if (slow_change_dist_y < 0.17 && slow_change_dist_p < 0.17)
         slow_can_shoot = true;
+
+    // Clamp as we changed angles
+    fClampAngle(input_angle);
 }
 
 // A function that determins whether aimkey allows aiming

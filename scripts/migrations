@@ -35,7 +35,7 @@ if [ ! -x "$(command -v git)" ]; then
 fi
 if [ ! -d "./.git" ]; then
     git init
-    git remote add origin https://gitlab.com/nullworks/cathook/cathook
+    git remote add origin https://github.com/nullworks/cathook
 fi
 fi
 
@@ -76,19 +76,10 @@ function migrations() {
     fi
 
     # Hack to fix compile error in version 1 to 4 caused by CoTiRe on legacy ubuntu.
-    if [ "$version" -lt 5 ]; then
-        cfg_write $configfile version 5
-        if [ -d "./build/CMakeFiles/cathook.dir" ]; then
-            rm -r ./build/CMakeFiles/cathook.dir
-        fi
-    fi
     if [ "$version" -lt 6 ]; then
         cfg_write $configfile version 6
-        GIT_REMOTE=$(git config --get remote.origin.url || echo unknown)
-        if [ "$GIT_REMOTE" == "https://github.com/nullworks/cathook.git" ] || [ "$GIT_REMOTE" == "https://github.com/nullworks/cathook" ]; then
-            updateRepoURL
-        else
-            echo -e '\033[1;33m\n\nMigrations: Did not update the remote URL because you are not using the default repo URLs set by our install scripts! We are now at https://gitlab.com/nullworks/cathook/cathook!\n\n\033[0m'
+        if [ -d "./build/CMakeFiles/cathook.dir" ]; then
+            rm -r ./build/CMakeFiles/cathook.dir
         fi
     fi
 

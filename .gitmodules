@@ -1,30 +1,30 @@
 [submodule "source-sdk-2013-headers"]
 	path = external/source-sdk-2013-headers
-	url = https://gitlab.com/nullworks/cathook/source-sdk-2013-headers
+	url = https://github.com/nullworks/source-sdk-2013-headers
 [submodule "libglez"]
 	path = external/libglez
-	url = https://gitlab.com/nullworks/cathook/libglez
+	url = https://github.com/nullworks/libglez
 [submodule "libxoverlay"]
 	path = external/libxoverlay
-	url = https://gitlab.com/nullworks/cathook/libxoverlay
+	url = https://github.com/nullworks/libxoverlay
 [submodule "simple-ipc"]
 	path = external/simple-ipc
-	url = https://gitlab.com/nullworks/cathook/simple-ipc
+	url = https://github.com/nullworks/simple-ipc
 [submodule "external/MicroPather"]
 	path = external/MicroPather
-	url = https://gitlab.com/nullworks/cathook/MicroPather
+	url = https://github.com/nullworks/MicroPather
 [submodule "external/TF2_NavFile_Reader"]
 	path = external/TF2_NavFile_Reader
-	url = https://gitlab.com/nullworks/cathook/TF2_NavFile_Reader
+	url = https://github.com/nullworks/TF2_NavFile_Reader
 [submodule "external/cotire"]
 	path = external/cotire
 	url = https://github.com/sakra/cotire
 [submodule "external/clip"]
 	path = external/clip
-	url = https://gitlab.com/nullworks/cathook/clip
+	url = https://github.com/nullworks/clip
 [submodule "external/libnullnexus"]
 	path = external/libnullnexus
-	url = https://gitlab.com/nullworks/cathook/libnullnexus
+	url = https://github.com/nullworks/libnullnexus
 [submodule "external/boost-cmake"]
 	path = external/boost-cmake
 	url = https://github.com/Orphis/boost-cmake.git

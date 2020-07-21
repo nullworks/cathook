@@ -2,9 +2,9 @@
 ![banner](http://i.imgur.com/w96wdtE.png)
 [![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/nullworks/cathook)
 
-## Repo disabled by Github
+## Moving back to GitHub
 
-GitHub has disabled our Repository and we have therefore moved to GitLab (for now). [How to fix your cathook install](https://t.me/cathook_cheat/81)
+GitHub has restored our repo and we have decided to move everything back to GitHub. The update process will be automatic.
 
 ## Risk of VAC detection
 

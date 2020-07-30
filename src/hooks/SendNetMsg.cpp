@@ -172,8 +172,8 @@ static InitRoutine run_identify([]() {
                 sendIdentifyMessage(true);
                 queue_ca8 = false;
             }
-            // 2 minutes between each identify seems ok?
-            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(1000 * 60 * 2))
+            // Send out identifies every 15 seconds or so
+            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(1000 * 15))
                 return;
             sendIdentifyMessage(false);
         },

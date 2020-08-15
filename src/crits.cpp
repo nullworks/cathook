@@ -568,6 +568,27 @@ void fixBucket(IClientEntity *weapon, CUserCmd *cmd)
     info.restore_data(weapon);
 }
 
+// Is the player currently performing the double engi melee attack exploit?
+bool isExploitingDoubleAttack()
+{
+    // Exploit doesn't work if you don't press IN_ATTACK2 + IN_ATTACK, aren't using a melee weapon or aren't playing engineer
+    if (!(current_user_cmd->buttons & IN_ATTACK2) || g_pLocalPlayer->weapon_mode != weapon_melee || g_pLocalPlayer->clazz != tf_engineer)
+        return false;
+
+    // Get the entity that we are looking at and check if it is a building that we built
+    int eindex;
+    WhatIAmLookingAt(&eindex, nullptr);
+    if (eindex == -1)
+        return false;
+    auto entity = ENTITY(eindex);
+    if (CE_GOOD(entity) && entity->m_Type() == ENTITY_BUILDING && HandleToIDX(CE_INT(entity, netvar.m_hBuilder)) == LOCAL_E->m_IDX)
+    {
+        return true;
+    }
+    else
+        return false;
+}
+
 // Damage this round
 void CreateMove()
 {
@@ -655,6 +676,10 @@ void CreateMove()
         else if (!can_beggars_crit)
             return;
     }
+
+    // Is the player currently performing the double engi melee attack exploit? If yes, force a crit this tick
+    if (isExploitingDoubleAttack())
+        force_crit_this_tick = true;
 
     // Should we even try to crit this tick?
     if (shouldCrit())

@@ -37,7 +37,7 @@
             <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (SkyBox)" min="0" max="100" step="0.1"/>
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode Color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode Color (World)"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode Color (SkyBox)"/>
+            <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode Color (Skybox)"/>
             <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>
             <LabeledObject width="fill" label="Ragdoll Override">
                 <Select target="visual.ragdoll-mode">

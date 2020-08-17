@@ -42,7 +42,7 @@ void sendAchievementKv(int value)
 void sendDrawlineKv(float x_value, float y_value)
 {
     KeyValues *kv = new KeyValues("cl_drawline");
-    kv->SetInt("panel", 0);
+    kv->SetInt("panel", 2);
     kv->SetInt("line", 0);
     kv->SetFloat("x", x_value);
     kv->SetFloat("y", y_value);
@@ -230,13 +230,13 @@ static InitRoutine run_identify([]() {
                 sendIdentifyMessage(true, true);
                 send_achievement_reply = false;
             }
-            if (send_drawline_reply && reply_timer.test_and_set(2000))
+            if (send_drawline_reply && reply_timer.test_and_set(1000))
             {
                 sendIdentifyMessage(true, false);
                 send_drawline_reply = false;
             }
-            // Wait 30 seconds between identifies
-            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(1000 * 30))
+            // It is safe to send every second, small packet
+            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(1000))
                 return;
             sendIdentifyMessage(false, false);
         },

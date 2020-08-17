@@ -34,7 +34,7 @@
         <List width="180">
             <AutoVariable width="fill" target="visual.night-mode.gui" label="Nightmode (GUI)" min="0" max="100" step="0.1"/>
             <AutoVariable width="fill" target="visual.night-mode.world" label="Nightmode (World)" min="0" max="100" step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (SkyBox)" min="0" max="100" step="0.1"/>
+            <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (Skybox)" min="0" max="100" step="0.1"/>
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode Color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode Color (World)"/>
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode Color (Skybox)"/>

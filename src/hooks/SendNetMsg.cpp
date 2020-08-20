@@ -235,8 +235,8 @@ static InitRoutine run_identify([]() {
                 sendIdentifyMessage(true, false);
                 send_drawline_reply = false;
             }
-            // It is safe to send every second, small packet
-            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(1000))
+            // It is safe to send every 15ish seconds, small packet
+            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(15000))
                 return;
             sendIdentifyMessage(false, false);
         },

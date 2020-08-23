@@ -2,7 +2,6 @@
   Created by Jenny White on 29.04.18.
   Copyright (c) 2018 nullworks. All rights reserved.
 */
-// test
 
 #include <MiscTemporary.hpp>
 #include <hacks/hacklist.hpp>
@@ -73,34 +72,58 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
 
             if (should_filter)
             {
-
                 if (should_filter == 1 && *nightmode_gui > 0.0f)
                 {
                     // Map to PI/2 so we get full color scale
                     rgba_t draw_color = colors::Fade(colors::white, *nightmode_gui_color, (*nightmode_gui / 100.0f) * (PI / 2), 1.0f);
 
-                    pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
-                    pMaterial->AlphaModulate((*nightmode_gui_color).a);
+                    // Check for change
+                    float r, g, b, a;
+                    pMaterial->GetColorModulation(&r, &g, &b);
+                    a = pMaterial->GetAlphaModulation();
+
+                    if (r != draw_color.r || g != draw_color.g || b != draw_color.b)
+                        pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
+                    if (a != draw_color.a)
+                        pMaterial->AlphaModulate((*nightmode_gui_color).a);
                 }
                 else if (should_filter == 2 && *nightmode_world > 0.0f)
                 {
                     // Map to PI/2 so we get full color scale
                     rgba_t draw_color = colors::Fade(colors::white, *nightmode_world_color, (*nightmode_world / 100.0f) * (PI / 2), 1.0f);
 
-                    pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
-                    pMaterial->AlphaModulate((*nightmode_world_color).a);
+                    // Check for change
+                    float r, g, b, a;
+                    pMaterial->GetColorModulation(&r, &g, &b);
+                    a = pMaterial->GetAlphaModulation();
+                    if (r != draw_color.r || g != draw_color.g || b != draw_color.b)
+                        pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
+                    if (a != draw_color.a)
+                        pMaterial->AlphaModulate((*nightmode_world_color).a);
                 }
                 else if (should_filter == 3 && *nightmode_skybox > 0.0f)
                 {
                     // Map to PI/2 so we get full color scale
                     rgba_t draw_color = colors::Fade(colors::white, *nightmode_skybox_color, (*nightmode_skybox / 100.0f) * (PI / 2), 1.0f);
 
-                    pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
-                    pMaterial->AlphaModulate((*nightmode_skybox_color).a);
+                    // Check for change
+                    float r, g, b, a;
+                    pMaterial->GetColorModulation(&r, &g, &b);
+                    a = pMaterial->GetAlphaModulation();
+                    if (r != draw_color.r || g != draw_color.g || b != draw_color.b)
+                        pMaterial->ColorModulate(draw_color.r, draw_color.g, draw_color.b);
+                    if (a != draw_color.a)
+                        pMaterial->AlphaModulate((*nightmode_skybox_color).a);
                 }
                 else
                 {
-                    pMaterial->ColorModulate(1.0f, 1.0f, 1.0f);
+                    float r, g, b, a;
+                    pMaterial->GetColorModulation(&r, &g, &b);
+                    a = pMaterial->GetAlphaModulation();
+                    if (r != 1.0f || g != 1.0f || b != 1.0f)
+                        pMaterial->ColorModulate(1.0f, 1.0f, 1.0f);
+                    if (a != 1.0f)
+                        pMaterial->AlphaModulate(1.0f);
                 }
             }
         }

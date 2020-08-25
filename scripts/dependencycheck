@@ -78,7 +78,7 @@ case "$OS" in
     "gentoo")
         requestPermissions "${gentoo_packages[@]}"
         # -U (--newuse): Installed packages that have no changes are excluded.
-        USE=abi_x86_32 $SUDO emerge -avU "${gentoo_packages[@]}"
+        USE=abi_x86_32 $SUDO emerge -vU "${gentoo_packages[@]}"
     ;;
     "arch")
         pacman -Qi "${arch_packages[@]}" > /dev/null 2>&1

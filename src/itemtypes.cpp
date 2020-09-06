@@ -196,27 +196,30 @@ void ItemModelMapper::RegisterItem(std::string modelpath, k_EItemType type)
 k_EItemType ItemModelMapper::GetItemType(CachedEntity *entity)
 {
     const uintptr_t model = (uintptr_t) RAW_ENT(entity)->GetModel();
-    for (const auto &it : map)
+    if (model)
     {
-        if (it.first == model)
-            return it.second;
-    }
-    std::string path(g_IModelInfo->GetModelName((const model_t *) model));
-    bool set = false;
-    for (const auto &it : models)
-    {
-        // logging::Info("comparing [%s] to [%s]", path.c_str(),
-        // it.first.c_str());
-        if (it.first == path)
+        for (const auto &it : map)
         {
-            // logging::Info("Found %s!", path.c_str());
-            map.emplace(model, it.second);
-            set = true;
-            break;
+            if (it.first == model)
+                return it.second;
         }
+        std::string path(g_IModelInfo->GetModelName((const model_t *) model));
+        bool set = false;
+        for (const auto &it : models)
+        {
+            // logging::Info("comparing [%s] to [%s]", path.c_str(),
+            // it.first.c_str());
+            if (it.first == path)
+            {
+                // logging::Info("Found %s!", path.c_str());
+                map.emplace(model, it.second);
+                set = true;
+                break;
+            }
+        }
+        if (!set)
+            map.emplace(model, k_EItemType::ITEM_NONE);
     }
-    if (!set)
-        map.emplace(model, k_EItemType::ITEM_NONE);
     return k_EItemType::ITEM_NONE;
 }
 

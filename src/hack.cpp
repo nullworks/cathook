@@ -305,6 +305,13 @@ free(logname);*/
     logging::Info("Initializing...");
     InitRandom();
     sharedobj::LoadEarlyObjects();
+
+// Fix locale issues caused by steam update
+#if ENABLE_TEXTMODE
+    static BytePatch patch(gSignatures.GetEngineSignature, "74 ? 89 5C 24 ? 8D 9D ? ? ? ? 89 74 24", 0, { 0x71 });
+    patch.Patch();
+#endif
+
     CreateEarlyInterfaces();
     logging::Info("Clearing Early initializer stack");
     while (!init_stack_early().empty())

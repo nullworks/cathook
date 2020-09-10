@@ -9,7 +9,7 @@ if ! [ -d "/opt/cathook/data" ]; then
 fi
 
 echo "Installing cathook data to /opt/cathook/data"
-rsync -avh --progress "data/" "/opt/cathook/data"
-rsync -avh --ignore-existing --progress "config_data/" "/opt/cathook/data"
+rsync -avh "data/" "/opt/cathook/data"
+rsync -avh --ignore-existing "config_data/" "/opt/cathook/data"
 chown -R $user "/opt/cathook/data"
 chmod -R 777 "/opt/cathook/data"

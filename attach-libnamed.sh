@@ -9,7 +9,7 @@ RUNCMD="sudo -u $RUNUSER"
 $RUNCMD bash ./scripts/updater true
 $RUNCMD bash ./report-crash true
 
-line=$(pgrep -u $(logname) hl2_linux)
+line=$(pgrep -u $RUNUSER hl2_linux)
 arr=($line)
 
 if [ $# == 1 ]; then

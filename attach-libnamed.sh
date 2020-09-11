@@ -50,13 +50,13 @@ sudo cp "bin/libcathook.so" "/lib/i386-linux-gnu/${FILENAME}"
 
 echo loading "$FILENAME" to "$proc"
 
-sudo gdb -n -q -batch \
-     -ex "attach $proc" \
-     -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
-     -ex "call \$dlopen(\"/lib/i386-linux-gnu/$FILENAME\", 1)" \
-     -ex "call dlerror()" \
-     -ex 'print (char *) $2' \
-     -ex "detach" \
-     -ex "quit"
+gdb -n -q -batch                                                                                \
+    -ex "attach $proc"                                                                          \
+    -ex "echo \033[1mCalling dlopen\033[0m\n"                                                   \
+    -ex "call ((void*(*)(const char*, int))dlopen)(\"/lib/i386-linux-gnu/$FILENAME\", 1)"       \
+    -ex "echo \033[1mCalling dlerror\033[0m\n"                                                  \
+    -ex "call ((char*(*)(void))dlerror)()"                                                      \
+    -ex "detach"                                                                                \
+    -ex "quit"
 
 sudo rm "/lib/i386-linux-gnu/${FILENAME}"

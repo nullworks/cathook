@@ -41,13 +41,13 @@ cp "bin/libcathook.so" "$FILENAME"
 
 echo loading "$FILENAME" to "$proc"
 
-gdb -n -q -batch \
-  -ex "attach $proc" \
-  -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
-  -ex "call \$dlopen(\"$FILENAME\", 1)" \
-  -ex "call dlerror()" \
-  -ex 'print (char *) $2' \
-  -ex "continue" \
-  -ex "backtrace"
+gdb -n -q -batch                                                        \
+    -ex "attach $proc"                                                  \
+    -ex "echo \033[1mCalling dlopen\033[0m\n"                           \
+    -ex "call ((void*(*)(const char*, int))dlopen)(\"$FILENAME\", 1)"   \
+    -ex "echo \033[1mCalling dlerror\033[0m\n"                          \
+    -ex "call ((char*(*)(void))dlerror)()"                              \
+    -ex "continue"                                                      \
+    -ex "backtrace"
 
 rm $FILENAME

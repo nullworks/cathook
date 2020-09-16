@@ -275,40 +275,34 @@ static void UnHookFs()
 #if ENABLE_TEXTMODE
 static InitRoutineEarly nullify_textmode([]() {
     // SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
-    static auto addr1 = gSignatures.GetLauncherSignature("C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24") + 0xb;
-    // All of these are needed so tf2 doesn't just unhide the window
-    static auto addr2 = gSignatures.GetLauncherSignature("E8 ? ? ? ? C6 43 25 01 83 C4 5C");
-    static auto addr3 = gSignatures.GetLauncherSignature("E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C");
-    static auto addr4 = gSignatures.GetLauncherSignature("89 14 24 E8 ? ? ? ? 8B 45 B4") + 0x3;
-
     // 0x8 = SDL_HIDDEN
-    static BytePatch patch1(addr1, { 0x8 });
+    static BytePatch patch1(gSignatures.GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
 
     // all are the same size so use same patch for all
     std::vector<unsigned char> patch_arr = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
-    static BytePatch patch2(addr2, patch_arr);
-    static BytePatch patch3(addr3, patch_arr);
-    static BytePatch patch4(addr4, patch_arr);
+    // Hide the SDL window
+    static BytePatch patch2(gSignatures.GetLauncherSignature, "E8 ? ? ? ? C6 43 25 01 83 C4 5C", 0x0, patch_arr);
+    static BytePatch patch3(gSignatures.GetLauncherSignature, "E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C", 0x0, patch_arr);
+    static BytePatch patch4(gSignatures.GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
+
+    ReduceRamUsage();
+    // CVideoMode_Common::Init  SetupStartupGraphic
+    // Make SetupStartupGraphic instantly return
+    auto setup_graphic_addr = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
+    static BytePatch patch5(setup_graphic_addr, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
+    // CMaterialSystem::SwapBuffers
+    static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ECB0), { 0x31, 0xC0, 0x40, 0xC3 });
+    // V_RenderView
+    static BytePatch patch7(gSignatures.GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
     patch1.Patch();
     patch2.Patch();
     patch3.Patch();
     patch4.Patch();
-
-    ReduceRamUsage();
-    // CVideoMode_Common::Init  SetupStartupGraphic
-    static auto addr5 = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
-    // make materials illegal
-    static auto addr6 = sharedobj::materialsystem().Pointer(0x3EC08);
-
-    // Make SetupStartupGraphic instantly return
-    static BytePatch patch5(addr5, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
-    // materials are gone :crab:
-    static BytePatch patch6(addr6, { 0x83, 0xC4, 0x50, 0x5B, 0x5E, 0x5D, 0xC3 });
-
     patch5.Patch();
     patch6.Patch();
+    patch7.Patch();
 });
 #endif
 
@@ -327,21 +321,11 @@ static InitRoutine nullifiy_textmode2([]() {
     // Catbots still hit properly, this just makes it easier to Stub stuff not needed in textmode
     bool *g_bTextMode_ptr = *((bool **) (gSignatures.GetEngineSignature("A2 ? ? ? ? 8B 43 04") + 0x1));
     *g_bTextMode_ptr      = true;
-    /*auto addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC ? ? ? ? C7 45 ? ? ? ? ? A1 ? ? ? ? C7 45 ? ? ? ? ? 8B 75 08 85 C0 0F 84 ? ? ? ? 8D 55 88 89 04 24 31 DB 89 54 24 04");
-    static BytePatch patch(addr, { 0x31, 0xc0, 0xc3 });
-    patch.Patch();
-    EC::Register(
-        EC::Paint,
-        []() {
-            if (!signon_timer.test_and_set(5000))
-                return;
-            if (CE_GOOD(LOCAL_E))
-                return;
-            static auto addr = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 85 ? ? ? ? 89 C7 E9"));
-            typedef void (*SendFinishedSync_t)(CBaseClientState *);
-            static SendFinishedSync_t SendFinishedSync_fn = SendFinishedSync_t(addr);
-            SendFinishedSync_fn(g_IBaseClientState);
-        },
-        "nographics_cm");*/
+    // Skip downloading ressources
+    static BytePatch patch1(gSignatures.GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B ? ? ? ?", 0x1, { 0x81 });
+    patch1.Patch();
+    // CViewRender::Render
+    static BytePatch patch2(gSignatures.GetClientSignature, "55 89 E5 57 56 53 81 EC DC 03 00 00 C7 85 ? ? ? ? 00 00 00 00", 0x0, { 0x31, 0xC0, 0x40, 0xC3 });
+    patch2.Patch();
 #endif
 });

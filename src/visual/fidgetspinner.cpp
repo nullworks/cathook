@@ -13,7 +13,6 @@
 #ifndef FEATURE_FIDGET_SPINNER_ENABLED
 
 static settings::Boolean enable_spinner{ "visual.fidget-spinner.enable", "false" };
-static settings::Boolean v9mode{ "visual.fidget-spinner.v952-mode", "false" };
 static settings::Float spinner_speed_cap{ "visual.fidget-spinner.speed-cap", "30" };
 static settings::Float spinner_speed_scale{ "visual.fidget-spinner.speed-scale", "0.03" };
 static settings::Float spinner_decay_speed{ "visual.fidget-spinner.decay-speed", "0.1" };
@@ -80,7 +79,7 @@ void DrawSpinner()
     angle += speed_scale * real_speed;
     int state = min(3, int(spinning_speed / 250));
 
-    draw::RectangleTextured(draw::width / 2 - size * 0.5f, draw::height / 2 - size * 0.5f, size, size, colors::white, textures::atlas().texture, 64 * state, (3 + (v9mode ? 0 : 1)) * 64, 64, 64, angle);
+    draw::RectangleTextured(draw::width / 2 - size * 0.5f, draw::height / 2 - size * 0.5f, size, size, colors::white, textures::atlas().texture, 64 * state, 4 * 64, 64, 64, angle);
     if (angle > PI * 4)
         angle -= PI * 4;
 }

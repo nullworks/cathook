@@ -44,7 +44,7 @@ static InitRoutine init([]() {
                     Vector out;
                     if (draw::WorldToScreen(*draw_pos, out))
                     {
-                        static textures::sprite sprite = textures::atlas().create_sprite(447, 257, 64, 64);
+                        static textures::sprite sprite = textures::atlas().create_sprite(448, 257, 64, 64);
                         sprite.draw(int(out.x - size / 2.0f), int(out.y - size), int(size), int(size), colors::white);
                     }
                 }

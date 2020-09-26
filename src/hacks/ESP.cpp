@@ -75,8 +75,6 @@ static settings::Boolean entity_info{ "esp.debug.entity", "false" };
 static settings::Boolean entity_model{ "esp.debug.model", "false" };
 static settings::Boolean entity_id{ "esp.debug.id", "true" };
 
-static settings::Boolean v9mode{ "esp.v952-mode", "false" };
-
 // Unknown
 std::mutex threadsafe_mutex;
 // Storage array for keeping strings and other data
@@ -385,8 +383,6 @@ void _FASTCALL emoji(CachedEntity *ent)
                 if (draw::WorldToScreen(hit->center, head_scr))
                 {
                     float size = emoji_esp_scaling ? fabs(hbm.y - hbx.y) : *emoji_esp_size;
-                    if (v9mode)
-                        size *= 1.4;
                     if (!size || !emoji_min_size)
                         return;
                     if (emoji_esp_scaling && (size < *emoji_min_size))
@@ -419,7 +415,7 @@ void _FASTCALL emoji(CachedEntity *ent)
                         }
                     }
                     if (!hascall)
-                        draw::RectangleTextured(head_scr.x - size / 2, head_scr.y - size / 2, size, size, colors::white, atlas, (3 + (v9mode ? 3 : (int) emoji_esp)) * 64, (v9mode ? 3 : 4) * 64, 64, 64, 0);
+                        draw::RectangleTextured(head_scr.x - size / 2, head_scr.y - size / 2, size, size, colors::white, atlas, (3 + (int) emoji_esp) * 64, 4 * 64, 64, 64, 0);
                 }
             }
         }

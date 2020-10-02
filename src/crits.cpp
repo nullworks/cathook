@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "crits.hpp"
 #include "Backtrack.hpp"
+#include "WeaponData.hpp"
 #include "netadr.h"
 
 std::unordered_map<int, int> command_number_mod{};
@@ -493,20 +494,13 @@ static void updateCmds()
     if (added_per_shot == 0.0f || previous_weapon != weapon->entindex())
     {
         weapon_info info(weapon);
-
-        // m_pWeaponInfo->GetWeaponData(m_iWeaponMode).m_nBulletsPerShot;
-
-        int WeaponData = info.weapon_data;
-        int WeaponMode = info.weapon_mode;
-        // Size of one WeaponMode_t is 0x40, 0x6fc is the offset to projectiles per shot
-        int nProjectilesPerShot = *(int *) (WeaponData + 0x6fc + WeaponMode * 0x40);
+        int nProjectilesPerShot = GetWeaponData(weapon)->m_nBulletsPerShot;
         if (nProjectilesPerShot >= 1)
             nProjectilesPerShot = ATTRIB_HOOK_FLOAT(nProjectilesPerShot, "mult_bullets_per_shot", weapon, 0x0, true);
         else
             nProjectilesPerShot = 1;
 
-        // Size of one WeaponMode_t is 0x40, 0x6f8 is the offset to damage
-        added_per_shot = *(int *) (WeaponData + 0x6f8 + WeaponMode * 0x40);
+        added_per_shot = GetWeaponData(weapon)->m_nDamage;
         added_per_shot = ATTRIB_HOOK_FLOAT(added_per_shot, "mult_dmg", weapon, 0x0, true);
         added_per_shot *= nProjectilesPerShot;
         shots_to_fill_bucket = getBucketCap() / added_per_shot;
@@ -514,8 +508,7 @@ static void updateCmds()
         if (isRapidFire(weapon))
         {
             taken_per_crit = added_per_shot;
-            // Size of one WeaponMode_t is 0x40, 0x70c is the offset to Fire delay
-            taken_per_crit *= 2.0f / *(float *) (WeaponData + 0x70c + WeaponMode * 0x40);
+            taken_per_crit *= 2.0f / GetWeaponData(weapon)->m_flTimeFireDelay;
 
             // Yes this looks dumb but i want to ensure that it matches with valve code
             int bucket_cap_recasted = (int) getBucketCap();

@@ -28,34 +28,7 @@
 #include "usercmd.hpp"
 #include "MiscTemporary.hpp"
 #include "AntiAim.hpp"
-
-struct WeaponData_t
-{
-    int m_nDamage;
-    int m_nBulletsPerShot;
-    float m_flRange;
-    float m_flSpread;
-    float m_flPunchAngle;
-    float m_flTimeFireDelay;   // Time to delay between firing
-    float m_flTimeIdle;        // Time to idle after firing
-    float m_flTimeIdleEmpty;   // Time to idle after firing last bullet in clip
-    float m_flTimeReloadStart; // Time to start into a reload (ie. shotgun)
-    float m_flTimeReload;      // Time to reload
-    bool m_bDrawCrosshair;     // Should the weapon draw a crosshair
-    int m_iProjectile;         // The type of projectile this mode fires
-    int m_iAmmoPerShot;        // How much ammo each shot consumes
-    float m_flProjectileSpeed; // Start speed for projectiles (nail, etc.); NOTE: union with something non-projectile
-    float m_flSmackDelay;      // how long after swing should damage happen for melee weapons
-    bool m_bUseRapidFireCrits;
-};
-
-WeaponData_t *GetWeaponData(IClientEntity *weapon)
-{
-    criticals::weapon_info info(weapon);
-    int WeaponData = info.weapon_data;
-    int WeaponMode = info.weapon_mode;
-    return (WeaponData_t *) (WeaponData + sizeof(WeaponData_t) * WeaponMode + 1784);
-}
+#include "WeaponData.hpp"
 
 namespace hacks::tf2::nospread
 {

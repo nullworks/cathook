@@ -12,6 +12,7 @@
 #include "MiscTemporary.hpp"
 #include "PlayerTools.hpp"
 #include "Ragdolls.hpp"
+#include "WeaponData.hpp"
 
 static settings::Boolean tcm{ "debug.tcm", "true" };
 static settings::Boolean should_correct_punch{ "debug.correct-punch", "true" };
@@ -838,9 +839,8 @@ void AngleVectors3(const QAngle &angles, Vector *forward, Vector *right, Vector 
 
 bool isRapidFire(IClientEntity *wep)
 {
-    criticals::weapon_info info(wep);
-    // Taken from game, m_pWeaponInfo->GetWeaponData( m_iWeaponMode ).m_bUseRapidFireCrits;
-    bool ret = *(bool *) (info.weapon_data + 0x734 + info.weapon_mode * 0x40);
+    weapon_info info(wep);
+    bool ret = GetWeaponData(wep)->m_bUseRapidFireCrits;
     // Minigun changes mode once revved, so fix that
     return ret || wep->GetClientClass()->m_ClassID == CL_CLASS(CTFMinigun);
 }
@@ -1606,7 +1606,7 @@ float ATTRIB_HOOK_FLOAT(float base_value, const char *search_string, IClientEnti
 {
     typedef float (*AttribHookFloat_t)(float, const char *, IClientEntity *, void *, bool);
 
-    static uintptr_t AttribHookFloat = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 6C C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 8B 75 ? 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 31 DB 89 54 24");
+    static uintptr_t AttribHookFloat = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 96 ? ? ? ? D9 5D"));
     static auto AttribHookFloat_fn   = AttribHookFloat_t(AttribHookFloat);
 
     return AttribHookFloat_fn(base_value, search_string, ent, buffer, is_global_const_string);

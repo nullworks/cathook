@@ -94,8 +94,8 @@ static std::vector<std::string> oceana_datacenters        = { { "syd" }, { "vie"
 static std::vector<std::string> africa_datacenters        = { { "jnb" } };
 
 static CatCommand print("dc_print", "Print codes of all available data centers", []() {
-    static auto GetPOPCount = *(int (**)(void *))(*(uintptr_t *) g_ISteamNetworkingUtils + 36);
-    static auto GetPOPList  = *(int (**)(void *, SteamNetworkingPOPID *, int))(*(uintptr_t *) g_ISteamNetworkingUtils + 40);
+    static auto GetPOPCount = *(int (**)(void *))(*(uintptr_t *) g_ISteamNetworkingUtils + 37);
+    static auto GetPOPList  = *(int (**)(void *, SteamNetworkingPOPID *, int))(*(uintptr_t *) g_ISteamNetworkingUtils + 41);
 
     char region[5];
 
@@ -141,6 +141,8 @@ static void OnRegionsUpdate(std::string regions)
     boost::split(regions_vec, regions, boost::is_any_of(","));
     for (auto &region_str : regions_vec)
     {
+        if (region_str == "")
+            continue;
         if (region_str.length() > 4)
         {
             logging::Info("Ignoring invalid region %s", region_str.c_str());
@@ -177,7 +179,7 @@ static void Hook(bool on)
     if (on)
     {
         v.Set(g_ISteamNetworkingUtils);
-        v.HookMethod(h_GetDirectPingToPOP, 8, &o_GetDirectPingToPOP);
+        v.HookMethod(h_GetDirectPingToPOP, 9, &o_GetDirectPingToPOP);
         v.Apply();
     }
     else
@@ -219,10 +221,11 @@ void manageRegions(std::vector<std::string> regions_vec, bool add)
 static void Init()
 {
     enable.installChangeCallback([](settings::VariableBase<bool> &, bool on) {
-        static auto create = (void *(*) ()) e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 85 C0 89 ? ? ? ? ? 74 ? 8B ? ? ? ? ? 80 ? ? ? ? ? 00"));
+        static auto create_interface = (void **(*) (unsigned *) ) e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 83 38 00"));
+        static auto parameter        = *(uintptr_t *) (gSignatures.GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? 8B 00 8B 10 C7 44 24 ? 00 00 00 00") + 3);
         if (!g_ISteamNetworkingUtils)
         {
-            g_ISteamNetworkingUtils = create();
+            g_ISteamNetworkingUtils = *create_interface((unsigned *) parameter);
             if (!g_ISteamNetworkingUtils)
             {
                 logging::Info("DataCenter.cpp: Failed to create ISteamNetworkingUtils!");

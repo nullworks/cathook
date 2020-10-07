@@ -124,7 +124,7 @@
             <AutoVariable width="fill" target="votelogger.restart-on-kick" label="Crash When Kicked"/>
         </List>
     </Box>
-    <!--<Box name="Command & Control" width="content" height="content" padding="12 6 6 6" y="235">
+    <Box name="Command & Control" width="content" height="content" padding="12 6 6 6" y="235">
         <List width="150">
             <AutoVariable width="fill" target="irc.cc.channel" label="Channel"/>
             <AutoVariable width="fill" target="irc.cc.password" label="Password"/>
@@ -133,5 +133,5 @@
             <AutoVariable width="fill" target="irc.cc.party-cooldown" label="Party cooldown"/>
             <AutoVariable width="fill" target="irc.cc.party-size" label="Party maxsize"/>
         </List>
-    </Box>-->
+    </Box>
 </Tab>

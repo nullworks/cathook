@@ -18,8 +18,8 @@ namespace playerlist
 
 std::unordered_map<unsigned, userdata> data{};
 
-const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };
-const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };
+const std::string k_Names[]                                     = { "Default", "Friend", "Rage", "IPC", "Textmode", "Cat", "Party" };
+const char *const k_pszNames[]                                  = { "Default", "Friend", "Rage", "IPC", "Textmode", "Cat", "Party" };
 const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 const userdata null_data{};
 #if ENABLE_VISUALS
@@ -444,7 +444,7 @@ CatCommand pl_info("pl_info", "pl_info uniqueid", [](const CCommand &args) {
     auto &pl = AccessData(steamid);
     const char *str_state;
     if (pl.state < k_EState::STATE_FIRST || pl.state > k_EState::STATE_LAST)
-        str_state = "UNKNOWN";
+        str_state = "Unknown";
     else
         str_state = k_pszNames[int(pl.state)];
 

@@ -1,21 +1,21 @@
 <Tab name="Debug" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Debug">
         <List width="200">
-            <AutoVariable width="fill" target="debug.cursor-fix" label="Cursor fix"/>
-            <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine pred others"/>
-            <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast vischeck"/>
-            <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam wait time"/>
-            <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log dispatched user messages"/>
-            <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>
-            <AutoVariable width="fill" target="debug.pp-extrapolate" label="PP extrapolate"/>
-            <AutoVariable width="fill" target="debug.pp-rocket-time-ping" label="PP rocket time ping"/>
-            <AutoVariable width="fill" target="debug.projectiles" label="Debug projectiles"/>
+            <AutoVariable width="fill" target="debug.cursor-fix" label="Cursor Fix"/>
+            <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine Pred Others"/>
+            <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast Vischeck"/>
+            <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam Wait Time"/>
+            <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log Dispatched User Messages"/>
+            <AutoVariable width="fill" target="debug.log-sent-chat" label="Log Sent Chat"/>
+            <AutoVariable width="fill" target="debug.pp-extrapolate" label="PP Extrapolate"/>
+            <AutoVariable width="fill" target="debug.pp-rocket-time-ping" label="PP Rocket Time Ping"/>
+            <AutoVariable width="fill" target="debug.projectiles" label="Debug Projectiles"/>
             <AutoVariable width="fill" target="debug.tcm" label="Debug TCM"/>
-            <AutoVariable width="fill" target="debug.ve.averaging" label="VE averaging"/>
-            <AutoVariable width="fill" target="debug.ve.smooth" label="VE smooth"/>
-            <AutoVariable width="fill" target="debug.ve.window" label="VE window"/>
-            <AutoVariable width="fill" target="aimbot.debug" label="Debug aimbot"/>
-            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug engine PP"/>
+            <AutoVariable width="fill" target="debug.ve.averaging" label="VE Averaging"/>
+            <AutoVariable width="fill" target="debug.ve.smooth" label="VE Smooth"/>
+            <AutoVariable width="fill" target="debug.ve.window" label="VE Window"/>
+            <AutoVariable width="fill" target="aimbot.debug" label="Debug Aimbot"/>
+            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug Engine PP"/>
         </List>
     </Box>
 </Tab>

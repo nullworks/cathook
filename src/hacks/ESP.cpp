@@ -213,40 +213,40 @@ std::unordered_map<studiohdr_t *, bonelist_s> bonelist_map{};
 
 // These are strings that never change and should only be constructed once
 const std::string hoovy_str                = "Hoovy";
-const std::string dormant_str              = "*DORMANT*";
-const std::string jarated_str              = "*JARATED*";
-const std::string slowed_str               = "*SLOWED*";
-const std::string zooming_str              = "*ZOOMING*";
-const std::string crit_str                 = "*CRITS*";
-const std::string blast_p_str              = "*BLAST PASSIVE*";
-const std::string blast_a_str              = "*BLAST VACCINATOR*";
-const std::string fire_p_str               = "*FIRE PASSIVE*";
-const std::string fire_a_str               = "*FIRE VACCINATOR*";
-const std::string bullet_p_str             = "*BULLET PASSIVE*";
-const std::string bullet_a_str             = "*BULLET VACCINATOR*";
-const std::string invulnerable_str         = "*INVULNERABLE*";
-const std::string ready_ringer_str         = "*DEADRINGER OUT*";
-const std::string cloaked_str              = "*CLOAKED*";
-const std::string in_ringer_str            = "*DEADRINGERED*";
-const std::string botname_str              = "BOT #";
+const std::string dormant_str              = "*Dormant*";
+const std::string jarated_str              = "*Jarate*";
+const std::string slowed_str               = "*Slowed*";
+const std::string zooming_str              = "*Zoom*";
+const std::string crit_str                 = "*Crits*";
+const std::string blast_p_str              = "*Blast Passive*";
+const std::string blast_a_str              = "*Blast Vaccinator*";
+const std::string fire_p_str               = "*Fire Passive*";
+const std::string fire_a_str               = "*Fire Vaccinator*";
+const std::string bullet_p_str             = "*Bullet Passive*";
+const std::string bullet_a_str             = "*Bullet Vaccinator*";
+const std::string invulnerable_str         = "*Invulnerable*";
+const std::string ready_ringer_str         = "*Deadringer Out*";
+const std::string cloaked_str              = "*Cloak*";
+const std::string in_ringer_str            = "*Deadringer*";
+const std::string botname_str              = "Bot";
 const std::string tp_ready_str             = "Ready";
 const std::string sapped_str               = "*Sapped*";
 const std::string teleporter_str           = "Teleporter";
-const std::string sentry_str               = "Sentry Gun";
+const std::string sentry_str               = "Sentry";
 const std::string dispenser_str            = "Dispenser";
 const std::string rare_spell_str           = "Rare Spell";
 const std::string spell_str                = "Spell";
-const std::string tf2c_spawner_respawn_str = "-- RESPAWNING --";
-const std::string ammo_big_str             = "{iii}";
-const std::string ammo_medium_str          = "{ii}";
-const std::string ammo_small_str           = "{i}";
+const std::string tf2c_spawner_respawn_str = "-- Respawning --";
+const std::string ammo_big_str             = "Big Ammo";
+const std::string ammo_medium_str          = "Medium Ammo";
+const std::string ammo_small_str           = "Small Ammo";
 const std::string tf2c_adrenaline_str      = "[a]";
 const std::string hl_battery_str           = "[Z]";
-const std::string health_big_str           = "[+++]";
-const std::string health_medium_str        = "[++]";
-const std::string health_small_str         = "[+]";
-const std::string mvm_money_str            = "$$$";
-const std::string mvm_red_money_str        = "~$~";
+const std::string health_big_str           = "Big Medkit";
+const std::string health_medium_str        = "Medium Medkit";
+const std::string health_small_str         = "Small Medkit";
+const std::string mvm_money_str            = "Money";
+const std::string mvm_red_money_str        = "~Money~";
 const std::string tank_str                 = "Tank";
 const std::string rpg_str                  = "RPG";
 const std::string smg_str                  = "SMG";
@@ -259,10 +259,10 @@ const std::string alyx_gun_str             = "Alyx Gun";
 const std::string ar2_str                  = "AR2";
 const std::string point357_str             = ".357";
 const std::string slam_str                 = "SLAM";
-const std::string arrow_str                = "[ >>---> ]";
-const std::string sticky_str               = "[ {*} ]";
-const std::string pill_str                 = "[ (PP) ]";
-const std::string rocket_str               = "[ ==> ]";
+const std::string arrow_str                = "\\";
+const std::string sticky_str               = "-x-";
+const std::string pill_str                 = "<->";
+const std::string rocket_str               = "[==]";
 
 // Function called on draw
 static void Draw()
@@ -1219,7 +1219,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             bool IsMini             = CE_BYTE(ent, netvar.m_bMiniBuilding);
             bool IsSapped           = CE_BYTE(ent, netvar.m_bHasSapper);
             if (!IsMini)
-                AddEntityString(ent, format("LVL ", level, ' ', name));
+                AddEntityString(ent, format("Level ", level, ' ', name));
             else
                 AddEntityString(ent, std::string("Mini ") + name);
             if (IsSapped)

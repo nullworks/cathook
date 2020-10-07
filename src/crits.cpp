@@ -791,23 +791,23 @@ void Draw()
             // Weapon can't randomly crit
             if (!re::C_TFWeaponBase::CanFireCriticalShot(RAW_ENT(LOCAL_W), false, nullptr) || !added_per_shot)
             {
-                AddCritString("Weapon cannot randomly crit.", colors::red);
+                AddCritString("Weapon Can't Crit.", colors::red);
                 DrawCritStrings();
                 return;
             }
 
             // We are out of sync. RIP
             if (is_out_of_sync)
-                AddCritString("Out of sync.", colors::red);
+                AddCritString("Out Of Sync.", colors::red);
             // Observed crit chance is not low enough, display how much damage is needed until we can crit again
             else if (crit_mult_info.first > crit_mult_info.second && g_pLocalPlayer->weapon_mode != weapon_melee)
-                AddCritString("Damage Until crit: " + std::to_string(damageUntilToCrit(wep)), colors::orange);
+                AddCritString("Damage Until Crit: " + std::to_string(damageUntilToCrit(wep)), colors::orange);
             else if (!can_crit)
             {
                 if (isRapidFire(wep))
-                    AddCritString("Crit multiplier: " + std::to_string(getWithdrawMult(wep)), colors::orange);
+                    AddCritString("Crit Multiplier: " + std::to_string(getWithdrawMult(wep)), colors::orange);
                 else
-                    AddCritString("Shots until crit: " + std::to_string(shots_until_crit), colors::orange);
+                    AddCritString("Shots Until Crit: " + std::to_string(shots_until_crit), colors::orange);
             }
 
             // Mark bucket as ready/not ready
@@ -868,17 +868,17 @@ void Draw()
                     draw::Rectangle(*bar_x, *bar_y, bar_bg_x_size * bucket_percentage, bar_bg_y_size, bucket_color);
 
                     if (is_out_of_sync)
-                        bar_string = "Out of sync.";
+                        bar_string = "Out Of Sync.";
                     else if (crit_mult_info.first > crit_mult_info.second && g_pLocalPlayer->weapon_mode != weapon_melee)
-                        bar_string = std::to_string(damageUntilToCrit(wep)) + " Damage until Crit!";
+                        bar_string = std::to_string(damageUntilToCrit(wep)) + " Damage Until Crit!";
                     else
                     {
                         if (!isRapidFire(wep))
                         {
-                            bar_string = std::to_string(shots_until_crit) + " Shots until Crit!";
+                            bar_string = std::to_string(shots_until_crit) + " Shots Until Crit!";
                         }
                         else
-                            bar_string = "Crit multiplier: " + std::to_string(getWithdrawMult(wep));
+                            bar_string = "Crit Multiplier: " + std::to_string(getWithdrawMult(wep));
                     }
                 }
                 // Still run when out of sync

@@ -1,4 +1,4 @@
-<Window width="content" height="content" x="200" y="200" name="Playerlist">
+<Window width="content" height="content" x="200" y="200" name="Player List">
     <Table id="special-player-list">
         <Column width="25"/>
         <Column width="70" />

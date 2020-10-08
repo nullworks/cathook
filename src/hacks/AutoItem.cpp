@@ -440,6 +440,17 @@ CatCommand lock_single("achievement_lock_single", "Locks single achievement by I
   }
 });
 
+CatCommand rent_item("rent_item", "testrun a item by ID", [](const CCommand &args) {
+  char *out = nullptr;
+  int id    = strtol(args.Arg(1), &out, 10);
+  if (out == args.Arg(1))
+  {
+      logging::Info("Bad item ID!");
+      return;
+  }
+  Rent(id);
+});
+
 CatCommand lock("achievement_lock", "Lock all achievements", Lock);
 CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
 

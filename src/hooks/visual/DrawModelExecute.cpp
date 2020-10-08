@@ -12,7 +12,11 @@
 #include "AntiAim.hpp"
 
 static settings::Boolean no_arms{ "remove.arms", "false" };
+static settings::Boolean arms_chams{ "chams.arms", "false" };
 static settings::Boolean no_hats{ "remove.hats", "false" };
+static settings::Boolean blend_zoom{ "zoom.blend", "false" };
+static settings::Rgba arm_overlaychams_color{ "chams.arms.overlaycolor", "FF6464FF" };
+static settings::Rgba arm_basechams_color{ "chams.arms.basecolor", "006464FF" };
 
 namespace effect_glow
 {
@@ -27,6 +31,8 @@ namespace hooked_methods
 // Global scope so we can deconstruct on shutdown
 static bool init_mat = false;
 static CMaterialReference mat_dme_chams;
+static CMaterialReference mat_dme_arm1_chams;
+static CMaterialReference mat_dme_arm_chams;
 static InitRoutine init_dme([]() {
     EC::Register(
         EC::LevelShutdown,
@@ -45,7 +51,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     if (!isHackActive())
         return original::DrawModelExecute(this_, state, info, bone);
 
-    if (!(hacks::tf2::backtrack::isBacktrackEnabled /*|| (hacks::shared::antiaim::force_fakelag && hacks::shared::antiaim::isEnabled())*/ || spectator_target || no_arms || no_hats || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer()))
+    if (!(hacks::tf2::backtrack::isBacktrackEnabled /*|| (hacks::shared::antiaim::force_fakelag && hacks::shared::antiaim::isEnabled())*/ || blend_zoom || spectator_target || arms_chams || no_arms || no_hats || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer()))
     {
         return original::DrawModelExecute(this_, state, info, bone);
     }
@@ -54,35 +60,96 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
     PROF_SECTION(DrawModelExecute);
 
-    if (no_arms || no_hats)
+    if (!init_mat)
     {
-        if (info.pModel)
         {
-            const char *name = g_IModelInfo->GetModelName(info.pModel);
-            if (name)
+            KeyValues *kv = new KeyValues("UnlitGeneric");
+            kv->SetString("$basetexture", "vgui/white_additive");
+            kv->SetInt("$ignorez", 0);
+            mat_dme_chams.Init("__cathook_glow_unlit", kv);
+        }
+
+        {
+            KeyValues *kv = new KeyValues("UnlitGeneric");
+            kv->SetString("$basetexture", "vgui/white_additive");
+            kv->SetInt("$ignorez", 0);
+            kv->SetBool("$flat", true);
+            mat_dme_arm1_chams.Init("__cathook_arm_base", kv);
+        }
+
+        { //
+            KeyValues *kv = new KeyValues("VertexLitGeneric");
+            kv->SetString("$basetexture", "vgui/white_additive");
+            kv->SetBool("$phong", true);
+            kv->SetInt("$phongboost", 4);
+            kv->SetBool("$rimlight", true);
+            kv->SetFloat("$rimlightexponent", 2.f);
+            kv->SetInt("$additive", 2);
+            kv->SetInt("$pearlescent", 8);
+            kv->SetBool("$flat", false);
+            kv->SetString("$envmap", "models/effects/cube_white");
+            kv->SetFloat("$envmapfresnel", 1.f);
+            kv->SetInt("$ignorez", 0);
+            mat_dme_arm_chams.Init("__cathook_arm_overlay", kv);
+        }
+        init_mat = true;
+    }
+
+    if (info.pModel)
+    {
+        const char *name = g_IModelInfo->GetModelName(info.pModel);
+        if (name)
+        {
+            std::string sname = name;
+            if (sname.find("arms") != std::string::npos || sname.find("c_engineer_gunslinger") != std::string::npos)
             {
-                std::string sname = name;
                 if (no_arms && sname.find("arms") != std::string::npos)
                 {
                     return;
                 }
-                else if (no_hats && sname.find("player/items") != std::string::npos)
+
+                if (arms_chams)
                 {
+                    rgba_t original_color;
+
+                    g_IVRenderView->GetColorModulation(original_color);
+                    original_color.a = g_IVRenderView->GetBlend();
+
+                    g_IVModelRender->ForcedMaterialOverride(mat_dme_arm1_chams);
+                    g_IVRenderView->SetBlend((*arm_basechams_color).a);
+                    g_IVRenderView->SetColorModulation(*arm_basechams_color);
+                    original::DrawModelExecute(this_, state, info, bone);
+
+                    g_IVModelRender->ForcedMaterialOverride(mat_dme_arm_chams);
+                    g_IVRenderView->SetBlend((*arm_overlaychams_color).a);
+                    g_IVRenderView->SetColorModulation(*arm_overlaychams_color);
+                    original::DrawModelExecute(this_, state, info, bone);
+
+                    g_IVModelRender->ForcedMaterialOverride(nullptr);
+                    g_IVRenderView->SetColorModulation(original_color);
+                    g_IVRenderView->SetBlend(original_color.a);
                     return;
                 }
             }
+
+            if (no_hats && sname.find("player/items") != std::string::npos)
+            {
+                return;
+            }
+
+            /*
+            if(g_pLocalPlayer->bZoomed && sname.find("models/weapons") != std::string::npos)
+            {
+                g_IVModelRender->ForcedMaterialOverride(nullptr);
+                g_IVRenderView->SetBlend(0.2f);
+                original::DrawModelExecute(this_, state, info, bone);
+                return;
+            }
+            */
         }
     }
 
     // Used for fakes and for backtrack chams/glow
-    if (!init_mat)
-    {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
-        kv->SetString("$basetexture", "vgui/white_additive");
-        kv->SetInt("$ignorez", 0);
-        mat_dme_chams.Init("__cathook_glow_unlit", kv);
-        init_mat = true;
-    }
 
     // Maybe one day i'll get this working
     /*if (aa_draw && info.entity_index == g_pLocalPlayer->entity_idx)

@@ -1,6 +1,6 @@
 <Tab name="Chams" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="chams">
-        <List width="150">
+    <Box padding="12 6 6 6" width="content" height="content" name="Chams">
+        <List width="160">
             <AutoVariable width="fill" target="chams.enable" label="Enable chams" tooltip="Change player textures for visiblity."/>
             <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show chams through walls."/>
             <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't show shadows on chams."/>
@@ -9,10 +9,13 @@
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
             <AutoVariable width="fill" target="chams.single-pass" label="Single pass"/>
             <AutoVariable width="fill" target="chams.white-weapons" label="White weapons" tooltip="Color weapons white."/>
+            <AutoVariable width="fill" target="chams.arms" label="Arm Chams" tooltip="Color arms."/>
+            <AutoVariable width="fill" target="chams.arms.overlaycolor" label="Overlay Arm Color" tooltip="Chams Overlay texture color."/>
+            <AutoVariable width="fill" target="chams.arms.basecolor" label="Underlay Arm Color" tooltip="Chams Underlay texture color."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="170">
-        <List width="150">
+        <List width="160">
             <AutoVariable width="fill" target="chams.show.players" label="Players"/>
             <AutoVariable width="fill" target="chams.show.teammates" label="Teammates"/>
             <AutoVariable width="fill" target="chams.show.disguised" label="Disguised"/>

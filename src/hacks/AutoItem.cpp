@@ -39,6 +39,12 @@ static settings::Int hat1{ "auto-item.hats.1", "940" };
 static settings::Int hat2{ "auto-item.hats.2", "941" };
 static settings::Int hat3{ "auto-item.hats.3", "302" };
 
+static settings::Boolean debug{ "auto-item.debug", "false" };
+
+#define Debug(...) \
+    if (*debug)  \
+    logging::Info("AutoItem.cpp: " __VA_ARGS__)
+
 #if ENABLE_TEXTMODE
 static settings::Boolean autoNoisemaker{ "misc.auto-noisemaker", "true" };
 #else
@@ -109,14 +115,14 @@ std::pair<int, std::string> isAchItem(int id)
 
 void getItem(int id, bool rent = true)
 {
-    logging::Info("Trying to get item, %i", id);
+    Debug("Trying to get item, %i", id);
     auto index = isAchItem(id);
     if (index.first != 0)
         unlockSingle(index.first);
     else if (rent)
         Rent(id);
     else
-        logging::Info("Failed to get item %i", id);
+        Debug("Failed to get item %i", id);
 }
 
 static bool equipItem(int clazz, int slot, int id, bool get = true, bool allowRent = false)
@@ -207,7 +213,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
         }
         catch (std::invalid_argument &e)
         {
-            logging::Info("invalid_argument error making ids_split vector.");
+            Debug("invalid_argument error making ids_split vector.");
             return;
         }
 
@@ -240,7 +246,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
             }
             catch (std::invalid_argument &e)
             {
-                logging::Info("invalid_argument error making result integer.");
+                Debug("invalid_argument error making result integer.");
                 return;
             }
 
@@ -256,7 +262,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
 
             for (auto &group_str : craft_groups[slot])
             {
-                logging::Info("Crafting group: %s", group_str.c_str());
+                Debug("Crafting group: %s", group_str.c_str());
                 ids_rec.clear();
                 ids_rec_str.clear();
 
@@ -277,7 +283,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
                 }
                 catch (std::invalid_argument &e)
                 {
-                    logging::Info("invalid_argument error making rec ids vector.");
+                    Debug("invalid_argument error making rec ids vector.");
                     return;
                 }
 
@@ -306,19 +312,18 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
                                 return;
                             if (g_IAchievementMgr->HasAchieved(index.second.c_str()))
                             {
-                                logging::Info("Cant get specified ach item %i because it has already been unlocked! moving to next item.", id);
-
+                                Debug("Cant get specified ach item %i because it has already been unlocked! moving to next item.", id);
                                 // User's fault if they put a ach item they unlocked and have used for crafting already/deleted.
                                 rec_req_amount_have++;
                                 continue;
                             }
-                            logging::Info("Getting ach item %i, required for this craft.", id);
+                            Debug("Getting ach item %i, required for this craft.", id);
                             getItem(id, false);
                             return;
                         }
                         else
                         {
-                            logging::Info("Missing required crafting materials! %i is NOT a ach item!", id);
+                            Debug("Missing required crafting materials! %i is NOT a ach item!", id);
                             return;
                         }
                     }
@@ -330,7 +335,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
         }
         else
         {
-            logging::Info("No result item, can't auto-craft.");
+            Debug("No result item, can't auto-craft.");
             return;
         }
     }
@@ -373,146 +378,146 @@ void CreateMove()
 }
 
 CatCommand dump_achievement("achievement_dump", "Dump achievements to file (development)", []() {
-  if (!checkAchMgr())
-      return;
-  std::ofstream out("/tmp/cathook_achievements.txt", std::ios::out);
-  if (out.bad())
-      return;
-  for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
-  {
-      out << '[' << i << "] " << g_IAchievementMgr->GetAchievementByIndex(i)->GetName() << ' ' << g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID() << "\n";
-  }
-  out.close();
+    if (!checkAchMgr())
+        return;
+    std::ofstream out("/tmp/cathook_achievements.txt", std::ios::out);
+    if (out.bad())
+        return;
+    for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
+    {
+        out << '[' << i << "] " << g_IAchievementMgr->GetAchievementByIndex(i)->GetName() << ' ' << g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID() << "\n";
+    }
+    out.close();
 });
 
 CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievement by ID", [](const CCommand &args) {
-  if (!checkAchMgr())
-      return;
-  char *out = nullptr;
-  int id    = strtol(args.Arg(1), &out, 10);
-  if (out == args.Arg(1))
-  {
-      logging::Info("NaN achievement ID!");
-      return;
-  }
-  unlockSingle(id);
+    if (!checkAchMgr())
+        return;
+    char *out = nullptr;
+    int id    = strtol(args.Arg(1), &out, 10);
+    if (out == args.Arg(1))
+    {
+        logging::Info("NaN achievement ID!");
+        return;
+    }
+    unlockSingle(id);
 });
 
 // For some reason it SEGV's when I try to GetAchievementByID();
 CatCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!", [](const CCommand &args) {
-  if (!checkAchMgr())
-      return;
-  if (args.ArgC() < 2)
-  {
-      logging::Info("Actually provide an index");
-      return;
-  }
-  int id;
-  try
-  {
-      id = std::stoi(args.Arg(1));
-  }
-  catch (std::invalid_argument)
-  {
-      logging::Info("NaN achievement ID!");
-      return;
-  }
-  auto *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByID(id));
+    if (!checkAchMgr())
+        return;
+    if (args.ArgC() < 2)
+    {
+        logging::Info("Actually provide an index");
+        return;
+    }
+    int id;
+    try
+    {
+        id = std::stoi(args.Arg(1));
+    }
+    catch (std::invalid_argument)
+    {
+        logging::Info("Bad achievement ID!");
+        return;
+    }
+    auto *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByID(id));
 
-  int index = -1;
-  if (ach)
-      for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
-      {
-          auto ach2 = g_IAchievementMgr->GetAchievementByIndex(i);
-          if (ach2->GetAchievementID() == id)
-          {
-              index = i;
-              break;
-          }
-      }
-  if (ach && index != -1)
-  {
-      g_ISteamUserStats->RequestCurrentStats();
-      auto ach = g_IAchievementMgr->GetAchievementByIndex(index);
-      g_ISteamUserStats->ClearAchievement(ach->GetName());
-      g_ISteamUserStats->StoreStats();
-      g_ISteamUserStats->RequestCurrentStats();
-  }
+    int index = -1;
+    if (ach)
+        for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
+        {
+            auto ach2 = g_IAchievementMgr->GetAchievementByIndex(i);
+            if (ach2->GetAchievementID() == id)
+            {
+                index = i;
+                break;
+            }
+        }
+    if (ach && index != -1)
+    {
+        g_ISteamUserStats->RequestCurrentStats();
+        auto ach = g_IAchievementMgr->GetAchievementByIndex(index);
+        g_ISteamUserStats->ClearAchievement(ach->GetName());
+        g_ISteamUserStats->StoreStats();
+        g_ISteamUserStats->RequestCurrentStats();
+    }
 });
 
 CatCommand rent_item("rent_item", "testrun a item by ID", [](const CCommand &args) {
-  char *out = nullptr;
-  int id    = strtol(args.Arg(1), &out, 10);
-  if (out == args.Arg(1))
-  {
-      logging::Info("Bad item ID!");
-      return;
-  }
-  Rent(id);
+    char *out = nullptr;
+    int id    = strtol(args.Arg(1), &out, 10);
+    if (out == args.Arg(1))
+    {
+        logging::Info("Bad item ID!");
+        return;
+    }
+    Rent(id);
 });
 
 CatCommand lock("achievement_lock", "Lock all achievements", Lock);
 CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
 
 static InitRoutine init([]() {
-  primary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string& after) { parseRvars(); });
-  secondary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string& after) { parseRvars(); });
-  melee.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string& after) { parseRvars(); });
+    primary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
+    secondary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
+    melee.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
 
-  EC::Register(EC::CreateMove, CreateMove, "autoitem_cm");
+    EC::Register(EC::CreateMove, CreateMove, "autoitem_cm");
 
-  std::time_t theTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm *aTime      = std::localtime(&theTime);
+    std::time_t theTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::tm *aTime      = std::localtime(&theTime);
 
-  int day   = aTime->tm_mday;
-  int month = aTime->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
+    int day   = aTime->tm_mday;
+    int month = aTime->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
 
-  // We only want to Use the christmas noisemaker around christmas time, let's use 12th of december+ til 12th of january
-  if ((month == 12 && day >= 12) || (month == 1 && day <= 12))
-      noisemaker_id = 673;
+    // We only want to Use the christmas noisemaker around christmas time, let's use 12th of december+ til 12th of january
+    if ((month == 12 && day >= 12) || (month == 1 && day <= 12))
+        noisemaker_id = 673;
 
-  /* haha emplace_back go brrrrrr */
-  ach_items.emplace_back(45, 1036, "TF_SCOUT_ACHIEVE_PROGRESS1");          // Force-A-Nature - Scout Milestone 1
-  ach_items.emplace_back(44, 1037, "TF_SCOUT_ACHIEVE_PROGRESS2");          // Sandman - Scout Milestone 2
-  ach_items.emplace_back(46, 1038, "TF_SCOUT_ACHIEVE_PROGRESS3");          // Bonk! Atomic Punch - Scout Milestone 3
-  ach_items.emplace_back(128, 1236, "TF_SOLDIER_ACHIEVE_PROGRESS1");       // Equalizer - Soldier Milestone 1
-  ach_items.emplace_back(127, 1237, "TF_SOLDIER_ACHIEVE_PROGRESS2");       // Direct Hit - Soldier Milestone 2
-  ach_items.emplace_back(129, 1238, "TF_SOLDIER_ACHIEVE_PROGRESS3");       // Buff Banner - Soldier Milestone 3
-  ach_items.emplace_back(39, 1637, "TF_PYRO_ACHIEVE_PROGRESS1");           // Flare Gun - Pyro Milestone 1
-  ach_items.emplace_back(40, 1638, "TF_PYRO_ACHIEVE_PROGRESS2");           // Backburner - Pyro Milestone 2
-  ach_items.emplace_back(38, 1639, "TF_PYRO_ACHIEVE_PROGRESS3");           // Axtinguisher - Pyro Milestone 3
-  ach_items.emplace_back(131, 1336, "TF_DEMOMAN_ACHIEVE_PROGRESS1");       // Chargin' Targe - Demoman Milestone 1
-  ach_items.emplace_back(132, 1337, "TF_DEMOMAN_ACHIEVE_PROGRESS2");       // Eyelander - Demoman Milestone 2
-  ach_items.emplace_back(130, 1338, "TF_DEMOMAN_ACHIEVE_PROGRESS3");       // Scottish Resistance - Demoman Milestone 3
-  ach_items.emplace_back(42, 1537, "TF_HEAVY_ACHIEVE_PROGRESS1");          // Sandvich - Heavy Milestone 1
-  ach_items.emplace_back(41, 1538, "TF_HEAVY_ACHIEVE_PROGRESS2");          // Natascha - Heavy Milestone 2
-  ach_items.emplace_back(43, 1539, "TF_HEAVY_ACHIEVE_PROGRESS3");          // Killing Gloves of Boxing - Heavy Milestone 3
-  ach_items.emplace_back(141, 1801, "TF_ENGINEER_ACHIEVE_PROGRESS1");      // Frontier Justice - Engineer Milestone 1
-  ach_items.emplace_back(142, 1802, "TF_ENGINEER_ACHIEVE_PROGRESS2");      // Gunslinger - Engineer Milestone 2
-  ach_items.emplace_back(140, 1803, "TF_ENGINEER_ACHIEVE_PROGRESS3");      // Wrangler - Engineer Milestone 3
-  ach_items.emplace_back(36, 1437, "TF_MEDIC_ACHIEVE_PROGRESS1");          // Blutsauger - Medic Milestone 1
-  ach_items.emplace_back(35, 1438, "TF_MEDIC_ACHIEVE_PROGRESS2");          // Kritzkrieg - Medic Milestone 2
-  ach_items.emplace_back(37, 1439, "TF_MEDIC_ACHIEVE_PROGRESS3");          // Ubersaw - Medic Milestone 3
-  ach_items.emplace_back(56, 1136, "TF_SNIPER_ACHIEVE_PROGRESS1");         // Huntsman - Sniper Milestone 1
-  ach_items.emplace_back(58, 1137, "TF_SNIPER_ACHIEVE_PROGRESS2");         // Jarate - Sniper Milestone 2
-  ach_items.emplace_back(57, 1138, "TF_SNIPER_ACHIEVE_PROGRESS3");         // Razorback - Sniper Milestone 3
-  ach_items.emplace_back(61, 1735, "TF_SPY_ACHIEVE_PROGRESS1");            // Ambassador - Spy Milestone 1
-  ach_items.emplace_back(60, 1736, "TF_SPY_ACHIEVE_PROGRESS2");            // Cloak and Dagger - Spy Milestone 2
-  ach_items.emplace_back(59, 1737, "TF_SPY_ACHIEVE_PROGRESS3");            // Dead Ringer - Spy Milestone 3
-  ach_items.emplace_back(1123, 1928, "TF_HALLOWEEN_DOOMSDAY_MILESTONE");   // Necro Smasher - Carnival of Carnage: Step Right Up
-  ach_items.emplace_back(940, 1902, "TF_HALLOWEEN_DOMINATE_FOR_HAT");      // Ghostly Gibus - Ghastly Gibus Grab
-  ach_items.emplace_back(115, 1901, "TF_HALLOWEEN_COLLECT_PUMPKINS");      // Mildly Disturbing Halloween Mask - Candy Coroner
-  ach_items.emplace_back(278, 1906, "TF_HALLOWEEN_BOSS_KILL");             // Horseless Headless Horsemann's Head - Sleepy Holl0WND
-  ach_items.emplace_back(302, 2006, "TF_REPLAY_YOUTUBE_VIEWS_TIER2");      // Frontline Field Recorder - Local Cinema Star
-  ach_items.emplace_back(581, 1910, "TF_HALLOWEEN_EYEBOSS_KILL");          // MONOCULUS! - Optical Defusion
-  ach_items.emplace_back(668, 2212, "TF_MAPS_FOUNDRY_ACHIEVE_PROGRESS1");  // Full Head Of Steam - Foundry Milestone
-  ach_items.emplace_back(756, 2412, "TF_MAPS_DOOMSDAY_ACHIEVE_PROGRESS1"); // Gentle Munitionne of Leisure - Doomsday Milestone
-  ach_items.emplace_back(941, 1912, "TF_HALLOWEEN_MERASMUS_COLLECT_LOOT"); // Skull Island Topper - A Lovely Vacation Spot
-  ach_items.emplace_back(581, 1911, "TF_HALLOWEEN_LOOT_ISLAND");           // Bombinomicon - Dive Into a Good Book
-  ach_items.emplace_back(744, 156, "TF_DOMINATE_FOR_GOGGLES");             // Pyrovision Goggles - A Fresh Pair of Eyes
-  ach_items.emplace_back(1164, 167, "TF_PASS_TIME_GRIND");                 // Civilian Grade JACK Hat - Jackpot!
-  ach_items.emplace_back(1169, 166, "TF_PASS_TIME_HAT");                   // Military Grade JACK Hat - Tune Merasmus's Multi-Dimensional Television
-  ach_items.emplace_back(1170, 166, "TF_PASS_TIME_HAT");                   // PASS Time Miniature Half JACK - Tune Merasmus's Multi-Dimensional Television
-  ach_items.emplace_back(267, 1909, "TF_HALLOWEEN_BOSS_KILL_MELEE");       // Haunted Metal Scrap - Gored!
+    /* haha emplace_back go brrrrrr */
+    ach_items.emplace_back(45, 1036, "TF_SCOUT_ACHIEVE_PROGRESS1");          // Force-A-Nature - Scout Milestone 1
+    ach_items.emplace_back(44, 1037, "TF_SCOUT_ACHIEVE_PROGRESS2");          // Sandman - Scout Milestone 2
+    ach_items.emplace_back(46, 1038, "TF_SCOUT_ACHIEVE_PROGRESS3");          // Bonk! Atomic Punch - Scout Milestone 3
+    ach_items.emplace_back(128, 1236, "TF_SOLDIER_ACHIEVE_PROGRESS1");       // Equalizer - Soldier Milestone 1
+    ach_items.emplace_back(127, 1237, "TF_SOLDIER_ACHIEVE_PROGRESS2");       // Direct Hit - Soldier Milestone 2
+    ach_items.emplace_back(129, 1238, "TF_SOLDIER_ACHIEVE_PROGRESS3");       // Buff Banner - Soldier Milestone 3
+    ach_items.emplace_back(39, 1637, "TF_PYRO_ACHIEVE_PROGRESS1");           // Flare Gun - Pyro Milestone 1
+    ach_items.emplace_back(40, 1638, "TF_PYRO_ACHIEVE_PROGRESS2");           // Backburner - Pyro Milestone 2
+    ach_items.emplace_back(38, 1639, "TF_PYRO_ACHIEVE_PROGRESS3");           // Axtinguisher - Pyro Milestone 3
+    ach_items.emplace_back(131, 1336, "TF_DEMOMAN_ACHIEVE_PROGRESS1");       // Chargin' Targe - Demoman Milestone 1
+    ach_items.emplace_back(132, 1337, "TF_DEMOMAN_ACHIEVE_PROGRESS2");       // Eyelander - Demoman Milestone 2
+    ach_items.emplace_back(130, 1338, "TF_DEMOMAN_ACHIEVE_PROGRESS3");       // Scottish Resistance - Demoman Milestone 3
+    ach_items.emplace_back(42, 1537, "TF_HEAVY_ACHIEVE_PROGRESS1");          // Sandvich - Heavy Milestone 1
+    ach_items.emplace_back(41, 1538, "TF_HEAVY_ACHIEVE_PROGRESS2");          // Natascha - Heavy Milestone 2
+    ach_items.emplace_back(43, 1539, "TF_HEAVY_ACHIEVE_PROGRESS3");          // Killing Gloves of Boxing - Heavy Milestone 3
+    ach_items.emplace_back(141, 1801, "TF_ENGINEER_ACHIEVE_PROGRESS1");      // Frontier Justice - Engineer Milestone 1
+    ach_items.emplace_back(142, 1802, "TF_ENGINEER_ACHIEVE_PROGRESS2");      // Gunslinger - Engineer Milestone 2
+    ach_items.emplace_back(140, 1803, "TF_ENGINEER_ACHIEVE_PROGRESS3");      // Wrangler - Engineer Milestone 3
+    ach_items.emplace_back(36, 1437, "TF_MEDIC_ACHIEVE_PROGRESS1");          // Blutsauger - Medic Milestone 1
+    ach_items.emplace_back(35, 1438, "TF_MEDIC_ACHIEVE_PROGRESS2");          // Kritzkrieg - Medic Milestone 2
+    ach_items.emplace_back(37, 1439, "TF_MEDIC_ACHIEVE_PROGRESS3");          // Ubersaw - Medic Milestone 3
+    ach_items.emplace_back(56, 1136, "TF_SNIPER_ACHIEVE_PROGRESS1");         // Huntsman - Sniper Milestone 1
+    ach_items.emplace_back(58, 1137, "TF_SNIPER_ACHIEVE_PROGRESS2");         // Jarate - Sniper Milestone 2
+    ach_items.emplace_back(57, 1138, "TF_SNIPER_ACHIEVE_PROGRESS3");         // Razorback - Sniper Milestone 3
+    ach_items.emplace_back(61, 1735, "TF_SPY_ACHIEVE_PROGRESS1");            // Ambassador - Spy Milestone 1
+    ach_items.emplace_back(60, 1736, "TF_SPY_ACHIEVE_PROGRESS2");            // Cloak and Dagger - Spy Milestone 2
+    ach_items.emplace_back(59, 1737, "TF_SPY_ACHIEVE_PROGRESS3");            // Dead Ringer - Spy Milestone 3
+    ach_items.emplace_back(1123, 1928, "TF_HALLOWEEN_DOOMSDAY_MILESTONE");   // Necro Smasher - Carnival of Carnage: Step Right Up
+    ach_items.emplace_back(940, 1902, "TF_HALLOWEEN_DOMINATE_FOR_HAT");      // Ghostly Gibus - Ghastly Gibus Grab
+    ach_items.emplace_back(115, 1901, "TF_HALLOWEEN_COLLECT_PUMPKINS");      // Mildly Disturbing Halloween Mask - Candy Coroner
+    ach_items.emplace_back(278, 1906, "TF_HALLOWEEN_BOSS_KILL");             // Horseless Headless Horsemann's Head - Sleepy Holl0WND
+    ach_items.emplace_back(302, 2006, "TF_REPLAY_YOUTUBE_VIEWS_TIER2");      // Frontline Field Recorder - Local Cinema Star
+    ach_items.emplace_back(581, 1910, "TF_HALLOWEEN_EYEBOSS_KILL");          // MONOCULUS! - Optical Defusion
+    ach_items.emplace_back(668, 2212, "TF_MAPS_FOUNDRY_ACHIEVE_PROGRESS1");  // Full Head Of Steam - Foundry Milestone
+    ach_items.emplace_back(756, 2412, "TF_MAPS_DOOMSDAY_ACHIEVE_PROGRESS1"); // Gentle Munitionne of Leisure - Doomsday Milestone
+    ach_items.emplace_back(941, 1912, "TF_HALLOWEEN_MERASMUS_COLLECT_LOOT"); // Skull Island Topper - A Lovely Vacation Spot
+    ach_items.emplace_back(581, 1911, "TF_HALLOWEEN_LOOT_ISLAND");           // Bombinomicon - Dive Into a Good Book
+    ach_items.emplace_back(744, 156, "TF_DOMINATE_FOR_GOGGLES");             // Pyrovision Goggles - A Fresh Pair of Eyes
+    ach_items.emplace_back(1164, 167, "TF_PASS_TIME_GRIND");                 // Civilian Grade JACK Hat - Jackpot!
+    ach_items.emplace_back(1169, 166, "TF_PASS_TIME_HAT");                   // Military Grade JACK Hat - Tune Merasmus's Multi-Dimensional Television
+    ach_items.emplace_back(1170, 166, "TF_PASS_TIME_HAT");                   // PASS Time Miniature Half JACK - Tune Merasmus's Multi-Dimensional Television
+    ach_items.emplace_back(267, 1909, "TF_HALLOWEEN_BOSS_KILL_MELEE");       // Haunted Metal Scrap - Gored!
 });
 } // namespace hacks::tf2::autoitem

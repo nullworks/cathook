@@ -167,7 +167,6 @@ bool Craft(std::vector<int> item_ids)
     // Add items
     for (int i = 0; i < item_UUIDs.size(); i++)
     {
-        logging::Info("%llu", item_UUIDs[i]);
         panel.m_InputItems[i] = item_UUIDs[i];
     }
 

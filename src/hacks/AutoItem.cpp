@@ -42,7 +42,7 @@ static settings::Int hat3{ "auto-item.hats.3", "302" };
 static settings::Boolean debug{ "auto-item.debug", "false" };
 
 #define Debug(...) \
-    if (*debug)  \
+    if (*debug)    \
     logging::Info("AutoItem.cpp: " __VA_ARGS__)
 
 #if ENABLE_TEXTMODE
@@ -118,7 +118,10 @@ void getItem(int id, bool rent = true)
     Debug("Trying to get item, %i", id);
     auto index = isAchItem(id);
     if (index.first != 0)
+    {
         unlockSingle(index.first);
+        g_IEngine->ClientCmd_Unrestricted("cl_trigger_first_notification");
+    }
     else if (rent)
         Rent(id);
     else
@@ -330,7 +333,10 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
                 }
                 // Only attempt crafting if we have the correct amount of items.
                 if (rec_req_amount_have == ids_rec.size())
+                {
                     Craft(ids_rec);
+                    g_IEngine->ClientCmd_Unrestricted("cl_trigger_first_notification");
+                }
             }
         }
         else

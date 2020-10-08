@@ -8,9 +8,9 @@
             <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary"/>
             <AutoVariable width="fill" target="auto-item.weapons.melee" label="Melee"/>
             <AutoVariable width="fill" target="auto-item.hats" label="Hats"/>
-            <AutoVariable width="fill" target="auto-item.hat1" label="Hat 1"/>
-            <AutoVariable width="fill" target="auto-item.hat2" label="Hat 2"/>
-            <AutoVariable width="fill" target="auto-item.hat3" label="Hat 3"/>
+            <AutoVariable width="fill" target="auto-item.hats.1" label="Hat 1"/>
+            <AutoVariable width="fill" target="auto-item.hats.2" label="Hat 2"/>
+            <AutoVariable width="fill" target="auto-item.hats.3" label="Hat 3"/>
         </List>
     </Box>
 </Tab>

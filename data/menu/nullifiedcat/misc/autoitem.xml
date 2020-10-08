@@ -1,0 +1,16 @@
+<Tab name="Auto Item" padding="4 4 4 4">
+    <Box name="Auto item" width="content" height="content" padding="12 6 6 6">
+        <List width="200">
+            <AutoVariable width="fill" target="auto-item.enable" label="Enable auto item"/>
+            <AutoVariable width="fill" target="auto-item.time" label="Equip timer"/>
+            <AutoVariable width="fill" target="auto-item.weapons" label="Weapons"/>
+            <AutoVariable width="fill" target="auto-item.weapons.primary" label="Primary"/>
+            <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary"/>
+            <AutoVariable width="fill" target="auto-item.weapons.melee" label="Melee"/>
+            <AutoVariable width="fill" target="auto-item.hats" label="Hats"/>
+            <AutoVariable width="fill" target="auto-item.hat1" label="Hat 1"/>
+            <AutoVariable width="fill" target="auto-item.hat2" label="Hat 2"/>
+            <AutoVariable width="fill" target="auto-item.hat3" label="Hat 3"/>
+        </List>
+    </Box>
+</Tab>

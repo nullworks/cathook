@@ -18,9 +18,9 @@ Vector SimpleLatencyPrediction(CachedEntity *ent, int hb);
 
 bool PerformProjectilePrediction(CachedEntity *target, int hitbox);
 
-Vector BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity);
-Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod);
-Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod /* ignored */);
+Vector BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity, float proj_startvelocity = 0.0f);
+Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity = 0.0f);
+Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod /* ignored */, float proj_startvelocity = 0.0f);
 
 std::vector<Vector> Predict(Vector pos, float offset, Vector vel, Vector acceleration, std::pair<Vector, Vector> minmax, float time, int count, bool vischeck = true);
 float PlayerGravityMod(CachedEntity *player);

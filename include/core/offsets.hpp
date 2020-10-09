@@ -224,4 +224,8 @@ struct offsets
     {
         return PlatformOffset(18, undefined, undefined);
     }
+    static constexpr uint32_t m_bUsingActionSlot()
+    {
+        return PlatformOffset(0x2fb8, undefined, undefined);
+    }
 };

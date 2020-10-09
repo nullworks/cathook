@@ -36,8 +36,8 @@ static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
-
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
+static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };
@@ -908,8 +908,37 @@ void cyoaview_nethook(const CRecvProxyData *data, void *pPlayer, void *out)
         *value_out = false;
 }
 
+// This function does two things.
+// 1. It patches the check that's supposed to update the "isWaitCommandEnabled" on the cvar buffer to always skip
+// 2. It sets the wait command to enabled
+// The Former is the main logic, the latter is so you don't accidentally perma disable it either
+inline void force_wait_func(bool after)
+{
+    static auto enable_wait_signature = gSignatures.GetEngineSignature("74 ? A2 ? ? ? ? C7 44 24 ? 01 00 00 00");
+    // Jump if not overflow, aka always jump in this case
+    static BytePatch patch_wait(enable_wait_signature, { 0x71 });
+    if (after)
+    {
+        // Enable the wait command
+        int **enable_wait = (int **) (enable_wait_signature + 3);
+        **enable_wait     = true;
+        patch_wait.Patch();
+    }
+    else
+        patch_wait.Shutdown();
+}
+
+void callback_force_wait(settings::VariableBase<bool> &, bool after)
+{
+    force_wait_func(after);
+}
+
 static InitRoutine init([]() {
     HookNetvar({ "DT_TFPlayer", "m_bViewingCYOAPDA" }, cyoa_anim_hook, cyoaview_nethook);
+
+    force_wait.installChangeCallback(callback_force_wait);
+    force_wait_func(true);
+
     teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
     EC::Register(EC::Shutdown, Shutdown, "draw_local_player", EC::average);
     EC::Register(EC::CreateMove, CreateMove, "cm_misc_hacks", EC::average);
@@ -944,6 +973,7 @@ static InitRoutine init([]() {
             stealth_kill.Shutdown();
             cyoa_patch.Shutdown();
             tryPatchLocalPlayerShouldDraw(false);
+            force_wait_func(false);
         },
         "shutdown_stealthkill");
     dont_hide_stealth_kills.installChangeCallback([](settings::VariableBase<bool> &, bool after) {

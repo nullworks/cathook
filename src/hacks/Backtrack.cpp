@@ -21,7 +21,7 @@ static int lastincomingsequence{ 0 };
 static float latency_rampup = 0.0f;
 
 // Which data to apply in the late CreateMove
-static CachedEntity *bt_ent;
+static CachedEntity *bt_ent = nullptr;
 static std::optional<BacktrackData> bt_data;
 
 static bool isEnabled();
@@ -51,7 +51,7 @@ void ApplyBacktrack()
 {
     if (!isBacktrackEnabled)
         return;
-    if (bt_ent)
+    if (bt_ent && bt_data)
     {
         current_user_cmd->tick_count                = (*bt_data).tickcount;
         CE_FLOAT(bt_ent, netvar.m_angEyeAngles)     = (*bt_data).m_vecAngles.x;

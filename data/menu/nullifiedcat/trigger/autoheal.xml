@@ -7,12 +7,13 @@
             <AutoVariable width="fill" target="autoheal.steamid" label="SteamID" tooltip="SteamID for the above."/>
             <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto uber"/>
             <AutoVariable width="fill" target="autoheal.uber.share" label="Share uber"/>
+            <AutoVariable width="fill" target="autoheal.disguised" label="Disguised spies"/>
             <AutoVariable width="fill" target="autoheal.uber.health-below-ratio" label="Ratio trigger" min="0" max="100"/>
             <AutoVariable width="fill" target="autoheal.popvoice" label="Pop on voicecommand"/>
             <AutoVariable width="fill" target="autoheal.friends-only" label="Only heal friends"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Health priority" y="160">
+    <Box padding="12 6 6 6" width="content" height="content" name="Health priority" y="170">
         <List width="160">
             <AutoVariable width="fill" target="autoheal.priority-scout" label="Scout weight"/>
             <AutoVariable width="fill" target="autoheal.priority-soldier" label="Soldier weight"/>

@@ -276,7 +276,7 @@ static bool doBacktrackStab(bool legit = false)
     {
         CachedEntity *ent = ENTITY(i);
         // Targeting checks
-        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent)|| IsPlayerInvulnerable(ent))
+        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
             continue;
 
         // Get the best tick for that ent
@@ -304,11 +304,18 @@ static bool doBacktrackStab(bool legit = false)
     return false;
 }
 
+inline bool HasKnife()
+{
+    if (re::C_TFWeaponBase::GetWeaponID(RAW_ENT(LOCAL_W)) == 7)
+        return true;
+    return false;
+}
+
 void CreateMove()
 {
     if (!enabled)
         return;
-    if (CE_BAD(LOCAL_E) || g_pLocalPlayer->life_state || g_pLocalPlayer->clazz != tf_spy || CE_BAD(LOCAL_W) || GetWeaponMode() != weapon_melee || IsPlayerInvisible(LOCAL_E) || CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
+    if (CE_BAD(LOCAL_E) || g_pLocalPlayer->life_state || CE_BAD(LOCAL_W) || !HasKnife() || IsPlayerInvisible(LOCAL_E) || CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
         return;
     if (!CanShoot())
         return;

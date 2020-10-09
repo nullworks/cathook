@@ -113,7 +113,7 @@ bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax);
 float DistToSqr(CachedEntity *entity);
 void fClampAngle(Vector &qaAng);
 // const char* MakeInfoString(IClientEntity* player);
-bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity);
+bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float &start_velocity);
 bool IsVectorVisible(Vector a, Vector b, bool enviroment_only = false, CachedEntity *self = LOCAL_E, unsigned int mask = MASK_SHOT_HULL);
 // A Special function for navparser to check if a Vector is visible.
 bool IsVectorVisibleNavigation(Vector a, Vector b, unsigned int mask = MASK_SHOT_HULL);

@@ -10,6 +10,7 @@
 #include "hacks/AutoJoin.hpp"
 #include "hack.hpp"
 
+static settings::Boolean auto_party{ "player-tools.set-party-state", "true" };
 settings::Int queue{ "autoqueue.mode", "7" };
 
 CatCommand cmd_queue_start("mm_queue_casual", "Start casual queue", []() { tfmm::startQueue(); });
@@ -171,7 +172,7 @@ void abandon()
 static Timer friend_party_t{};
 void friend_party()
 {
-    if (friend_party_t.test_and_set(10000))
+    if (auto_party && friend_party_t.test_and_set(10000))
     {
         re::CTFPartyClient *pc = re::CTFPartyClient::GTFPartyClient();
         if (pc)

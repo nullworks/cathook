@@ -21,6 +21,7 @@ static settings::Boolean pop_uber_auto{ "autoheal.uber.enable", "true" };
 static settings::Boolean pop_uber_voice{ "autoheal.popvoice", "true" };
 static settings::Float pop_uber_percent{ "autoheal.uber.health-below-ratio", "0" };
 static settings::Boolean share_uber{ "autoheal.uber.share", "false" };
+static settings::Boolean heal_disguised{ "autoheal.disguised", "false" };
 
 static settings::Boolean auto_vacc{ "autoheal.vacc.enable", "false" };
 
@@ -490,6 +491,8 @@ bool CanHeal(int idx)
     if (IsPlayerInvisible(ent))
         return false;
     if (friendsonly && !playerlist::IsFriend(ent))
+        return false;
+    if (!heal_disguised && IsPlayerDisguised(ent))
         return false;
     return true;
 }

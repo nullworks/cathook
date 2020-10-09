@@ -38,6 +38,7 @@ static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
 static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "0" };
 
+static settings::Boolean proj_silent("aimbot.projectile-silent", "1");
 static settings::Boolean silent{ "aimbot.silent", "1" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "0" };
 #if ENABLE_VISUALS
@@ -54,6 +55,7 @@ static settings::Int miss_chance{ "aimbot.miss-chance", "0" };
 static settings::Boolean projectile_aimbot{ "aimbot.projectile.enable", "true" };
 static settings::Float proj_gravity{ "aimbot.projectile.gravity", "0" };
 static settings::Float proj_speed{ "aimbot.projectile.speed", "0" };
+static settings::Float proj_start_vel{ "aimbot.projectile.initial-velocity", "0" };
 
 static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot", "0.5" };
 
@@ -153,6 +155,7 @@ settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "1" };
 bool projectile_mode{ false };
 float cur_proj_speed{ 0.0f };
 float cur_proj_grav{ 0.0f };
+float cur_proj_start_vel{ 0.0f };
 
 bool shouldBacktrack()
 {
@@ -266,13 +269,15 @@ static void CreateMove()
     // Refresh projectile info
     if (projectileAimbotRequired)
     {
-        projectile_mode = GetProjectileData(g_pLocalPlayer->weapon(), cur_proj_speed, cur_proj_grav);
+        projectile_mode = GetProjectileData(g_pLocalPlayer->weapon(), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
         if (!projectile_mode)
             return;
         if (proj_speed)
-            cur_proj_speed = float(proj_speed);
+            cur_proj_speed = *proj_speed;
         if (proj_gravity)
-            cur_proj_grav = float(proj_gravity);
+            cur_proj_grav = *proj_gravity;
+        if (proj_start_vel)
+            cur_proj_start_vel = *proj_start_vel;
     }
     // Refresh our best target
     CachedEntity *target_entity = RetrieveBestTarget(aimkey_status);
@@ -340,14 +345,14 @@ static void CreateMove()
         }
         else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
         {
-            float chargebegin = *((float *) ((uintptr_t) RAW_ENT(LOCAL_W) + 3152));
+            float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
             float chargetime  = g_GlobalVars->curtime - chargebegin;
 
             DoAutoshoot();
             static bool currently_charging_pipe = false;
 
             // Grenade started charging
-            if (chargetime < 6.0f && chargetime)
+            if (chargetime < 6.0f && chargetime && chargebegin)
                 currently_charging_pipe = true;
 
             // Grenade was released
@@ -980,8 +985,11 @@ void DoAutoshoot(CachedEntity *target_entity)
             current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(5);
             begancharge = false;
-            // Pull string if charge isnt enough
+            // Projectile silent logic
+            if (proj_silent)
+                *bSendPackets = false;
         }
+        // Pull string if charge isnt enough
         else
         {
             current_user_cmd->buttons |= IN_ATTACK;
@@ -993,16 +1001,19 @@ void DoAutoshoot(CachedEntity *target_entity)
         begancharge = false;
     if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
     {
-        float chargebegin = *((float *) ((unsigned) RAW_ENT(LOCAL_W) + 3152));
+        float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
         float chargetime  = g_GlobalVars->curtime - chargebegin;
 
         // Release Sticky if > chargetime, 3.85 is the max second chargetime,
-        // but we want a percent so here we go
+        // but we also need to consider the release time supplied by the user
         if ((chargetime >= 3.85f * *sticky_autoshoot) && begansticky > 3)
         {
             current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(5);
             begansticky = 0;
+            // Projectile silent logic
+            if (proj_silent)
+                *bSendPackets = false;
         }
         // Else just keep charging
         else
@@ -1059,7 +1070,11 @@ void DoAutoshoot(CachedEntity *target_entity)
             auto hitbox = calculated_data_array[target_entity->m_IDX].hitbox;
             hitrate::AimbotShot(target_entity->m_IDX, hitbox != head);
         }
-        *bSendPackets = true;
+        // Projectile silent logic
+        if (projectileAimbotRequired && proj_silent)
+            *bSendPackets = false;
+        else
+            *bSendPackets = true;
     }
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
@@ -1084,9 +1099,9 @@ const Vector &PredictEntity(CachedEntity *entity)
             {
                 // Use prediction engine if user settings allow
                 if (engine_projpred)
-                    result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0);
+                    result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0, cur_proj_start_vel);
                 else
-                    result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity));
+                    result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
             }
             else
             {
@@ -1102,7 +1117,7 @@ const Vector &PredictEntity(CachedEntity *entity)
         else if (entity->m_Type() == ENTITY_BUILDING || entity->m_iClassID() != CL_CLASS(CTFTankBoss))
         {
             if (cur_proj_grav || cur_proj_grav)
-                result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav);
+                result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
             else
                 result = GetBuildingPosition(entity);
             // Other
@@ -1172,12 +1187,12 @@ int BestHitbox(CachedEntity *target)
                 // Rocket launcher
             }
             // These weapons should aim at the foot if the target is grounded
-            else if (ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar))
+            else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar))
             {
                 preferred = hitbox_t::foot_L;
             }
             // These weapons should aim at the center of mass due to little/no splash
-            else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher_DirectHit) || ci == CL_CLASS(CTFGrenadeLauncher))
+            else if (ci == CL_CLASS(CTFRocketLauncher_DirectHit) || ci == CL_CLASS(CTFGrenadeLauncher))
             {
                 preferred = hitbox_t::spine_3;
             }

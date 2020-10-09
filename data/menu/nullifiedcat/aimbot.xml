@@ -12,6 +12,7 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen."/>
+            <AutoVariable width="fill" target="aimbot.projectile-silent" label="pSilent" tooltip="Stops snapping of projectile weapons on the screen of others."/>
             <AutoVariable width="fill" target="aimbot.slow" label="Slow aimbot" min="0" max="30"/>
             <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the aimbot to a certain FOV from the crosshair."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle" tooltip="Shows the Aimbot's FOV."/>
@@ -23,7 +24,7 @@
             <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip Viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" y="225">
+    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" y="235">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"/>
             <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
@@ -99,6 +100,7 @@
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
             <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial Velocity"/>
             <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
             <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Bow threshold"/>
             <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky threshold"/>

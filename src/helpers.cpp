@@ -1229,16 +1229,17 @@ bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax)
     return true;
 }
 
-bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
+bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float &start_velocity)
 {
-    float rspeed, rgrav;
+    float rspeed, rgrav, rinitial_vel;
 
     IF_GAME(!IsTF()) return false;
 
     if (CE_BAD(weapon))
         return false;
-    rspeed = 0.0f;
-    rgrav  = 0.0f;
+    rspeed       = 0.0f;
+    rgrav        = 0.0f;
+    rinitial_vel = 0.0f;
     typedef float(GetProjectileData)(IClientEntity *);
 
     switch (weapon->m_iClassID())
@@ -1265,25 +1266,24 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
     }
     case CL_CLASS(CTFGrenadeLauncher):
     {
-        rspeed = 1200.0f;
-        rgrav  = 0.4f;
+        rspeed       = 1200.0f;
+        rgrav        = 1.0f;
+        rinitial_vel = 200.0f;
         IF_GAME(IsTF2())
         {
             // Loch'n Load
             if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 308)
                 rspeed *= 1.25f;
         }
-        IF_GAME(IsTF2C())
-        {
-            rgrav = 0.5f;
-        }
         break;
     }
     case CL_CLASS(CTFPipebombLauncher):
     {
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
-        rspeed           = RemapValClamped(chargetime, 0.0f, 4.0f, 900, 2400);
-        rgrav            = 0.4f;
+        if (!CE_FLOAT(weapon, netvar.flChargeBeginTime))
+            chargetime = 0.0f;
+        rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 900, 2400);
+        rgrav  = 0.4f;
         break;
     }
     case CL_CLASS(CTFCompoundBow):
@@ -1346,9 +1346,10 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity)
     }
     }
 
-    speed   = rspeed;
-    gravity = rgrav;
-    return (rspeed || rgrav);
+    speed          = rspeed;
+    gravity        = rgrav;
+    start_velocity = rinitial_vel;
+    return (rspeed || rgrav || rinitial_vel);
 }
 
 constexpr unsigned developer_list[] = { 306902159 };

@@ -18,9 +18,10 @@ static settings::Boolean sandwichaim_enabled{ "sandwichaim.enable", "false" };
 static settings::Button sandwichaim_aimkey{ "sandwichaim.aimkey", "<null>" };
 static settings::Int sandwichaim_aimkey_mode{ "sandwichaim.aimkey-mode", "0" };
 
-float sandwich_speed = 350.0f;
-float grav           = 0.25f;
-int prevent          = -1;
+constexpr float sandwich_speed = 350.0f;
+constexpr float grav           = 0.25f;
+constexpr float initial_vel    = 200.0f;
+int prevent                    = -1;
 static Timer previous_entity_delay{};
 
 // TODO: Refactor this jank
@@ -47,7 +48,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
                 continue;
             Vector target{};
             if (Predict)
-                target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent));
+                target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent), initial_vel);
             else
                 target = ent->hitboxes.GetHitbox(1)->center;
             if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))

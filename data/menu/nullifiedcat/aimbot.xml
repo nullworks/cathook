@@ -12,7 +12,6 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen."/>
-            <AutoVariable width="fill" target="aimbot.projectile-silent" label="pSilent" tooltip="Stops snapping of projectile weapons on the screen of others."/>
             <AutoVariable width="fill" target="aimbot.slow" label="Slow aimbot" min="0" max="30"/>
             <AutoVariable width="fill" target="aimbot.fov" label="FOV" tooltip="Restricts the aimbot to a certain FOV from the crosshair."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle" tooltip="Shows the Aimbot's FOV."/>
@@ -21,18 +20,18 @@
             <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss chance" tooltip="% chance the aimbot will miss on purpose."/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
-            <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip Viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" y="235">
+    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="210">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"/>
-            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
-            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot disguised" tooltip="Allow autoshoot while disguised"/>
-            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto spin-up" tooltip="Spin up the minigun automatically if an enemy is found."/>
-            <AutoVariable width="fill" target="aimbot.auto.tapfire" label="Tapfire minigun"/>
-            <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"/>
-            <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"/>
+            <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
+            <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip Viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
+            <AutoVariable width="fill" target="aimbot.projectile-silent" label="pSilent" tooltip="Stops snapping of projectile weapons on the screen of others."/>
+            <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial Velocity"/>
+            <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
+            <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Bow threshold"/>
+            <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky threshold"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Target selection" x="170">
@@ -96,14 +95,15 @@
             <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore Dead Ringer Spies"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" x="170" y="255">
+    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="170" y="250">
         <List width="150">
-            <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
-            <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
-            <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial Velocity"/>
-            <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
-            <AutoVariable width="fill" target="aimbot.projectile.huntsman-autoshoot" label="Bow threshold"/>
-            <AutoVariable width="fill" target="aimbot.projectile.sticky-autoshoot" label="Sticky threshold"/>
+            <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"/>
+            <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
+            <AutoVariable width="fill" target="aimbot.autoshoot-disguised" label="Autoshoot disguised" tooltip="Allow autoshoot while disguised"/>
+            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto spin-up" tooltip="Spin up the minigun automatically if an enemy is found."/>
+            <AutoVariable width="fill" target="aimbot.auto.tapfire" label="Tapfire minigun"/>
+            <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"/>
+            <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">

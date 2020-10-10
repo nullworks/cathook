@@ -9,6 +9,7 @@
 #include "hacks/FollowBot.hpp"
 #include "settings/Bool.hpp"
 #include "PlayerTools.hpp"
+#include "MiscAimbot.hpp"
 
 namespace hacks::tf::autoheal
 {
@@ -16,6 +17,7 @@ std::vector<int> called_medic{};
 static settings::Boolean enable{ "autoheal.enable", "false" };
 static settings::Boolean steamid_only{ "autoheal.steam-only", "false" };
 static settings::Boolean silent{ "autoheal.silent", "true" };
+static settings::Boolean look_at_target{ "autoheal.look-at-target", "false" };
 static settings::Boolean friendsonly{ "autoheal.friends-only", "false" };
 static settings::Boolean pop_uber_auto{ "autoheal.uber.enable", "true" };
 static settings::Boolean pop_uber_voice{ "autoheal.popvoice", "true" };
@@ -661,17 +663,24 @@ void CreateMove()
     if (!CurrentHealingTargetIDX)
         return;
 
-    CachedEntity *target = ENTITY(CurrentHealingTargetIDX);
+    CachedEntity *target          = ENTITY(CurrentHealingTargetIDX);
+    bool target_is_healing_target = HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) == CurrentHealingTargetIDX;
 
-    if (HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) != CurrentHealingTargetIDX)
+    if (!target_is_healing_target || look_at_target)
     {
         auto out = target->hitboxes.GetHitbox(spine_2);
         if (out)
         {
             if (silent)
                 g_pLocalPlayer->bUseSilentAngles = true;
-            AimAt(g_pLocalPlayer->v_Eye, out->center, current_user_cmd);
-            if ((g_GlobalVars->tickcount % 2) == 0)
+            auto angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, out->center);
+
+            // If we are already healing our target, then follow the target using slowaim
+            if (target_is_healing_target)
+                hacks::tf2::misc_aimbot::DoSlowAim(angles);
+
+            current_user_cmd->viewangles = angles;
+            if (!target_is_healing_target && (g_GlobalVars->tickcount % 2) == 0)
                 current_user_cmd->buttons |= IN_ATTACK;
         }
     }

@@ -3,11 +3,9 @@
 #include "NavBot.hpp"
 #include "PlayerTools.hpp"
 #include "Aimbot.hpp"
-#include "FollowBot.hpp"
-#include "soundcache.hpp"
 #include "Misc.hpp"
-#include "MiscTemporary.hpp"
 #include "teamroundtimer.hpp"
+#include "MiscAimbot.hpp"
 
 namespace hacks::tf2::NavBot
 {

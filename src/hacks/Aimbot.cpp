@@ -218,10 +218,7 @@ static void doAutoZoom(bool target_found)
 }
 
 // Current Entity
-int target_eid{ 0 };
-CachedEntity *target      = 0;
 CachedEntity *target_last = 0;
-bool foundTarget          = false;
 
 // If slow aimbot allows autoshoot
 bool slow_can_shoot = false;
@@ -233,17 +230,20 @@ AimbotCalculatedData_s calculated_data_array[2048]{};
 // The main "loop" of the aimbot.
 static void CreateMove()
 {
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
-        return;
-
     enable   = *normal_enable;
     slow_aim = *normal_slow_aim;
     fov      = *normal_fov;
 
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+        enable = false;
+
     spectatorUpdate();
 
     if (!enable)
+    {
+        target_last = nullptr;
         return;
+    }
 
     doAutoZoom(false);
 
@@ -276,7 +276,8 @@ static void CreateMove()
     }
     // Refresh our best target
     CachedEntity *target_entity = RetrieveBestTarget(aimkey_status);
-    if (CE_BAD(target_entity) || !foundTarget)
+    target_last                 = target_entity;
+    if (CE_BAD(target_entity))
         return;
 
     // Auto-zoom
@@ -304,7 +305,6 @@ static void CreateMove()
     // Attemt to auto-shoot
 
     // flNextPrimaryAttack meme
-    // target_eid = target_entity->m_IDX;
     if (only_can_shoot && g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFMinigun) && g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFLaserPointer))
     {
         // Handle Compound bow
@@ -497,7 +497,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
     // If we have a previously chosen target, target lock is on, and the aimkey
     // is allowed, then attemt to keep the previous target
-    if (target_lock && foundTarget && aimkey_state)
+    if (target_lock && target_last && aimkey_state)
     {
         if (CE_GOOD(target_last))
         {
@@ -509,11 +509,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
         }
     }
-
-    // We dont have a target currently so we must find one, reset statuses
-    foundTarget = false;
-    target_last = nullptr;
-    target_eid  = -1;
 
     float target_highest_score, scr = 0.0f;
     CachedEntity *ent;
@@ -556,18 +551,11 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             // Compare the top score to our current ents score
             if (scr > target_highest_score)
             {
-                foundTarget          = true;
                 target_highest_score = scr;
                 target_highest_ent   = ent;
             }
         }
     }
-
-    // Save the ent for future use with target lock
-    target_last = target_highest_ent;
-
-    if (CE_GOOD(target_last))
-        target_eid = target_last->m_IDX;
 
     return target_highest_ent;
 }
@@ -1368,7 +1356,6 @@ static float slow_change_dist_y = 0;
 // angle, effectively slowing the aiming process
 void DoSlowAim(Vector &input_angle)
 {
-    LookAtPathTimer.update();
     auto viewangles = current_user_cmd->viewangles;
 
     // Yaw
@@ -1479,10 +1466,7 @@ float EffectiveTargetingRange()
 // A function used by gui elements to determine the current target
 CachedEntity *CurrentTarget()
 {
-    if (foundTarget)
-        return target; // Doesnt work for some reason
-
-    return nullptr;
+    return target_last;
 }
 
 // Used for when you join and leave maps to reset aimbot vars

@@ -149,7 +149,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 }
 static float slow_change_dist_y{};
 static float slow_change_dist_p{};
-void DoSlowAim(Vector &input_angle)
+void DoSlowAim(Vector &input_angle, int speed)
 {
     auto viewangles = current_user_cmd->viewangles;
 
@@ -179,7 +179,7 @@ void DoSlowAim(Vector &input_angle)
         // opposing sides making the distance spike, so just cheap out and reuse
         // our last one.
         if (!slow_opposing)
-            slow_change_dist_y = fminf(std::abs(viewangles.y - input_angle.y), flChargeYawCap);
+            slow_change_dist_y = std::abs(viewangles.y - input_angle.y) / (int) speed;
 
         // Move in the direction of the input angle
         if (slow_dir)
@@ -192,7 +192,7 @@ void DoSlowAim(Vector &input_angle)
     if (viewangles.x != input_angle.x)
     {
         // Get speed
-        slow_change_dist_p = std::abs(viewangles.x - input_angle.x) / 5;
+        slow_change_dist_p = std::abs(viewangles.x - input_angle.x) / speed;
 
         // Move in the direction of the input angle
         if (viewangles.x > input_angle.x)

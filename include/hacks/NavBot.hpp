@@ -1,6 +1,8 @@
 #pragma once
 
-#include "common.hpp"
+#include <array>
+#include <stdint.h>
+
 namespace hacks::tf2::NavBot
 {
 bool init(bool first_cm);

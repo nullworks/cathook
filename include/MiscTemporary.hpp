@@ -18,7 +18,6 @@ extern std::array<int, 32> bruteint;
 extern std::array<Timer, 32> timers;
 
 extern Timer DelayTimer;
-extern Timer LookAtPathTimer;
 extern bool firstcm;
 extern bool ignoredc;
 
@@ -49,10 +48,6 @@ extern bool freecam_is_toggled;
 typedef void (*CL_SendMove_t)();
 extern DetourHook cl_warp_sendmovedetour;
 extern DetourHook cl_nospread_sendmovedetour;
-namespace hacks::tf2::misc_aimbot
-{
-bool ShouldHitBuilding(CachedEntity *ent);
-}
 namespace hooked_methods
 {
 void sendAchievementKv(int value);

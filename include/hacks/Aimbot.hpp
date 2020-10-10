@@ -32,12 +32,6 @@ const Vector &PredictEntity(CachedEntity *entity);
 bool VischeckPredictedEntity(CachedEntity *entity);
 bool BacktrackVisCheck(CachedEntity *entity);
 
-// Variable used to tell when the aimbot has found a target
-extern bool foundTarget;
-
-// Used by esp to set their color
-extern int target_eid;
-
 // Functions called by other functions for when certian game calls are run
 void Reset();
 

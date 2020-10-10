@@ -136,14 +136,8 @@ static bool equipItem(int clazz, int slot, int id, bool get = true, bool allowRe
     // Slot correction for spy
     if (g_pLocalPlayer->clazz == tf_spy)
     {
-        // On spy primary is secondary
-        if (slot == 0)
-            slot = 1;
-        // On spy secondary is melee
+        // Secondary -> Cloak
         if (slot == 1)
-            slot = 3;
-        // On spy melee slot is watch, for some reason 6.
-        if (slot == 2)
             slot = 6;
     }
 

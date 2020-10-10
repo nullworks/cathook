@@ -5,7 +5,7 @@
             <AutoVariable width="fill" target="auto-item.time" label="Equip timer"/>
             <AutoVariable width="fill" target="auto-item.weapons" label="Weapons"/>
             <AutoVariable width="fill" target="auto-item.weapons.primary" label="Primary"/>
-            <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary"/>
+            <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary/Cloak"/>
             <AutoVariable width="fill" target="auto-item.weapons.melee" label="Melee"/>
             <AutoVariable width="fill" target="auto-item.hats" label="Hats"/>
             <AutoVariable width="fill" target="auto-item.hats.1" label="Hat 1"/>

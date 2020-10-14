@@ -90,9 +90,9 @@
             <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim at stickybombs"/>
             <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim at sentry guns"/>
             <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim at other buildings"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore cloaked Spies"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore Vaccinator Uber"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore Dead Ringer Spies"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore Cloaked"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore Vaccinator"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore Dead Ringer"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="170" y="250">

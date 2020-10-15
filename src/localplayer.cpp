@@ -63,6 +63,12 @@ weaponmode GetWeaponModeloc()
         return weaponmode::weapon_throwable;
     case CL_CLASS(CWeaponMedigun):
         return weaponmode::weapon_medigun;
+    case CL_CLASS(CTFWeaponSapper):
+    case CL_CLASS(CTFWeaponPDA):
+    case CL_CLASS(CTFWeaponPDA_Spy):
+    case CL_CLASS(CTFWeaponPDA_Engineer_Build):
+    case CL_CLASS(CTFWeaponPDA_Engineer_Destroy):
+        return weaponmode::weapon_pda;
     default:
         return weaponmode::weapon_hitscan;
     }

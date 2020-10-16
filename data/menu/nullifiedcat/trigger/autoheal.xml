@@ -14,7 +14,7 @@
             <AutoVariable width="fill" target="autoheal.friends-only" label="Only heal friends"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Health priority" y="170">
+    <Box padding="12 6 6 6" width="content" height="content" name="Health priority" y="185">
         <List width="160">
             <AutoVariable width="fill" target="autoheal.priority-scout" label="Scout weight"/>
             <AutoVariable width="fill" target="autoheal.priority-soldier" label="Soldier weight"/>

@@ -44,7 +44,7 @@ DECLARE_HOOKED_METHOD(DispatchUserMessage, bool, void *, int, bf_read &);
 DECLARE_HOOKED_METHOD(IN_KeyEvent, int, void *, int, ButtonCode_t, const char *);
 DECLARE_HOOKED_METHOD(FrameStageNotify, void, void *, ClientFrameStage_t);
 // IInput
-DECLARE_HOOKED_METHOD(CreateMoveEarly, void, IInput *, int, float, bool)
+DECLARE_HOOKED_METHOD(CreateMoveInput, void, IInput *, int, float, bool)
 DECLARE_HOOKED_METHOD(GetUserCmd, CUserCmd *, IInput *, int);
 // INetChannel
 DECLARE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *, INetMessage &, bool, bool);

@@ -56,7 +56,7 @@ Vector Predict(Vector &pos, Vector &vel, Vector acceleration, std::optional<floa
     return result;
 }
 
-Vector PredictStep(Vector pos, Vector &vel, Vector acceleration, std::pair<Vector, Vector> &minmax, float time, float steplength = g_GlobalVars->interval_per_tick, bool vischeck = true, std::optional<float> grounddistance = std::nullopt)
+Vector PredictStep(Vector pos, Vector &vel, Vector acceleration, std::pair<Vector, Vector> &minmax, float time, float steplength, bool vischeck, std::optional<float> grounddistance)
 {
     PROF_SECTION(PredictNew)
     Vector result = pos;

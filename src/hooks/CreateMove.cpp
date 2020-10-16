@@ -18,6 +18,7 @@
 
 #include "HookedMethods.hpp"
 #include "nospread.hpp"
+#include "Warp.hpp"
 
 static settings::Boolean minigun_jump{ "misc.minigun-jump-tf2c", "false" };
 static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
@@ -127,6 +128,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     Vector vsilent, ang;
 
     current_user_cmd = cmd;
+    EC::run(EC::CreateMoveEarly);
     IF_GAME(IsTF2C())
     {
         if (CE_GOOD(LOCAL_W) && minigun_jump && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
@@ -430,11 +432,11 @@ void WriteCmd(IInput *input, CUserCmd *cmd, int sequence_nr)
 }
 
 // This gets called before the other CreateMove, but since we run original first in here all the stuff gets called after normal CreateMove is done
-DEFINE_HOOKED_METHOD(CreateMoveEarly, void, IInput *this_, int sequence_nr, float input_sample_time, bool arg3)
+DEFINE_HOOKED_METHOD(CreateMoveInput, void, IInput *this_, int sequence_nr, float input_sample_time, bool arg3)
 {
     bSendPackets = reinterpret_cast<bool *>((uintptr_t) __builtin_frame_address(1) - 8);
     // Call original function, includes Normal CreateMove
-    original::CreateMoveEarly(this_, sequence_nr, input_sample_time, arg3);
+    original::CreateMoveInput(this_, sequence_nr, input_sample_time, arg3);
 
     CUserCmd *cmd = nullptr;
     if (this_ && GetCmds(this_) && sequence_nr > 0)
@@ -457,10 +459,10 @@ DEFINE_HOOKED_METHOD(CreateMoveEarly, void, IInput *this_, int sequence_nr, floa
         return;
     }
 
-    PROF_SECTION(CreateMoveEarly);
+    PROF_SECTION(CreateMoveInput);
 
     // Run EC
-    EC::run(EC::CreateMoveEarly);
+    EC::run(EC::CreateMoveLate);
 
     // Write the usercmd
     WriteCmd(this_, current_late_user_cmd, sequence_nr);

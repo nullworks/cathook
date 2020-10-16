@@ -1065,7 +1065,7 @@ static CatCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch 
 });
 
 static InitRoutine init([]() {
-    EC::Register(EC::CreateMoveEarly, CreateMove, "crit_cm");
+    EC::Register(EC::CreateMoveLate, CreateMove, "crit_cm");
 #if ENABLE_VISUALS
     EC::Register(EC::Draw, Draw, "crit_draw");
 #endif

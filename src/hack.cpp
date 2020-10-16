@@ -218,7 +218,7 @@ void hack::Hook()
 
     hooks::input.Set(g_IInput);
     hooks::input.HookMethod(HOOK_ARGS(GetUserCmd));
-    hooks::input.HookMethod(HOOK_ARGS(CreateMoveEarly));
+    hooks::input.HookMethod(HOOK_ARGS(CreateMoveInput));
     hooks::input.Apply();
 
 #if ENABLE_VISUALS || ENABLE_TEXTMODE

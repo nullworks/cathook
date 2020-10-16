@@ -80,7 +80,7 @@ struct offsets
     {
         return PlatformOffset(7, undefined, undefined);
     }
-    static constexpr uint32_t CreateMoveEarly()
+    static constexpr uint32_t CreateMoveInput()
     {
         return PlatformOffset(3, undefined, undefined);
     }

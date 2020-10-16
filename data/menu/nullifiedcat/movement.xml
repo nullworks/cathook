@@ -1,4 +1,4 @@
-<Tab name="Movement" padding="6 6 6 6">
+<Tab name="Movement" padding="0 6 6 6">
     <Box padding="12 6 6 6" width="content" height="content" name="Bunny hop">
         <List width="150">
             <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunny hop"/>
@@ -47,7 +47,7 @@
             <!-- <!AutoVariable width="fill" target="navbot.take-teleporters" label="take teleporters"/> -->
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Anti-backstab" x="370">
+    <Box padding="12 6 6 6" width="content" height="content" name="Anti-backstab" x="170" y="300">
         <List width="180">
             <AutoVariable width="fill" target="antibackstab.enable" label="Enable anti-backstab"/>
             <AutoVariable width="fill" target="antibackstab.angle" label="Detection angle"/>
@@ -56,11 +56,12 @@
             <AutoVariable width="fill" target="antibackstab.nope" label="Nope!" tooltip="Have the charachter say 'no'."/>
         </List>
     </Box>
-        <Box padding="12 6 6 6" width="content" height="content" name="Warp" x="370" y="65">
-        <List width="180">
+        <Box padding="12 6 6 6" width="content" height="content" name="Warp" x="370">
+        <List width="195">
             <AutoVariable width="fill" target="warp.enabled" label="Enable warp" tooltip="Allows you to charge a burst of speed."/>
             <AutoVariable width="fill" target="warp.speed" label="Warp speed" tooltip="The discharge speed (0.5 = +50%, 2 = +200%. +2300% is the maximum possible)."/>
             <AutoVariable width="fill" target="warp.key" label="Warp key" tooltip="Pressing this key will use all stored ticks to accelerate you."/>
+            <AutoVariable width="fill" target="warp.charge-key" label="Charge key" tooltip="Hold down this key to charge warp."/>
             <AutoVariable width="fill" target="warp.draw" label="Draw warp" tooltip="Draws a bar indicating your warp readiness."/>
             <AutoVariable width="fill" target="warp.bar-size" label="Bar size"/>
             <AutoVariable width="fill" target="warp.bar-x" label="X position"/>
@@ -76,6 +77,13 @@
             <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp backwards" tooltip="Warp when hit option"/>
             <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option"/>
             <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
+            <Box padding="12 6 6 6" width="content" height="content" name="Rapidfire">
+            <List width="185">
+                <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
+                <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
+                <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
+            </List>
+            </Box>
         </List>
     </Box>
 </Tab>

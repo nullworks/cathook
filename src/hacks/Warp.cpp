@@ -781,7 +781,7 @@ void SendNetMessage(INetMessage &msg)
         return;
 
     // Credits to MrSteyk for this btw
-    if (msg.GetGroup() == 0xA)
+    if (msg.GetGroup() == INetChannelInfo::MOVE)
     {
         // Charge
         if (should_charge && !charged)

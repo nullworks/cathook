@@ -9,6 +9,7 @@
             <Include path="nullifiedcat/crits.xml"/>
             <Include path="nullifiedcat/visuals.xml"/>
             <Include path="nullifiedcat/movement.xml"/>
+            <Include path="nullifiedcat/warp.xml"/>
             <Include path="nullifiedcat/misc.xml"/>
             <Include path="nullifiedcat/hackinfo.xml"/>
             <Include path="nullifiedcat/debug.xml"/>

@@ -22,6 +22,7 @@ static settings::Boolean no_movement{ "warp.rapidfire.no-movement", "true" };
 static settings::Boolean rapidfire{ "warp.rapidfire", "false" };
 static settings::Boolean wait_full{ "warp.rapidfire.wait-full", "true" };
 static settings::Button rapidfire_key{ "warp.rapidfire.key", "<null>" };
+static settings::Int rapidfire_key_mode{ "warp.rapidfire.key-mode", "1" };
 static settings::Float speed{ "warp.speed", "23" };
 static settings::Boolean draw{ "warp.draw", "false" };
 static settings::Button warp_key{ "warp.key", "<null>" };
@@ -69,6 +70,45 @@ static bool charged             = false;
 static bool should_warp = true;
 static bool was_hurt    = false;
 
+// Rapidfire key mode
+static bool key_valid = false;
+
+// A function that determins whether our key state allows us to rapidfire or not
+bool UpdateRFKey()
+{
+    static bool key_flip          = false;
+    static bool pressed_last_tick = false;
+    bool allow_key                = true;
+
+    // Check if the key is even used
+    if (rapidfire_key && rapidfire_key_mode)
+    {
+        bool key_down = rapidfire_key.isKeyDown();
+        switch ((int) rapidfire_key_mode)
+        {
+        case 1: // Only while key is pressed
+            if (!key_down)
+                allow_key = false;
+            break;
+        case 2: // Only while key is not pressed
+            if (key_down)
+                allow_key = false;
+            break;
+        case 3: // Key acts like a toggle switch
+            if (!pressed_last_tick && key_down)
+                key_flip = !key_flip;
+            if (!key_flip)
+                allow_key = false;
+            break;
+        default:
+            break;
+        }
+        pressed_last_tick = key_down;
+    }
+    // Return whether the key allows it
+    return allow_key;
+}
+
 bool shouldRapidfire()
 {
     if (!rapidfire)
@@ -78,8 +118,8 @@ bool shouldRapidfire()
     if (in_rapidfire)
         return false;
 
-    // No key set? Always run. Else check if key is held
-    if (rapidfire_key && !rapidfire_key.isKeyDown())
+    // Only run if key state allows it
+    if (!key_valid)
         return false;
 
     // Dead player
@@ -104,7 +144,13 @@ bool shouldRapidfire()
         return false;
 
     // Mouse 1 is held, do it.
-    return current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
+    bool buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
+
+    // Unless we are on a flamethrower, where we only want m2.
+    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+        buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK2;
+
+    return buttons_pressed;
 }
 
 // Should we warp?
@@ -391,6 +437,8 @@ void CL_Move_hook(float accumulated_extra_samples, bool bFinalTick)
 // and the global variable so our time based functions are synced properly.
 void CreateMoveEarly()
 {
+    // Update key state
+    key_valid = UpdateRFKey();
     if (hacks::tf2::warp::in_rapidfire && current_user_cmd)
     {
         if (current_user_cmd)

@@ -1,0 +1,40 @@
+<Tab name="Warp" padding="6 6 6 6">    
+    <Box padding="12 6 6 6" width="content" height="content" name="Warp">
+        <List width="195">
+            <AutoVariable width="fill" target="warp.enabled" label="Enable warp" tooltip="Allows you to charge a burst of speed."/>
+            <AutoVariable width="fill" target="warp.speed" label="Warp speed" tooltip="The discharge speed (0.5 = +50%, 2 = +200%. +2300% is the maximum possible)."/>
+            <AutoVariable width="fill" target="warp.key" label="Warp key" tooltip="Pressing this key will use all stored ticks to accelerate you."/>
+            <AutoVariable width="fill" target="warp.charge-key" label="Charge key" tooltip="Hold down this key to charge warp."/>
+            <AutoVariable width="fill" target="warp.draw" label="Draw warp" tooltip="Draws a bar indicating your warp readiness."/>
+            <AutoVariable width="fill" target="warp.bar-size" label="Bar size"/>
+            <AutoVariable width="fill" target="warp.bar-x" label="X position"/>
+            <AutoVariable width="fill" target="warp.bar-y" label="Y position"/>
+            <AutoVariable width="fill" target="warp.charge-passively" label="Charge passively" tooltip="Charge warp passively, e.g. when moving"/>
+            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump, This will make you fall slower"/>
+            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys"/>
+            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp"/>
+            <AutoVariable width="fill" target="warp.demoknight" label="Demoknight mode" tooltip="This will make you do a swing charge with warp (attack, charge, warp)."/>
+            <AutoVariable width="fill" target="warp.peek" label="Peek mode" tooltip="This will teleport you for a tick and then teleport you back"/>
+            <AutoVariable width="fill" target="warp.on-hit" label="Warp when hit" tooltip="Whenever Someone Melees you or shoots you with hitscan, warp"/>
+            <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp forwards" tooltip="Warp when hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp backwards" tooltip="Warp when hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option"/>
+            <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
+        </List>
+        <Box padding="12 6 6 6" width="content" height="content" name="Rapidfire" x="210">
+                <List width="185">
+                <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
+                <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
+                <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
+                <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">
+                    <Select target="warp.rapidfire.key-mode">
+                        <Option name="Disable" value="0"/>
+                        <Option name="Pressed" value="1"/>
+                        <Option name="Not Pressed" value="2"/>
+                        <Option name="Toggle" value="3"/>
+                    </Select>
+                </LabeledObject>
+            </List>
+        </Box>
+    </Box>
+</Tab>

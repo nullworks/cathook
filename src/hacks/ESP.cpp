@@ -259,7 +259,7 @@ const std::string alyx_gun_str             = "Alyx Gun";
 const std::string ar2_str                  = "AR2";
 const std::string point357_str             = ".357";
 const std::string slam_str                 = "SLAM";
-const std::string arrow_str                = ">>";
+const std::string arrow_str                = "-->";
 const std::string sticky_str               = "X";
 const std::string pill_str                 = "<=>";
 const std::string rocket_str               = "=>";

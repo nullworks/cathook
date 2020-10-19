@@ -962,18 +962,17 @@ bool AmbassadorCanHeadshot()
     return true;
 }
 
+static std::random_device random_device;
+static std::mt19937 engine{random_device()};
+
 float RandFloatRange(float min, float max)
 {
-    static std::random_device random_device;
-    static std::mt19937 engine{random_device()};
     std::uniform_real_distribution<float> random(min, max);
     return random(engine);
 }
 
 int UniformRandomInt(int min, int max)
 {
-    static std::random_device random_device;
-    static std::mt19937 engine{random_device()};
     std::uniform_int_distribution<int> random(min, max);
     return random(engine);
 }

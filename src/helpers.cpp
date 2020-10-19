@@ -964,32 +964,18 @@ bool AmbassadorCanHeadshot()
 
 float RandFloatRange(float min, float max)
 {
-    return (min + 1) + (((float) rand()) / (float) RAND_MAX) * (max - (min + 1));
+    static std::random_device random_device;
+    static std::mt19937 engine{random_device()};
+    std::uniform_real_distribution<float> random(min, max);
+    return random(engine);
 }
 
 int UniformRandomInt(int min, int max)
 {
-    uint32_t bound, len, r, result = 0;
-    /* Protect from random stupidity */
-    if (min > max)
-        std::swap(min, max);
-
-    len = max - min + 1;
-    /* RAND_MAX is implementation dependent.
-     * It's guaranteed that this value is at least 32767.
-     * glibc's RAND_MAX is 2^31 - 1 exactly. Since source games hard
-     * depend on glibc, we will do so as well
-     */
-    while (len)
-    {
-        bound = (1U + RAND_MAX) % len;
-        while ((r = rand()) < bound)
-            ;
-        result *= 1U + RAND_MAX;
-        result += r % len;
-        len -= len > RAND_MAX ? RAND_MAX : len;
-    }
-    return int(result) + min;
+    static std::random_device random_device;
+    static std::mt19937 engine{random_device()};
+    std::uniform_int_distribution<int> random(min, max);
+    return random(engine);
 }
 
 bool IsEntityVisible(CachedEntity *entity, int hb)

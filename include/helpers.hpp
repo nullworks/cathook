@@ -226,3 +226,5 @@ template <typename... Args> std::string format(const Args &... args)
 
 extern const std::string classes[10];
 extern const char *powerups[POWERUP_COUNT];
+bool isTruce();
+void setTruce(bool status);

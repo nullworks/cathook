@@ -963,7 +963,7 @@ bool AmbassadorCanHeadshot()
 }
 
 static std::random_device random_device;
-static std::mt19937 engine{random_device()};
+static std::mt19937 engine{ random_device() };
 
 float RandFloatRange(float min, float max)
 {
@@ -1905,4 +1905,14 @@ bool HookNetvar(std::vector<std::string> path, ProxyFnHook &hook, RecvVarProxyFn
         pClass = pClass->m_pNext;
     }
     return false;
+}
+
+static bool is_truce_active = false;
+bool isTruce()
+{
+    return is_truce_active;
+}
+void setTruce(bool status)
+{
+    is_truce_active = status;
 }

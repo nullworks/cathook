@@ -157,6 +157,8 @@ public:
             ret = ENTITY_PROJECTILE;
         else if (classid == CL_CLASS(CObjectTeleporter) || classid == CL_CLASS(CObjectSentrygun) || classid == CL_CLASS(CObjectDispenser))
             ret = ENTITY_BUILDING;
+        else if (classid == CL_CLASS(CZombie) || classid == CL_CLASS(CTFTankBoss) || classid == CL_CLASS(CMerasmus) || classid == CL_CLASS(CEyeballBoss))
+            ret = ENTITY_NPC;
         else
             ret = ENTITY_GENERIC;
         return ret;

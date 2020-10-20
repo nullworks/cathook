@@ -27,6 +27,9 @@ static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { be
 
 bool shouldTargetSteamId(unsigned id)
 {
+    // Don't shoot players in truce
+    if (isTruce())
+        return false;
     if (betrayal_limit)
     {
         if (betrayal_list[id] > (unsigned) *betrayal_limit)
@@ -51,6 +54,10 @@ bool shouldTarget(CachedEntity *entity)
             return false;
         return shouldTargetSteamId(entity->player_info.friendsID);
     }
+    else if (entity->m_Type() == ENTITY_BUILDING)
+        // Don't shoot buildings in truce
+        if (isTruce())
+            return false;
 
     return true;
 }

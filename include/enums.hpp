@@ -12,7 +12,8 @@ enum EntityType
     ENTITY_GENERIC,
     ENTITY_PLAYER,
     ENTITY_BUILDING,
-    ENTITY_PROJECTILE
+    ENTITY_PROJECTILE,
+    ENTITY_NPC
 };
 
 enum powerup_type

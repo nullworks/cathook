@@ -776,6 +776,14 @@ static InitRoutine init([]() {
     // Patch!
     patch_scoreboardcolor1->Patch();
     patch_scoreboardcolor2->Patch();
+
+    EC::Register(
+        EC::LevelInit,
+        []() {
+            // Remove truce status
+            setTruce(false);
+        },
+        "truce_reset");
 });
 } // namespace ScoreboardColoring
 

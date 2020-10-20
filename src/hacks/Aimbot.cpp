@@ -77,6 +77,7 @@ static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "
 static settings::Boolean ignore_deadringer{ "aimbot.target.ignore-deadringer", "1" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "1" };
 static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "1" };
+static settings::Boolean npcs{ "aimbot.target.npcs", "1" };
 static settings::Boolean stickybot{ "aimbot.target.stickybomb", "0" };
 static settings::Boolean rageonly{ "aimbot.target.ignore-non-rage", "0" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
@@ -141,7 +142,7 @@ int GetSentry()
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
-        if ((ent->m_Type() != ENTITY_BUILDING && ent->m_iClassID() != CL_CLASS(CTFTankBoss)) || ent->m_iClassID() != CL_CLASS(CObjectSentrygun))
+        if (ent->m_Type() != ENTITY_BUILDING || ent->m_iClassID() != CL_CLASS(CObjectSentrygun))
             continue;
         if ((CE_INT(ent, netvar.m_hBuilder) & 0xFFF) != g_pLocalPlayer->entity_idx)
             continue;
@@ -745,10 +746,9 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
 
         return true;
-
-        // Check for buildings
     }
-    else if (entity->m_Type() == ENTITY_BUILDING || entity->m_iClassID() == CL_CLASS(CTFTankBoss))
+    // Check for buildings
+    else if (entity->m_Type() == ENTITY_BUILDING)
     {
         // Don't aim if holding sapper
         if (g_pLocalPlayer->holding_sapper)
@@ -803,9 +803,39 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
 
         return true;
-
-        // Check for stickybombs
     }
+    // NPCs (Skeletons, Merasmus, etc)
+    else if (entity->m_Type() == ENTITY_NPC)
+    {
+        // Sapper aimbot? no.
+        if (g_pLocalPlayer->holding_sapper)
+            return false;
+
+        // NPC targeting is disabled
+        if (!npcs)
+            return false;
+
+        // Cannot shoot this
+        if (entity->m_iTeam() == LOCAL_E->m_iTeam())
+            return false;
+
+        // Distance
+        if (EffectiveTargetingRange())
+        {
+            if (entity->m_flDistance() > (int) EffectiveTargetingRange())
+                return false;
+        }
+
+        // Grab the prediction var
+        AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
+
+        if (!VischeckPredictedEntity(entity))
+            return false;
+        if (fov > 0.0f && cd.fov > fov)
+            return false;
+        return true;
+    }
+    // Check for stickybombs
     else if (entity->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
     {
         // Enabled
@@ -885,7 +915,7 @@ void Aim(CachedEntity *entity)
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, PredictEntity(entity));
 
     // Multipoint
-    if (multipoint && !projectile_mode)
+    if (multipoint && !projectile_mode && entity->m_Type() == ENTITY_PLAYER)
     {
         // Get hitbox num
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
@@ -894,7 +924,7 @@ void Aim(CachedEntity *entity)
         auto hitboxmin    = hb->min;
         auto hitboxmax    = hb->max;
         auto hitboxcenter = hb->center;
-        if (shouldBacktrack() && entity->m_Type() == ENTITY_PLAYER)
+        if (shouldBacktrack())
         {
             // This does vischecks and everything
             auto data    = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
@@ -1100,16 +1130,23 @@ const Vector &PredictEntity(CachedEntity *entity)
                 else
                     GetHitbox(entity, cd.hitbox, result);
             }
-            // Buildings
         }
-        else if (entity->m_Type() == ENTITY_BUILDING || entity->m_iClassID() != CL_CLASS(CTFTankBoss))
+        // Buildings
+        else if (entity->m_Type() == ENTITY_BUILDING)
         {
             if (cur_proj_grav || cur_proj_grav)
                 result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
             else
                 result = GetBuildingPosition(entity);
-            // Other
         }
+        // NPCs (Skeletons, merasmus, etc)
+        else if (entity->m_Type() == ENTITY_NPC)
+        {
+            auto mins = RAW_ENT(entity)->GetCollideable()->OBBMins();
+            auto maxs = RAW_ENT(entity)->GetCollideable()->OBBMaxs();
+            result    = RAW_ENT(entity)->GetCollideable()->GetCollisionOrigin() + (mins + maxs) / 2.0f;
+        }
+        // Other
         else
         {
             result = entity->m_vecOrigin();

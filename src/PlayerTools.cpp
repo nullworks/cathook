@@ -27,9 +27,6 @@ static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { be
 
 bool shouldTargetSteamId(unsigned id)
 {
-    // Don't shoot players in truce
-    if (isTruce())
-        return false;
     if (betrayal_limit)
     {
         if (betrayal_list[id] > (unsigned) *betrayal_limit)
@@ -51,6 +48,9 @@ bool shouldTarget(CachedEntity *entity)
         if (taunting && HasCondition<TFCond_Taunting>(entity) && CE_INT(entity, netvar.m_iTauntIndex) == 3)
             return false;
         if (HasCondition<TFCond_HalloweenGhostMode>(entity))
+            return false;
+        // Don't shoot players in truce
+        if (isTruce())
             return false;
         return shouldTargetSteamId(entity->player_info.friendsID);
     }

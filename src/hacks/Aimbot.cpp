@@ -746,7 +746,9 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
 
         return true;
+
     }
+
     // Check for buildings
     else if (entity->m_Type() == ENTITY_BUILDING)
     {
@@ -803,7 +805,8 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
 
         return true;
-    }
+
+        }
     // NPCs (Skeletons, Merasmus, etc)
     else if (entity->m_Type() == ENTITY_NPC)
     {
@@ -815,7 +818,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (!npcs)
             return false;
 
-        // Cannot shoot this
+                // Cannot shoot this
         if (entity->m_iTeam() == LOCAL_E->m_iTeam())
             return false;
 
@@ -1131,7 +1134,7 @@ const Vector &PredictEntity(CachedEntity *entity)
                     GetHitbox(entity, cd.hitbox, result);
             }
         }
-        // Buildings
+                // Buildings
         else if (entity->m_Type() == ENTITY_BUILDING)
         {
             if (cur_proj_grav || cur_proj_grav)
@@ -1139,7 +1142,7 @@ const Vector &PredictEntity(CachedEntity *entity)
             else
                 result = GetBuildingPosition(entity);
         }
-        // NPCs (Skeletons, merasmus, etc)
+                // NPCs (Skeletons, merasmus, etc)
         else if (entity->m_Type() == ENTITY_NPC)
         {
             auto mins = RAW_ENT(entity)->GetCollideable()->OBBMins();

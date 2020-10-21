@@ -17,14 +17,17 @@
             <AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP"/>
             <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP"/>
             <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
-            <AutoVariable width="fill" target="esp.show.tank" label="Tank ESP"/>
+            <AutoVariable width="fill" target="esp.show.npc" label="NPC ESP"/>
             <AutoVariable width="fill" target="esp.item.money" label="MvM money"/>
             <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money is automatically collected."/>
             <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
-            <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
+            <AutoVariable width="fill" target="esp.item.pumpkinbomb" label="Pumpkin bomb"/>
+            <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits"/>
+            <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps"/>
+            <!-- <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
             <AutoVariable width="fill" target="esp.item.adrenaline" label="TF2C adrenaline"/>
-            <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C weapon spawner"/>
+            <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C weapon spawner"/> -->
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectiles" x="170">

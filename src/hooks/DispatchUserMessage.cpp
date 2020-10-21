@@ -120,7 +120,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         buf.Seek(0);
         break;
     }
-    // Hud message
+        // Hud message
     case 26:
     {
         // Hud message type

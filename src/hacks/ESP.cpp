@@ -40,7 +40,7 @@ static settings::Boolean legit{ "esp.legit", "false" };
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
 static settings::Boolean teammates{ "esp.show.teammates", "true" };
-static settings::Boolean tank{ "esp.show.tank", "true" };
+static settings::Boolean npc{ "esp.show.npc", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
@@ -60,6 +60,9 @@ static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
 static settings::Boolean item_money{ "esp.item.money", "true" };
 static settings::Boolean item_money_red{ "esp.item.money-red", "false" };
 static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
+static settings::Boolean item_pumpkinbomb{ "esp.item.pumpkinbomb", "true" };
+static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
+static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 // TF2C
 static settings::Boolean item_weapon_spawners{ "esp.item.weapon-spawner", "true" };
 static settings::Boolean item_adrenaline{ "esp.item.adrenaline", "true" };
@@ -248,6 +251,14 @@ const std::string health_small_str         = "Small Medkit";
 const std::string mvm_money_str            = "Money";
 const std::string mvm_red_money_str        = "~Money~";
 const std::string tank_str                 = "Tank";
+const std::string merasmus_str             = "Merasmus";
+const std::string monoculus_str            = "Monoculus";
+const std::string horsemann_str            = "Horsemann";
+const std::string skeleton_str             = "Skeleton";
+const std::string ghost_str                = "Ghost";
+const std::string pumpkinbomb_str          = "Pumpkin Bomb";
+const std::string crumpkin_str             = "Crumpkin";
+const std::string gargoyle_str             = "Gargoyle";
 const std::string rpg_str                  = "RPG";
 const std::string smg_str                  = "SMG";
 const std::string shotgun_str              = "Shotgun";
@@ -1106,16 +1117,34 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     }
 
     int itemtype = ent->m_ItemType();
-    // Tank esp
-    if (classid == CL_CLASS(CTFTankBoss) && tank)
+    // NPC esp
+    if (classid == CL_CLASS(CTFTankBoss) || classid == CL_CLASS(CMerasmus) || classid == CL_CLASS(CMerasmusDancer) || classid == CL_CLASS(CZombie) || classid == CL_CLASS(CEyeballBoss) || classid == CL_CLASS(CHeadlessHatman) && npc)
     {
-        AddEntityString(ent, tank_str);
+        if (classid == CL_CLASS(CTFTankBoss))
+            AddEntityString(ent, tank_str, colors::FromRGBA8(0, 128, 0, 255));
+        if (classid == CL_CLASS(CMerasmus) || classid == CL_CLASS(CMerasmusDancer))
+            AddEntityString(ent, merasmus_str, colors::FromRGBA8(0, 128, 0, 255));
+        if (classid == CL_CLASS(CZombie))
+            AddEntityString(ent, skeleton_str, colors::FromRGBA8(0, 128, 0, 255));
+        if (classid == CL_CLASS(CEyeballBoss))
+            AddEntityString(ent, monoculus_str, colors::FromRGBA8(0, 128, 0, 255));
+        if (classid == CL_CLASS(CHeadlessHatman))
+            AddEntityString(ent, horsemann_str, colors::FromRGBA8(0, 128, 0, 255));
 
         // Dropped weapon esp
     }
     else if (classid == CL_CLASS(CTFDroppedWeapon) && item_esp && item_dropped_weapons)
     {
-        AddEntityString(ent, std::string("Dropped Weapon")); //I've never seen this not being "WEAPON CTFDroppedWeapon" so why not make it prettier?
+        AddEntityString(ent, std::string("Dropped Weapon"));
+
+        // Gargoyle esp
+    }
+    else if (classid == CL_CLASS(CHalloweenGiftPickup) && item_esp && item_gargoyle)
+    {
+        if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
+        {
+            AddEntityString(ent, gargoyle_str, colors::FromRGBA8( 98, 163, 213, 255));
+        }
 
         // MVM Money esp
     }
@@ -1132,6 +1161,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             AddEntityString(ent, mvm_money_str);
         }
+
+        // Pumpkin bomb esp
+    }
+    else if (classid == CL_CLASS(CTFPumpkinBomb) && item_esp && item_pumpkinbomb)
+    {
+        AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
 
         // Other item esp
     }
@@ -1171,13 +1206,13 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         }
         else if (item_powerups && itemtype >= ITEM_POWERUP_FIRST && itemtype <= ITEM_POWERUP_LAST)
         {
-            AddEntityString(ent, std::string(powerups[itemtype - ITEM_POWERUP_FIRST])); //User should already know it's a pickup
+            AddEntityString(ent, std::string(powerups[itemtype - ITEM_POWERUP_FIRST]));
 
             // TF2C weapon spawner esp
         }
         else if (item_weapon_spawners && itemtype >= ITEM_TF2C_W_FIRST && itemtype <= ITEM_TF2C_W_LAST)
         {
-            AddEntityString(ent, std::string(tf2c_weapon_names[itemtype - ITEM_TF2C_W_FIRST]) + " SPAWNER");
+            AddEntityString(ent, std::string(tf2c_weapon_names[itemtype - ITEM_TF2C_W_FIRST]) + " Spawner");
             if (CE_BYTE(ent, netvar.bRespawning))
                 AddEntityString(ent, tf2c_spawner_respawn_str);
 
@@ -1193,7 +1228,21 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             {
                 AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
             }
+            
+            // Crumpkin esp https://wiki.teamfortress.com/wiki/Halloween_pumpkin
         }
+        else if (item_crumpkin && itemtype == ITEM_CRUMPKIN)
+        {
+            AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
+
+            // Ghost esp
+        }
+        else if (npc && (itemtype == HALLOWEEN_GHOST || itemtype == HALLOWEEN_GHOST_NOHAT_RED || itemtype == HALLOWEEN_GHOST_NOHAT))
+        {
+            AddEntityString(ent, ghost_str, colors::FromRGBA8(0, 128, 0, 255));
+            
+        }
+        
 
         // Building esp
     }

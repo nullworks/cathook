@@ -1621,6 +1621,30 @@ void AimAtHitbox(CachedEntity *ent, int hitbox, CUserCmd *cmd, bool compensate_p
     AimAt(g_pLocalPlayer->v_Eye, r, cmd, compensate_punch);
 }
 
+// Thanks to "copypaste" on UnknownCheats, this really helped
+void FastStop()
+{
+    // Get velocity
+    Vector vel;
+    velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
+
+    Vector direction;
+    VectorAngles(vel, direction);
+    float speed = vel.Length();
+
+    // Prevent overshooting
+    speed *= 0.5f;
+
+    direction.y = current_user_cmd->viewangles.y - direction.y;
+
+    Vector negated_direction;
+    AngleVectors2(VectorToQAngle(direction), &negated_direction);
+    negated_direction *= -speed;
+
+    current_user_cmd->forwardmove = negated_direction.x;
+    current_user_cmd->sidemove    = negated_direction.y;
+}
+
 bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
 {
     trace_t trace_visible;

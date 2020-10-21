@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 class CGameRules
 {
 public:

@@ -171,6 +171,7 @@ inline Vector GetAimAtAngles(Vector origin, Vector target, CachedEntity *punch_c
 }
 
 void AimAt(Vector origin, Vector target, CUserCmd *cmd, bool compensate_punch = true);
+void FastStop();
 void AimAtHitbox(CachedEntity *ent, int hitbox, CUserCmd *cmd, bool compensate_punch = true);
 bool IsProjectileCrit(CachedEntity *ent);
 

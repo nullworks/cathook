@@ -149,6 +149,9 @@ void NetVars::Init()
         this->m_iHealingAssist_Resource     = gNetvars.get_offset("DT_TFPlayerResource", "m_iHealingAssist");
         this->m_iPlayerLevel_Resource       = gNetvars.get_offset("DT_TFPlayerResource", "m_iPlayerLevel");
         this->m_iPlayerIndex                = gNetvars.get_offset("DT_TFRagdoll", "m_iPlayerIndex");
+
+        // Gargoyle
+        this->m_hTargetPlayer = gNetvars.get_offset("DT_CHalloweenGiftPickup", "m_hTargetPlayer");
     }
     IF_GAME(IsTF2C())
     {

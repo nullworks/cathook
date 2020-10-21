@@ -202,6 +202,7 @@ public:
     offset_t m_iPlayerLevel_Resource;
 
     offset_t m_iPlayerIndex;
+    offset_t m_hTargetPlayer;
 };
 
 extern NetVars netvar;

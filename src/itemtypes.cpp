@@ -34,6 +34,8 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/items/ammopack_small_bday.mdl", ITEM_AMMO_SMALL);
     RegisterModelMapping("models/items/ammopack_medium_bday.mdl", ITEM_AMMO_MEDIUM);
     RegisterModelMapping("models/items/ammopack_large_bday.mdl", ITEM_AMMO_LARGE);
+    // Crumpkin
+    RegisterModelMapping("models/props_halloween/pumpkin_loot.mdl", ITEM_CRUMPKIN);
 
     // == POWERUPS
     RegisterModelMapping("models/pickups/pickup_powerup_haste.mdl", ITEM_POWERUP_HASTE);
@@ -71,7 +73,17 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/props_halloween/hwn_spellbook_upright_major.mdl", ITEM_SPELL_RARE);
     RegisterModelMapping("models/items/crystal_ball_pickup_major.mdl", ITEM_SPELL_RARE);
 
-    RegisterSpecialMapping([](CachedEntity *ent) -> bool { return ent->m_iClassID() == CL_CLASS(CTFAmmoPack); }, ITEM_AMMO_MEDIUM);
+    // == GHOSTS
+    RegisterModelMapping("models/props_halloween/ghost.mdl", HALLOWEEN_GHOST);
+    RegisterModelMapping("models/props_halloween/ghost_no_hat_red.mdl", HALLOWEEN_GHOST_NOHAT_RED);
+    RegisterModelMapping("models/props_halloween/ghost_no_hat.mdl", HALLOWEEN_GHOST_NOHAT);
+
+    // == BOMBS
+    RegisterModelMapping("models/props_laughter/balloonbomb.mdl", BOMB_BALLOONBOMB);
+    RegisterModelMapping("models/props_coast/wooden_barrel.mdl", BOMB_WOODENBARREL);
+    RegisterModelMapping("models/props_invasion/props_alien/walker_explode.mdl", BOMB_WALKEREXPLODE);
+
+    RegisterSpecialMapping([](CachedEntity *ent) -> bool { return ent->m_iClassID() == CL_CLASS(CTFAmmoPack) && g_ItemManager.mapper.GetItemType(ent) != ITEM_CRUMPKIN; }, ITEM_AMMO_MEDIUM);
 
     RegisterModelMapping("models/items/medkit_overheal.mdl", ITEM_TF2C_PILL);
     // TF2C spawners

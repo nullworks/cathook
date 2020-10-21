@@ -1,4 +1,4 @@
-/*
+﻿/*
  * HEsp.cpp
  *
  *  Created on: Oct 6, 2016
@@ -40,7 +40,7 @@ static settings::Boolean legit{ "esp.legit", "false" };
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
 static settings::Boolean teammates{ "esp.show.teammates", "true" };
-static settings::Boolean tank{ "esp.show.tank", "true" };
+static settings::Boolean npc{ "esp.show.npc", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
@@ -60,6 +60,9 @@ static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
 static settings::Boolean item_money{ "esp.item.money", "true" };
 static settings::Boolean item_money_red{ "esp.item.money-red", "false" };
 static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
+static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
+static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
+static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 // TF2C
 static settings::Boolean item_weapon_spawners{ "esp.item.weapon-spawner", "true" };
 static settings::Boolean item_adrenaline{ "esp.item.adrenaline", "true" };
@@ -248,6 +251,17 @@ const std::string health_small_str         = "Small Medkit";
 const std::string mvm_money_str            = "Money";
 const std::string mvm_red_money_str        = "~Money~";
 const std::string tank_str                 = "Tank";
+const std::string merasmus_str             = "Merasmus";
+const std::string monoculus_str            = "Monoculus";
+const std::string horsemann_str            = "Horsemann";
+const std::string skeleton_str             = "Skeleton";
+const std::string ghost_str                = "Ghost";
+const std::string pumpkinbomb_str          = "Pumpkin Bomb";
+const std::string crumpkin_str             = "Crumpkin";
+const std::string gargoyle_str             = "Gargoyle";
+const std::string balloonbomb_str          = "Dynamite Balloon";
+const std::string woodenbarrel_str         = "Explosive Barrel";
+const std::string walkerexplode_str        = "Alien Walker";
 const std::string rpg_str                  = "RPG";
 const std::string smg_str                  = "SMG";
 const std::string shotgun_str              = "Shotgun";
@@ -1022,7 +1036,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     // Projectile esp
     if (ent->m_Type() == ENTITY_PROJECTILE && proj_esp && (ent->m_bEnemy() || (teammates && !proj_enemy)))
     {
-
         // Rockets
         if (classid == CL_CLASS(CTFProjectile_Rocket) || classid == CL_CLASS(CTFProjectile_SentryRocket))
         {
@@ -1104,22 +1117,147 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
         }
     }
-
     int itemtype = ent->m_ItemType();
-    // Tank esp
-    if (classid == CL_CLASS(CTFTankBoss) && tank)
+    // NPC esp
+    if (npc)
     {
-        AddEntityString(ent, tank_str);
-
+        // We can mark everything except the ghost like this
+        if (ent->m_Type() == ENTITY_NPC)
+        {
+            switch (classid)
+            {
+            case CL_CLASS(CTFTankBoss):
+                AddEntityString(ent, tank_str, colors::FromRGBA8(0, 128, 0, 255));
+                break;
+            case CL_CLASS(CMerasmus):
+            case CL_CLASS(CMerasmusDancer):
+                AddEntityString(ent, merasmus_str, colors::FromRGBA8(0, 128, 0, 255));
+                break;
+            case CL_CLASS(CZombie):
+                AddEntityString(ent, skeleton_str, colors::FromRGBA8(0, 128, 0, 255));
+                break;
+            case CL_CLASS(CEyeballBoss):
+                AddEntityString(ent, monoculus_str, colors::FromRGBA8(0, 128, 0, 255));
+                break;
+            case CL_CLASS(CHeadlessHatman):
+                AddEntityString(ent, horsemann_str, colors::FromRGBA8(0, 128, 0, 255));
+                break;
+            }
+        }
+        else
+        {
+            switch (itemtype)
+            {
+            case HALLOWEEN_GHOST:
+            case HALLOWEEN_GHOST_NOHAT_RED:
+            case HALLOWEEN_GHOST_NOHAT:
+                AddEntityString(ent, ghost_str, colors::FromRGBA8(0, 128, 0, 255));
+            }
+        }
+    }
+    if (item_esp)
+    {
         // Dropped weapon esp
-    }
-    else if (classid == CL_CLASS(CTFDroppedWeapon) && item_esp && item_dropped_weapons)
-    {
-        AddEntityString(ent, std::string("Dropped Weapon")); //I've never seen this not being "WEAPON CTFDroppedWeapon" so why not make it prettier?
+        if (item_dropped_weapons && classid == CL_CLASS(CTFDroppedWeapon))
+        {
+            AddEntityString(ent, std::string("Dropped Weapon"));
+        }
+        // Gargoyle esp
+        else if (item_gargoyle && classid == CL_CLASS(CHalloweenGiftPickup))
+        {
+            if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
+            {
+                AddEntityString(ent, gargoyle_str, colors::FromRGBA8(98, 163, 213, 255));
+            }
+        }
+        // Explosive/Environmental hazard esp
+        else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || itemtype == BOMB_BALLOONBOMB || itemtype == BOMB_WOODENBARREL || itemtype == BOMB_WALKEREXPLODE))
+        {
+            if (classid == CL_CLASS(CTFPumpkinBomb))
+                AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
+            else
+            {
+                switch (itemtype)
+                {
+                case BOMB_BALLOONBOMB:
+                    AddEntityString(ent, balloonbomb_str, colors::FromRGBA8(255, 162, 0, 255));
+                    break;
+                case BOMB_WOODENBARREL:
+                    AddEntityString(ent, woodenbarrel_str, colors::FromRGBA8(255, 162, 0, 255));
+                    break;
+                case BOMB_WALKEREXPLODE:
+                    AddEntityString(ent, walkerexplode_str, colors::FromRGBA8(255, 162, 0, 255));
+                    break;
+                }
+            }
+        }
+        // Other item esp
+        else if (itemtype != ITEM_NONE)
+        {
+            // Health pack esp
+            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= ITEM_HEALTH_LARGE || itemtype == ITEM_HL_BATTERY))
+            {
+                if (itemtype == ITEM_HEALTH_SMALL)
+                    AddEntityString(ent, health_small_str);
+                if (itemtype == ITEM_HEALTH_MEDIUM)
+                    AddEntityString(ent, health_medium_str);
+                if (itemtype == ITEM_HEALTH_LARGE)
+                    AddEntityString(ent, health_big_str);
+                if (itemtype == ITEM_HL_BATTERY)
+                    AddEntityString(ent, hl_battery_str);
 
-        // MVM Money esp
+                // TF2C Adrenaline esp
+            }
+            else if (item_adrenaline && itemtype == ITEM_TF2C_PILL)
+            {
+                AddEntityString(ent, pill_str);
+
+                // Ammo pack esp
+            }
+            else if (item_ammo_packs && itemtype >= ITEM_AMMO_SMALL && itemtype <= ITEM_AMMO_LARGE)
+            {
+                if (itemtype == ITEM_AMMO_SMALL)
+                    AddEntityString(ent, ammo_small_str);
+                if (itemtype == ITEM_AMMO_MEDIUM)
+                    AddEntityString(ent, ammo_medium_str);
+                if (itemtype == ITEM_AMMO_LARGE)
+                    AddEntityString(ent, ammo_big_str);
+
+                // Powerup esp
+            }
+            else if (item_powerups && itemtype >= ITEM_POWERUP_FIRST && itemtype <= ITEM_POWERUP_LAST)
+            {
+                AddEntityString(ent, std::string(powerups[itemtype - ITEM_POWERUP_FIRST]));
+
+                // TF2C weapon spawner esp
+            }
+            else if (item_weapon_spawners && itemtype >= ITEM_TF2C_W_FIRST && itemtype <= ITEM_TF2C_W_LAST)
+            {
+                AddEntityString(ent, std::string(tf2c_weapon_names[itemtype - ITEM_TF2C_W_FIRST]) + " Spawner");
+                if (CE_BYTE(ent, netvar.bRespawning))
+                    AddEntityString(ent, tf2c_spawner_respawn_str);
+            }
+            // Halloween spell esp
+            else if (item_spellbooks && (itemtype == ITEM_SPELL || itemtype == ITEM_SPELL_RARE))
+            {
+                if (itemtype == ITEM_SPELL)
+                {
+                    AddEntityString(ent, spell_str, colors::green);
+                }
+                else
+                {
+                    AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
+                }
+            }
+            // Crumpkin esp https://wiki.teamfortress.com/wiki/Halloween_pumpkin
+            else if (item_crumpkin && itemtype == ITEM_CRUMPKIN)
+            {
+                AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
+            }
+        }
     }
-    else if (classid == CL_CLASS(CCurrencyPack) && item_money)
+    // MVM Money esp
+    if (classid == CL_CLASS(CCurrencyPack) && item_money)
     {
         if (CE_BYTE(ent, netvar.bDistributed))
         {
@@ -1132,71 +1270,8 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         {
             AddEntityString(ent, mvm_money_str);
         }
-
-        // Other item esp
     }
-    else if (itemtype != ITEM_NONE && item_esp)
-    {
-
-        // Health pack esp
-        if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= ITEM_HEALTH_LARGE || itemtype == ITEM_HL_BATTERY))
-        {
-            if (itemtype == ITEM_HEALTH_SMALL)
-                AddEntityString(ent, health_small_str);
-            if (itemtype == ITEM_HEALTH_MEDIUM)
-                AddEntityString(ent, health_medium_str);
-            if (itemtype == ITEM_HEALTH_LARGE)
-                AddEntityString(ent, health_big_str);
-            if (itemtype == ITEM_HL_BATTERY)
-                AddEntityString(ent, hl_battery_str);
-
-            // TF2C Adrenaline esp
-        }
-        else if (item_adrenaline && itemtype == ITEM_TF2C_PILL)
-        {
-            AddEntityString(ent, pill_str);
-
-            // Ammo pack esp
-        }
-        else if (item_ammo_packs && itemtype >= ITEM_AMMO_SMALL && itemtype <= ITEM_AMMO_LARGE)
-        {
-            if (itemtype == ITEM_AMMO_SMALL)
-                AddEntityString(ent, ammo_small_str);
-            if (itemtype == ITEM_AMMO_MEDIUM)
-                AddEntityString(ent, ammo_medium_str);
-            if (itemtype == ITEM_AMMO_LARGE)
-                AddEntityString(ent, ammo_big_str);
-
-            // Powerup esp
-        }
-        else if (item_powerups && itemtype >= ITEM_POWERUP_FIRST && itemtype <= ITEM_POWERUP_LAST)
-        {
-            AddEntityString(ent, std::string(powerups[itemtype - ITEM_POWERUP_FIRST])); //User should already know it's a pickup
-
-            // TF2C weapon spawner esp
-        }
-        else if (item_weapon_spawners && itemtype >= ITEM_TF2C_W_FIRST && itemtype <= ITEM_TF2C_W_LAST)
-        {
-            AddEntityString(ent, std::string(tf2c_weapon_names[itemtype - ITEM_TF2C_W_FIRST]) + " SPAWNER");
-            if (CE_BYTE(ent, netvar.bRespawning))
-                AddEntityString(ent, tf2c_spawner_respawn_str);
-
-            // Halloween spell esp
-        }
-        else if (item_spellbooks && (itemtype == ITEM_SPELL || itemtype == ITEM_SPELL_RARE))
-        {
-            if (itemtype == ITEM_SPELL)
-            {
-                AddEntityString(ent, spell_str, colors::green);
-            }
-            else
-            {
-                AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
-            }
-        }
-
-        // Building esp
-    }
+    // Building esp
     else if (ent->m_Type() == ENTITY_BUILDING && buildings)
     {
 

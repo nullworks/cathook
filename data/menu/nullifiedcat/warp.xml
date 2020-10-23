@@ -21,20 +21,20 @@
             <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option"/>
             <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
         </List>
+    </Box>
         <Box padding="12 6 6 6" width="content" height="content" name="Rapidfire" x="210">
-                <List width="185">
-                <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
-                <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
-                <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
-                <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">
-                    <Select target="warp.rapidfire.key-mode">
-                        <Option name="Disable" value="0"/>
-                        <Option name="Pressed" value="1"/>
-                        <Option name="Not Pressed" value="2"/>
-                        <Option name="Toggle" value="3"/>
-                    </Select>
-                </LabeledObject>
-            </List>
-        </Box>
+            <List width="185">
+            <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
+            <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
+            <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
+            <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">
+                <Select target="warp.rapidfire.key-mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Pressed" value="1"/>
+                    <Option name="Not Pressed" value="2"/>
+                    <Option name="Toggle" value="3"/>
+                </Select>
+            </LabeledObject>
+        </List>
     </Box>
 </Tab>

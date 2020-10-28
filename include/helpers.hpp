@@ -73,7 +73,7 @@ void EndConVars();
 
 bool IsPlayerInvulnerable(CachedEntity *player);
 bool IsPlayerCritBoosted(CachedEntity *player);
-bool IsPlayerInvisible(CachedEntity *player);
+bool IsPlayerInvisible(CachedEntity *player, bool check_stealth = true);
 bool IsPlayerDisguised(CachedEntity *player);
 bool IsPlayerResistantToCurrentWeapon(CachedEntity *player);
 

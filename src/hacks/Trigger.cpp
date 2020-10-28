@@ -191,7 +191,7 @@ bool ShouldShoot()
         if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
             return false;
         // Check if player is cloaked
-        if (IsPlayerInvisible(g_pLocalPlayer->entity))
+        if (IsPlayerInvisible(g_pLocalPlayer->entity, false))
             return false;
 
         if (IsAmbassador(g_pLocalPlayer->weapon()))

@@ -315,7 +315,7 @@ void CreateMove()
 {
     if (!enabled)
         return;
-    if (CE_BAD(LOCAL_E) || g_pLocalPlayer->life_state || CE_BAD(LOCAL_W) || !HasKnife() || IsPlayerInvisible(LOCAL_E) || CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
+    if (CE_BAD(LOCAL_E) || g_pLocalPlayer->life_state || CE_BAD(LOCAL_W) || !HasKnife() || IsPlayerInvisible(LOCAL_E, false) || CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
         return;
     if (!CanShoot())
         return;

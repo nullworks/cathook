@@ -390,9 +390,10 @@ void Draw()
     }
     if (!debug_info)
         return;
-    if (CE_GOOD(g_pLocalPlayer->weapon()))
+    auto local = LOCAL_W;
+    if (CE_GOOD(local))
     {
-        AddSideString(format("Slot: ", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(g_pLocalPlayer->weapon()))));
+        AddSideString(format("Slot: ", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(local))));
         AddSideString(format("Taunt Concept: ", CE_INT(LOCAL_E, netvar.m_iTauntConcept)));
         AddSideString(format("Taunt Index: ", CE_INT(LOCAL_E, netvar.m_iTauntIndex)));
         AddSideString(format("Sequence: ", CE_INT(LOCAL_E, netvar.m_nSequence)));
@@ -408,6 +409,8 @@ void Draw()
         if (current_user_cmd)
             AddSideString(format("command_number: ", last_cmd_number));
         AddSideString(format("clip: ", CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1)));
+        if (local->m_iClassID() == CL_CLASS(CTFMinigun))
+            AddSideString(format("Weapon state: ", CE_INT(local, netvar.iWeaponState)));
         /*AddSideString(colors::white, "Weapon: %s [%i]",
         RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
         g_pLocalPlayer->weapon()->m_iClassID());

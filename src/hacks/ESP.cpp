@@ -1,4 +1,4 @@
-﻿/*
+/*
  * HEsp.cpp
  *
  *  Created on: Oct 6, 2016
@@ -218,6 +218,8 @@ std::unordered_map<studiohdr_t *, bonelist_s> bonelist_map{};
 const std::string hoovy_str                = "Hoovy";
 const std::string dormant_str              = "*Dormant*";
 const std::string jarated_str              = "*Jarate*";
+const std::string taunting_str             = "*Taunt*";
+const std::string revving_str              = "*Revved*";
 const std::string slowed_str               = "*Slow*";
 const std::string zooming_str              = "*Zoom*";
 const std::string crit_str                 = "*Crits*";
@@ -1476,19 +1478,26 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     // Crit
                     if (IsPlayerCritBoosted(ent))
                         AddEntityString(ent, crit_str, colors::orange);
+
+                    // We want revving, zoomed and slowed to be mutually exclusive. Otherwise slowed and zoomed/revving will show at the same time.
+                    // Revving
+                    auto weapon_idx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                    CachedEntity *weapon = IDX_GOOD(weapon_idx) ? ENTITY(weapon_idx) : nullptr;
+                    if (CE_GOOD(weapon) && weapon->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(weapon, netvar.iWeaponState) != 0)
+                            AddEntityString(ent, revving_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                     // Zoomed
-                    if (HasCondition<TFCond_Zoomed>(ent))
-                    {
+                    else if (HasCondition<TFCond_Zoomed>(ent))
                         AddEntityString(ent, zooming_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
-                        // Slowed
-                    }
+                    // Slowed
                     else if (HasCondition<TFCond_Slowed>(ent))
-                    {
                         AddEntityString(ent, slowed_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
-                    }
+
                     // Jarated
                     if (HasCondition<TFCond_Jarated>(ent))
                         AddEntityString(ent, jarated_str, colors::yellow);
+                    // Taunting
+                    if (HasCondition<TFCond_Taunting>(ent))
+                        AddEntityString(ent, taunting_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                     // Dormant
                     if (CE_VALID(ent) && RAW_ENT(ent)->IsDormant())
                         AddEntityString(ent, dormant_str, colors::red);

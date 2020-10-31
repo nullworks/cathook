@@ -1075,7 +1075,12 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
 
 Vector GetBuildingPosition(CachedEntity *ent)
 {
-    return ent->hitboxes.GetHitbox(std::max(0, ent->hitboxes.GetNumHitboxes() / 2 - 1))->center;
+    // Get a centered hitbox
+    auto hitbox = ent->hitboxes.GetHitbox(std::max(0, ent->hitboxes.GetNumHitboxes() / 2 - 1));
+    // Dormant/Invalid, return origin
+    if (!hitbox)
+        return ent->m_vecOrigin();
+    return hitbox->center;
 }
 
 bool IsBuildingVisible(CachedEntity *ent)

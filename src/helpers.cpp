@@ -1075,12 +1075,7 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
 
 Vector GetBuildingPosition(CachedEntity *ent)
 {
-    // Get the collideable origin of ent and get min and max of collideable
-    // OBBMins and OBBMaxs are offsets from origin
-    auto raw = RAW_ENT(ent);
-    Vector min, max;
-    raw->GetRenderBounds(min, max);
-    return (min + max) / 2 + raw->GetCollideable()->GetCollisionOrigin();
+    return ent->hitboxes.GetHitbox(std::max(0, ent->hitboxes.GetNumHitboxes() / 2 - 1))->center;
 }
 
 bool IsBuildingVisible(CachedEntity *ent)

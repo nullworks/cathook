@@ -1142,9 +1142,7 @@ const Vector &PredictEntity(CachedEntity *entity)
         // NPCs (Skeletons, merasmus, etc)
         else if (entity->m_Type() == ENTITY_NPC)
         {
-            auto mins = RAW_ENT(entity)->GetCollideable()->OBBMins();
-            auto maxs = RAW_ENT(entity)->GetCollideable()->OBBMaxs();
-            result    = RAW_ENT(entity)->GetCollideable()->GetCollisionOrigin() + (mins + maxs) / 2.0f;
+            result = entity->hitboxes.GetHitbox(std::max(0, entity->hitboxes.GetNumHitboxes() / 2 - 1))->center;
         }
         // Other
         else

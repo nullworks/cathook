@@ -84,9 +84,11 @@ void NetVars::Init()
         this->flChargedDamage    = gNetvars.get_offset("DT_TFSniperRifle", "SniperRifleLocalData", "m_flChargedDamage");
 
         // sentry
-        this->m_iAmmoShells  = gNetvars.get_offset("DT_ObjectSentrygun", "m_iAmmoShells");
-        this->m_iAmmoRockets = gNetvars.get_offset("DT_ObjectSentrygun", "m_iAmmoRockets");
-        this->m_iSentryState = gNetvars.get_offset("DT_ObjectSentrygun", "m_iState");
+        this->m_iAmmoShells       = gNetvars.get_offset("DT_ObjectSentrygun", "m_iAmmoShells");
+        this->m_iAmmoRockets      = gNetvars.get_offset("DT_ObjectSentrygun", "m_iAmmoRockets");
+        this->m_iSentryState      = gNetvars.get_offset("DT_ObjectSentrygun", "m_iState");
+        this->m_bPlayerControlled = gNetvars.get_offset("DT_ObjectSentrygun", "m_bPlayerControlled");
+        this->m_bDisabled         = gNetvars.get_offset("DT_BaseObject", "m_bDisabled");
 
         // dispenser
         this->m_iAmmoMetal = gNetvars.get_offset("DT_ObjectDispenser", "m_iAmmoMetal");
@@ -98,16 +100,15 @@ void NetVars::Init()
         // any building
         this->m_iUpgradeMetal           = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeMetal");
         this->m_flPercentageConstructed = gNetvars.get_offset("DT_BaseObject", "m_flPercentageConstructed");
-
-        // any building
-        this->iUpgradeLevel   = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeLevel");
-        this->m_hBuilder      = gNetvars.get_offset("DT_BaseObject", "m_hBuilder");
-        this->m_bCanPlace     = gNetvars.get_offset("DT_BaseObject", "m_bServerOverridePlacement");
-        this->m_bBuilding     = gNetvars.get_offset("DT_BaseObject", "m_bBuilding");
-        this->m_iObjectType   = gNetvars.get_offset("DT_BaseObject", "m_iObjectType");
-        this->m_bHasSapper    = gNetvars.get_offset("DT_BaseObject", "m_bHasSapper");
-        this->m_bPlacing      = gNetvars.get_offset("DT_BaseObject", "m_bPlacing");
-        this->m_bMiniBuilding = gNetvars.get_offset("DT_BaseObject", "m_bMiniBuilding");
+        this->iUpgradeLevel             = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeLevel");
+        this->m_hBuilder                = gNetvars.get_offset("DT_BaseObject", "m_hBuilder");
+        this->m_bCanPlace               = gNetvars.get_offset("DT_BaseObject", "m_bServerOverridePlacement");
+        this->m_bBuilding               = gNetvars.get_offset("DT_BaseObject", "m_bBuilding");
+        this->m_iObjectType             = gNetvars.get_offset("DT_BaseObject", "m_iObjectType");
+        this->m_bHasSapper              = gNetvars.get_offset("DT_BaseObject", "m_bHasSapper");
+        this->m_bPlacing                = gNetvars.get_offset("DT_BaseObject", "m_bPlacing");
+        this->m_bMiniBuilding           = gNetvars.get_offset("DT_BaseObject", "m_bMiniBuilding");
+        this->m_bPlasmaDisable          = gNetvars.get_offset("DT_BaseObject", "m_bPlasmaDisable");
 
         // teleporter
         this->m_iTeleState                    = gNetvars.get_offset("DT_ObjectTeleporter", "m_iState");

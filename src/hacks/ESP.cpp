@@ -1311,7 +1311,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (IsSapped)
                 AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
 
-            if (IsDisabled || IsPlasmaDisabled)
+            else if (IsDisabled || IsPlasmaDisabled)
                 AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
             
             switch (classid)

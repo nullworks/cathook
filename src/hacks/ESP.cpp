@@ -1311,9 +1311,9 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (IsSapped)
                 AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
 
-            else if (IsDisabled || IsPlasmaDisabled)
+            else if (CE_INT(ent, netvar.m_iTeleState) == 1 || (IsDisabled || IsPlasmaDisabled))
                 AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
-            
+
             switch (classid)
             {
             case CL_CLASS(CObjectSentrygun):
@@ -1352,7 +1352,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
             case CL_CLASS(CObjectTeleporter):
             {
-                if (!(IsSapped || IsDisabled || IsPlasmaDisabled))
+                if (CE_INT(ent, netvar.m_iTeleState) > 1)
                 {
                     float next_teleport = CE_FLOAT(ent, netvar.m_flTeleRechargeTime);
                     float yaw_to_exit   = CE_FLOAT(ent, netvar.m_flTeleYawToExit);

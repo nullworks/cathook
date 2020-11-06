@@ -1302,17 +1302,17 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 AddEntityString(ent, std::string("Mini ") + name);
         }
 
+        // If text health is true, then add a string with the health
+        if (show_health)
+        {
+            AddEntityString(ent, format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), " HP"), colors::Health(ent->m_iHealth(), ent->m_iMaxHealth()));
+        }
+
         if (show_conditions)
         {
             bool IsSapped         = CE_BYTE(ent, netvar.m_bHasSapper);
             bool IsDisabled       = CE_BYTE(ent, netvar.m_bDisabled);
             bool IsPlasmaDisabled = CE_BYTE(ent, netvar.m_bPlasmaDisable);
-
-            if (IsSapped)
-                AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
-
-            else if (CE_INT(ent, netvar.m_iTeleState) == 1 || (IsDisabled || IsPlasmaDisabled))
-                AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
 
             switch (classid)
             {
@@ -1367,12 +1367,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 break;
             }
             }
-        }
-        
-        // If text health is true, then add a string with the health
-        if (show_health)
-        {
-            AddEntityString(ent, format(ent->m_iHealth(), '/', ent->m_iMaxHealth(), " HP"), colors::Health(ent->m_iHealth(), ent->m_iMaxHealth()));
+
+            if (IsSapped)
+                AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
+
+            else if (classid == CL_CLASS(CObjectTeleporter) && CE_INT(ent, netvar.m_iTeleState) == 1 || (IsDisabled || IsPlasmaDisabled))
+                AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
         }
 
         // Set the entity to repaint

@@ -1313,6 +1313,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             bool IsSapped         = CE_BYTE(ent, netvar.m_bHasSapper);
             bool IsDisabled       = CE_BYTE(ent, netvar.m_bDisabled);
             bool IsPlasmaDisabled = CE_BYTE(ent, netvar.m_bPlasmaDisable);
+            bool IsMini           = CE_BYTE(ent, netvar.m_bMiniBuilding);
+            int required_metal    = CE_INT(ent, netvar.m_iUpgradeMetalRequired);
+            int metal             = CE_INT(ent, netvar.m_iUpgradeMetal);
+            
+            if (!IsMini && CE_INT(ent, netvar.iUpgradeLevel) != 3)
+                AddEntityString(ent, format("Upgrade: " + std::to_string(required_metal - metal), '/', std::to_string(required_metal)));
 
             switch (classid)
             {
@@ -1371,7 +1377,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (IsSapped)
                 AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
 
-            else if (classid == CL_CLASS(CObjectTeleporter) && CE_INT(ent, netvar.m_iTeleState) == 1 || (IsDisabled || IsPlasmaDisabled))
+            else if (classid == CL_CLASS(CObjectTeleporter) && CE_INT(ent, netvar.m_iTeleState) <= 1 || (IsDisabled || IsPlasmaDisabled))
                 AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
         }
 

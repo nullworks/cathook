@@ -101,6 +101,7 @@ void NetVars::Init()
         this->m_iUpgradeMetal           = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeMetal");
         this->m_flPercentageConstructed = gNetvars.get_offset("DT_BaseObject", "m_flPercentageConstructed");
         this->iUpgradeLevel             = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeLevel");
+        this->m_iUpgradeMetalRequired   = gNetvars.get_offset("DT_BaseObject", "m_iUpgradeMetalRequired");
         this->m_hBuilder                = gNetvars.get_offset("DT_BaseObject", "m_hBuilder");
         this->m_bCanPlace               = gNetvars.get_offset("DT_BaseObject", "m_bServerOverridePlacement");
         this->m_bBuilding               = gNetvars.get_offset("DT_BaseObject", "m_bBuilding");

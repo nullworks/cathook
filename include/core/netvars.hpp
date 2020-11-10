@@ -1,4 +1,4 @@
-﻿/*
+/*
  * entity.h
  *
  *  Created on: Oct 6, 2016
@@ -74,6 +74,7 @@ public:
     offset_t m_iUpgradeMetal;           // upgrade metal on any building
     offset_t m_flPercentageConstructed; // use only with        if (IsBuilding())
     offset_t iUpgradeLevel;             // any building
+    offset_t m_iUpgradeMetalRequired;
     offset_t m_hBuilder;
     offset_t m_bCanPlace;
     offset_t m_iObjectType;

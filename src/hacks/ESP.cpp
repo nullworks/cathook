@@ -1362,12 +1362,14 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 {
                     float next_teleport = CE_FLOAT(ent, netvar.m_flTeleRechargeTime);
                     float yaw_to_exit   = CE_FLOAT(ent, netvar.m_flTeleYawToExit);
+                    std::string time = std::to_string((int) floor((next_teleport - g_GlobalVars->curtime) * 100) / 100);
+
                     if (yaw_to_exit)
                     {
                         if (next_teleport < g_GlobalVars->curtime)
                             AddEntityString(ent, tp_ready_str);
                         else
-                            AddEntityString(ent, std::to_string(next_teleport - g_GlobalVars->curtime) + "s");
+                            AddEntityString(ent, time + "s");
                     }
                 }
                 break;

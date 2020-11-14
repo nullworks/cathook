@@ -15,6 +15,8 @@ struct brutedata
     int hits_in_a_row{ 0 };
     Vector original_angle{};
     Vector new_angle{};
+    Vector previous_angle{};
+    Vector previous_delta{};
 };
 
 namespace hacks::shared::anti_anti_aim

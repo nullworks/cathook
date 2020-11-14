@@ -18,6 +18,7 @@ static settings::Rgba nightmode_gui_color{ "visual.night-mode.gui-color", "00000
 static settings::Rgba nightmode_world_color{ "visual.night-mode.world-color", "000000FF" };
 static settings::Rgba nightmode_skybox_color{ "visual.night-mode.skybox-color", "000000FF" };
 static settings::Boolean no_shake{ "visual.no-shake", "true" };
+static settings::Boolean nointerp_enabled("misc.animfix.nointerp", "false");
 
 // Should we update nightmode?
 static bool update_nightmode = false;
@@ -143,6 +144,22 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
     std::optional<Vector> backup_punch;
     if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
     {
+        if (nointerp_enabled)
+        {
+            for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+            {
+                CachedEntity *ent = ENTITY(i);
+                if (CE_GOOD(ent) && ent->m_bAlivePlayer())
+                {
+                    typedef void (*AddEffects_t)(IClientEntity *, int);
+                    static auto add_effects_signature = gSignatures.GetClientSignature("55 89 E5 8B 55 ? 8B 45 ? 09 50");
+                    static AddEffects_t AddEffects_fn = (AddEffects_t) add_effects_signature;
+                    AddEffects_fn(RAW_ENT(ent), EF_NOINTERP);
+
+                    re::C_BaseEntity::SetAbsOrigin(RAW_ENT(ent), ent->m_vecOrigin());
+                }
+            }
+        }
         IF_GAME(IsTF())
         {
             if (no_shake && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())

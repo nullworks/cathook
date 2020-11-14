@@ -27,6 +27,19 @@ static inline void modifyAnlges()
         angle.y     = data.new_angle.y;
     }
 }
+
+static inline void resetangles()
+{
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    {
+        auto player = ENTITY(i);
+        if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info.friendsID)
+            continue;
+        auto &data  = resolver_map[player->player_info.friendsID];
+        CE_VECTOR(player, netvar.m_angEyeAngles) = CE_VECTOR(player, netvar.m_angEyeAngles);
+    }
+}
+
 static inline void CreateMove()
 {
     // Empty the array
@@ -51,43 +64,67 @@ static inline void CreateMove()
 void frameStageNotify(ClientFrameStage_t stage)
 {
 #if !ENABLE_TEXTMODE
-    if (!enable || !g_IEngine->IsInGame())
+    if (!g_IEngine->IsInGame())
         return;
+
     if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
     {
-        modifyAnlges();
+        if(!enable)
+            resetangles();
+        else
+            modifyAnlges();
     }
 #endif
 }
 
-static std::array<float, 5> yaw_resolves{ 0.0f, 180.0f, 65.0f, -65.0f, -180.0f };
+static std::array<float, 2> spin_yaw_resolves{ 0.0f, 180.0f};
+static std::array<float, 2> static_yaw_resolves{90.0f, -90.0f};
+static std::array<std::string, 4> yaw_resolvetype{"NONE", "OPPOSITE", "LEFT", "RIGHT"};
 
-static float resolveAngleYaw(float angle, brutedata &brute)
+static float resolveAngleYaw(float angle, brutedata &brute, CachedEntity* ent)
 {
     brute.original_angle.y = angle;
+    float delta;
+
     while (angle > 180)
         angle -= 360;
 
     while (angle < -180)
         angle += 360;
-
+    Vector vecangle;
     // Yaw Resolving
     // Find out which angle we should try
-    int entry = (int) std::floor((brute.brutenum / 2.0f)) % yaw_resolves.size();
-    angle += yaw_resolves[entry];
+    if(CE_GOOD(LOCAL_E))
+        vecangle = GetAimAtAngles(LOCAL_E->m_vecOrigin(), ent->m_vecOrigin());
 
-    while (angle > 180)
-        angle -= 360;
+    delta = brute.previous_angle.y - angle;
+    
+    {
+        int entry = (int) std::floor((brute.brutenum / 2.0f)) % static_yaw_resolves.size();
+        vecangle.y += static_yaw_resolves[entry];
+    }
 
-    while (angle < -180)
-        angle += 360;
-    brute.new_angle.y = angle;
-    return angle;
+    while (vecangle.y > 180)
+        vecangle.y -= 360;
+
+    while (vecangle.y < -180)
+        vecangle.y += 360;
+
+    brute.new_angle.y = vecangle.y;
+
+    brute.previous_delta.y = delta;
+    return vecangle.y;
 }
 
 static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
 {
     brute.original_angle.x = angle;
+
+    while (angle > 90)
+        angle -= 90;
+
+    while (angle < -90)
+        angle += 90;
 
     // Get CSniperDot associated with entity
     CachedEntity *sniper_dot = nullptr;
@@ -112,14 +149,22 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     // No sniper dot/not using a sniperrifle.
     if (sniper_dot == nullptr)
     {
-        if (brute.brutenum % 2)
+
+        if (brute.brutenum % 3)
         {
             // Pitch resolver
             if (angle >= 90)
                 angle = -89;
-            if (angle <= -90)
+            else if (angle <= -90)
                 angle = 89;
+            else
+                angle = 0;
         }
+
+        if(brute.previous_angle.x == -89 && brute.hits_in_a_row % 2 == 0)
+            angle = 89;
+        else
+            angle = -89;
     }
     // Sniper dot found, use it.
     else
@@ -136,6 +181,7 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     }
 
     brute.new_angle.x = angle;
+    brute.previous_angle.x = angle;
     return angle;
 }
 
@@ -157,9 +203,9 @@ void increaseBruteNum(int idx)
         data.hits_in_a_row = 0;
         auto &angle        = CE_VECTOR(ent, netvar.m_angEyeAngles);
         angle.x            = resolveAnglePitch(data.original_angle.x, data, ent);
-        angle.y            = resolveAngleYaw(data.original_angle.y, data);
-        data.new_angle.x   = angle.x;
-        data.new_angle.y   = angle.y;
+        angle.y            = resolveAngleYaw(data.original_angle.y, data, ent);
+        data.previous_angle.y = data.new_angle.x   = angle.x;
+        data.previous_angle.y = data.new_angle.y   = angle.y;
     }
 }
 
@@ -194,7 +240,7 @@ static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info.friendsID]);
+        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info.friendsID], ent);
 }
 
 // *_ptr points to what we need to modify while *_ProxyFn holds the old value

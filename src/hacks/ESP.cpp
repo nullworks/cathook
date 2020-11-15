@@ -1316,14 +1316,13 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             bool IsMini           = CE_BYTE(ent, netvar.m_bMiniBuilding);
             int required_metal    = CE_INT(ent, netvar.m_iUpgradeMetalRequired);
             int metal             = CE_INT(ent, netvar.m_iUpgradeMetal);
-            
+
             if (!IsMini && CE_INT(ent, netvar.iUpgradeLevel) != 3)
                 AddEntityString(ent, format("Upgrade: " + std::to_string(required_metal - metal), '/', std::to_string(required_metal)));
 
             switch (classid)
             {
             case CL_CLASS(CObjectSentrygun):
-            {
                 bool IsControlled  = CE_BYTE(ent, netvar.m_bPlayerControlled);
                 int sentry_ammo    = CE_INT(ent, netvar.m_iAmmoShells);
                 int sentry_rockets = CE_INT(ent, netvar.m_iAmmoRockets);
@@ -1348,16 +1347,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 if (IsControlled) // Dispensers are also "controlled" when they're in use
                     AddEntityString(ent, controlled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                 break;
-            }
             case CL_CLASS(CObjectDispenser):
-            {
                 int AmmoMetal = CE_INT(ent, netvar.m_iAmmoMetal);
 
                 AddEntityString(ent, format(std::to_string(AmmoMetal), '/', "400 Metal"));
                 break;
-            }
             case CL_CLASS(CObjectTeleporter):
-            {
                 if (CE_INT(ent, netvar.m_iTeleState) > 1)
                 {
                     float next_teleport = CE_FLOAT(ent, netvar.m_flTeleRechargeTime);
@@ -1373,7 +1368,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     }
                 }
                 break;
-            }
             }
 
             if (IsSapped)

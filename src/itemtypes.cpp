@@ -83,6 +83,24 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/props_coast/wooden_barrel.mdl", BOMB_WOODENBARREL);
     RegisterModelMapping("models/props_invasion/props_alien/walker_explode.mdl", BOMB_WALKEREXPLODE);
 
+    // == FLAGS
+    RegisterModelMapping("models/props_td/atom_bomb.mdl", FLAG_ATOMBOMB);
+    RegisterModelMapping("models/props_pirate/pd_skull_pickup.mdl", FLAG_SKULLPICKUP);
+    RegisterModelMapping("models/props_monster_mash/gib_bucket.mdl", FLAG_GIBBUCKET);
+    RegisterModelMapping("models/effects/playersoul.mdl", FLAG_PLAYERSOUL);
+    RegisterModelMapping("models/props_watergate/bottle_pickup.mdl", FLAG_BOTTLEPICKUP);
+    RegisterModelMapping("models/props_doomsday/australium_container.mdl", FLAG_AUSSIECONTAINER);
+    RegisterModelMapping("models/flag/ticket_case.mdl", FLAG_TICKETCASE);
+
+    // == BOMB CARTS
+    RegisterModelMapping("models/props_trainyard/bomb_cart.mdl", CART_BOMBCART);
+    RegisterModelMapping("models/props_trainyard/bomb_cart_red.mdl", CART_BOMBCART_RED);
+    RegisterModelMapping("models/custom/dirty_bomb_cart.mdl", CART_DIRTYBOMBCART);
+    RegisterModelMapping("models/lilchewchew/lilchewchew_v3.mdl", CART_LILCHEWCHEW);
+    RegisterModelMapping("models/props_trainyard/bomb_redmond.mdl", CART_REDMOND);
+    RegisterModelMapping("models/props_trainyard/bomb_blutarch.mdl", CART_BLUTARCH);
+    RegisterModelMapping("models/props_snowycoast/gasoline_bomb_cart.mdl", CART_GASOLINEBOMBCART);
+
     RegisterSpecialMapping([](CachedEntity *ent) -> bool { return ent->m_iClassID() == CL_CLASS(CTFAmmoPack) && g_ItemManager.mapper.GetItemType(ent) != ITEM_CRUMPKIN; }, ITEM_AMMO_MEDIUM);
 
     RegisterModelMapping("models/items/medkit_overheal.mdl", ITEM_TF2C_PILL);

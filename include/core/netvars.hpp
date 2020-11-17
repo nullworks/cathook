@@ -1,4 +1,4 @@
-/*
+﻿/*
  * entity.h
  *
  *  Created on: Oct 6, 2016
@@ -207,6 +207,7 @@ public:
 
     offset_t m_iPlayerIndex;
     offset_t m_hTargetPlayer;
+    offset_t m_flResetTime;
 };
 
 extern NetVars netvar;

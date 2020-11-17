@@ -39,6 +39,7 @@ static settings::Boolean legit{ "esp.legit", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
+static settings::Boolean team_buildings{ "esp.show.team-buildings", "true" };
 static settings::Boolean teammates{ "esp.show.teammates", "true" };
 static settings::Boolean npc{ "esp.show.npc", "true" };
 
@@ -63,6 +64,7 @@ static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
 static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
 static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
 static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
+static settings::Boolean item_objectives{ "esp.item.objectives", "true" };
 // TF2C
 static settings::Boolean item_weapon_spawners{ "esp.item.weapon-spawner", "true" };
 static settings::Boolean item_adrenaline{ "esp.item.adrenaline", "true" };
@@ -258,15 +260,24 @@ const std::string slowed_str               = "*Slow*";
 const std::string zooming_str              = "*Zoom*";
 const std::string crit_str                 = "*Crits*";
 const std::string blast_p_str              = "*Blast Passive*";
-const std::string blast_a_str              = "*Blast Vaccinator*";
+const std::string blast_a_str              = "*Blast-Resist*";
 const std::string fire_p_str               = "*Fire Passive*";
-const std::string fire_a_str               = "*Fire Vaccinator*";
+const std::string fire_a_str               = "*Fire-Resist*";
 const std::string bullet_p_str             = "*Bullet Passive*";
-const std::string bullet_a_str             = "*Bullet Vaccinator*";
+const std::string bullet_a_str             = "*Bullet-Resist*";
 const std::string invulnerable_str         = "*Invulnerable*";
 const std::string ready_ringer_str         = "*Dead Ringer Out*";
 const std::string cloaked_str              = "*Cloak*";
 const std::string in_ringer_str            = "*Dead Ringer*";
+const std::string disguised_str            = "*Disguise*";
+const std::string intel_str                = "Intel";
+const std::string atombomb_str             = "Atom Bomb";
+const std::string soulpickup_str           = "Soul Pickup";
+const std::string bodyparts_str            = "Body Parts";
+const std::string beerbottle_str           = "Beer Bottle";
+const std::string aussiecontainer_str      = "Australium Container";
+const std::string ticketcase_str           = "Tickets";
+const std::string cart_str                 = "Cart";
 const std::string botname_str              = "Bot #";
 const std::string tp_ready_str             = "Ready";
 const std::string sapped_str               = "*Sapped*";
@@ -658,7 +669,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 Draw3DBox(ent, fg);
             break;
         case ENTITY_BUILDING:
-            if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !teammates)
+            if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !teammates && !team_buildings)
                 break;
             if (!fg)
                 fg = colors::EntityF(ent);
@@ -1197,7 +1208,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
         }
         // Explosive/Environmental hazard esp
-        else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || itemtype == BOMB_BALLOONBOMB || itemtype == BOMB_WOODENBARREL || itemtype == BOMB_WALKEREXPLODE))
+        else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || itemtype >= BOMB_BALLOONBOMB && itemtype <= BOMB_WALKEREXPLODE))
         {
             if (classid == CL_CLASS(CTFPumpkinBomb))
                 AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
@@ -1217,21 +1228,74 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 }
             }
         }
+        if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || itemtype >= FLAG_ATOMBOMB && itemtype <= CART_GASOLINEBOMBCART))
+        {
+            rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
+
+            switch (itemtype)
+            {
+            case FLAG_ATOMBOMB:
+                AddEntityString(ent, atombomb_str, color);
+                break;
+            case FLAG_SKULLPICKUP:
+            case FLAG_PLAYERSOUL:
+                AddEntityString(ent, soulpickup_str, color);
+                break;
+            case FLAG_GIBBUCKET:
+                AddEntityString(ent, bodyparts_str, color);
+                break;
+            case FLAG_BOTTLEPICKUP:
+                AddEntityString(ent, beerbottle_str, color);
+                break;
+            case FLAG_AUSSIECONTAINER:
+                AddEntityString(ent, aussiecontainer_str, color);
+                break;
+            case FLAG_TICKETCASE:
+                AddEntityString(ent, ticketcase_str, color);
+                break;
+            case CART_BOMBCART_RED:
+            case CART_BLUTARCH:
+                AddEntityString(ent, cart_str, colors::red);
+                break;
+            case CART_GASOLINEBOMBCART:
+            case CART_REDMOND:
+            case CART_LILCHEWCHEW:
+            case CART_DIRTYBOMBCART:
+            case CART_BOMBCART:
+                AddEntityString(ent, cart_str, colors::blu);
+                break;
+            default:
+                AddEntityString(ent, intel_str, color);
+                break;
+            }
+            
+            auto resettime = CE_FLOAT(ent, netvar.m_flResetTime);
+            std::string time = std::to_string((int) floor((resettime - g_GlobalVars->curtime) * 100) / 100);
+
+            if (resettime)
+                AddEntityString(ent, time + "s", colors::FromRGBA8(98, 163, 213, 255));
+        }
         // Other item esp
         else if (itemtype != ITEM_NONE)
         {
             // Health pack esp
             if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= ITEM_HEALTH_LARGE || itemtype == ITEM_HL_BATTERY))
             {
-                if (itemtype == ITEM_HEALTH_SMALL)
+                switch (itemtype)
+                {
+                case ITEM_HEALTH_SMALL:
                     AddEntityString(ent, health_small_str);
-                if (itemtype == ITEM_HEALTH_MEDIUM)
+                    break;
+                case ITEM_HEALTH_MEDIUM:
                     AddEntityString(ent, health_medium_str);
-                if (itemtype == ITEM_HEALTH_LARGE)
+                    break;
+                case ITEM_HEALTH_LARGE:
                     AddEntityString(ent, health_big_str);
-                if (itemtype == ITEM_HL_BATTERY)
+                    break;
+                case ITEM_HL_BATTERY:
                     AddEntityString(ent, hl_battery_str);
-
+                    break;
+                }
                 // TF2C Adrenaline esp
             }
             else if (item_adrenaline && itemtype == ITEM_TF2C_PILL)
@@ -1242,13 +1306,18 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
             else if (item_ammo_packs && itemtype >= ITEM_AMMO_SMALL && itemtype <= ITEM_AMMO_LARGE)
             {
-                if (itemtype == ITEM_AMMO_SMALL)
+                switch (itemtype)
+                {
+                case ITEM_AMMO_SMALL:
                     AddEntityString(ent, ammo_small_str);
-                if (itemtype == ITEM_AMMO_MEDIUM)
+                    break;
+                case ITEM_AMMO_MEDIUM:
                     AddEntityString(ent, ammo_medium_str);
-                if (itemtype == ITEM_AMMO_LARGE)
+                    break;
+                case ITEM_AMMO_LARGE:
                     AddEntityString(ent, ammo_big_str);
-
+                    break;
+                }
                 // Powerup esp
             }
             else if (item_powerups && itemtype >= ITEM_POWERUP_FIRST && itemtype <= ITEM_POWERUP_LAST)
@@ -1302,7 +1371,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     {
 
         // Check if enemy building
-        if (!ent->m_bEnemy() && !teammates)
+        if (!ent->m_bEnemy() && !teammates && !team_buildings)
             return;
 
         // TODO maybe...
@@ -1318,6 +1387,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             const std::string &name = (classid == CL_CLASS(CObjectTeleporter) ? teleporter_str : (classid == CL_CLASS(CObjectSentrygun) ? sentry_str : dispenser_str));
             int level               = CE_INT(ent, netvar.iUpgradeLevel);
             bool IsMini             = CE_BYTE(ent, netvar.m_bMiniBuilding);
+
             if (!IsMini)
                 AddEntityString(ent, format("Level ", level, ' ', name));
             else
@@ -1506,7 +1576,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                                         AddEntityString(ent, charge + "% Uber", colors::Health(floor(CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
                                     }
                                     else
-                                        AddEntityString(ent, charge + "% Uber | Charges: " + std::to_string(floor(CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f)), colors::Health((CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
+                                        AddEntityString(ent, charge + "% Uber | Charges: " + std::to_string((int) floor((CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f) * 100) / 100), colors::Health((CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
                                     break;
                                 }
                             }
@@ -1533,6 +1603,8 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     }
                     if (CE_BYTE(ent, netvar.m_bFeignDeathReady))
                         AddEntityString(ent, ready_ringer_str, colors::FromRGBA8(178.0f, 0.0f, 255.0f, 255.0f));
+                    if (HasCondition<TFCond_Disguised>(ent))
+                    AddEntityString(ent, disguised_str, colors::FromRGBA8(220, 220, 220, 255));
                     // Uber/Bonk
                     if (IsPlayerInvulnerable(ent))
                         AddEntityString(ent, invulnerable_str);

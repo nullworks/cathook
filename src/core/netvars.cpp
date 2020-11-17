@@ -154,6 +154,9 @@ void NetVars::Init()
 
         // Gargoyle
         this->m_hTargetPlayer = gNetvars.get_offset("DT_CHalloweenGiftPickup", "m_hTargetPlayer");
+
+        // Flag
+        this->m_flResetTime = gNetvars.get_offset("DT_CaptureFlag", "m_flResetTime");
     }
     IF_GAME(IsTF2C())
     {

@@ -12,6 +12,7 @@
             <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP"/>
             <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Toggles ESP on self."/>
             <AutoVariable width="fill" target="esp.show.buildings" label="Building ESP"/>
+            <AutoVariable width="fill" target="esp.show.team-buildings" label="Teammate Building ESP"/>
             <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
             <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
             <AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP"/>
@@ -22,6 +23,7 @@
             <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money is automatically collected."/>
             <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
+            <AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intels, carts and mvm bomb"/>
             <AutoVariable width="fill" target="esp.item.explosive" label="Explosives" tooltip="Environmental hazards like bombs"/>
             <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits"/>
             <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps"/>

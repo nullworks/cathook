@@ -369,22 +369,30 @@ void Draw()
             // Assign the for loops tick number to an ent
             CachedEntity *ent = ENTITY(i);
             player_info_s info;
-            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && g_IEngine->GetPlayerInfo(i, &info))
+            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 1 && g_IEngine->GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {
+                case 1:
+                    observermode = "DeathCam";
+                    break;
+                case 2:
+                    observermode = "FreezeCam";
+                    break;
                 case 4:
-                    observermode = "Firstperson";
+                    observermode = "1st Person";
                     break;
                 case 5:
-                    observermode = "Thirdperson";
+                    observermode = "3rd Person";
                     break;
                 case 7:
-                    observermode = "Freecam";
+                    observermode = "FreeCam";
                     break;
                 }
-                AddSideString(format(info.name, " ", observermode));
+                rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
+
+                AddSideString(format(info.name, " - (", observermode, ")"), color);
             }
         }
     }

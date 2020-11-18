@@ -18,10 +18,9 @@ const std::vector<std::string> builtin_default = {
     "%name%, nice skill, you sell?",
     "%name%, umad?",
     "smh i have %dominum% dominations",
-    "R.I.P %name%, they were fat, and died a virgin!",
     "Well, off to vist %name%'s mother!",
     "Cleanup on asile 3, %name% left their skill!",
-    "Congrats %name%! You just won 50 precent off a free asswhoopin! Call now and get another one absolutely free!",
+    "Congrats %name%! You just won 50 precent off another asswhoopin! Call now and get a third absolutely free!",
 };
 const std::string tf_classes_dominatesay[] = { "class", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer" };
 const std::string tf_teams_dominatesay[]   = { "RED", "BLU" };

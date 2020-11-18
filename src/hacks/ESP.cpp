@@ -1272,7 +1272,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             auto resettime = CE_FLOAT(ent, netvar.m_flResetTime);
             std::string time = std::to_string((int) floor((resettime - g_GlobalVars->curtime) * 100) / 100);
 
-            if (resettime)
+            if (resettime && classid == CL_CLASS(CCaptureFlag))
                 AddEntityString(ent, time + "s", colors::FromRGBA8(98, 163, 213, 255));
         }
         // Other item esp

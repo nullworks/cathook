@@ -70,8 +70,10 @@ ItemManager::ItemManager() : mapper()
     // Spellbooks
     RegisterModelMapping("models/props_halloween/hwn_spellbook_upright.mdl", ITEM_SPELL);
     RegisterModelMapping("models/items/crystal_ball_pickup.mdl", ITEM_SPELL);
+    RegisterModelMapping("models/props_monster_mash/flask_vial_green.mdl", ITEM_SPELL);
     RegisterModelMapping("models/props_halloween/hwn_spellbook_upright_major.mdl", ITEM_SPELL_RARE);
     RegisterModelMapping("models/items/crystal_ball_pickup_major.mdl", ITEM_SPELL_RARE);
+    RegisterModelMapping("models/props_monster_mash/flask_vial_purple.mdl", ITEM_SPELL_RARE);
 
     // == GHOSTS
     RegisterModelMapping("models/props_halloween/ghost.mdl", HALLOWEEN_GHOST);

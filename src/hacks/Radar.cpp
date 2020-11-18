@@ -28,6 +28,7 @@ static settings::Boolean show_teammates{ "radar.show.teammates", "true" };
 static settings::Boolean show_teambuildings{ "radar.show.team.buildings", "true" };
 static settings::Boolean show_healthpacks{ "radar.show.health", "true" };
 static settings::Boolean show_ammopacks{ "radar.show.ammo", "true" };
+static settings::Boolean hide_invis{ "radar.hide-invis", "true" };
 
 static Timer invalid{};
 
@@ -107,6 +108,8 @@ void DrawEntity(int x, int y, CachedEntity *ent)
         {
             if (CE_BYTE(ent, netvar.iLifeState))
                 return; // DEAD. not big surprise.
+            if (hide_invis && IsPlayerInvisible(ent))
+                return;
             const int &clazz = CE_INT(ent, netvar.iClass);
             const int &team  = CE_INT(ent, netvar.iTeamNum);
             idx              = team - 2;

@@ -104,6 +104,7 @@
                     <Option name="Vertical" value="3"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="esp.hide-invis" label="Hide invisible"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Strings" x="340">

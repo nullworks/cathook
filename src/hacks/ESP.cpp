@@ -35,6 +35,7 @@ static settings::Int sightlines{ "esp.sightlines", "0" };
 static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
 static settings::Boolean vischeck{ "esp.vischeck", "true" };
+static settings::Boolean hide_invis{ "esp.hide-invis", "true" };
 static settings::Boolean legit{ "esp.legit", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
@@ -1487,6 +1488,8 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         // Local player handling
         if (!(local_esp && g_IInput->CAM_IsThirdPerson()) && ent->m_IDX == g_IEngine->GetLocalPlayer())
             return;
+        if (hide_invis && IsPlayerInvisible(ent))
+            return;
 
         // Get player class
         int pclass = CE_INT(ent, netvar.iClass);
@@ -1604,7 +1607,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     if (CE_BYTE(ent, netvar.m_bFeignDeathReady))
                         AddEntityString(ent, ready_ringer_str, colors::FromRGBA8(178.0f, 0.0f, 255.0f, 255.0f));
                     if (HasCondition<TFCond_Disguised>(ent))
-                    AddEntityString(ent, disguised_str, colors::FromRGBA8(220, 220, 220, 255));
+                        AddEntityString(ent, disguised_str, colors::FromRGBA8(220, 220, 220, 255));
                     // Uber/Bonk
                     if (IsPlayerInvulnerable(ent))
                         AddEntityString(ent, invulnerable_str);

@@ -57,6 +57,12 @@ static CatCommand debug_drawpanel("debug_drawline", "debug", []() {
     g_IEngine->ServerCmdKeyValues(kv);
 });
 
+#if ENABLE_TEXTMODE
+settings::Boolean identify{ "chat.identify", "true" };
+#else
+settings::Boolean identify{ "chat.identify", "false" };
+#endif
+
 void ProcessSendline(IGameEvent *kv)
 {
     int player_idx = kv->GetInt("player", 0xDEAD);
@@ -80,8 +86,6 @@ void ProcessSendline(IGameEvent *kv)
             PrintChat("\x07%06X%s\x01 Marked as CAT (Cathook user)", 0xe05938, info.name);
     }
 }
-
-settings::Boolean identify{ "chat.identify", "true" };
 
 std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
 {
@@ -172,8 +176,7 @@ class IdentifyListener : public IGameEventListener2
 {
     virtual void FireGameEvent(IGameEvent *event)
     {
-        if (*identify)
-            ProcessSendline(event);
+        ProcessSendline(event);
     }
 }; // namespace hooked_methods
 

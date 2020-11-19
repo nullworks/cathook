@@ -277,6 +277,12 @@ const std::string soulpickup_str           = "Soul Pickup";
 const std::string bodyparts_str            = "Body Parts";
 const std::string beerbottle_str           = "Beer Bottle";
 const std::string aussiecontainer_str      = "Australium Container";
+const std::string sandvich_str             = "Sandvich";
+const std::string robosandwich_str         = "Robo-Sandvich";
+const std::string fishcake_str             = "Fishcake";
+const std::string steak_str                = "Buffalo Steak Sandvich";
+const std::string chocolate_str            = "Dalokohs Bar";
+const std::string banana_str               = "Second Banana";
 const std::string ticketcase_str           = "Tickets";
 const std::string cart_str                 = "Cart";
 const std::string botname_str              = "Bot #";
@@ -1280,7 +1286,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         else if (itemtype != ITEM_NONE)
         {
             // Health pack esp
-            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= ITEM_HEALTH_LARGE || itemtype == ITEM_HL_BATTERY))
+            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= EDIBLE_ROBOSANDWICH || itemtype == ITEM_HL_BATTERY))
             {
                 switch (itemtype)
                 {
@@ -1295,6 +1301,24 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     break;
                 case ITEM_HL_BATTERY:
                     AddEntityString(ent, hl_battery_str);
+                    break;
+                case EDIBLE_SANDVICH:
+                    AddEntityString(ent, sandvich_str, colors::green);
+                    break;
+                case EDIBLE_FISHCAKE:
+                    AddEntityString(ent, fishcake_str, colors::green);
+                    break;
+                case EDIBLE_STEAK:
+                    AddEntityString(ent, steak_str, colors::green);
+                    break;
+                case EDIBLE_CHOCOLATE:
+                    AddEntityString(ent, chocolate_str, colors::green);
+                    break;
+                case EDIBLE_BANANA:
+                    AddEntityString(ent, banana_str, colors::green);
+                    break;
+                case EDIBLE_ROBOSANDWICH:
+                    AddEntityString(ent, robosandwich_str, colors::green);
                     break;
                 }
                 // TF2C Adrenaline esp

@@ -1235,7 +1235,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 }
             }
         }
-        if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || itemtype >= FLAG_ATOMBOMB && itemtype <= CART_GASOLINEBOMBCART))
+        if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || itemtype >= FLAG_ATOMBOMB && itemtype <= CART_BOMBCART_RED))
         {
             rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
 
@@ -1245,7 +1245,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 AddEntityString(ent, atombomb_str, color);
                 break;
             case FLAG_SKULLPICKUP:
-            case FLAG_PLAYERSOUL:
                 AddEntityString(ent, soulpickup_str, color);
                 break;
             case FLAG_GIBBUCKET:
@@ -1260,16 +1259,11 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             case FLAG_TICKETCASE:
                 AddEntityString(ent, ticketcase_str, color);
                 break;
-            case CART_BOMBCART_RED:
-            case CART_BLUTARCH:
-                AddEntityString(ent, cart_str, colors::red);
-                break;
-            case CART_GASOLINEBOMBCART:
-            case CART_REDMOND:
-            case CART_LILCHEWCHEW:
-            case CART_DIRTYBOMBCART:
             case CART_BOMBCART:
                 AddEntityString(ent, cart_str, colors::blu);
+                break;
+            case CART_BOMBCART_RED:
+                AddEntityString(ent, cart_str, colors::red);
                 break;
             default:
                 AddEntityString(ent, intel_str, color);

@@ -3,8 +3,10 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <EventLogging.hpp>
 #include "HookedMethods.hpp"
+#if ENABLE_VISUALS
+#include <EventLogging.hpp>
+#endif
 
 namespace hooked_methods
 {

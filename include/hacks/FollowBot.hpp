@@ -5,7 +5,7 @@
  *
  */
 
-#include "common.hpp"
+#include "entitycache.hpp"
 
 namespace hacks::shared::followbot
 {

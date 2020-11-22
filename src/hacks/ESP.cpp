@@ -78,6 +78,41 @@ static settings::Boolean entity_info{ "esp.debug.entity", "false" };
 static settings::Boolean entity_model{ "esp.debug.model", "false" };
 static settings::Boolean entity_id{ "esp.debug.id", "true" };
 
+// Forward declarations
+void ResetEntityStrings(bool full_clear);
+void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color = colors::empty);
+// Entity Processing
+void __attribute__((fastcall)) ProcessEntity(CachedEntity *ent);
+void __attribute__((fastcall)) ProcessEntityPT(CachedEntity *ent);
+void __attribute__((fastcall)) emoji(CachedEntity *ent);
+// helper funcs
+void __attribute__((fastcall)) Draw3DBox(CachedEntity *ent, const rgba_t &clr);
+void __attribute__((fastcall)) DrawBox(CachedEntity *ent, const rgba_t &clr);
+void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, bool transparent);
+bool GetCollide(CachedEntity *ent);
+
+// Strings
+class ESPString
+{
+public:
+    std::string data;
+    rgba_t color{ colors::empty };
+};
+
+// Cached data
+class ESPData
+{
+public:
+    int string_count{ 0 };
+    std::array<ESPString, 16> strings{};
+    rgba_t color{ colors::empty };
+    bool needs_paint{ false };
+    bool has_collide{ false };
+    Vector collide_max{ 0, 0, 0 };
+    Vector collide_min{ 0, 0, 0 };
+    bool transparent{ false };
+};
+
 // Unknown
 std::mutex threadsafe_mutex;
 // Storage array for keeping strings and other data
@@ -212,7 +247,6 @@ struct bonelist_s
         }*/
     }
 };
-std::unordered_map<studiohdr_t *, bonelist_s> bonelist_map{};
 
 // These are strings that never change and should only be constructed once
 const std::string hoovy_str                = "Hoovy";
@@ -306,19 +340,24 @@ static void cm()
         return;
     if (CE_BAD(LOCAL_E))
         return;
-    PROF_SECTION(DRAW_CM_PERFORMANCE);
     // Something
     std::lock_guard<std::mutex> esp_lock(threadsafe_mutex);
 
-    ResetEntityStrings();          // Clear any strings entities have
-    entities_need_repaint.clear(); // Clear data on entities that need redraw
-    int max_clients = g_IEngine->GetMaxClients();
+    // Update entites every 1/5s
+    const bool entity_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.20f) == 0;
+
+    ResetEntityStrings(entity_tick); // Clear any strings entities have
+    entities_need_repaint.clear();   // Clear data on entities that need redraw
+    int max_clients = g_GlobalVars->maxClients;
     int limit       = HIGHEST_ENTITY;
 
     // If not using any other special esp, we lower the min to the max
     // clients
     if (!buildings && !proj_esp && !item_esp)
         limit = std::min(max_clients, HIGHEST_ENTITY);
+
+    // Do a vischeck every 1/2s
+    const bool vischeck_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.50f) == 0;
 
     { // Prof section ends when out of scope, these brackets here.
         PROF_SECTION(CM_ESP_EntityLoop);
@@ -329,42 +368,30 @@ static void cm()
             CachedEntity *ent = ENTITY(i);
             if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
                 continue;
-            ProcessEntity(ent);
-            // Update Bones
-            if (i <= MAX_PLAYERS)
-                ent->hitboxes.GetHitbox(0);
-            // Dont know what this check is for
-            if (data[i].string_count)
+
+            bool player = i <= max_clients;
+
+            if (player)
             {
-
-                // Set entity color
-                rgba_t color = colors::EntityF(ent);
-                if (RAW_ENT(ent)->IsDormant())
-                {
-                    color.r *= 0.5f;
-                    color.g *= 0.5f;
-                    color.b *= 0.5f;
-                }
-                SetEntityColor(ent, color);
-
-                // If snow distance, add string here
-                if (show_distance)
-                {
-                    AddEntityString(ent, format((int) ENTITY(i)->m_flDistance() / 64 * 1.22f, 'm'));
-                }
+                ProcessEntity(ent);
             }
-            // No idea, this is confusing
+            else if (entity_tick)
+            {
+                ProcessEntity(ent);
+            }
+
             if (data[ent->m_IDX].needs_paint)
             {
-                if (vischeck)
+                // Checking this every tick is a waste of nanoseconds
+                if (vischeck_tick && vischeck)
                     data[ent->m_IDX].transparent = !ent->IsVisible();
-                entities_need_repaint.push_back({ ent->m_IDX, ent->m_flDistance() });
+                entities_need_repaint.push_back({ ent->m_IDX, ent->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) });
             }
         }
     }
     // Render closer entities later in order to have their text in the foreground
     std::sort(entities_need_repaint.begin(), entities_need_repaint.end(), [](std::pair<int, float> &a, std::pair<int, float> &b) { return a.second > b.second; });
-}
+} // namespace hacks::shared::esp
 
 static draw::Texture atlas{ paths::getDataPath("/textures/atlas.png") };
 static draw::Texture idspec{ paths::getDataPath("/textures/idspec.png") };
@@ -480,8 +507,8 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
     auto position = ent->m_vecDormantOrigin();
     if (!position)
         return;
-    static Vector screen, origin_screen;
-    if (!draw::EntityCenterToScreen(ent, screen) && !draw::WorldToScreen(*position, origin_screen))
+    static Vector screen;
+    if (!draw::EntityCenterToScreen(ent, screen))
         return;
 
     // Reset the collide cache
@@ -615,8 +642,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         switch (type)
         {
         case ENTITY_PLAYER:
-            if (vischeck && !ent->IsVisible())
-                transparent = true;
             if (!fg)
                 fg = colors::EntityF(ent);
             if (transparent)
@@ -909,11 +934,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
             }
         }
 
-        // if user setting allows vis check and ent isnt visable, make
-        // transparent
-        if (vischeck && !ent->IsVisible())
-            transparent = true;
-
         // Loop through strings
         for (int j = 0; j < ent_data.string_count; j++)
         {
@@ -1005,17 +1025,21 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 // Used to process entities from CreateMove
 void _FASTCALL ProcessEntity(CachedEntity *ent)
 {
-    if (!enable)
-        return; // Esp enable check
-    if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
-        return; // CE_INVALID check to prevent crashes
-    // Dormant
-    if (RAW_ENT(ent)->IsDormant())
+    auto origin = ent->m_vecDormantOrigin();
+    // Dormant and no data
+    if (!origin)
+        return;
+
     {
-        if (!ent->m_vecDormantOrigin())
+        // We don't actually care about this vector at all. It just exists so WorldToScreen can function normally
+        static Vector origin_screen;
+        if (!draw::WorldToScreen(*origin, origin_screen))
             return;
     }
-    if (max_dist && ent->m_flDistance() > *max_dist)
+
+    auto distance = ent->m_flDistance();
+
+    if (max_dist && distance > *max_dist)
         return;
     int classid = ent->m_iClassID();
     // Entity esp
@@ -1114,10 +1138,10 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     AddEntityString(ent, smg_str);
                 else if (classid == CL_CLASS(CWeaponRPG))
                     AddEntityString(ent, rpg_str);
-                if (string_count_backup != data[ent->m_IDX].string_count)
+                /*if (string_count_backup != data[ent->m_IDX].string_count)
                 {
                     SetEntityColor(ent, colors::yellow);
-                }
+                }*/
             }
         }
     }
@@ -1164,7 +1188,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         // Dropped weapon esp
         if (item_dropped_weapons && classid == CL_CLASS(CTFDroppedWeapon))
         {
-            AddEntityString(ent, std::string("Dropped Weapon"));
+            AddEntityString(ent, "Dropped Weapon");
         }
         // Gargoyle esp
         else if (item_gargoyle && classid == CL_CLASS(CHalloweenGiftPickup))
@@ -1231,7 +1255,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
             else if (item_powerups && itemtype >= ITEM_POWERUP_FIRST && itemtype <= ITEM_POWERUP_LAST)
             {
-                AddEntityString(ent, std::string(powerups[itemtype - ITEM_POWERUP_FIRST]));
+                AddEntityString(ent, powerups[itemtype - ITEM_POWERUP_FIRST]);
 
                 // TF2C weapon spawner esp
             }
@@ -1327,7 +1351,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 bool IsControlled  = CE_BYTE(ent, netvar.m_bPlayerControlled);
                 int sentry_ammo    = CE_INT(ent, netvar.m_iAmmoShells);
                 int sentry_rockets = CE_INT(ent, netvar.m_iAmmoRockets);
-                int max_ammo = 0;
+                int max_ammo       = 0;
 
                 switch (CE_INT(ent, netvar.iUpgradeLevel))
                 {
@@ -1362,14 +1386,15 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 {
                     float next_teleport = CE_FLOAT(ent, netvar.m_flTeleRechargeTime);
                     float yaw_to_exit   = CE_FLOAT(ent, netvar.m_flTeleYawToExit);
-                    std::string time = std::to_string((int) floor((next_teleport - g_GlobalVars->curtime) * 100) / 100);
+                    std::string time    = std::to_string((int) floor((next_teleport - g_GlobalVars->curtime) * 100) / 100);
+                    time.append("s");
 
                     if (yaw_to_exit)
                     {
                         if (next_teleport < g_GlobalVars->curtime)
                             AddEntityString(ent, tp_ready_str);
                         else
-                            AddEntityString(ent, time + "s");
+                            AddEntityString(ent, time);
                     }
                 }
                 break;
@@ -1379,13 +1404,12 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (IsSapped)
                 AddEntityString(ent, sapped_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
 
-            else if (classid == CL_CLASS(CObjectTeleporter) && CE_INT(ent, netvar.m_iTeleState) <= 1 || (IsDisabled || IsPlasmaDisabled))
+            else if ((classid == CL_CLASS(CObjectTeleporter) && CE_INT(ent, netvar.m_iTeleState) <= 1) || IsDisabled || IsPlasmaDisabled)
                 AddEntityString(ent, disabled_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
         }
 
         // Set the entity to repaint
         espdata.needs_paint = true;
-        return;
 
         // Player esp
     }
@@ -1545,10 +1569,10 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
 
                     // We want revving, zoomed and slowed to be mutually exclusive. Otherwise slowed and zoomed/revving will show at the same time.
                     // Revving
-                    auto weapon_idx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                    auto weapon_idx      = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
                     CachedEntity *weapon = IDX_GOOD(weapon_idx) ? ENTITY(weapon_idx) : nullptr;
                     if (CE_GOOD(weapon) && weapon->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(weapon, netvar.iWeaponState) != 0)
-                            AddEntityString(ent, revving_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
+                        AddEntityString(ent, revving_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
                     // Zoomed
                     else if (HasCondition<TFCond_Zoomed>(ent))
                         AddEntityString(ent, zooming_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
@@ -1591,7 +1615,24 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Notify esp to repaint
             espdata.needs_paint = true;
         }
-        return;
+    }
+
+    if (espdata.needs_paint)
+    {
+        // Set entity color
+        rgba_t color = colors::EntityF(ent);
+        if (RAW_ENT(ent)->IsDormant())
+        {
+            color.r *= 0.5f;
+            color.g *= 0.5f;
+            color.b *= 0.5f;
+        }
+        // If show distance, add string here
+        if (show_distance)
+        {
+            AddEntityString(ent, format(int(distance / 64 * 1.22f), 'm'));
+        }
+        SetEntityColor(ent, color);
     }
 }
 
@@ -1607,11 +1648,7 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
     // Dormant
     if (RAW_ENT(ent)->IsDormant())
     {
-        auto vec = ent->m_vecDormantOrigin();
-        if (!vec)
-            origin = *vec;
-        else
-            return;
+        origin = *ent->m_vecDormantOrigin();
     }
 
     // Create a array for storing box points
@@ -1847,14 +1884,23 @@ void AddEntityString(CachedEntity *entity, const std::string &string, const rgba
 }
 
 // Function to reset entitys strings
-void ResetEntityStrings()
+void ResetEntityStrings(bool full_clear)
 {
-    for (auto &i : data)
-    {
-        i.string_count = 0;
-        i.color        = colors::empty;
-        i.needs_paint  = false;
-    }
+    if (full_clear)
+        for (auto &i : data)
+        {
+            i.string_count = 0;
+            i.color        = colors::empty;
+            i.needs_paint  = false;
+        }
+    else
+        for (std::size_t i = 0; i <= g_GlobalVars->maxClients; ++i)
+        {
+            auto &element        = data[i];
+            element.string_count = 0;
+            element.color        = colors::empty;
+            element.needs_paint  = false;
+        }
 }
 
 // Sets an entitys esp color

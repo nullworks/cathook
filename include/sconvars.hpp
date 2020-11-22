@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "common.hpp"
+#include "convar.h"
 
 /*
  * HECK off F1ssi0N

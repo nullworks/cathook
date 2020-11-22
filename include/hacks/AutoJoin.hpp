@@ -6,7 +6,8 @@
  */
 
 #pragma once
-#include "common.hpp"
+#include "config.h"
+#include "timer.hpp"
 namespace hacks::shared::autojoin
 {
 void updateSearch();

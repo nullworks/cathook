@@ -14,7 +14,7 @@
     along with Cathook.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "common.hpp"
+#include <string>
 
 namespace hacks::shared::ChatCommands
 {

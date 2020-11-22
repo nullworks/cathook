@@ -4,7 +4,11 @@
  *
  */
 #pragma once
-#include "common.hpp"
+
+#include <cstdint>
+#include <memory>
+
+#include "bytepatch.hpp"
 
 #define foffset(p, i) ((unsigned char *) &p)[i]
 

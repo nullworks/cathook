@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <string>
+#include <vector>
 
 namespace hacks::tf::uberspam
 {

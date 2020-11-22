@@ -1,5 +1,7 @@
 #pragma once
-#include "common.hpp"
+
+struct INetMessage;
+struct bf_read;
 
 namespace hacks::tf2::nospread
 {

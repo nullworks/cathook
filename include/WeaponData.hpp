@@ -1,6 +1,6 @@
-#include "common.hpp"
-
 #pragma once
+
+#include "common.hpp"
 
 struct WeaponData_t
 {

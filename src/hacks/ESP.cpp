@@ -660,8 +660,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         case ENTITY_BUILDING:
             if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !teammates)
                 break;
-            if (!transparent && vischeck && !ent->IsVisible())
-                transparent = true;
             if (!fg)
                 fg = colors::EntityF(ent);
             if (transparent)

@@ -8,8 +8,9 @@
 #pragma once
 
 #include "config.h"
-#include "colors.hpp"
 #if ENABLE_VISUALS
+#include "colors.hpp"
+
 namespace hacks::shared::esp
 {
 

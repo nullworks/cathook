@@ -5,7 +5,7 @@
 			<AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
 			<AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able" tooltip="Don't try to reflect when using primary fire."/>
 			<AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles" tooltip="Attempt to reflect teammate projectiles."/>
-			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode" tooltip="Disasble vischeck"/>
+			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode" tooltip="Disable vischeck"/>
 			<AutoVariable width="fill" target="autoreflect.legit" label="Legit mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
 		</List>
 		<Box padding="12 6 6 6" name="Targets" width="content" height="content" y="100">

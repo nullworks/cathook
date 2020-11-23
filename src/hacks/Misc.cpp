@@ -207,16 +207,18 @@ void CreateMove()
     if (anti_afk)
         updateAntiAfk();
 
-    // Automaticly airstrafes in the air
+    // Automatically strafes in the air
     if (auto_strafe)
     {
-        auto ground = (bool) (CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & FL_ONGROUND);
-        if (!ground)
+        auto flags = CE_INT(g_pLocalPlayer->entity, netvar.iFlags);
+        auto movetype = CE_INT(g_pLocalPlayer->entity, netvar.movetype);
+        bool is_jumping  = current_user_cmd->buttons & IN_JUMP;
+        
+        if (movetype == MOVETYPE_FLY || movetype == MOVETYPE_FLYGRAVITY || movetype == MOVETYPE_NOCLIP || (flags & FL_ONGROUND) || (flags & FL_INWATER) || is_jumping) return;
+
+        if (current_user_cmd->mousedx)
         {
-            if (current_user_cmd->mousedx)
-            {
-                current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
-            }
+            current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
         }
     }
 

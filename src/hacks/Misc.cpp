@@ -377,16 +377,18 @@ void Draw()
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {
                 case 4:
-                    observermode = "Firstperson";
+                    observermode = "1st Person";
                     break;
                 case 5:
-                    observermode = "Thirdperson";
+                    observermode = "3rd Person";
                     break;
                 case 7:
-                    observermode = "Freecam";
+                    observermode = "FreeCam";
                     break;
                 }
-                AddSideString(format(info.name, " ", observermode));
+                rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
+
+                AddSideString(format(info.name, " - (", observermode, ")"), color);
             }
         }
     }

@@ -1,16 +1,16 @@
 <Tab name="Auto Item" padding="4 4 4 4">
     <Box name="Auto item" width="content" height="content" padding="12 6 6 6">
         <List width="200">
-            <AutoVariable width="fill" target="auto-item.enable" label="Enable auto item"/>
-            <AutoVariable width="fill" target="auto-item.time" label="Equip timer"/>
-            <AutoVariable width="fill" target="auto-item.weapons" label="Weapons"/>
-            <AutoVariable width="fill" target="auto-item.weapons.primary" label="Primary"/>
-            <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary/Cloak"/>
-            <AutoVariable width="fill" target="auto-item.weapons.melee" label="Melee"/>
-            <AutoVariable width="fill" target="auto-item.hats" label="Hats"/>
-            <AutoVariable width="fill" target="auto-item.hats.1" label="Hat 1"/>
-            <AutoVariable width="fill" target="auto-item.hats.2" label="Hat 2"/>
-            <AutoVariable width="fill" target="auto-item.hats.3" label="Hat 3"/>
+            <AutoVariable width="fill" target="auto-item.enable" label="Enable auto item" tooltip="Allows you to automatically rent and craft items, very useful for bots."/>
+            <AutoVariable width="fill" target="auto-item.time" label="Equip timer" tooltip="Time between auto item attempts in milliseconds."/>
+            <AutoVariable width="fill" target="auto-item.weapons" label="Weapons" tooltip="Enable automatically renting/crafting weapons."/>
+            <AutoVariable width="fill" target="auto-item.weapons.primary" label="Primary" tooltip="Primary weapon to rent/craft, see cathook.club/wiki/How-to-Autoitem for formatting information. -1 is stock"/>
+            <AutoVariable width="fill" target="auto-item.weapons.secondary" label="Secondary/Cloak" tooltip="Secondary/Cloak weapon to rent/craft, see cathook.club/wiki/How-to-Autoitem for formatting information. -1 is stock"/>
+            <AutoVariable width="fill" target="auto-item.weapons.melee" label="Melee" tooltip="Melee weapon to rent/craft, see cathook.club/wiki/How-to-Autoitem for formatting information. -1 is stock"/>
+            <AutoVariable width="fill" target="auto-item.hats" label="Hats" tooltip="Enable automatically equipping hats, if it's an achievement hat it will be automatically obtained, else you must have the item already."/>
+            <AutoVariable width="fill" target="auto-item.hats.1" label="Hat 1" tooltip="First hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
+            <AutoVariable width="fill" target="auto-item.hats.2" label="Hat 2" tooltip="Second hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
+            <AutoVariable width="fill" target="auto-item.hats.3" label="Hat 3" tooltip="Third hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
         </List>
     </Box>
 </Tab>

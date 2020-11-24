@@ -65,7 +65,7 @@ static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
 static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
 static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
 static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
-static settings::Boolean item_objectives{ "esp.item.objectives", "true" };
+static settings::Boolean item_objectives{ "esp.item.objectives", "false" };
 // TF2C
 static settings::Boolean item_weapon_spawners{ "esp.item.weapon-spawner", "true" };
 static settings::Boolean item_adrenaline{ "esp.item.adrenaline", "true" };

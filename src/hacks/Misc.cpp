@@ -208,18 +208,20 @@ void CreateMove()
         updateAntiAfk();
 
     // Automatically strafes in the air
-    if (auto_strafe)
+    if (auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
-        auto flags = CE_INT(g_pLocalPlayer->entity, netvar.iFlags);
-        auto movetype = CE_INT(g_pLocalPlayer->entity, netvar.movetype);
-        bool is_jumping  = current_user_cmd->buttons & IN_JUMP;
-        
-        if (movetype == MOVETYPE_FLY || movetype == MOVETYPE_FLYGRAVITY || movetype == MOVETYPE_NOCLIP || (flags & FL_ONGROUND) || (flags & FL_INWATER) || is_jumping) return;
+        static bool was_jumping = false;
+        auto flags              = CE_INT(LOCAL_E, netvar.iFlags);
+        bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
 
-        if (current_user_cmd->mousedx)
+        if (!(flags & FL_ONGROUND) && !(flags & FL_INWATER) && (!is_jumping || was_jumping))
         {
-            current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
+            if (current_user_cmd->mousedx)
+            {
+                current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
+            }
         }
+        was_jumping = is_jumping;
     }
 
     // TF2c Tauntslide
@@ -374,19 +376,19 @@ void Draw()
             if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && g_IEngine->GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
-                rgba_t color = colors::white;
+                rgba_t color      = colors::white;
 
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {
                 case 4:
                     observermode = "1st Person";
-                    color = colors::red;
+                    color        = colors::red;
                     break;
                 case 5:
                     observermode = "3rd Person";
                     break;
                 case 7:
-                    observermode = "FreeCam";
+                    observermode = "Freecam";
                     break;
                 }
                 AddSideString(format(info.name, " - (", observermode, ")"), color);

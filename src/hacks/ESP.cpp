@@ -278,8 +278,8 @@ const std::string bodyparts_str            = "Body Parts";
 const std::string beerbottle_str           = "Beer Bottle";
 const std::string aussiecontainer_str      = "Australium Container";
 const std::string ticketcase_str           = "Tickets";
-const std::string sandvich_str             = "Sandvich";
-const std::string smallsandvich_str        = "Small Sandvich";
+const std::string mediumhealth_str         = "Medium Health";
+const std::string smallhealth_str          = "Small Health";
 const std::string cart_str                 = "Cart";
 const std::string botname_str              = "Bot #";
 const std::string tp_ready_str             = "Ready";
@@ -672,7 +672,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 Draw3DBox(ent, fg);
             break;
         case ENTITY_BUILDING:
-            if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !teammates && !team_buildings)
+            if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !team_buildings)
                 break;
             if (!fg)
                 fg = colors::EntityF(ent);
@@ -1265,9 +1265,9 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 AddEntityString(ent, intel_str, color);
                 break;
             }
-            
-            auto resettime = CE_FLOAT(ent, netvar.m_flResetTime);
-            std::string time = std::to_string((int) floor((resettime - g_GlobalVars->curtime) * 100) / 100);
+
+            auto resettime   = CE_FLOAT(ent, netvar.m_flResetTime);
+            std::string time = std::to_string(int(resettime - g_GlobalVars->curtime));
             time.append("s");
 
             if (resettime && classid == CL_CLASS(CCaptureFlag))
@@ -1277,7 +1277,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         else if (itemtype != ITEM_NONE)
         {
             // Health pack esp
-            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= EDIBLE_SMALLSANDVICH || itemtype == ITEM_HL_BATTERY))
+            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= EDIBLE_MEDIUM || itemtype == ITEM_HL_BATTERY))
             {
                 switch (itemtype)
                 {
@@ -1293,11 +1293,11 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 case ITEM_HL_BATTERY:
                     AddEntityString(ent, hl_battery_str);
                     break;
-                case EDIBLE_SANDVICH:
-                    AddEntityString(ent, sandvich_str, colors::green);
+                case EDIBLE_MEDIUM:
+                    AddEntityString(ent, mediumhealth_str, colors::green);
                     break;
-                case EDIBLE_SMALLSANDVICH:
-                    AddEntityString(ent, smallsandvich_str, colors::green);
+                case EDIBLE_SMALL:
+                    AddEntityString(ent, smallhealth_str, colors::green);
                     break;
                 }
                 // TF2C Adrenaline esp
@@ -1375,7 +1375,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     {
 
         // Check if enemy building
-        if (!ent->m_bEnemy() && !teammates && !team_buildings)
+        if (!ent->m_bEnemy() && !team_buildings)
             return;
 
         // TODO maybe...
@@ -1458,7 +1458,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 {
                     float next_teleport = CE_FLOAT(ent, netvar.m_flTeleRechargeTime);
                     float yaw_to_exit   = CE_FLOAT(ent, netvar.m_flTeleYawToExit);
-                    std::string time    = std::to_string((int) floor((next_teleport - g_GlobalVars->curtime) * 100) / 100);
+                    std::string time    = std::to_string(int(next_teleport - g_GlobalVars->curtime));
                     time.append("s");
 
                     if (yaw_to_exit)
@@ -1575,14 +1575,14 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                                 CachedEntity *weapon = ENTITY(eid);
                                 if (!CE_INVALID(weapon) && weapon->m_iClassID() == CL_CLASS(CWeaponMedigun) && weapon)
                                 {
-                                    std::string charge = std::to_string((int) floor(CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100));
+                                    std::string charge = std::to_string(int(CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100));
 
                                     if (CE_INT(weapon, netvar.iItemDefinitionIndex) != 998)
                                     {
-                                        AddEntityString(ent, charge + "% Uber", colors::Health(floor(CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
+                                        AddEntityString(ent, charge + "% Uber", colors::Health(CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100, 100));
                                     }
                                     else
-                                        AddEntityString(ent, charge + "% Uber | Charges: " + std::to_string((int) floor((CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f) * 100) / 100), colors::Health((CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
+                                        AddEntityString(ent, charge + "% Uber | Charges: " + std::to_string(int(CE_FLOAT(weapon, netvar.m_flChargeLevel) / 0.25f)), colors::Health((CE_FLOAT(weapon, netvar.m_flChargeLevel) * 100), 100));
                                     break;
                                 }
                             }

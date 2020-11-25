@@ -26,12 +26,12 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/props_medieval/medieval_meat.mdl", ITEM_HEALTH_MEDIUM);
     // Edibles / Lunchboxes
     RegisterModelMapping("models/items/plate.mdl", EDIBLE_SANDVICH);
-    RegisterModelMapping("models/workshop/weapons/c_models/c_fishcake/plate_fishcake.mdl", EDIBLE_FISHCAKE);
-    RegisterModelMapping("models/workshop/weapons/c_models/c_buffalo_steak/plate_buffalo_steak.mdl", EDIBLE_STEAK);
-    RegisterModelMapping("models/workshop/weapons/c_models/c_chocolate/plate_chocolate.mdl", EDIBLE_CHOCOLATE);
-    RegisterModelMapping("models/items/banana/plate_banana.mdl", EDIBLE_BANANA);
-    RegisterModelMapping("models/workshop/weapons/c_models/c_sandwich/plate_robo_sandwich.mdl", EDIBLE_ROBOSANDWICH);
-
+    RegisterModelMapping("models/workshop/weapons/c_models/c_sandwich/plate_robo_sandwich.mdl", EDIBLE_SANDVICH);
+    RegisterModelMapping("models/workshop/weapons/c_models/c_fishcake/plate_fishcake.mdl", EDIBLE_SMALLSANDVICH);
+    RegisterModelMapping("models/workshop/weapons/c_models/c_buffalo_steak/plate_buffalo_steak.mdl", EDIBLE_SMALLSANDVICH);
+    RegisterModelMapping("models/workshop/weapons/c_models/c_chocolate/plate_chocolate.mdl", EDIBLE_SMALLSANDVICH);
+    RegisterModelMapping("models/items/banana/plate_banana.mdl", EDIBLE_SMALLSANDVICH);
+    
     // == AMMOPACKS
     // Normal
     RegisterModelMapping("models/items/ammopack_small.mdl", ITEM_AMMO_SMALL);

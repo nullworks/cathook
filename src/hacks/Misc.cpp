@@ -374,10 +374,13 @@ void Draw()
             if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && g_IEngine->GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
+                rgba_t color = colors::white;
+
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {
                 case 4:
                     observermode = "1st Person";
+                    color = colors::red;
                     break;
                 case 5:
                     observermode = "3rd Person";
@@ -386,8 +389,6 @@ void Draw()
                     observermode = "FreeCam";
                     break;
                 }
-                rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
-
                 AddSideString(format(info.name, " - (", observermode, ")"), color);
             }
         }

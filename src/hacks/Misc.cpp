@@ -376,13 +376,13 @@ void Draw()
             if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && g_IEngine->GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
-                rgba_t color      = colors::white;
+                rgba_t color      = colors::green;
 
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {
                 case 4:
                     observermode = "1st Person";
-                    color        = colors::red;
+                    color        = colors::red_b;
                     break;
                 case 5:
                     observermode = "3rd Person";

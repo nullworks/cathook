@@ -23,7 +23,7 @@
             <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money is automatically collected."/>
             <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
-            <AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intels, carts and mvm bomb"/>
+            <AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intel, carts and mvm bombs"/>
             <AutoVariable width="fill" target="esp.item.explosive" label="Explosives" tooltip="Environmental hazards like bombs"/>
             <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits"/>
             <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps"/>

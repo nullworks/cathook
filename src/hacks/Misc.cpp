@@ -382,7 +382,7 @@ void Draw()
                 {
                 case 4:
                     observermode = "1st Person";
-                    color        = colors::red_b;
+                    color        = colors::red;
                     break;
                 case 5:
                     observermode = "3rd Person";

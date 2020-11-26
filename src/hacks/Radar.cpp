@@ -106,7 +106,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
     {
         if (ent->m_Type() == ENTITY_PLAYER)
         {
-            if (ent->m_bAlivePlayer())
+            if (!ent->m_bAlivePlayer())
                 return; // DEAD. not big surprise.
             if (hide_invis && IsPlayerInvisible(ent))
                 return;

@@ -19,7 +19,7 @@ public:
         return VariableType::STRING;
     }
 
-    void fromString(const std::string &string) override
+    void fromString(const std::string &string, bool = false) override
     {
         fireCallbacks(string);
         value = string;

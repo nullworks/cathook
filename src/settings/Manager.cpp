@@ -24,14 +24,13 @@ void Manager::add(IVariable &me, std::string name)
     registered.emplace(name, me);
 }
 
-void Manager::add(IVariable &me, std::string name, std::string value)
+// Applying the defaults needs to be delayed, because preloaded Cathook can not properly convert SDL codes to names before TF2 init
+void Manager::applyDefaults()
 {
-    if (registered.find(name) != registered.end())
+    for (auto &variables : registered)
     {
-        logging::Info(("Double registering variable: " + name).c_str());
-        throw std::runtime_error("Double registering variable: " + name);
+        variables.second.applyDefaults();
     }
-    registered.emplace(name, Manager::VariableDescriptor{ me, value });
 }
 
 IVariable *Manager::lookup(const std::string &string)
@@ -48,14 +47,19 @@ Manager::VariableDescriptor::VariableDescriptor(IVariable &variable) : variable(
     defaults = variable.toString();
 }
 
-Manager::VariableDescriptor::VariableDescriptor(IVariable &variable, std::string value) : variable(variable)
-{
-    type     = variable.getType();
-    defaults = value;
-}
-
 bool Manager::VariableDescriptor::isChanged()
 {
     return variable.toString() != defaults;
+}
+
+// Applying the defaults needs to be delayed, because preloaded Cathook can not properly convert SDL codes to names before TF2 init
+void Manager::VariableDescriptor::applyDefaults()
+{
+    if (type == VariableType::KEY)
+    {
+        // Shitcode, this is a pain in the you know what to fix
+        variable.fromString(variable.toString());
+        defaults = variable.toString();
+    }
 }
 } // namespace settings

@@ -32,7 +32,7 @@ public:
     }
 
     // Valid inputs: "Mouse1", "Mouse5", "Key 6", "Key 10", "Key 2", "Space".
-    void fromString(const std::string &string) override
+    void fromString(const std::string &string, bool init = false) override
     {
         if (string == "<null>")
         {
@@ -57,6 +57,9 @@ public:
         }
 
         setInternal(key);
+        // This is broken otherwise
+        if (init)
+            this->string = string;
     }
 
     // Variable & causes segfault with gcc optimizations + these dont even

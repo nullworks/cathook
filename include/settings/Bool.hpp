@@ -27,7 +27,7 @@ public:
         return VariableType::BOOL;
     }
 
-    void fromString(const std::string &string) override
+    void fromString(const std::string &string, bool = false) override
     {
         if (string == "0" || string == "false")
             setInternal(false);

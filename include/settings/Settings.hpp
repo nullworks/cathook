@@ -55,8 +55,8 @@ public:
     virtual ~IVariable() = default;
 
     // Faster than checking with dynamic_cast
-    virtual VariableType getType()                     = 0;
-    virtual void fromString(const std::string &string) = 0;
+    virtual VariableType getType()                                        = 0;
+    virtual void fromString(const std::string &string, bool init = false) = 0;
     // Const reference because every variable will cache the string value
     // instead of generating it every call
     virtual const std::string &toString() = 0;
@@ -84,7 +84,6 @@ protected:
     }
 
     std::vector<std::function<void(VariableBase<T> &, T)>> callbacks{};
-    T default_value{};
 };
 
 template <typename T> class Variable

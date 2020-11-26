@@ -19,7 +19,7 @@ public:
         return VariableType::FLOAT;
     }
 
-    void fromString(const std::string &string) override
+    void fromString(const std::string &string, bool = false) override
     {
         errno     = 0;
         auto next = std::strtof(string.c_str(), nullptr);

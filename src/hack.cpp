@@ -313,6 +313,10 @@ free(logname);*/
 #endif
 
     CreateEarlyInterfaces();
+
+    // Applying the defaults needs to be delayed, because preloaded Cathook can not properly convert SDL codes to names before TF2 init
+    settings::Manager::instance().applyDefaults();
+
     logging::Info("Clearing Early initializer stack");
     while (!init_stack_early().empty())
     {

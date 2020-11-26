@@ -30,7 +30,7 @@ public:
         return VariableType::COLOR;
     }
 
-    void fromString(const std::string &string) override
+    void fromString(const std::string &string, bool = false) override
     {
         uint8_t rgba[4] = { 0, 0, 0, 255 };
 

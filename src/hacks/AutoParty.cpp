@@ -74,8 +74,7 @@ void find_party()
     log_debug("No party members and not a party host; requesting to join with each party host");
     for (int i = 0; i < party_hosts.size(); i++)
     {
-        std::string command = "tf_party_request_join_user " + std::to_string(party_hosts[i]);
-        hack::ExecuteCommand(command.c_str());
+        hack::ExecuteCommand("tf_party_request_join_user " + std::to_string(party_hosts[i]));
     }
 }
 

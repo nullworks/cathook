@@ -168,7 +168,7 @@ public:
         return VariableType::KEY;
     }
     // Valid inputs: "Mouse1", "Mouse5", "Key 6", "Key 10", "Key 2", "Space".
-    void fromString(const std::string &string, book = false) override
+    void fromString(const std::string &string, bool = false) override
     {
     }
     // Variable & causes segfault with gcc optimizations + these dont even

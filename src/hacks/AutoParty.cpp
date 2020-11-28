@@ -5,34 +5,25 @@
  *      Author: delimeats-ch
  */
 
-#include <settings/Bool.hpp>
-#include <settings/Int.hpp>
-#include <settings/String.hpp>
 #include "common.hpp"
+#include "hack.hpp"
 
 namespace hacks::tf2::autoparty
 {
-// cheemsburger gaming
+// Enable auto-party?
 static settings::Boolean enabled{ "autoparty.enable", "false" };
-
 // Max number of party members before locking the party (and kicking members if there are too many)
 static settings::Int max_size{ "autoparty.max-party-size", "6" };
-
 // Comma-separated list of Steam32 IDs that should accept party requests
 static settings::String host_list{ "autoparty.party-hosts", "" };
-
 // Actions like leaving the party or kicking members
 static settings::Boolean autoparty_log{ "autoparty.log", "true" };
-
 // Extra debugging information like locking/unlocking the party
 static settings::Boolean autoparty_debug{ "autoparty.debug", "false" };
-
 // How often to run the autoparty routine, in seconds
 static settings::Int timeout{ "autoparty.run-frequency", "60" };
-
 // Only run the autoparty routine once every N seconds
 static Timer routine_timer{};
-
 // Populated by the routine
 static std::vector<uint32> party_hosts = {};
 
@@ -49,7 +40,7 @@ static std::vector<uint32> party_hosts = {};
 void repopulate()
 {
     // Empty previous values
-    party_hosts = {};
+    party_hosts.clear();
 
     // Add Steam32 IDs to party_hosts
     std::stringstream ss(*host_list);
@@ -84,7 +75,7 @@ void find_party()
     for (int i = 0; i < party_hosts.size(); i++)
     {
         std::string command = "tf_party_request_join_user " + std::to_string(party_hosts[i]);
-        g_IEngine->ClientCmd_Unrestricted(command.c_str());
+        hack::ExecuteCommand(command.c_str());
     }
 }
 
@@ -92,14 +83,14 @@ void find_party()
 void lock_party()
 {
     // "Friends must be invited"
-    g_IEngine->ClientCmd_Unrestricted("tf_party_join_request_mode 2");
+    hack::ExecuteCommand("tf_party_join_request_mode 2");
 }
 
 // Unlocks the party, yeah?
 void unlock_party()
 {
     // "Friends can freely join"
-    g_IEngine->ClientCmd_Unrestricted("tf_party_join_request_mode 0");
+    hack::ExecuteCommand("tf_party_join_request_mode 0");
 }
 
 // Leaves the party, called when a member is offline
@@ -107,7 +98,7 @@ void unlock_party()
 void leave_party(re::CTFPartyClient *client, bool was_leader)
 {
     log("Leaving the party because %d/%d members are offline", client->GetNumMembers() - client->GetNumOnlineMembers(), client->GetNumMembers());
-    g_IEngine->ClientCmd_Unrestricted("tf_party_leave");
+    hack::ExecuteCommand("tf_party_leave");
 }
 
 // Automatically join/leave parties and kick bad members
@@ -236,6 +227,6 @@ void party_routine()
 
 static InitRoutine init([]() {
     host_list.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { repopulate(); });
-    EC::Register(EC::CreateMove, party_routine, "cm_autoparty", EC::average);
+    EC::Register(EC::Paint, party_routine, "paint_autoparty", EC::average);
 });
 } // namespace hacks::tf2::autoparty

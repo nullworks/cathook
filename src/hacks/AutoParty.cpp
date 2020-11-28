@@ -3,51 +3,6 @@
  *
  *  Created on: Nov 27, 2020
  *      Author: delimeats-ch
- *
- *                            ...
- *                           :ssssssssoooo+////:`
- *                         `:osyyyyyyyyyhdhyyyyyho.
- *                        -oosyyyyyyyyyyyyyyyhhyydhs-
- *                       .soosyyssssyyyyyyyyyyyyyddhh+
- *                       odsssssyhhhhyyyyyyyyhhhhddhhyo`
- *                       syhhhhhyyyyso++osyyyyhyhhhhyhy+`
- *                     :shdhhyyso+++/////+osyyyyyyyyyyyys:
- *                   .ydmddyssssooo++////++oosyyyyyyyyyhhys:`
- *                  `smmmmdysssyhdys++++++oossyyyyyyhhyyyyyys`
- *                   `/shhhyyyhhhyso+//++oossyyyyyhhhhyyyyyyy/`
- *                         :ssssoo++++++oossyyyhhhhhyyyyyyyyyys:`
- *                         `+oo+++++++oossyyyhhhhhyyyyyyyyyyyhhhy+-`
- *                         .+++++++++oossyyyyyyyyyyyysyyyyyyhhhhhhys.
- *                         .++++++++++oosssssssssssssssyyhhhhhhhhhyy+
- *                         .+++++++//++oooooooooooosssyyhhhhhhdhhhyyy/
- *                         -++++++////++++++++ooossssyyyyyhhhdhhyyyyhh-
- *                         :++++++++++/+++ooooooossooosyyyhhhdhyyyyhhdy.
- *                         :+++++++++++++++++++++ooooosyyhhhhhhyyyhhddds
- *                         -+++oo++++++++++++++++++ooyyyyhhhhhyyhhhdddy-
- *                         .+ooooo+++++++++++++++oosyyyyhhhhhyyhhhhhds.
- *                         `+oossoo++++oooooooooossyyyhhhhhhhhhhhhys/
- *                         `osooooooo++oooooooosyyyyyyhhhhhhhhhhhy.
- *                          osooooooooooooooosssyyyyyhhhdhhhhhhhdh`
- *                         `osoo+++osysssssssossyyyyyhhdddhhhhhhds
- *                         .oooo++oshdhyssssysossyyyyhhdmddddhhddo
- *                    `.-:+ooooo++oyhhdhysssssoossyyyhhdddddhhddd:
- *               `-:++ossyyysoooooshhddyysssssosssyyyhhdmddddhdds`
- *              `sssysso+/:-ooooosyyyysoooooooossyyhhhhddmddddy/`
- *               .--:.     :soossyhysoooo+++ooossyyhhhdmmmds/.
- *                  ``--:/osoossyyyo+++++ooossosyyyhhhdhy+.
- *              `/+ossssssooooo:``....`....-/ossyyhhh:`
- *              :yysoooooo+o+:`              -ssyyhh-
- *              `:ooooooooo:`                .sysyhy`
- *                -///++/:`                  +sssyys
- *                                            ``````
- *           _                             _
- *          | |                           | |
- *       ___| |__   ___  ___ _ __ ___  ___| |__  _   _ _ __ __ _  ___ _ __
- *      / __| '_ \ / _ \/ _ \ '_ ` _ \/ __| '_ \| | | | '__/ _` |/ _ \ '__|
- *     | (__| | | |  __/  __/ | | | | \__ \ |_) | |_| | | | (_| |  __/ |
- *      \___|_| |_|\___|\___|_| |_| |_|___/_.__/ \__,_|_|  \__, |\___|_|
- *                                                          __/ |
- *                                                         |___/
  */
 
 #include <settings/Bool.hpp>

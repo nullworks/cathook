@@ -18,15 +18,23 @@ static settings::Int max_size{ "autoparty.max-party-size", "6" };
 static settings::String host_list{ "autoparty.party-hosts", "" };
 // Whether to automatically kick raged players from the party
 static settings::Boolean kick_rage{ "autoparty.kick-rage", "true" };
+// Automatically leave the party when a member goes offline
+static settings::Boolean auto_leave{ "autoparty.auto-leave", "false" };
+// Automatically lock the party when max party size is reached
+static settings::Boolean auto_lock{ "autoparty.auto-lock", "true" };
+// Automatically unlock the party when max party size has not been reached
+static settings::Boolean auto_unlock{ "autoparty.auto-unlock", "true" };
 // Actions like leaving the party or kicking members
 static settings::Boolean autoparty_log{ "autoparty.log", "true" };
+// Log kick notifications to party chat
+static settings::Boolean message_kicks{ "autoparty.message-kicks", "true" };
 // Extra debugging information like locking/unlocking the party
 static settings::Boolean autoparty_debug{ "autoparty.debug", "false" };
 // How often to run the autoparty routine, in seconds
 static settings::Int timeout{ "autoparty.run-frequency", "60" };
 // Only run the autoparty routine once every N seconds
 static Timer routine_timer{};
-// Populated by the routine
+// Populated by the routine when empty and by configuration changes
 static std::vector<uint32> party_hosts = {};
 
 // ha ha macros go brr
@@ -114,7 +122,7 @@ void party_routine()
         return;
 
     // Ignore bad settings
-    if (*max_size > 6)
+    if (1 > *max_size > 6)
     {
         log("Can't have %d members, max-party-size has been reset to 6", *max_size);
         max_size = 6;
@@ -168,7 +176,7 @@ void party_routine()
             if (leader_id == g_ISteamUser->GetSteamID().GetAccountID())
             {
                 // If a member is offline, just leave the party and allow new join requests
-                if (client->GetNumMembers() > client->GetNumOnlineMembers())
+                if (*auto_leave and client->GetNumMembers() > client->GetNumOnlineMembers())
                 {
                     leave_party(client, true);
                     return;
@@ -184,7 +192,10 @@ void party_routine()
                         auto &pl = playerlist::AccessData(members[i]);
                         if (pl.state == playerlist::k_EState::RAGE)
                         {
-                            log("Kicking Steam32 ID %d from the party because they are set to RAGE", members[i]);
+                            std::string message = "Kicking Steam32 ID " + std::toString(members[i]) + " from the party because they are set to RAGE";
+                            log(message);
+                            if (*message_kicks)
+                                client->SendPartyChat(message.c_str());
                             CSteamID id = CSteamID(members[i], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
                             client->KickPlayer(id);
                             should_ret = true;
@@ -195,7 +206,7 @@ void party_routine()
                 }
 
                 // If we are at or over the specified limit, lock the party so we auto-reject future join requests
-                if (members.size() >= *max_size)
+                if (*auto_lock and members.size() >= *max_size)
                 {
                     log_debug("Locking the party because we have %d out of %d allowed members", members.size(), *max_size);
                     lock_party();
@@ -204,8 +215,11 @@ void party_routine()
                 // Kick extra members from the party
                 if (members.size() > *max_size)
                 {
-                    int num_to_kick = members.size() - *max_size;
-                    log("Kicking %d party members because there are %d out of %d allowed members", num_to_kick, members.size(), *max_size);
+                    int num_to_kick     = members.size() - *max_size;
+                    std::string message = "Kicking " std::toString(num_to_kick) + " party members because there are " + std::toString(members.size()) + " out of " + std::toString(*max_size) + " allowed members";
+                    log(message);
+                    if (*message_kicks)
+                        client->SendPartyChat(message.c_str());
                     for (int i = 0; i < num_to_kick; i++)
                     {
                         CSteamID id = CSteamID(members[members.size() - (1 + i)], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
@@ -214,17 +228,20 @@ void party_routine()
                 }
 
                 // Unlock the party if it's not full
-                if (members.size() < *max_size)
+                if (*auto_unlock and members.size() < *max_size)
                     unlock_party();
             }
             else
             {
                 // In a party, but not the leader
-                log_debug("Locking our party join mode because we are not the leader of the current party");
-                lock_party();
+                if (*auto_lock)
+                {
+                    log_debug("Locking our party join mode because we are not the leader of the current party");
+                    lock_party();
+                }
 
                 // If a member is offline, leave the party
-                if (client->GetNumMembers() > client->GetNumOnlineMembers())
+                if (*auto_leave and client->GetNumMembers() > client->GetNumOnlineMembers())
                 {
                     leave_party(client, false);
                 }

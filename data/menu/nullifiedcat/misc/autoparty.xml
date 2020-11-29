@@ -1,6 +1,6 @@
 <Tab name="Auto Party" padding="4 4 4 4">
 	<Box name="Auto Party" width="content" height="content" padding="12 6 6 6">
-		<List width="250">
+		<List width="400">
 			<AutoVariable width="fill" target="autoparty.enable" label="Enable auto party"/>
 			<AutoVariable width="fill" target="autoparty.run-frequency" label="Run every N seconds"/>
 			<AutoVariable width="fill" target="autoparty.max-party-size" label="Max party members allowed"/>

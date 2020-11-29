@@ -16,6 +16,8 @@ static settings::Boolean enabled{ "autoparty.enable", "false" };
 static settings::Int max_size{ "autoparty.max-party-size", "6" };
 // Comma-separated list of Steam32 IDs that should accept party requests
 static settings::String host_list{ "autoparty.party-hosts", "" };
+// Whether to automatically kick raged players from the party
+static settings::Boolean kick_rage{ "autoparty.kick-rage", "true" };
 // Actions like leaving the party or kicking members
 static settings::Boolean autoparty_log{ "autoparty.log", "true" };
 // Extra debugging information like locking/unlocking the party
@@ -172,22 +174,25 @@ void party_routine()
                     return;
                 }
 
-                // Check for any raged players who may have joined our party and kick them
-                // If there are, return so we don't kick others in the event we're also over the set limit
-                bool should_ret = false;
-                for (int i = 0; i < members.size(); i++)
+                // If enabled, check for any raged players who may have joined our party and kick them
+                // If there are any, return so we don't kick other members in the event we're also over the set size limit
+                if (*kick_rage)
                 {
-                    auto &pl = playerlist::AccessData(members[i]);
-                    if (pl.state == playerlist::k_EState::RAGE)
+                    bool should_ret = false;
+                    for (int i = 0; i < members.size(); i++)
                     {
-                        log("Kicking Steam32 ID %d from the party because they are set to RAGE", members[i]);
-                        CSteamID id = CSteamID(members[i], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
-                        client->KickPlayer(id);
-                        should_ret = true;
+                        auto &pl = playerlist::AccessData(members[i]);
+                        if (pl.state == playerlist::k_EState::RAGE)
+                        {
+                            log("Kicking Steam32 ID %d from the party because they are set to RAGE", members[i]);
+                            CSteamID id = CSteamID(members[i], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
+                            client->KickPlayer(id);
+                            should_ret = true;
+                        }
                     }
+                    if (should_ret)
+                        return;
                 }
-                if (should_ret)
-                    return;
 
                 // If we are at or over the specified limit, lock the party so we auto-reject future join requests
                 if (members.size() >= *max_size)

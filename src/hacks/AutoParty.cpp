@@ -122,7 +122,7 @@ void party_routine()
         return;
 
     // Ignore bad settings
-    if (1 > *max_size > 6)
+    if (*max_size < 1 or *max_size > 6)
     {
         log("Can't have %d members, max-party-size has been reset to 6", *max_size);
         max_size = 6;

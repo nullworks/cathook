@@ -193,7 +193,7 @@ void party_routine()
                         if (pl.state == playerlist::k_EState::RAGE)
                         {
                             std::string message = "Kicking Steam32 ID " + std::to_string(members[i]) + " from the party because they are set to RAGE";
-                            log(message);
+                            logging::Info("AutoParty: %s", message);
                             if (*message_kicks)
                                 client->SendPartyChat(message.c_str());
                             CSteamID id = CSteamID(members[i], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
@@ -216,8 +216,8 @@ void party_routine()
                 if (members.size() > *max_size)
                 {
                     int num_to_kick     = members.size() - *max_size;
-                    std::string message = "Kicking " std::to_string(num_to_kick) + " party members because there are " + std::to_string(members.size()) + " out of " + std::to_string(*max_size) + " allowed members";
-                    log(message);
+                    std::string message = "Kicking " + std::to_string(num_to_kick) + " party members because there are " + std::to_string(members.size()) + " out of " + std::to_string(*max_size) + " allowed members";
+                    logging::Info("AutoParty: %s", message);
                     if (*message_kicks)
                         client->SendPartyChat(message.c_str());
                     for (int i = 0; i < num_to_kick; i++)

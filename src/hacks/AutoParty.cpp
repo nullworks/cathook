@@ -212,6 +212,10 @@ void party_routine()
                         client->KickPlayer(id);
                     }
                 }
+
+                // Unlock the party if it's not full
+                if (members.size() < *max_size)
+                    unlock_party();
             }
             else
             {

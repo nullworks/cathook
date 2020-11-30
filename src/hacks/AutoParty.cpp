@@ -46,14 +46,14 @@ static std::vector<uint32> party_hosts = {};
     if (*autoparty_debug) \
     logging::Info("AutoParty (debug): " __VA_ARGS__)
 
-// Re-populates party_hosts from the current configuration
-void repopulate()
+// Re-populates party_hosts from the current or new configuration
+void repopulate(std::string str)
 {
     // Empty previous values
     party_hosts.clear();
 
     // Add Steam32 IDs to party_hosts
-    std::stringstream ss(*host_list);
+    std::stringstream ss(str);
     for (uint32 id; ss >> id;)
     {
         party_hosts.push_back(id);
@@ -131,7 +131,7 @@ void party_routine()
     // Populate party_hosts from the current configuration
     if (party_hosts.size() == 0)
     {
-        repopulate();
+        repopulate(*host_list);
     }
 
     re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
@@ -251,7 +251,7 @@ void party_routine()
 }
 
 static InitRoutine init([]() {
-    host_list.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { repopulate(); });
+    host_list.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { repopulate(after); });
     EC::Register(EC::Paint, party_routine, "paint_autoparty", EC::average);
 });
 } // namespace hacks::tf2::autoparty

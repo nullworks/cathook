@@ -40,7 +40,7 @@
         </Tab>
         <Include path="nullifiedcat/trigger/autopyro.xml"/>
         <Include path="nullifiedcat/trigger/autosticky.xml"/>
-	<Include path="nullifiedcat/trigger/autoheal.xml"/>
+        <Include path="nullifiedcat/trigger/autoheal.xml"/>
         <Include path="nullifiedcat/trigger/autospy.xml"/>
     </TabContainer>
 </Tab>

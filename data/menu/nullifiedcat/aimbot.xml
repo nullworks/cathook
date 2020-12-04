@@ -20,9 +20,10 @@
             <AutoVariable width="fill" target="aimbot.miss-chance" label="Miss chance" tooltip="% chance the aimbot will miss on purpose."/>
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
+            <AutoVariable width="fill" target="aimbot.target.color" label="Target color"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="210">
+    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="230">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
             <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip Viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>

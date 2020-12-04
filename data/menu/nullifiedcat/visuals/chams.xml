@@ -9,6 +9,9 @@
             <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
             <AutoVariable width="fill" target="chams.single-pass" label="Single pass"/>
             <AutoVariable width="fill" target="chams.white-weapons" label="White weapons" tooltip="Color weapons white."/>
+            <AutoVariable width="fill" target="chams.team-colored" label="Team colored"/>
+            <AutoVariable width="fill" target="chams.enemy-color" label="Enemy color"/>
+            <AutoVariable width="fill" target="chams.ally-color" label="Ally color"/>
             <AutoVariable width="fill" target="chams.arms" label="Arm Chams" tooltip="Color arms."/>
             <AutoVariable width="fill" target="chams.arms.overlaycolor" label="Overlay Arm Color" tooltip="Chams Overlay texture color."/>
             <AutoVariable width="fill" target="chams.arms.basecolor" label="Underlay Arm Color" tooltip="Chams Underlay texture color."/>

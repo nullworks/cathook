@@ -47,4 +47,6 @@ int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);
 bool UpdateAimkey();
 float EffectiveTargetingRange();
+
+extern settings::Rgba target_color;
 } // namespace hacks::shared::aimbot

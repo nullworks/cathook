@@ -81,6 +81,7 @@ static settings::Boolean npcs{ "aimbot.target.npcs", "1" };
 static settings::Boolean stickybot{ "aimbot.target.stickybomb", "0" };
 static settings::Boolean rageonly{ "aimbot.target.ignore-non-rage", "0" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
+settings::Rgba target_color{ "aimbot.target.color", "FF69B4FF" };
 
 /*
  * 0 Always on
@@ -312,8 +313,8 @@ static void CreateMove()
 #if ENABLE_VISUALS
     if (target_entity->m_Type() == ENTITY_PLAYER)
     {
-        hacks::shared::esp::SetEntityColor(target_entity, colors::pink);
-        effect_chams::g_EffectChams.SetEntityColor(target_entity, colors::pink);
+        hacks::shared::esp::SetEntityColor(target_entity, *target_color);
+        effect_chams::g_EffectChams.SetEntityColor(target_entity, *target_color);
     }
 #endif
 

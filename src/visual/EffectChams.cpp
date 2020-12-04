@@ -29,6 +29,9 @@ static settings::Boolean legit{ "chams.legit", "false" };
 static settings::Boolean singlepass{ "chams.single-pass", "false" };
 static settings::Boolean chamsself{ "chams.self", "true" };
 static settings::Boolean disco_chams{ "chams.disco", "false" };
+static settings::Boolean use_team_color{ "chams.team-colored", "true" };
+static settings::Rgba enemy_color{ "chams.enemy-color", "FF6464FF" };
+static settings::Rgba ally_color{ "chams.ally-color", "006464FF" };
 
 settings::Boolean enable{ "chams.enable", "false" };
 CatCommand fix_black_chams("fix_black_chams", "Fix Black Chams", []() {
@@ -320,13 +323,16 @@ void EffectChams::RenderChams(IClientEntity *entity)
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     if (ShouldRenderChams(entity))
     {
+        CachedEntity *ent = ENTITY(entity->entindex());
         rgba_t color   = ChamsColor(entity);
         rgba_t color_2 = color * 0.6f;
+
         if (!legit)
         {
             mat_unlit_z->AlphaModulate(1.0f);
             ptr->DepthRange(0.0f, 0.01f);
-            g_IVRenderView->SetColorModulation(color_2);
+            g_IVRenderView->SetBlend((use_team_color ? color_2 : (ent->m_bEnemy() ? *enemy_color : *ally_color)).a);
+            g_IVRenderView->SetColorModulation(use_team_color ? color_2 : (ent->m_bEnemy() ? *enemy_color : *ally_color));
             g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit_z : mat_lit_z);
             RenderChamsRecursive(entity);
         }
@@ -334,7 +340,8 @@ void EffectChams::RenderChams(IClientEntity *entity)
         if (legit || !singlepass)
         {
             mat_unlit->AlphaModulate(1.0f);
-            g_IVRenderView->SetColorModulation(color);
+            g_IVRenderView->SetBlend((use_team_color ? color : (ent->m_bEnemy() ? *enemy_color : *ally_color)).a);
+            g_IVRenderView->SetColorModulation(use_team_color ? color : (ent->m_bEnemy() ? *enemy_color : *ally_color));
             ptr->DepthRange(0.0f, 1.0f);
             g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit : mat_lit);
             RenderChamsRecursive(entity);

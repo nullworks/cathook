@@ -207,6 +207,10 @@ rgba_t EffectChams::ChamsColor(IClientEntity *entity)
     default:
         break;
     }
+    if (!use_team_color)
+    {
+        return (ent->m_bEnemy() ? *enemy_color : *ally_color);
+    }
     return colors::EntityF(ent);
 }
 
@@ -323,7 +327,6 @@ void EffectChams::RenderChams(IClientEntity *entity)
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     if (ShouldRenderChams(entity))
     {
-        CachedEntity *ent = ENTITY(entity->entindex());
         rgba_t color   = ChamsColor(entity);
         rgba_t color_2 = color * 0.6f;
 
@@ -331,8 +334,8 @@ void EffectChams::RenderChams(IClientEntity *entity)
         {
             mat_unlit_z->AlphaModulate(1.0f);
             ptr->DepthRange(0.0f, 0.01f);
-            g_IVRenderView->SetBlend((use_team_color ? color_2 : (ent->m_bEnemy() ? *enemy_color : *ally_color)).a);
-            g_IVRenderView->SetColorModulation(use_team_color ? color_2 : (ent->m_bEnemy() ? *enemy_color : *ally_color));
+            g_IVRenderView->SetBlend((color_2).a);
+            g_IVRenderView->SetColorModulation(color_2);
             g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit_z : mat_lit_z);
             RenderChamsRecursive(entity);
         }
@@ -340,8 +343,8 @@ void EffectChams::RenderChams(IClientEntity *entity)
         if (legit || !singlepass)
         {
             mat_unlit->AlphaModulate(1.0f);
-            g_IVRenderView->SetBlend((use_team_color ? color : (ent->m_bEnemy() ? *enemy_color : *ally_color)).a);
-            g_IVRenderView->SetColorModulation(use_team_color ? color : (ent->m_bEnemy() ? *enemy_color : *ally_color));
+            g_IVRenderView->SetBlend((color).a);
+            g_IVRenderView->SetColorModulation(color);
             ptr->DepthRange(0.0f, 1.0f);
             g_IVModelRender->ForcedMaterialOverride(flat ? mat_unlit : mat_lit);
             RenderChamsRecursive(entity);

@@ -1,8 +1,27 @@
-<Tab name="Cathook" padding="4 4 4 4">
-    <Box height="content" width="content" padding="12 6 6 6" name="Cathook">
+<Tab name="Info" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Debug">
+        <List width="200">
+            <AutoVariable width="fill" target="misc.debug-info" label="Debug"/>
+            <AutoVariable width="fill" target="hack.log-console" label="Log debug info"/>
+            <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine pred others"/>
+            <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast vischeck"/>
+            <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam wait time"/>
+            <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log dispatched user messages"/>
+            <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>
+            <AutoVariable width="fill" target="debug.pp-extrapolate" label="PP extrapolate"/>
+            <AutoVariable width="fill" target="debug.pp-rocket-time-ping" label="PP rocket time ping"/>
+            <AutoVariable width="fill" target="debug.projectiles" label="Debug projectiles"/>
+            <AutoVariable width="fill" target="debug.tcm" label="Debug TCM"/>
+            <AutoVariable width="fill" target="debug.ve.averaging" label="VE averaging"/>
+            <AutoVariable width="fill" target="debug.ve.smooth" label="VE smooth"/>
+            <AutoVariable width="fill" target="debug.ve.window" label="VE window"/>
+            <AutoVariable width="fill" target="aimbot.debug" label="Debug aimbot"/>
+            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug engine PP"/>
+        </List>
+    </Box>
+    <Box height="content" width="content" padding="12 6 6 6" name="Cathook" x="215">
         <List width="150">
             <AutoVariable width="fill" target="hack.enable" label="Enable cathook"/>
-            <AutoVariable width="fill" target="hack.log-console" label="Log debug info"/>
             <AutoVariable width="fill" target="hack-info.enable" label="Enable Cathook label" tooltip="Controls text at top left of screen."/>
             <AutoVariable width="fill" target="hack-info.minimal" label="Minimal Cathook label"/>
         </List>

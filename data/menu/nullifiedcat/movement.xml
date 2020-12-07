@@ -24,7 +24,7 @@
             <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
             <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to follow" tooltip="Steamid of player to follow. Highest priority."/>
             <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the party leader" Tooltip="Second highest priority."/>
-            <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize friends" tooltip="Thrid highest priority."/>
+            <AutoVariable width="fill" target="follow-bot.prioritize-friends" label="Prioritize friends" tooltip="Third highest priority."/>
             <AutoVariable width="fill" target="follow-bot.draw-crumbs" label="Draw crumbs" tooltip="Draw follow path"/>
         </List>
     </Box>
@@ -54,6 +54,13 @@
             <AutoVariable width="fill" target="antibackstab.distance" label="Detection distance"/>
             <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
             <AutoVariable width="fill" target="antibackstab.nope" label="Nope!" tooltip="Have the charachter say 'no'."/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="370">
+        <List width="150">
+            <AutoVariable width="fill" target="misc.no-push" label="Nopush"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk Fowards"/>
         </List>
     </Box>
 </Tab>

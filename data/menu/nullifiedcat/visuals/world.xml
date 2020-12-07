@@ -14,9 +14,9 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
+        <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
             <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Real Antiaim Angles in Third Person"/>
-            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
+        <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">
@@ -48,6 +48,42 @@
                     <Option name="Ash" value="4"/>
                     <Option name="Gold" value="5"/>
                     <Option name="Ice" value="6"/>
+                </Select>
+            </LabeledObject>
+            <LabeledObject width="fill" label="Skybox Override">
+                <Select target="misc.skybox-override">
+                    <Option name="none" value="0"/>
+                    <Option name="sky_tf2_04" value="1"/>
+                    <Option name="sky_upward" value="2"/>
+                    <Option name="sky_dustbowl_01" value="3"/>
+                    <Option name="sky_goldrush_01" value="4"/>
+                    <Option name="sky_granary_01" value="5"/>
+                    <Option name="sky_well_01" value="6"/>
+                    <Option name="sky_gravel_01" value="7"/>
+                    <Option name="sky_badlands_01" value="8"/>
+                    <Option name="sky_hydro_01" value="9"/>
+                    <Option name="sky_night_01" value="10"/>
+                    <Option name="sky_nightfall_01" value="11"/>
+                    <Option name="sky_trainyard_01" value="12"/>
+                    <Option name="sky_stormfront_01" value="13"/>
+                    <Option name="sky_morningsnow_01" value="14"/>
+                    <Option name="sky_alpinestorm_01" value="15"/>
+                    <Option name="sky_harvest_01" value="16"/>
+                    <Option name="sky_harvest_night_01" value="17"/>
+                    <Option name="sky_halloween" value="18"/>
+                    <Option name="sky_halloween_night_01" value="19"/>
+                    <Option name="sky_halloween_night2014_01" value="20"/>
+                    <Option name="sky_island_01" value="21"/>
+                    <Option name="sky_jungle_01" value="22"/>
+                    <Option name="sky_invasion2fort_01" value="23"/>
+                    <Option name="sky_well_02" value="24"/>
+                    <Option name="sky_outpost_01" value="25"/>
+                    <Option name="sky_coastal_01" value="26"/>
+                    <Option name="sky_rainbow_01" value="27"/>
+                    <Option name="sky_badlands_pyroland_01" value="28"/>
+                    <Option name="sky_pyroland_01" value="29"/>
+                    <Option name="sky_pyroland_02" value="30"/>
+                    <Option name="sky_pyroland_03" value="31"/>
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only Override Local Player Kills"/>

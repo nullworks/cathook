@@ -4,58 +4,17 @@
             <AutoVariable width="fill" target="misc.anti-afk" label="Enable antiafk"/>
             <AutoVariable width="fill" target="misc.auto-abandon" label="Enable auto abandon"/>
             <AutoVariable width="fill" target="misc.auto-balance-spam" label="Enable auto balance spam"/>
-            <AutoVariable width="fill" target="misc.debug-info" label="Debug"/>
             <AutoVariable width="fill" target="misc.die-if-vac" label="Crash on VAC"/>
             <AutoVariable width="fill" target="misc.disconnect-reason" label="Disconnect reason"/>
             <AutoVariable width="fill" target="misc.engine-prediction" label="Engine prediction"/>
             <AutoVariable width="fill" target="misc.flashlight-spam" label="Flashlight spam" tooltip="Used in Half Life Death Match."/>
             <AutoVariable width="fill" target="misc.force-halloween" label="Force halloween"/>
             <AutoVariable width="fill" target="misc.god-mode" label="xd"/>
-            <AutoVariable width="fill" target="misc.minigun-jump-tf2c" label="TF2C minigun jump"/>
             <AutoVariable width="fill" target="misc.no-homo" label="#nohomo"/>
             <AutoVariable width="fill" target="misc.no-lerp" label="Nolerp"/>
-            <AutoVariable width="fill" target="misc.no-push" label="Nopush"/>
-            <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"/>
             <AutoVariable width="fill" target="misc.full-auto" label="Fully automated firing"/>
             <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>
-            <LabeledObject width="fill" label="Skybox override">
-                <Select target="misc.skybox-override">
-                    <Option name="none" value="0"/>
-                    <Option name="sky_tf2_04" value="1"/>
-                    <Option name="sky_upward" value="2"/>
-                    <Option name="sky_dustbowl_01" value="3"/>
-                    <Option name="sky_goldrush_01" value="4"/>
-                    <Option name="sky_granary_01" value="5"/>
-                    <Option name="sky_well_01" value="6"/>
-                    <Option name="sky_gravel_01" value="7"/>
-                    <Option name="sky_badlands_01" value="8"/>
-                    <Option name="sky_hydro_01" value="9"/>
-                    <Option name="sky_night_01" value="10"/>
-                    <Option name="sky_nightfall_01" value="11"/>
-                    <Option name="sky_trainyard_01" value="12"/>
-                    <Option name="sky_stormfront_01" value="13"/>
-                    <Option name="sky_morningsnow_01" value="14"/>
-                    <Option name="sky_alpinestorm_01" value="15"/>
-                    <Option name="sky_harvest_01" value="16"/>
-                    <Option name="sky_harvest_night_01" value="17"/>
-                    <Option name="sky_halloween" value="18"/>
-                    <Option name="sky_halloween_night_01" value="19"/>
-                    <Option name="sky_halloween_night2014_01" value="20"/>
-                    <Option name="sky_island_01" value="21"/>
-                    <Option name="sky_jungle_01" value="22"/>
-                    <Option name="sky_invasion2fort_01" value="23"/>
-                    <Option name="sky_well_02" value="24"/>
-                    <Option name="sky_outpost_01" value="25"/>
-                    <Option name="sky_coastal_01" value="26"/>
-                    <Option name="sky_rainbow_01" value="27"/>
-                    <Option name="sky_badlands_pyroland_01" value="28"/>
-                    <Option name="sky_pyroland_01" value="29"/>
-                    <Option name="sky_pyroland_02" value="30"/>
-                    <Option name="sky_pyroland_03" value="31"/>
-                </Select>
-            </LabeledObject>
             <AutoVariable width="fill" target="misc.tauntslide" label="Tauntslide"/>
-            <AutoVariable width="fill" target="misc.tauntslide-tf2c" label="TF2C tauntslide"/>
             <AutoVariable width="fill" target="announcer" label="Enable announcer"/>
         </List>
     </Box>
@@ -76,13 +35,8 @@
     <Box height="content" width="content" padding="12 6 6 6" name="Extra" x="215" y="65">
         <List width="200">
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
-            <AutoVariable width="fill" target="online.enable" label="Enable Cathook online"/>
             <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit"/>
-            <AutoVariable width="fill" target="player-tools.ignore.online.notarget" label="Don't target users"/>
             <AutoVariable width="fill" target="player-tools.ignore.hoovy" label="Ignore hoovies"/>
-            <AutoVariable width="fill" target="player-tools.ignore.online.anonymous" label="Ignore anonymous"/>
-            <AutoVariable width="fill" target="player-tools.ignore.online.friendly-software" label="Ignore friendly software"/>
-            <AutoVariable width="fill" target="player-tools.ignore.online.only-verified-accounts" label="Only ignore verified accounts"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting players"/>
             <AutoVariable width="fill" target="player-tools.auto-party" label="Automatically add party state"/>
             <AutoVariable width="fill" target="killstreak.enable" label="Enable killstreak"/>

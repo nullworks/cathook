@@ -107,6 +107,12 @@
             <AutoVariable width="fill" target="esp.hide-invis" label="Hide invisible"/>
         </List>
     </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="170" y="300">
+        <List width="150">
+            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D Over Head"/>
+            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's How Mafia Works"/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Strings" x="340">
         <List width="150">
             <AutoVariable width="fill" target="esp.info.name" label="Name"/>
@@ -137,7 +143,13 @@
             <AutoVariable width="fill" target="esp.emoji.size" label="Size"/>
         </List>
     </Box>
-
+    <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="240">
+        <List width="150">
+            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to one if you are being dominated by someone else."/>
+            <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
+            <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
+        </List>
+    </Box>
     <!-- <Box padding="12 6 6 6" width="content" height="content" y="260" name="Debug">
         <List width="150">
             <AutoVariable width="fill" target="esp.debug.entity" label="Entity ESP"/>

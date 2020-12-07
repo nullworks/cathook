@@ -1,5 +1,22 @@
 <Tab name="Tracers" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Tracers">
+    <Box padding="12 6 6 6" width="content" height="content" name="Bullet tracers">
+        <List width="150">
+            <AutoVariable width="fill" target="visual.bullet-tracers.enable" label="Enable" tooltip="Make weapons have Machina tracers."/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.sniper-only" label="Sniperrifles only" tooltip="Only snipers have bullet tracers."/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.local-only" label="Don't draw other players"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.draw-local" label="Draw local beams" tooltip="Draw bullet tracers for self."/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.sentry" label="Sentry tracers"/>
+            <LabeledObject width="fill" label="Team mode">
+                <Select target="visual.bullet-tracers.teammode" tooltip="Set team to have tracers.">
+                    <Option name="All" value="0"/>
+                    <Option name="Enemies" value="1"/>
+                    <Option name="Teammates" value="2"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="visual.bullet-tracers.one-trace-only" label="Single beam only"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Tracers" x="165">
         <List width="150">
             <AutoVariable width="fill" target="tracers.enabled" label="Enabled"/>
             <AutoVariable width="fill" target="tracers.buildings" label="Enable building tracers"/>
@@ -9,10 +26,10 @@
             <AutoVariable width="fill" target="tracers.min-fov" label="Min FOV"/>
             <AutoVariable width="fill" target="tracers.max-dist" label="Max distance"/>
             <LabeledObject width="fill" label="Show friends">
-                <Select width="150" target="tracers.draw-friends">
-                    <Option name="Don't show friends" value="0"/>
-                    <Option name="Friends in enemy team" value="1"/>
-                    <Option name="Always show friends" value="2"/>
+                <Select width="content" target="tracers.draw-friends">
+                    <Option name="None" value="0"/>
+                    <Option name="Enemy" value="1"/>
+                    <Option name="All" value="2"/>
                 </Select>
             </LabeledObject>
         </List>

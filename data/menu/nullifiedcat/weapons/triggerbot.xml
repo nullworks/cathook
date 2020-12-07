@@ -1,0 +1,102 @@
+<Tab name="Triggerbot" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Reflect">
+        <List width="202">
+            <AutoVariable width="fill" target="autoreflect.enable" label="Enable auto reflect"/>
+            <AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
+            <AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able" tooltip="Don't try to reflect when using primary fire."/>
+            <AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles" tooltip="Attempt to reflect teammate projectiles."/>
+            <AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode" tooltip="Disable vischeck"/>
+            <AutoVariable width="fill" target="autoreflect.legit" label="Legit mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
+        </List>
+        <Box padding="12 6 6 6" name="Targets" width="content" height="content" y="100">
+            <Box padding="12 6 6 6" name="Big" width="content" height="content">
+                <List width="95">
+                    <AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
+                    <AutoVariable width="fill" target="autoreflect.pipes" label="Pipes"/>
+                    <AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
+                    <AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
+                </List>
+            </Box>
+            <Box padding="12 6 6 6" name="Small" width="content" height="content" x="105">
+                <List width="85">
+                    <AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
+                    <AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
+                    <AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
+                    <AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing bolts"/>
+                    <AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"/>
+                </List>
+            </Box>
+            <AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should autoreflect still try to reflect it?"/>
+        </Box>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto backstab" y="245">
+        <List width="214">
+            <AutoVariable width="fill" target="autobackstab.enabled" label="Enable auto backstab"/>
+            <LabeledObject width="fill" label="Auto backstab mode">
+                <Select target="autobackstab.mode">
+                    <Option name="Legit" value="0"/>
+                    <Option name="Rage" value="1"/>
+                    <Option name="Backtrack" value="2"/>
+                    <Option name="Legit backtrack" value="3"/>
+                </Select>
+            </LabeledObject>
+        </List>
+    </Box>
+    <Box name="Trigger bot" padding="12 6 6 6" width="content" height="content" x="230">
+        <List width="150">
+            <AutoVariable width="fill" target="trigger.enable" label="Enable trigger bot"/>
+            <LabeledObject width="fill" label="Trigger key mode" tooltip="Optional: what should the key set below do?">
+                <Select target="trigger.key.mode">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Pressed" value="1"/>
+                    <Option name="Not pressed" value="2"/>
+                    <Option name="Toggle" value="3"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="trigger.key.button" label="Aim key"/>
+            <AutoVariable width="fill" target="trigger.wait-for-charge" label="Wait for charge" tooltip="Hold fire until a single shot is enough to kill the target."/>
+            <AutoVariable width="fill" target="trigger.zoomed-only" label="Zoomed only" tooltip="When applicable, only fire when zoomed."/>
+            <AutoVariable width="fill" target="trigger.accuracy" label="Accuracy mode" min="0" max="10"/>
+            <AutoVariable width="fill" target="trigger.delay" label="Delay" min="0" max="1"/>
+        </List>
+        <Box padding="12 6 6 6" width="content" height="content" name="Target selection" y="125">
+            <List width="150">
+                <LabeledObject width="fill" label="Hitbox mode">
+                    <Select target="trigger.hitbox-mode">
+                        <Option name="Auto head" value="0"/>
+                        <Option name="Auto closest" value="1"/>
+                        <Option name="Head only" value="2"/>
+                    </Select>
+                </LabeledObject>
+                <AutoVariable width="fill" target="trigger.target.max-range" label="Max range"/>
+                <AutoVariable width="fill" target="trigger.target.teammates" label="Teammates" tooltip="Fire on teammates."/>
+                <AutoVariable width="fill" target="trigger.target.stickybombs" label="Stickybombs" tooltip="Fire upon stickybombs."/>
+                <AutoVariable width="fill" target="trigger.target.buildings-sentry" label="Sentry guns"/>
+                <AutoVariable width="fill" target="trigger.target.buildings-other" label="Other buildings"/>
+                <AutoVariable width="fill" target="trigger.target.ignore-cloaked-spies" label="Ignore Cloaked"/>
+                <AutoVariable width="fill" target="trigger.target.ignore-vaccinator" label="Ignore Vaccinator"/>
+            </List>
+        </Box>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="410">
+        <List width="150">
+            <AutoVariable width="fill" target="auto-detonator.enable" label="Enable auto detonator" tooltip="Auto explode flares"/>
+            <AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore cloaked"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto sticky" x="410" y="50">
+        <List width="150">
+            <AutoVariable width="fill" target="autosticky.enable" label="Enable auto sticky" tooltip="Auto detonate stickies."/>
+            <AutoVariable width="fill" target="autosticky.buildings" label="Detonate on buildings"/>
+            <AutoVariable width="fill" target="autosticky.legit" label="Legit mode" tooltip="Require line of sight and ignores invisible spies."/>
+            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't blow me up" tooltip="Don't detonate if you would recieve damage."/>
+            <AutoVariable width="fill" target="autosticky.min-dist" label="Min distance" min="0" max="130" step="5"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Dead Ringer" x="410" y="150">
+        <List width="150">
+            <AutoVariable width="fill" target="auto-deadringer.enable" label="Enable auto Dead Ringer"/>
+            <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
+        </List>
+    </Box>
+</Tab>

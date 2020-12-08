@@ -270,18 +270,17 @@ void Draw()
             DrawEntity(x, y, enemy);
     for (auto Sentry : sentries)
         DrawEntity(x, y, Sentry);
+    if (show_cross)
+    {
+        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
+        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
+    }
     if (CE_GOOD(LOCAL_E))
     {
         DrawEntity(x, y, LOCAL_E);
         const auto &wtr = WorldToRadar(g_pLocalPlayer->v_Origin.x, g_pLocalPlayer->v_Origin.y);
         if (!use_icons)
             draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), team_colored_ui, 0.5f);
-    }
-
-    if (show_cross)
-    {
-        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
-        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
     }
 }
 

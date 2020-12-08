@@ -2,13 +2,13 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Radar">
         <List width="150">
             <AutoVariable width="fill" target="radar.enable" label="Enable" tooltip="Shows a highly customizable radar."/>
-	    <LabeledObject width="fill" label="Radar Shape" tooltip="Sets the radar's shape">
-	        <Select target="radar.shape">
-	            <Option name="Square" value="0"/>
-	            <Option name="Circle" value="1"/>
-	        </Select>
-	    </LabeledObject>
-	    <AutoVariable width="fill" target="radar.show-cross" label="Show Cross" tooltip="Show cross in the center of the radar."/>
+        <LabeledObject width="fill" label="Radar Shape" tooltip="Sets the radar's shape">
+            <Select target="radar.shape">
+                <Option name="Square" value="0"/>
+                <Option name="Circle" value="1"/>
+            </Select>
+        </LabeledObject>
+        <AutoVariable width="fill" target="radar.show-cross" label="Show Cross" tooltip="Show cross in the center of the radar."/>
             <AutoVariable width="fill" target="radar.enemies-over-teammates" label="Enemies on top"/>
             <AutoVariable width="fill" target="radar.healthbar" label="Health bar size" min="0" max="5" step="1"/>
             <AutoVariable width="fill" target="radar.use-icons" label="Use icons"/>
@@ -25,7 +25,7 @@
             <AutoVariable width="fill" target="radar.show.ammo" label="Ammo packs"/>
             <AutoVariable width="fill" target="radar.show.health" label="Health packs"/>
             <AutoVariable width="fill" target="radar.show.teammates" label="Teammates"/>
-	    <AutoVariable width="fill" target="radar.show.team.buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="radar.show.team.buildings" label="Team buildings"/>
             <AutoVariable width="fill" target="radar.hide-invis" label="Hide invisible"/>
         </List>
     </Box>

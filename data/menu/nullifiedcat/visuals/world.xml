@@ -14,9 +14,9 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-	    <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
+            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
             <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Real Antiaim Angles in Third Person"/>
-	    <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
+            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">

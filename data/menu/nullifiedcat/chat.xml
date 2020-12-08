@@ -27,7 +27,7 @@
                     <Option name="Random" value="1"/>
                     <Option name="Medic" value="2"/>
                     <Option name="Thanks" value="3"/>
-		    <Option name="Nice shot" value="4"/>
+                    <Option name="Nice shot" value="4"/>
                     <Option name="Cheers" value="5"/>
                     <Option name="Jeers" value="6"/>
                 </Select>

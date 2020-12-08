@@ -1,0 +1,17 @@
+<Tab name="Auto Party" padding="4 4 4 4">
+    <Box name="Auto Party" width="content" height="content" padding="12 6 6 6">
+        <List width="400">
+            <AutoVariable width="fill" target="autoparty.enable" label="Enable auto party"/>
+            <AutoVariable width="fill" target="autoparty.run-frequency" label="Run every N seconds"/>
+            <AutoVariable width="fill" target="autoparty.max-party-size" label="Max party members allowed"/>
+            <AutoVariable width="fill" target="autoparty.kick-rage" label="Automatically kick raged players from the party"/>
+            <AutoVariable width="fill" target="autoparty.auto-leave" label="Leave the party when a member goes offline"/>
+            <AutoVariable width="fill" target="autoparty.auto-lock" label="Lock the party when max party size is reached"/>
+            <AutoVariable width="fill" target="autoparty.auto-unlock" label="Unlock the party when max party size has not been reached"/>
+            <AutoVariable width="fill" target="autoparty.party-hosts" label="Comma-separated list of Steam32 IDs to use as party hosts"/>
+            <AutoVariable width="fill" target="autoparty.log" label="Log party leaves and member kicks"/>
+            <AutoVariable width="fill" target="autoparty.message-kicks" label="Log kick notifications to party chat"/>
+            <AutoVariable width="fill" target="autoparty.debug" label="Log party locks and unlocks"/>
+        </List>
+    </Box>
+</Tab>

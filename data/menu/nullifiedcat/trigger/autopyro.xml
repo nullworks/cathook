@@ -1,38 +1,38 @@
 <Tab name="Auto Pyro" padding="4 4 4 4">
-	<Box padding="12 6 6 6" width="content" height="content" name="Auto reflect">
-		<List width="202">
-			<AutoVariable width="fill" target="autoreflect.enable" label="Enable auto reflect"/>
-			<AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
-			<AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able" tooltip="Don't try to reflect when using primary fire."/>
-			<AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles" tooltip="Attempt to reflect teammate projectiles."/>
-			<AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode" tooltip="Disable vischeck"/>
-			<AutoVariable width="fill" target="autoreflect.legit" label="Legit mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
-		</List>
-		<Box padding="12 6 6 6" name="Targets" width="content" height="content" y="100">
-			<Box padding="12 6 6 6" name="Big" width="content" height="content">
-				<List width="95">
-					<AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
-					<AutoVariable width="fill" target="autoreflect.pipes" label="Pipes"/>
-					<AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
-					<AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
-				</List>
-			</Box>
-			<Box padding="12 6 6 6" name="Small" width="content" height="content" x="105">
-				<List width="85">
-					<AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
-					<AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
-					<AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
-					<AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing bolts"/>
-					<AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"/>
-				</List>
-			</Box>
-			<AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should autoreflect still try to reflect it?"/>
-		</Box>
-	</Box>
-	<Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="235">
-		<List width="150">
-			<AutoVariable width="fill" target="auto-detonator.enable" label="Enable auto detonator" tooltip="Auto explode flares"/>
-			<AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore cloaked"/>
-		</List>
-	</Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto reflect">
+        <List width="202">
+            <AutoVariable width="fill" target="autoreflect.enable" label="Enable auto reflect"/>
+            <AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
+            <AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able" tooltip="Don't try to reflect when using primary fire."/>
+            <AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles" tooltip="Attempt to reflect teammate projectiles."/>
+            <AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode" tooltip="Disable vischeck"/>
+            <AutoVariable width="fill" target="autoreflect.legit" label="Legit mode" tooltip="Don't move the mouse to reflect. Spectator safe."/>
+        </List>
+        <Box padding="12 6 6 6" name="Targets" width="content" height="content" y="100">
+            <Box padding="12 6 6 6" name="Big" width="content" height="content">
+                <List width="95">
+                    <AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
+                    <AutoVariable width="fill" target="autoreflect.pipes" label="Pipes"/>
+                    <AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
+                    <AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
+                </List>
+            </Box>
+            <Box padding="12 6 6 6" name="Small" width="content" height="content" x="105">
+                <List width="85">
+                    <AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
+                    <AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
+                    <AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
+                    <AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing bolts"/>
+                    <AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"/>
+                </List>
+            </Box>
+            <AutoVariable width="196" y="95" target="autoreflect.default" label="Default" tooltip="If a projectile is not known, should autoreflect still try to reflect it?"/>
+        </Box>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto Detonator" x="235">
+        <List width="150">
+            <AutoVariable width="fill" target="auto-detonator.enable" label="Enable auto detonator" tooltip="Auto explode flares"/>
+            <AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore cloaked"/>
+        </List>
+    </Box>
 </Tab>

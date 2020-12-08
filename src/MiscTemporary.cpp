@@ -36,6 +36,7 @@ settings::Int fakelag_amount{ "misc.fakelag", "0" };
 settings::Boolean no_zoom{ "remove.zoom", "false" };
 settings::Boolean no_scope{ "remove.scope", "false" };
 settings::Boolean disable_visuals{ "visual.disable", "false" };
+settings::Boolean team_colored_ui_elements{ "visual.team-colored-ui-elements", "false" };
 settings::Int print_r{ "print.rgb.r", "183" };
 settings::Int print_g{ "print.rgb.b", "27" };
 settings::Int print_b{ "print.rgb.g", "139" };

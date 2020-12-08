@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 #include <settings/Bool.hpp>
+#include <MiscTemporary.hpp>
 
 namespace hacks::tf::autoreflect
 {
@@ -218,8 +219,8 @@ void Draw()
             // Dont show ring while player is dead
             if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
-                rgba_t color = GUIColor();
-                color.a      = float(fovcircle_opacity);
+                rgba_t team_colored_ui = !team_colored_ui_elements ? GUIColor() : (LOCAL_E->m_iTeam() == TEAM_BLU ? colors::blu : (LOCAL_E->m_iTeam() == TEAM_RED ? colors::red : colors::white));
+                team_colored_ui.a      = float(fovcircle_opacity);
 
                 int width, height;
                 g_IEngine->GetScreenSize(width, height);
@@ -229,7 +230,7 @@ void Draw()
                 float fov_real = RAD2DEG(2 * atanf(mon_fov * tanf(DEG2RAD(draw::fov / 2))));
                 float radius   = tan(DEG2RAD(float(fov)) / 2) / tan(DEG2RAD(fov_real) / 2) * (width);
 
-                draw::Circle(width / 2, height / 2, radius, color, 1, 100);
+                draw::Circle(width / 2, height / 2, radius, team_colored_ui, 1, 100);
             }
         }
     }

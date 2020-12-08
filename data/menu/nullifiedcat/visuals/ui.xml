@@ -22,6 +22,7 @@
             <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
             <AutoVariable width="fill" target="mc_health.enable" label="Enable MC healthbar"/>
             <AutoVariable width="fill" target="mc_health.size" label="MC healthbar size"/>
+            <AutoVariable width="fill" target="visual.team-colored-ui-elements" label="Team colored UI elements"/>
         </List>
     </Box>
 </Tab>

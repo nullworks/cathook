@@ -116,6 +116,7 @@ constexpr rgba_t white = FromRGBA8(255, 255, 255, 255);
 constexpr rgba_t black(0, 0, 0, 1);
 
 constexpr rgba_t pink = FromRGBA8(255, 105, 180, 255);
+constexpr rgba_t purple = FromRGBA8(128, 0, 128, 255);
 
 constexpr rgba_t red = FromRGBA8(237, 42, 42, 255), blu = FromRGBA8(28, 108, 237, 255);
 constexpr rgba_t red_b = FromRGBA8(64, 32, 32, 178), blu_b = FromRGBA8(32, 32, 64, 178);       // Background

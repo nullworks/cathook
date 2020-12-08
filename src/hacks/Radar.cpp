@@ -6,6 +6,8 @@
  */
 #include "common.hpp"
 #include <settings/Int.hpp>
+#include <hacks/Aimbot.hpp>
+#include <MiscTemporary.hpp>
 
 #ifndef FEATURE_RADAR_DISABLED
 #if ENABLE_VISUALS
@@ -129,7 +131,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             else
             {
                 tx_class[2 - idx][clazz - 1].draw(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, colors::white);
-                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, idx ? colors::blu_v : colors::red_v, 1.0f);
+                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, !team_colored_ui_elements ? (idx ? colors::blu_v : colors::red_v) : (ent == hacks::shared::aimbot::CurrentTarget()) ? colors::purple : (idx ? colors::blu_v : colors::red_v), 1.0f);
             }
 
             if (ent->m_iMaxHealth() && *healthbar > 0)
@@ -214,7 +216,6 @@ void Draw()
     if (CE_BAD(LOCAL_E))
         return;
     int x, y;
-    rgba_t outlineclr;
     std::vector<CachedEntity *> enemies{};
     CachedEntity *ent;
 
@@ -223,18 +224,19 @@ void Draw()
     int radar_size = *size;
     int half_size  = radar_size / 2;
 
-    outlineclr = GUIColor();
+    rgba_t radar_outer_color = !team_colored_ui_elements ? GUIColor() : ((hacks::shared::aimbot::CurrentTarget() != null) ? colors::purple : (LOCAL_E->m_iTeam() == TEAM_BLU ? colors::blu : (LOCAL_E->m_iTeam() == TEAM_RED ? colors::red : colors::white)));
+    rgba_t team_colored_ui = !team_colored_ui_elements ? GUIColor() : (LOCAL_E->m_iTeam() == TEAM_BLU ? colors::blu : (LOCAL_E->m_iTeam() == TEAM_RED ? colors::red : colors::white));
 
     if (*shape == 0)
     {
         draw::Rectangle(x, y, radar_size, radar_size, colors::Transparent(colors::black, *opacity));
-        draw::RectangleOutlined(x, y, radar_size, radar_size, outlineclr, 0.5f);
+        draw::RectangleOutlined(x, y, radar_size, radar_size, radar_outer_color, 0.5f);
     }
     else if (*shape == 1)
     {
         int center_x = x + half_size;
         int center_y = y + half_size;
-        draw::Circle(center_x, center_y, half_size, outlineclr, 1, 100);
+        draw::Circle(center_x, center_y, half_size, radar_outer_color, 1, 100);
         draw::Circle(center_x, center_y, half_size / 2, colors::Transparent(colors::black, *opacity), half_size, 100);
     }
 
@@ -273,13 +275,13 @@ void Draw()
         DrawEntity(x, y, LOCAL_E);
         const auto &wtr = WorldToRadar(g_pLocalPlayer->v_Origin.x, g_pLocalPlayer->v_Origin.y);
         if (!use_icons)
-            draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), GUIColor(), 0.5f);
+            draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), team_colored_ui, 0.5f);
     }
 
     if (show_cross)
     {
-        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(GUIColor(), 0.4f), 0.5f);
-        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(GUIColor(), 0.4f), 0.5f);
+        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
+        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(team_colored_ui, 0.4f), 0.5f);
     }
 }
 

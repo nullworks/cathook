@@ -37,6 +37,7 @@ extern float backup_lerp;
 extern settings::Int fakelag_amount;
 extern settings::Boolean no_zoom;
 extern settings::Boolean disable_visuals;
+extern settings::Boolean team_colored_ui_elements;
 extern settings::Int print_r;
 extern settings::Int print_g;
 extern settings::Int print_b;

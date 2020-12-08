@@ -223,7 +223,7 @@ void Draw()
     int radar_size = *size;
     int half_size  = radar_size / 2;
 
-    outlineclr = GUIColor();
+    outlineclr = colors::gui;
 
     if (*shape == 0)
     {
@@ -273,13 +273,13 @@ void Draw()
         DrawEntity(x, y, LOCAL_E);
         const auto &wtr = WorldToRadar(g_pLocalPlayer->v_Origin.x, g_pLocalPlayer->v_Origin.y);
         if (!use_icons)
-            draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), GUIColor(), 0.5f);
+            draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), colors::gui, 0.5f);
     }
 
     if (show_cross)
     {
-        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(GUIColor(), 0.4f), 0.5f);
-        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(GUIColor(), 0.4f), 0.5f);
+        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(colors::gui, 0.4f), 0.5f);
+        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(colors::gui, 0.4f), 0.5f);
     }
 }
 

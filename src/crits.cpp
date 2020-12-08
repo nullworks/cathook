@@ -724,7 +724,7 @@ void DrawCritStrings()
         float sx, sy;
         fonts::center_screen->stringSize(bar_string, &sx, &sy);
         // Center and draw below
-        draw::String(x - sx / 2, (y + sy), colors::red, bar_string.c_str(), *fonts::center_screen);
+        draw::String(x - sx / 2, (y + sy), colors::red_s, bar_string.c_str(), *fonts::center_screen);
         y += fonts::center_screen->size + 1;
     }
 
@@ -783,22 +783,22 @@ void Draw()
             if (shouldCrit())
             {
                 if (can_crit)
-                    AddCritString("Forcing Crits!", colors::red);
+                    AddCritString("Forcing Crits!", colors::red_s);
                 else
-                    AddCritString("Weapon can currently not crit!", colors::red);
+                    AddCritString("Weapon can currently not crit!", colors::red_s);
             }
 
             // Weapon can't randomly crit
             if (!re::C_TFWeaponBase::CanFireCriticalShot(RAW_ENT(LOCAL_W), false, nullptr) || !added_per_shot)
             {
-                AddCritString("Weapon cannot randomly crit.", colors::red);
+                AddCritString("Weapon cannot randomly crit.", colors::red_s);
                 DrawCritStrings();
                 return;
             }
 
             // We are out of sync. RIP
             if (is_out_of_sync)
-                AddCritString("Out of sync.", colors::red);
+                AddCritString("Out of sync.", colors::red_s);
             // Observed crit chance is not low enough, display how much damage is needed until we can crit again
             else if (crit_mult_info.first > crit_mult_info.second && g_pLocalPlayer->weapon_mode != weapon_melee)
                 AddCritString("Damage Until crit: " + std::to_string(damageUntilToCrit(wep)), colors::orange);
@@ -811,7 +811,7 @@ void Draw()
             }
 
             // Mark bucket as ready/not ready
-            auto color = colors::red;
+            auto color = colors::red_s;
             if (can_crit && (crit_mult_info.first <= crit_mult_info.second || g_pLocalPlayer->weapon_mode != weapon_melee))
                 color = colors::green;
             AddCritString("Crit Bucket: " + std::to_string(bucket), color);
@@ -829,7 +829,7 @@ void Draw()
                     bucket_color = colors::FromRGBA8(0x34, 0xeb, 0xae, 255);
                 // Color everything red
                 if (!can_crit)
-                    bucket_color = colors::red;
+                    bucket_color = colors::red_s;
 
                 // Get the percentage the bucket will take up
                 float bucket_percentage = bucket / getBucketCap();

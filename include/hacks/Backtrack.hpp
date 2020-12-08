@@ -50,9 +50,16 @@ extern settings::Float latency;
 extern settings::Int bt_slots;
 #if ENABLE_VISUALS
 extern settings::Boolean chams;
+extern settings::Boolean chams_wireframe;
 extern settings::Int chams_ticks;
 extern settings::Rgba chams_color;
 extern settings::Boolean chams_solid;
+extern settings::Boolean chams_overlay;
+extern settings::Boolean chams_flat;
+extern settings::Rgba chams_color_overlay;
+extern settings::Float chams_envmap_tint_r;
+extern settings::Float chams_envmap_tint_g;
+extern settings::Float chams_envmap_tint_b;
 #endif
 
 // Check if backtrack is enabled

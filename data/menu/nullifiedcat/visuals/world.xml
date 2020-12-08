@@ -38,6 +38,8 @@
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode Color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode Color (World)"/>
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode Color (Skybox)"/>
+            <AutoVariable width="fill" target="visual.override-textures" label="Override map textures"/>
+            <AutoVariable width="fill" target="visual.override-textures.custom-texture" label="Override texture"/>
             <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>
             <LabeledObject width="fill" label="Ragdoll Override">
                 <Select target="visual.ragdoll-mode">

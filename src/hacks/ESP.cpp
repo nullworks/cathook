@@ -925,7 +925,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 break;
                 case 1:
                 { // BOTTOM RIGHT
-                    draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 14, 0);
+                    draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 16, 0);
                 }
                 break;
                 case 2:
@@ -935,12 +935,22 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 break;
                 case 3:
                 { // ABOVE
-                    draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 14, 0);
+                    draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
                 }
                 break;
                 case 4:
                 { // BELOW
                     draw_point = Vector((min_x + max_x) / 2.0f, max_y, 0);
+                }
+                break;
+                case 5:
+                { // ABOVE LEFT
+                    draw_point = Vector(min_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+                }
+                break;
+                case 6:
+                { // ABOVE RIGHT
+                    draw_point = Vector(max_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
                 }
                 }
             }

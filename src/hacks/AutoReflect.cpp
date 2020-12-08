@@ -218,7 +218,7 @@ void Draw()
             // Dont show ring while player is dead
             if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
-                rgba_t color = GUIColor();
+                rgba_t color = colors::gui;
                 color.a      = float(fovcircle_opacity);
 
                 int width, height;

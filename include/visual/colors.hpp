@@ -117,10 +117,17 @@ constexpr rgba_t black(0, 0, 0, 1);
 
 constexpr rgba_t pink = FromRGBA8(255, 105, 180, 255);
 
-constexpr rgba_t red = FromRGBA8(237, 42, 42, 255), blu = FromRGBA8(28, 108, 237, 255);
-constexpr rgba_t red_b = FromRGBA8(64, 32, 32, 178), blu_b = FromRGBA8(32, 32, 64, 178);       // Background
-constexpr rgba_t red_v = FromRGBA8(196, 102, 108, 255), blu_v = FromRGBA8(102, 182, 196, 255); // Vaccinator
-constexpr rgba_t red_u = FromRGBA8(216, 34, 186, 255), blu_u = FromRGBA8(167, 75, 252, 255);   // Ubercharged
+extern rgba_t red; // RED team user controlled
+extern rgba_t blu; // BLU team user controlled
+extern rgba_t red_b; // Background
+extern rgba_t blu_b; // Background
+extern rgba_t red_v; // Vaccinator
+extern rgba_t blu_v; // Vaccinator
+extern rgba_t red_u; // Ubercharge
+extern rgba_t blu_u;  // Ubercharge
+extern rgba_t gui;    // GUI color
+extern rgba_t target; // Aimbot target color
+constexpr rgba_t red_s  = FromRGBA8(237, 42, 42, 255); // Not user controlled
 constexpr rgba_t yellow = FromRGBA8(255, 255, 0, 255);
 constexpr rgba_t orange = FromRGBA8(255, 120, 0, 255);
 constexpr rgba_t green  = FromRGBA8(0, 255, 0, 255);

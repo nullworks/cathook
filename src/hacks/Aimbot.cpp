@@ -18,12 +18,6 @@
 #include "hitrate.hpp"
 #include "FollowBot.hpp"
 
-#if ENABLE_VISUALS
-#ifndef FEATURE_EFFECTS_DISABLED
-#include "EffectChams.hpp"
-#endif
-#endif
-
 namespace hacks::shared::aimbot
 {
 static settings::Boolean normal_enable{ "aimbot.enable", "false" };
@@ -312,8 +306,7 @@ static void CreateMove()
 #if ENABLE_VISUALS
     if (target_entity->m_Type() == ENTITY_PLAYER)
     {
-        hacks::shared::esp::SetEntityColor(target_entity, colors::pink);
-        effect_chams::g_EffectChams.SetEntityColor(target_entity, colors::pink);
+        hacks::shared::esp::SetEntityColor(target_entity, colors::target);
     }
 #endif
 
@@ -1551,7 +1544,7 @@ static void DrawText()
             // Dont show ring while player is dead
             if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
-                rgba_t color = GUIColor();
+                rgba_t color = colors::gui;
                 color.a      = float(fovcircle_opacity);
 
                 int width, height;

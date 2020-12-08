@@ -59,11 +59,6 @@ void Update();
 extern const std::vector<std::string> fonts;
 } // namespace fonts
 
-constexpr rgba_t GUIColor()
-{
-    return colors::white;
-}
-
 void InitStrings();
 void ResetStrings();
 void AddCenterString(const std::string &string, const rgba_t &color = colors::white);

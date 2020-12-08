@@ -1054,7 +1054,7 @@ void DrawNode(index_t node, bool draw_back)
                 node_size = 6;
         }
         if (node == state::active_node)
-            color = &colors::red;
+            color = &colors::red_s;
 
         draw::Rectangle(wts.x - node_size, wts.y - node_size, 2 * node_size, 2 * node_size, *color);
     }
@@ -1112,7 +1112,7 @@ void Draw()
         }
         if (HasLowHealth())
         {
-            AddSideString("Walkbot: LOW HEALTH", colors::red);
+            AddSideString("Walkbot: LOW HEALTH", colors::red_s);
         }
     }
     break;

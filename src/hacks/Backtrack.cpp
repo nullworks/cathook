@@ -34,9 +34,15 @@ settings::Float latency{ "backtrack.latency", "0" };
 settings::Int bt_slots{ "backtrack.slots", "0" };
 #if ENABLE_VISUALS
 settings::Boolean chams{ "backtrack.chams", "false" };
+settings::Boolean chams_wireframe{ "backtrack.chams.wireframe", "false" };
 settings::Int chams_ticks{ "backtrack.chams.ticks", "1" };
-settings::Rgba chams_color{ "backtrack.chams.color", "646464FF" };
-settings::Boolean chams_solid{ "backtrack.chams.color.solid", "false" };
+settings::Rgba chams_color{ "backtrack.chams.color", "ff00ff10" };
+settings::Boolean chams_flat{ "backtrack.chams.flat", "false" };
+settings::Boolean chams_overlay{ "backtrack.chams.overlay", "true" };
+settings::Rgba chams_color_overlay{ "backtrack.chams.color.overlay", "000000ff" };
+settings::Float chams_envmap_tint_r{ "backtrack.chams.envmap.tint.r", "1" };
+settings::Float chams_envmap_tint_g{ "backtrack.chams.envmap.tint.g", "0" };
+settings::Float chams_envmap_tint_b{ "backtrack.chams.envmap.tint.b", "1" };
 #endif
 
 // Check if backtrack is enabled
@@ -320,7 +326,7 @@ void Draw()
                 rgba_t draw_color = colors::green;
                 // Found our target tick
                 if (bt_ent && tick.tickcount == (*bt_data).tickcount && i == bt_ent->m_IDX)
-                    draw_color = colors::red;
+                    draw_color = colors::red_s;
                 draw::Rectangle(out.x, out.y, size / 4, size / 4, draw_color);
             }
         }

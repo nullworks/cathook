@@ -18,14 +18,19 @@ static settings::Rgba nightmode_gui_color{ "visual.night-mode.gui-color", "00000
 static settings::Rgba nightmode_world_color{ "visual.night-mode.world-color", "000000FF" };
 static settings::Rgba nightmode_skybox_color{ "visual.night-mode.skybox-color", "000000FF" };
 static settings::Boolean no_shake{ "visual.no-shake", "true" };
+static settings::Boolean override_textures{ "visual.override-textures", "false" };
+static settings::String override_textures_texture{ "visual.override-textures.custom-texture", "dev/dev_measuregeneric01b" };
 
-// Should we update nightmode?
-static bool update_nightmode = false;
+// Should we update?
+static bool update_nightmode         = false;
+static bool update_override_textures = false;
 
 // Which strings trigger this nightmode option
-std::vector<std::string> world_strings  = { "World" };
-std::vector<std::string> skybox_strings = { "SkyBox" };
-std::vector<std::string> gui_strings    = { "Other", "VGUI" };
+std::vector<std::string> world_strings         = { "World" };
+std::vector<std::string> skybox_strings        = { "SkyBox" };
+std::vector<std::string> gui_strings           = { "Other", "VGUI" };
+std::vector<std::string> dont_override_strings = { "glass", "door", "water", "tools", "player" };
+std::vector<std::string> nodraw_strings        = { "prop", "decal", "overlay" };
 
 namespace hooked_methods
 {
@@ -36,6 +41,52 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
         return original::FrameStageNotify(this_, stage);
 
     PROF_SECTION(FrameStageNotify_TOTAL);
+
+    if (update_override_textures)
+    {
+        if (override_textures)
+        {
+            for (MaterialHandle_t i = g_IMaterialSystem->FirstMaterial(); i != g_IMaterialSystem->InvalidMaterial(); i = g_IMaterialSystem->NextMaterial(i))
+            {
+                IMaterial *pMaterial = g_IMaterialSystem->GetMaterial(i);
+                if (!pMaterial)
+                    continue;
+
+                auto name = std::string(pMaterial->GetTextureGroupName());
+                auto path = std::string(pMaterial->GetName());
+
+                // Ensure world mat
+                if (name.find("World") == std::string::npos)
+                    continue;
+                // Don't override this stuff
+                bool good = true;
+                for (auto &entry : dont_override_strings)
+                    if (path.find(entry) != path.npos)
+                    {
+                        good = false;
+                    }
+                // Don't draw this stuff
+                for (auto &entry : nodraw_strings)
+                    if (path.find(entry) != path.npos)
+                    {
+                        pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
+                        good = false;
+                    }
+                if (!good)
+                    continue;
+
+                if (!pMaterial->GetMaterialVarFlag(MATERIAL_VAR_NO_DRAW))
+                {
+                    auto *kv = new KeyValues(pMaterial->GetShaderName());
+                    kv->SetString("$basetexture", (*override_textures_texture).c_str());
+                    kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
+                    kv->SetString("$surfaceprop", "concrete");
+                    pMaterial->SetShaderAndParams(kv);
+                }
+            }
+        }
+        update_override_textures = false;
+    }
 
     if (update_nightmode)
     {
@@ -168,5 +219,9 @@ static InitRoutine init_fsn([]() {
     nightmode_gui_color.installChangeCallback(rvarCallback<rgba_t>);
     nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
     nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
+    override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
+    override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
+    EC::Register(
+        EC::LevelInit, []() { update_nightmode, update_override_textures = true; }, "levelinit_fsn");
 });
 } // namespace hooked_methods

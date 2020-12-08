@@ -8,6 +8,44 @@
 #include <PlayerTools.hpp>
 #include "common.hpp"
 
+namespace colors
+{
+settings::Rgba col_red{ "colors.team-red", "ed2a2aff" };
+settings::Rgba col_blu{ "colors.team-blu", "1c6cedff" };
+settings::Rgba col_red_b{ "colors.team-red.background", "402020ff" };
+settings::Rgba col_blu_b{ "colors.team-blu.background", "202040ff" };
+settings::Rgba col_red_v{ "colors.team-red.vaccinator", "c4666cff" };
+settings::Rgba col_blu_v{ "colors.team-blu.vaccinator", "66b6c4ff" };
+settings::Rgba col_red_u{ "colors.team-red.ubercharge", "ff6600ff" };
+settings::Rgba col_blu_u{ "colors.team-blu.ubercharge", "003399ff" };
+settings::Rgba col_guicolor{ "colors.guicolor", "ffffffff" };
+settings::Rgba col_target{ "colors.target", "00ff00ff" };
+
+rgba_t red   = *col_red;
+rgba_t blu   = *col_blu;
+rgba_t red_b = *col_red_b;
+rgba_t blu_b = *col_blu_b;
+rgba_t red_v = *col_red_v;
+rgba_t blu_v = *col_blu_v;
+rgba_t red_u = *col_red_u;
+rgba_t blu_u = *col_blu_u;
+rgba_t gui = *col_guicolor;
+rgba_t target = *col_target;
+
+static InitRoutine init([]() {
+  col_red.installChangeCallback([](rgba_t after) { red = after; });
+  col_blu.installChangeCallback([](rgba_t after) { blu = after; });
+  col_red_b.installChangeCallback([](rgba_t after) { red_b = after; });
+  col_blu_b.installChangeCallback([](rgba_t after) { blu_b = after; });
+  col_red_v.installChangeCallback([](rgba_t after) { red_v = after; });
+  col_blu_v.installChangeCallback([](rgba_t after) { blu_v = after; });
+  col_red_u.installChangeCallback([](rgba_t after) { red_u = after; });
+  col_blu_u.installChangeCallback([](rgba_t after) { blu_u = after; });
+  col_guicolor.installChangeCallback([](rgba_t after) { gui = after; });
+  col_target.installChangeCallback([](rgba_t after) { target = after; });
+});
+}
+
 rgba_t colors::EntityF(CachedEntity *ent)
 {
     rgba_t result, plclr;

@@ -905,7 +905,7 @@ static InitRoutine init_bulletnospread([]() {
                 {
                     if (bad_mantissa)
                     {
-                        draw_color  = colors::red;
+                        draw_color  = colors::red_s;
                         draw_string = "Server uptime too Low!";
                     }
                     else

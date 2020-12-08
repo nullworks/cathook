@@ -85,11 +85,11 @@ void DrawCheatVisuals()
             if (!info_text_min)
             {
                 AddSideString(hack::GetVersion(),
-                              GUIColor());                  // github commit and date
-                AddSideString(hack::GetType(), GUIColor()); //  Compile type
+                              colors::gui);                  // github commit and date
+                AddSideString(hack::GetType(), colors::gui); //  Compile type
 #if ENABLE_GUI
-                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", GUIColor());
-                AddSideString("Use mouse to navigate in menu.", GUIColor());
+                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
+                AddSideString("Use mouse to navigate in menu.", colors::gui);
 #endif
             }
         }

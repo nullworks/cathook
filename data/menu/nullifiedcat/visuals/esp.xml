@@ -77,8 +77,10 @@
                 <Select target="esp.text-position">
                     <Option name="Top right" value="0"/>
                     <Option name="Bottom right" value="1"/>
+                    <Option name="Above Center" value="3"/>
+                    <Option name="Above Left" value="5"/>
+                    <Option name="Above Right" value="6"/>
                     <Option name="Center" value="2"/>
-                    <Option name="Above" value="3"/>
                     <Option name="Below" value="4"/>
                 </Select>
             </LabeledObject>

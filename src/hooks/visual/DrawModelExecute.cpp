@@ -169,7 +169,7 @@ static InitRoutine init_dme([]() {
     pearlescent.installChangeCallback([](settings::VariableBase<int> &var, int after) { init_mat = false; });
 
     phong_enable.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    phong_boost.installChangeCallback([](settings::VariableBase<bool> &var, int after) { init_mat = false; });
+    phong_boost.installChangeCallback([](settings::VariableBase<int> &var, int after) { init_mat = false; });
     phong_exponent.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
     phong_fresnelrange.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
     phong_fresnelrange_1.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });

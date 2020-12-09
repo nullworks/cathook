@@ -613,6 +613,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             auto colors = GetChamColors(entity, true);
                             g_IVRenderView->SetColorModulation(colors.rgba);
                             g_IVRenderView->SetBlend(*cham_alpha);
+                            mat->AlphaModulate(*cham_alpha);
+
                             if (envmap && envmap_tint)
                                 mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
 
@@ -633,7 +635,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                     g_IVRenderView->SetBlend((ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white).a);
                                 }
                                 static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                                mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
+                                mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
+                                mat_overlay->AlphaModulate(*cham_alpha);
 
                                 g_IVModelRender->ForcedMaterialOverride(mat_overlay);
                                 RenderChamsRecursive(entity, this_, state, info, bone);
@@ -644,6 +647,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             auto colors = GetChamColors(entity, false);
                             g_IVRenderView->SetColorModulation(colors.rgba);
                             g_IVRenderView->SetBlend(*cham_alpha);
+                            mat->AlphaModulate(*cham_alpha);
+
                             if (envmap && envmap_tint)
                                 mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
 
@@ -665,6 +670,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                 }
                                 static auto &mat_overlay = mats.mat_dme_lit_overlay;
                                 mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+                                mat_overlay->AlphaModulate(*cham_alpha)
+
                                 g_IVModelRender->ForcedMaterialOverride(mat_overlay);
                                 RenderChamsRecursive(entity, this_, state, info, bone);
                             }

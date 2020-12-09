@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
 [[ ! -z "$SUDO_USER" ]] && user=$SUDO_USER || user=$LOGNAME
-if ! [ -d "/opt/cathook/data" ]; then
-    echo "Creating cathook data directory at /opt/cathook/data"
-    mkdir -p "/opt/cathook/data"
-    chown -R $user "/opt/cathook/data"
-    chmod -R 777 "/opt/cathook/data"
+
+DATA_PATH=${1:-/opt/cathook/data}
+
+if ! [ -d "$DATA_PATH" ]; then
+    echo "Creating cathook data directory at $DATA_PATH"
+    mkdir -p "$DATA_PATH"
+    chown -R $user "$DATA_PATH"
+    chmod -R 777 "$DATA_PATH"
 fi
 
-echo "Installing cathook data to /opt/cathook/data"
-rsync -avh "data/" "/opt/cathook/data"
-rsync -avh --ignore-existing "config_data/" "/opt/cathook/data"
-chown -R $user "/opt/cathook/data"
-chmod -R 777 "/opt/cathook/data"
+echo "Installing cathook data to $DATA_PATH"
+rsync -avh "data/" "$DATA_PATH"
+rsync -avh --ignore-existing "config_data/" "$DATA_PATH"
+chown -R $user "$DATA_PATH"
+chmod -R 777 "$DATA_PATH"

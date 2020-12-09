@@ -33,16 +33,16 @@ rgba_t gui = *col_guicolor;
 rgba_t target = *col_target;
 
 static InitRoutine init([]() {
-  col_red.installChangeCallback([](rgba_t after) { red = after; });
-  col_blu.installChangeCallback([](rgba_t after) { blu = after; });
-  col_red_b.installChangeCallback([](rgba_t after) { red_b = after; });
-  col_blu_b.installChangeCallback([](rgba_t after) { blu_b = after; });
-  col_red_v.installChangeCallback([](rgba_t after) { red_v = after; });
-  col_blu_v.installChangeCallback([](rgba_t after) { blu_v = after; });
-  col_red_u.installChangeCallback([](rgba_t after) { red_u = after; });
-  col_blu_u.installChangeCallback([](rgba_t after) { blu_u = after; });
-  col_guicolor.installChangeCallback([](rgba_t after) { gui = after; });
-  col_target.installChangeCallback([](rgba_t after) { target = after; });
+  col_red.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { red = after; });
+  col_blu.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { blu = after; });
+  col_red_b.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { red_b = after; });
+  col_blu_b.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { blu_b = after; });
+  col_red_v.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { red_v = after; });
+  col_blu_v.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { blu_v = after; });
+  col_red_u.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { red_u = after; });
+  col_blu_u.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { blu_u = after; });
+  col_guicolor.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { gui = after; });
+  col_target.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { target = after; });
 });
 }
 

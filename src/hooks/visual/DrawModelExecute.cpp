@@ -330,7 +330,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 
         return result;
     }
-    return ChamColors(colors::EntityF(ent, *cham_alpha));
+    return ChamColors(colors::EntityF(ent));
 }
 
 void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)

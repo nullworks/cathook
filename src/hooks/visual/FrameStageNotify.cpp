@@ -30,7 +30,7 @@ std::vector<std::string> world_strings         = { "World" };
 std::vector<std::string> skybox_strings        = { "SkyBox" };
 std::vector<std::string> gui_strings           = { "Other", "VGUI" };
 std::vector<std::string> dont_override_strings = { "glass", "door", "water", "tools", "player" };
-std::vector<std::string> nodraw_strings        = { "prop", "decal", "overlay" };
+std::vector<std::string> nodraw_strings        = { "decal", "overlay", "hay" };
 
 namespace hooked_methods
 {
@@ -222,6 +222,6 @@ static InitRoutine init_fsn([]() {
     override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
     override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
     EC::Register(
-        EC::LevelInit, []() { update_nightmode, update_override_textures = true; }, "levelinit_fsn");
+        EC::LevelInit, []() { update_nightmode = true; update_override_textures = true; }, "levelinit_fsn");
 });
 } // namespace hooked_methods

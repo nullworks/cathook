@@ -38,6 +38,7 @@ static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
+static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
 
 #if ENABLE_VISUALS
 static settings::Boolean god_mode{ "misc.god-mode", "false" };
@@ -706,13 +707,16 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
 {
     static Color returnColor(0, 0, 0, 0);
 
+    int col_red[] = { scc ? int(colors::red.r * 255) : 255, scc ? int(colors::red.g * 255) : 64, scc ? int(colors::red.b * 255) : 64 };
+    int col_blu[] = { scc ? int(colors::blu.r * 255) : 153, scc ? int(colors::blu.g * 255) : 204, scc ? int(colors::blu.b * 255) : 255 };
+
     switch (team)
     {
     case TEAM_RED:
-        returnColor.SetColor(255, 64, 64, 255);
+        returnColor.SetColor(col_red[0], col_red[1], col_red[2], 255);
         break;
     case TEAM_BLU:
-        returnColor.SetColor(153, 204, 255, 255);
+        returnColor.SetColor(col_blu[0], col_blu[1], col_blu[2],255);
         break;
     default:
         returnColor.SetColor(245, 229, 196, 255);

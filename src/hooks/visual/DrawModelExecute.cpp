@@ -421,11 +421,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
-                {
-                    char buffer[100];
-                    snprintf(buffer, 100, "[%.2f %.2f %.2f]", 1.0f, 1.0f, 1.0f);
-                    kv->SetString("$envmaptint", buffer);
-                }
+                    kv->SetString("$envmaptint", "[1, 1, 1]");
             }
             kv->SetBool("$rimlight", *rimlighting);
             kv->SetFloat("$rimlightexponent", *rimlighting_exponent);
@@ -466,11 +462,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
-                {
-                    char buffer[100];
-                    snprintf(buffer, 100, "[%.2f %.2f %.2f]", 1.0f, 1.0f, 1.0f);
-                    kv->SetString("$envmaptint", buffer);
-                }
+                    kv->SetString("$envmaptint", "[1, 1, 1]");
             }
             mats.mat_dme_lit_overlay.Init("__cathook_dme_chams_lit_overlay", kv);
         }
@@ -608,9 +600,14 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                         g_IVRenderView->GetColorModulation(original_color);
                         original_color.a = g_IVRenderView->GetBlend();
                         static auto &mat = overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
-                        if (!legit)
+                        for (int i = 1; i >= 0; i--)
                         {
-                            auto colors = GetChamColors(entity, true);
+                            if (i && legit)
+                                continue;
+                            if (!i && singlepass)
+                                continue;
+
+                            auto colors = GetChamColors(entity, i);
                             g_IVRenderView->SetColorModulation(colors.rgba);
                             g_IVRenderView->SetBlend(*cham_alpha);
                             mat->AlphaModulate(*cham_alpha);
@@ -618,7 +615,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             if (envmap && envmap_tint)
                                 mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
 
-                            mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
+                            mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, i);
                             mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *flat);
                             g_IVModelRender->ForcedMaterialOverride(mat);
                             RenderChamsRecursive(entity, this_, state, info, bone);
@@ -631,46 +628,14 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                 }
                                 else
                                 {
-                                    g_IVRenderView->SetColorModulation(ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white);
-                                    g_IVRenderView->SetBlend((ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white).a);
+                                    auto col = ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
+
+                                    g_IVRenderView->SetColorModulation(col);
+                                    g_IVRenderView->SetBlend((col).a);
                                 }
                                 static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                                mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
+                                mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, i);
                                 mat_overlay->AlphaModulate(*cham_alpha);
-
-                                g_IVModelRender->ForcedMaterialOverride(mat_overlay);
-                                RenderChamsRecursive(entity, this_, state, info, bone);
-                            }
-                        }
-                        if (legit || !singlepass)
-                        {
-                            auto colors = GetChamColors(entity, false);
-                            g_IVRenderView->SetColorModulation(colors.rgba);
-                            g_IVRenderView->SetBlend(*cham_alpha);
-                            mat->AlphaModulate(*cham_alpha);
-
-                            if (envmap && envmap_tint)
-                                mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-
-                            mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                            mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *flat);
-                            g_IVModelRender->ForcedMaterialOverride(mat);
-                            RenderChamsRecursive(entity, this_, state, info, bone);
-                            if (overlay_chams)
-                            {
-                                if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_PROJECTILE && ent->m_Type() != ENTITY_BUILDING)
-                                {
-                                    g_IVRenderView->SetColorModulation(colors::white);
-                                    g_IVRenderView->SetBlend((colors::white).a);
-                                }
-                                else
-                                {
-                                    g_IVRenderView->SetColorModulation(ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white);
-                                    g_IVRenderView->SetBlend((ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white).a);
-                                }
-                                static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                                mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                                mat_overlay->AlphaModulate(*cham_alpha)
 
                                 g_IVModelRender->ForcedMaterialOverride(mat_overlay);
                                 RenderChamsRecursive(entity, this_, state, info, bone);

@@ -421,7 +421,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
-                    kv->SetString("$envmaptint", "[1, 1, 1]");
+                    kv->SetString("$envmaptint", "[1 1 1]");
             }
             kv->SetBool("$rimlight", *rimlighting);
             kv->SetFloat("$rimlightexponent", *rimlighting_exponent);
@@ -462,7 +462,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
-                    kv->SetString("$envmaptint", "[1, 1, 1]");
+                    kv->SetString("$envmaptint", "[1 1 1]");
             }
             mats.mat_dme_lit_overlay.Init("__cathook_dme_chams_lit_overlay", kv);
         }

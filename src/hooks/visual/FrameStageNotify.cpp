@@ -32,6 +32,7 @@ std::vector<std::string> gui_strings           = { "Other", "VGUI" };
 std::vector<std::string> dont_override_strings = { "glass", "door", "water", "tools", "player" };
 std::vector<std::string> nodraw_strings        = { "decal", "overlay", "hay" };
 
+std::unordered_map<IMaterial *, KeyValues *> material_backup;
 namespace hooked_methods
 {
 #include "reclasses.hpp"
@@ -44,44 +45,61 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
 
     if (update_override_textures)
     {
-        if (override_textures)
+        for (MaterialHandle_t i = g_IMaterialSystem->FirstMaterial(); i != g_IMaterialSystem->InvalidMaterial(); i = g_IMaterialSystem->NextMaterial(i))
         {
-            for (MaterialHandle_t i = g_IMaterialSystem->FirstMaterial(); i != g_IMaterialSystem->InvalidMaterial(); i = g_IMaterialSystem->NextMaterial(i))
-            {
-                IMaterial *pMaterial = g_IMaterialSystem->GetMaterial(i);
-                if (!pMaterial)
-                    continue;
+            IMaterial *pMaterial = g_IMaterialSystem->GetMaterial(i);
+            if (!pMaterial)
+                continue;
 
-                auto name = std::string(pMaterial->GetTextureGroupName());
-                auto path = std::string(pMaterial->GetName());
+            auto name = std::string(pMaterial->GetTextureGroupName());
+            auto path = std::string(pMaterial->GetName());
 
-                // Ensure world mat
-                if (name.find("World") == std::string::npos)
-                    continue;
-                // Don't override this stuff
-                bool good = true;
-                for (auto &entry : dont_override_strings)
-                    if (path.find(entry) != path.npos)
-                    {
-                        good = false;
-                    }
-                // Don't draw this stuff
-                for (auto &entry : nodraw_strings)
-                    if (path.find(entry) != path.npos)
-                    {
-                        pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
-                        good = false;
-                    }
-                if (!good)
-                    continue;
-
-                if (!pMaterial->GetMaterialVarFlag(MATERIAL_VAR_NO_DRAW))
+            // Ensure world mat
+            if (name.find("World") == std::string::npos)
+                continue;
+            // Don't override this stuff
+            bool good = true;
+            for (auto &entry : dont_override_strings)
+                if (path.find(entry) != path.npos)
                 {
-                    auto *kv = new KeyValues(pMaterial->GetShaderName());
+                    good = false;
+                }
+            // Don't draw this stuff
+            for (auto &entry : nodraw_strings)
+                if (path.find(entry) != path.npos)
+                {
+                    pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
+                    good = false;
+                }
+            if (!good)
+                continue;
+
+            if (!pMaterial->GetMaterialVarFlag(MATERIAL_VAR_NO_DRAW))
+            {
+                if (override_textures)
+                {
+                    auto shader_name = pMaterial->GetShaderName();
+                    if (material_backup.find(pMaterial) == material_backup.end())
+                    {
+                        if (NET_VAR(pMaterial, 0x88, KeyValues *))
+                        {
+                            material_backup[pMaterial] = NET_VAR(pMaterial, 0x88, KeyValues *)->MakeCopy();
+                            // Ensure the game does not delete the KeyValues
+                            NET_VAR(pMaterial, 0x88, KeyValues *) = nullptr;
+                        }
+                    }
+                    auto *kv = new KeyValues(shader_name);
                     kv->SetString("$basetexture", (*override_textures_texture).c_str());
                     kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
                     kv->SetString("$surfaceprop", "concrete");
                     pMaterial->SetShaderAndParams(kv);
+                }
+                else
+                {
+                    if (material_backup[pMaterial])
+                        pMaterial->SetShaderAndParams(&*material_backup[pMaterial]);
+                    else
+                        pMaterial->SetShaderAndParams(nullptr);
                 }
             }
         }
@@ -222,6 +240,11 @@ static InitRoutine init_fsn([]() {
     override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
     override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
     EC::Register(
-        EC::LevelInit, []() { update_nightmode = true; update_override_textures = true; }, "levelinit_fsn");
+        EC::LevelInit,
+        []() {
+            update_nightmode         = true;
+            update_override_textures = true;
+        },
+        "levelinit_fsn");
 });
 } // namespace hooked_methods

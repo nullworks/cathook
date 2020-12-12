@@ -61,6 +61,7 @@ static settings::Float rimlighting_exponent{ "chams.rimlighting.exponent", "4" }
 
 /* Customization of envmap */
 static settings::Boolean envmap{ "chams.envmap", "true" };
+static settings::Boolean envmap_matt{ "chams.envmap.matt", "false" };
 static settings::Float envmapfresnel{ "chams.envmapfresnel", "1" };
 static settings::Boolean envmap_tint{ "chams.envmap.tint", "true" };
 static settings::Float envmap_tint_red_r{ "chams.envmap.tint.red.r", "4" };
@@ -152,6 +153,12 @@ namespace hooked_methods
 {
 static bool init_mat = false;
 static Materials mats;
+
+template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
+{
+    init_mat = false;
+}
+
 static InitRoutine init_dme([]() {
     EC::Register(
         EC::LevelShutdown,
@@ -164,25 +171,26 @@ static InitRoutine init_dme([]() {
         },
         "dme_lvl_shutdown");
 
-    halfambert.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    additive.installChangeCallback([](settings::VariableBase<int> &var, int after) { init_mat = false; });
-    pearlescent.installChangeCallback([](settings::VariableBase<int> &var, int after) { init_mat = false; });
+    halfambert.installChangeCallback(rvarCallback<bool>);
+    additive.installChangeCallback(rvarCallback<int>);
+    pearlescent.installChangeCallback(rvarCallback<int>);
 
-    phong_enable.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    phong_boost.installChangeCallback([](settings::VariableBase<int> &var, int after) { init_mat = false; });
-    phong_exponent.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
-    phong_fresnelrange.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    phong_fresnelrange_1.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
-    phong_fresnelrange_2.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
-    phong_fresnelrange_3.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
+    phong_enable.installChangeCallback(rvarCallback<bool>);
+    phong_boost.installChangeCallback(rvarCallback<int>);
+    phong_exponent.installChangeCallback(rvarCallback<float>);
+    phong_fresnelrange.installChangeCallback(rvarCallback<bool>);
+    phong_fresnelrange_1.installChangeCallback(rvarCallback<float>);
+    phong_fresnelrange_2.installChangeCallback(rvarCallback<float>);
+    phong_fresnelrange_3.installChangeCallback(rvarCallback<float>);
 
-    rimlighting.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    rimlighting_boost.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
-    rimlighting_exponent.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
+    rimlighting.installChangeCallback(rvarCallback<bool>);
+    rimlighting_boost.installChangeCallback(rvarCallback<float>);
+    rimlighting_exponent.installChangeCallback(rvarCallback<float>);
 
-    envmap.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
-    envmapfresnel.installChangeCallback([](settings::VariableBase<float> &var, float after) { init_mat = false; });
-    envmap_tint.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { init_mat = false; });
+    envmap.installChangeCallback(rvarCallback<bool>);
+    envmapfresnel.installChangeCallback(rvarCallback<float>);
+    envmap_tint.installChangeCallback(rvarCallback<bool>);
+    envmap_matt.installChangeCallback(rvarCallback<bool>);
 });
 
 bool ShouldRenderChams(IClientEntity *entity)
@@ -394,6 +402,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
     if (!init_mat)
     {
+        std::string cubemap_str = *envmap_matt ? "effects/saxxy/saxxy_gold" : "env_cubemap";
         {
             auto *kv = new KeyValues("UnlitGeneric");
             kv->SetString("$basetexture", "white");
@@ -416,8 +425,9 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             }
             if (envmap)
             {
-                kv->SetString("$envmap", "env_cubemap");
+                kv->SetString("$envmap", cubemap_str.c_str());
                 kv->SetFloat("$envmapfresnel", *envmapfresnel);
+                kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
@@ -457,7 +467,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             kv->SetBool("$flat", false);
             if (envmap)
             {
-                kv->SetString("$envmap", "env_cubemap");
+                kv->SetString("$envmap", cubemap_str.c_str());
+                kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
                 kv->SetFloat("$envmapfresnel", *envmapfresnel);
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);

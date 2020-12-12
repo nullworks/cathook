@@ -15,6 +15,7 @@
             <AutoVariable width="fill" target="chams.rimlighting.boost" label="Rimlighting bst"/>
             <AutoVariable width="fill" target="chams.rimlighting.exponent" label="Rimlighting exp"/>
             <AutoVariable width="fill" target="chams.envmap" label="Envmap"/>
+            <AutoVariable width="fill" target="chams.envmap.matt" label="Make envmap matt"/>
             <AutoVariable width="fill" target="chams.envmap.tint" label="Enable tint" tooltip="Control intensity of envmap colors"/>
             <AutoVariable width="fill" target="chams.envmapfresnel" label="EnvMap Fresnel"/>
         </List>

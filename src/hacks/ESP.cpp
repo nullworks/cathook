@@ -276,6 +276,7 @@ const std::string atombomb_str             = "Atom Bomb";
 const std::string soulpickup_str           = "Soul Pickup";
 const std::string bodyparts_str            = "Body Parts";
 const std::string beerbottle_str           = "Beer Bottle";
+const std::string gift_str                 = "Gift";
 const std::string aussiecontainer_str      = "Australium Container";
 const std::string ticketcase_str           = "Tickets";
 const std::string mediumhealth_str         = "Medium Health";
@@ -1184,16 +1185,8 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 break;
             }
         }
-        else
-        {
-            switch (itemtype)
-            {
-            case HALLOWEEN_GHOST:
-            case HALLOWEEN_GHOST_NOHAT_RED:
-            case HALLOWEEN_GHOST_NOHAT:
-                AddEntityString(ent, ghost_str, colors::FromRGBA8(0, 128, 0, 255));
-            }
-        }
+        else if (itemtype == HALLOWEEN_GHOST)
+            AddEntityString(ent, ghost_str, colors::FromRGBA8(0, 128, 0, 255));
     }
     if (item_esp)
     {
@@ -1248,6 +1241,10 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 break;
             case FLAG_BOTTLEPICKUP:
                 AddEntityString(ent, beerbottle_str, color);
+                break;
+            case FLAG_GIFT:
+                if (classid == CL_CLASS(CCaptureFlag))
+                    AddEntityString(ent, gift_str, color);
                 break;
             case FLAG_AUSSIECONTAINER:
                 AddEntityString(ent, aussiecontainer_str, color);
@@ -1393,7 +1390,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             bool IsMini             = CE_BYTE(ent, netvar.m_bMiniBuilding);
 
             if (!IsMini)
-                AddEntityString(ent, format("Level ", level, ' ', name));
+                AddEntityString(ent, format(name, " (Level ", level, ")"));
             else
                 AddEntityString(ent, std::string("Mini ") + name);
         }

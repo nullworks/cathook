@@ -85,8 +85,8 @@ ItemManager::ItemManager() : mapper()
 
     // == GHOSTS
     RegisterModelMapping("models/props_halloween/ghost.mdl", HALLOWEEN_GHOST);
-    RegisterModelMapping("models/props_halloween/ghost_no_hat_red.mdl", HALLOWEEN_GHOST_NOHAT_RED);
-    RegisterModelMapping("models/props_halloween/ghost_no_hat.mdl", HALLOWEEN_GHOST_NOHAT);
+    RegisterModelMapping("models/props_halloween/ghost_no_hat_red.mdl", HALLOWEEN_GHOST);
+    RegisterModelMapping("models/props_halloween/ghost_no_hat.mdl", HALLOWEEN_GHOST);
 
     // == BOMBS
     RegisterModelMapping("models/props_laughter/balloonbomb.mdl", BOMB_BALLOONBOMB);
@@ -99,6 +99,7 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/effects/playersoul.mdl", FLAG_SKULLPICKUP);
     RegisterModelMapping("models/props_monster_mash/gib_bucket.mdl", FLAG_GIBBUCKET);
     RegisterModelMapping("models/props_watergate/bottle_pickup.mdl", FLAG_BOTTLEPICKUP);
+    RegisterModelMapping("models/props_halloween/halloween_gift.mdl", FLAG_GIFT);
     RegisterModelMapping("models/props_doomsday/australium_container.mdl", FLAG_AUSSIECONTAINER);
     RegisterModelMapping("models/flag/ticket_case.mdl", FLAG_TICKETCASE);
 
@@ -108,6 +109,7 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/lilchewchew/lilchewchew_v3.mdl", CART_BOMBCART);
     RegisterModelMapping("models/props_trainyard/bomb_redmond.mdl", CART_BOMBCART);
     RegisterModelMapping("models/props_snowycoast/gasoline_bomb_cart.mdl", CART_BOMBCART);
+    RegisterModelMapping("models/props_xmas/rudy.mdl", CART_BOMBCART);
     RegisterModelMapping("models/props_trainyard/bomb_blutarch.mdl", CART_BOMBCART_RED);
     RegisterModelMapping("models/props_trainyard/bomb_cart_red.mdl", CART_BOMBCART_RED);
 

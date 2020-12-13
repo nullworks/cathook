@@ -341,6 +341,61 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     return ChamColors(colors::EntityF(ent));
 }
 
+class DrawEntry
+{
+public:
+    int entidx;
+    int parentidx;
+    DrawEntry()
+    {
+    }
+    DrawEntry(int own_idx, int parent_idx)
+    {
+        entidx    = own_idx;
+        parentidx = parent_idx;
+    }
+};
+
+std::vector<DrawEntry> attachment_draw_list;
+
+void RenderAttachment(IClientEntity *entity, IClientEntity *attach)
+{
+    if (attach->ShouldDraw())
+    {
+        if (entity->GetClientClass()->m_ClassID == RCC_PLAYER && re::C_BaseCombatWeapon::IsBaseCombatWeapon(attach))
+        {
+            if (weapons)
+            {
+                // TODO: Use the envmap_tint_weapons for the envmap tint, also fix the flickering
+
+                rgba_t mod_original;
+                g_IVRenderView->GetColorModulation(mod_original.rgba);
+                g_IVRenderView->SetColorModulation(*weapons_base);
+                g_IVRenderView->SetBlend((*weapons_base).a);
+                attach->DrawModel(1);
+
+                if (overlay_chams)
+                {
+                    g_IVRenderView->SetColorModulation(*weapons_overlay);
+                    g_IVRenderView->SetBlend((*weapons_overlay).a);
+                    attach->DrawModel(1);
+                }
+
+                g_IVRenderView->SetColorModulation(mod_original.rgba);
+            }
+            else
+            {
+                attach->DrawModel(1);
+            }
+        }
+        else
+            attach->DrawModel(1);
+    }
+}
+
+// Locked from drawing
+bool chams_attachment_drawing = false;
+
 void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
 #if !ENFORCE_STREAM_SAFETY
@@ -357,45 +412,18 @@ void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const Dra
     attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24) & 0xFFF);
     while (attach && passes++ < 32)
     {
-        if (attach->ShouldDraw())
-        {
-            if (entity->GetClientClass()->m_ClassID == RCC_PLAYER && re::C_BaseCombatWeapon::IsBaseCombatWeapon(attach))
-            {
-                if (weapons)
-                {
-                    // TODO: Use the envmap_tint_weapons for the envmap tint, also fix the flickering
-
-                    rgba_t mod_original;
-                    g_IVRenderView->GetColorModulation(mod_original.rgba);
-                    g_IVRenderView->SetColorModulation(*weapons_base);
-                    g_IVRenderView->SetBlend((*weapons_base).a);
-                    attach->DrawModel(1);
-
-                    if (overlay_chams)
-                    {
-                        g_IVRenderView->SetColorModulation(*weapons_overlay);
-                        g_IVRenderView->SetBlend((*weapons_overlay).a);
-                        attach->DrawModel(1);
-                    }
-
-                    g_IVRenderView->SetColorModulation(mod_original.rgba);
-                }
-                else
-                {
-                    attach->DrawModel(1);
-                }
-            }
-            else
-                attach->DrawModel(1);
-        }
-        attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
+        attachment_draw_list.emplace_back(attach->entindex(), entity->entindex());
+        chams_attachment_drawing = true;
+        RenderAttachment(entity, attach);
+        chams_attachment_drawing = false;
+        attach                   = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
     }
 #endif
 }
 
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)))
+    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)))
         return original::DrawModelExecute(this_, state, info, bone);
 
     PROF_SECTION(DrawModelExecute);
@@ -479,7 +507,6 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
         }
         init_mat = true;
     }
-
     if (info.pModel)
     {
         const char *name = g_IModelInfo->GetModelName(info.pModel);
@@ -543,6 +570,21 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     return;
                 }
             }
+            std::vector<DrawEntry> tmp_list;
+            bool do_draw = true;
+            for (auto &drawer : attachment_draw_list)
+            {
+                if (drawer.entidx == info.entity_index)
+                {
+                    do_draw = false;
+                }
+                else
+                    tmp_list.push_back(drawer);
+            }
+            attachment_draw_list = std::move(tmp_list);
+            if (!do_draw)
+                return;
+
             if (local_weapon_chams && info.entity_index == -1 && sname.find("arms") == std::string::npos && (sname.find("models/weapons") != std::string::npos || sname.find("models/workshop/weapons") != std::string::npos || sname.find("models/workshop_partner/weapons") != std::string::npos))
             {
                 rgba_t original_color;

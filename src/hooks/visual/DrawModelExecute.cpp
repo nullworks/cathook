@@ -159,6 +159,23 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
     init_mat = false;
 }
 
+class DrawEntry
+{
+public:
+    int entidx;
+    int parentidx;
+    DrawEntry()
+    {
+    }
+    DrawEntry(int own_idx, int parent_idx)
+    {
+        entidx    = own_idx;
+        parentidx = parent_idx;
+    }
+};
+
+std::vector<DrawEntry> attachment_draw_list;
+
 static InitRoutine init_dme([]() {
     EC::Register(
         EC::LevelShutdown,
@@ -168,6 +185,7 @@ static InitRoutine init_dme([]() {
                 mats.Shutdown();
                 init_mat = false;
             }
+            attachment_draw_list.clear();
         },
         "dme_lvl_shutdown");
 
@@ -341,27 +359,11 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     return ChamColors(colors::EntityF(ent));
 }
 
-class DrawEntry
-{
-public:
-    int entidx;
-    int parentidx;
-    DrawEntry()
-    {
-    }
-    DrawEntry(int own_idx, int parent_idx)
-    {
-        entidx    = own_idx;
-        parentidx = parent_idx;
-    }
-};
-
-std::vector<DrawEntry> attachment_draw_list;
-
 void RenderAttachment(IClientEntity *entity, IClientEntity *attach)
 {
     if (attach->ShouldDraw())
     {
+        attachment_draw_list.emplace_back(attach->entindex(), entity->entindex());
         if (entity->GetClientClass()->m_ClassID == RCC_PLAYER && re::C_BaseCombatWeapon::IsBaseCombatWeapon(attach))
         {
             if (weapons)
@@ -412,7 +414,6 @@ void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const Dra
     attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24) & 0xFFF);
     while (attach && passes++ < 32)
     {
-        attachment_draw_list.emplace_back(attach->entindex(), entity->entindex());
         chams_attachment_drawing = true;
         RenderAttachment(entity, attach);
         chams_attachment_drawing = false;
@@ -767,5 +768,5 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     // Don't do it when we are trying to enforce backtrack chams
     if (!hacks::tf2::backtrack::isDrawing)
         return original::DrawModelExecute(this_, state, info, bone);
-} // namespace hooked_methods
+}
 } // namespace hooked_methods

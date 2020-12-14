@@ -452,7 +452,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
     recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
     if (overlay)
     {
-        if (colors.rgba_overlay == colors::empty && IDX_GOOD(entity->entindex()))
+        if (colors.rgba_overlay == colors::empty && entity && IDX_GOOD(entity->entindex()))
         {
             CachedEntity *ent = ENTITY(entity->entindex());
             if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_PROJECTILE && ent->m_Type() != ENTITY_BUILDING)
@@ -579,50 +579,20 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     g_IVRenderView->GetColorModulation(original_color);
                     original_color.a = g_IVRenderView->GetBlend();
 
-                    // Render original arm model
-                    if (arm_chams_original)
-                        original::DrawModelExecute(this_, state, info, bone);
-
-                    static auto &mat = arm_chams_overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
-                    auto colors      = GetChamColors(LOCAL_E->InternalEntity(), false);
-
-                    g_IVRenderView->SetColorModulation(arms_chams_team_color ? colors.rgba : *arm_basechams_color);
-                    g_IVRenderView->SetBlend((*arm_basechams_color).a);
-                    if (envmap && envmap_tint)
+                    auto colors         = GetChamColors(LOCAL_E->InternalEntity(), false);
+                    colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
+                    if (!arms_chams_team_color)
                     {
-                        if (arms_chams_team_color)
-                            mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-                        else
-                            mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_arms_r, *envmap_tint_arms_g, *envmap_tint_arms_b);
+                        colors              = *arm_basechams_color;
+                        colors.rgba_overlay = *arm_overlaychams_color;
+                        colors.envmap_r     = *envmap_tint_arms_r;
+                        colors.envmap_g     = *envmap_tint_arms_g;
+                        colors.envmap_b     = *envmap_tint_arms_b;
                     }
-                    mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                    mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, *arms_chams_wireframe);
-                    g_IVModelRender->ForcedMaterialOverride(mat);
-                    original::DrawModelExecute(this_, state, info, bone);
-                    if (arm_chams_overlay_chams)
-                    {
-                        if (arms_chams_team_color)
-                        {
-                            g_IVRenderView->SetColorModulation(LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white);
-                            g_IVRenderView->SetBlend((*arm_overlaychams_color).a);
-                        }
-                        else
-                        {
-                            g_IVRenderView->SetColorModulation(*arm_overlaychams_color);
-                            g_IVRenderView->SetBlend((*arm_overlaychams_color).a);
-                        }
-                        static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                        mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                        if (envmap && envmap_tint)
-                        {
-                            if (arms_chams_team_color)
-                                mat_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-                            else
-                                mat_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_arms_r, *envmap_tint_arms_g, *envmap_tint_arms_b);
-                        }
-                        g_IVModelRender->ForcedMaterialOverride(mat_overlay);
-                        original::DrawModelExecute(this_, state, info, bone);
-                    }
+                    colors.rgba_overlay.a = (*arm_overlaychams_color).a;
+
+                    IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
+                    ApplyChams(colors, false, *arm_chams_original, *arm_chams_overlay_chams, false, *arms_chams_wireframe, entity, this_, state, info, bone);
                     g_IVModelRender->ForcedMaterialOverride(nullptr);
                     g_IVRenderView->SetColorModulation(original_color);
                     g_IVRenderView->SetBlend(original_color.a);
@@ -650,50 +620,25 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 g_IVRenderView->GetColorModulation(original_color);
                 original_color.a = g_IVRenderView->GetBlend();
 
-                // Render original weapon model
-                if (local_weapon_chams_original)
-                    original::DrawModelExecute(this_, state, info, bone);
+                auto colors           = GetChamColors(LOCAL_E->InternalEntity(), false);
+                IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
 
-                static auto &mat = local_weapon_chams_overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
-                auto colors      = GetChamColors(LOCAL_E->InternalEntity(), false);
+                if (local_weapon_chams_team_color)
+                {
+                    colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
+                }
+                else
+                {
+                    colors              = *local_weapon_basechams_color;
+                    colors.rgba_overlay = *local_weapon_overlaychams_color;
+                    colors.envmap_r     = *envmap_tint_local_weapon_r;
+                    colors.envmap_g     = *envmap_tint_local_weapon_g;
+                    colors.envmap_b     = *envmap_tint_local_weapon_b;
+                }
+                colors.rgba_overlay.a = (*local_weapon_overlaychams_color).a;
 
-                g_IVRenderView->SetColorModulation(local_weapon_chams_team_color ? colors.rgba : *local_weapon_basechams_color);
-                g_IVRenderView->SetBlend((*local_weapon_basechams_color).a);
-                if (envmap && envmap_tint)
-                {
-                    if (local_weapon_chams_team_color)
-                        mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-                    else
-                        mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_local_weapon_r, *envmap_tint_local_weapon_g, *envmap_tint_local_weapon_b);
-                }
-                mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, *local_weapon_chams_wireframe);
-                g_IVModelRender->ForcedMaterialOverride(mat);
-                original::DrawModelExecute(this_, state, info, bone);
-                if (local_weapon_chams_overlay_chams)
-                {
-                    if (local_weapon_chams_team_color)
-                    {
-                        g_IVRenderView->SetColorModulation(LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white);
-                        g_IVRenderView->SetBlend((*local_weapon_overlaychams_color).a);
-                    }
-                    else
-                    {
-                        g_IVRenderView->SetColorModulation(*local_weapon_overlaychams_color);
-                        g_IVRenderView->SetBlend((*local_weapon_overlaychams_color).a);
-                    }
-                    static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                    mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                    g_IVModelRender->ForcedMaterialOverride(mat_overlay);
-                    if (envmap && envmap_tint)
-                    {
-                        if (local_weapon_chams_team_color)
-                            mat_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-                        else
-                            mat_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_local_weapon_r, *envmap_tint_local_weapon_g, *envmap_tint_local_weapon_b);
-                    }
-                    original::DrawModelExecute(this_, state, info, bone);
-                }
+                ApplyChams(colors, false, *local_weapon_chams_original, *local_weapon_chams_overlay_chams, false, *local_weapon_chams_wireframe, entity, this_, state, info, bone);
+
                 g_IVModelRender->ForcedMaterialOverride(nullptr);
                 g_IVRenderView->SetColorModulation(original_color);
                 g_IVRenderView->SetBlend(original_color.a);

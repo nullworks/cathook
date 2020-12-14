@@ -143,6 +143,8 @@ public:
     float envmap_r, envmap_g, envmap_b;
     rgba_t rgba;
 
+    rgba_t rgba_overlay = colors::empty;
+
     ChamColors(rgba_t col = colors::empty, float r = 1.0f, float g = 1.0f, float b = 1.0f)
     {
         rgba     = col;
@@ -431,6 +433,48 @@ void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVMode
 #endif
 }
 
+void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool overlay, bool ignorez, bool wireframe, IClientEntity *entity, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
+{
+    static auto &mat = overlay ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
+    if (render_original)
+        recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
+
+    g_IVRenderView->SetColorModulation(colors.rgba);
+    g_IVRenderView->SetBlend((colors.rgba).a);
+    mat->AlphaModulate((colors.rgba).a);
+    if (envmap && envmap_tint)
+        mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
+
+    mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignorez);
+    mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
+    g_IVModelRender->ForcedMaterialOverride(mat);
+
+    recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
+    if (overlay)
+    {
+        if (colors.rgba_overlay == colors::empty && IDX_GOOD(entity->entindex()))
+        {
+            CachedEntity *ent = ENTITY(entity->entindex());
+            if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_PROJECTILE && ent->m_Type() != ENTITY_BUILDING)
+                colors.rgba_overlay = colors::white;
+            else
+                colors.rgba_overlay = ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
+        }
+        g_IVRenderView->SetColorModulation(colors.rgba_overlay);
+        g_IVRenderView->SetBlend((colors.rgba_overlay).a);
+
+        static auto &mat_overlay = mats.mat_dme_lit_overlay;
+        if (envmap && envmap_tint)
+            mat_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
+
+        mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignorez);
+        mat_overlay->AlphaModulate((colors.rgba_overlay).a);
+
+        g_IVModelRender->ForcedMaterialOverride(mat_overlay);
+        recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
+    }
+}
+
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
     if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)))
@@ -669,13 +713,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     if (CE_GOOD(ent))
                     {
                         rgba_t original_color;
-                        static auto &mat = overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
-
                         g_IVRenderView->GetColorModulation(original_color);
                         original_color.a = g_IVRenderView->GetBlend();
-                        if (render_original)
-                            RenderChamsRecursive(entity, mat, this_, state, info, bone);
-
                         for (int i = 1; i >= 0; i--)
                         {
                             if (i && legit)
@@ -683,39 +722,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             if (!i && singlepass)
                                 continue;
 
-                            auto colors = GetChamColors(entity, i);
-                            g_IVRenderView->SetColorModulation(colors.rgba);
-                            g_IVRenderView->SetBlend(*cham_alpha);
-                            mat->AlphaModulate(*cham_alpha);
+                            auto colors   = GetChamColors(entity, i);
+                            colors.rgba.a = *cham_alpha;
 
-                            if (envmap && envmap_tint)
-                                mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
-
-                            mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, i);
-                            mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *flat);
-                            g_IVModelRender->ForcedMaterialOverride(mat);
-                            RenderChamsRecursive(entity, mat, this_, state, info, bone);
-                            if (overlay_chams)
-                            {
-                                if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_PROJECTILE && ent->m_Type() != ENTITY_BUILDING)
-                                {
-                                    g_IVRenderView->SetColorModulation(colors::white);
-                                    g_IVRenderView->SetBlend((colors::white).a);
-                                }
-                                else
-                                {
-                                    auto col = ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
-
-                                    g_IVRenderView->SetColorModulation(col);
-                                    g_IVRenderView->SetBlend((col).a);
-                                }
-                                static auto &mat_overlay = mats.mat_dme_lit_overlay;
-                                mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, i);
-                                mat_overlay->AlphaModulate(*cham_alpha);
-
-                                g_IVModelRender->ForcedMaterialOverride(mat_overlay);
-                                RenderChamsRecursive(entity, mat_overlay, this_, state, info, bone);
-                            }
+                            ApplyChams(colors, *recursive, *render_original, *overlay_chams, i, false, entity, this_, state, info, bone);
                         }
                         // Backtrack chams
                         using namespace hacks::tf2;
@@ -726,46 +736,20 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                 auto good_ticks = backtrack::getGoodTicks(info.entity_index);
                                 if (!good_ticks.empty())
                                 {
-                                    rgba_t original_color;
-                                    g_IVRenderView->GetColorModulation(original_color);
-                                    original_color.a = g_IVRenderView->GetBlend();
-                                    static auto &mat = backtrack::chams_overlay ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
+                                    ChamColors backtrack_colors;
+                                    backtrack_colors.rgba         = *backtrack::chams_color;
+                                    backtrack_colors.rgba_overlay = *backtrack::chams_color_overlay;
+                                    backtrack_colors.envmap_r     = *backtrack::chams_envmap_tint_r;
+                                    backtrack_colors.envmap_g     = *backtrack::chams_envmap_tint_g;
+                                    backtrack_colors.envmap_b     = *backtrack::chams_envmap_tint_b;
 
-                                    mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, *backtrack::chams_wireframe);
-                                    mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *backtrack::chams_flat);
-                                    mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                                    if (envmap && envmap_tint)
-                                        mat->FindVar("$envmaptint", nullptr)->SetVecValue(*backtrack::chams_envmap_tint_r, *backtrack::chams_envmap_tint_g, *backtrack::chams_envmap_tint_b);
-
-                                    g_IVModelRender->ForcedMaterialOverride(mat);
-                                    g_IVRenderView->SetColorModulation(*backtrack::chams_color);
-                                    g_IVRenderView->SetBlend((*backtrack::chams_color).a);
                                     for (unsigned i = 0; i <= (unsigned) std::max(*backtrack::chams_ticks, 1); i++)
                                     {
                                         // Can't draw more than we have
                                         if (i >= good_ticks.size())
                                             break;
                                         if (!good_ticks[i].bones.empty())
-                                            RenderChamsRecursive(entity, mat, this_, state, info, &good_ticks[i].bones[0]);
-                                    }
-
-                                    if (backtrack::chams_overlay)
-                                    {
-                                        mats.mat_dme_lit_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-                                        if (envmap && envmap_tint)
-                                            mats.mat_dme_lit_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(*backtrack::chams_envmap_tint_r, *backtrack::chams_envmap_tint_g, *backtrack::chams_envmap_tint_b);
-
-                                        g_IVRenderView->SetColorModulation(*backtrack::chams_color_overlay);
-                                        g_IVRenderView->SetBlend((*backtrack::chams_color_overlay).a);
-                                        g_IVModelRender->ForcedMaterialOverride(mats.mat_dme_lit_overlay);
-                                        for (unsigned i = 0; i <= (unsigned) std::max(*backtrack::chams_ticks, 1); i++)
-                                        {
-                                            // Can't draw more than we have
-                                            if (i >= good_ticks.size())
-                                                break;
-                                            if (!good_ticks[i].bones.empty())
-                                                RenderChamsRecursive(entity, mats.mat_dme_lit_overlay, this_, state, info, &good_ticks[i].bones[0]);
-                                        }
+                                            ApplyChams(backtrack_colors, false, false, *backtrack::chams_overlay, false, *backtrack::chams_wireframe, entity, this_, state, info, &good_ticks[i].bones[0]);
                                     }
                                 }
                             }

@@ -17,6 +17,7 @@ static settings::Boolean no_hats{ "remove.hats", "false" };
 static settings::Boolean blend_zoom{ "zoom.blend", "false" };
 
 static settings::Boolean enable{ "chams.enable", "false" };
+static settings::Boolean render_original{ "chams.original", "false" };
 
 /* Cham target rvars */
 static settings::Boolean flat{ "chams.flat", "false" };
@@ -103,6 +104,7 @@ static settings::Rgba chams_overlay_color_red_novis{ "chams.novis.overlay.overla
 
 /* Arm chams */
 static settings::Boolean arms_chams{ "chams.arms", "false" };
+static settings::Boolean arm_chams_original{ "chams.arms.original", "false" };
 static settings::Boolean arms_chams_team_color{ "chams.arms.team-colors", "true" };
 static settings::Boolean arms_chams_wireframe{ "chams.arms.wireframe", "false" };
 static settings::Boolean arm_chams_overlay_chams{ "chams.overlay.arms", "true" };
@@ -111,6 +113,7 @@ static settings::Rgba arm_basechams_color{ "chams.arms.basecolor", "00000055" };
 
 /* Local weapon chams */
 static settings::Boolean local_weapon_chams{ "chams.local-weapon", "false" };
+static settings::Boolean local_weapon_chams_original{ "chams.local-weapon.original", "false" };
 static settings::Boolean local_weapon_chams_team_color{ "chams.local-weapon.team-colors", "true" };
 static settings::Boolean local_weapon_chams_wireframe{ "chams.local-weapon.wireframe", "false" };
 static settings::Boolean local_weapon_chams_overlay_chams{ "chams.overlay.local-weapon", "true" };
@@ -359,7 +362,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     return ChamColors(colors::EntityF(ent));
 }
 
-void RenderAttachment(IClientEntity *entity, IClientEntity *attach)
+void RenderAttachment(IClientEntity *entity, IClientEntity *attach, CMaterialReference &mat)
 {
     if (attach->ShouldDraw())
     {
@@ -368,22 +371,28 @@ void RenderAttachment(IClientEntity *entity, IClientEntity *attach)
         {
             if (weapons)
             {
-                // TODO: Use the envmap_tint_weapons for the envmap tint, also fix the flickering
-
-                rgba_t mod_original;
-                g_IVRenderView->GetColorModulation(mod_original.rgba);
+                rgba_t original;
+                g_IVRenderView->GetColorModulation(original.rgba);
                 g_IVRenderView->SetColorModulation(*weapons_base);
                 g_IVRenderView->SetBlend((*weapons_base).a);
+
+                if (mat)
+                    mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_weapons_r, *envmap_tint_weapons_g, *envmap_tint_weapons_b);
+
                 attach->DrawModel(1);
 
                 if (overlay_chams)
                 {
                     g_IVRenderView->SetColorModulation(*weapons_overlay);
                     g_IVRenderView->SetBlend((*weapons_overlay).a);
+
+                    if (mat)
+                        mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_weapons_r, *envmap_tint_weapons_g, *envmap_tint_weapons_b);
+
                     attach->DrawModel(1);
                 }
 
-                g_IVRenderView->SetColorModulation(mod_original.rgba);
+                g_IVRenderView->SetColorModulation(original.rgba);
             }
             else
             {
@@ -398,7 +407,7 @@ void RenderAttachment(IClientEntity *entity, IClientEntity *attach)
 // Locked from drawing
 bool chams_attachment_drawing = false;
 
-void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
+void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
 #if !ENFORCE_STREAM_SAFETY
     if (!enable)
@@ -415,7 +424,7 @@ void RenderChamsRecursive(IClientEntity *entity, IVModelRender *this_, const Dra
     while (attach && passes++ < 32)
     {
         chams_attachment_drawing = true;
-        RenderAttachment(entity, attach);
+        RenderAttachment(entity, attach, mat);
         chams_attachment_drawing = false;
         attach                   = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
     }
@@ -431,7 +440,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
     if (!init_mat)
     {
-        std::string cubemap_str = *envmap_matt ? "effects/saxxy/saxxy_gold" : "env_cubemap";
+        const char *cubemap_str = *envmap_matt ? "effects/saxxy/saxxy_gold" : "env_cubemap";
         {
             auto *kv = new KeyValues("UnlitGeneric");
             kv->SetString("$basetexture", "white");
@@ -454,7 +463,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             }
             if (envmap)
             {
-                kv->SetString("$envmap", cubemap_str.c_str());
+                kv->SetString("$envmap", cubemap_str);
                 kv->SetFloat("$envmapfresnel", *envmapfresnel);
                 kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
@@ -496,9 +505,9 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             kv->SetBool("$flat", false);
             if (envmap)
             {
-                kv->SetString("$envmap", cubemap_str.c_str());
-                kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
+                kv->SetString("$envmap", cubemap_str);
                 kv->SetFloat("$envmapfresnel", *envmapfresnel);
+                kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
                 kv->SetInt("$normalmapalphaenvmapmask", 1);
                 kv->SetInt("$selfillum", 1);
                 if (envmap_tint)
@@ -508,6 +517,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
         }
         init_mat = true;
     }
+
     if (info.pModel)
     {
         const char *name = g_IModelInfo->GetModelName(info.pModel);
@@ -524,6 +534,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     rgba_t original_color;
                     g_IVRenderView->GetColorModulation(original_color);
                     original_color.a = g_IVRenderView->GetBlend();
+
+                    // Render original arm model
+                    if (arm_chams_original)
+                        original::DrawModelExecute(this_, state, info, bone);
 
                     static auto &mat = arm_chams_overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
                     auto colors      = GetChamColors(LOCAL_E->InternalEntity(), false);
@@ -592,6 +606,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 g_IVRenderView->GetColorModulation(original_color);
                 original_color.a = g_IVRenderView->GetBlend();
 
+                // Render original weapon model
+                if (local_weapon_chams_original)
+                    original::DrawModelExecute(this_, state, info, bone);
+
                 static auto &mat = local_weapon_chams_overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
                 auto colors      = GetChamColors(LOCAL_E->InternalEntity(), false);
 
@@ -651,9 +669,13 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     if (CE_GOOD(ent))
                     {
                         rgba_t original_color;
+                        static auto &mat = overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
+
                         g_IVRenderView->GetColorModulation(original_color);
                         original_color.a = g_IVRenderView->GetBlend();
-                        static auto &mat = overlay_chams ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
+                        if (render_original)
+                            RenderChamsRecursive(entity, mat, this_, state, info, bone);
+
                         for (int i = 1; i >= 0; i--)
                         {
                             if (i && legit)
@@ -672,7 +694,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, i);
                             mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *flat);
                             g_IVModelRender->ForcedMaterialOverride(mat);
-                            RenderChamsRecursive(entity, this_, state, info, bone);
+                            RenderChamsRecursive(entity, mat, this_, state, info, bone);
                             if (overlay_chams)
                             {
                                 if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_PROJECTILE && ent->m_Type() != ENTITY_BUILDING)
@@ -692,7 +714,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                 mat_overlay->AlphaModulate(*cham_alpha);
 
                                 g_IVModelRender->ForcedMaterialOverride(mat_overlay);
-                                RenderChamsRecursive(entity, this_, state, info, bone);
+                                RenderChamsRecursive(entity, mat_overlay, this_, state, info, bone);
                             }
                         }
                         // Backtrack chams
@@ -713,7 +735,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                     mat->SetMaterialVarFlag(MATERIAL_VAR_FLAT, *backtrack::chams_flat);
                                     mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
                                     if (envmap && envmap_tint)
-                                        mats.mat_dme_lit_overlay->FindVar("$envmaptint", nullptr)->SetVecValue(*backtrack::chams_envmap_tint_r, *backtrack::chams_envmap_tint_g, *backtrack::chams_envmap_tint_b);
+                                        mat->FindVar("$envmaptint", nullptr)->SetVecValue(*backtrack::chams_envmap_tint_r, *backtrack::chams_envmap_tint_g, *backtrack::chams_envmap_tint_b);
 
                                     g_IVModelRender->ForcedMaterialOverride(mat);
                                     g_IVRenderView->SetColorModulation(*backtrack::chams_color);
@@ -724,7 +746,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                         if (i >= good_ticks.size())
                                             break;
                                         if (!good_ticks[i].bones.empty())
-                                            RenderChamsRecursive(entity, this_, state, info, &good_ticks[i].bones[0]);
+                                            RenderChamsRecursive(entity, mat, this_, state, info, &good_ticks[i].bones[0]);
                                     }
 
                                     if (backtrack::chams_overlay)
@@ -742,7 +764,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                             if (i >= good_ticks.size())
                                                 break;
                                             if (!good_ticks[i].bones.empty())
-                                                RenderChamsRecursive(entity, this_, state, info, &good_ticks[i].bones[0]);
+                                                RenderChamsRecursive(entity, mats.mat_dme_lit_overlay, this_, state, info, &good_ticks[i].bones[0]);
                                         }
                                     }
                                 }
@@ -768,5 +790,5 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     // Don't do it when we are trying to enforce backtrack chams
     if (!hacks::tf2::backtrack::isDrawing)
         return original::DrawModelExecute(this_, state, info, bone);
-}
+} // namespace hooked_methods
 } // namespace hooked_methods

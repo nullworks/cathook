@@ -13,13 +13,20 @@
                     <AutoVariable width="fill" target="chams.local-weapon" label="Local weapon chams" tooltip="Cham your first person weapon"/>
                     <AutoVariable width="fill" target="chams.overlay.local-weapon" label="Overlay local weapon chams" tooltip="Phong and other eye candies for local weapon chams"/>
                     <AutoVariable width="fill" target="chams.local-weapon.wireframe" label="Local weapon chams wireframe"/>
+                    <AutoVariable width="fill" target="chams.local-weapon.original" label="Local weapon chams draw original"/>
                     <AutoVariable width="fill" target="chams.local-weapon.team-colors" label="Local weapon chams use team color"/>
                     <AutoVariable width="fill" target="chams.arms" label="Arm chams"/>
                     <AutoVariable width="fill" target="chams.overlay.arms" label="Overlay arm chams" tooltip="Phong and other eye candies for arm chams"/>
                     <AutoVariable width="fill" target="chams.arms.wireframe" label="Arm chams Wireframe"/>
+                    <AutoVariable width="fill" target="chams.arms.original" label="Arm chams draw original model"/>
                     <AutoVariable width="fill" target="chams.arms.team-colors" label="Arm chams use team colors"/>
                     <AutoVariable width="fill" target="chams.overlay" label="Overlay player/other entity chams" tooltip="Uses overlay colors"/>
+                    <AutoVariable width="fill" target="chams.original" label="Entity chams draw original model"/>
                     <AutoVariable width="fill" target="chams.alpha" label="Player chams alpha" tooltip="Player chams transparency."/>
+                </List>
+            </Box>
+            <Box padding="12 6 6 6" width="content" height="content" name="Backtrack chams" x="210" y="200">
+                <List width="200">
                     <AutoVariable width="fill" target="backtrack.chams" label="Backtrack chams" tooltip="Draw chams for backtrack ticks"/>
                     <AutoVariable width="fill" target="backtrack.chams.flat" label="Backtrack chams flat"/>
                     <AutoVariable width="fill" target="backtrack.chams.overlay" label="Overlay backtrack chams"/>
@@ -58,8 +65,8 @@
                     <AutoVariable width="fill" target="backtrack.chams.color.overlay" label="Backtrack chams overlay color"/>
                 </List>
             </Box>
-            <Box padding="12 6 6 6" width="content" height="content" name="Colors (NoVis)" x="370" y="190">
-                <List width="200">
+            <Box padding="12 6 6 6" width="content" height="content" name="Colors (NoVis)" x="430" y="190">
+                <List width="130">
                     <AutoVariable width="fill" target="chams.novis.red" label="Red team"/>
                     <AutoVariable width="fill" target="chams.novis.blu" label="Blu team"/>
                     <AutoVariable width="fill" target="chams.novis.overlay.overlaycolor.blu" label="Blu overlay" tooltip="Chams overlay texture color."/>

@@ -28,46 +28,46 @@
                 <AutoVariable width="fill" target="chams.envmap.tint.red.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Blu team" y="70">
+        <Box padding="12 12 12 12" width="content" height="content" name="Blu team" x="170">
             <List width="150">
                 <AutoVariable width="fill" target="chams.envmap.tint.blu.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.blu.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.blu.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Weapons" y="140">
+        <Box padding="12 12 12 12" width="content" height="content" name="Weapons" y="70">
             <List width="150">
                 <AutoVariable width="fill" target="chams.envmap.tint.weapons.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.weapons.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.weapons.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Local weapon" x="170">
+        <Box padding="12 12 12 12" width="content" height="content" name="Local weapon" x="170" y="70">
             <List width="150">
                 <AutoVariable width="fill" target="chams.envmap.tint.local-weapon.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.local-weapon.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.local-weapon.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Arms" x="170" y="70">
-            <List width="150">
-                <AutoVariable width="fill" target="chams.envmap.tint.arms.r" label="Red intensity"/>
-                <AutoVariable width="fill" target="chams.envmap.tint.arms.g" label="Green intensity"/>
-                <AutoVariable width="fill" target="chams.envmap.tint.arms.b" label="Blue intensity"/>
-            </List>
-        </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Novis red" x="170" y="140">
+        <Box padding="12 12 12 12" width="content" height="content" name="Novis red" y="140">
             <List width="150">
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.red.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.red.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.red.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="Novis blu" y="210">
+        <Box padding="12 12 12 12" width="content" height="content" name="Novis blu" x="170" y="140">
             <List width="150">
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.blu.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.blu.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.novis.envmap.tint.blu.b" label="Blue intensity"/>
+            </List>
+        </Box>
+        <Box padding="12 12 12 12" width="content" height="content" name="Arms" y="210">
+            <List width="150">
+                <AutoVariable width="fill" target="chams.envmap.tint.arms.r" label="Red intensity"/>
+                <AutoVariable width="fill" target="chams.envmap.tint.arms.g" label="Green intensity"/>
+                <AutoVariable width="fill" target="chams.envmap.tint.arms.b" label="Blue intensity"/>
             </List>
         </Box>
         <Box padding="12 12 12 12" width="content" height="content" name="Backtrack" x="170" y="210">

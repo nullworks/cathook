@@ -475,6 +475,35 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
     }
 }
 
+bool tryDrawChams()
+{
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    {
+        IClientEntity *entity = g_IEntityList->GetClientEntity(i);
+        if (!entity || IDX_BAD(entity->entindex()))
+            continue;
+        if (entity->ShouldDraw())
+        {
+            chams_attachment_drawing = true;
+
+            rgba_t original_color;
+            g_IVRenderView->GetColorModulation(original_color);
+            original_color.a = g_IVRenderView->GetBlend();
+
+            g_IVModelRender->ForcedMaterialOverride(mats.mat_dme_lit);
+
+            entity->DrawModel(1);
+
+            g_IVModelRender->ForcedMaterialOverride(nullptr);
+            g_IVRenderView->SetColorModulation(original_color);
+            g_IVRenderView->SetBlend(original_color.a);
+
+            chams_attachment_drawing = false;
+            return true;
+        }
+    }
+    return false;
+}
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
     if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)))
@@ -490,6 +519,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             kv->SetString("$basetexture", "white");
             mats.mat_dme_unlit.Init("__cathook_dme_chams_unlit", kv);
         }
+        KeyValues *kv_vertex_lit = nullptr;
         {
             auto *kv = new KeyValues("VertexLitGeneric");
             kv->SetString("$basetexture", "white");
@@ -518,45 +548,19 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             kv->SetBool("$rimlight", *rimlighting);
             kv->SetFloat("$rimlightexponent", *rimlighting_exponent);
             kv->SetFloat("$rimlightboost", *phong_boost);
+            kv_vertex_lit = kv->MakeCopy();
             mats.mat_dme_lit.Init("__cathook_dme_chams_lit", kv);
         }
         {
             auto *kv = new KeyValues("UnlitGeneric");
             kv->SetString("$basetexture", "white");
-            kv->SetBool("$flat", true);
             mats.mat_dme_unlit_overlay_base.Init("__cathook_dme_chams_lit_overlay_base", kv);
         }
         {
-            auto *kv = new KeyValues("VertexLitGeneric");
-            kv->SetString("$basetexture", "white");
-            kv->SetString("$bumpmap", "water/tfwater001_normal");
-            kv->SetString("$lightwarptexture", "models/player/pyro/pyro_lightwarp");
-            kv->SetBool("$phong", *phong_enable);
-            kv->SetFloat("$phongexponent", *phong_exponent);
-            kv->SetFloat("$phongboost", *phong_boost);
-            if (phong_fresnelrange)
-            {
-                char buffer[100];
-                snprintf(buffer, 100, "[%.2f %.2f %.2f]", *phong_fresnelrange_1, *phong_fresnelrange_2, *phong_fresnelrange_3);
-                kv->SetString("$phongfresnelranges", buffer);
-            }
-            kv->SetBool("$halflambert", *halfambert);
-            kv->SetBool("$rimlight", *rimlighting);
-            kv->SetFloat("$rimlightboost", *rimlighting_boost);
-            kv->SetFloat("$rimlightexponent", *rimlighting_exponent);
+            auto *kv = kv_vertex_lit;
             kv->SetInt("$additive", *additive);
             kv->SetInt("$pearlescent", *pearlescent);
             kv->SetBool("$flat", false);
-            if (envmap)
-            {
-                kv->SetString("$envmap", cubemap_str);
-                kv->SetFloat("$envmapfresnel", *envmapfresnel);
-                kv->SetString("$envmapfresnelminmaxexp", "[0.01 1 2]");
-                kv->SetInt("$normalmapalphaenvmapmask", 1);
-                kv->SetInt("$selfillum", 1);
-                if (envmap_tint)
-                    kv->SetString("$envmaptint", "[1 1 1]");
-            }
             mats.mat_dme_lit_overlay.Init("__cathook_dme_chams_lit_overlay", kv);
         }
         init_mat = true;
@@ -567,6 +571,8 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
         const char *name = g_IModelInfo->GetModelName(info.pModel);
         if (name)
         {
+            static bool inited_lit = false;
+            static Timer inited_lit_timer{};
             std::string sname = name;
             if ((sname.find("arms") != std::string::npos && sname.find("yeti") == std::string::npos) || sname.find("c_engineer_gunslinger") != std::string::npos)
             {
@@ -575,6 +581,18 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
                 if (arms_chams)
                 {
+                    // We cannot use the material unless we draw it on local player first, it will break
+                    if (!inited_lit || !inited_lit_timer.check(400))
+                    {
+                        if (tryDrawChams())
+                        {
+                            if (!inited_lit)
+                                inited_lit_timer.update();
+                            inited_lit = true;
+                        }
+                        return original::DrawModelExecute(this_, state, info, bone);
+                    }
+
                     rgba_t original_color;
                     g_IVRenderView->GetColorModulation(original_color);
                     original_color.a = g_IVRenderView->GetBlend();
@@ -589,6 +607,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                         colors.envmap_g     = *envmap_tint_arms_g;
                         colors.envmap_b     = *envmap_tint_arms_b;
                     }
+                    colors.rgba.a         = (*arm_basechams_color).a;
                     colors.rgba_overlay.a = (*arm_overlaychams_color).a;
 
                     IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
@@ -616,6 +635,18 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
             if (local_weapon_chams && info.entity_index == -1 && sname.find("arms") == std::string::npos && (sname.find("models/weapons") != std::string::npos || sname.find("models/workshop/weapons") != std::string::npos || sname.find("models/workshop_partner/weapons") != std::string::npos))
             {
+                // We cannot use the material unless we draw it on local player first, it will break
+                if (!inited_lit || !inited_lit_timer.check(400))
+                {
+                    if (tryDrawChams())
+                    {
+                        if (!inited_lit)
+                            inited_lit_timer.update();
+                        inited_lit = true;
+                    }
+                    return original::DrawModelExecute(this_, state, info, bone);
+                }
+
                 rgba_t original_color;
                 g_IVRenderView->GetColorModulation(original_color);
                 original_color.a = g_IVRenderView->GetBlend();
@@ -635,6 +666,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     colors.envmap_g     = *envmap_tint_local_weapon_g;
                     colors.envmap_b     = *envmap_tint_local_weapon_b;
                 }
+                colors.rgba.a         = (*local_weapon_basechams_color).a;
                 colors.rgba_overlay.a = (*local_weapon_overlaychams_color).a;
 
                 ApplyChams(colors, false, *local_weapon_chams_original, *local_weapon_chams_overlay_chams, false, *local_weapon_chams_wireframe, entity, this_, state, info, bone);

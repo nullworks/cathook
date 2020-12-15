@@ -191,7 +191,7 @@ void CreateMove()
 #if ENABLE_VISUALS
     if (misc_drawhitboxes)
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
         {
             auto ent = ENTITY(i);
             if (CE_INVALID(ent) || ent == LOCAL_E || (!misc_drawhitboxes_dead && !ent->m_bAlivePlayer()))

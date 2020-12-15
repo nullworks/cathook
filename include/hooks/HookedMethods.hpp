@@ -61,6 +61,7 @@ DECLARE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *, IGameEven
 // g_IEngine
 DECLARE_HOOKED_METHOD(IsPlayingTimeDemo, bool, void *);
 DECLARE_HOOKED_METHOD(ServerCmdKeyValues, void, IVEngineClient013 *, KeyValues *);
+DECLARE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013*, const char*);
 #if ENABLE_VISUALS || ENABLE_TEXTMODE
 // vgui::IPanel
 DECLARE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *, unsigned int, bool, bool);

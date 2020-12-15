@@ -585,7 +585,7 @@ int BestTarget()
     int best_score = INT_MIN;
     if (steamid_only)
         return best;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         int score = HealingPriority(i);
         if (score > best_score && score != -1)

@@ -20,7 +20,7 @@ namespace hacks::shared::catbot
 {
 static settings::Boolean auto_disguise{ "misc.autodisguise", "true" };
 
-static settings::Int abandon_if_ipc_bots_gte{ "cat-bot.abandon-if.ipc-bots-gte", "0" };
+settings::Int abandon_if_ipc_bots_gte{ "cat-bot.abandon-if.ipc-bots-gte", "0" };
 static settings::Int abandon_if_humans_lte{ "cat-bot.abandon-if.humans-lte", "0" };
 static settings::Int abandon_if_players_lte{ "cat-bot.abandon-if.players-lte", "0" };
 
@@ -638,7 +638,7 @@ void smart_crouch()
     static bool crouch = false;
     if (crouchcdr.test_and_set(2000))
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
         {
             auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER || ent->m_iTeam() == LOCAL_E->m_iTeam() || !(ent->hitboxes.GetHitbox(0)) || !(ent->m_bAlivePlayer()) || !player_tools::shouldTarget(ent) || should_ignore_player(ent))
@@ -790,6 +790,9 @@ void update()
 
         for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
+            if (g_IEngine->GetLocalPlayer() == i)
+                continue;
+
             if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
             else

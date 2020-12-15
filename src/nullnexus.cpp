@@ -59,7 +59,7 @@ void authedplayers(std::vector<std::string> steamids)
     // Check if we are in a game
     if (g_Settings.bInvalid)
         return;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         player_info_s pinfo{};
         if (g_IEngine->GetPlayerInfo(i, &pinfo))

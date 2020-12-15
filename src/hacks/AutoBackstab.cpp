@@ -272,7 +272,7 @@ static bool doBacktrackStab(bool legit = false)
     // Set for our filter
     legit_stab = legit;
     // Get the Best tick
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *ent = ENTITY(i);
         // Targeting checks

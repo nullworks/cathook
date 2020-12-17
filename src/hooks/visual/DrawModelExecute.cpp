@@ -1,7 +1,21 @@
 /*
-  Created by Jenny White on 29.04.18.
-  Copyright (c) 2018 nullworks. All rights reserved.
+    This file is part of Cathook.
+
+    Cathook is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Cathook is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Cathook. If not, see <https://www.gnu.org/licenses/>.
 */
+
+// Codeowners: aUniqueUser
 
 #include <PlayerTools.hpp>
 #include "common.hpp"
@@ -128,6 +142,7 @@ public:
     CMaterialReference mat_dme_unlit_overlay_base;
     CMaterialReference mat_dme_lit_overlay;
 
+    // Sadly necessary ):
     CMaterialReference mat_dme_lit_fp;
     CMaterialReference mat_dme_unlit_overlay_base_fp;
     CMaterialReference mat_dme_lit_overlay_fp;
@@ -224,6 +239,7 @@ static InitRoutine init_dme([]() {
     envmap_matt.installChangeCallback(rvarCallback<bool>);
 });
 
+// Purpose => Returns true if we should render provided internal entity
 bool ShouldRenderChams(IClientEntity *entity)
 {
     if (!enable || CE_BAD(LOCAL_E))
@@ -231,8 +247,8 @@ bool ShouldRenderChams(IClientEntity *entity)
     if (entity->entindex() < 0)
         return false;
     CachedEntity *ent = ENTITY(entity->entindex());
-    if (!chamsself && ent->m_IDX == LOCAL_E->m_IDX)
-        return false;
+    if (chamsself && ent->m_IDX == LOCAL_E->m_IDX)
+        return true;
     switch (ent->m_Type())
     {
     case ENTITY_BUILDING:
@@ -300,6 +316,7 @@ bool ShouldRenderChams(IClientEntity *entity)
     return false;
 }
 
+// Purpose => Get ChamColors struct from internal entity
 static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 {
     CachedEntity *ent = ENTITY(entity->entindex());
@@ -372,6 +389,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     return ChamColors(colors::EntityF(ent));
 }
 
+// Purpose => Render entity attachments (weapons, hats)
 void RenderAttachment(IClientEntity *entity, IClientEntity *attach, CMaterialReference &mat)
 {
     if (attach->ShouldDraw())
@@ -379,29 +397,35 @@ void RenderAttachment(IClientEntity *entity, IClientEntity *attach, CMaterialRef
         attachment_draw_list.emplace_back(attach->entindex(), entity->entindex());
         if (entity->GetClientClass()->m_ClassID == RCC_PLAYER && re::C_BaseCombatWeapon::IsBaseCombatWeapon(attach))
         {
+            // If separate weapon settings is used, apply them
             if (weapons)
             {
+                // Backup original color
                 rgba_t original;
                 g_IVRenderView->GetColorModulation(original.rgba);
                 g_IVRenderView->SetColorModulation(*weapons_base);
-                g_IVRenderView->SetBlend((*weapons_base).a);
 
-                if (mat)
+                // Setup material
+                g_IVRenderView->SetBlend((*weapons_base).a);
+                if (mat && envmap)
                     mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_weapons_r, *envmap_tint_weapons_g, *envmap_tint_weapons_b);
 
+                // Render
                 attach->DrawModel(1);
 
                 if (overlay_chams)
                 {
+                    // Setup material
                     g_IVRenderView->SetColorModulation(*weapons_overlay);
                     g_IVRenderView->SetBlend((*weapons_overlay).a);
-
-                    if (mat)
+                    if (mat && envmap)
                         mat->FindVar("$envmaptint", nullptr)->SetVecValue(*envmap_tint_weapons_r, *envmap_tint_weapons_g, *envmap_tint_weapons_b);
 
+                    // Render
                     attach->DrawModel(1);
                 }
 
+                // Reset it!
                 g_IVRenderView->SetColorModulation(original.rgba);
             }
             else
@@ -417,6 +441,7 @@ void RenderAttachment(IClientEntity *entity, IClientEntity *attach, CMaterialRef
 // Locked from drawing
 bool chams_attachment_drawing = false;
 
+// Purpose => Render overriden model and and attachments
 void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
 #if !ENFORCE_STREAM_SAFETY
@@ -441,25 +466,32 @@ void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVMode
 #endif
 }
 
+// Purpose => Apply and render chams according to settings
 void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool overlay, bool ignorez, bool wireframe, bool firstperson, IClientEntity *entity, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
     static auto &mat = firstperson ? overlay ? mats.mat_dme_unlit_overlay_base_fp : mats.mat_dme_lit_fp : overlay ? mats.mat_dme_unlit_overlay_base : mats.mat_dme_lit;
     if (render_original)
         recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
 
+    // Setup material
     g_IVRenderView->SetColorModulation(colors.rgba);
     g_IVRenderView->SetBlend((colors.rgba).a);
     mat->AlphaModulate((colors.rgba).a);
     if (envmap && envmap_tint)
         mat->FindVar("$envmaptint", nullptr)->SetVecValue(colors.envmap_r, colors.envmap_g, colors.envmap_b);
 
+    // Setup wireframe and ignorez using material vars
     mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignorez);
     mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
+
+    // Override
     g_IVModelRender->ForcedMaterialOverride(mat);
 
+    // Apply our new material
     recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
     if (overlay)
     {
+        // Use white if no color was supplied
         if (colors.rgba_overlay == colors::empty && entity && IDX_GOOD(entity->entindex()))
         {
             CachedEntity *ent = ENTITY(entity->entindex());
@@ -468,6 +500,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
             else
                 colors.rgba_overlay = ent->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : ent->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
         }
+        // Setup material
         g_IVRenderView->SetColorModulation(colors.rgba_overlay);
         g_IVRenderView->SetBlend((colors.rgba_overlay).a);
 
@@ -478,6 +511,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
         mat_overlay->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignorez);
         mat_overlay->AlphaModulate((colors.rgba_overlay).a);
 
+        // Override and apply
         g_IVModelRender->ForcedMaterialOverride(mat_overlay);
         recurse ? RenderChamsRecursive(entity, mat, this_, state, info, bone) : original::DrawModelExecute(this_, state, info, bone);
     }
@@ -602,10 +636,12 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
                 if (arms_chams)
                 {
+                    // Backup original colors
                     rgba_t original_color;
                     g_IVRenderView->GetColorModulation(original_color);
                     original_color.a = g_IVRenderView->GetBlend();
 
+                    // Setup according to user settings using the ChamColors struct
                     auto colors         = GetChamColors(LOCAL_E->InternalEntity(), false);
                     colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
                     if (!arms_chams_team_color)
@@ -619,14 +655,18 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     colors.rgba.a         = (*arm_basechams_color).a;
                     colors.rgba_overlay.a = (*arm_overlaychams_color).a;
 
+                    // Apply arm chams
                     IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
                     ApplyChams(colors, false, *arm_chams_original, *arm_chams_overlay_chams, false, *arms_chams_wireframe, true, entity, this_, state, info, bone);
+
+                    // Reset it!
                     g_IVModelRender->ForcedMaterialOverride(nullptr);
                     g_IVRenderView->SetColorModulation(original_color);
                     g_IVRenderView->SetBlend(original_color.a);
                     return;
                 }
             }
+            // Workaround for attachments flickering
             std::vector<DrawEntry> tmp_list;
             bool do_draw = true;
             for (auto &drawer : attachment_draw_list)
@@ -644,6 +684,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
 
             if (local_weapon_chams && info.entity_index == -1 && sname.find("arms") == std::string::npos && (sname.find("models/weapons") != std::string::npos || sname.find("models/workshop/weapons") != std::string::npos || sname.find("models/workshop_partner/weapons") != std::string::npos))
             {
+                // Backup original colors
                 rgba_t original_color;
                 g_IVRenderView->GetColorModulation(original_color);
                 original_color.a = g_IVRenderView->GetBlend();
@@ -651,6 +692,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 auto colors           = GetChamColors(LOCAL_E->InternalEntity(), false);
                 IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
 
+                // Setup according to user settings using the ChamColors struct
                 if (local_weapon_chams_team_color)
                 {
                     colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
@@ -666,8 +708,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 colors.rgba.a         = (*local_weapon_basechams_color).a;
                 colors.rgba_overlay.a = (*local_weapon_overlaychams_color).a;
 
+                // Apply local weapon chams
                 ApplyChams(colors, false, *local_weapon_chams_original, *local_weapon_chams_overlay_chams, false, *local_weapon_chams_wireframe, true, entity, this_, state, info, bone);
 
+                // Reset it!
                 g_IVModelRender->ForcedMaterialOverride(nullptr);
                 g_IVRenderView->SetColorModulation(original_color);
                 g_IVRenderView->SetBlend(original_color.a);
@@ -680,36 +724,50 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             // Player, entity and backtrack chams
             if (IDX_GOOD(info.entity_index))
             {
+                // Get the internal entity from the index
                 IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
                 if (ShouldRenderChams(entity))
                 {
+                    // Ensure a valid entity
                     CachedEntity *ent = ENTITY(info.entity_index);
                     if (CE_GOOD(ent))
                     {
+                        // Get original to restore to later
                         rgba_t original_color;
                         g_IVRenderView->GetColorModulation(original_color);
                         original_color.a = g_IVRenderView->GetBlend();
-                        for (int i = 1; i >= 0; i--)
+
+                        // Player and entity chams
+                        if (enable)
                         {
-                            if (i && legit)
-                                continue;
-                            if (!i && singlepass)
-                                continue;
+                            // First time has ignorez, 2nd time not
+                            for (int i = 1; i >= 0; i--)
+                            {
+                                if (i && legit)
+                                    continue;
+                                if (!i && singlepass)
+                                    continue;
 
-                            auto colors   = GetChamColors(entity, i);
-                            colors.rgba.a = *cham_alpha;
+                                // Setup colors
+                                auto colors   = GetChamColors(entity, i);
+                                colors.rgba.a = *cham_alpha;
 
-                            ApplyChams(colors, *recursive, *render_original, *overlay_chams, i, false, false, entity, this_, state, info, bone);
+                                // Apply chams according to user settings
+                                ApplyChams(colors, *recursive, *render_original, *overlay_chams, i, false, false, entity, this_, state, info, bone);
+                            }
                         }
                         // Backtrack chams
                         using namespace hacks::tf2;
                         if (backtrack::chams && backtrack::isBacktrackEnabled)
                         {
+                            // TODO: Allow for a fade between the entity's color and a specified color, it would look cool but i'm lazy
                             if (ent->m_bAlivePlayer())
                             {
+                                // Get ticks
                                 auto good_ticks = backtrack::getGoodTicks(info.entity_index);
                                 if (!good_ticks.empty())
                                 {
+                                    // Setup chams according to user settings
                                     ChamColors backtrack_colors;
                                     backtrack_colors.rgba         = *backtrack::chams_color;
                                     backtrack_colors.rgba_overlay = *backtrack::chams_color_overlay;
@@ -728,6 +786,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                 }
                             }
                         }
+                        // Reset it!
                         g_IVModelRender->ForcedMaterialOverride(nullptr);
                         g_IVRenderView->SetColorModulation(original_color);
                         g_IVRenderView->SetBlend(original_color.a);

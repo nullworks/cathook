@@ -37,7 +37,6 @@ settings::Boolean chams{ "backtrack.chams", "false" };
 settings::Boolean chams_wireframe{ "backtrack.chams.wireframe", "false" };
 settings::Int chams_ticks{ "backtrack.chams.ticks", "1" };
 settings::Rgba chams_color{ "backtrack.chams.color", "ff00ff10" };
-settings::Boolean chams_flat{ "backtrack.chams.flat", "false" };
 settings::Boolean chams_overlay{ "backtrack.chams.overlay", "true" };
 settings::Rgba chams_color_overlay{ "backtrack.chams.color.overlay", "000000ff" };
 settings::Float chams_envmap_tint_r{ "backtrack.chams.envmap.tint.r", "1" };

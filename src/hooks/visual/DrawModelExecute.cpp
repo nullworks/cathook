@@ -34,7 +34,6 @@ static settings::Boolean enable{ "chams.enable", "false" };
 static settings::Boolean render_original{ "chams.original", "false" };
 
 /* Cham target rvars */
-static settings::Boolean flat{ "chams.flat", "false" };
 static settings::Boolean health{ "chams.health", "false" };
 static settings::Boolean teammates{ "chams.show.teammates", "false" };
 static settings::Boolean disguised{ "chams.show.disguised", "true" };

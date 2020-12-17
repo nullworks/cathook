@@ -5,7 +5,6 @@
                 <List width="200">
                     <AutoVariable width="fill" target="chams.enable" label="Entity Chams" tooltip="Change textures for visiblity."/>
                     <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show chams through walls."/>
-                    <AutoVariable width="fill" target="chams.flat" label="Flat" tooltip="Don't show shadows on chams."/>
                     <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
                     <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
                     <AutoVariable width="fill" target="chams.novis" label="Use seperate novis colors" tooltip="Seperate colors when a entity is not visible"/>
@@ -28,7 +27,6 @@
             <Box padding="12 6 6 6" width="content" height="content" name="Backtrack chams" x="210" y="200">
                 <List width="200">
                     <AutoVariable width="fill" target="backtrack.chams" label="Backtrack chams" tooltip="Draw chams for backtrack ticks"/>
-                    <AutoVariable width="fill" target="backtrack.chams.flat" label="Backtrack chams flat"/>
                     <AutoVariable width="fill" target="backtrack.chams.overlay" label="Overlay backtrack chams"/>
                     <AutoVariable width="fill" target="backtrack.chams.wireframe" label="Backtrack chams wireframe"/>
                     <AutoVariable width="fill" target="backtrack.chams.ticks" label="Backtrack chams amount" tooltip="How many ticks to draw (WARNING, this can cause lag)"/>

@@ -60,6 +60,7 @@ weaponmode GetWeaponModeloc()
         return weaponmode::weapon_projectile;
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarMilk):
+    case CL_CLASS(CTFJarGas):
         return weaponmode::weapon_throwable;
     case CL_CLASS(CWeaponMedigun):
         return weaponmode::weapon_medigun;

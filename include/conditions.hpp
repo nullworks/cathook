@@ -147,7 +147,19 @@ enum condition : unsigned
     TFCond_KnockedIntoAir,
     TFCond_CompetitiveWinner,
     TFCond_CompetitiveLoser,
-    TFCond_NoTaunting
+    TFCond_NoTaunting = 117,
+    TFCond_AirblastHealingDebuff,
+    TFCond_PasstimePenaltyMarkedForDeath,
+    TFCond_GrappledToPlayer,
+    TFCond_GrappledByPlayer, // Unknown
+    TFCond_BASEJumperDeployed,
+    TFCond_GasCoated,
+    TFCond_PyroBurningByDragonsFury,
+    TFCond_ThermalThrusting,
+    TFCond_DecreasedFriction,
+    TFCond_AirBlasted,
+    TFCond_TeleportedToHellHeal,
+    TFCond_MannpowerDominant // 129
 };
 
 template <typename... ConditionList> constexpr condition_data_s CreateConditionMask(ConditionList... conds)

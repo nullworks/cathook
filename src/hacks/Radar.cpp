@@ -6,6 +6,7 @@
  */
 #include "common.hpp"
 #include <settings/Int.hpp>
+#include <hacks/Aimbot.hpp>
 
 #ifndef FEATURE_RADAR_DISABLED
 #if ENABLE_VISUALS
@@ -129,7 +130,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             else
             {
                 tx_class[2 - idx][clazz - 1].draw(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, colors::white);
-                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, idx ? colors::blu_v : colors::red_v, 1.0f);
+                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, (ent == hacks::shared::aimbot::CurrentTarget()) ? colors::target : (idx ? colors::blu_v : colors::red_v), 1.0f);
             }
 
             if (ent->m_iMaxHealth() && *healthbar > 0)
@@ -214,7 +215,6 @@ void Draw()
     if (CE_BAD(LOCAL_E))
         return;
     int x, y;
-    rgba_t outlineclr;
     std::vector<CachedEntity *> enemies{};
     CachedEntity *ent;
 
@@ -223,7 +223,7 @@ void Draw()
     int radar_size = *size;
     int half_size  = radar_size / 2;
 
-    outlineclr = colors::gui;
+    rgba_t outlineclr = hacks::shared::aimbot::CurrentTarget() != null ? colors::target : colors::gui;
 
     if (*shape == 0)
     {
@@ -268,18 +268,17 @@ void Draw()
             DrawEntity(x, y, enemy);
     for (auto Sentry : sentries)
         DrawEntity(x, y, Sentry);
+    if (show_cross)
+    {
+        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(colors::gui, 0.4f), 0.5f);
+        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(colors::gui, 0.4f), 0.5f);
+    }
     if (CE_GOOD(LOCAL_E))
     {
         DrawEntity(x, y, LOCAL_E);
         const auto &wtr = WorldToRadar(g_pLocalPlayer->v_Origin.x, g_pLocalPlayer->v_Origin.y);
         if (!use_icons)
             draw::RectangleOutlined(x + wtr.first, y + wtr.second, int(icon_size), int(icon_size), colors::gui, 0.5f);
-    }
-
-    if (show_cross)
-    {
-        draw::Line(x + half_size, y + half_size / 2, 0, half_size, colors::Transparent(colors::gui, 0.4f), 0.5f);
-        draw::Line(x + half_size / 2, y + half_size, half_size, 0, colors::Transparent(colors::gui, 0.4f), 0.5f);
     }
 }
 

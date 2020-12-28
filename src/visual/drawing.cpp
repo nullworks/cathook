@@ -171,7 +171,7 @@ static InitRoutine font_size([]() {
         {
 #if ENABLE_GLEZ_DRAWING
             fonts::esp->unload();
-            fonts::esp.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), after));
+            fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
 #else
             fonts::esp->changeSize(after);
 #endif
@@ -182,7 +182,7 @@ static InitRoutine font_size([]() {
         {
 #if ENABLE_GLEZ_DRAWING
             fonts::center_screen->unload();
-            fonts::center_screen.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), after));
+            fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
 #else
             fonts::center_screen->changeSize(after);
 #endif
@@ -202,17 +202,17 @@ void Initialize()
     }
 #if ENABLE_GLEZ_DRAWING
     glez::preInit();
-    fonts::menu.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 10));
-    fonts::esp.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 10));
-    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 12));
+    fonts::menu.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 10));
+    fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 10));
+    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 12));
 #elif ENABLE_ENGINE_DRAWING
-    fonts::menu.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 10, true));
-    fonts::esp.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 10, true));
-    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 12, true));
+    fonts::menu.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 10, true));
+    fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 10, true));
+    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 12, true));
 #elif ENABLE_IMGUI_DRAWING
-    fonts::menu.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 13, true));
-    fonts::esp.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 13, true));
-    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/fonts/megasans.ttf"), 14, true));
+    fonts::menu.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 13, true));
+    fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 13, true));
+    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), 14, true));
 #endif
 #if ENABLE_ENGINE_DRAWING
     texture_white                = g_ISurface->CreateNewTextureID();

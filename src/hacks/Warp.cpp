@@ -73,6 +73,7 @@ static settings::Int draw_string_y{ "warp.draw-info.y", "800" };
 
 // Need our own Text drawing
 static std::array<std::string, 32> warp_strings;
+#if ENABLE_VISUALS
 static size_t warp_strings_count{ 0 };
 static std::array<rgba_t, 32> warp_strings_colors{ colors::empty };
 
@@ -96,6 +97,7 @@ void DrawWarpStrings()
     }
     warp_strings_count = 0;
 }
+#endif
 
 static bool should_charge       = false;
 static int warp_amount          = 0;

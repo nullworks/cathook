@@ -57,10 +57,13 @@ weaponmode GetWeaponModeloc()
     case CL_CLASS(CTFWeaponFlameBall):
     case CL_CLASS(CTFRaygun):
     case CL_CLASS(CTFGrapplingHook):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFCannon):
         return weaponmode::weapon_projectile;
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarMilk):
     case CL_CLASS(CTFJarGas):
+    case CL_CLASS(CTFCleaver):
         return weaponmode::weapon_throwable;
     case CL_CLASS(CWeaponMedigun):
         return weaponmode::weapon_medigun;

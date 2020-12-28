@@ -271,7 +271,6 @@ const std::string ready_ringer_str         = "*Dead Ringer Out*";
 const std::string cloaked_str              = "*Cloak*";
 const std::string in_ringer_str            = "*Dead Ringer*";
 const std::string disguised_str            = "*Disguise*";
-const std::string gassed_str               = "*Gassed*";
 const std::string intel_str                = "Intel";
 const std::string atombomb_str             = "Atom Bomb";
 const std::string soulpickup_str           = "Soul Pickup";
@@ -1619,8 +1618,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         AddEntityString(ent, ready_ringer_str, colors::FromRGBA8(178.0f, 0.0f, 255.0f, 255.0f));
                     if (HasCondition<TFCond_Disguised>(ent))
                         AddEntityString(ent, disguised_str, colors::FromRGBA8(220, 220, 220, 255));
-                    if (HasCondition<TFCond_GasCoated>(ent))
-                        AddEntityString(ent, gassed_str, colors::FromRGBA8(0, 128, 0, 255));
                     // Uber/Bonk
                     if (IsPlayerInvulnerable(ent))
                         AddEntityString(ent, invulnerable_str);

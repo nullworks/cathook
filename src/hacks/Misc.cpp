@@ -419,7 +419,6 @@ void Draw()
         AddSideString(format("clip: ", CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1)));
         if (local->m_iClassID() == CL_CLASS(CTFMinigun))
             AddSideString(format("Weapon state: ", CE_INT(local, netvar.iWeaponState)));
-        AddSideString(format("ItemDefinitionIndex: ", CE_INT(local, netvar.iItemDefinitionIndex)));
         /*AddSideString(colors::white, "Weapon: %s [%i]",
         RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
         g_pLocalPlayer->weapon()->m_iClassID());

@@ -18,6 +18,7 @@
             <AutoVariable width="fill" target="radar.y" label="Radar Y" tooltip="Sets the radar's y value from the top of the window."/>
             <AutoVariable width="fill" target="radar.zoom" label="Zoom" min="1" max="20" step="0.1"/>
             <AutoVariable width="fill" target="radar.opacity" label="Opacity" min="0" max="1.01" step="0.1"/>
+            <AutoVariable width="fill" target="radar.aimbot-highlight" label="Aimbot highlight" tooltip="Outer border and target's icon border color changes when aimbot is used."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="170">
@@ -25,7 +26,7 @@
             <AutoVariable width="fill" target="radar.show.ammo" label="Ammo packs"/>
             <AutoVariable width="fill" target="radar.show.health" label="Health packs"/>
             <AutoVariable width="fill" target="radar.show.teammates" label="Teammates"/>
-        <AutoVariable width="fill" target="radar.show.team.buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="radar.show.team.buildings" label="Team buildings"/>
             <AutoVariable width="fill" target="radar.hide-invis" label="Hide invisible"/>
         </List>
     </Box>

@@ -30,6 +30,7 @@ static settings::Boolean show_teambuildings{ "radar.show.team.buildings", "true"
 static settings::Boolean show_healthpacks{ "radar.show.health", "true" };
 static settings::Boolean show_ammopacks{ "radar.show.ammo", "true" };
 static settings::Boolean hide_invis{ "radar.hide-invis", "false" };
+static settings::Boolean aimbot_highlight{ "radar.aimbot-highlight", "false" };
 
 static Timer invalid{};
 
@@ -130,7 +131,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             else
             {
                 tx_class[2 - idx][clazz - 1].draw(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, colors::white);
-                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, (ent == hacks::shared::aimbot::CurrentTarget()) ? colors::target : (idx ? colors::blu_v : colors::red_v), 1.0f);
+                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, *aimbot_highlight ? (ent == hacks::shared::aimbot::CurrentTarget() ? colors::target : (idx ? colors::blu_v : colors::red_v)) : (idx ? colors::blu_v : colors::red_v), 1.0f);
             }
 
             if (ent->m_iMaxHealth() && *healthbar > 0)
@@ -223,7 +224,7 @@ void Draw()
     int radar_size = *size;
     int half_size  = radar_size / 2;
 
-    rgba_t outlineclr = hacks::shared::aimbot::CurrentTarget() != null ? colors::target : colors::gui;
+    rgba_t outlineclr = *aimbot_highlight ? (hacks::shared::aimbot::CurrentTarget() != null ? colors::target : colors::gui) : colors::gui;
 
     if (*shape == 0)
     {

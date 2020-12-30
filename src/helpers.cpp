@@ -1192,6 +1192,7 @@ weaponmode GetWeaponMode(CachedEntity *ent)
         return weaponmode::weapon_consumable;
     case CL_CLASS(CTFRocketLauncher_DirectHit):
     case CL_CLASS(CTFRocketLauncher):
+    case CL_CLASS(CTFParticleCannon):
     case CL_CLASS(CTFGrenadeLauncher):
     case CL_CLASS(CTFPipebombLauncher):
     case CL_CLASS(CTFCompoundBow):
@@ -1206,12 +1207,25 @@ weaponmode GetWeaponMode(CachedEntity *ent)
     case CL_CLASS(CTFWeaponFlameBall):
     case CL_CLASS(CTFRaygun):
     case CL_CLASS(CTFGrapplingHook):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFCannon):
+    case CL_CLASS(CTFMechanicalArm):
         return weaponmode::weapon_projectile;
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarMilk):
+    case CL_CLASS(CTFJarGas):
+    case CL_CLASS(CTFCleaver):
         return weaponmode::weapon_throwable;
     case CL_CLASS(CWeaponMedigun):
         return weaponmode::weapon_medigun;
+    case CL_CLASS(CTFWeaponSapper):
+    case CL_CLASS(CTFWeaponPDA):
+    case CL_CLASS(CTFWeaponPDA_Spy):
+    case CL_CLASS(CTFWeaponPDA_Engineer_Build):
+    case CL_CLASS(CTFWeaponPDA_Engineer_Destroy):
+    case CL_CLASS(CTFWeaponBuilder):
+    case CL_CLASS(CTFLaserPointer):
+        return weaponmode::weapon_pda;
     default:
         return weaponmode::weapon_hitscan;
     }
@@ -1259,31 +1273,31 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         rspeed = 1980.0f;
         break;
     }
-    case CL_CLASS(CTFParticleCannon):
+    case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFRocketLauncher):
     {
         rspeed = 1100.0f;
         // Libery Launcher
         if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 414)
-            rspeed *= 1.4f;
+            rspeed = 1540.0f;
         break;
     }
     case CL_CLASS(CTFCannon):
     {
-        rspeed = 1400.0f;
+        rspeed = 1453.9f;
         break;
     }
     case CL_CLASS(CTFGrenadeLauncher):
     {
-        rspeed       = 1200.0f;
+        rspeed       = 1216.6f;
         rgrav        = 1.0f;
         rinitial_vel = 200.0f;
         IF_GAME(IsTF2())
         {
             // Loch'n Load
             if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 308)
-                rspeed *= 1.25f;
+                rspeed = 1513.3f;
         }
         break;
     }
@@ -1292,14 +1306,16 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
         if (!CE_FLOAT(weapon, netvar.flChargeBeginTime))
             chargetime = 0.0f;
-        rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 900, 2400);
+        rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 925.38, 2409.2);
         rgrav  = 0.4f;
+        if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 1150) // Quickiebomb Launcher
+            rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 930.88, 2409.2);
         break;
     }
     case CL_CLASS(CTFCompoundBow):
     {
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
-        rspeed           = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
+        rspeed           = RemapValClamped(chargetime, 0.0f, 1.f, 1812.1, 2600);
         rgrav            = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1);
         break;
     }
@@ -1311,6 +1327,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         break;
     }
     case CL_CLASS(CTFFlareGun):
+    case CL_CLASS(CTFFlareGun_Revenge): // Detonator
     {
         rspeed = 2000.0f;
         rgrav  = 0.25f;
@@ -1319,15 +1336,10 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFSyringeGun):
     {
         rgrav  = 0.2f;
-        rspeed = 990.0f;
+        rspeed = 1000.0f;
         break;
     }
     case CL_CLASS(CTFCrossbow):
-    {
-        rgrav  = 0.2f;
-        rspeed = 2400.0f;
-        break;
-    }
     case CL_CLASS(CTFShotgunBuildingRescue):
     {
         rgrav  = 0.2f;
@@ -1335,23 +1347,35 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         break;
     }
     case CL_CLASS(CTFDRGPomson):
+    case CL_CLASS(CTFRaygun): // Righteous Bison
     {
         rspeed = 1200.0f;
         break;
     }
     case CL_CLASS(CTFWeaponFlameBall):
+    case CL_CLASS(CTFCleaver):
     {
         rspeed = 3000.0f;
-        break;
-    }
-    case CL_CLASS(CTFRaygun):
-    {
-        rspeed = 1200.0f;
         break;
     }
     case CL_CLASS(CTFGrapplingHook):
     {
         rspeed = 1500.0f;
+        break;
+    }
+    case CL_CLASS(CTFJarMilk):
+    {
+        rspeed = 1019.9f;
+        break;
+    }
+    case CL_CLASS(CTFJar):
+    {
+        rspeed = 1017.9f;
+        break;
+    }
+    case CL_CLASS(CTFJarGas):
+    {
+        rspeed = 2009.2f;
         break;
     }
     }
@@ -1892,7 +1916,7 @@ void ChangeName(std::string name)
         ch->SendNetMsg(setname, false);
     }
 }
-const char *powerups[] = { "STRENGTH", "RESISTANCE", "VAMPIRE", "REFLECT", "HASTE", "REGENERATION", "PRECISION", "AGILITY", "KNOCKOUT", "KING", "PLAGUE", "SUPERNOVA", "CRITS" };
+const char *powerups[] = { "Strength", "Resistance", "Vampire", "Reflect", "Haste", "Regeneration", "Precision", "Agility", "Knockout", "King", "Plague", "Supernova", "Revenge" };
 
 const std::string classes[] = { "Scout", "Sniper", "Soldier", "Demoman", "Medic", "Heavy", "Pyro", "Spy", "Engineer" };
 

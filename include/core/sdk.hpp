@@ -35,6 +35,7 @@
 #include <studio.h>
 #include <vgui/ISurface.h>
 #include <vgui/IPanel.h>
+#include <vgui/ILocalize.h>
 #include <mathlib/vmatrix.h>
 #include <inetmessage.h>
 #include <iclient.h>

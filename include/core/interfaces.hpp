@@ -15,6 +15,7 @@ namespace vgui
 {
 class ISurface;
 class IPanel;
+class ILocalize;
 } // namespace vgui
 
 class IToolFrameworkInternal;
@@ -66,6 +67,7 @@ extern void *demoplayer;
 extern IEngineSound *g_ISoundEngine;
 extern vgui::ISurface *g_ISurface;
 extern vgui::IPanel *g_IPanel;
+extern vgui::ILocalize *g_ILocalize;
 extern IClientEntityList *g_IEntityList;
 extern ICvar *g_ICvar;
 extern IGameEventManager2 *g_IEventManager2;

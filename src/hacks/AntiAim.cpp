@@ -370,7 +370,7 @@ void ProcessUserCmd(CUserCmd *cmd)
     if (!ShouldAA(cmd))
         return;
     // Not running
-    if (!pitch && !yaw)
+    if (!pitch_mode && !yaw_mode)
         return;
     static bool keepmode  = true;
     keepmode              = !keepmode;

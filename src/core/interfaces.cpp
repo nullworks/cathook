@@ -26,6 +26,7 @@ void *demoplayer                         = nullptr;
 IEngineSound *g_ISoundEngine             = nullptr;
 vgui::ISurface *g_ISurface               = nullptr;
 vgui::IPanel *g_IPanel                   = nullptr;
+vgui::ILocalize *g_ILocalize             = nullptr;
 IClientEntityList *g_IEntityList         = nullptr;
 ICvar *g_ICvar                           = nullptr;
 IGameEventManager2 *g_IEventManager2     = nullptr;
@@ -163,6 +164,7 @@ void CreateInterfaces()
     g_IMDLCache       = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());
 
     g_IPanel         = BruteforceInterface<vgui::IPanel>("VGUI_Panel", sharedobj::vgui2());
+    g_ILocalize      = BruteforceInterface<vgui::ILocalize>("VGUI_Localize", sharedobj::vgui2());
     g_pUniformStream = **(IUniformRandomStream ***) (gSignatures.GetVstdSignature("A3 ? ? ? ? C3 89 F6") + 0x1);
     g_IToolFramework = BruteforceInterface<IToolFrameworkInternal>("VTOOLFRAMEWORKVERSION", sharedobj::engine());
 #if ENABLE_VISUALS

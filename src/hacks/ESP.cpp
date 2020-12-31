@@ -1687,8 +1687,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     CachedEntity *weapon = ENTITY(widx);
                     if (CE_VALID(weapon) && re::C_BaseCombatWeapon::IsBaseCombatWeapon(RAW_ENT(weapon)))
                     {
-
-                        const char *weapon_name = re::C_BaseCombatWeapon::GetPrintName(RAW_ENT(weapon));
+                        const char *weapon_name = g_ILocalize->FindAsUTF8(re::C_BaseCombatWeapon::GetPrintName(RAW_ENT(weapon)));
                         if (weapon_name)
                             AddEntityString(ent, std::string(weapon_name));
                     }

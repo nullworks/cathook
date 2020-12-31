@@ -145,6 +145,9 @@ static bool equipItem(int clazz, int slot, int id, bool get = true, bool allowRe
             slot = 6;
     }
 
+    if (id == -1)
+        return invmng->EquipItemInLoadout(clazz, slot, -1);
+
     if (get)
     {
         auto item_view = inv->GetFirstItemOfItemDef(id);
@@ -154,9 +157,6 @@ static bool equipItem(int clazz, int slot, int id, bool get = true, bool allowRe
             return false;
         }
     }
-    if (id == -1)
-        return invmng->EquipItemInLoadout(clazz, slot, -1);
-
     auto item_view = inv->GetFirstItemOfItemDef(id);
     if (item_view)
         return invmng->EquipItemInLoadout(clazz, slot, item_view->UUID());

@@ -32,7 +32,6 @@ static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
 static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "0" };
 
-static settings::Boolean proj_silent("aimbot.projectile-silent", "1");
 static settings::Boolean silent{ "aimbot.silent", "1" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "0" };
 #if ENABLE_VISUALS
@@ -1009,9 +1008,6 @@ void DoAutoshoot(CachedEntity *target_entity)
             current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(5);
             begancharge = false;
-            // Projectile silent logic
-            if (proj_silent)
-                *bSendPackets = false;
         }
         // Pull string if charge isnt enough
         else
@@ -1035,9 +1031,6 @@ void DoAutoshoot(CachedEntity *target_entity)
             current_user_cmd->buttons &= ~IN_ATTACK;
             hacks::shared::antiaim::SetSafeSpace(5);
             begansticky = 0;
-            // Projectile silent logic
-            if (proj_silent)
-                *bSendPackets = false;
         }
         // Else just keep charging
         else
@@ -1094,11 +1087,7 @@ void DoAutoshoot(CachedEntity *target_entity)
             auto hitbox = calculated_data_array[target_entity->m_IDX].hitbox;
             hitrate::AimbotShot(target_entity->m_IDX, hitbox != head);
         }
-        // Projectile silent logic
-        if (projectileAimbotRequired && proj_silent)
-            *bSendPackets = false;
-        else
-            *bSendPackets = true;
+        *bSendPackets = true;
     }
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;

@@ -26,7 +26,6 @@
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
             <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip Viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
-            <AutoVariable width="fill" target="aimbot.projectile-silent" label="pSilent" tooltip="Stops snapping of projectile weapons on the screen of others."/>
             <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
             <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial Velocity"/>
             <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>

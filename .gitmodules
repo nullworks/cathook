@@ -16,9 +16,6 @@
 [submodule "external/TF2_NavFile_Reader"]
 	path = external/TF2_NavFile_Reader
 	url = https://github.com/nullworks/TF2_NavFile_Reader
-[submodule "external/cotire"]
-	path = external/cotire
-	url = https://github.com/sakra/cotire
 [submodule "external/clip"]
 	path = external/clip
 	url = https://github.com/nullworks/clip

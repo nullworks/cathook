@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
 if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
-    set(EnableCotire 1 CACHE BOOL "Enable CoTiRe (Compile Time Reducer)")
     unset(NativePrecompiledHeaders)
 else()
     set(NativePrecompiledHeaders 1)
@@ -11,26 +10,6 @@ endif()
 
 # Ensure that only 32 bit libraries are used.
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/Toolchain-cross-m32.cmake")
-
-if (EnableCotire)
-    # Don't enable cotire when running in QtCreator
-    execute_process(COMMAND "printenv" OUTPUT_VARIABLE contents)
-    STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
-    STRING(REGEX REPLACE "\n" ";" contents "${contents}")
-    foreach(text ${contents})
-        if ("${text}"  STREQUAL "CC=")
-            message("qtcreator running")
-            set(EnableCotire 0)
-        endif()
-    endforeach()
-endif()
-
-if (EnableCotire)
-    set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/cotire/CMake")
-    include(cotire)
-    file(GLOB_RECURSE ignore_files *.cpp)
-    set(ignore_files ${ignore_files} CACHE INTERNAL "")
-endif()
 
 #
 # Config stuff
@@ -233,17 +212,7 @@ add_subdirectory(include)
 add_subdirectory(external)
 add_subdirectory(modules)
 
-if (EnableCotire)
-    if (EnablePrecompiledHeaders)
-        set_target_properties(cathook PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "${CMAKE_SOURCE_DIR}/include/common.hpp")
-    else()
-        set_target_properties(cathook PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
-    endif()
-    set_target_properties(cathook PROPERTIES COTIRE_ADD_UNITY_BUILD true)
-    set_target_properties(cathook PROPERTIES COTIRE_UNITY_SOURCE_MAXIMUM_NUMBER_OF_INCLUDES 30)
-    set_source_files_properties(${ignore_files} PROPERTIES COTIRE_EXCLUDED true)
-    cotire(cathook)
-elseif(EnablePrecompiledHeaders AND NativePrecompiledHeaders)
+if(EnablePrecompiledHeaders AND NativePrecompiledHeaders)
     target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
 endif()
 
@@ -253,8 +222,4 @@ if (NOT Internal_Symbolized)
 else()
     message("Symbolized build")
     set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent" FORCE)
-endif()
-if (EnableCotire)
-    add_custom_command(TARGET cathook_unity POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook_unity> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook_unity>")
 endif()

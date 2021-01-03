@@ -5,6 +5,7 @@
  *      Author: nullifiedcat
  */
 
+#include "common.hpp"
 #include "sconvars.hpp"
 
 namespace sconvar

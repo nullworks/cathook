@@ -88,7 +88,7 @@ std::vector<std::string> config_list(std::string in)
     if (!hasEnding(complete_in, ".conf"))
         complete_in = complete_in + ".conf";
     std::vector<std::string> config_vec;
-    int i;
+    size_t i;
     int flags = 0;
     glob_t results;
     int ret;
@@ -603,7 +603,7 @@ CatCommand report_uid("report_steamid", "Report with steamid", [](const CCommand
     {
         steamid = std::stoi(args.Arg(1));
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         logging::Info("Report machine broke");
         return;

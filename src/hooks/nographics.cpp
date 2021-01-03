@@ -163,10 +163,8 @@ static int FSHook_ReadFileEx(void *this_, const char *pFileName, const char *pPa
 static void (*FSorig_AddFilesToFileCache)(void *, void *, const char **, int, const char *);
 static void FSHook_AddFilesToFileCache(void *this_, void *cacheId, const char **ppFileNames, int nFileNames, const char *pPathID)
 {
-    int i, j;
-
     fprintf(stderr, "AddFilesToFileCache: %d\n", nFileNames);
-    for (i = 0; i < nFileNames; ++i)
+    for (int i = 0; i < nFileNames; ++i)
         fprintf(stderr, "%s\n", ppFileNames[i]);
 }
 

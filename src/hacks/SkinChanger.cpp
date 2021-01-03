@@ -126,7 +126,7 @@ static CatCommand set_attr("skinchanger_set", "Set Attribute", [](const CCommand
         GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Set(attrid, attrv);
         InvalidateCookie();
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
     }
@@ -146,7 +146,7 @@ static CatCommand remove_attr("skinchanger_remove", "Remove attribute", [](const
         GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Remove(attrid);
         InvalidateCookie();
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
     }
@@ -166,7 +166,7 @@ static CatCommand set_redirect("skinchanger_redirect", "Set Redirect", [](const 
         GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).defidx_redirect = redirect;
         InvalidateCookie();
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
     }
@@ -230,7 +230,7 @@ static CatCommand remove_redirect("skinchanger_remove_redirect", "Remove redirec
         logging::Info("Redirect removed");
         InvalidateCookie();
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please supply a valid int\n");
     }

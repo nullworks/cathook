@@ -342,7 +342,7 @@ bool canWeaponCrit(bool draw = false)
 }
 
 // We cycle between the crit cmds so we want to store where we are currently at
-int current_index = 0;
+size_t current_index = 0;
 // Cache Weapons
 std::map<int, std::vector<int>> crit_cmds;
 
@@ -1000,9 +1000,6 @@ void observedcritchance_nethook(const CRecvProxyData *data, void *pWeapon, void 
     if (sent_chance)
     {
         // Before fix
-        float old_observed_chance;
-        if (debug_desync)
-            old_observed_chance = getObservedCritChance();
         // Sync our chance, Player ressource is guranteed to be working, melee damage not, but it's fairly reliable
         int ranged_damage = g_pPlayerResource->GetDamage(g_pLocalPlayer->entity_idx) - melee_damage;
 
@@ -1013,10 +1010,14 @@ void observedcritchance_nethook(const CRecvProxyData *data, void *pWeapon, void 
             // Powered by math
             crit_damage = (3.0f * ranged_damage * sent_chance) / (2.0f * sent_chance + 1);
         }
-        // We Were out of sync with the server
-        if (debug_desync && sent_chance > old_observed_chance && fabsf(sent_chance - old_observed_chance) > 0.01f)
+        if (debug_desync)
         {
-            logging::Info("Out of sync! Observed crit chance is %f, but client expected: %f, fixed to %f", data->m_Value.m_Float, old_observed_chance, getObservedCritChance());
+            float old_observed_chance = getObservedCritChance();
+            // We Were out of sync with the server
+            if (debug_desync && sent_chance > old_observed_chance && fabsf(sent_chance - old_observed_chance) > 0.01f)
+            {
+                logging::Info("Out of sync! Observed crit chance is %f, but client expected: %f, fixed to %f", data->m_Value.m_Float, old_observed_chance, getObservedCritChance());
+            }
         }
     }
 }

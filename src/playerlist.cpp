@@ -23,7 +23,7 @@ const char *const k_pszNames[]                                  = { "DEFAULT", "
 const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 const userdata null_data{};
 #if ENABLE_VISUALS
-rgba_t k_Colors[] = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(99, 226, 161, 255) };
+std::array<rgba_t, 7> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(99, 226, 161, 255) };
 #endif
 bool ShouldSave(const userdata &data)
 {
@@ -123,7 +123,7 @@ rgba_t Color(unsigned steamid)
         return pl.color;
 
     int state = static_cast<int>(pl.state);
-    if (state < sizeof(k_Colors) / sizeof(*k_Colors))
+    if (state < k_Colors.size())
         return k_Colors[state];
 
     return colors::empty;
@@ -384,7 +384,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
     }
     std::sort(names.begin(), names.end());
 
-    if (parts[0].empty() || parts[1].empty() && (!parts[0].empty() && partial.back() != ' '))
+    if (parts[0].empty() || (parts[1].empty() && (!parts[0].empty() && partial.back() != ' ')))
     {
         boost::to_lower(parts[0]);
         for (const auto &s : names)
@@ -437,7 +437,7 @@ CatCommand pl_info("pl_info", "pl_info uniqueid", [](const CCommand &args) {
     {
         steamid = strtoul(args.Arg(1), nullptr, 10);
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         return;
     }

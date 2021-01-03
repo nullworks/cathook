@@ -43,6 +43,7 @@ bool zerokernel::TextInput::handleSdlEvent(SDL_Event *event)
                 return true;
             }
         }
+        break;
     }
     case SDL_TEXTINPUT:
         if (is_input_active)
@@ -57,6 +58,7 @@ bool zerokernel::TextInput::handleSdlEvent(SDL_Event *event)
             }
             return true;
         }
+        break;
     case SDL_KEYDOWN:
         if (is_input_active)
         {

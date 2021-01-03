@@ -238,7 +238,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
     {
         // Using auto-craft
         int result;
-        int loc = str.find('-');
+        size_t loc = str.find('-');
         if (loc != std::string::npos)
         {
             try
@@ -289,7 +289,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
                 }
 
                 // See if we have the requirements to perform this craft, if not try to get them.
-                int rec_req_amount_have = 0;
+                size_t rec_req_amount_have = 0;
                 for (auto &id : ids_rec)
                 {
                     // For now we should just assume the user has
@@ -421,7 +421,7 @@ CatCommand lock_single("achievement_lock_single", "Locks single achievement by I
     {
         id = std::stoi(args.Arg(1));
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         logging::Info("Bad achievement ID!");
         return;

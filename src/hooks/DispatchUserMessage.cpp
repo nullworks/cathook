@@ -85,7 +85,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
     if (!isHackActive())
         return original::DispatchUserMessage(this_, type, buf);
 
-    int s, i, j;
+    int s, i;
     char c;
     const char *buf_data = reinterpret_cast<const char *>(buf.m_pData);
 

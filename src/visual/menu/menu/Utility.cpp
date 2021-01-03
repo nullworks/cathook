@@ -15,14 +15,11 @@ std::string wrapString(const std::string &input, fonts::font &font, int width, i
 {
     int lineWidth{ 0 };
     float wordWidth{ 0 };
-    int isspace{ false };
     std::ostringstream resultStream{};
     std::ostringstream wordStream{};
     std::istringstream inputStream{ input };
     int lineCount{ 1 };
     int maxWidth{ 0 };
-
-    bool wrapped{ true };
 
     auto splitWord = [&](bool newln) {
         std::string word = wordStream.str();

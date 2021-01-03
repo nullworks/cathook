@@ -254,6 +254,7 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
         }
         else if (!playerlist::IsDefault(ent))
             return playerlist::Color(ent);
+    default:
         break;
     }
 

@@ -407,15 +407,8 @@ static void CreateMove()
 #if ENABLE_VISUALS
 bool MouseMoving()
 {
-    if ((g_GlobalVars->curtime - last_mouse_check) < 0.02)
-    {
-        auto previous = SDL_GetMouseState(&PreviousX, &PreviousY);
-    }
-    else
-    {
-        auto current     = SDL_GetMouseState(&CurrentX, &CurrentY);
+    if ((g_GlobalVars->curtime - last_mouse_check) >= 0.02)
         last_mouse_check = g_GlobalVars->curtime;
-    }
 
     if (PreviousX != CurrentX || PreviousY != CurrentY)
     {
@@ -1410,7 +1403,7 @@ void DoSlowAim(Vector &input_angle)
         // Check if input angle and user angle are on opposing sides of yaw so
         // we can correct for that
         bool slow_opposing = false;
-        if (input_angle.y < -90 && viewangles.y > 90 || input_angle.y > 90 && viewangles.y < -90)
+        if ((input_angle.y < -90 && viewangles.y > 90) || (input_angle.y > 90 && viewangles.y < -90))
             slow_opposing = true;
 
         // Direction

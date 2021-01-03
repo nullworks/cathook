@@ -60,9 +60,6 @@ void CachedEntity::Update()
         return;
     }
 #endif
-    bool dormant               = raw->IsDormant();
-    bool dormant_state_changed = dormant != was_dormant();
-
     m_lSeenTicks = 0;
     m_lLastSeen  = 0;
 

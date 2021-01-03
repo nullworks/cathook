@@ -362,7 +362,7 @@ static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with Ste
     {
         steam_var = std::stoul(args.Arg(1));
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         logging::Info("Invalid steamid! Setting current to null.");
         steam_var = 0;

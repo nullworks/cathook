@@ -431,8 +431,6 @@ bool HeadPreferable(CachedEntity *target)
     { // AUTO-HEAD priority
         // Var to keep if we can bodyshot
         bool headonly = false;
-        // Save the local players current weapon to a var
-        int ci = g_pLocalPlayer->weapon()->m_iClassID();
         IF_GAME(IsTF())
         {
             // If user is using a sniper rifle, Set headonly to whether we can

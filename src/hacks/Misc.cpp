@@ -131,8 +131,6 @@ void SendAutoBalanceRequest()
 CatCommand SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance", [](const CCommand &args) { SendAutoBalanceRequest(); });
 
 int last_number{ 0 };
-static int last_checked_command_number{ 0 };
-static IClientEntity *last_checked_weapon{ nullptr };
 static bool flash_light_spam_switch{ false };
 static Timer auto_balance_timer{};
 
@@ -646,6 +644,9 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
         case SendPropType::DPT_VectorXY:
             logging::Info("TABLE %s IN DEPTH %d: %s [0x%04x] = (%f, %f)", table ? table->GetName() : "none", depth, prop->GetName(), prop->GetOffset(), CE_FLOAT(ent, acc_offset + prop->GetOffset()), CE_FLOAT(ent, acc_offset + prop->GetOffset() + 4));
             break;
+            // There are some missing things here
+        default:
+            break;
         }
     }
     if (!ft || !strcmp(ft, table->GetName()))
@@ -716,7 +717,7 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
         returnColor.SetColor(col_red[0], col_red[1], col_red[2], 255);
         break;
     case TEAM_BLU:
-        returnColor.SetColor(col_blu[0], col_blu[1], col_blu[2],255);
+        returnColor.SetColor(col_blu[0], col_blu[1], col_blu[2], 255);
         break;
     default:
         returnColor.SetColor(245, 229, 196, 255);
@@ -770,14 +771,14 @@ static InitRoutine init([]() {
 
     // Construct BytePatch1
     std::vector<unsigned char> patch1 = { 0xE8 };
-    for (int i = 0; i < sizeof(uintptr_t); i++)
+    for (size_t i = 0; i < sizeof(uintptr_t); i++)
         patch1.push_back(((unsigned char *) &relAddr1)[i]);
     for (int i = patch1.size(); i < 6; i++)
         patch1.push_back(0x90);
 
     // Construct BytePatch2
     std::vector<unsigned char> patch2 = { 0xE8 };
-    for (int i = 0; i < sizeof(uintptr_t); i++)
+    for (size_t i = 0; i < sizeof(uintptr_t); i++)
         patch2.push_back(((unsigned char *) &relAddr2)[i]);
     patch2.push_back(0x8B);
     patch2.push_back(0x00);

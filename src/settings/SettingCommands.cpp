@@ -279,7 +279,7 @@ static int cat_completionCallback(const char *c_partial, char commands[COMMAND_C
 
     // logging::Info("%s|%s", parts.at(0).c_str(), parts.at(1).c_str());
 
-    if (parts.at(0).empty() || parts.at(1).empty() && (!parts.at(0).empty() && partial.back() != ' '))
+    if (parts.at(0).empty() || (parts.at(1).empty() && (!parts.at(0).empty() && partial.back() != ' ')))
     {
         if (std::string("get").find(parts.at(0)) != std::string::npos)
             snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH, "cat get ");

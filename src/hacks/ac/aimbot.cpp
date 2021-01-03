@@ -109,8 +109,6 @@ void Event(KeyValues *event)
         int vid      = g_IEngine->GetPlayerForUserID(victim);
         if (eid > 0 && eid <= MAX_PLAYERS && vid > 0 && vid <= MAX_PLAYERS)
         {
-            CachedEntity *victim   = ENTITY(vid);
-            CachedEntity *attacker = ENTITY(eid);
             auto &Po_v             = Player_origs[vid];
             auto &Po_e             = Player_origs[eid];
             if (Po_v.z != 0 && Po_e.z != 0)

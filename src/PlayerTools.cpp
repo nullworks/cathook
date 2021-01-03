@@ -140,7 +140,7 @@ static CatCommand mark_betrayal("pl_mark_betrayal", "Mark a steamid32 as betraya
         unsigned steamid       = std::stoul(args.Arg(1));
         betrayal_list[steamid] = *betrayal_limit;
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid Steamid32 provided.");
     }

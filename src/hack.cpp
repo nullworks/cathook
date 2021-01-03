@@ -158,7 +158,7 @@ static void InitRandom()
         logging::Info("Warning!!! Failed read from /dev/urandom (%s). Randomness is going to be weak", strerror(errno));
         timespec t;
         clock_gettime(CLOCK_MONOTONIC, &t);
-        rand_seed = t.tv_nsec ^ t.tv_sec & getpid();
+        rand_seed = t.tv_nsec ^ (t.tv_sec & getpid());
     }
     srand(rand_seed);
     if (rnd)

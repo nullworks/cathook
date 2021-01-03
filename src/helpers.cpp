@@ -473,7 +473,6 @@ Vector ComputeMove(const Vector &a, const Vector &b)
     const float x = diff.x;
     const float y = diff.y;
     Vector vsilent(x, y, 0);
-    float speed = sqrt(vsilent.x * vsilent.x + vsilent.y * vsilent.y);
     Vector ang;
     VectorAngles(vsilent, ang);
     float yaw   = DEG2RAD(ang.y - current_user_cmd->viewangles.y);
@@ -1250,7 +1249,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     rspeed       = 0.0f;
     rgrav        = 0.0f;
     rinitial_vel = 0.0f;
-    typedef float(GetProjectileData)(IClientEntity *);
 
     switch (weapon->m_iClassID())
     {
@@ -1360,18 +1358,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     gravity        = rgrav;
     start_velocity = rinitial_vel;
     return (rspeed || rgrav || rinitial_vel);
-}
-
-constexpr unsigned developer_list[] = { 306902159 };
-
-bool Developer(CachedEntity *ent)
-{
-    /*
-    for (int i = 0; i < sizeof(developer_list) / sizeof(unsigned); i++) {
-        if (developer_list[i] == ent->player_info.friendsID) return true;
-    }
-    */
-    return false;
 }
 
 /*const char* MakeInfoString(IClientEntity* player) {

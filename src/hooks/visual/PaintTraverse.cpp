@@ -41,16 +41,13 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_, vgui::VPANEL pane
     if (!isHackActive())
         return original::PaintTraverse(this_, panel, force, allow_force);
 
-    static bool textures_loaded           = false;
-    static vgui::VPANEL panel_scope       = 0;
-    static vgui::VPANEL FocusOverlayPanel = 0;
-    static vgui::VPANEL motd_panel        = 0;
-    static vgui::VPANEL motd_panel_sd     = 0;
-    static vgui::VPANEL health_panel      = 0;
-    static bool call_default              = true;
-    static bool cur;
-    static ConVar *software_cursor = g_ICvar->FindVar("cl_software_cursor");
-    static const char *name;
+    static bool textures_loaded       = false;
+    static vgui::VPANEL panel_scope   = 0;
+    static vgui::VPANEL motd_panel    = 0;
+    static vgui::VPANEL motd_panel_sd = 0;
+    static vgui::VPANEL health_panel  = 0;
+    static bool call_default          = true;
+    static ConVar *software_cursor    = g_ICvar->FindVar("cl_software_cursor");
 
 #if ENABLE_VISUALS
     if (!textures_loaded)
@@ -88,7 +85,6 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_, vgui::VPANEL pane
 
     if (software_cursor_mode)
     {
-        cur = software_cursor->GetBool();
         switch (*software_cursor_mode)
         {
         case 1:

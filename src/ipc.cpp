@@ -80,7 +80,7 @@ CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)", [](cons
         logging::Info("Target id is NaN!");
         return;
     }
-    if (target_id < 0 || target_id > 255)
+    if (target_id > 255)
     {
         logging::Info("Invalid target id: %u", target_id);
         return;
@@ -130,8 +130,7 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                 players.push_back(info.friendsID);
         }
     }
-    int count        = 0;
-    unsigned highest = 0;
+    int count = 0;
     std::vector<unsigned> botlist{};
     for (unsigned i = 0; i < cat_ipc::max_peers; i++)
     {
@@ -144,7 +143,6 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                     botlist.push_back(i);
                     logging::Info("-> %u (%u)", i, ipc::peer->memory->peer_user_data[i].friendid);
                     count++;
-                    highest = i;
                 }
             }
         }

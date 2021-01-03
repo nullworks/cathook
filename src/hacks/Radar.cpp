@@ -69,11 +69,8 @@ std::pair<int, int> WorldToRadar(int x, int y)
 
         return { nx + halfsize - (int) icon_size / 2, ny + halfsize - (int) icon_size / 2 };
     }
-
-    else if (*shape == 1)
+    else /* if (*shape == 1) */
     {
-        float PI = 3.14159265;
-
         float theta = atan2(ny, nx);
 
         if (nx > halfsize * std::cos(theta) && nx > 0)

@@ -417,7 +417,7 @@ public:
             }
         }
 
-        static int previous_blacklist_size = 0;
+        static size_t previous_blacklist_size = 0;
 
         bool erased = false;
         if (previous_blacklist_size != free_blacklist.size())

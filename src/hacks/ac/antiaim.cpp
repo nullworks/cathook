@@ -26,16 +26,12 @@ void ResetPlayer(int idx)
     last_accusation[idx - 1] = 0;
 }
 
-void Init()
-{
-    ResetEverything();
-}
+int amount[MAX_PLAYERS] = {};
 
 void Update(CachedEntity *player)
 {
     if (!enable)
         return;
-    int amount[MAX_PLAYERS];
     auto &am = amount[player->m_IDX - 1];
     if (tickcount - last_accusation[player->m_IDX - 1] < 60 * 60)
         return;
@@ -68,9 +64,5 @@ void Update(CachedEntity *player)
             last_accusation[player->m_IDX - 1] = tickcount;
         }
     }
-}
-
-void Event(KeyValues *event)
-{
 }
 } // namespace ac::antiaim

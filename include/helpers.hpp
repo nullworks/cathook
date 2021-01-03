@@ -194,8 +194,6 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb);
 float RandFloatRange(float min, float max);
 int UniformRandomInt(int min, int max);
 
-bool Developer(CachedEntity *ent);
-
 Vector CalcAngle(Vector src, Vector dst);
 void MakeVector(Vector ang, Vector &out);
 float GetFov(Vector ang, Vector src, Vector dst);

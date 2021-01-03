@@ -321,7 +321,7 @@ CatCommand debug_mantissa("test_mantissa", "For debug purposes", [](const CComma
 
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Mantissa step for %.3f: %.10f\n", float_value, mantissa_step);
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid float.\n");
     }
@@ -489,7 +489,7 @@ bool DispatchUserMessage(bf_read *buf, int type)
             vData.push_back(std::strtod(server_time.c_str(), &tmp));
         }
         // Shouldn't happen
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
         }
     }

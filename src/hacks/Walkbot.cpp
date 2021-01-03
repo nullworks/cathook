@@ -735,7 +735,7 @@ void UpdateClosestNode()
     {
         auto &node = state::nodes[i];
 
-        if (not node.flags & NF_GOOD)
+        if (!(node.flags & NF_GOOD))
             continue;
         // Eclipse shits itself when it sees Vector& beung used as Vector in
         // GetFov

@@ -45,7 +45,6 @@ void Update()
                 logging::Info("movement: %f", movement);
                 prevloc[i]      = abs_orig;
                 const Vector &v = ent->m_vecVelocity;
-                const Vector &a = ent->m_vecAcceleration;
                 Vector eav;
                 velocity::EstimateAbsVelocity(RAW_ENT(ent), eav);
                 //				logging::Info("%d [%s]: CatVelocity: %.2f %.2f

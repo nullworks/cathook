@@ -51,7 +51,7 @@ static CatCommand follow_steam("fb_steam", "Follow Steam Id", [](const CCommand 
         steam_var = std::stoul(args.Arg(1));
         logging::Info("Stored Steamid: %u", steamid);
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument &)
     {
         logging::Info("Invalid Argument! resetting steamid.");
         steam_var = 0;
@@ -128,7 +128,7 @@ static void checkAFK()
 
 static void init()
 {
-    for (int i = 0; i < afkTicks.size(); i++)
+    for (size_t i = 0; i < afkTicks.size(); i++)
     {
         afkTicks[i].update();
     }
@@ -230,7 +230,7 @@ static bool navtarget = false;
 
 static bool startFollow(CachedEntity *entity, bool useNavbot)
 {
-    if (CE_GOOD(entity) && !follow_activation || entity->m_flDistance() <= (float) follow_activation)
+    if (CE_GOOD(entity) && (!follow_activation || entity->m_flDistance() <= (float) follow_activation))
     {
         if (corneractivate)
         {
@@ -584,12 +584,12 @@ static void cm()
 
     // Prune old and close crumbs that we wont need anymore, update idle
     // timer too
-    for (int i = 0; i < breadcrumbs.size(); i++)
+    for (size_t i = 0; i < breadcrumbs.size(); i++)
     {
         if (loc_orig.DistTo(breadcrumbs.at(i)) < 60.f)
         {
             idle_time.update();
-            for (int j = 0; j <= i; j++)
+            for (size_t j = 0; j <= i; j++)
                 breadcrumbs.erase(breadcrumbs.begin());
         }
     }

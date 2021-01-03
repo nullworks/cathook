@@ -230,7 +230,7 @@ void Prediction_PaintTraverse()
             if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
                 continue;
             rgba_t color = colors::FromRGBA8(255, 0, 0, 255);
-            for (int j = 0; j < data.size(); j++)
+            for (size_t j = 0; j < data.size(); j++)
             {
                 Vector screen;
                 if (draw::WorldToScreen(data[j], screen))
@@ -276,7 +276,6 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     float curTime   = g_GlobalVars->curtime;
 
     CUserCmd fakecmd{};
-    memset(&fakecmd, 0, sizeof(CUserCmd));
 
     Vector vel;
     velocity::EstimateAbsVelocity(RAW_ENT(entity), vel);

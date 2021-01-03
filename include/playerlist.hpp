@@ -27,7 +27,7 @@ enum class k_EState
     STATE_LAST = PARTY
 };
 #if ENABLE_VISUALS
-extern rgba_t k_Colors[];
+extern std::array<rgba_t, 7> k_Colors;
 static_assert(sizeof(rgba_t) == sizeof(float) * 4, "player list is going to be incompatible with no visual version");
 #endif
 extern const std::string k_Names[];

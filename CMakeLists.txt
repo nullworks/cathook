@@ -190,7 +190,7 @@ target_include_directories(cathook SYSTEM PRIVATE
         "external/source-sdk-2013-headers/mp/src")
 
 if(EnableWarnings)
-    target_compile_options(cathook PRIVATE -Wall -Wextra)
+    target_compile_options(cathook PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-class-memaccess -Wno-strict-aliasing -Wno-sign-compare)
 else()
     target_compile_options(cathook PRIVATE -w)
 endif()

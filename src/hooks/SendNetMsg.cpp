@@ -263,8 +263,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
             //}
         }
     }
-    static ConVar *sv_player_usercommand_timeout = g_ICvar->FindVar("sv_player_usercommand_timeout");
-    static float lastcmd                         = 0.0f;
+    static float lastcmd = 0.0f;
     if (lastcmd > g_GlobalVars->absoluteframetime)
     {
         lastcmd = g_GlobalVars->absoluteframetime;

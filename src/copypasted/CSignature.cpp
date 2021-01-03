@@ -13,12 +13,11 @@ Elf32_Shdr *getSectionHeader(void *module, const char *sectionName)
 
     Elf32_Ehdr *ehdr = (Elf32_Ehdr *) module;
     Elf32_Shdr *shdr = (Elf32_Shdr *) ((unsigned) module + ehdr->e_shoff);
-    int shNum        = ehdr->e_shnum;
 
     Elf32_Shdr *strhdr = &shdr[ehdr->e_shstrndx];
 
-    char *strtab   = NULL;
-    int strtabSize = 0;
+    char *strtab        = NULL;
+    unsigned strtabSize = 0;
     if (strhdr != NULL && strhdr->sh_type == 3)
     {
         strtab = (char *) ((unsigned) module + strhdr->sh_offset);

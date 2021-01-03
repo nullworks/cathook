@@ -622,8 +622,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 {
                     // Set status
                     found_scn1 = false;
-                    // Get the end distance from the trace
-                    float start_distance = trace.endpos.DistTo(eye_position);
 
                     // Loop and look back untill we have a vector on screen
                     for (int i = 1; i > 400; i++)
@@ -1214,7 +1212,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             }
         }
         // Explosive/Environmental hazard esp
-        else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || itemtype >= BOMB_BALLOONBOMB && itemtype <= BOMB_WALKEREXPLODE))
+        else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || (itemtype >= BOMB_BALLOONBOMB && itemtype <= BOMB_WALKEREXPLODE)))
         {
             if (classid == CL_CLASS(CTFPumpkinBomb))
                 AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
@@ -1234,7 +1232,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 }
             }
         }
-        if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || itemtype >= FLAG_ATOMBOMB && itemtype <= CART_BOMBCART_RED))
+        if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (itemtype >= FLAG_ATOMBOMB && itemtype <= CART_BOMBCART_RED)))
         {
             rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
 
@@ -1284,7 +1282,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         else if (itemtype != ITEM_NONE)
         {
             // Health pack esp
-            if (item_health_packs && (itemtype >= ITEM_HEALTH_SMALL && itemtype <= EDIBLE_MEDIUM || itemtype == ITEM_HL_BATTERY))
+            if (item_health_packs && ((itemtype >= ITEM_HEALTH_SMALL && itemtype <= EDIBLE_MEDIUM) || itemtype == ITEM_HL_BATTERY))
             {
                 switch (itemtype)
                 {

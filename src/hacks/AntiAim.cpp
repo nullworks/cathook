@@ -138,9 +138,9 @@ void FuckPitch(float &io_pitch)
 {
     constexpr float min_pitch = -149489.97f;
     constexpr float max_pitch = 149489.97f;
-    static FuckData_s fuck_data;
+    // static FuckData_s fuck_data;
     static k_EFuckMode fuckmode = k_EFuckMode::FM_RANDOMVARS;
-    static int fuckmode_ticks   = 0;
+    // static int fuckmode_ticks   = 0;
 
     /*if (!fuckmode_ticks) {
         fuckmode = rand() % k_EFuckMode::FM_COUNT;
@@ -177,9 +177,7 @@ void FuckYaw(float &io_yaw)
     constexpr float min_yaw = -359999.97f;
     constexpr float max_yaw = 359999.97f;
 
-    static FuckData_s fuck_data;
     static k_EFuckMode fuckmode = k_EFuckMode::FM_RANDOMVARS;
-    static int fuckmode_ticks   = 0;
 
     switch (fuckmode)
     {
@@ -227,7 +225,7 @@ bool ShouldAA(CUserCmd *cmd)
             }
             break;
         }
-    /* no break */
+        [[fallthrough]];
     case weapon_throwable:
         if ((cmd->buttons & (IN_ATTACK | IN_ATTACK2)) || g_pLocalPlayer->bAttackLastTick)
         {
@@ -372,14 +370,12 @@ void ProcessUserCmd(CUserCmd *cmd)
     // Not running
     if (!pitch_mode && !yaw_mode)
         return;
-    static bool keepmode  = true;
-    keepmode              = !keepmode;
-    float &p              = cmd->viewangles.x;
-    float &y              = cmd->viewangles.y;
-    static bool flip      = false;
-    static bool bsendflip = true;
-    static float rngyaw   = 0.0f;
-    bool clamp            = !no_clamping;
+    static bool keepmode = true;
+    keepmode             = !keepmode;
+    float &p             = cmd->viewangles.x;
+    float &y             = cmd->viewangles.y;
+    static bool flip     = false;
+    bool clamp           = !no_clamping;
 
     static int ticksUntilSwap = 0;
     static bool swap          = true;

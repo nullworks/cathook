@@ -22,12 +22,12 @@ static settings::Boolean teamname_spam{ "spam.teamname", "0" };
 static settings::String teamname_file{ "spam.teamname.file", "teamspam.txt" };
 static settings::Boolean team_only{ "spam.teamchat", "false" };
 
-static int last_index;
+static size_t last_index;
 
 std::chrono::time_point<std::chrono::system_clock> last_spam_point{};
 
-int current_index{ 0 };
-TextFile file{};
+static size_t current_index{ 0 };
+static TextFile file{};
 
 const std::string teams[] = { "RED", "BLU" };
 
@@ -82,7 +82,7 @@ bool PlayerPassesQuery(Query query, int idx)
         return false;
     int teammate = !player->m_bEnemy();
     bool alive   = !CE_BYTE(player, netvar.iLifeState);
-    int clazzBit = (1 << CE_INT(player, netvar.iClass) - 1);
+    int clazzBit = (1 << (CE_INT(player, netvar.iClass) - 1));
     if (static_cast<int>(query.flags_class))
     {
         if (!(clazzBit & static_cast<int>(query.flags_class)))
@@ -239,7 +239,7 @@ bool FormatSpamMessage(std::string &message)
 // What to spam
 static std::vector<std::string> teamspam_text = { "CAT", "HOOK" };
 // Current spam index
-static int current_teamspam_idx = 0;
+static size_t current_teamspam_idx = 0;
 
 void createMove()
 {
@@ -252,11 +252,12 @@ void createMove()
             {
                 if (teamspam_text.size())
                 {
+                    // We've hit the end of the vector, loop back to the front
+                    // We need to do it like this, otherwise a file reload happening could cause this to crash at ".at"
+                    if (current_teamspam_idx >= teamspam_text.size())
+                        current_teamspam_idx = 0;
                     g_IEngine->ServerCmd(format("tournament_teamname ", teamspam_text.at(current_teamspam_idx)).c_str());
                     current_teamspam_idx++;
-                    // We've hit the end of the vector
-                    if (current_teamspam_idx == teamspam_text.size())
-                        current_teamspam_idx = 0;
                 }
             }
         }
@@ -292,9 +293,8 @@ void createMove()
 
     if (!spam_source)
         return;
-    static int safety_ticks   = 0;
-    static int last_source    = 0;
-    static float last_message = 0;
+    static int safety_ticks = 0;
+    static int last_source  = 0;
     if (*spam_source != last_source)
     {
         safety_ticks = 300;

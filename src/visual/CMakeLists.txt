@@ -14,8 +14,6 @@ if(EnableGUI)
 endif()
 
 target_sources(cathook PRIVATE ${files})
-list(REMOVE_ITEM ignore_files ${files})
-set(ignore_files ${ignore_files} CACHE INTERNAL "")
 
 if (EnableImGuiDrawing)
     add_subdirectory(imgui)

@@ -9,5 +9,3 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/checksum_crc.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/UtlString.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/netmessage.cpp")
 target_sources(cathook PRIVATE ${files})
-list(REMOVE_ITEM ignore_files ${files})
-set(ignore_files ${ignore_files} CACHE INTERNAL "")

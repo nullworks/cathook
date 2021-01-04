@@ -11,6 +11,7 @@
 #include <studio.h>
 #include <stdexcept>
 #include <memory>
+#include <vector>
 
 // Forward declaration from entitycache.hpp
 class CachedEntity;

@@ -12,7 +12,7 @@ namespace sharedobj
 
 bool LocateSharedObject(std::string &name, std::string &out_full_path)
 {
-    FILE *proc_maps = fopen(strfmt("/proc/%i/maps", getpid()).get(), "r");
+    FILE *proc_maps = fopen("/proc/self/maps", "r");
     if (proc_maps == nullptr)
     {
         return false;

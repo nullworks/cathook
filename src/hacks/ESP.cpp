@@ -1976,7 +1976,7 @@ void ResetEntityStrings(bool full_clear)
             i.needs_paint  = false;
         }
     else
-        for (std::size_t i = 0; i <= g_GlobalVars->maxClients; ++i)
+        for (std::size_t i = 0; i < g_GlobalVars->maxClients; ++i)
         {
             auto &element        = data[i];
             element.string_count = 0;

@@ -217,7 +217,7 @@ void Prediction_PaintTraverse()
             if (!sv_gravity)
                 return;
         }
-        for (int i = 1; i <= g_GlobalVars->maxClients; i++)
+        for (int i = 1; i < g_GlobalVars->maxClients; i++)
         {
             auto ent = ENTITY(i);
             if (CE_BAD(ent) || !ent->m_bAlivePlayer())
@@ -545,7 +545,7 @@ static InitRoutine init([]() {
     EC::Register(
         EC::CreateMove,
         []() {
-            for (int i = 1; i <= g_GlobalVars->maxClients; i++)
+            for (int i = 1; i < g_GlobalVars->maxClients; i++)
             {
                 auto ent     = ENTITY(i);
                 auto &buffer = previous_positions.at(i - 1);

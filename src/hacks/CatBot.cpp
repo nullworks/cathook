@@ -200,7 +200,7 @@ void do_random_votekick()
 
     if (CE_BAD(LOCAL_E) || !g_IEngine->GetPlayerInfo(LOCAL_E->m_IDX, &local_info))
         return;
-    for (int i = 1; i <= g_GlobalVars->maxClients; ++i)
+    for (int i = 1; i < g_GlobalVars->maxClients; ++i)
     {
         player_info_s info;
         if (!g_IEngine->GetPlayerInfo(i, &info) || !info.friendsID)

@@ -214,7 +214,7 @@ void UpdateTemporaryData()
 
             int players = 0;
 
-            for (int i = 1; i <= g_GlobalVars->maxClients; ++i)
+            for (int i = 1; i < g_GlobalVars->maxClients; ++i)
             {
                 if (g_IEntityList->GetClientEntity(i))
                     ++players;

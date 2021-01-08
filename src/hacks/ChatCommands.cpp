@@ -111,10 +111,10 @@ static CatCommand chatcommands_add("chatcommands_add", "chatcommands_add <chat c
     }
     std::string command = args.Arg(2);
 
-    auto &chatcomamnd = commands[prefix];
+    auto &chatcommand = commands[prefix];
 
     logging::Info("%s: %s", prefix.c_str(), command.c_str());
-    chatcomamnd.addcommand(command);
+    chatcommand.addcommand(command);
 });
 
 static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>", [](const CCommand &args) {
@@ -131,9 +131,9 @@ static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat
     }
     std::string file = args.Arg(2);
 
-    auto &chatcomamnd = commands[prefix];
+    auto &chatcommand = commands[prefix];
 
-    if (!chatcomamnd.readFile(file))
+    if (!chatcommand.readFile(file))
     {
         g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Couldn't open the file!\n");
         return;

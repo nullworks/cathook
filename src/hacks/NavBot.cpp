@@ -1003,7 +1003,7 @@ static slots getBestSlot(slots active_slot)
 static void updateSlot()
 {
     static Timer slot_timer{};
-    if (!slot_timer.test_and_set(300))
+    if (!primary_only || !slot_timer.test_and_set(300))
         return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer())
     {

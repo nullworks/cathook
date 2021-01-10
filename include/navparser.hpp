@@ -4,6 +4,9 @@
 #include <vector>
 #include "CNavFile.h"
 
+// 1. Who the fuck put this in navparser.hpp
+// 2. Why the fuck is it outside of all namespaces
+// 3. There's a conflict between melee and prio_melee in navbot.cpp, so it needs to be named differently
 enum Priority_list
 {
     patrol = 5,
@@ -13,6 +16,7 @@ enum Priority_list
     followbot,
     ammo,
     capture,
+    prio_melee,
     health,
     danger,
 };

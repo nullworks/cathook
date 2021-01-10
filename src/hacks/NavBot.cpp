@@ -26,6 +26,7 @@ static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true");
+static settings::Boolean melee_mode("navbot.melee-mode", "false");
 static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
@@ -239,16 +240,24 @@ void refreshSniperSpots()
                 sniper_spots.emplace_back(hiding_spot.m_pos, 0);
 }
 
+enum slots
+{
+    primary   = 1,
+    secondary = 2,
+    melee     = 3
+};
+
 #if ENABLE_VISUALS
 std::vector<Vector> slight_danger_drawlist_normal;
 std::vector<Vector> slight_danger_drawlist_dormant;
 #endif
 static Timer blacklist_update_timer{};
 static Timer dormant_update_timer{};
-void updateEnemyBlacklist()
+void updateEnemyBlacklist(int slot)
 {
-    bool should_run_normal  = blacklist_update_timer.test_and_set(*blacklist_delay);
-    bool should_run_dormant = blacklist_dormat && dormant_update_timer.test_and_set(*blacklist_delay_dormat);
+    static int last_slot_blacklist = primary;
+    bool should_run_normal         = blacklist_update_timer.test_and_set(*blacklist_delay) || last_slot_blacklist != slot;
+    bool should_run_dormant        = blacklist_dormat && (dormant_update_timer.test_and_set(*blacklist_delay_dormat) || last_slot_blacklist != slot);
     // Don't run since we do not care here
     if (!should_run_dormant && !should_run_normal)
         return;
@@ -257,8 +266,12 @@ void updateEnemyBlacklist()
     if (should_run_normal)
         navparser::NavEngine::clearFreeBlacklist(navparser::ENEMY_NORMAL);
     // Clear blacklist for dormant entities
-    if (should_run_dormant)
+    if (should_run_dormant || !blacklist_dormat)
         navparser::NavEngine::clearFreeBlacklist(navparser::ENEMY_DORMANT);
+
+    // #NoFear
+    if (slot == melee)
+        return;
 
     // Store the danger of the invidual nav areas
     std::unordered_map<CNavArea *, int> dormant_slight_danger;
@@ -485,11 +498,9 @@ bool stayNearTarget(CachedEntity *ent)
     else
         std::sort(good_areas.begin(), good_areas.end(), [](std::pair<CNavArea *, float> a, std::pair<CNavArea *, float> b) { return a.second < b.second; });
 
-    // If we're not already pathing we should reallign with the center of the area
-    bool should_path_to_local = !navparser::NavEngine::isPathing();
     // Try to path to all the good areas, based on distance
     for (auto &area : good_areas)
-        if (navparser::NavEngine::navTo(area.first->m_center, staynear, true, should_path_to_local))
+        if (navparser::NavEngine::navTo(area.first->m_center, staynear, true, !navparser::NavEngine::isPathing()))
             return true;
 
     return false;
@@ -587,6 +598,44 @@ bool stayNear()
     // Stay near failed to find any good targets, add extra delay
     staynear_cooldown.last += std::chrono::seconds(3);
     return false;
+}
+
+// Try to attack people using melee if we are in a situation where this is viable
+bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
+{
+    // There is no point in engaging the melee AI if we are not using melee
+    if (slot != melee || !nearest.first)
+    {
+        if (navparser::NavEngine::current_priority == prio_melee)
+            navparser::NavEngine::cancelPath();
+        return false;
+    }
+
+    // Too high priority, so don't try
+    if (navparser::NavEngine::current_priority > prio_melee)
+        return false;
+
+    static Timer melee_cooldown{};
+
+    // If we are close enough, don't even bother with using the navparser to get there
+    if (nearest.second < 200 && nearest.first->IsVisible())
+    {
+        WalkTo(nearest.first->m_vecOrigin());
+        navparser::NavEngine::cancelPath();
+        return true;
+    }
+    else
+    {
+        // Don't constantly path, it's slow.
+        // The closer we are, the more we should try to path
+        if (!melee_cooldown.test_and_set(nearest.second < 200 ? 200 : nearest.second < 1000 ? 500 : 2000) && navparser::NavEngine::isPathing())
+            return navparser::NavEngine::current_priority == prio_melee;
+
+        // Just walk at the enemy l0l
+        if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
+            return true;
+        return false;
+    }
 }
 
 // Basically the same as isAreaValidForStayNear, but some restrictions lifted.
@@ -916,17 +965,9 @@ static std::pair<CachedEntity *, float> getNearestPlayerDistance()
     return { best_ent, distance };
 }
 
-enum slots
-{
-    primary   = 1,
-    secondary = 2,
-    melee     = 3
-};
-
 static int slot = primary;
-static std::pair<CachedEntity *, float> nearest;
 
-static void autoJump()
+static void autoJump(std::pair<CachedEntity *, float> &nearest)
 {
     if (!autojump)
         return;
@@ -938,9 +979,10 @@ static void autoJump()
         current_user_cmd->buttons |= IN_JUMP | IN_DUCK;
 }
 
-static slots getBestSlot(slots active_slot)
+static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
-    nearest = getNearestPlayerDistance();
+    if (melee_mode)
+        return melee;
     switch (g_pLocalPlayer->clazz)
     {
     case tf_scout:
@@ -1000,10 +1042,10 @@ static slots getBestSlot(slots active_slot)
     }
 }
 
-static void updateSlot()
+static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 {
     static Timer slot_timer{};
-    if (!primary_only || !slot_timer.test_and_set(300))
+    if ((!melee_mode && !primary_only) || !slot_timer.test_and_set(300))
         return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer())
     {
@@ -1011,7 +1053,7 @@ static void updateSlot()
         if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon))
         {
             slot        = re::C_BaseCombatWeapon::GetSlot(weapon) + 1;
-            int newslot = getBestSlot(static_cast<slots>(slot));
+            int newslot = getBestSlot(static_cast<slots>(slot), nearest);
             if (slot != newslot)
                 g_IEngine->ClientCmd_Unrestricted(format("slot", newslot).c_str());
         }
@@ -1048,9 +1090,11 @@ void CreateMove()
         }
     }
 
-    updateSlot();
-    autoJump();
-    updateEnemyBlacklist();
+    auto nearest = getNearestPlayerDistance();
+
+    updateSlot(nearest);
+    autoJump(nearest);
+    updateEnemyBlacklist(slot);
 
     // Try to escape danger first of all
     if (escapeDanger())
@@ -1060,6 +1104,8 @@ void CreateMove()
         return;
     // If we aren't getting health, get ammo
     else if (getAmmo())
+        return;
+    else if (meleeAttack(slot, nearest))
         return;
     // Try to capture objectives
     else if (captureObjectives())

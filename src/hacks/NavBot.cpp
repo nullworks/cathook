@@ -26,7 +26,7 @@ static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true");
-static settings::Boolean melee_mode("navbot.melee-mode", "false");
+static settings::Int force_slot("navbot.force-slot", "0");
 static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
@@ -244,7 +244,9 @@ enum slots
 {
     primary   = 1,
     secondary = 2,
-    melee     = 3
+    melee     = 3,
+    pda1      = 4,
+    pda2      = 5
 };
 
 #if ENABLE_VISUALS
@@ -981,8 +983,8 @@ static void autoJump(std::pair<CachedEntity *, float> &nearest)
 
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
-    if (melee_mode)
-        return melee;
+    if (force_slot)
+        return (slots) *force_slot;
     switch (g_pLocalPlayer->clazz)
     {
     case tf_scout:
@@ -1045,7 +1047,7 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
 static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 {
     static Timer slot_timer{};
-    if ((!melee_mode && !primary_only) || !slot_timer.test_and_set(300))
+    if ((!force_slot && !primary_only) || !slot_timer.test_and_set(300))
         return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer())
     {

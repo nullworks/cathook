@@ -42,6 +42,16 @@
             <AutoVariable width="fill" target="navbot.escape-danger.ctf-cap" label="Escape danger w. intel" tooltip="Also try to escape from danger when carrying intel."/>
             <AutoVariable width="fill" target="navbot.primary-only" label="Auto best weapon"/>
             <AutoVariable width="fill" target="navbot.melee-mode" label="Melee only"/>
+            <LabeledObject width="fill" label="Force slot">
+                <Select target="navbot.force-slot">
+                    <Option name="Do not force" value="0"/>
+                    <Option name="Primary" value="1"/>
+                    <Option name="Secondary" value="2"/>
+                    <Option name="Melee" value="3"/>
+                    <Option name="PDA" value="4"/>
+                    <Option name="PDA2" value="5"/>
+                </Select>
+            </LabeledObject>
             <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable autojump"/>
             <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump distance"/>
             <AutoVariable width="fill" target="navbot.snipe-sentries" label="Try to target sentries"/>

@@ -10,6 +10,7 @@ gentoo_packages=(dev-vcs/git dev-libs/boost dev-util/cmake sys-devel/gcc sys-dev
 arch_packages=(git boost cmake make gcc gdb lib32-sdl2 lib32-glew lib32-freetype2 rsync lib32-libglvnd dialog)
 ubuntu_packages=(build-essential git g++ g++-multilib libboost-dev gdb libsdl2-dev:i386 libfreetype6-dev:i386 cmake dialog rsync)
 fedora_packages=(cmake dialog make gcc-c++ glibc-devel.i686 freetype-devel.i686 SDL2-devel.i686 glew-devel.i686 boost-devel rsync gdb git)
+void_packages=(git gcc gdb gcc-multilib boost boost-devel-32bit SDL2-devel-32bit glew-devel-32bit freetype-devel-32bit libglvnd-devel-32bit rsync)
 
 # Check if we should only install git
 if [ "$GIT" == true ]; then
@@ -17,6 +18,7 @@ if [ "$GIT" == true ]; then
     arch_packages=(git)
     ubuntu_packages=(git)
     fedora_packages=(git)
+    void_packages=(git)
 fi
 
 requestPermissions()
@@ -76,6 +78,10 @@ case "$DISTRO" in
         [ "$(type dnf)" ] || { printf "/etc/os-release outputs 'ID=fedora' but DNF is not present, exiting.."; exit; }
         OS="fedora"
     ;;
+    '"void"')
+        [ "$(type xbps-install)" ] || { printf "/etc/os-release outputs 'ID=void' but XBPS is not present, exiting.."; exit; }
+        OS="void"
+    ;;
 esac
 
 case "$OS" in
@@ -117,6 +123,16 @@ case "$OS" in
         if [ "$out" != 0 ]; then
             requestPermissions "${fedora_packages[@]}"
             $SUDO dnf install -y "${fedora_packages[@]}"
+        fi
+    ;;
+    "void")
+        xbps-query "${void_packages[@]}" > /dev/null 2>&1
+        out=$?
+        if [ "$out" = 1 ]; then
+            requestPermissions "${void_packages[@]}"
+            # libs and dev files require this repo to be enabled
+            $SUDO xbps-install -S void-repo-multilib
+            $SUDO xbps-install -S "${void_packages[@]}"
         fi
     ;;
     "*")

@@ -74,6 +74,11 @@ case "$DISTRO" in
         [ "$(type apt-get)" ] || { printf "/etc/os-release outputs 'ID=ubuntu' but APT is not present, exiting.."; exit; }
         OS="ubuntu"
     ;;
+    "debian")
+        [ "$(type apt-get)" ] || { printf "/etc/os-release outputs 'ID=debian' but APT is not present, exiting.."; exit; }
+        OS="ubuntu"
+    ;;
+    # package names are the same. Also kitware's Ubuntu CMake works just fine on Debian
     "fedora")
         [ "$(type dnf)" ] || { printf "/etc/os-release outputs 'ID=fedora' but DNF is not present, exiting.."; exit; }
         OS="fedora"

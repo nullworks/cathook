@@ -9,6 +9,8 @@
 #include "PlayerTools.hpp"
 #include "Trigger.hpp"
 #include "Backtrack.hpp"
+#include "conditions.hpp"
+#include "helpers.hpp"
 
 namespace hacks::tf2::autobackstab
 {
@@ -59,14 +61,14 @@ bool canFaceStab(CachedEntity *ent)
         return false;
     }
 
-    if (HasCondition<TFCond_Jarated>(ent))
+    if (HasCondition<TFCond_MiniCritOnKill>(g_pLocalPlayer->entity) || HasCondition<TFCond_Jarated>(ent))
     {
         return ent->m_iHealth() <= 54.0f;
     }
 
     return ent->m_iHealth() <= 40.0f;
 }
-    
+
 bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vector> target_pos, Vector from_angle)
 {
     Vector tarAngle = CE_VECTOR(to, netvar.m_angEyeAngles);

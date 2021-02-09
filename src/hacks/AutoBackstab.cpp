@@ -52,9 +52,18 @@ int ClosestDistanceHitbox(hacks::tf2::backtrack::BacktrackData btd)
 
 bool canFaceStab(CachedEntity *ent)
 {
+    int w_index = CE_INT(LOCAL_W, netvar.iItemDefinitionIndex);
+
+    if(w_index == 40000) { 
+        return false;
+    }
+
+    if(HasCondition<TFCond_Jarated>(ent)) {
+        return ent->m_iHealth() <= 54.0f;
+    }
+
     return ent->m_iHealth() <= 40.0f;
 }
-
 bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vector> target_pos, Vector from_angle)
 {
     Vector tarAngle = CE_VECTOR(to, netvar.m_angEyeAngles);

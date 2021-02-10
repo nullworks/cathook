@@ -62,9 +62,8 @@ struct AchivementItem
 };
 
 // A map that allows us to map item ids to achievement names and achievement ids
-std::unordered_map<int /*item_id*/, AchivementItem> ach_items;
-
-std::vector<std::vector<std::string>> craft_groups;
+static std::unordered_map<int /*item_id*/, AchivementItem> ach_items;
+static std::array<std::vector<std::string>, 3> craft_groups;
 
 bool checkAchMgr()
 {
@@ -164,24 +163,8 @@ static bool equipItem(int clazz, int slot, int id, bool get = true, bool allowRe
     return false;
 }
 
-void parseRvars()
-{
-    craft_groups.clear();
-
-    std::vector<std::string> tmp_vec;
-
-    boost::split(tmp_vec, *primary, boost::is_any_of(";-"));
-    craft_groups.emplace_back(tmp_vec);
-
-    boost::split(tmp_vec, *secondary, boost::is_any_of(";-"));
-    craft_groups.emplace_back(tmp_vec);
-
-    boost::split(tmp_vec, *melee, boost::is_any_of(";-"));
-    craft_groups.emplace_back(tmp_vec);
-}
-
-bool use_fallback       = false;
-int first_item_attempts = 0;
+static bool use_fallback       = false;
+static int first_item_attempts = 0;
 void getAndEquipWeapon(std::string str, int clazz, int slot)
 {
     auto invmng = re::CTFInventoryManager::GTFInventoryManager();
@@ -463,10 +446,16 @@ CatCommand rent_item("rent_item", "testrun a item by ID", [](const CCommand &arg
 CatCommand lock("achievement_lock", "Lock all achievements", Lock);
 CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
 
+void rvarCallback(std::string after, int idx)
+{
+    craft_groups[idx].clear();
+    boost::split(craft_groups[idx], after, boost::is_any_of(";-"));
+}
+
 static InitRoutine init([]() {
-    primary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
-    secondary.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
-    melee.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { parseRvars(); });
+    primary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 0); });
+    secondary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 1); });
+    melee.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 2); });
 
     EC::Register(EC::CreateMove, CreateMove, "autoitem_cm");
 

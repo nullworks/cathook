@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# TODO 
-# do not depend on graphical libraries if compiling for textmode
-# do not depend on X libraries if Xoverlay is disabled
-
-DEPENDS_LIBRARIES=(ssl m rt GL freetype GLEW png X11 Xext pthread Xfixes xoverlay glez);
-DEPENDS_HEADERS=("SDL2/SDL.h" "freetype2/freetype/config/ftheader.h" "openssl/err.h" "GL/gl.h" "GL/glew.h");
-DEPENDS_PACKAGES=("gcc-6" "g++-6" "gcc-6-multilib" "g++-6-multilib" "libssl-dev:i386" "libsdl2-dev" "libfreetype6-dev" "libfreetype6-dev:i386" "libglew-dev" "libglew-dev:i386" "libpng-dev" "libpng-dev:i386" "libboost-all-dev");

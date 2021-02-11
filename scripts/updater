@@ -21,7 +21,7 @@ if [ $(id -u) -eq 0 ]; then
 fi
 
 LOCKFILE=/tmp/chupdater.lock
-if [ -e ${LOCKFILE} ] && ps -p `cat ${LOCKFILE}` >/dev/null; then
+if [ -e ${LOCKFILE} ] && ps -p `cat ${LOCKFILE}` >/dev/null && [ -z "$CH_UPDATER_SELFUPDATE" ]; then
     echo -e "\033[1;33m \n \nUpdater: Updater already running!\n\033[0m"
     exit 1
 fi
@@ -48,9 +48,6 @@ if [ "$DISABLE_TUI" == "true" ]; then
 fi
 if [ ! -x "$(command -v dialog)" ] || [ "$tui" == false ]; then
     dialog=false
-    if [ "$tui" == true ]; then
-        echo -e "\033[1;31mTerminal UI NOT supported! Install \"dialog\"! \033[0m"
-    fi
 fi
 
 # Run migrations if not a developer
@@ -67,14 +64,14 @@ fi
 exists=true
 cfg_haskey $configfile autoupdater || exists=false
 if [ "$dialog" == true ] && [ "$exists" == false ]; then
-    value=true
+    value=false
     response=255
     while [ "$response" != 0 ] && [ "$response" != 1 ]; do
         dialog --keep-tite --title "Updater"  --yesno "Do you want to enable the cathook auto updater?" 10 25 || { response=$?; continue; }
         response=$?
     done
-    if [ "$response" == 1 ]; then
-        value=false
+    if [ "$response" == 0 ]; then
+        value=true
     fi
     cfg_write $configfile autoupdater $value
 fi
@@ -106,12 +103,15 @@ function performupdate() {
         fi
     fi
     
+    # Store info about the currently checked out updater script hash
+    OLD_UPDATE=$(git rev-parse HEAD:scripts/updater)
+
     if [ "$update_channel" == "stable" ]; then
         git fetch --force --depth 1 origin refs/tags/stable:refs/tags/stable && git reset --hard stable || { echo -e "\033[1;33m\nFailed to pull from github! Trying alternative pull (legacy)\n\033[0m"; git fetch --depth 1 && git reset --hard @{upstream} || { echo -e "\033[1;31m\nFailed to pull from github! A reinstall is recommended. https://cathook.club\n\033[0m"; exit 1; } }
     elif [ "$update_channel" == "master" ]; then
         git fetch --force --depth 1 origin && git reset --hard origin/master || { echo -e "\033[1;33m\nFailed to pull from github! Trying alternative pull (legacy)\n\033[0m"; git fetch --depth 1 && git reset --hard @{upstream} || { echo -e "\033[1;31m\nFailed to pull from github! A reinstall is recommended. https://cathook.club\n\033[0m"; exit 1; } }
     elif [ "$update_channel" == "developer" ]; then
-        echo -e "\033[1;33m\nWarning! Running in developer mode! Expect issues!\n\033[0m" && git pull origin || { echo -e "\033[1;31m\n\nFailed to pull from github!\n\033[0m"; exit 1; }
+        echo -e "\033[1;33m\nWarning! Running in developer mode! Expect issues!\n\033[0m" && git pull origin --rebase=false || { echo -e "\033[1;31m\n\nFailed to pull from github!\n\033[0m"; exit 1; }
     else
         if [ "$dialog" == true ]; then
             value=true
@@ -124,11 +124,19 @@ function performupdate() {
         exit 1
     fi
     
-    # Run migrations 
-    if [ "$update_channel" != "developer" ]; then
+    # Run migrations, idk if it's a good idea to let this execute outside of the reach of the updater script self updater
+    if [ "$update_channel" != "developer" ] && [ -e ./scripts/migrations ]; then
         ./scripts/migrations $tui $INIT false || exit 1
     fi
     
+    NEW_UPDATE=$(git rev-parse HEAD:scripts/updater)
+
+    # Check if the updater script hash has changed. If yes, re-execute yourself (this automates the "double updates" that are sometimes required
+    if [ "$OLD_UPDATE" != "$NEW_UPDATE" ]; then
+        echo -e "\033[1;33m\nWarning: Update script self update!\n\033[0m"
+        CH_UPDATER_SELFUPDATE=1 exec $0 $@
+    fi
+
     # Check if all required packages are installed
     ./scripts/dependencycheck
     
@@ -145,7 +153,7 @@ function performupdate() {
     if [ "$AUTOUPDATER" == true ]; then
         proccount=1
     fi
-    
+
     #Create build folder in case it doesn't exist
     mkdir -p ./build
     # Update cathook

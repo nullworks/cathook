@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Verify that we are root
+if [ ! $(id -u) -eq 0 ]; then
+    echo -e "\033[1;33m \n \nThis script must be ran as root!\n\033[0m"
+    exit 1
+fi
+
 [[ ! -z "$SUDO_USER" ]] && RUNUSER="$SUDO_USER" || RUNUSER="$LOGNAME"
 RUNCMD="sudo -u $RUNUSER"
 
@@ -14,7 +20,7 @@ if [ $# == 1 ]; then
 else
     if [ ${#arr[@]} == 0 ]; then
         echo TF2 isn\'t running!
-        exit
+        exit 1
     fi
     proc=${arr[0]}
 fi

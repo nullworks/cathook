@@ -104,7 +104,7 @@ function performupdate() {
     fi
     
     # Store info about the currently checked out updater script hash
-    OLD_UPDATE=$(git rev-parse HEAD:scripts/updater)
+    OLD_UPDATE="$(git rev-parse HEAD:scripts/updater || echo invalid)"
 
     if [ "$update_channel" == "stable" ]; then
         git fetch --force --depth 1 origin refs/tags/stable:refs/tags/stable && git reset --hard stable || { echo -e "\033[1;33m\nFailed to pull from github! Trying alternative pull (legacy)\n\033[0m"; git fetch --depth 1 && git reset --hard @{upstream} || { echo -e "\033[1;31m\nFailed to pull from github! A reinstall is recommended. https://cathook.club\n\033[0m"; exit 1; } }

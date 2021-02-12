@@ -28,15 +28,16 @@ fi
 # Git check, migrate users from .zip to git repos
 #
 if [ "$PRE_UPDATE" == "true" ]; then
-if [ ! -x "$(command -v git)" ]; then
-    # install only git
-    echo git not installed!
-    ./scripts/dependencycheck true
-fi
-if [ ! -d "./.git" ]; then
-    git init
-    git remote add origin https://github.com/nullworks/cathook
-fi
+    if [ ! -x "$(command -v git)" ]; then
+        # install only git
+        echo git not installed!
+        ./scripts/dependencycheck true
+    fi
+    if [ ! -d "./.git" ]; then
+        git init
+        git remote add origin https://github.com/nullworks/cathook
+        cfg_write $configfile update_channel stable
+    fi
 fi
 
 #

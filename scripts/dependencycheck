@@ -98,7 +98,7 @@ case "$OS" in
             $SUDO pacman -S --noconfirm --needed "${arch_packages[@]}"
         fi
         # Arch's shipped GDB is broken at this time
-        curl -C - -o ./bin/gdb-arch-2021-02 https://nullworks.gitlab.io/cathook/cathook/gdb && chmod +x ./bin/gdb-arch-2021-02 || true
+        mkdir -p ./bin && curl -C - -o ./bin/gdb-arch-2021-02 https://nullworks.gitlab.io/cathook/cathook/gdb && chmod +x ./bin/gdb-arch-2021-02 || true
     ;;
     "ubuntu")
         dpkg -s "${ubuntu_packages[@]}" > /dev/null 2>&1

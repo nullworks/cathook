@@ -317,7 +317,7 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     return result;
 }
 
-Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod /* ignored */, float proj_startvelocity)
+std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod /* ignored */, float proj_startvelocity)
 {
     Vector origin = ent->m_vecOrigin();
     Vector hitbox;
@@ -328,7 +328,7 @@ Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
     if (speed == 0.0f || !sv_gravity)
-        return Vector();
+        return { Vector(), Vector() };
 
     // TODO ProjAim
     float medianTime  = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed;
@@ -375,17 +375,19 @@ Vector ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float
     CE_VECTOR(ent, 0x354)                              = origin;
     // Compensate for ping
     // besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravitymod - proj_startvelocity * besttime);
+    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravitymod);
     // S = at^2/2 ; t = sqrt(2S/a)*/
-    Vector result = bestpos + hitbox_offset;
+    Vector result            = bestpos + hitbox_offset;
+    Vector result_initialvel = result;
+    result_initialvel.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/
-    return result;
+    return { result, result_initialvel };
 }
-Vector BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity, float proj_startvelocity)
+std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity, float proj_startvelocity)
 {
     if (!vec.z || CE_BAD(building))
-        return Vector();
+        return { Vector(), Vector() };
     Vector result = vec;
     // if (not debug_pp_extrapolate) {
     //} else {
@@ -397,7 +399,7 @@ Vector BuildingPrediction(CachedEntity *building, Vector vec, float speed, float
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
     if (speed == 0.0f || !sv_gravity)
-        return Vector();
+        return { Vector(), Vector() };
 
     trace::filter_no_player.SetSelf(RAW_ENT(building));
     float dtg = DistanceToGround(vec, RAW_ENT(building)->GetCollideable()->OBBMins(), RAW_ENT(building)->GetCollideable()->OBBMaxs());
@@ -431,12 +433,14 @@ Vector BuildingPrediction(CachedEntity *building, Vector vec, float speed, float
     }
     // Compensate for ping
     besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravity - proj_startvelocity * besttime);
+    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravity);
+    Vector bestpos_initialvel = bestpos;
+    bestpos_initialvel.z -= proj_startvelocity * besttime;
     // S = at^2/2 ; t = sqrt(2S/a)*/
-    return bestpos;
+    return { bestpos, bestpos_initialvel };
 }
 
-Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity)
+std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity)
 {
     Vector origin = ent->m_vecOrigin();
     Vector hitbox;
@@ -447,7 +451,7 @@ Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravit
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
     if (speed == 0.0f || !sv_gravity)
-        return Vector();
+        return { Vector(), Vector() };
 
     // TODO ProjAim
     float medianTime  = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed;
@@ -500,12 +504,14 @@ Vector ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravit
     }
     // Compensate for ping
     besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravitymod - proj_startvelocity * besttime);
+    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravitymod);
     // S = at^2/2 ; t = sqrt(2S/a)*/
-    Vector result = bestpos + hitbox_offset;
+    Vector result            = bestpos + hitbox_offset;
+    Vector initialvel_result = result;
+    initialvel_result.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/
-    return result;
+    return { result, initialvel_result };
 }
 
 float DistanceToGround(CachedEntity *ent)

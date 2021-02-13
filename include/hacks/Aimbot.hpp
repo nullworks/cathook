@@ -20,6 +20,7 @@ extern settings::Boolean ignore_cloak;
 struct AimbotCalculatedData_s
 {
     unsigned long predict_tick{ 0 };
+    bool predict_type{ 0 };
     Vector aim_position{ 0 };
     unsigned long vcheck_tick{ 0 };
     bool visible{ false };
@@ -28,7 +29,7 @@ struct AimbotCalculatedData_s
 };
 
 // Functions used to calculate aimbot data, and if already calculated use it
-const Vector &PredictEntity(CachedEntity *entity);
+Vector PredictEntity(CachedEntity *entity, bool vischeck);
 bool VischeckPredictedEntity(CachedEntity *entity);
 bool BacktrackVisCheck(CachedEntity *entity);
 

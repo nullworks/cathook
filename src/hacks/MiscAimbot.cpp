@@ -48,7 +48,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
                 continue;
             Vector target{};
             if (Predict)
-                target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent), initial_vel);
+                target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent), initial_vel).second;
             else
                 target = ent->hitboxes.GetHitbox(1)->center;
             if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))
@@ -106,7 +106,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             continue;
         Vector target{};
         if (Predict)
-            target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent));
+            target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent)).second;
         else
             target = ent->hitboxes.GetHitbox(1)->center;
         if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))

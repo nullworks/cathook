@@ -907,7 +907,7 @@ void Aim(CachedEntity *entity)
         return;
 
     // Get angles from eye to target
-    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, PredictEntity(entity));
+    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, PredictEntity(entity, false));
 
     // Multipoint
     if (multipoint && !projectile_mode && entity->m_Type() == ENTITY_PLAYER)
@@ -1085,12 +1085,12 @@ void DoAutoshoot(CachedEntity *target_entity)
 }
 
 // Grab a vector for a specific ent
-const Vector &PredictEntity(CachedEntity *entity)
+Vector PredictEntity(CachedEntity *entity, bool vischeck)
 {
     // Pull out predicted data
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     Vector &result             = cd.aim_position;
-    if (cd.predict_tick == tickcount)
+    if (cd.predict_tick == tickcount && cd.predict_type == vischeck)
         return result;
 
     if (!shouldBacktrack() || entity->m_Type() != ENTITY_PLAYER)
@@ -1101,11 +1101,18 @@ const Vector &PredictEntity(CachedEntity *entity)
             // If using projectiles, predict a vector
             if (projectileAimbotRequired)
             {
+                std::pair<Vector, Vector> tmp_result;
                 // Use prediction engine if user settings allow
                 if (engine_projpred)
-                    result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0, cur_proj_start_vel);
+                    tmp_result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0, cur_proj_start_vel);
                 else
-                    result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
+                    tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
+
+                // Don't use the intial velocity compensated one in vischecks
+                if (vischeck)
+                    result = tmp_result.first;
+                else
+                    result = tmp_result.second;
             }
             else
             {
@@ -1121,7 +1128,16 @@ const Vector &PredictEntity(CachedEntity *entity)
         else if (entity->m_Type() == ENTITY_BUILDING)
         {
             if (cur_proj_grav || cur_proj_grav)
-                result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+            {
+                std::pair<Vector, Vector> tmp_result;
+                tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+
+                // Don't use the intial velocity compensated one in vischecks
+                if (vischeck)
+                    result = tmp_result.first;
+                else
+                    result = tmp_result.second;
+            }
             else
                 result = GetBuildingPosition(entity);
         }
@@ -1137,6 +1153,7 @@ const Vector &PredictEntity(CachedEntity *entity)
         }
 
         cd.predict_tick = tickcount;
+        cd.predict_type = vischeck;
 
         cd.fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
     }
@@ -1147,6 +1164,7 @@ const Vector &PredictEntity(CachedEntity *entity)
         {
             result          = data->hitboxes.at(cd.hitbox).center;
             cd.predict_tick = tickcount;
+            cd.predict_type = vischeck;
             cd.fov          = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
         }
     }
@@ -1365,11 +1383,11 @@ bool VischeckPredictedEntity(CachedEntity *entity)
         // Update info
         cd.vcheck_tick = tickcount;
         if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
-            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity), true);
+            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), true);
         else
         {
             trace_t trace;
-            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity), false, MASK_SHOT, &trace);
+            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), false, MASK_SHOT, &trace);
             if (cd.visible && cd.hitbox == head && trace.hitbox != head)
                 cd.visible = false;
         }

@@ -1304,8 +1304,9 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
         if (!CE_FLOAT(weapon, netvar.flChargeBeginTime))
             chargetime = 0.0f;
-        rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 925.38, 2409.2);
-        rgrav  = 0.4f;
+        rspeed       = RemapValClamped(chargetime, 0.0f, 4.0f, 925.38, 2409.2);
+        rgrav        = 1.0f;
+        rinitial_vel = 200.0f;
         if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 1150) // Quickiebomb Launcher
             rspeed = RemapValClamped(chargetime, 0.0f, 4.0f, 930.88, 2409.2);
         break;
@@ -1313,8 +1314,8 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFCompoundBow):
     {
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
-        rspeed           = RemapValClamped(chargetime, 0.0f, 1.f, 1812.1, 2600);
-        rgrav            = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1);
+        rspeed           = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
+        rgrav            = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1) - 0.05;
         break;
     }
     case CL_CLASS(CTFBat_Giftwrap):
@@ -1831,10 +1832,10 @@ Vector getShootPos(Vector angle)
         vecOffset = Vector(16.0f, 6.0f, -8.0f);
         break;
 
-    // Huntsman
-    case CL_CLASS(CTFCompoundBow):
-        vecOffset = Vector(23.5f, -8.0f, -3.0f);
-        break;
+        // Huntsman
+        /*case CL_CLASS(CTFCompoundBow):
+            vecOffset = Vector(23.5f, -8.0f, -3.0f);
+            break;*/
 
     default:
         break;

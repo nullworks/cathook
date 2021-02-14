@@ -221,8 +221,8 @@ bool getAmmo()
     return false;
 }
 
-// Former is position, latter is until which tick it is ignored
-std::vector<std::pair<Vector, int>> sniper_spots;
+// Vector of sniper spot positions we can nav to
+std::vector<Vector> sniper_spots;
 
 // Used for time between refreshing sniperspots
 static Timer refresh_sniperspots_timer{};
@@ -238,7 +238,7 @@ void refreshSniperSpots()
         for (auto &hiding_spot : area.m_hidingSpots)
             // Spots actually marked for sniping
             if (hiding_spot.IsExposed() || hiding_spot.IsGoodSniperSpot() || hiding_spot.IsIdealSniperSpot())
-                sniper_spots.emplace_back(hiding_spot.m_pos, 0);
+                sniper_spots.emplace_back(hiding_spot.m_pos);
 }
 
 enum slots
@@ -399,48 +399,6 @@ void updateEnemyBlacklist(int slot)
                 slight_danger_drawlist_dormant.push_back(area.first->m_center);
     }
 #endif
-}
-
-// Roam around map
-bool doRoam()
-{
-    static Timer fail_timer;
-    // No sniper spots :shrug:
-    if (sniper_spots.empty())
-        return false;
-    // Failed recently, wait a while
-    if (!fail_timer.check(1000))
-        return false;
-    // Don't overwrite current roam
-    if (navparser::NavEngine::current_priority == patrol)
-        return false;
-
-    // Get closest sniper spots
-    std::sort(sniper_spots.begin(), sniper_spots.end(), [](std::pair<Vector, int> a, std::pair<Vector, int> b) { return a.first.DistTo(g_pLocalPlayer->v_Origin) < b.first.DistTo(g_pLocalPlayer->v_Origin); });
-
-    bool tried_pathing = false;
-    for (auto &sniper_spot : sniper_spots)
-    {
-        // Timed out
-        if (sniper_spot.second > g_GlobalVars->tickcount)
-            continue;
-
-        tried_pathing = true;
-
-        // Ignore for spot for 30s
-        sniper_spot.second = TICKCOUNT_TIMESTAMP(30);
-        if (navparser::NavEngine::navTo(sniper_spot.first, patrol))
-            return true;
-    }
-
-    // Every sniper spot is on cooldown, refresh cooldowns
-    if (!tried_pathing)
-        for (auto &spot : sniper_spots)
-            spot.second = 0;
-    // Failed, time out
-    fail_timer.update();
-
-    return false;
 }
 
 // Check if an area is valid for stay near. the Third parameter is to save some performance.
@@ -941,6 +899,52 @@ bool captureObjectives()
         else
             capture_timer.update();
     }
+    return false;
+}
+
+// Roam around map
+bool doRoam()
+{
+    static Timer roam_timer;
+    // Don't path constantly
+    if (!roam_timer.test_and_set(200))
+        return false;
+
+    // RED team, nav near enemy objective if possible
+    if (g_pLocalPlayer->team == TEAM_RED)
+    {
+        std::optional<Vector> target;
+        target = getPayloadGoal(TEAM_BLU);
+        if (!target)
+            target = getControlPointGoal(TEAM_BLU);
+        if (target)
+        {
+            if ((*target).DistTo(g_pLocalPlayer->v_Origin) <= 250.0f)
+            {
+                navparser::NavEngine::cancelPath();
+                return true;
+            }
+            if (navparser::NavEngine::navTo(*target, patrol))
+                return true;
+        }
+    }
+
+    // No sniper spots :shrug:
+    if (sniper_spots.empty())
+        return false;
+    // Don't overwrite current roam
+    if (navparser::NavEngine::current_priority == patrol)
+        return false;
+    // Max 10 attempts
+    for (int attempts = 0; attempts < 10; ++attempts)
+    {
+        // Get a random sniper spot
+        auto random = select_randomly(sniper_spots.begin(), sniper_spots.end());
+        // Try to nav there
+        if (navparser::NavEngine::navTo(*random, patrol))
+            return true;
+    }
+
     return false;
 }
 

@@ -487,7 +487,7 @@ Vector last_destination;
 
 bool isReady()
 {
-    return enabled && map && map->state == NavState::Active && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU);
+    return enabled && map && map->state == NavState::Active && g_pGameRules->roundmode >= 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU);
 }
 
 bool isPathing()

@@ -279,7 +279,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
     case ENTITY_BUILDING:
         if (!buildings)
             return false;
-        if (!ent->m_bEnemy() && !(teammate_buildings || teammates))
+        if (!ent->m_bEnemy() && !teammate_buildings)
             return false;
         if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject) && ent->m_IDX == HandleToIDX(CE_INT(LOCAL_E, netvar.m_hCarriedObject)))
             return false;

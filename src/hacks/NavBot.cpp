@@ -910,23 +910,22 @@ bool doRoam()
     if (!roam_timer.test_and_set(200))
         return false;
 
-    // RED team, nav near enemy objective if possible
-    if (g_pLocalPlayer->team == TEAM_RED)
+    // Defend our objective if possible
+    int enemy_team = g_pLocalPlayer->team == TEAM_BLU ? TEAM_RED : TEAM_BLU;
+
+    std::optional<Vector> target;
+    target = getPayloadGoal(enemy_team);
+    if (!target)
+        target = getControlPointGoal(enemy_team);
+    if (target)
     {
-        std::optional<Vector> target;
-        target = getPayloadGoal(TEAM_BLU);
-        if (!target)
-            target = getControlPointGoal(TEAM_BLU);
-        if (target)
+        if ((*target).DistTo(g_pLocalPlayer->v_Origin) <= 250.0f)
         {
-            if ((*target).DistTo(g_pLocalPlayer->v_Origin) <= 250.0f)
-            {
-                navparser::NavEngine::cancelPath();
-                return true;
-            }
-            if (navparser::NavEngine::navTo(*target, patrol))
-                return true;
+            navparser::NavEngine::cancelPath();
+            return true;
         }
+        if (navparser::NavEngine::navTo(*target, patrol))
+            return true;
     }
 
     // No sniper spots :shrug:

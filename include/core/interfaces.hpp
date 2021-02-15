@@ -92,7 +92,8 @@ extern IVRenderView *g_IVRenderView;
 extern IMoveHelperServer *g_IMoveHelperServer;
 extern CBaseClientState *g_IBaseClientState;
 extern IGameEventManager *g_IGameEventManager;
-extern CGameRules *g_pGameRules;
+extern CGameRules **rg_pGameRules;
+#define g_pGameRules (*rg_pGameRules)
 extern IEngineVGui *g_IEngineVGui;
 extern IUniformRandomStream *g_pUniformStream;
 extern int *g_PredictionRandomSeed;

@@ -158,7 +158,7 @@ void CreateInterfaces()
         g_PredictionRandomSeed = *reinterpret_cast<int **>(sig + (uintptr_t) 1);
 
         uintptr_t g_pGameRules_sig = gSignatures.GetClientSignature("C7 03 ? ? ? ? 89 1D ? ? ? ? 83 C4 14 5B 5D C3");
-        g_pGameRules               = **reinterpret_cast<CGameRules ***>(g_pGameRules_sig + 8);
+        rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig + 8);
     }
     g_IMaterialSystem = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
     g_IMDLCache       = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());

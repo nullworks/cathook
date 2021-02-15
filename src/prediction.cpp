@@ -402,7 +402,7 @@ std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec,
         return { Vector(), Vector() };
 
     trace::filter_no_player.SetSelf(RAW_ENT(building));
-    float dtg = DistanceToGround(vec, RAW_ENT(building)->GetCollideable()->OBBMins(), RAW_ENT(building)->GetCollideable()->OBBMaxs());
+
     // TODO ProjAim
     float medianTime  = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
     float range       = 1.5f;
@@ -415,12 +415,7 @@ std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec,
     int maxsteps   = 300;
     for (int steps = 0; steps < maxsteps; steps++, currenttime += ((float) (2 * range) / (float) maxsteps))
     {
-        Vector curpos = result;
-        if (dtg > 0.0f)
-        {
-            if (curpos.z < result.z - dtg)
-                curpos.z = result.z - dtg;
-        }
+        Vector curpos    = result;
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(curpos) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();

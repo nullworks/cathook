@@ -1127,7 +1127,7 @@ Vector PredictEntity(CachedEntity *entity, bool vischeck)
         // Buildings
         else if (entity->m_Type() == ENTITY_BUILDING)
         {
-            if (cur_proj_grav || cur_proj_grav)
+            if (projectileAimbotRequired)
             {
                 std::pair<Vector, Vector> tmp_result;
                 tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);

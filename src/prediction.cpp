@@ -41,27 +41,27 @@ struct StrafePredictionData
 {
     bool strafing_dir;
     float radius;
-    Vector2D center;
+    Vector center;
 };
 
 // StrafePredictionData strafepred_data;
-static std::array<boost::circular_buffer<Vector2D>, MAX_PLAYERS> previous_positions;
+static std::array<boost::circular_buffer<Vector>, MAX_PLAYERS> previous_positions;
 static ConVar *sv_gravity = nullptr;
 
 // Function for calculating the center and radius of a circle that is supposed to represent a players starfing pattern
-static std::optional<StrafePredictionData> findCircle(const Vector2D &current, const Vector2D &past1, const Vector2D &past2)
+static std::optional<StrafePredictionData> findCircle(const Vector &current, const Vector &past1, const Vector &past2)
 {
     float yDelta_a = past1.y - current.y;
     float xDelta_a = past1.x - current.x;
     float yDelta_b = past2.y - past1.y;
     float xDelta_b = past2.x - past1.x;
-    Vector2D Center{};
+    Vector Center{};
 
     float aSlope = yDelta_a / xDelta_a;
     float bSlope = yDelta_b / xDelta_b;
 
-    Vector2D AB_Mid = Vector2D((current.x + past1.x) / 2, (current.y + past1.y) / 2);
-    Vector2D BC_Mid = Vector2D((past1.x + past2.x) / 2, (past1.y + past2.y) / 2);
+    Vector AB_Mid = Vector((current.x + past1.x) / 2, (current.y + past1.y) / 2, current.z);
+    Vector BC_Mid = Vector((past1.x + past2.x) / 2, (past1.y + past2.y) / 2, current.z);
 
     if (yDelta_a == 0)
     {
@@ -147,7 +147,7 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
         auto newpos = result + (acceleration / 2.0f) * pow(steplength, 2) + vel * steplength;
         // Strafe pred does not predict Z! The player can't control his Z anyway, so it is pointless.
         result.z = newpos.z;
-        applyStrafePrediction(result, *strafepred, newpos.AsVector2D().DistTo(result.AsVector2D()));
+        applyStrafePrediction(result, *strafepred, newpos.DistTo(result));
     }
     else
         result += (acceleration / 2.0f) * pow(steplength, 2) + vel * steplength;
@@ -540,8 +540,8 @@ float DistanceToGround(Vector origin)
 }
 
 static InitRoutine init([]() {
-    previous_positions.fill(boost::circular_buffer<Vector2D>(*sample_size));
-    sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(boost::circular_buffer<Vector2D>(after)); });
+    previous_positions.fill(boost::circular_buffer<Vector>(*sample_size));
+    sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(boost::circular_buffer<Vector>(after)); });
     EC::Register(
         EC::CreateMove,
         []() {
@@ -555,7 +555,7 @@ static InitRoutine init([]() {
                     continue;
                 }
 
-                buffer.push_front(ent->m_vecOrigin().AsVector2D());
+                buffer.push_front(ent->m_vecOrigin());
             }
         },
         "cm_prediction", EC::very_early);

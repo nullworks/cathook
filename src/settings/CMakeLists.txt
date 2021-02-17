@@ -1,4 +1,5 @@
-set(files "${CMAKE_CURRENT_LIST_DIR}/Manager.cpp"
+set(files "${CMAKE_CURRENT_LIST_DIR}/ConfigUI.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/Manager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Registered.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/Settings.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/SettingCommands.cpp"

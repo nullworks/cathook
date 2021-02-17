@@ -11,6 +11,7 @@
 #if ENABLE_VISUALS
 #include "Menu.hpp"
 #include "special/SettingsManagerList.hpp"
+#include "special/ConfigsManagerList.hpp"
 #include "settings/Bool.hpp"
 #endif
 /*
@@ -20,6 +21,17 @@
 namespace settings::commands
 {
 static settings::Boolean autosave{ "settings.autosave", "true" };
+
+void refreshConfigList()
+{
+    zerokernel::Container *cl = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("cfg-list"));
+    if (cl)
+    {
+        zerokernel::special::ConfigsManagerList list(*cl);
+        list.construct();
+        printf("CL found\n");
+    }
+}
 
 static void getAndSortAllConfigs();
 static std::string getAutoSaveConfigPath()
@@ -144,6 +156,7 @@ static CatCommand save("save", "", [](const CCommand &args) {
     logging::Info("cat_save: Sorting configs...");
     getAndSortAllConfigs();
     logging::Info("cat_save: Closing dir...");
+    refreshConfigList();
     closedir(config_directory);
 });
 
@@ -156,6 +169,37 @@ static CatCommand load("load", "", [](const CCommand &args) {
     else
     {
         loader.loadFrom(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
+    }
+});
+
+
+static CatCommand delete_config("delete_config", "", [](const CCommand &args) {
+    if (args.ArgC() == 2)
+    {
+        remove((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str());
+        refreshConfigList();
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
+    }
+    else
+    {
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
+    }
+});
+
+static CatCommand list_config("list_config", "", [](const CCommand &args) {
+    DIR           *direc;
+    struct dirent *directory;
+
+    direc = opendir(paths::getConfigPath().c_str());
+    if (direc)
+    {
+        while ((directory = readdir(direc)) != NULL)
+        {
+            if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
+                g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
+        }
+
+        closedir(direc);
     }
 });
 

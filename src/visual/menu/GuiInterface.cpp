@@ -6,6 +6,7 @@
 #include <menu/menu/Menu.hpp>
 #include <drawing.hpp>
 #include <menu/menu/special/SettingsManagerList.hpp>
+#include <menu/menu/special/ConfigsManagerList.hpp>
 #include <menu/menu/special/PlayerListController.hpp>
 #include <hack.hpp>
 #include <common.hpp>
@@ -128,6 +129,15 @@ static void load()
         list.construct();
         printf("SV found\n");
     }
+    
+    zerokernel::Container *cl = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("cfg-list"));
+    if (cl)
+    {
+        zerokernel::special::ConfigsManagerList list(*cl);
+        list.construct();
+        printf("CL found\n");
+    }
+    
     initPlayerlist();
 
     zerokernel::Menu::instance->update();

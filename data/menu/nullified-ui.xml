@@ -9,6 +9,7 @@
             <Include path="nullifiedcat/movement.xml"/>
             <Include path="nullifiedcat/misc.xml"/>
             <Include path="nullifiedcat/chat.xml"/>
+            <Include path="nullifiedcat/config.xml"/>
             <Include path="nullifiedcat/hackinfo.xml"/>
         </TabContainer>
     </Window>

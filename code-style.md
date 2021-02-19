@@ -8,7 +8,7 @@
 - `using namespace` is strictly forbidden.
 - [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) is forbidden.
 - Comments should be above the relevant code.
-- Use [modern c++](http://www.modernescpp.com/index.php/what-is-modern-c). (Usage of `make_unique` instead `new`, etc)
+- Use [modern c++](http://www.modernescpp.com/index.php/what-is-modern-c). (Usage of `make_unique` instead of `new`, etc)
 
 ### File names
 

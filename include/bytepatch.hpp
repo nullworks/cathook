@@ -44,6 +44,14 @@ public:
         Copy();
     }
 
+    static void mprotectAddr(unsigned addr, int size, int flags)
+    {
+        void *page          = (void *) ((uint64_t) addr & ~0xFFF);
+        void *end_page      = (void *) (((uint64_t)(addr) + size) & ~0xFFF);
+        uintptr_t mprot_len = (uint64_t) end_page - (uint64_t) page + 0xFFF;
+
+        mprotect(page, mprot_len, flags);
+    }
     void Copy()
     {
         void *page          = (void *) ((uint64_t) addr & ~0xFFF);

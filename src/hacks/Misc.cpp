@@ -963,7 +963,13 @@ inline void force_wait_func(bool after)
     {
         // Enable the wait command
         int **enable_wait = (int **) (enable_wait_signature + 3);
-        **enable_wait     = true;
+
+        BytePatch::mprotectAddr((uintptr_t) enable_wait, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+        BytePatch::mprotectAddr((uintptr_t) *enable_wait, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+
+        **enable_wait = true;
+        BytePatch::mprotectAddr((uintptr_t) enable_wait, 4, PROT_EXEC);
+
         patch_wait.Patch();
     }
     else

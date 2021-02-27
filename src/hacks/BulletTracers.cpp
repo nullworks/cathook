@@ -236,6 +236,12 @@ static InitRoutine init([]() {
             static auto addr4 = gSignatures.GetClientSignature("E8 ? ? ? ? 8D 85 ? ? ? ? 89 7C 24 0C 89 44 24 10");
             static auto addr5 = gSignatures.GetClientSignature("E8 ? ? ? ? 8D 65 F4 5B 5E 5F 5D C3 8D 76 00 8B 43 0C"); // FX_Tracer detour
 
+            BytePatch::mprotectAddr(addr1 + 1, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+            BytePatch::mprotectAddr(addr2 + 1, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+            BytePatch::mprotectAddr(addr3 + 1, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+            BytePatch::mprotectAddr(addr4 + 1, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+            BytePatch::mprotectAddr(addr5 + 1, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+
             GetParticleSystemNameFromIndex_fn = GetParticleSystemNameFromIndex_t(e8call(addr1 + 7));
             GetActiveTFWeapon_fn              = GetActiveTFWeapon_t(e8call_direct(addr2));
             DispatchEffect_fn                 = DispatchEffect_t(e8call_direct(addr3));

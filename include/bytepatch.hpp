@@ -29,21 +29,31 @@ public:
         addr = static_cast<void *>(static_cast<char *>(addr) + offset);
         size = patch.size();
         original.resize(size);
-        memcpy(&original[0], addr, size);
+        Copy();
     }
     BytePatch(uintptr_t addr, std::vector<unsigned char> patch) : addr{ reinterpret_cast<void *>(addr) }, patch_bytes{ patch }
     {
         size = patch.size();
         original.resize(size);
-        memcpy(&original[0], reinterpret_cast<void *>(addr), size);
+        Copy();
     }
     BytePatch(void *addr, std::vector<unsigned char> patch) : addr{ addr }, patch_bytes{ patch }
     {
         size = patch.size();
         original.resize(size);
-        memcpy(&original[0], addr, size);
+        Copy();
     }
 
+    void Copy()
+    {
+        void *page          = (void *) ((uint64_t) addr & ~0xFFF);
+        void *end_page      = (void *) (((uint64_t)(addr) + size) & ~0xFFF);
+        uintptr_t mprot_len = (uint64_t) end_page - (uint64_t) page + 0xFFF;
+
+        mprotect(page, mprot_len, PROT_READ | PROT_WRITE | PROT_EXEC);
+        memcpy(&original[0], addr, size);
+        mprotect(page, mprot_len, PROT_EXEC);
+    }
     void Patch()
     {
         if (!patched)

@@ -15,7 +15,7 @@
         <List width="185">
             <AutoVariable width="fill" target="colors.guicolor" label="GUI Color"/>
             <AutoVariable width="fill" target="colors.target" label="Target color" tooltip="Color for the aimbot's target."/>
-            <AutoVariable width="fill" target="misc.scoreboard.match-custom-team-colors" label="Make the scoreboard use custom colors."/>
+            <AutoVariable width="fill" target="misc.scoreboard.match-custom-team-colors" label="Custom scoreboard colors" tooltip="Make the scoreboard use custom colors."/>
         </List>
     </Box>
 </Tab>

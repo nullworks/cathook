@@ -1,7 +1,7 @@
 <Tab name="Movement" padding="6 6 6 6">
-    <Box padding="12 6 6 6" width="content" height="content" name="Bunny hop">
+    <Box padding="12 6 6 6" width="content" height="content" name="Bunnyhop">
         <List width="150">
-            <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunny hop"/>
+            <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunnyhop"/>
             <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop chance" tooltip="% chance of a successful bunnyhop"/>
             <AutoVariable width="fill" target="misc.autostrafe" label="Enable auto strafe"/>
         </List>

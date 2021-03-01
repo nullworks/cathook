@@ -2,9 +2,9 @@
     <Box padding="12 6 6 6" width="content" height="content" name="ESP">
         <List width="150">
             <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception"/>
-            <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Dont show ESP of enemies behind walls"/>
+            <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Don't show ESP of enemies behind walls"/>
             <AutoVariable width="fill" target="esp.range" label="Max range"/>
-            <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP"/>
+            <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP" tooltip="Draws square over enemies' heads"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="81">
@@ -66,14 +66,14 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="ESP settings" x="170" y="90">
         <List width="150">
-            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players"/>
+            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players" tooltip="Makes the box around players 3D. Overrides 'Box mode' setting."/>
             <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
-            <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
+            <AutoVariable width="fill" target="esp.bones" label="Bone ESP" tooltip="Draws the skeleton of players."/>
             <AutoVariable width="fill" target="esp.bones.color" label="Bone color" tooltip="Colors bones according to player state."/>
             <AutoVariable width="fill" target="esp.sightlines" label="Sightlines"/>
             <AutoVariable width="fill" target="esp.expand" label="Expand" tooltip="Make ESP larger or smaller."/>
-            <LabeledObject width="fill" label="Text position">
+            <LabeledObject width="fill" label="Text position" tooltip="Sets location of text found in 'Strings'.">
                 <Select target="esp.text-position">
                     <Option name="Top right" value="0"/>
                     <Option name="Bottom right" value="1"/>
@@ -91,7 +91,7 @@
                     <Option name="Corners" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Tracer mode">
+            <LabeledObject width="fill" label="Tracer mode" tooltip="Shows tracers similar to those found in Visuals->Tracers.">
                 <Select target="esp.tracers-mode">
                     <Option name="Off" value="0"/>
                     <Option name="Center" value="1"/>
@@ -147,7 +147,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="240">
         <List width="150">
-            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to one if you are being dominated by someone else."/>
+            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Displays a mark on people you are dominating, similar to the one if someone is dominating you."/>
             <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
             <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
         </List>

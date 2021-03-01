@@ -14,7 +14,7 @@
                     <AutoVariable width="fill" target="chams.local-weapon.wireframe" label="Local weapon chams wireframe"/>
                     <AutoVariable width="fill" target="chams.local-weapon.original" label="Local weapon chams draw original"/>
                     <AutoVariable width="fill" target="chams.local-weapon.team-colors" label="Local weapon chams use team color"/>
-                    <AutoVariable width="fill" target="chams.arms" label="Arm chams"/>
+                    <AutoVariable width="fill" target="chams.arms" label="Arm chams" tooltip="Enable chams on your arms."/>
                     <AutoVariable width="fill" target="chams.overlay.arms" label="Overlay arm chams" tooltip="Phong and other eye candies for arm chams"/>
                     <AutoVariable width="fill" target="chams.arms.wireframe" label="Arm chams Wireframe"/>
                     <AutoVariable width="fill" target="chams.arms.original" label="Arm chams draw original model"/>
@@ -29,7 +29,7 @@
                     <AutoVariable width="fill" target="backtrack.chams" label="Backtrack chams" tooltip="Draw chams for backtrack ticks"/>
                     <AutoVariable width="fill" target="backtrack.chams.overlay" label="Overlay backtrack chams"/>
                     <AutoVariable width="fill" target="backtrack.chams.wireframe" label="Backtrack chams wireframe"/>
-                    <AutoVariable width="fill" target="backtrack.chams.ticks" label="Backtrack chams amount" tooltip="How many ticks to draw (WARNING, this can cause lag)"/>
+                    <AutoVariable width="fill" target="backtrack.chams.ticks" label="Backtrack chams amount" tooltip="How many ticks to draw (WARNING: this can cause lag)"/>
                 </List>
             </Box>
             <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="210">

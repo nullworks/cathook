@@ -14,8 +14,8 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Cheat colors" x="200">
         <List width="185">
             <AutoVariable width="fill" target="colors.guicolor" label="GUI Color"/>
-            <AutoVariable width="fill" target="colors.target" label="Target color" tooltip="Aimbot target"/>
-            <AutoVariable width="fill" target="misc.scoreboard.match-custom-team-colors" label="Scoreboard use custom colors"/>
+            <AutoVariable width="fill" target="colors.target" label="Target color" tooltip="Color for the aimbot's target."/>
+            <AutoVariable width="fill" target="misc.scoreboard.match-custom-team-colors" label="Make the scoreboard use custom colors."/>
         </List>
     </Box>
 </Tab>

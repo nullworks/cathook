@@ -11,7 +11,7 @@
         <AutoVariable width="fill" target="radar.show-cross" label="Show Cross" tooltip="Show cross in the center of the radar."/>
             <AutoVariable width="fill" target="radar.enemies-over-teammates" label="Enemies on top"/>
             <AutoVariable width="fill" target="radar.healthbar" label="Health bar size" min="0" max="5" step="1"/>
-            <AutoVariable width="fill" target="radar.use-icons" label="Use icons"/>
+            <AutoVariable width="fill" target="radar.use-icons" label="Use icons" tooltip="Use icons to represent what class an enemy is."/>
             <AutoVariable width="fill" target="radar.size" label="Size" min="1" max="480" step="5"/>
             <AutoVariable width="fill" target="radar.icon-size" label="Icon size" min="1" max="48"/>
             <AutoVariable width="fill" target="radar.x" label="Radar X" tooltip="Sets the radar's x value from the left side of the window."/>

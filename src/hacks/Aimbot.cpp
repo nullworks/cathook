@@ -404,25 +404,27 @@ static void CreateMove()
         }
     }
 }
+
 #if ENABLE_VISUALS
 bool MouseMoving()
 {
-    if ((g_GlobalVars->curtime - last_mouse_check) >= 0.02)
-        last_mouse_check = g_GlobalVars->curtime;
-
-    if (PreviousX != CurrentX || PreviousY != CurrentY)
+    if ((g_GlobalVars->curtime - last_mouse_check) < 0.02)
     {
-        stop_moving_time = g_GlobalVars->curtime + 0.5;
-        return true;
-    }
-    else if (g_GlobalVars->curtime <= stop_moving_time)
-    {
-        return true;
+        auto previous = SDL_GetMouseState(&PreviousX, &PreviousY);
     }
     else
     {
-        return false;
+        auto current     = SDL_GetMouseState(&CurrentX, &CurrentY);
+        last_mouse_check = g_GlobalVars->curtime;
     }
+
+    if (PreviousX != CurrentX || PreviousY != CurrentY)
+        stop_moving_time = g_GlobalVars->curtime + 0.5;
+    
+    if (g_GlobalVars->curtime <= stop_moving_time)
+        return true;
+    else
+        return false;
 }
 #endif
 

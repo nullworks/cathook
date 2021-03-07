@@ -1,7 +1,7 @@
 <Tab name="Chat" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chat spam">
         <List width="150">
-            <LabeledObject width="fill" label="Spam mode">
+            <LabeledObject width="fill" label="Spam mode" tooltip="Set which lines to spam in chat.">
                 <Select target="spam.source">
                     <Option name="Disable" value="0"/>
                     <Option name="Custom" value="1"/>
@@ -85,10 +85,10 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="uberspam.file" label="Custom uber chat"/>
-            <AutoVariable width="fill" target="uberspam.team-chat" label="Team Chat" tooltip="Only send uber chat to teamchat."/>
-            <AutoVariable width="fill" target="uberspam.triggers.ended" label="Uber End"/>
-            <AutoVariable width="fill" target="uberspam.triggers.ready" label="Uber Ready"/>
-            <AutoVariable width="fill" target="uberspam.triggers.used" label="Uber Used"/>
+            <AutoVariable width="fill" target="uberspam.team-chat" label="Team chat" tooltip="Only send uber chat to teamchat."/>
+            <AutoVariable width="fill" target="uberspam.triggers.ended" label="Uber end"/>
+            <AutoVariable width="fill" target="uberspam.triggers.ready" label="Uber ready"/>
+            <AutoVariable width="fill" target="uberspam.triggers.used" label="Uber used"/>
             <AutoVariable width="fill" target="uberspam.triggers.every-n-percent" label="Every %" tooltip="Increment of percent of uber to send info to chat."/>
             <!-- FIXME add button -->
         </List>

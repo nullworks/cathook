@@ -8,7 +8,7 @@
             <AutoVariable width="fill" target="autoheal.steamid" label="SteamID" tooltip="SteamID for the above."/>
             <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto uber"/>
             <AutoVariable width="fill" target="autoheal.uber.share" label="Share uber"/>
-            <AutoVariable width="fill" target="autoheal.disguised" label="Disguised spies"/>
+            <AutoVariable width="fill" target="autoheal.disguised" label="Disguised Spies"/>
             <AutoVariable width="fill" target="autoheal.uber.health-below-ratio" label="Ratio trigger" min="0" max="100"/>
             <AutoVariable width="fill" target="autoheal.popvoice" label="Pop on voicecommand"/>
             <AutoVariable width="fill" target="autoheal.friends-only" label="Only heal friends"/>
@@ -58,7 +58,7 @@
                 <AutoVariable width="fill" target="autoheal.vacc.blast.enable" label="Enable"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.crit-pop" label="Pop on near crit"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.danger-range" label="Danger range" min="0" max="1000"/>
-                <AutoVariable width="fill" target="autoheal.vacc.blast.pop-near-rocket-health" label="Rocket health pop" tooltip="Health value to pop ubercharge at if rocket is near." min="0" max="450"/>
+                <AutoVariable width="fill" target="autoheal.vacc.blast.pop-near-rocket-health" label="Rocket health pop" min="0" max="450"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.min-charges" label="Min. charges" min="0" max="4"/>
             </List>
         </Box>

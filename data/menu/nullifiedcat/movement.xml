@@ -13,14 +13,14 @@
             <AutoVariable width="fill" target="follow-bot.change-roaming-target" label="Change when possible" tooltip="Allows more changing of follow targets"/>
             <AutoVariable width="fill" target="follow-bot.jump-if-stuck" label="Jump if stuck"/>
             <AutoVariable width="fill" target="follow-bot.taunt-sync" label="Synced taunts" tooltip="Taunt when follow target taunts."/>
-            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation Range" tooltip="Max distance to follow a target"/>
-            <AutoVariable width="fill" target="follow-bot.distance" label="Follow distance" tooltip="Distance to follow target"/>
+            <AutoVariable width="fill" target="follow-bot.max-range" label="Activation Range" tooltip="Max distance a target can be from FollowBot to get followed."/>
+            <AutoVariable width="fill" target="follow-bot.distance" label="Follow distance" tooltip="Distance to keep between target and FollowBot."/>
             <AutoVariable width="fill" target="follow-bot.ipc-distance" label="IRC additive distance"/>
             <AutoVariable width="fill" target="follow-bot.mimic-slot" label="Mimic slot" tooltip="Mimic target's weapon slot."/>
             <AutoVariable width="fill" target="follow-bot.mimic-crouch" label="Mimic crouch"/>
             <AutoVariable width="fill" target="follow-bot.always-medigun" label="Always Medigun" tooltip="Always have the medigun out. Overrides mimic slot."/>
             <AutoVariable width="fill" target="follow-bot.switch-afk" label="AFK switch"/>
-            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit" tooltip="Time a target must be AFK for to switch from them."/>
+            <AutoVariable width="fill" target="follow-bot.afk-time" label="AFK limit" tooltip="Time a target must be AFK for FollowBot to switch look for a new target."/>
             <AutoVariable width="fill" target="follow-bot.corners" label="Corner activate"/>
             <AutoVariable width="fill" target="follow-bot.steamid" label="SteamID to follow" tooltip="Steamid of player to follow. Highest priority."/>
             <AutoVariable width="fill" target="follow-bot.prioritize-leader" label="Prioritize the party leader" Tooltip="Second highest priority."/>
@@ -34,7 +34,7 @@
             <AutoVariable width="fill" target="nav.draw" label="Draw path"/>
             <AutoVariable width="fill" target="nav.look-at-path" label="Look at path"/>
             <AutoVariable width="fill" target="navbot.enabled" label="Enable NavBot"/>
-            <AutoVariable width="fill" target="navbot.capture-objectives" label="Capture objectives" tooltip="Automatically capture objectives (CTF,CP and PL only)"/>
+            <AutoVariable width="fill" target="navbot.capture-objectives" label="Capture objectives" tooltip="Automatically capture objectives (CTF, CP, and PL only)"/>
             <AutoVariable width="fill" target="navbot.search-health" label="Search health"/>
             <AutoVariable width="fill" target="navbot.search-ammo" label="Search ammo"/>
             <AutoVariable width="fill" target="navbot.escape-danger" label="Escape danger"/>
@@ -55,7 +55,7 @@
             <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable autojump"/>
             <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump distance"/>
             <AutoVariable width="fill" target="navbot.snipe-sentries" label="Try to target sentries"/>
-            <AutoVariable width="fill" target="navbot.snipe-sentries.shortrange" label="Scout/Pyro sentry mode" tooltip="Try to target sentries as scout/pyro aswell. Usually not recommended."/>
+            <AutoVariable width="fill" target="navbot.snipe-sentries.shortrange" label="Scout/Pyro sentry mode" tooltip="Try to target sentries as scout/pyro as well. Usually not recommended."/>
             <AutoVariable width="fill" target="navbot.stay-near" label="Stalk enemies" tooltip="Try to outrange as sniper and close distance as scout/heavy"/>
             <!-- <!AutoVariable width="fill" target="navbot.take-teleporters" label="take teleporters"/> -->
         </List>
@@ -79,7 +79,7 @@
         <List width="150">
             <AutoVariable width="fill" target="misc.no-push" label="Nopush"/>
             <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"/>
-            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk Fowards"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk fowards"/>
         </List>
     </Box>
 </Tab>

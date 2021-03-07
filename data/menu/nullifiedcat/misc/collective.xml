@@ -1,7 +1,7 @@
 <Tab name="Collective" padding="4 4 4 4">
     <Box height="content" width="content" padding="12 6 6 6" name="Collective">
         <List width="200">
-            <AutoVariable width="fill" target="misc.anti-afk" label="Enable antiafk"/>
+            <AutoVariable width="fill" target="misc.anti-afk" label="Enable antiafk" tooltip="Automatically make small movements to avoid AFK kicking."/>
             <AutoVariable width="fill" target="misc.auto-abandon" label="Enable auto abandon"/>
             <AutoVariable width="fill" target="misc.auto-balance-spam" label="Enable auto balance spam"/>
             <AutoVariable width="fill" target="misc.die-if-vac" label="Crash on VAC"/>
@@ -35,11 +35,11 @@
     <Box height="content" width="content" padding="12 6 6 6" name="Extra" x="215" y="65">
         <List width="200">
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
-            <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit"/>
-            <AutoVariable width="fill" target="player-tools.ignore.hoovy" label="Ignore hoovies"/>
+            <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit" tooltip="Target friendlies if they kill you this many times."/>
+            <AutoVariable width="fill" target="player-tools.ignore.hoovy" label="Ignore hoovies" tooltip="Don't target hoovies"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting players"/>
             <AutoVariable width="fill" target="player-tools.auto-party" label="Automatically add party state"/>
-            <AutoVariable width="fill" target="killstreak.enable" label="Enable killstreak"/>
+            <AutoVariable width="fill" target="killstreak.enable" label="Enable killstreak" tooltip="Enable killstreak killfeed effect on all weapons."/>
             <AutoVariable width="fill" target="misc.backpack-expander.enabled" label="Expand backpack"/>
             <AutoVariable width="fill" target="misc.backpack-expander.slot-count" label="Backpack slots" min="1" max="3000"/>
         </List>

@@ -9,8 +9,8 @@
             <AutoVariable width="fill" target="crit.draw-info.x" label="Text x position"/>
             <AutoVariable width="fill" target="crit.draw-info.y" label="Text y position"/>
             <AutoVariable width="fill" target="crit.draw-meter" label="Crit bar" tooltip="Instead of text draw a Bar"/>
-            <AutoVariable width="fill" target="crit.bar-x" label="Bar x position"/>
-            <AutoVariable width="fill" target="crit.bar-y" label="Bar y position"/>
+            <AutoVariable width="fill" target="crit.bar-x" label="Bar x position" tooltip="Number of pixels from left side of screen."/>
+            <AutoVariable width="fill" target="crit.bar-y" label="Bar y position" tooltip="Number of pixels from top side of screen."/>
             <AutoVariable width="fill" target="crit.bar-size" label="Bar size"/>
         </List>
     </Box>

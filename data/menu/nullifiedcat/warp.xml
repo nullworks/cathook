@@ -25,14 +25,14 @@
             <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Rapidfire" x="210">
+    <Box padding="12 6 6 6" width="content" height="content" name="Rapid-fire" x="210">
         <List width="185">
-            <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
-            <AutoVariable width="fill" target="warp.rapidfire.distance" label="Maximum distance" tooltip="How close an enemy has to be for rapidfire to trigger. 0 = unlimited range."/>
-            <AutoVariable width="fill" target="warp.rapidfire.zoom" label="Enable Rapid zoom" tooltip="Allows you to instantly zoom in."/>
-            <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
-            <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
-            <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">
+            <AutoVariable width="fill" target="warp.rapidfire" label="Enable rapid-fire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
+            <AutoVariable width="fill" target="warp.rapidfire.distance" label="Maximum distance" tooltip="How close an enemy has to be for rapid-fire to trigger. 0 = unlimited range."/>
+            <AutoVariable width="fill" target="warp.rapidfire.zoom" label="Enable rapid zoom" tooltip="Allows you to instantly zoom in."/>
+            <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapid-fire" tooltip="Attempt to not move when rapid-firing."/>
+            <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapid-fire key" tooltip="Optional. If set, you can use this key to control when to rapid-fire."/>
+            <LabeledObject width="fill" label="Rapid-fire key mode" tooltip="Controls what the rapid-fire key does.">
                 <Select target="warp.rapidfire.key-mode">
                     <Option name="Disable" value="0"/>
                     <Option name="Pressed" value="1"/>
@@ -40,7 +40,7 @@
                     <Option name="Toggle" value="3"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Disable Rapidfire on">
+            <LabeledObject width="fill" label="Disable rapid-fire on">
                 <Select target="warp.rapidfire.disable-on">
                     <Option name="None" value="0"/>
                     <Option name="Projectile" value="1"/>

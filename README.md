@@ -26,7 +26,7 @@ and a lot of useful features, including
 * Anti Backstab with option to use "No" voice command when spy tries to backstab you
 * Extremely customizable spam (you can make spam lines that'll include name of random dead enemy pyro or sniper)
 * Follow Bots
-* Navparser Bots (Walkbots than can walk on any map without manual configuration)
+* Navparser Bots (Walkbots that can walk on any map without manual configuration)
 * Working crit hack (Editors note: Not fully working on all weapons)
 * Backtrack
 * Automatic matchmaking
@@ -39,7 +39,8 @@ and a lot of useful features, including
 [View our short guide to installing and using cathook](https://cathook.club/wikis/Installing,-Attaching-And-General-Infos)
 
 ## Community
-You can chat with other cathook users in [our official telegram group](https://t.me/nullworks) and the [cathook announcements channel](https://t.me/cathook_cheat).
+You can chat with other cathook users in [our official Telegram group](https://t.me/nullworks) and the [cathook announcements channel](https://t.me/cathook_cheat).
+If you don't have Telegram, you can chat with other cathook users in our official Matrix room, however, you will have to ask TotallyNotElite or BenCat07 for an invite to said room.
 
 ## Reporting Issues
 

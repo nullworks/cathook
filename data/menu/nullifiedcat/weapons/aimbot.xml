@@ -52,7 +52,7 @@
                     <Option name="All" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Hitbox mode" tooltip="Auto: aimbot will inteligently pick which hitbox to target. Closest: aimbot will target whichever hitbox is closest to crosshair. Static: aimbot will target the hitbox set below.">
+            <LabeledObject width="fill" label="Hitbox mode" tooltip="Auto: aimbot will intelligently pick which hitbox to target. Closest: aimbot will target whichever hitbox is closest to crosshair. Static: aimbot will target the hitbox set below.">
                 <Select target="aimbot.hitbox-mode">
                     <Option name="Auto" value="0"/>
                     <Option name="Closest" value="1"/>

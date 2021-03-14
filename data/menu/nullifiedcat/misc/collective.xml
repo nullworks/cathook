@@ -35,8 +35,8 @@
     <Box height="content" width="content" padding="12 6 6 6" name="Extra" x="215" y="65">
         <List width="200">
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
-            <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit" tooltip="Target friendlies if they kill you this many times."/>
-            <AutoVariable width="fill" target="player-tools.ignore.hoovy" label="Ignore hoovies" tooltip="Don't target hoovies"/>
+            <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit" tooltip="Target ignored enemies if they kill you this many times."/>
+            <AutoVariable width="fill" target="player-tools.ignore.hoovy" label="Ignore hoovies" tooltip="Don't target hoovies."/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting players"/>
             <AutoVariable width="fill" target="player-tools.auto-party" label="Automatically add party state"/>
             <AutoVariable width="fill" target="killstreak.enable" label="Enable killstreak" tooltip="Enable killstreak killfeed effect on all weapons."/>

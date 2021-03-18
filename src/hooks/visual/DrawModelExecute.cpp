@@ -35,6 +35,7 @@ static settings::Boolean render_original{ "chams.original", "false" };
 
 /* Cham target rvars */
 static settings::Boolean health{ "chams.health", "false" };
+static settings::Boolean aimbot_color{ "chams.aimbot.color", "true" };
 static settings::Boolean teammates{ "chams.show.teammates", "false" };
 static settings::Boolean disguised{ "chams.show.disguised", "true" };
 static settings::Boolean players{ "chams.show.players", "true" };
@@ -335,7 +336,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 
     if (CE_BAD(ent))
         return ChamColors(colors::white);
-    if (ent == hacks::shared::aimbot::CurrentTarget())
+    if (ent == hacks::shared::aimbot::CurrentTarget() && aimbot_color)
         return ChamColors(colors::target);
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {

@@ -44,4 +44,12 @@
             <AutoVariable width="fill" target="misc.backpack-expander.slot-count" label="Backpack slots" min="1" max="3000"/>
         </List>
     </Box>
+    <Box name="Rich presence editor" width="content" height="content" padding="12 6 6 6" x="215" y="190">
+        <List width="200">
+            <AutoVariable width="fill" target="misc.rich-presence.enabled" label="Enabled"/>
+            <AutoVariable width="fill" target="misc.rich-presence.file" label="Filename" tooltip="For the message that comes after 'Special Event -'"/>
+            <AutoVariable width="fill" target="misc.rich-presence.party_size" label="Party size"/>
+            <AutoVariable width="fill" target="misc.rich-presence.delay" label="Delay (ms)"/>
+        </List>
+    </Box>
 </Tab>

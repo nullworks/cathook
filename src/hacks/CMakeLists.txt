@@ -38,7 +38,8 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Trigger.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/UberSpam.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Walkbot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/Warp.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/Warp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/RichPresence.cpp")
 target_sources(cathook PRIVATE ${files})
 
 add_subdirectory(ac)

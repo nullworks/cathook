@@ -18,6 +18,7 @@ Cathook is a training software designed for Team Fortress 2 for Linux. Cathook i
 * Encrypted chat
 * Nullnexus Support (Find other Cathook users in-game automatically)
 * Sandvich aimbot
+* Steam friends rich presence editor
 * Chance to get manually VAC banned by Valve
 
 and a lot of useful features, including

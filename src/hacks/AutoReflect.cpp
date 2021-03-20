@@ -5,7 +5,11 @@
  *      Author: nullifiedcat
  */
 
+#include "Registered.hpp"
 #include "common.hpp"
+#include "conditions.hpp"
+#include "localplayer.hpp"
+#include <const.h>
 #include <settings/Bool.hpp>
 
 namespace hacks::tf::autoreflect
@@ -27,6 +31,7 @@ static settings::Boolean rockets{ "autoreflect.rockets", "true" };
 static settings::Boolean sentryrockets{ "autoreflect.sentryrockets", "true" };
 static settings::Boolean cleavers{ "autoreflect.cleavers", "false" };
 static settings::Boolean teammates{ "autoreflect.teammate", "false" };
+static settings::Boolean teammates_fire{ "autoreflect.teammatesfire", "false" };
 
 static settings::Float fov{ "autoreflect.fov", "85" };
 
@@ -38,6 +43,26 @@ static settings::Float fovcircle_opacity{ "autoreflect.draw-fov-opacity", "0.7" 
 // Function to determine whether an ent is good to reflect
 static bool ShouldReflect(CachedEntity *ent)
 {
+    // Check if entity is a burning teammate
+    if (ent->m_Type() == ENTITY_PLAYER && teammates_fire)
+    {
+        // check if player is local player
+        if (ent->m_IDX == LOCAL_E->m_IDX)
+            return false;
+        // check if player is on the same team
+        if (ent->m_iTeam() != g_pLocalPlayer->team)
+            return false;
+        // check if player is on fire
+        if (!HasCondition<TFCond_OnFire>(ent))
+            return false;
+
+        float dist = ent->m_flDistance();
+
+        // this isnt the correct distance value but it works, and looks legit.
+        if (dist < 1000.0f)
+            return *teammates_fire;
+    }
+
     // Check if the entity is a projectile
     if (ent->m_Type() != ENTITY_PROJECTILE)
         return false;

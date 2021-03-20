@@ -88,38 +88,49 @@ static bool ShouldReflect(CachedEntity *ent)
     // Checks if the projectile is x and if the user settings allow it to be reflected
     // If not, returns false
 
-    if (ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+    switch (ent->m_iClassID())
     {
-        // Checks the demoman projectile type (both stickies and pipes are combined under PipeBombProjectile)
+    default:
+    {
+        // Target is not known, return default value
+        return *proj_default;
+    }
+    case CL_CLASS(CTFGrenadePipebombProjectile):
+    {
         if (CE_INT(ent, netvar.iPipeType) == 1)
             return *stickies;
         if (CE_INT(ent, netvar.iPipeType) == 0)
             return *pipes;
     }
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Arrow))
+    case CL_CLASS(CTFProjectile_Arrow):
+    {
         return *arrows;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Jar) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk))
+    }
+    case CL_CLASS(CTFProjectile_Jar) || ent->m_iClassID() == CL_CLASS(CTFProjectile_JarMilk):
+    {
         return *jars;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_HealingBolt))
+    }
+    case CL_CLASS(CTFProjectile_HealingBolt):
+    {
         return *healingbolts;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Rocket))
+    }
+    case CL_CLASS(CTFProjectile_Rocket):
+    {
         return *rockets;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_SentryRocket))
+    }
+    case CL_CLASS(CTFProjectile_SentryRocket):
+    {
         return *sentryrockets;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFProjectile_Cleaver))
+    }
+    case CL_CLASS(CTFProjectile_Cleaver):
+    {
         return *cleavers;
-
-    if (ent->m_iClassID() == CL_CLASS(CTFGrapplingHook))
+    }
+    case CL_CLASS(CTFGrapplingHook):
+    {
         return false;
-
-    // Target is not known, return default value
-    return *proj_default;
+    }
+    }
 }
 
 // Function called by game for movement

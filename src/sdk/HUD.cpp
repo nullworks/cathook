@@ -21,3 +21,7 @@ CHudElement *CHud::FindElement(const char *name)
     ((FindElement)(findel_sig))(this, name);
     return ((FindElement)(findel_sig))(this, name);
 }
+float &CHud::GetSensitivityFactor()
+{
+    return *(float *) ((uintptr_t) this + 8);
+}

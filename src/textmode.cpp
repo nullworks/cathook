@@ -26,7 +26,12 @@ void EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG()
     HostSecureServer2.Patch();
 
     uintptr_t allowSecureServers_addr = Host_IsSecureServerAllowed_addr + 0x21;
-    allowSecureServers                = *(bool **) (allowSecureServers_addr);
+
+    BytePatch::mprotectAddr(allowSecureServers_addr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+    BytePatch::mprotectAddr(*(uintptr_t *) allowSecureServers_addr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+    BytePatch::mprotectAddr(**(uintptr_t **) allowSecureServers_addr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+
+    allowSecureServers = *(bool **) (allowSecureServers_addr);
     logging::Info("Allow Secure Servers: 0x%08x", allowSecureServers);
     *allowSecureServers = true;
     logging::Info("Allow Secure Servers: %d", *allowSecureServers);

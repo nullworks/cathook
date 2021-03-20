@@ -11,11 +11,97 @@
 #include "Backtrack.hpp"
 #include "conditions.hpp"
 #include "helpers.hpp"
+#include "DetourHook.hpp"
 
 namespace hacks::tf2::autobackstab
 {
 static settings::Boolean enabled("autobackstab.enabled", "false");
+static settings::Boolean decrease_range("autobackstab.decrease-range", "false");
 static settings::Int mode("autobackstab.mode", "0");
+
+DetourHook melee_range_hook{};
+
+typedef int (*GetSwingRange_o)(IClientEntity *);
+int GetSwingRange_hook(IClientEntity *_this)
+{
+    float return_val = ((GetSwingRange_o) melee_range_hook.GetOriginalFunc())(_this);
+    if (decrease_range)
+        return_val *= 0.5f;
+    melee_range_hook.RestorePatch();
+    return return_val;
+}
+
+void ApplySwingHook()
+{
+    static bool inited = false;
+    if (!inited)
+    {
+        inited = true;
+        melee_range_hook.Init((uintptr_t) vfunc<GetSwingRange_o>(RAW_ENT(LOCAL_W), offsets::PlatformOffset(521, offsets::undefined, 521), 0), (void *) GetSwingRange_hook);
+    }
+    melee_range_hook.RestorePatch();
+}
+
+void RemoveSwingHook()
+{
+    melee_range_hook.Shutdown();
+}
+
+// Function to do swing trace in a specific direction
+bool doSwingTraceAngle(Vector angles, trace_t &trace)
+{
+    Vector original_angles = LOCAL_E->m_vecAngle();
+
+    re::C_BasePlayer::GetEyeAngles(RAW_ENT(LOCAL_E)) = angles;
+    ApplySwingHook();
+    bool hit_trace = re::C_TFWeaponBaseMelee::DoSwingTrace(RAW_ENT(LOCAL_W), &trace);
+    RemoveSwingHook();
+
+    re::C_BasePlayer::GetEyeAngles(RAW_ENT(LOCAL_E)) = original_angles;
+    return hit_trace && (IClientEntity *) trace.m_pEnt != g_IEntityList->GetClientEntity(0);
+}
+
+// Function to do a swing trace against an entity from an arbitary position
+bool doMovedSwingTrace(CachedEntity *target, Vector new_target_origin)
+{
+    // Back up data
+    Vector target_origin = target->m_vecOrigin();
+
+    Vector angles_to_target = GetAimAtAngles(LOCAL_E->m_vecOrigin(), new_target_origin);
+
+    // Set Our and entity data to match the target origin
+    const_cast<Vector &>(RAW_ENT(target)->GetAbsOrigin()) = new_target_origin;
+
+    // We need to update their positions so the rays actually work, this requires some hacky stuff
+    uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
+
+    typedef void (*MarkSurroundingBoundsDirty_t)(uintptr_t prop);
+    static auto sig_mark                                              = gSignatures.GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 43 ? 81 88 ? ? ? ? 00 40 00 00");
+    static MarkSurroundingBoundsDirty_t MarkSurroundingBoundsDirty_fn = (MarkSurroundingBoundsDirty_t) sig_mark;
+
+    typedef void (*UpdateParition_t)(uintptr_t prop);
+    static auto sig_update                     = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static UpdateParition_t UpdatePartition_fn = (UpdateParition_t) sig_update;
+
+    // Mark for update
+    MarkSurroundingBoundsDirty_fn(collisionprop);
+    // Update
+    UpdatePartition_fn(collisionprop);
+
+    trace_t trace;
+
+    // TF2 swing trace
+    bool did_trace_hit = doSwingTraceAngle(angles_to_target, trace);
+
+    // Restore data
+    const_cast<Vector &>(RAW_ENT(target)->GetAbsOrigin()) = target_origin;
+
+    // Once again update the ray traces
+    MarkSurroundingBoundsDirty_fn(collisionprop);
+    UpdatePartition_fn(collisionprop);
+
+    return did_trace_hit && (IClientEntity *) trace.m_pEnt == RAW_ENT(target);
+}
 
 // Function to find the closest hitbox to the v_Eye for a given ent
 int ClosestDistanceHitbox(CachedEntity *target)
@@ -146,8 +232,14 @@ static bool angleCheck(CachedEntity *target, std::optional<Vector> target_pos, V
 static bool doLegitBackstab()
 {
     trace_t trace;
+    ApplySwingHook();
     if (!re::C_TFWeaponBaseMelee::DoSwingTrace(RAW_ENT(LOCAL_W), &trace))
+    {
+        RemoveSwingHook();
         return false;
+    }
+    RemoveSwingHook();
+
     if (!trace.m_pEnt)
         return false;
     int index = reinterpret_cast<IClientEntity *>(trace.m_pEnt)->entindex();
@@ -166,6 +258,7 @@ static bool doRageBackstab()
 {
     if (doLegitBackstab())
         return true;
+    trace_t trace;
     float swingrange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     // AimAt Autobackstab
     {
@@ -179,51 +272,37 @@ static bool doRageBackstab()
             auto hitbox = ClosestDistanceHitbox(ent);
             if (hitbox == -1)
                 continue;
-            auto angle = GetAimAtAngles(g_pLocalPlayer->v_Eye, ent->hitboxes.GetHitbox(hitbox)->center, LOCAL_E);
+
+            Vector aim_pos = ent->m_vecOrigin();
+            aim_pos.z      = ent->hitboxes.GetHitbox(hitbox)->center.z;
+            auto angle     = GetAimAtAngles(g_pLocalPlayer->v_Eye, aim_pos, LOCAL_E);
             if (!angleCheck(ent, std::nullopt, angle) && !canFaceStab(ent))
                 continue;
-
-            trace_t trace;
-            Ray_t ray;
-            trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
-            ray.Init(g_pLocalPlayer->v_Eye, GetForwardVector(g_pLocalPlayer->v_Eye, angle, swingrange, LOCAL_E));
-            g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_default, &trace);
-            if (trace.m_pEnt)
+            if (doSwingTraceAngle(angle, trace))
             {
-                int index = reinterpret_cast<IClientEntity *>(trace.m_pEnt)->entindex();
-                if (index == ent->m_IDX)
-                {
-                    current_user_cmd->buttons |= IN_ATTACK;
-                    g_pLocalPlayer->bUseSilentAngles = true;
-                    current_user_cmd->viewangles     = angle;
-                    *bSendPackets                    = true;
-                    return true;
-                }
+                current_user_cmd->buttons |= IN_ATTACK;
+                g_pLocalPlayer->bUseSilentAngles = true;
+                current_user_cmd->viewangles     = angle;
+                *bSendPackets                    = true;
+                return true;
             }
         }
     }
-
-    // Rotating Autobackstab
+    // Rotating Autobackstab, only use if we hit the world
+    if (trace.DidHit() && (IClientEntity *) trace.m_pEnt == g_IEntityList->GetClientEntity(0))
     {
         Vector newangle = { 0, 0, g_pLocalPlayer->v_OrigViewangles.z };
         std::vector<float> yangles;
         for (newangle.y = -180.0f; newangle.y < 180.0f; newangle.y += 10.0f)
         {
-            trace_t trace;
-            Ray_t ray;
-            trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
-            ray.Init(g_pLocalPlayer->v_Eye, GetForwardVector(g_pLocalPlayer->v_Eye, newangle, swingrange, LOCAL_E));
-            g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_default, &trace);
-            if (trace.m_pEnt)
+            if (doSwingTraceAngle(newangle, trace))
             {
                 int index = reinterpret_cast<IClientEntity *>(trace.m_pEnt)->entindex();
                 auto ent  = ENTITY(index);
                 if (index == 0 || index > PLAYER_ARRAY_SIZE || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
                     continue;
                 if (angleCheck(ent, std::nullopt, newangle))
-                {
                     yangles.push_back(newangle.y);
-                }
             }
         }
         if (!yangles.empty())
@@ -244,8 +323,6 @@ static Vector newangle_apply;
 
 bool backtrackFilter(CachedEntity *ent, hacks::tf2::backtrack::BacktrackData tick, std::optional<hacks::tf2::backtrack::BacktrackData> &best_tick)
 {
-    float swingrange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-
     Vector target_worldspace;
     VectorLerp(tick.m_vecMins, tick.m_vecMaxs, 0.5f, target_worldspace);
     target_worldspace += tick.m_vecOrigin;
@@ -261,12 +338,8 @@ bool backtrackFilter(CachedEntity *ent, hacks::tf2::backtrack::BacktrackData tic
     if (!angleCheck(ent, target_worldspace, newangle) && !canFaceStab(ent))
         return false;
 
-    Vector min = tick.m_vecMins + tick.m_vecOrigin;
-    Vector max = tick.m_vecMaxs + tick.m_vecOrigin;
-    Vector hit;
-
-    // Check if we can hit the enemies hitbox
-    if (hacks::shared::triggerbot::CheckLineBox(min, max, g_pLocalPlayer->v_Eye, GetForwardVector(g_pLocalPlayer->v_Eye, newangle, swingrange * 0.95f), hit))
+    // Check if we can hit the enemy
+    if (doMovedSwingTrace(ent, tick.m_vecOrigin))
     {
         // Check if this tick is closer
         if (!best_tick || (*best_tick).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin()) > tick.m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin()))

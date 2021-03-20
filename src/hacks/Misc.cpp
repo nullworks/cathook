@@ -60,7 +60,18 @@ static settings::Boolean fix_cyoaanim{ "remove.contracker", "false" };
 static void tryPatchLocalPlayerShouldDraw(bool after)
 {
     static BytePatch patch_shoulddraw{ gSignatures.GetClientSignature, "80 BB ? ? ? ? ? 75 DE", 0xD, { 0xE0 } };
-    after ? patch_shoulddraw.Patch() : patch_shoulddraw.Shutdown();
+    static BytePatch patch_shoulddraw_wearable{ gSignatures.GetClientSignature("0F 85 ? ? ? ? E9 ? ? ? ? 85 D2") + 1, { 0x80 } };
+
+    if (after)
+    {
+        patch_shoulddraw.Patch();
+        patch_shoulddraw_wearable.Patch();
+    }
+    else
+    {
+        patch_shoulddraw.Shutdown();
+        patch_shoulddraw_wearable.Shutdown();
+    }
 }
 #endif
 

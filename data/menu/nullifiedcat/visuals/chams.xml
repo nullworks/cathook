@@ -7,6 +7,7 @@
                     <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show chams through walls."/>
                     <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
                     <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
+                    <AutoVariable width="fill" target="chams.aimbot.color" label="Aimbot coloring" tooltip="Color the aimbot's target according to color set in Visual:Colors"/>
                     <AutoVariable width="fill" target="chams.novis" label="Use seperate novis colors" tooltip="Seperate colors when a entity is not visible"/>
                     <AutoVariable width="fill" target="chams.weapons" label="Weapon chams seperate color" tooltip="Color weapons."/>
                     <AutoVariable width="fill" target="chams.local-weapon" label="Local weapon chams" tooltip="Cham your first person weapon"/>

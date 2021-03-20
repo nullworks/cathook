@@ -30,6 +30,7 @@ namespace effect_glow
 {
 
 static settings::Boolean health{ "glow.health", "false" };
+static settings::Boolean aimbot_color{ "glow.aimbot.color", "true" };
 static settings::Boolean teammates{ "glow.show.teammates", "false" };
 static settings::Boolean disguised{ "glow.show.disguised", "true" };
 static settings::Boolean players{ "glow.show.players", "true" };
@@ -229,7 +230,7 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
     ent = ENTITY(entity->entindex());
     if (CE_BAD(ent))
         return colors::white;
-    if (ent == hacks::shared::aimbot::CurrentTarget())
+    if (ent == hacks::shared::aimbot::CurrentTarget() && aimbot_color)
         return colors::target;
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {

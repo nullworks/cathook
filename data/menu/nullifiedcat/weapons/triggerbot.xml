@@ -33,6 +33,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Auto backstab" y="245">
         <List width="214">
             <AutoVariable width="fill" target="autobackstab.enabled" label="Enable auto backstab"/>
+            <AutoVariable width="fill" target="autobackstab.decrease-range" label="Decrease stab range" tooltip="Decreases the swing range in order to make backstabs more consistent. Recommended for Backtrack."/>
             <LabeledObject width="fill" label="Auto backstab mode">
                 <Select target="autobackstab.mode">
                     <Option name="Legit" value="0"/>

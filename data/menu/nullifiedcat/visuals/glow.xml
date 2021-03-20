@@ -4,7 +4,8 @@
             <AutoVariable width="fill" target="glow.enable" label="Enable glow"/>
             <AutoVariable width="fill" target="glow.blur-scale" label="Blur scale" min="1" max="20"/>
             <AutoVariable width="fill" target="glow.health" label="Health" tooltip="Color glow according to player health."/>
-            <LabeledObject width="fill" label="Solid When">
+            <AutoVariable width="fill" target="glow.aimbot.color" label="Aimbot coloring" tooltip="Color the aimbot's target according to color set in Visual:Colors"/>
+            <LabeledObject width="fill" label="Solid when">
                 <Select target="glow.solid-when">
                     <Option name="Never" value="0"/>
                     <Option name="Always" value="1"/>

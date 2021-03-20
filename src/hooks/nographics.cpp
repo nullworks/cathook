@@ -317,7 +317,13 @@ static InitRoutine nullifiy_textmode2([]() {
     });
 #if ENABLE_TEXTMODE
     // Catbots still hit properly, this just makes it easier to Stub stuff not needed in textmode
-    bool *g_bTextMode_ptr = *((bool **) (gSignatures.GetEngineSignature("A2 ? ? ? ? 8B 43 04") + 0x1));
+    uintptr_t g_bTextMode_ptrptr = gSignatures.GetEngineSignature("A2 ? ? ? ? 8B 43 04") + 0x1;
+
+    BytePatch::mprotectAddr(g_bTextMode_ptrptr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+    BytePatch::mprotectAddr(*(uintptr_t *) g_bTextMode_ptrptr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+    BytePatch::mprotectAddr(**(uintptr_t **) g_bTextMode_ptrptr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
+
+    bool *g_bTextMode_ptr = *((bool **) g_bTextMode_ptrptr);
     *g_bTextMode_ptr      = true;
     // Skip downloading ressources
     static BytePatch patch1(gSignatures.GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B ? ? ? ?", 0x1, { 0x81 });

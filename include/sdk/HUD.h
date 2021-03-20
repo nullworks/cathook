@@ -35,4 +35,5 @@ public:
     void *vtable;
 
     CHudElement *FindElement(const char *name);
+    float &GetSensitivityFactor();
 };

@@ -1,0 +1,14 @@
+<Tab name="Config" padding="4 4 4 4">
+    <Box padding="12 6 6 6" width="content" height="content" name="Config List">
+        <List width="180">
+			<ScrollableList id="cfg-list" x="0" y="0" width="180" height="300"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Config Options" x="195">
+        <List width="200">
+			<AutoVariable width="fill" target="cfg.save" label="Save config"/>
+			<AutoVariable width="fill" target="cfg.load" label="Load config"/>
+			<AutoVariable width="fill" target="cfg.delete" label="Delete config"/>
+        </List>
+    </Box>
+</Tab>

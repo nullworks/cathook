@@ -18,7 +18,7 @@
                     <AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
                 </List>
             </Box>
-            <Box padding="12 6 6 6" name="Small" width="content" height="content" x="105"><
+            <Box padding="12 6 6 6" name="Small" width="content" height="content" x="105">
                 <List width="85">
                     <AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
                     <AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>

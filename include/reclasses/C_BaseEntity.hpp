@@ -35,8 +35,8 @@ public:
     inline static int SetAbsOrigin(IClientEntity *self, Vector const &origin)
     {
         typedef int (*SetAbsOrigin_t)(IClientEntity *, Vector const &);
-        uintptr_t addr                 = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? EB 7D 8B 42 04"));
-        SetAbsOrigin_t SetAbsOrigin_fn = SetAbsOrigin_t(addr);
+        static uintptr_t addr                 = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? EB 7D 8B 42 04"));
+        static SetAbsOrigin_t SetAbsOrigin_fn = SetAbsOrigin_t(addr);
 
         return SetAbsOrigin_fn(self, origin);
     }

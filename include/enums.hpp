@@ -102,5 +102,8 @@ enum hitbox_t
     foot_L     = 14,
     hip_R      = 15,
     knee_R     = 16,
-    foot_R     = 17
+    foot_R     = 17,
+
+    // Always last
+    HITBOXES_SIZE
 };

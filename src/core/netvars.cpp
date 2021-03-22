@@ -29,7 +29,9 @@ void NetVars::Init()
     this->m_Collision          = gNetvars.get_offset("DT_BaseEntity", "m_Collision");
     this->m_flSimulationTime   = gNetvars.get_offset("DT_BaseEntity", "m_flSimulationTime");
     this->m_flAnimTime         = gNetvars.get_offset("DT_BaseEntity", "AnimTimeMustBeFirst", "m_flAnimTime");
+    this->m_flCycle            = gNetvars.get_offset("DT_BaseAnimating", "serveranimdata", "m_flCycle");
     this->m_angRotation        = gNetvars.get_offset("DT_BaseEntity", "m_angRotation");
+    this->m_vecOrigin          = gNetvars.get_offset("DT_BaseEntity", "m_vecOrigin");
 
     IF_GAME(IsTF2())
     {

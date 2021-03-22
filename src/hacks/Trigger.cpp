@@ -8,7 +8,6 @@
 
 #include <hacks/Trigger.hpp>
 #include "common.hpp"
-#include <hacks/Backtrack.hpp>
 #include <PlayerTools.hpp>
 #include <settings/Bool.hpp>
 #include "Backtrack.hpp"
@@ -40,46 +39,6 @@ float target_time = 0.0f;
 int last_hb_traced = 0;
 Vector forward;
 
-// Filters for backtrack
-bool tick_filter(CachedEntity *entity, hacks::tf2::backtrack::BacktrackData tick)
-{
-    // Check if it intersects any hitbox
-    int num_hitboxes = 18;
-
-    // Only need head hitbox
-    if (HeadPreferable(entity))
-        num_hitboxes = 1;
-    for (int i = 0; i < num_hitboxes; i++)
-    {
-        auto hitbox = tick.hitboxes.at(i);
-        auto min    = hitbox.min;
-        auto max    = hitbox.max;
-        // Get the min and max for the hitbox
-        Vector minz(fminf(min.x, max.x), fminf(min.y, max.y), fminf(min.z, max.z));
-        Vector maxz(fmaxf(min.x, max.x), fmaxf(min.y, max.y), fmaxf(min.z, max.z));
-
-        // Shrink the hitbox here
-        Vector size = maxz - minz;
-        // Use entire hitbox if accuracy unset
-        Vector smod = size * 0.05f * (*accuracy > 0 ? *accuracy : 20);
-
-        // Save the changes to the vectors
-        minz += smod;
-        maxz -= smod;
-
-        // Trace and test if it hits the smaller hitbox, if it hits we can return true
-        Vector hit;
-        // Found a good one
-        if (CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
-        {
-            // Is tick visible
-            if (IsVectorVisible(g_pLocalPlayer->v_Eye, hitbox.center))
-                return true;
-        }
-    }
-    return false;
-}
-
 // The main function of the triggerbot
 void CreateMove()
 {
@@ -95,39 +54,51 @@ void CreateMove()
 
     // Get an ent in front of the player
     CachedEntity *ent = nullptr;
-    std::optional<hacks::tf2::backtrack::BacktrackData> bt_data;
 
-    if (!hacks::tf2::backtrack::isBacktrackEnabled)
-        ent = FindEntInSight(EffectiveTargetingRange());
-    // Backtrack, use custom filter to check if tick is in crosshair
+    bool state_good = false;
+
+    bool shouldBacktrack = tf2::backtrack::backtrackEnabled() && !hacks::tf2::backtrack::hasData();
+
+    if (shouldBacktrack)
+    {
+        float target_range = EffectiveTargetingRange();
+        for (auto &ent_data : tf2::backtrack::bt_data)
+        {
+            if (state_good)
+                break;
+            for (auto &tick_data : ent_data)
+            {
+                if (!tick_data.in_range)
+                    continue;
+                tf2::backtrack::MoveToTick(tick_data);
+                ent = FindEntInSight(target_range);
+                // Restore the data
+                tf2::backtrack::RestoreEntity(tick_data.entidx);
+                if (ent)
+                {
+                    state_good = IsTargetStateGood(ent, tick_data);
+                    if (state_good)
+                        break;
+                    else
+                        tf2::backtrack::RestoreEntity(tick_data.entidx);
+                }
+            }
+        }
+    }
     else
     {
-        // Set up forward Vector
-        forward = GetForwardVector(EffectiveTargetingRange(), LOCAL_E);
-
-        // Call closest tick with our Tick filter func
-        auto closest_data = hacks::tf2::backtrack::getClosestTick(g_pLocalPlayer->v_Eye, hacks::tf2::backtrack::defaultEntFilter, tick_filter);
-
-        // No results, try to grab a building
-        if (!closest_data)
-        {
-            ent = FindEntInSight(EffectiveTargetingRange(), true);
-        }
-        else
-        {
-            // Assign entity
-            ent     = (*closest_data).first;
-            bt_data = (*closest_data).second;
-            hacks::tf2::backtrack::SetBacktrackData(ent, *bt_data);
-        }
+        ent = FindEntInSight(EffectiveTargetingRange());
     }
 
     // Check if dormant or null to prevent crashes
     if (CE_BAD(ent))
         return;
 
+    if (!shouldBacktrack)
+        state_good = IsTargetStateGood(ent, std::nullopt);
+
     // Determine whether the triggerbot should shoot, then act accordingly
-    if (IsTargetStateGood(ent, bt_data ? &*bt_data : nullptr))
+    if (state_good)
     {
         target_time = backup_time;
         if (delay)
@@ -235,8 +206,10 @@ bool ShouldShoot()
 }
 
 // A second check to determine whether a target is good enough to be aimed at
-bool IsTargetStateGood(CachedEntity *entity, hacks::tf2::backtrack::BacktrackData *tick)
+bool IsTargetStateGood(CachedEntity *entity, std::optional<tf2::backtrack::BacktrackData> bt_data)
 {
+    if (bt_data)
+        tf2::backtrack::MoveToTick(*bt_data);
     // Check for Players
     if (entity->m_Type() == ENTITY_PLAYER)
     {
@@ -283,45 +256,40 @@ bool IsTargetStateGood(CachedEntity *entity, hacks::tf2::backtrack::BacktrackDat
                 return false;
         }
 
-        // Backtrack did these in the tick check
-        if (!tick)
+        // Head hitbox detection
+        if (HeadPreferable(entity))
         {
-            // Head hitbox detection
-            if (HeadPreferable(entity))
+            if (last_hb_traced != hitbox_t::head)
+                return false;
+        }
+
+        // If usersettings tell us to use accuracy improvements and the cached
+        // hitbox isnt null, then we check if it hits here
+        if (*accuracy)
+        {
+            // Get a cached hitbox for the one traced
+            hitbox_cache::CachedHitbox *hb = entity->hitboxes.GetHitbox(last_hb_traced);
+            // Check for null
+            if (hb)
             {
-                if (last_hb_traced != hitbox_t::head)
+                // Get the min and max for the hitbox
+                Vector minz(fminf(hb->min.x, hb->max.x), fminf(hb->min.y, hb->max.y), fminf(hb->min.z, hb->max.z));
+                Vector maxz(fmaxf(hb->min.x, hb->max.x), fmaxf(hb->min.y, hb->max.y), fmaxf(hb->min.z, hb->max.z));
+
+                // Shrink the hitbox here
+                Vector size = maxz - minz;
+                Vector smod = size * 0.05f * *accuracy;
+
+                // Save the changes to the vectors
+                minz += smod;
+                maxz -= smod;
+
+                // Trace and test if it hits the smaller hitbox, if it fails
+                // we
+                // return false
+                Vector hit;
+                if (!CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
                     return false;
-            }
-
-            // If usersettings tell us to use accuracy improvements and the cached
-            // hitbox isnt null, then we check if it hits here
-            if (*accuracy)
-            {
-
-                // Get a cached hitbox for the one traced
-                hitbox_cache::CachedHitbox *hb = entity->hitboxes.GetHitbox(last_hb_traced);
-                // Check for null
-                if (hb)
-                {
-                    // Get the min and max for the hitbox
-                    Vector minz(fminf(hb->min.x, hb->max.x), fminf(hb->min.y, hb->max.y), fminf(hb->min.z, hb->max.z));
-                    Vector maxz(fmaxf(hb->min.x, hb->max.x), fmaxf(hb->min.y, hb->max.y), fmaxf(hb->min.z, hb->max.z));
-
-                    // Shrink the hitbox here
-                    Vector size = maxz - minz;
-                    Vector smod = size * 0.05f * *accuracy;
-
-                    // Save the changes to the vectors
-                    minz += smod;
-                    maxz -= smod;
-
-                    // Trace and test if it hits the smaller hitbox, if it fails
-                    // we
-                    // return false
-                    Vector hit;
-                    if (!CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
-                        return false;
-                }
             }
         }
         // Target passed the tests so return true
@@ -407,7 +375,7 @@ CachedEntity *FindEntInSight(float range, bool no_players)
     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace);
 
     // Return an ent if that is what we hit
-    if (trace.m_pEnt)
+    if (trace.DidHit() && trace.m_pEnt && (IClientEntity *) trace.m_pEnt != g_IEntityList->GetClientEntity(0))
     {
         last_hb_traced    = trace.hitbox;
         CachedEntity *ent = ENTITY(((IClientEntity *) trace.m_pEnt)->entindex());

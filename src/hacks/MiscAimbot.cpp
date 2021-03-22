@@ -27,12 +27,17 @@ static Timer previous_entity_delay{};
 // TODO: Refactor this jank
 std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck, bool demoknight_mode, float range)
 {
-    CachedEntity *bestent = nullptr;
-    float bestscr         = FLT_MAX;
+
+    CachedEntity *bestent                             = nullptr;
+    float bestscr                                     = FLT_MAX;
+    std::optional<backtrack::BacktrackData> best_data = std::nullopt;
     Vector predicted{};
     // Too long since we focused it
     if (previous_entity_delay.check(100))
         prevent = -1;
+
+    bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
+
     for (int i = 0; i < 1; i++)
     {
         if (prevent != -1)
@@ -51,22 +56,44 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
                 target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent), initial_vel).second;
             else
                 target = ent->hitboxes.GetHitbox(1)->center;
-            if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))
+            if (!shouldBacktrack && !IsEntityVectorVisible(ent, target))
                 continue;
             if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
                 continue;
-            float scr = ent->m_flDistance();
-            if (hacks::tf2::backtrack::isBacktrackEnabled && demoknight_mode)
+            float scr                                    = ent->m_flDistance();
+            std::optional<backtrack::BacktrackData> data = std::nullopt;
+            if (!shouldBacktrack && demoknight_mode)
             {
-                auto data = hacks::tf2::backtrack::getClosestEntTick(ent, LOCAL_E->m_vecOrigin(), hacks::tf2::backtrack::defaultTickFilter);
-                // No entity
-                if (!data)
-                    scr = FLT_MAX;
-                else
+                if (backtrack::bt_data.size() >= ent->m_IDX)
                 {
-                    target = (*data).m_vecOrigin;
-                    scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+                    float tick_score = FLT_MAX;
+                    for (auto &tick : backtrack::bt_data.at(ent->m_IDX - 1))
+                    {
+                        if (!tick.in_range)
+                            continue;
+                        float dist = tick.m_vecOrigin.DistTo(ent->m_vecOrigin());
+                        if (dist < tick_score)
+                        {
+                            backtrack::MoveToTick(tick);
+                            if (IsEntityVectorVisible(ent, ent->hitboxes.GetHitbox(1)->center))
+                            {
+                                data       = tick;
+                                tick_score = dist;
+                            }
+                            backtrack::RestoreEntity(ent->m_IDX);
+                        }
+                    }
+                    // No entity
+                    if (!data)
+                        scr = FLT_MAX;
+                    else
+                    {
+                        target = (*data).m_vecOrigin;
+                        scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+                    }
                 }
+                else
+                    scr = FLT_MAX;
             }
             // Demoknight
             if (demoknight_mode)
@@ -91,6 +118,8 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         if (bestent && predicted.z)
         {
             previous_entity_delay.update();
+            if (demoknight_mode && best_data)
+                backtrack::MoveToTick(*best_data);
             return { bestent, predicted };
         }
     }
@@ -109,22 +138,45 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             target = ProjectilePrediction(ent, 1, sandwich_speed, grav, PlayerGravityMod(ent)).second;
         else
             target = ent->hitboxes.GetHitbox(1)->center;
-        if (!hacks::tf2::backtrack::isBacktrackEnabled && !IsEntityVectorVisible(ent, target))
+        if (!shouldBacktrack && !IsEntityVectorVisible(ent, target))
             continue;
         if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
             continue;
-        float scr = ent->m_flDistance();
-        if (hacks::tf2::backtrack::isBacktrackEnabled && demoknight_mode)
+        float scr                                    = ent->m_flDistance();
+        std::optional<backtrack::BacktrackData> data = std::nullopt;
+
+        if (!shouldBacktrack && demoknight_mode)
         {
-            auto data = hacks::tf2::backtrack::getClosestEntTick(ent, LOCAL_E->m_vecOrigin(), hacks::tf2::backtrack::defaultTickFilter);
-            // No entity
-            if (!data)
-                scr = FLT_MAX;
-            else
+            if (backtrack::bt_data.size() >= ent->m_IDX)
             {
-                target = (*data).m_vecOrigin;
-                scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+                float tick_score = FLT_MAX;
+                for (auto &tick : backtrack::bt_data.at(ent->m_IDX - 1))
+                {
+                    if (!tick.in_range)
+                        continue;
+                    float dist = tick.m_vecOrigin.DistTo(ent->m_vecOrigin());
+                    if (dist < tick_score)
+                    {
+                        backtrack::MoveToTick(tick);
+                        if (IsEntityVectorVisible(ent, ent->hitboxes.GetHitbox(1)->center))
+                        {
+                            data       = tick;
+                            tick_score = dist;
+                        }
+                        backtrack::RestoreEntity(ent->m_IDX);
+                    }
+                }
+                // No entity
+                if (!data)
+                    scr = FLT_MAX;
+                else
+                {
+                    target = (*data).m_vecOrigin;
+                    scr    = (*data).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin());
+                }
             }
+            else
+                scr = FLT_MAX;
         }
         // Demoknight
         if (demoknight_mode)
@@ -144,8 +196,12 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             predicted = target;
             bestscr   = scr;
             prevent   = ent->m_IDX;
+            if (shouldBacktrack)
+                best_data = data;
         }
     }
+    if (demoknight_mode && best_data)
+        backtrack::MoveToTick(*best_data);
     return { bestent, predicted };
 }
 static float slow_change_dist_y{};

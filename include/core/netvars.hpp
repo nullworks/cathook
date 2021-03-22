@@ -46,6 +46,8 @@ public:
     offset_t iFlags;
     offset_t iHealth;
 
+    offset_t m_vecOrigin;
+
     // sentry
     offset_t m_iAmmoShells;       // sentry shells
     offset_t m_iAmmoRockets;      // use only with if (GetLevel() == 3)
@@ -184,6 +186,7 @@ public:
     offset_t m_nSequence;
     offset_t m_flSimulationTime;
     offset_t m_flAnimTime;
+    offset_t m_flCycle;
     offset_t m_angRotation;
 
     offset_t m_hOwnerEntity;

@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "entityhitboxcache.hpp"
 
 namespace hacks::tf2::backtrack
 {
@@ -18,75 +19,45 @@ public:
     }
 };
 
-class hitboxData
-{
-public:
-    Vector center{ 0.0f, 0.0f, 0.0f };
-    Vector min{ 0.0f, 0.0f, 0.0f };
-    Vector max{ 0.0f, 0.0f, 0.0f };
-};
-
 class BacktrackData
 {
 public:
     int tickcount{};
+    int entidx{};
 
-    std::array<hitboxData, 18> hitboxes{};
-    Vector m_vecOrigin{};
-    Vector m_vecAngles{};
-
-    Vector m_vecMins{};
-    Vector m_vecMaxs{};
-
-    float m_flSimulationTime{};
-    bool has_updated{};
+    bool in_range{};
 
     std::vector<matrix3x4_t> bones{};
+
+    Vector m_vecOrigin{};
+    Vector m_vecAngles{};
+    float simtime;
+    float animtime;
+    float cycle;
+    int sequence;
+    std::array<hitbox_cache::CachedHitbox, HITBOXES_SIZE> hitboxes{};
 };
 
-// Stuff that has to be accessible from outside, mostly functions
-
 extern settings::Float latency;
-extern settings::Int bt_slots;
+void adjustPing(INetChannel *ch);
+bool backtrackEnabled();
+bool isTickInRange(int tickcount);
+void MoveToTick(BacktrackData data);
+void RestoreEntity(int entidx);
+bool hasData();
+std::optional<BacktrackData> getData();
+
+extern std::vector<std::vector<BacktrackData>> bt_data;
+
 #if ENABLE_VISUALS
 extern settings::Boolean chams;
 extern settings::Boolean chams_wireframe;
 extern settings::Int chams_ticks;
 extern settings::Rgba chams_color;
-extern settings::Boolean chams_solid;
 extern settings::Boolean chams_overlay;
 extern settings::Rgba chams_color_overlay;
 extern settings::Float chams_envmap_tint_r;
 extern settings::Float chams_envmap_tint_g;
 extern settings::Float chams_envmap_tint_b;
 #endif
-
-// Check if backtrack is enabled
-extern bool isBacktrackEnabled;
-#if ENABLE_VISUALS
-// Drawing Backtrack chams
-extern bool isDrawing;
-#endif
-// Event callbacks
-void CreateMove();
-void CreateMoveLate();
-#if ENABLE_VISUALS
-void Draw();
-#endif
-void LevelShutdown();
-
-void adjustPing(INetChannel *);
-void updateDatagram();
-void resetData(int);
-bool isGoodTick(BacktrackData &);
-bool defaultTickFilter(CachedEntity *, BacktrackData);
-bool defaultEntFilter(CachedEntity *);
-
-// Various functions for getting backtrack ticks
-std::vector<BacktrackData> getGoodTicks(int);
-std::optional<BacktrackData> getBestTick(CachedEntity *, std::function<bool(CachedEntity *, BacktrackData &, std::optional<BacktrackData> &)>);
-std::optional<BacktrackData> getClosestEntTick(CachedEntity *, Vector, std::function<bool(CachedEntity *, BacktrackData)>);
-std::optional<std::pair<CachedEntity *, BacktrackData>> getClosestTick(Vector, std::function<bool(CachedEntity *)>, std::function<bool(CachedEntity *, BacktrackData)>);
-
-void SetBacktrackData(CachedEntity *ent, BacktrackData);
 } // namespace hacks::tf2::backtrack

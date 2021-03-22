@@ -321,32 +321,24 @@ static bool doRageBackstab()
 static bool legit_stab = false;
 static Vector newangle_apply;
 
-bool backtrackFilter(CachedEntity *ent, hacks::tf2::backtrack::BacktrackData tick, std::optional<hacks::tf2::backtrack::BacktrackData> &best_tick)
+bool IsTickGood(hacks::tf2::backtrack::BacktrackData tick)
 {
-    Vector target_worldspace;
-    VectorLerp(tick.m_vecMins, tick.m_vecMaxs, 0.5f, target_worldspace);
-    target_worldspace += tick.m_vecOrigin;
-    Vector distcheck = target_worldspace;
-    distcheck.z      = g_pLocalPlayer->v_Eye.z;
+    CachedEntity *ent = ENTITY(tick.entidx);
+    Vector target_vec = tick.m_vecOrigin;
 
-    // Angle check
-    Vector newangle;
-    if (legit_stab)
-        newangle = g_pLocalPlayer->v_OrigViewangles;
-    else
-        newangle = GetAimAtAngles(g_pLocalPlayer->v_Eye, distcheck, LOCAL_E);
-    if (!angleCheck(ent, target_worldspace, newangle) && !canFaceStab(ent))
+    Vector target_worldspace = target_vec;
+    target_worldspace += (RAW_ENT(ent)->GetCollideable()->OBBMins() + RAW_ENT(ent)->GetCollideable()->OBBMaxs()) / 2.0f;
+
+    Vector angle = GetAimAtAngles(g_pLocalPlayer->v_Eye, target_worldspace);
+
+    if (!angleCheck(ent, target_worldspace, angle))
         return false;
 
-    // Check if we can hit the enemy
-    if (doMovedSwingTrace(ent, tick.m_vecOrigin))
+    trace_t trace;
+    if (doMovedSwingTrace(ent, target_vec))
     {
-        // Check if this tick is closer
-        if (!best_tick || (*best_tick).m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin()) > tick.m_vecOrigin.DistTo(LOCAL_E->m_vecOrigin()))
-        {
-            newangle_apply = newangle;
-            return true;
-        }
+        newangle_apply = angle;
+        return true;
     }
 
     return false;
@@ -359,29 +351,29 @@ static bool doBacktrackStab(bool legit = false)
     // Set for our filter
     legit_stab = legit;
     // Get the Best tick
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         CachedEntity *ent = ENTITY(i);
         // Targeting checks
         if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
             continue;
 
-        // Get the best tick for that ent
-        auto tick_data = hacks::tf2::backtrack::getBestTick(ent, backtrackFilter);
-
-        // We found something matching the criterias, break out
-        if (tick_data)
+        for (auto &bt_tick : hacks::tf2::backtrack::bt_data[i - 1])
         {
-            stab_data = *tick_data;
-            stab_ent  = ent;
-            break;
+            if (bt_tick.in_range && IsTickGood(bt_tick))
+            {
+                // We found something matching the criterias, break out
+                stab_data = bt_tick;
+                stab_ent  = ent;
+                break;
+            }
         }
     }
 
     // We found a good ent
     if (stab_ent)
     {
-        hacks::tf2::backtrack::SetBacktrackData(stab_ent, stab_data);
+        hacks::tf2::backtrack::MoveToTick(stab_data);
         current_user_cmd->buttons |= IN_ATTACK;
         current_user_cmd->viewangles     = newangle_apply;
         g_pLocalPlayer->bUseSilentAngles = true;
@@ -406,6 +398,8 @@ void CreateMove()
         return;
     if (!CanShoot())
         return;
+
+    bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
     switch (*mode)
     {
     case 0:
@@ -415,7 +409,7 @@ void CreateMove()
         doRageBackstab();
         break;
     case 2:
-        if (hacks::tf2::backtrack::isBacktrackEnabled)
+        if (shouldBacktrack)
         {
             if (*hacks::tf2::backtrack::latency <= 190 && doRageBackstab())
                 break;
@@ -427,7 +421,7 @@ void CreateMove()
         }
         break;
     case 3:
-        if (hacks::tf2::backtrack::isBacktrackEnabled)
+        if (shouldBacktrack)
         {
             if (*hacks::tf2::backtrack::latency <= 190 && doLegitBackstab())
                 break;

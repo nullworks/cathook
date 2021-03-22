@@ -140,7 +140,7 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
                 numbones = MAXSTUDIOBONES;
         }
 
-        if (bones.size() < (size_t) numbones)
+        if (bones.size() != (size_t) numbones)
             bones.resize(numbones);
         if (g_Settings.is_create_move)
         {

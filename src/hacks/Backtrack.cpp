@@ -1,38 +1,14 @@
-/*
- * Remade on May the 3rd 2020
- * Author: BenCat07
- *
- */
+#include "common.hpp"
 #include "Backtrack.hpp"
-#include "PlayerTools.hpp"
-#include "memory"
 
 namespace hacks::tf2::backtrack
 {
-// Internal rvars
-static settings::Boolean enabled{ "backtrack.enabled", "false" };
-static settings::Boolean draw{ "backtrack.draw", "false" };
+static settings::Boolean enabled("backtrack.enabled", "false");
+settings::Float latency("backtrack.latency", "0");
+static settings::Int bt_slots("backtrack.slots", "0");
 
-static std::vector<CIncomingSequence> sequences;
-static int current_tickcount;
-static std::vector<std::unique_ptr<std::array<BacktrackData, 67>>> backtrack_data;
-static int lastincomingsequence{ 0 };
-// Used to make transition smooth(er)
-static float latency_rampup = 0.0f;
-
-// Which data to apply in the late CreateMove
-static CachedEntity *bt_ent = nullptr;
-static std::optional<BacktrackData> bt_data;
-
-static bool isEnabled();
-static float getLatency();
-static int getTicks();
-static bool getBestInternalTick(CachedEntity *, BacktrackData &, std::optional<BacktrackData> &);
-static void ApplyBacktrack();
-
-settings::Float latency{ "backtrack.latency", "0" };
-settings::Int bt_slots{ "backtrack.slots", "0" };
 #if ENABLE_VISUALS
+static settings::Boolean draw("backtrack.draw", "false");
 settings::Boolean chams{ "backtrack.chams", "false" };
 settings::Boolean chams_wireframe{ "backtrack.chams.wireframe", "false" };
 settings::Int chams_ticks{ "backtrack.chams.ticks", "1" };
@@ -44,63 +20,73 @@ settings::Float chams_envmap_tint_g{ "backtrack.chams.envmap.tint.g", "0" };
 settings::Float chams_envmap_tint_b{ "backtrack.chams.envmap.tint.b", "1" };
 #endif
 
+static bool isEnabled();
+
+#define MAX_BACKTRACK_TICKS 66
+
 // Check if backtrack is enabled
-bool isBacktrackEnabled;
-#if ENABLE_VISUALS
-// Drawing Backtrack chams
-bool isDrawing;
-#endif
+static bool isBacktrackEnabled = false;
 
-// Apply Backtrack
-void ApplyBacktrack()
+// Is any backtrack tick set for a player currently?
+static std::optional<BacktrackData> set_data;
+bool hasData()
 {
-    if (!isBacktrackEnabled)
-        return;
-    if (bt_ent && bt_data)
+    return (bool) set_data;
+}
+
+std::optional<BacktrackData> getData()
+{
+    return set_data;
+}
+
+static int lastincomingsequence = 0;
+std::deque<CIncomingSequence> sequences;
+static float latency_rampup = 0.0f;
+
+// Store draw positions in CreateMove, also store the selected tick one too
+static std::vector<Vector> draw_positions;
+static std::optional<Vector> red_position;
+
+std::vector<std::vector<BacktrackData>> bt_data;
+// Update our sequences
+void updateDatagram()
+{
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    if (ch)
     {
-        current_user_cmd->tick_count                = (*bt_data).tickcount;
-        CE_FLOAT(bt_ent, netvar.m_angEyeAngles)     = (*bt_data).m_vecAngles.x;
-        CE_FLOAT(bt_ent, netvar.m_angEyeAngles + 4) = (*bt_data).m_vecAngles.y;
-        CE_FLOAT(bt_ent, netvar.m_flSimulationTime) = (*bt_data).m_flSimulationTime;
+        int m_nInSequenceNr = ch->m_nInSequenceNr;
+        int instate         = ch->m_nInReliableState;
+        if (m_nInSequenceNr > lastincomingsequence)
+        {
+            lastincomingsequence = m_nInSequenceNr;
+            sequences.insert(sequences.begin(), CIncomingSequence(instate, m_nInSequenceNr, g_GlobalVars->realtime));
+        }
+        if (sequences.size() > 2048)
+            sequences.pop_back();
     }
 }
 
-// Update tick to apply
-void SetBacktrackData(CachedEntity *ent, BacktrackData tick)
+// Latency to add for backtrack
+float getLatency()
 {
-    bt_ent  = ent;
-    bt_data = tick;
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    // Track what actual latency we have
+    float real_latency = 0.0f;
+
+    // If we have a netchannel (just in case) set real latency to it
+    if (ch)
+        real_latency = ch->GetLatency(FLOW_OUTGOING) * 1000.0f;
+
+    // Clamp and apply rampup, also ensure we do not go out of the 1000.0f bounds
+    float backtrack_latency = latency_rampup * std::clamp(*latency, 0.0f, 800.0f - real_latency);
+
+    return backtrack_latency;
 }
 
-// Get Best tick for Backtrack (crosshair/fov based)
-bool getBestInternalTick(CachedEntity *, BacktrackData &data, std::optional<BacktrackData> &best_tick)
+bool isTickInRange(int tickcount)
 {
-    // Best Score
-    float bestScore = FLT_MAX;
-
-    // Are we using a melee weapon?
-    bool is_melee = false;
-    if (g_pLocalPlayer->weapon_mode == weapon_melee)
-        is_melee = true;
-
-    // Get the FOV of the best tick if available
-    if (best_tick)
-        bestScore = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, (*best_tick).hitboxes.at(head).center);
-
-    float FOVDistance = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, data.hitboxes.at(head).center);
-    if (FOVDistance >= bestScore)
-        return false;
-
-    // Found new best fov, now vischeck
-    if (FOVDistance < bestScore)
-    {
-        // Vischeck check
-        if (!is_melee && !IsVectorVisible(g_pLocalPlayer->v_Eye, data.hitboxes.at(head).center, false))
-            return false;
-        return true;
-    }
-    // Should never be called but gcc likes to complain anyways
-    return false;
+    int delta_tickcount = abs(tickcount - current_user_cmd->tick_count + TIME_TO_TICKS(getLatency() / 1000.0f));
+    return TICKS_TO_TIME(delta_tickcount) <= 0.2f - TICKS_TO_TIME(2);
 }
 
 // Is backtrack enabled?
@@ -145,207 +131,6 @@ bool isEnabled()
     return false;
 }
 
-// Main Tracking logic
-void CreateMove()
-{
-    // Update enabled status
-    isBacktrackEnabled = isEnabled();
-    if (!isBacktrackEnabled)
-    {
-        latency_rampup = 0.0f;
-        return;
-    }
-
-    // Return if local entity is bad (Still have backtrack run while dead so ping does not fluctuate heavily)
-    if (CE_BAD(LOCAL_E))
-    {
-        latency_rampup = 0.0f;
-        return;
-    }
-
-    // Make Latency not instantly spike
-    latency_rampup += 1.0f / 66.0f;
-    latency_rampup = std::min(latency_rampup, 1.0f);
-
-    updateDatagram();
-
-    // Don't run rest
-    if (CE_BAD(LOCAL_W) || !LOCAL_E->m_bAlivePlayer())
-        return;
-
-    // Clear data
-    bt_ent = nullptr;
-    bt_data.reset();
-
-    current_tickcount = current_user_cmd->tick_count;
-
-    // the "Base" Backtracking
-    std::optional<BacktrackData> best_data;
-    CachedEntity *best_ent = nullptr;
-
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        if (i == g_pLocalPlayer->entity_idx)
-        {
-            resetData(i);
-            continue;
-        }
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || ent->m_Type() != ENTITY_PLAYER || !ent->m_bEnemy())
-        {
-            resetData(i);
-            continue;
-        }
-        if (!ent->hitboxes.GetHitbox(0))
-        {
-            resetData(i);
-            continue;
-        }
-        auto &backtrack_ent = backtrack_data.at(i - 1);
-
-        // Have no data, create it
-        if (!backtrack_ent)
-            backtrack_ent.reset(new std::array<BacktrackData, 67>);
-
-        int current_index = current_user_cmd->tick_count % getTicks();
-
-        // Our current tick
-        auto &current_tick = (*backtrack_ent).at(current_index);
-
-        // Previous tick
-        int last_index = current_index - 1;
-        if (last_index < 0)
-            last_index = getTicks() - 1;
-
-        auto &previous_tick = (*backtrack_ent).at(last_index);
-
-        // Update basics
-        current_tick.tickcount = current_user_cmd->tick_count;
-
-        current_tick.m_vecAngles.x = CE_FLOAT(ent, netvar.m_angEyeAngles);
-        current_tick.m_vecAngles.y = CE_FLOAT(ent, netvar.m_angEyeAngles + 4);
-
-        current_tick.m_vecOrigin = ent->m_vecOrigin();
-        current_tick.m_vecMins   = RAW_ENT(ent)->GetCollideable()->OBBMins();
-        current_tick.m_vecMaxs   = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
-
-        current_tick.m_flSimulationTime = CE_FLOAT(ent, netvar.m_flSimulationTime);
-
-        // Update hitboxes
-        ent->hitboxes.InvalidateCache();
-        for (size_t i = 0; i < 18; i++)
-        {
-            current_tick.hitboxes[i].center = ent->hitboxes.GetHitbox(i)->center;
-            current_tick.hitboxes[i].min    = ent->hitboxes.GetHitbox(i)->min;
-            current_tick.hitboxes[i].max    = ent->hitboxes.GetHitbox(i)->max;
-        }
-
-        // Copy bones (for chams/glow)
-        auto model = (const model_t *) RAW_ENT(ent)->GetModel();
-        if (model)
-        {
-            auto shdr = g_IModelInfo->GetStudiomodel(model);
-            if (shdr)
-            {
-                int numbones = shdr->numbones;
-                if (numbones != current_tick.bones.size())
-                    current_tick.bones.resize(numbones);
-
-                memcpy((void *) &current_tick.bones[0], (void *) &ent->hitboxes.bones[0], sizeof(matrix3x4_t) * numbones);
-            }
-            else
-                current_tick.bones.resize(0);
-        }
-        else
-            current_tick.bones.resize(0);
-
-        // Check if tick updated or not (fakelag)
-        current_tick.has_updated = !previous_tick.m_flSimulationTime || previous_tick.m_flSimulationTime != current_tick.m_flSimulationTime;
-
-        // Special Case that invalidates all the previous ticks
-        // if the new tick is too far away all the other ones get marked as not updated and thus invalid
-        if (current_tick.m_vecOrigin.AsVector2D().DistTo(previous_tick.m_vecOrigin.AsVector2D()) > 64)
-        {
-            for (auto &tick : *backtrack_ent)
-            {
-                // Older than current tick, mark invalid
-                if (tick.tickcount < current_tick.tickcount)
-                    tick.has_updated = false;
-            }
-        }
-
-        // Get best tick for this ent
-        std::optional<BacktrackData> data = getBestTick(ent, getBestInternalTick);
-        // Check if actually the best tick we have in total
-        if (data && (!best_data || getBestInternalTick(ent, *data, best_data)))
-        {
-            best_data = data;
-            best_ent  = ent;
-        }
-    }
-    if (best_data && best_ent)
-        SetBacktrackData(best_ent, *best_data);
-}
-void CreateMoveLate()
-{
-    ApplyBacktrack();
-}
-
-#if ENABLE_VISUALS
-// Drawing
-void Draw()
-{
-    if (!isBacktrackEnabled || !draw)
-        return;
-
-    if (CE_BAD(LOCAL_E))
-        return;
-
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        auto data = getGoodTicks(i);
-        if (data.empty())
-            continue;
-        for (auto &tick : data)
-        {
-            auto hbpos = tick.hitboxes.at(head).center;
-            auto min   = tick.hitboxes.at(head).min;
-            auto max   = tick.hitboxes.at(head).max;
-            if (!hbpos.x && !hbpos.y && !hbpos.z)
-                continue;
-            Vector out;
-            if (draw::WorldToScreen(hbpos, out))
-            {
-                float size = 0.0f;
-                if (abs(max.x - min.x) > abs(max.y - min.y))
-                    size = abs(max.x - min.x);
-                else
-                    size = abs(max.y - min.y);
-
-                rgba_t draw_color = colors::green;
-                // Found our target tick
-                if (bt_ent && tick.tickcount == (*bt_data).tickcount && i == bt_ent->m_IDX)
-                    draw_color = colors::red_s;
-                draw::Rectangle(out.x, out.y, size / 4, size / 4, draw_color);
-            }
-        }
-    }
-}
-#endif
-
-// Resize our backtrackdata
-void LevelInit()
-{
-    backtrack_data.resize(g_IEngine->GetMaxClients());
-}
-
-// Reset things
-void LevelShutdown()
-{
-    lastincomingsequence = 0;
-    sequences.clear();
-}
-
 // Change Datagram data
 void adjustPing(INetChannel *ch)
 {
@@ -362,207 +147,235 @@ void adjustPing(INetChannel *ch)
     }
 }
 
-// Latency to add for backtrack
-float getLatency()
+// Move target entity to tick
+void MoveToTick(BacktrackData data)
 {
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    // Track what actual latency we have
-    float real_latency = 0.0f;
+    CachedEntity *target = ENTITY(data.entidx);
 
-    // If we have a netchannel (just in case) set real latency to it
-    if (ch)
-        real_latency = ch->GetLatency(FLOW_OUTGOING) * 1000.0f;
+    // Set entity data to match the target data
+    re::C_BasePlayer::SetAbsOrigin(RAW_ENT(target), data.m_vecOrigin);
+    re::C_BasePlayer::GetEyeAngles(RAW_ENT(target)) = data.m_vecAngles;
 
-    // Fix the latency
-    float backtrack_latency = *latency - real_latency;
+    // Need to reconstruct a bunch of data
+    target->hitboxes.InvalidateCache();
 
-    // Clamp and apply rampup
-    backtrack_latency = latency_rampup * std::clamp(backtrack_latency, 0.0f, std::max(800.0f - real_latency, 0.0f));
+    // Mark all the hitboxes as valid so we don't recalc them and use the old data
+    // We already have
+    for (int i = hitbox_t::head; i <= foot_R; i++)
+    {
+        target->hitboxes.m_CacheValidationFlags[i] = true;
+        target->hitboxes.m_CacheInternal.at(i)     = data.hitboxes.at(i);
+    }
 
-    return backtrack_latency;
+    // Sync animation properly
+    CE_FLOAT(target, netvar.m_flSimulationTime) = data.simtime;
+    CE_FLOAT(target, netvar.m_flCycle)          = data.cycle;
+    CE_FLOAT(target, netvar.m_flAnimTime)       = data.animtime;
+    CE_INT(target, netvar.m_nSequence)          = data.sequence;
+
+    // Thanks to the epic doghook developers (mainly F1ssion and MrSteyk)
+    // I do not have to find all of these signatures and dig through ida
+    struct BoneCache;
+
+    typedef BoneCache *(*GetBoneCache_t)(unsigned);
+    typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t * bones, unsigned, float time);
+    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (gSignatures.GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
+    static auto studio_get_bone_cache           = (GetBoneCache_t) gSignatures.GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
+    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) gSignatures.GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
+
+    auto hitbox_bone_cache_handle = CE_VAR(target, hitbox_bone_cache_handle_offset, unsigned);
+    if (hitbox_bone_cache_handle)
+    {
+        BoneCache *bone_cache = studio_get_bone_cache(hitbox_bone_cache_handle);
+        if (bone_cache && !data.bones.empty())
+            bone_cache_update_bones(bone_cache, data.bones.data(), data.bones.size(), g_GlobalVars->curtime);
+    }
+
+    // Copy old bones to avoid really really slow setupbones logic
+    target->hitboxes.bones       = data.bones;
+    target->hitboxes.bones_setup = true;
+
+    // We need to update their positions so the rays actually work, this requires some hacky stuff
+    uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
+
+    typedef void (*UpdateParition_t)(uintptr_t prop);
+    static auto sig_update                     = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static UpdateParition_t UpdatePartition_fn = (UpdateParition_t) sig_update;
+
+    // Mark for update
+    int *entity_flags = (int *) ((uintptr_t) RAW_ENT(target) + 400);
+    // (EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS | EFL_DIRTY_SPATIAL_PARTITION)
+    *entity_flags |= (1 << 14) | (1 << 15);
+
+    // Update
+    UpdatePartition_fn(collisionprop);
+    set_data = data;
 }
 
-// Update our sequences
-void updateDatagram()
+// Restore ent to original state
+void RestoreEntity(int entidx)
 {
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    if (ch)
+    MoveToTick(bt_data[entidx - 1][0]);
+    // Undo tick setting
+    set_data = std::nullopt;
+}
+
+void CreateMoveEarly()
+{
+    draw_positions.clear();
+    isBacktrackEnabled = isEnabled();
+    if (!isBacktrackEnabled)
     {
-        int m_nInSequenceNr = ch->m_nInSequenceNr;
-        int instate         = ch->m_nInReliableState;
-        if (m_nInSequenceNr > lastincomingsequence)
+        latency_rampup = 0.0f;
+        bt_data.clear();
+        return;
+    }
+
+    if (CE_GOOD(LOCAL_E))
+        updateDatagram();
+    else
+        sequences.clear();
+
+    latency_rampup += g_GlobalVars->interval_per_tick;
+    latency_rampup = std::min(1.0f, latency_rampup);
+    if ((int) bt_data.size() != g_IEngine->GetMaxClients())
+        bt_data.resize(g_IEngine->GetMaxClients());
+
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    {
+        CachedEntity *ent = ENTITY(i);
+        int index         = i - 1;
+
+        auto &ent_data = bt_data[index];
+
+        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(ent) || !ent->m_bEnemy())
         {
-            lastincomingsequence = m_nInSequenceNr;
-            sequences.insert(sequences.begin(), CIncomingSequence(instate, m_nInSequenceNr, g_GlobalVars->realtime));
+            ent_data.clear();
+            continue;
         }
-        if (sequences.size() > 2048)
-            sequences.pop_back();
+        BacktrackData data{};
+        data.entidx      = i;
+        data.m_vecAngles = ent->m_vecAngle();
+        data.m_vecOrigin = ent->m_vecOrigin();
+        data.tickcount   = current_user_cmd->tick_count;
+
+        data.simtime  = CE_FLOAT(ent, netvar.m_flSimulationTime);
+        data.animtime = CE_FLOAT(ent, netvar.m_flAnimTime);
+        data.cycle    = CE_FLOAT(ent, netvar.m_flCycle);
+        data.sequence = CE_INT(ent, netvar.m_nSequence);
+
+        ent->hitboxes.GetHitbox(0);
+        // Copy bones (for chams/glow)
+        data.bones = ent->hitboxes.bones;
+
+        for (int i = head; i <= foot_R; i++)
+            data.hitboxes.at(i) = *ent->hitboxes.GetHitbox(i);
+
+        ent_data.insert(ent_data.begin(), data);
+        if (ent_data.size() > MAX_BACKTRACK_TICKS)
+            ent_data.pop_back();
+
+        for (auto &tick : ent_data)
+        {
+            tick.in_range = isTickInRange(tick.tickcount);
+
+            if (!tick.in_range)
+                continue;
+
+#if ENABLE_VISUALS
+            if (draw)
+            {
+                MoveToTick(tick);
+                Vector draw_pos = ent->hitboxes.GetHitbox(0)->center;
+                draw_positions.push_back(draw_pos);
+                RestoreEntity(i);
+            }
+#endif
+        }
     }
 }
 
-// Get How many ticks we should Store and use
-int getTicks()
+void CreateMoveLate()
 {
-    float max_lat = getLatency() + 200.0f;
+    if (!isBacktrackEnabled)
+        return;
 
-    // Clamp
-    max_lat = std::min(1000.0f, max_lat);
+    red_position = std::nullopt;
 
-    // Get difference
-    int ticks = TIME_TO_TICKS(max_lat / 1000.0f);
-    return ticks;
-};
+    // Bad player
+    if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+        return;
 
-void resetData(int entidx)
-{
-    // Clear everything
-    backtrack_data.at(entidx - 1).reset();
-}
-
-bool isGoodTick(BacktrackData &tick)
-{
-    // This tick hasn't updated since the last one, Entity might be dropping packets
-    if (!tick.has_updated)
-        return false;
-    // How big a difference is between the ping we fake and the tick passed?
-    int delta_ticks = current_tickcount - TIME_TO_TICKS(getLatency() / 1000.0f) - tick.tickcount;
-
-    // Difference may not be greater than 200ms, shave off a few ticks just to be safe.
-    if (fabsf(TICKS_TO_TIME(delta_ticks)) <= 0.2f - TICKS_TO_TIME(3))
-        return true;
-
-    return false;
-}
-
-// Read only vector of good ticks
-std::vector<BacktrackData> getGoodTicks(int entidx)
-{
-    std::vector<BacktrackData> to_return;
-    // Invalid
-    if (entidx <= 0 || (int) backtrack_data.size() < entidx || !backtrack_data.at(entidx - 1))
-        return to_return;
-
-    // Check all ticks
-    for (auto &tick : *backtrack_data.at(entidx - 1))
-        if (isGoodTick(tick))
-            to_return.push_back(tick);
-
-    // Sort so that oldest ticks come first
-    std::sort(to_return.begin(), to_return.end(), [](BacktrackData &a, BacktrackData &b) { return a.tickcount < b.tickcount; });
-
-    return to_return;
-}
-
-// This function is so other files can Easily get the best tick matching their criteria
-std::optional<BacktrackData> getBestTick(CachedEntity *ent, std::function<bool(CachedEntity *ent, BacktrackData &data, std::optional<BacktrackData> &best_tick)> callback)
-{
-    std::optional<BacktrackData> best_tick;
-
-    // No data recorded
-    if (ent->m_IDX <= 0 || backtrack_data.size() < ent->m_IDX || !backtrack_data.at(ent->m_IDX - 1))
-        return std::nullopt;
-
-    // Let the callback do the lifting
-    for (auto &tick : getGoodTicks(ent->m_IDX))
-        // Call the callback, and if we have a new best tick assign it
-        if (callback(ent, tick, best_tick))
-            best_tick = tick;
-
-    // Return best result
-    return best_tick;
-}
-
-// Default filter method. Checks for vischeck on Hitscan weapons.
-bool defaultTickFilter(CachedEntity *ent, BacktrackData tick)
-{
-    // Not hitscan, no vischeck needed
-    if (g_pLocalPlayer->weapon_mode != weapon_hitscan)
-        return true;
-    // Return visibility
-    return IsEntityVectorVisible(ent, tick.hitboxes.at(head).center, true, MASK_SHOT);
-}
-
-bool defaultEntFilter(CachedEntity *ent)
-{
-    // Dormant
-    if (CE_BAD(ent))
-        return false;
-    // Should we even target them
-    if (!player_tools::shouldTarget(ent))
-        return false;
-    return true;
-}
-
-// Get Closest tick of a specific entity
-std::optional<BacktrackData> getClosestEntTick(CachedEntity *ent, Vector vec, std::function<bool(CachedEntity *, BacktrackData)> tick_filter)
-{
-    std::optional<BacktrackData> return_value;
-    // No entry
-    if (ent->m_IDX <= 0 || backtrack_data.size() < ent->m_IDX || !backtrack_data.at(ent->m_IDX - 1))
-        return return_value;
-
-    float distance = FLT_MAX;
-
-    // Go through all Good ticks
-    for (auto &tick : getGoodTicks(ent->m_IDX))
+    // No data set yet, try to get nearest to cursor
+    if (!set_data && !g_pLocalPlayer->bUseSilentAngles)
     {
-        // Found Closer tick
-        if (tick.m_vecOrigin.DistTo(vec) < distance)
+        float cursor_distance = FLT_MAX;
+        for (auto &ent_data : bt_data)
         {
-            // Does the tick pass the filter
-            if (tick_filter(ent, tick))
+            for (auto &tick_data : ent_data)
             {
-                return_value = tick;
-                distance     = tick.m_vecOrigin.DistTo(vec);
+                if (isTickInRange(tick_data.tickcount))
+                {
+                    float distance = GetFov(LOCAL_E->m_vecAngle(), g_pLocalPlayer->v_Eye, tick_data.hitboxes.at(0).center);
+                    if (distance < cursor_distance)
+                    {
+                        cursor_distance = distance;
+                        set_data        = tick_data;
+                    }
+                }
             }
         }
     }
-    return return_value;
+
+    // Still no data set, be sad and return
+    if (!set_data)
+        return;
+    current_user_cmd->tick_count = set_data->tickcount;
+    red_position                 = set_data->hitboxes.at(0).center;
+    RestoreEntity(set_data->entidx);
+    set_data = std::nullopt;
 }
 
-// Get Closest tick of any (enemy) entity, Second Parameter is to allow custom filters for entity criteria, third for ticks. We provide defaults for vischecks + melee for the second one
-std::optional<std::pair<CachedEntity *, BacktrackData>> getClosestTick(Vector vec, std::function<bool(CachedEntity *)> ent_filter, std::function<bool(CachedEntity *, BacktrackData)> tick_filter)
+void Shutdown()
 {
-    float distance         = FLT_MAX;
-    CachedEntity *best_ent = nullptr;
-    BacktrackData best_data;
-
-    std::optional<std::pair<CachedEntity *, BacktrackData>> return_val;
-
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        CachedEntity *ent = ENTITY(i);
-        // These checks are always present
-        if (CE_INVALID(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy())
-            continue;
-        // true = passes check
-        if (!ent_filter(ent))
-            continue;
-        auto closest_entdata = getClosestEntTick(ent, vec, tick_filter);
-        // Closer than the stuff we have
-        if (closest_entdata && (*closest_entdata).m_vecOrigin.DistTo(vec) <= distance)
-        {
-            distance  = (*closest_entdata).m_vecOrigin.DistTo(vec);
-            best_data = *closest_entdata;
-            best_ent  = ent;
-        }
-    }
-    if (best_ent)
-        return_val = std::pair<CachedEntity *, BacktrackData>(best_ent, best_data);
-    return return_val;
+    bt_data.clear();
+    sequences.clear();
+    lastincomingsequence = 0;
 }
+
+bool backtrackEnabled()
+{
+    return isBacktrackEnabled;
+}
+
+#if ENABLE_VISUALS
+void Draw()
+{
+    if (!isBacktrackEnabled || !draw)
+        return;
+
+    if (!g_IEngine->IsInGame())
+        return;
+
+    Vector screen;
+    for (auto &pos : draw_positions)
+    {
+        if (draw::WorldToScreen(pos, screen))
+            draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::green);
+    }
+    if (red_position && draw::WorldToScreen(*red_position, screen))
+        draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::red);
+}
+#endif
 
 static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, CreateMove, "backtrack_cm", EC::early);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "backtrack_cmw", EC::early);
-    EC::Register(EC::CreateMove, CreateMoveLate, "backtrack_cmlate", EC::very_late);
-    EC::Register(EC::CreateMoveWarp, CreateMoveLate, "backtrack_cmwlate", EC::very_late);
+    EC::Register(EC::CreateMove, CreateMoveEarly, "bt_update", EC::very_early);
+    EC::Register(EC::CreateMove, CreateMoveLate, "bt_createmove", EC::very_late);
+    EC::Register(EC::Shutdown, Shutdown, "bt_shutdown");
+    EC::Register(EC::LevelInit, Shutdown, "bt_shutdown");
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "backtrack_draw");
+    EC::Register(EC::Draw, Draw, "bt_draw");
 #endif
-    EC::Register(EC::LevelShutdown, LevelShutdown, "backtrack_levelshutdown");
-    EC::Register(EC::LevelInit, LevelInit, "backtrack_levelinit");
-    LevelInit();
 });
 
 } // namespace hacks::tf2::backtrack

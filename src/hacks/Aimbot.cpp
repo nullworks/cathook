@@ -151,9 +151,27 @@ float cur_proj_speed{ 0.0f };
 float cur_proj_grav{ 0.0f };
 float cur_proj_start_vel{ 0.0f };
 
-bool shouldBacktrack()
+bool shouldbacktrack_cache = false;
+
+void updateShouldBacktrack()
 {
-    return !projectile_mode && (*backtrackAimbot || force_backtrack_aimbot) && hacks::tf2::backtrack::isBacktrackEnabled;
+    if (!hacks::tf2::backtrack::backtrackEnabled() || hacks::tf2::backtrack::hasData() || projectile_mode || !(*backtrackAimbot || force_backtrack_aimbot))
+        shouldbacktrack_cache = false;
+    else
+        shouldbacktrack_cache = true;
+}
+
+bool shouldBacktrack(CachedEntity *ent)
+{
+    if (!shouldbacktrack_cache)
+        return false;
+    if (ent && ent->m_Type() != ENTITY_PLAYER)
+        return false;
+    if (hacks::tf2::backtrack::bt_data.size() < ent->m_IDX)
+        return false;
+    if (hacks::tf2::backtrack::bt_data[ent->m_IDX - 1].empty())
+        return false;
+    return true;
 }
 
 // Am I holding Hitman's Heatmaker ?
@@ -162,23 +180,6 @@ static bool CarryingHeatmaker()
     return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 752;
 }
 
-// Backtrack filter for aimbot
-bool aimbotTickFilter(CachedEntity *ent, hacks::tf2::backtrack::BacktrackData tick)
-{
-    // FOV check
-    if (fov > 0.0f)
-    {
-        float fov_scr = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, tick.hitboxes.at(0).center);
-        // Failed FOV check
-        if (fov_scr > fov)
-            return false;
-    }
-    // Not hitscan, no vischeck needed
-    if (g_pLocalPlayer->weapon_mode != weapon_hitscan)
-        return true;
-    // Return visibility
-    return IsEntityVectorVisible(ent, tick.hitboxes.at(head).center, true, MASK_SHOT);
-}
 static void doAutoZoom(bool target_found)
 {
     bool isIdle = target_found ? false : hacks::shared::followbot::isIdle();
@@ -232,6 +233,7 @@ static void CreateMove()
     slow_aim = *normal_slow_aim;
     fov      = *normal_fov;
 
+    updateShouldBacktrack();
     spectatorUpdate();
 
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
@@ -410,17 +412,17 @@ bool MouseMoving()
 {
     if ((g_GlobalVars->curtime - last_mouse_check) < 0.02)
     {
-        auto previous = SDL_GetMouseState(&PreviousX, &PreviousY);
+        SDL_GetMouseState(&PreviousX, &PreviousY);
     }
     else
     {
-        auto current     = SDL_GetMouseState(&CurrentX, &CurrentY);
+        SDL_GetMouseState(&CurrentX, &CurrentY);
         last_mouse_check = g_GlobalVars->curtime;
     }
 
     if (PreviousX != CurrentX || PreviousY != CurrentY)
         stop_moving_time = g_GlobalVars->curtime + 0.5;
-    
+
     if (g_GlobalVars->curtime <= stop_moving_time)
         return true;
     else
@@ -506,8 +508,23 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     {
         if (CE_GOOD(target_last))
         {
+            if (shouldBacktrack(target_last))
+            {
+                for (auto &bt_tick : hacks::tf2::backtrack::bt_data[target_last->m_IDX - 1])
+                {
+                    if (bt_tick.in_range)
+                    {
+                        hacks::tf2::backtrack::MoveToTick(bt_tick);
+                        if (IsTargetStateGood(target_last))
+                            return target_last;
+                        // Restore if bad target
+                        hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
+                    }
+                }
+            }
+
             // Check if previous target is still good
-            if (IsTargetStateGood(target_last))
+            else if (IsTargetStateGood(target_last))
             {
                 // If it is then return it again
                 return target_last;
@@ -517,15 +534,38 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
 
     float target_highest_score, scr = 0.0f;
     CachedEntity *ent;
-    CachedEntity *target_highest_ent = 0;
-    target_highest_score             = -256;
+    CachedEntity *target_highest_ent                            = 0;
+    target_highest_score                                        = -256;
+    std::optional<hacks::tf2::backtrack::BacktrackData> bt_tick = std::nullopt;
     for (int i = 1; i <= HIGHEST_ENTITY; i++)
     {
         ent = ENTITY(i);
         if (CE_BAD(ent))
             continue; // Check for null and dormant
         // Check whether the current ent is good enough to target
-        if (IsTargetStateGood(ent))
+        bool isTargetGood = false;
+
+        static std::optional<hacks::tf2::backtrack::BacktrackData> temp_bt_tick = std::nullopt;
+        if (shouldBacktrack(ent))
+        {
+            for (auto &bt_tick : hacks::tf2::backtrack::bt_data[ent->m_IDX - 1])
+            {
+                if (bt_tick.in_range)
+                {
+                    hacks::tf2::backtrack::MoveToTick(bt_tick);
+                    if (IsTargetStateGood(ent))
+                    {
+                        isTargetGood = true;
+                        temp_bt_tick = bt_tick;
+                        break;
+                    }
+                    hacks::tf2::backtrack::RestoreEntity(ent->m_IDX);
+                }
+            }
+        }
+        else
+            isTargetGood = IsTargetStateGood(ent);
+        if (isTargetGood)
         {
             // Distance Priority, Uses this is melee is used
             if (GetWeaponMode() == weaponmode::weapon_melee || (int) priority_mode == 2)
@@ -558,10 +598,17 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             {
                 target_highest_score = scr;
                 target_highest_ent   = ent;
+                bt_tick              = temp_bt_tick;
             }
         }
+
+        // Restore tick
+        if (shouldBacktrack(ent))
+            hacks::tf2::backtrack::RestoreEntity(i);
     }
 
+    if (target_highest_ent && bt_tick)
+        hacks::tf2::backtrack::MoveToTick(*bt_tick);
     return target_highest_ent;
 }
 
@@ -593,34 +640,17 @@ bool IsTargetStateGood(CachedEntity *entity)
             else
             {
                 float swingrange = EffectiveTargetingRange();
-                if (!shouldBacktrack() || entity->m_Type() != ENTITY_PLAYER)
-                {
-                    int hb = BestHitbox(entity);
-                    if (hb == -1)
-                        return false;
-                    Vector newangle = GetAimAtAngles(g_pLocalPlayer->v_Eye, entity->hitboxes.GetHitbox(hb)->center, LOCAL_E);
-                    trace_t trace;
-                    Ray_t ray;
-                    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
-                    ray.Init(g_pLocalPlayer->v_Eye, GetForwardVector(g_pLocalPlayer->v_Eye, newangle, swingrange, LOCAL_E));
-                    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
-                    if ((IClientEntity *) trace.m_pEnt != RAW_ENT(entity))
-                        return false;
-                }
-                else
-                {
-                    // This does vischecks and everything
-                    auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-                    // No data found
-                    if (!data)
-                        return false;
-                    // Is within range?
-                    Vector melee_vec = data->m_vecOrigin;
-                    melee_vec.z      = g_pLocalPlayer->v_Eye.z;
-                    // Out of range
-                    if (melee_vec.DistTo(g_pLocalPlayer->v_Eye) >= swingrange)
-                        return false;
-                }
+                int hb           = BestHitbox(entity);
+                if (hb == -1)
+                    return false;
+                Vector newangle = GetAimAtAngles(g_pLocalPlayer->v_Eye, entity->hitboxes.GetHitbox(hb)->center, LOCAL_E);
+                trace_t trace;
+                Ray_t ray;
+                trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+                ray.Init(g_pLocalPlayer->v_Eye, GetForwardVector(g_pLocalPlayer->v_Eye, newangle, swingrange, LOCAL_E));
+                g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
+                if ((IClientEntity *) trace.m_pEnt != RAW_ENT(entity))
+                    return false;
             }
         }
         // Rage only check
@@ -728,15 +758,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             Vector pos = GetBuildingPosition(ENTITY(sentry));
             if (hitbox == -1 || !entity->hitboxes.GetHitbox(cd.hitbox))
                 return false;
-            if (shouldBacktrack())
-            {
-                // This does vischecks and everything
-                auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-                // No data found
-                if (!data)
-                    return false;
-            }
-            else if (!IsVectorVisible(pos, entity->hitboxes.GetHitbox(cd.hitbox)->center, false, ENTITY(sentry)))
+            if (!IsVectorVisible(pos, entity->hitboxes.GetHitbox(cd.hitbox)->center, false, ENTITY(sentry)))
                 return false;
         }
         if (fov > 0.0f && cd.fov > fov)
@@ -875,15 +897,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             if (sentry == -1)
                 return false;
             Vector pos = GetBuildingPosition(ENTITY(sentry));
-            if (shouldBacktrack())
-            {
-                // This does vischecks and everything
-                auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-                // No data found
-                if (!data)
-                    return false;
-            }
-            else if (!IsVectorVisible(pos, entity->m_vecOrigin(), false))
+            if (!IsVectorVisible(pos, entity->m_vecOrigin(), false))
                 return false;
         }
         if (fov > 0.0f && cd.fov > fov)
@@ -921,15 +935,7 @@ void Aim(CachedEntity *entity)
         auto hitboxmin    = hb->min;
         auto hitboxmax    = hb->max;
         auto hitboxcenter = hb->center;
-        if (shouldBacktrack())
-        {
-            // This does vischecks and everything
-            auto data    = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-            auto bt_hb   = data->hitboxes.at(cd.hitbox);
-            hitboxcenter = bt_hb.center;
-            hitboxmin    = bt_hb.min;
-            hitboxmax    = bt_hb.max;
-        }
+
         // get positions
         minx    = hitboxmin.x;
         miny    = hitboxmin.y;
@@ -968,15 +974,8 @@ void Aim(CachedEntity *entity)
     if (silent && !slow_aim)
         g_pLocalPlayer->bUseSilentAngles = true;
     // Set tick count to targets (backtrack messes with this)
-    if (!shouldBacktrack() && nolerp && entity->m_IDX <= g_IEngine->GetMaxClients())
+    if (!shouldBacktrack(entity) && nolerp && entity->m_IDX <= g_IEngine->GetMaxClients())
         current_user_cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(entity, netvar.m_flSimulationTime));
-    // Set Backtrack data
-    if (shouldBacktrack() && entity->m_Type() == ENTITY_PLAYER)
-    {
-        auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-        if (data)
-            hacks::tf2::backtrack::SetBacktrackData(entity, *data);
-    }
     aimed_this_tick = true;
     // Finish function
     return;
@@ -1092,84 +1091,71 @@ Vector PredictEntity(CachedEntity *entity, bool vischeck)
     // Pull out predicted data
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     Vector &result             = cd.aim_position;
-    if (cd.predict_tick == tickcount && cd.predict_type == vischeck)
+    if (cd.predict_tick == tickcount && cd.predict_type == vischeck && !shouldBacktrack(entity))
         return result;
 
-    if (!shouldBacktrack() || entity->m_Type() != ENTITY_PLAYER)
+    // Players
+    if ((entity->m_Type() == ENTITY_PLAYER))
     {
-        // Players
-        if ((entity->m_Type() == ENTITY_PLAYER))
+        // If using projectiles, predict a vector
+        if (projectileAimbotRequired)
         {
-            // If using projectiles, predict a vector
-            if (projectileAimbotRequired)
-            {
-                std::pair<Vector, Vector> tmp_result;
-                // Use prediction engine if user settings allow
-                if (engine_projpred)
-                    tmp_result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0, cur_proj_start_vel);
-                else
-                    tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
-
-                // Don't use the intial velocity compensated one in vischecks
-                if (vischeck)
-                    result = tmp_result.first;
-                else
-                    result = tmp_result.second;
-            }
+            std::pair<Vector, Vector> tmp_result;
+            // Use prediction engine if user settings allow
+            if (engine_projpred)
+                tmp_result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, 0, cur_proj_start_vel);
             else
-            {
-                // If using extrapolation, then predict a vector
-                if (extrapolate)
-                    result = SimpleLatencyPrediction(entity, cd.hitbox);
-                // else just grab strait from the hitbox
-                else
-                    GetHitbox(entity, cd.hitbox, result);
-            }
-        }
-        // Buildings
-        else if (entity->m_Type() == ENTITY_BUILDING)
-        {
-            if (projectileAimbotRequired)
-            {
-                std::pair<Vector, Vector> tmp_result;
-                tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+                tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
 
-                // Don't use the intial velocity compensated one in vischecks
-                if (vischeck)
-                    result = tmp_result.first;
-                else
-                    result = tmp_result.second;
-            }
+            // Don't use the intial velocity compensated one in vischecks
+            if (vischeck)
+                result = tmp_result.first;
             else
-                result = GetBuildingPosition(entity);
+                result = tmp_result.second;
         }
-        // NPCs (Skeletons, merasmus, etc)
-        else if (entity->m_Type() == ENTITY_NPC)
-        {
-            result = entity->hitboxes.GetHitbox(std::max(0, entity->hitboxes.GetNumHitboxes() / 2 - 1))->center;
-        }
-        // Other
         else
         {
-            result = entity->m_vecOrigin();
+            // If using extrapolation, then predict a vector
+            if (extrapolate)
+                result = SimpleLatencyPrediction(entity, cd.hitbox);
+            // else just grab strait from the hitbox
+            else
+                GetHitbox(entity, cd.hitbox, result);
         }
-
-        cd.predict_tick = tickcount;
-        cd.predict_type = vischeck;
-
-        cd.fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
     }
+    // Buildings
+    else if (entity->m_Type() == ENTITY_BUILDING)
+    {
+        if (projectileAimbotRequired)
+        {
+            std::pair<Vector, Vector> tmp_result;
+            tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+
+            // Don't use the intial velocity compensated one in vischecks
+            if (vischeck)
+                result = tmp_result.first;
+            else
+                result = tmp_result.second;
+        }
+        else
+            result = GetBuildingPosition(entity);
+    }
+    // NPCs (Skeletons, merasmus, etc)
+    else if (entity->m_Type() == ENTITY_NPC)
+    {
+        result = entity->hitboxes.GetHitbox(std::max(0, entity->hitboxes.GetNumHitboxes() / 2 - 1))->center;
+    }
+    // Other
     else
     {
-        auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-        if (data)
-        {
-            result          = data->hitboxes.at(cd.hitbox).center;
-            cd.predict_tick = tickcount;
-            cd.predict_type = vischeck;
-            cd.fov          = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
-        }
+        result = entity->m_vecOrigin();
     }
+
+    cd.predict_tick = tickcount;
+    cd.predict_type = vischeck;
+
+    cd.fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
+
     // Return the found vector
     return result;
 }
@@ -1300,38 +1286,15 @@ int BestHitbox(CachedEntity *target)
             return 12;
         }
 
-        // Backtracking and preferred hitbox
-        if (shouldBacktrack())
-        {
-            auto data = hacks::tf2::backtrack::getClosestEntTick(target, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-
-            if (data)
-            {
-                // First check preferred hitbox
-                if (IsEntityVectorVisible(target, (*data).hitboxes[preferred].center, false))
-                    return preferred;
-
-                // Then check the rest
-                if (*backtrackVischeckAll)
-                    for (int j = head; j < foot_R; j++)
-                    {
-                        if (IsEntityVectorVisible(target, (*data).hitboxes[j].center, false))
-                            return j;
-                    }
-                else if (IsEntityVectorVisible(target, (*data).hitboxes.at(head).center, false))
-                    return 0;
-            }
-            // Nothing found, falling through to further below
-        }
-        else if (target->hitboxes.VisibilityCheck(preferred))
+        // preferred hitbox
+        if (target->hitboxes.VisibilityCheck(preferred))
             return preferred;
         // Else attempt to find any hitbox at all
-        if (!shouldBacktrack())
-            for (int i = projectile_mode ? 1 : 0; i < target->hitboxes.GetNumHitboxes() && i < 6; i++)
-            {
-                if (target->hitboxes.VisibilityCheck(i))
-                    return i;
-            }
+        for (int i = projectile_mode ? 1 : 0; i < target->hitboxes.GetNumHitboxes() && i < 6; i++)
+        {
+            if (target->hitboxes.VisibilityCheck(i))
+                return i;
+        }
     }
     break;
     case 1:
@@ -1378,28 +1341,17 @@ bool VischeckPredictedEntity(CachedEntity *entity)
 {
     // Retrieve predicted data
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
-    if (cd.vcheck_tick == tickcount)
+    if (cd.vcheck_tick == tickcount && !shouldBacktrack(entity))
         return cd.visible;
-    if (!shouldBacktrack() || entity->m_Type() != ENTITY_PLAYER)
-    {
-        // Update info
-        cd.vcheck_tick = tickcount;
-        if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
-            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), true);
-        else
-        {
-            trace_t trace;
-            cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), false, MASK_SHOT, &trace);
-            if (cd.visible && cd.hitbox == head && trace.hitbox != head)
-                cd.visible = false;
-        }
-    }
+    // Update info
+    cd.vcheck_tick = tickcount;
+    if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
+        cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), true);
     else
     {
-        auto data = hacks::tf2::backtrack::getClosestEntTick(entity, LOCAL_E->m_vecOrigin(), aimbotTickFilter);
-        if (data && IsEntityVectorVisible(entity, data->hitboxes.at((cd.hitbox == -1 || cd.hitbox >= 18) ? 0 : cd.hitbox).center, false, MASK_SHOT))
-            cd.visible = true;
-        else
+        trace_t trace;
+        cd.visible = IsEntityVectorVisible(entity, PredictEntity(entity, true), false, MASK_SHOT, &trace);
+        if (cd.visible && cd.hitbox == head && trace.hitbox != head)
             cd.visible = false;
     }
     return cd.visible;

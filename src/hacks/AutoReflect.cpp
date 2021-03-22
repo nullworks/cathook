@@ -5,11 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include "Registered.hpp"
 #include "common.hpp"
-#include "conditions.hpp"
-#include "localplayer.hpp"
-#include <const.h>
 #include <settings/Bool.hpp>
 
 namespace hacks::tf::autoreflect

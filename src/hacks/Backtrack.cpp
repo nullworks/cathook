@@ -284,12 +284,7 @@ void CreateMoveEarly()
 
 #if ENABLE_VISUALS
             if (draw)
-            {
-                MoveToTick(tick);
-                Vector draw_pos = ent->hitboxes.GetHitbox(0)->center;
-                draw_positions.push_back(draw_pos);
-                RestoreEntity(i);
-            }
+                draw_positions.push_back(tick.hitboxes.at(0).center);
 #endif
         }
     }
@@ -333,7 +328,6 @@ void CreateMoveLate()
     current_user_cmd->tick_count = set_data->tickcount;
     red_position                 = set_data->hitboxes.at(0).center;
     RestoreEntity(set_data->entidx);
-    set_data = std::nullopt;
 }
 
 void Shutdown()

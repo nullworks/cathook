@@ -309,7 +309,7 @@ void CreateMoveLate()
         {
             for (auto &tick_data : ent_data)
             {
-                if (isTickInRange(tick_data.tickcount))
+                if (tick_data.in_range)
                 {
                     float distance = GetFov(LOCAL_E->m_vecAngle(), g_pLocalPlayer->v_Eye, tick_data.hitboxes.at(0).center);
                     if (distance < cursor_distance)

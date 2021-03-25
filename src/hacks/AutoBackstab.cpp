@@ -330,6 +330,8 @@ bool IsTickGood(hacks::tf2::backtrack::BacktrackData tick)
     target_worldspace += (RAW_ENT(ent)->GetCollideable()->OBBMins() + RAW_ENT(ent)->GetCollideable()->OBBMaxs()) / 2.0f;
 
     Vector angle = GetAimAtAngles(g_pLocalPlayer->v_Eye, target_worldspace);
+    if (legit_stab)
+        angle = current_user_cmd->viewangles;
 
     if (!angleCheck(ent, target_worldspace, angle))
         return false;

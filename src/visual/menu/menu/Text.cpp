@@ -14,8 +14,6 @@ void zerokernel::Text::render()
 #else
     draw::String(bb.getContentBox().left() + text_x, bb.getContentBox().top() + text_y + 1, *color_text, data.c_str(), resource::font::base);
 #endif
-
-    BaseMenuObject::render();
 }
 
 void zerokernel::Text::set(std::string text)

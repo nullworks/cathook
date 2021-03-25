@@ -21,9 +21,9 @@
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Cathook" x="215">
         <List width="150">
-            <AutoVariable width="fill" target="hack.enable" label="Enable cathook"/>
+            <AutoVariable width="fill" target="hack.enable" label="Enable Cathook" tooltip="WARNING: Advanced users only."/>
             <AutoVariable width="fill" target="hack-info.enable" label="Enable Cathook label" tooltip="Controls text at top left of screen."/>
-            <AutoVariable width="fill" target="hack-info.minimal" label="Minimal Cathook label"/>
+            <AutoVariable width="fill" target="hack-info.minimal" label="Minimal Cathook label" tooltip="Only show the rainbow text in the label."/>
         </List>
     </Box>
 </Tab>

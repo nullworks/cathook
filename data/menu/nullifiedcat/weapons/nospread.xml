@@ -1,19 +1,19 @@
 <Tab name="Nospread" padding="6 6 6 6">
     <Box padding="12 6 6 6" width="content" height="content" name="Nospread">
         <List width="150">
-            <AutoVariable width="fill" target="nospread.projectile" label="Projectile no spread" tooltip="Projectiles won't have any spread. Independent of aimbot."/>
-            <AutoVariable width="fill" target="nospread.bullet" label="Bullet no Spread" tooltip="Bullets won't have any spread. Aimbot independent. (Only works on one bullet per shot)"/>
-            <AutoVariable width="fill" target="nospread.center-cone" label="Center spread" tooltip="Center the bullet spread cone for a higher hitrate"/>
-            <AutoVariable width="fill" target="nospread.draw-info" label="Draw info" tooltip="Draw some useful info onscreen"/>
-            <AutoVariable width="fill" target="nospread.draw-info.mantissa" label="Draw step size" tooltip="Draw Inaccuracy of server clock floats (Higher = Better)"/>
-            <AutoVariable width="fill" target="nospread.use-extreme-accuracy" label="Precision mode" tooltip="Makes nospread sync slower, but also more accurate and ping resistant"/>
-            <AutoVariable width="fill" target="nospread.use-average-latency" label="Use Average Latency" tooltip="Use Average Latency for ping correction instead of current one"/>
-            <AutoVariable width="fill" target="nospread.correct-ping" label="Try to Lag compensate" tooltip="Attempt to compensate for ping. Disable if you miss alot on low jitter."/>
-            <LabeledObject width="fill" label="Spectator mode" tooltip="How should nospread react to spectators?">
+            <AutoVariable width="fill" target="nospread.projectile" label="Projectile nospread" tooltip="Projectiles won't have any spread. Independent of aimbot."/>
+            <AutoVariable width="fill" target="nospread.bullet" label="Bullet nospread" tooltip="Bullets won't have any spread. Aimbot independent. (Only works on one bullet per shot)."/>
+            <AutoVariable width="fill" target="nospread.center-cone" label="Center spread" tooltip="Center the bullet spread cone for a higher hitrate."/>
+            <AutoVariable width="fill" target="nospread.draw-info" label="Draw info" tooltip="Draw some useful info onscreen."/>
+            <AutoVariable width="fill" target="nospread.draw-info.mantissa" label="Draw step size" tooltip="Draw Inaccuracy of server clock floats (Higher = Better)."/>
+            <AutoVariable width="fill" target="nospread.use-extreme-accuracy" label="Precision mode" tooltip="Makes nospread sync slower, but also more accurate and ping resistant."/>
+            <AutoVariable width="fill" target="nospread.use-average-latency" label="Use average latency" tooltip="Use average latency for ping correction instead of current one."/>
+            <AutoVariable width="fill" target="nospread.correct-ping" label="Try to lag compensate" tooltip="Attempt to compensate for ping. Disable if you miss a lot on low jitter."/>
+            <LabeledObject width="fill" label="Spectator mode" tooltip="When (if every) should being spectated disable the nospread? Spectated: disable when anyone is spectating you. Firstperson: disable only when someone is spectating you in first person.">
                 <Select target="nospread.spectator-mode">
-                    <Option name="Always on" value="0"/>
+                    <Option name="Never" value="0"/>
                     <Option name="Firstperson" value="1" tooltip="Disable if at least one spectator is in firstperson."/>
-                    <Option name="Spectated" value="2" tooltip="Disable if you are being spectated in first- or thirdperson."/>
+                    <Option name="Spectated" value="2" tooltip="Disable if you are being spectated in first or thirdperson."/>
                 </Select>
             </LabeledObject>
         </List>

@@ -2,15 +2,15 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Auto heal">
         <List width="160">
             <AutoVariable width="fill" target="autoheal.enable" label="Enable auto heal"/>
-            <AutoVariable width="fill" target="autoheal.silent" label="Silent"/>
+            <AutoVariable width="fill" target="autoheal.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen. Crosshair movement is still visible for spectators."/>
             <AutoVariable width="fill" target="autoheal.look-at-target" label="Look at target" tooltip="Autoheal will permanently look at the target."/>
             <AutoVariable width="fill" target="autoheal.steam-only" label="Heal SteamID only"/>
             <AutoVariable width="fill" target="autoheal.steamid" label="SteamID" tooltip="SteamID for the above."/>
             <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto uber"/>
             <AutoVariable width="fill" target="autoheal.uber.share" label="Share uber"/>
-            <AutoVariable width="fill" target="autoheal.disguised" label="Disguised spies"/>
+            <AutoVariable width="fill" target="autoheal.disguised" label="Disguised Spies"/>
             <AutoVariable width="fill" target="autoheal.uber.health-below-ratio" label="Ratio trigger" min="0" max="100"/>
-            <AutoVariable width="fill" target="autoheal.popvoice" label="Pop on voicecommand"/>
+            <AutoVariable width="fill" target="autoheal.popvoice" label="Pop on voice command"/>
             <AutoVariable width="fill" target="autoheal.friends-only" label="Only heal friends"/>
         </List>
     </Box>

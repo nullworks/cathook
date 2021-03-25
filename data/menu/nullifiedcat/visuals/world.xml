@@ -7,16 +7,16 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Freecam" y="55">
         <List width="180">
-            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam Button"/>
-            <AutoVariable width="fill" target="visual.freecam-speed" label="Freecam Speed (HU/s)"/>
+            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button"/>
+            <AutoVariable width="fill" target="visual.freecam-speed" label="Freecam speed (HU/s)"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
-            <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable Thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson Button" tooltip="Set a Button to Toggle Thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show Angles in Thirdperson" tooltip="Show Real Antiaim Angles in Third Person"/>
-            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable When Zoomed" tooltip="Disables Thirdperson When Zoomed In"/>
+            <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable thirdperson"/>
+            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson button" tooltip="Set a button to toggle thirdperson."/>
+            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show angles in thirdperson" tooltip="Show real antiaim angles in third person."/>
+            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable when zoomed" tooltip="Disables thirdperson when zoomed in."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Zooming" y="190">
@@ -27,25 +27,25 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">
         <List width="180">
-            <AutoVariable width="fill" target="remove.arms" label="Remove Arms"/>
-            <AutoVariable width="fill" target="remove.cloak" label="Remove Cloak"/>
-            <AutoVariable width="fill" target="remove.disguise" label="Remove Disguise"/>
-            <AutoVariable width="fill" target="remove.hats" label="Remove Hats"/>
-            <AutoVariable width="fill" target="remove.contracker" label="Remove Contracker"/>
-            <AutoVariable width="fill" target="remove.scope" label="Remove Scope"/>
-            <AutoVariable width="fill" target="remove.zoom" label="Remove Zoom/Keep Rifle"/>
+            <AutoVariable width="fill" target="remove.arms" label="Remove arms"/>
+            <AutoVariable width="fill" target="remove.cloak" label="Remove cloak"/>
+            <AutoVariable width="fill" target="remove.disguise" label="Remove disguise"/>
+            <AutoVariable width="fill" target="remove.hats" label="Remove hats"/>
+            <AutoVariable width="fill" target="remove.contracker" label="Remove contracker"/>
+            <AutoVariable width="fill" target="remove.scope" label="Remove scope"/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Use the command 'zoom_sensitivity_ratio' to adjust mouse sensitivity."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="125">
         <List width="180">
             <AutoVariable width="fill" target="visual.night-mode.gui" label="Nightmode (GUI)" min="0" max="100" step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.world" label="Nightmode (World)" min="0" max="100" step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (Skybox)" min="0" max="100" step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode Color (GUI)"/>
-            <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode Color (World)"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode Color (Skybox)"/>
-            <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw Explosion Spheres"/>
-            <LabeledObject width="fill" label="Ragdoll Override">
+            <AutoVariable width="fill" target="visual.night-mode.world" label="Nightmode (world)" min="0" max="100" step="0.1"/>
+            <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (skybox)" min="0" max="100" step="0.1"/>
+            <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode color (GUI)"/>
+            <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode color (world)"/>
+            <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
+            <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw explosion spheres" tooltip="Show explosion radius of Stickybombs."/>
+            <LabeledObject width="fill" label="Ragdoll override">
                 <Select target="visual.ragdoll-mode">
                     <Option name="Auto" value="0"/>
                     <Option name="Gib" value="1"/>
@@ -56,7 +56,7 @@
                     <Option name="Ice" value="6"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Skybox Override">
+            <LabeledObject width="fill" label="Skybox override">
                 <Select target="misc.skybox-override">
                     <Option name="none" value="0"/>
                     <Option name="sky_tf2_04" value="1"/>
@@ -92,15 +92,15 @@
                     <Option name="sky_pyroland_03" value="31"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only Override Local Player Kills"/>
-            <LabeledObject width="fill" label="Pyro Vision">
+            <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only override local player kills"/>
+            <LabeledObject width="fill" label="Pyrovision">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>
-                    <Option name="ON" value="1"/>
-                    <Option name="OFF" value="2"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Off" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable Killfeed Coloring" tooltip="Colors Names in Killfeed to Reflect Player States Eg: Rage"/>
+            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable killfeed coloring" tooltip="Colors names in killfeed to reflect player states eg: RAGE"/>
         </List>
     </Box>
 </Tab>

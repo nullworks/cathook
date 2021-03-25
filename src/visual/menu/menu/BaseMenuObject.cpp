@@ -34,7 +34,12 @@ bool BaseMenuObject::handleSdlEvent(SDL_Event *event)
 
 void BaseMenuObject::render()
 {
-    if (tooltip.has_value() && isHovered())
+    float w, h;
+    font = &resource::font::base;
+    
+    font->stringSize(label, &w, &h);
+    int length = int(w);
+    if (tooltip.has_value() && isHoveredText(length))
         Menu::instance->showTooltip(*tooltip);
 }
 
@@ -84,6 +89,23 @@ bool BaseMenuObject::isHovered()
     }
 
     return bb.contains(mx, my);
+}
+
+bool BaseMenuObject::isHoveredText(int text_length)
+{
+    if (Menu::instance->frame != hovered_frame)
+        return false;
+
+    int mx{ 0 };
+    int my{ 0 };
+
+    if (Menu::instance)
+    {
+        mx = Menu::instance->mouseX;
+        my = Menu::instance->mouseY;
+    }
+
+    return bb.containsForTooltip(mx, my, text_length);
 }
 
 void BaseMenuObject::handleMessage(Message &msg, bool is_relayed)
@@ -163,6 +185,9 @@ void BaseMenuObject::loadFromXml(const tinyxml2::XMLElement *data)
     if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("tooltip", &str))
         tooltip = str;
 
+    if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("label", &str))
+        label = str;
+    
     if (tinyxml2::XML_SUCCESS == data->QueryStringAttribute("id", &str))
         string_id = str;
 

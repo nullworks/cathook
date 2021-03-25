@@ -5,8 +5,8 @@
             <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean screenshots"/>
             <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>
-            <LabeledObject width="fill" label="Software cursor mode">
-                <Select target="visual.software-cursor-mode" tooltip="Advanced users only">
+            <LabeledObject width="fill" label="Software cursor mode" tooltip="WARNING: Advanced users only.">
+                <Select target="visual.software-cursor-mode">
                     <Option name="Keep" value="0"/>
                     <Option name="Always" value="1"/>
                     <Option name="Never" value="2"/>
@@ -20,7 +20,7 @@
             <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.max" label="Maximum sidemove speed"/>
             <AutoVariable width="fill" target="visual.font_size.esp" label="Main font size"/>
             <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
-            <AutoVariable width="fill" target="mc_health.enable" label="Enable MC healthbar"/>
+            <AutoVariable width="fill" target="mc_health.enable" label="Enable MC healthbar" tooltip="Shows a Minecraft style healthbar."/>
             <AutoVariable width="fill" target="mc_health.size" label="MC healthbar size"/>
         </List>
     </Box>

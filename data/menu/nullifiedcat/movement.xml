@@ -2,7 +2,7 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Bunny hop">
         <List width="150">
             <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunny hop"/>
-            <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop chance" tooltip="% chance of a successful bunnyhop"/>
+            <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop chance" tooltip="% chance of a successful bunnyhop."/>
             <AutoVariable width="fill" target="misc.autostrafe" label="Enable auto strafe"/>
         </List>
     </Box>
@@ -78,8 +78,8 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="370" y="50">
         <List width="150">
             <AutoVariable width="fill" target="misc.no-push" label="Nopush"/>
-            <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"/>
-            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk Fowards"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk" tooltip="Increase crouched movement speed."/>
+            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk fowards"/>
         </List>
     </Box>
 </Tab>

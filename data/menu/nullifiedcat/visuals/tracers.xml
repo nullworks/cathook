@@ -13,12 +13,12 @@
                     <Option name="Teammates" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.bullet-tracers.one-trace-only" label="Single beam only"/>
+            <AutoVariable width="fill" target="visual.bullet-tracers.one-trace-only" label="Single beam only" tooltip="Make shotguns only show a single beam."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Tracers" x="165">
         <List width="150">
-            <AutoVariable width="fill" target="tracers.enabled" label="Enabled"/>
+            <AutoVariable width="fill" target="tracers.enabled" label="Enabled" tooltip="Draw lines from your crosshair to targets to show their location."/>
             <AutoVariable width="fill" target="tracers.buildings" label="Enable building tracers"/>
             <AutoVariable width="fill" target="tracers.green-distance" label="Green distance" min="0" max="10001" step="100"/>
             <AutoVariable width="fill" target="tracers.line-thickness" label="Line thickness"/>

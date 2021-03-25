@@ -114,6 +114,12 @@ bool zerokernel::BoundingBox::contains(int x, int y)
     return x >= border_box.left() && x <= border_box.right() && y >= border_box.top() && y <= border_box.bottom();
 }
 
+bool zerokernel::BoundingBox::containsForTooltip(int x, int y, int length)
+{
+    int right_end = border_box.left() + length;
+    return x >= border_box.left() && x <= right_end && y >= border_box.top() && y <= border_box.bottom();
+}
+
 bool zerokernel::BoundingBox::extend(zerokernel::BoundingBox &box)
 {
     if (box.isFloating())

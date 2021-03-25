@@ -2,22 +2,22 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Radar">
         <List width="150">
             <AutoVariable width="fill" target="radar.enable" label="Enable" tooltip="Shows a highly customizable radar."/>
-        <LabeledObject width="fill" label="Radar Shape" tooltip="Sets the radar's shape">
+        <LabeledObject width="fill" label="Radar shape" tooltip="Sets the radar's shape.">
             <Select target="radar.shape">
                 <Option name="Square" value="0"/>
                 <Option name="Circle" value="1"/>
             </Select>
         </LabeledObject>
-        <AutoVariable width="fill" target="radar.show-cross" label="Show Cross" tooltip="Show cross in the center of the radar."/>
+        <AutoVariable width="fill" target="radar.show-cross" label="Show cross" tooltip="Show cross in the center of the radar."/>
             <AutoVariable width="fill" target="radar.enemies-over-teammates" label="Enemies on top"/>
-            <AutoVariable width="fill" target="radar.healthbar" label="Health bar size" min="0" max="5" step="1"/>
+            <AutoVariable width="fill" target="radar.healthbar" label="Health bar size" tooltip="Size of health bars. Set to 0 to disable." min="0" max="5" step="1"/>
             <AutoVariable width="fill" target="radar.use-icons" label="Use icons"/>
             <AutoVariable width="fill" target="radar.size" label="Size" min="1" max="480" step="5"/>
             <AutoVariable width="fill" target="radar.icon-size" label="Icon size" min="1" max="48"/>
             <AutoVariable width="fill" target="radar.x" label="Radar X" tooltip="Sets the radar's x value from the left side of the window."/>
             <AutoVariable width="fill" target="radar.y" label="Radar Y" tooltip="Sets the radar's y value from the top of the window."/>
             <AutoVariable width="fill" target="radar.zoom" label="Zoom" min="1" max="20" step="0.1"/>
-            <AutoVariable width="fill" target="radar.opacity" label="Opacity" min="0" max="1.01" step="0.1"/>
+            <AutoVariable width="fill" target="radar.opacity" label="Opacity" tooltip="Sets the radar's background opacity." min="0" max="1.01" step="0.1"/>
             <AutoVariable width="fill" target="radar.aimbot-highlight" label="Aimbot highlight" tooltip="Outer border and target's icon border color changes when aimbot is used."/>
         </List>
     </Box>

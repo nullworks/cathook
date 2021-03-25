@@ -98,6 +98,8 @@ public:
      */
     bool contains(int x, int y);
 
+    bool containsForTooltip(int x, int y, int length);
+
     /*
      * Extends the box, if needed, to fit the other box without moving it
      * Returns true if the size of the box was changed

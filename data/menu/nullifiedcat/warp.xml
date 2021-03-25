@@ -12,24 +12,24 @@
             <AutoVariable width="fill" target="warp.bar-size" label="Bar size"/>
             <AutoVariable width="fill" target="warp.bar-x" label="X position"/>
             <AutoVariable width="fill" target="warp.bar-y" label="Y position"/>
-            <AutoVariable width="fill" target="warp.charge-passively" label="Charge passively" tooltip="Charge warp passively, e.g. when moving"/>
-            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump, This will make you fall slower"/>
-            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys"/>
-            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp"/>
+            <AutoVariable width="fill" target="warp.charge-passively" label="Charge passively" tooltip="Charge warp passively, e.g. when moving."/>
+            <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump, This will make you fall slower."/>
+            <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys."/>
+            <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp."/>
             <AutoVariable width="fill" target="warp.demoknight" label="Demoknight mode" tooltip="This will make you do a swing charge with warp (attack, charge, warp)."/>
-            <AutoVariable width="fill" target="warp.peek" label="Peek mode" tooltip="This will teleport you for a tick and then teleport you back"/>
-            <AutoVariable width="fill" target="warp.on-hit" label="Warp when hit" tooltip="Whenever Someone Melees you or shoots you with hitscan, warp"/>
-            <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp forwards" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp backwards" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option"/>
-            <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option"/>
+            <AutoVariable width="fill" target="warp.peek" label="Peek mode" tooltip="This will teleport you for a tick and then teleport you back."/>
+            <AutoVariable width="fill" target="warp.on-hit" label="Warp when hit" tooltip="Warp whenever someone melees you or shoots you with hitscan."/>
+            <AutoVariable width="fill" target="warp.on-hit.forward" label="Warp forwards" tooltip="Warp when hit option."/>
+            <AutoVariable width="fill" target="warp.on-hit.backwards" label="Warp backwards" tooltip="Warp when hit option."/>
+            <AutoVariable width="fill" target="warp.on-hit.left" label="Warp left" tooltip="Warp when hit option."/>
+            <AutoVariable width="fill" target="warp.on-hit.right" label="Warp right" tooltip="Warp when hit option."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Rapidfire" x="210">
         <List width="185">
             <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
             <AutoVariable width="fill" target="warp.rapidfire.distance" label="Maximum distance" tooltip="How close an enemy has to be for rapidfire to trigger. 0 = unlimited range."/>
-            <AutoVariable width="fill" target="warp.rapidfire.zoom" label="Enable Rapid zoom" tooltip="Allows you to instantly zoom in."/>
+            <AutoVariable width="fill" target="warp.rapidfire.zoom" label="Enable rapid zoom" tooltip="Allows you to instantly zoom in."/>
             <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
             <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
             <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">

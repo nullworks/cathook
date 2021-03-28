@@ -1,28 +1,43 @@
 ---
 name: Bug Report
-about: Create a report to help us improve cathook
-
+about: Create a report and help us improve Cathook!
+title: Quick Description of Bug
+labels: bug
+assignees: ''
 ---
 
-**Describe the Bug**
-A clear and concise description of what the bug is.
+## System Information
+**OS:**  
+**DE:**  
+**Cathook Version:**  
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. …
-2. …
-3. …
-…
-999. (result)
+## Logs / Crash Report  
+<!-- Add logs from /tmp/. if it crashes, paste symbolize-crash-log here. -->
+<!-- Drag and drop the file here. -->
+<!-- You can delete this line if you don't have any crash reports to give. -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Description  
+<!-- Please provide a clear and concise description of what the bug is. -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Steps to reproduce  
+- [ ] I am able to consistently reproduce this error
+<!-- If you can consistently get this error, let us know how! If we can reproduce it, we can fix it. If we can't, then we're just shooting in the dark on whether or not we've fixed it! -->
 
-**Logs**
-Add logs from /tmp/ and  - if it crashes - use symbolize-crash-log here.
+Steps to reproduce the behavior:  
+<!-- Example only, please delete these steps and enter your own. -->
+1. Enable X
+2. Do Y
+3. Notice Z
 
-**Additional context**
-Add any other context about the problem here.
+## Additional context 
+<!-- Is there anything specific else that we should know that could help us find/fix this bug? -->
+
+## Screenshot of modules enabled  
+- [ ] This image contains sensitivity information
+<!-- Even if you don't think it could effect what happened, sometimes modules may break others. We don't know! We may never know, if you don't show us what mods are enabled. -->
+
+
+## Checklist  
+- [ ] I have included my DE, WM, and version of Cathook.
+- [ ] I have included the steps to reproduce and my logs to the best I am able to share.
+- [ ] The Developers are allowed to contact me on [the official telegram](https://t.me/nullworks) for further information if they need to.

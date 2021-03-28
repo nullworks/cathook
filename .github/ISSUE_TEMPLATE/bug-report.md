@@ -32,12 +32,11 @@ Steps to reproduce the behavior:
 ## Additional context 
 <!-- Is there anything specific else that we should know that could help us find/fix this bug? -->
 
-## Screenshot of modules enabled  
-- [ ] This image contains sensitivity information
-<!-- Even if you don't think it could effect what happened, sometimes modules may break others. We don't know! We may never know, if you don't show us what mods are enabled. -->
+## Screenshot of cheats enabled  
+<!-- Even if you don't think it could effect what happened, sometimes some cheats may break others. We don't know! We may never know, if you don't show us what cheats are enabled. -->
 
 
 ## Checklist  
 - [ ] I have included my DE, WM, and version of Cathook.
 - [ ] I have included the steps to reproduce and my logs to the best I am able to share.
-- [ ] The Developers are allowed to contact me on [the official telegram](https://t.me/nullworks) for further information if they need to.
+- [ ] The Developers are allowed to contact me on [the official telegram](https://t.me/nullworks) for further information if they need to. (Put your username here)

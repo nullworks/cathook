@@ -42,7 +42,7 @@ assignees: ''
 
 **Additional Context**
 
-<!-- Is this feature in another client? Do you have a video showcasing it? Anything leftover that you might want to add, or to let us know about? -->
+<!-- Is this feature in another cheat? Do you have a video showcasing it? Anything leftover that you might want to add, or to let us know about? -->
 
-<!-- Example: A lot of other TF2 clients has this. It's really necessary, so you should add it! It will really help a lot. Also, I think it would be cool if you could make the text turn from yellow to red if they getting closer! -->
+<!-- Example: A lot of other TF2 cheats have this. It's really necessary, so you should add it! It will really help a lot. Also, I think it would be cool if you could make the text turn from yellow to red if they getting closer! -->
 

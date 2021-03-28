@@ -27,9 +27,6 @@
             <AutoVariable width="fill" target="esp.item.explosive" label="Explosives" tooltip="Environmental hazards like bombs"/>
             <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits"/>
             <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps"/>
-            <!-- <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
-            <AutoVariable width="fill" target="esp.item.adrenaline" label="TF2C adrenaline"/>
-            <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C weapon spawner"/> -->
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectiles" x="170">
@@ -131,20 +128,6 @@
             <AutoVariable width="fill" target="esp.online.software" label="Online: software"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="155">
-        <List width="150">
-            <LabeledObject width="fill" label="Mode">
-                <Select target="esp.emoji.mode">
-                    <Option name="None" value="0"/>
-                    <Option name="Joy" value="1"/>
-                    <Option name="Thinking" value="2"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="esp.emoji.min-size" label="Min size"/>
-            <AutoVariable width="fill" target="esp.emoji.scaling" label="Scaling"/>
-            <AutoVariable width="fill" target="esp.emoji.size" label="Size"/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="240">
         <List width="150">
             <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to one if you are being dominated by someone else."/>
@@ -152,11 +135,4 @@
             <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
         </List>
     </Box>
-    <!-- <Box padding="12 6 6 6" width="content" height="content" y="260" name="Debug">
-        <List width="150">
-            <AutoVariable width="fill" target="esp.debug.entity" label="Entity ESP"/>
-            <AutoVariable width="fill" target="esp.debug.id" label="Entity ID"/>
-            <AutoVariable width="fill" target="esp.debug.model" label="Model name"/>
-        </List>
-    </Box> -->
 </Tab>

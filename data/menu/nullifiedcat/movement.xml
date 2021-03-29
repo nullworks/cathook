@@ -79,7 +79,7 @@
         <List width="150">
             <AutoVariable width="fill" target="misc.no-push" label="Nopush"/>
             <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk" tooltip="Increase crouched movement speed."/>
-            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk fowards"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk forwards"/>
         </List>
     </Box>
 </Tab>

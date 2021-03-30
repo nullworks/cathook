@@ -1,7 +1,7 @@
 <Tab name="UI" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="UI">
         <List width="180">
-            <AutoVariable width="fill" target="visual.open-gui-button" label="GUI button"/>
+            <AutoVariable width="fill" target="visual.open-gui-button" label="GUI button" tooltip="Button to toggle this menu."/>
             <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean screenshots"/>
             <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>

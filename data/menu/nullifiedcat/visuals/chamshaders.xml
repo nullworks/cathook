@@ -5,9 +5,10 @@
             <AutoVariable width="fill" target="chams.additive" label="Additive"/>
             <AutoVariable width="fill" target="chams.pearlescent" label="Pearlescent"/>
             <AutoVariable width="fill" target="chams.phong" label="Phong"/>
-            <AutoVariable width="fill" target="chams.phongboost" label="Phong bst"/>
-            <AutoVariable width="fill" target="chams.phongexponent" label="Phong exp"/>
-            <AutoVariable width="fill" target="chams.phonefresnelranges" label="Phong Fresnel Ranges"/>
+            <AutoVariable width="fill" target="chams.phongboost" label="Phong bst" tooltip="Phong boost."/>
+            <AutoVariable width="fill" target="chams.phongexponent" label="Phong exp" tooltip="Phone exponent."/>
+			<!--Fresnel should be capitalized-->
+            <AutoVariable width="fill" target="chams.phonefresnelranges" label="Phong Fresnel ranges"/>
             <AutoVariable width="fill" target="chams.phongfresnelranges.1" label="Normal"/>
             <AutoVariable width="fill" target="chams.phongfresnelranges.2" label="Between"/>
             <AutoVariable width="fill" target="chams.phongfresnelranges.3" label="Grazing angle"/>

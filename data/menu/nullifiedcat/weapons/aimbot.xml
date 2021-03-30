@@ -22,7 +22,7 @@
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only" tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Projectile Aimbot" y="210">
+    <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="210">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
             <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
@@ -116,7 +116,7 @@
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.spectator.enable" label="Aimbot enable" tooltip="Should the aimbot be enabled based on the above?"/>
             <AutoVariable width="fill" target="aimbot.spectator.fov" label="Spectated FOV" tooltip="FOV for the aimbot when in spectated mode."/>
-            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow" min="0" max="30"/>
+            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow" tooltip="Controls how quickly the aimbot moves your crosshair while in spectated mode." min="0" max="30"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">

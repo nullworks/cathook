@@ -24,7 +24,7 @@
                     <Option name="Heck" value="11"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="antiaim.pitch.static" label="Custom pitch"/>
+            <AutoVariable width="fill" target="antiaim.pitch.static" label="Custom pitch" tooltip="Used when 'Pitch mode' is set to 'Custom'."/>
             <LabeledObject width="fill" label="Yaw mode">
                 <Select target="antiaim.yaw.mode">
                     <Option name="Disable" value="0"/>
@@ -52,7 +52,7 @@
                     <Option name="TestAA" value="22"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="antiaim.yaw.static" label="Custom yaw"/>
+            <AutoVariable width="fill" target="antiaim.yaw.static" label="Custom yaw" tooltip="Used when 'Yaw mode' is set to 'Custom'."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Resolver" x="170">

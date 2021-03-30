@@ -6,11 +6,11 @@
                     <AutoVariable width="fill" target="chams.enable" label="Entity Chams" tooltip="Change textures for visiblity."/>
                     <AutoVariable width="fill" target="chams.legit" label="Legit" tooltip="Don't show chams through walls."/>
                     <AutoVariable width="fill" target="chams.health" label="Health" tooltip="Color chams according to player health."/>
-                    <AutoVariable width="fill" target="chams.recursive" label="Recursive"/>
-                    <AutoVariable width="fill" target="chams.aimbot.color" label="Aimbot coloring" tooltip="Color the aimbot's target according to color set in Visual:Colors"/>
-                    <AutoVariable width="fill" target="chams.novis" label="Use seperate novis colors" tooltip="Seperate colors when a entity is not visible"/>
-                    <AutoVariable width="fill" target="chams.weapons" label="Weapon chams seperate color" tooltip="Color weapons."/>
-                    <AutoVariable width="fill" target="chams.local-weapon" label="Local weapon chams" tooltip="Cham your first person weapon"/>
+                    <AutoVariable width="fill" target="chams.recursive" label="Recursive" tooltip="Include weapons in chams."/>
+                    <AutoVariable width="fill" target="chams.aimbot.color" label="Aimbot coloring" tooltip="Color the aimbot's target according to color set in Visuals->Colors"/>
+                    <AutoVariable width="fill" target="chams.novis" label="Use seperate novis colors" tooltip="Use seperate colors when an entity is not visible"/>
+                    <AutoVariable width="fill" target="chams.weapons" label="Weapon chams seperate color" tooltip="Color weapons differently. Requires 'Recursive' to be checked."/>
+                    <AutoVariable width="fill" target="chams.local-weapon" label="Local weapon chams" tooltip="Cham your weapons."/>
                     <AutoVariable width="fill" target="chams.overlay.local-weapon" label="Overlay local weapon chams" tooltip="Phong and other eye candies for local weapon chams"/>
                     <AutoVariable width="fill" target="chams.local-weapon.wireframe" label="Local weapon chams wireframe"/>
                     <AutoVariable width="fill" target="chams.local-weapon.original" label="Local weapon chams draw original"/>
@@ -27,10 +27,10 @@
             </Box>
             <Box padding="12 6 6 6" width="content" height="content" name="Backtrack chams" x="210" y="200">
                 <List width="200">
-                    <AutoVariable width="fill" target="backtrack.chams" label="Backtrack chams" tooltip="Draw chams for backtrack ticks"/>
+                    <AutoVariable width="fill" target="backtrack.chams" label="Backtrack chams" tooltip="Draw chams for backtrack ticks."/>
                     <AutoVariable width="fill" target="backtrack.chams.overlay" label="Overlay backtrack chams"/>
                     <AutoVariable width="fill" target="backtrack.chams.wireframe" label="Backtrack chams wireframe"/>
-                    <AutoVariable width="fill" target="backtrack.chams.ticks" label="Backtrack chams amount" tooltip="How many ticks to draw (WARNING, this can cause lag)"/>
+                    <AutoVariable width="fill" target="backtrack.chams.ticks" label="Backtrack chams amount" tooltip="How many ticks to draw (WARNING: this can cause lag)."/>
                 </List>
             </Box>
             <Box padding="12 6 6 6" width="content" height="content" name="Targets" x="210">
@@ -38,7 +38,7 @@
                     <AutoVariable width="fill" target="chams.show.players" label="Players"/>
                     <AutoVariable width="fill" target="chams.show.teammates" label="Teammates"/>
                     <AutoVariable width="fill" target="chams.show.disguised" label="Disguised"/>
-                    <AutoVariable width="fill" target="chams.self" label="Local Player"/>
+                    <AutoVariable width="fill" target="chams.self" label="Local player" tooltip="Show chams on yourself."/>
                     <AutoVariable width="fill" target="chams.show.buildings" label="Buildings"/>
                     <AutoVariable width="fill" target="chams.show.teammate-buildings" label="Team buildings"/>
                     <AutoVariable width="fill" target="chams.show.powerups" label="Powerups"/>

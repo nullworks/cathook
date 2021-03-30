@@ -34,17 +34,17 @@
             <AutoVariable width="fill" target="nav.draw" label="Draw path"/>
             <AutoVariable width="fill" target="nav.look-at-path" label="Look at path"/>
             <AutoVariable width="fill" target="navbot.enabled" label="Enable NavBot"/>
-            <AutoVariable width="fill" target="navbot.capture-objectives" label="Capture objectives" tooltip="Automatically capture objectives (CTF,CP and PL only)"/>
+            <AutoVariable width="fill" target="navbot.capture-objectives" label="Capture objectives" tooltip="Automatically capture objectives (CTF, CP, and PL only)."/>
             <AutoVariable width="fill" target="navbot.search-health" label="Search health"/>
             <AutoVariable width="fill" target="navbot.search-ammo" label="Search ammo"/>
             <AutoVariable width="fill" target="navbot.escape-danger" label="Escape danger"/>
-            <AutoVariable width="fill" target="navbot.escape-danger.slight-danger.capping" label="Safe capping" tooltip="Make bots run pre-emptively from capture points in case of danger"/>
+            <AutoVariable width="fill" target="navbot.escape-danger.slight-danger.capping" label="Safe capping" tooltip="Make bots run pre-emptively from capture points in case of danger."/>
             <AutoVariable width="fill" target="navbot.escape-danger.ctf-cap" label="Escape danger w. intel" tooltip="Also try to escape from danger when carrying intel."/>
             <AutoVariable width="fill" target="navbot.primary-only" label="Auto best weapon"/>
             <AutoVariable width="fill" target="navbot.melee-mode" label="Melee only"/>
             <LabeledObject width="fill" label="Force slot">
                 <Select target="navbot.force-slot">
-                    <Option name="Do not force" value="0"/>
+                    <Option name="Don't force" value="0"/>
                     <Option name="Primary" value="1"/>
                     <Option name="Secondary" value="2"/>
                     <Option name="Melee" value="3"/>
@@ -66,7 +66,7 @@
             <AutoVariable width="fill" target="antibackstab.angle" label="Detection angle"/>
             <AutoVariable width="fill" target="antibackstab.distance" label="Detection distance"/>
             <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
-            <AutoVariable width="fill" target="antibackstab.nope" label="Nope!" tooltip="Have the charachter say 'no'."/>
+            <AutoVariable width="fill" target="antibackstab.nope" label="Nope!" tooltip="Have your character say 'no'."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Shield aimbot" x="370">

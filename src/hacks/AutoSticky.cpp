@@ -14,13 +14,15 @@ namespace hacks::tf::autosticky
 {
 static settings::Boolean enable{ "autosticky.enable", "false" };
 static settings::Boolean buildings{ "autosticky.buildings", "true" };
-static settings::Boolean legit{ "autosticky.legit", "false" };
+static settings::Int legit{ "autosticky.legit-mode", "0" };
 static settings::Boolean dontblowmeup{ "autosticky.dontblowmeup", "true" };
 static settings::Int min_dist{ "autosticky.min-dist", "130" };
 
 // A storage array for ents
 static std::vector<CachedEntity *> bombs;
 static std::vector<CachedEntity *> targets;
+
+bool shouldExplode;
 
 // Function to tell when an ent is the local players own bomb
 bool IsBomb(CachedEntity *ent)
@@ -71,8 +73,8 @@ bool IsTarget(CachedEntity *ent)
             // if (ignore_taunting && HasCondition<TFCond_Taunting>(ent)) return
             // false;
 
-            // If settings allow, dont target cloaked players
-            if (legit && IsPlayerInvisible(ent))
+            // If settings don't allow, dont target cloaked players
+            if (*legit && IsPlayerInvisible(ent))
                 return false;
         }
 
@@ -179,21 +181,15 @@ void CreateMove()
                     {
                         // Check user settings if legit mode is off, if legit mode
                         // is off then detonate
-                        if (!legit)
-                        {
-                            // Aim at bomb
-                            if (IsScottishResistance)
-                                AimAt(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), current_user_cmd);
-                            // Use silent
-                            g_pLocalPlayer->bUseSilentAngles = true;
-
-                            // Continue the loop in case local player is within the explosion radius
-                            found = true;
-                            continue;
-                        }
-                        // Since legit mode is on, check if the sticky can see
-                        // the local player
-                        else if (CE_GOOD(target) && IsVectorVisible(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), true))
+                        shouldExplode = false;
+                        if (!*legit)
+                            shouldExplode = true;
+                        else if (*legit == 1 && CE_GOOD(target) && IsVectorVisible(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), true))
+                            shouldExplode = true;
+                        else if (*legit == 2 && CE_GOOD(target) && IsVectorVisible(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), true) && IsVectorVisible(g_pLocalPlayer->v_Eye, *position, true))
+                            shouldExplode = true;
+                        
+                        if (shouldExplode)
                         {
                             // Aim at bomb
                             if (IsScottishResistance)

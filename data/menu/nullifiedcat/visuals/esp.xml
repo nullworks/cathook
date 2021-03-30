@@ -1,26 +1,26 @@
 <Tab name="ESP" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="ESP">
         <List width="150">
-            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception"/>
+            <AutoVariable width="fill" target="esp.enable" label="Enable ESP" tooltip="Enable extrasensory perception. This shows important information about game entities."/>
             <AutoVariable width="fill" target="esp.legit" label="Legit mode" tooltip="Dont show ESP of enemies behind walls"/>
             <AutoVariable width="fill" target="esp.range" label="Max range"/>
-            <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP"/>
+            <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP" tooltip="Show a red and green dot on the heads of enemies."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="81">
         <List width="150">
-            <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP"/>
-            <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Toggles ESP on self."/>
+            <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP" tooltip="Shows ESP on teammates."/>
+            <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Shows ESP on yourself."/>
             <AutoVariable width="fill" target="esp.show.buildings" label="Building ESP"/>
-            <AutoVariable width="fill" target="esp.show.team-buildings" label="Teammate Building ESP"/>
+            <AutoVariable width="fill" target="esp.show.team-buildings" label="Teammate building ESP"/>
             <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
             <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
             <AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP"/>
             <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP"/>
             <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
             <AutoVariable width="fill" target="esp.show.npc" label="NPC ESP"/>
-            <AutoVariable width="fill" target="esp.item.money" label="MvM money"/>
-            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red money is automatically collected."/>
+            <AutoVariable width="fill" target="esp.item.money" label="MvM money" tooltip="Regular MvM money that needs to be picked up."/>
+            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red MvM money that is automatically picked up."/>
             <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
             <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
             <AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intel, carts and mvm bombs"/>
@@ -111,8 +111,8 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="170" y="300">
         <List width="150">
-            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D Over Head"/>
-            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's How Mafia Works"/>
+            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D over head"/>
+            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's how Mafia works"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Strings" x="340">
@@ -133,7 +133,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="155">
         <List width="150">
-            <LabeledObject width="fill" label="Mode">
+            <LabeledObject width="fill" label="Mode" tooltip="Shows an emoji on the heads of ESP targets.">
                 <Select target="esp.emoji.mode">
                     <Option name="None" value="0"/>
                     <Option name="Joy" value="1"/>
@@ -147,7 +147,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="240">
         <List width="150">
-            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to one if you are being dominated by someone else."/>
+            <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to the one shown if someone is dominating you."/>
             <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
             <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
         </List>

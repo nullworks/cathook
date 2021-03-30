@@ -3,7 +3,7 @@
         <List width="250">
             <AutoVariable width="fill" target="autoparty.enable" label="Enable auto party"/>
             <AutoVariable width="fill" target="autoparty.run-frequency" label="Run frequency" tooltip="Run every n seconds."/>
-            <AutoVariable width="fill" target="autoparty.max-party-size" label="Max party members allowed."/>
+            <AutoVariable width="fill" target="autoparty.max-party-size" label="Max party size" tooltip="Max number of party members allowed."/>
             <AutoVariable width="fill" target="autoparty.kick-rage" label="Autokick rage" tooltip="Automatically kick raged players from the party."/>
             <AutoVariable width="fill" target="autoparty.auto-leave" label="Leave if offline" tooltip="Leave the party when a member goes offline."/>
             <AutoVariable width="fill" target="autoparty.auto-lock" label="Autolock party" tooltip="Lock the party when max party size is reached."/>

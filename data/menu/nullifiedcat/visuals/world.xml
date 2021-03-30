@@ -7,7 +7,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Freecam" y="55">
         <List width="180">
-            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button"/>
+            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button" tooltip="Press this button to toggle freecam."/>
             <AutoVariable width="fill" target="visual.freecam-speed" label="Freecam speed (HU/s)"/>
         </List>
     </Box>
@@ -21,7 +21,7 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Zooming" y="190">
         <List width="180">
-            <AutoVariable width="fill" target="visual.zoom-key" label="Zoom key"/>
+            <AutoVariable width="fill" target="visual.zoom-key" label="Zoom key" tooltip="Hold down this key to override your FOV to the one set below."/>
             <AutoVariable width="fill" target="visual.zoom-key.fov" label="Zoom FOV"/>
         </List>
     </Box>
@@ -33,7 +33,7 @@
             <AutoVariable width="fill" target="remove.hats" label="Remove hats"/>
             <AutoVariable width="fill" target="remove.contracker" label="Remove contracker"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove scope"/>
-            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Use the command 'zoom_sensitivity_ratio' to adjust mouse sensitivity."/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Use the command 'zoom_sensitivity_ratio' to adjust mouse sensitivity while zoomed."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="125">
@@ -93,7 +93,7 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only override local player kills"/>
-            <LabeledObject width="fill" label="Pyrovision">
+            <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>
                     <Option name="On" value="1"/>

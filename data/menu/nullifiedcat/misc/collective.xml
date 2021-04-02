@@ -9,8 +9,6 @@
             <AutoVariable width="fill" target="misc.engine-prediction" label="Engine prediction"/>
             <AutoVariable width="fill" target="misc.flashlight-spam" label="Flashlight spam" tooltip="Used in Half Life Death Match."/>
             <AutoVariable width="fill" target="misc.force-halloween" label="Force halloween"/>
-            <AutoVariable width="fill" target="misc.god-mode" label="xd"/>
-            <AutoVariable width="fill" target="misc.no-homo" label="#nohomo"/>
             <AutoVariable width="fill" target="misc.no-lerp" label="Nolerp"/>
             <AutoVariable width="fill" target="misc.full-auto" label="Fully automated firing"/>
             <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>

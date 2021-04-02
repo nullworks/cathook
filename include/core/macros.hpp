@@ -21,4 +21,3 @@ constexpr int c_strcmp(char const *lhs, char const *rhs)
 }
 
 //#define FEATURE_RADAR_DISABLED
-#define FEATURE_FIDGET_SPINNER_DISABLED

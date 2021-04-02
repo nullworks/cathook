@@ -11,6 +11,12 @@ assignees: ''
 **DE:**  
 **Cathook Version:**  
 
+## Config used
+<!-- Add the .conf file you were using from /opt/cathook/data/configs/. -->
+<!-- Drag and drop the file here. -->
+<!-- You can delete this line if you don't have any crash reports to give. -->
+
+
 ## Logs / Crash Report  
 <!-- Add logs from /tmp/. if it crashes, paste symbolize-crash-log here. -->
 <!-- Drag and drop the file here. -->

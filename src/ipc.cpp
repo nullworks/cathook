@@ -28,9 +28,7 @@ static settings::String server_name{ "ipc.server", "cathook_followbot_server" };
 
 CatCommand fix_deadlock("ipc_fix_deadlock", "Fix deadlock", []() {
     if (peer)
-    {
-        pthread_mutex_unlock(&peer->memory->mutex);
-    }
+        peer->memory->mutex.unlock();
 });
 
 CatCommand id("ipc_id", "Echo ipc id", []() { logging::Info("%d", ipc::peer->client_id); });

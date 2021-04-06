@@ -774,18 +774,13 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                         if (bt::chams && bt::backtrackEnabled())
                         {
                             // TODO: Allow for a fade between the entity's color and a specified color, it would look cool but i'm lazy
-                            if (ent->m_bAlivePlayer() && (int) bt::bt_data.size() >= info.entity_index > 0)
+                            if (ent->m_bAlivePlayer() && (int) bt::bt_data.size() >= info.entity_index && info.entity_index > 0)
                             {
                                 // Get ticks
                                 auto ticks = bt::bt_data.at(info.entity_index - 1);
 
-                                std::vector<bt::BacktrackData> good_ticks;
-                                for (auto &tick : ticks)
-                                {
-                                    if (tick.in_range)
-                                        good_ticks.push_back(tick);
-                                }
-                                if (!good_ticks.empty())
+                                auto good_ticks = bt::getGoodTicks(ENTITY(info.entity_index));
+                                if (good_ticks)
                                 {
                                     // Setup chams according to user settings
                                     ChamColors backtrack_colors;
@@ -798,10 +793,10 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                                     for (unsigned i = 0; i <= (unsigned) std::max(*bt::chams_ticks, 1); i++)
                                     {
                                         // Can't draw more than we have
-                                        if (i >= good_ticks.size())
+                                        if (i >= good_ticks->size())
                                             break;
-                                        if (!good_ticks[i].bones.empty())
-                                            ApplyChams(backtrack_colors, false, false, *bt::chams_overlay, false, *bt::chams_wireframe, false, entity, this_, state, info, good_ticks[i].bones.data());
+                                        if (!(*good_ticks)[i].bones.empty())
+                                            ApplyChams(backtrack_colors, false, false, *bt::chams_overlay, false, *bt::chams_wireframe, false, entity, this_, state, info, (*good_ticks)[i].bones.data());
                                     }
                                 }
                             }

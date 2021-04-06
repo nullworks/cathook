@@ -46,6 +46,7 @@ void MoveToTick(BacktrackData data);
 void RestoreEntity(int entidx);
 bool hasData();
 std::optional<BacktrackData> getData();
+std::optional<std::vector<BacktrackData>> getGoodTicks(CachedEntity *ent);
 
 extern std::vector<std::vector<BacktrackData>> bt_data;
 

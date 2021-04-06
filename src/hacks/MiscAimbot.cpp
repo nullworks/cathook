@@ -64,13 +64,12 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             std::optional<backtrack::BacktrackData> data = std::nullopt;
             if (!shouldBacktrack && demoknight_mode)
             {
-                if (backtrack::bt_data.size() >= ent->m_IDX)
+                auto good_ticks = backtrack::getGoodTicks(ent);
+                if (good_ticks)
                 {
                     float tick_score = FLT_MAX;
-                    for (auto &tick : backtrack::bt_data.at(ent->m_IDX - 1))
+                    for (auto &tick : *good_ticks)
                     {
-                        if (!tick.in_range)
-                            continue;
                         float dist = tick.m_vecOrigin.DistTo(ent->m_vecOrigin());
                         if (dist < tick_score)
                         {
@@ -147,13 +146,12 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 
         if (!shouldBacktrack && demoknight_mode)
         {
-            if (backtrack::bt_data.size() >= ent->m_IDX)
+            auto good_ticks = backtrack::getGoodTicks(ent);
+            if (good_ticks)
             {
                 float tick_score = FLT_MAX;
-                for (auto &tick : backtrack::bt_data.at(ent->m_IDX - 1))
+                for (auto &tick : *good_ticks)
                 {
-                    if (!tick.in_range)
-                        continue;
                     float dist = tick.m_vecOrigin.DistTo(ent->m_vecOrigin());
                     if (dist < tick_score)
                     {

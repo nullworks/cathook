@@ -167,9 +167,7 @@ bool shouldBacktrack(CachedEntity *ent)
         return false;
     if (ent && ent->m_Type() != ENTITY_PLAYER)
         return false;
-    if (hacks::tf2::backtrack::bt_data.size() < ent->m_IDX)
-        return false;
-    if (hacks::tf2::backtrack::bt_data[ent->m_IDX - 1].empty())
+    if (!tf2::backtrack::getGoodTicks(ent))
         return false;
     return true;
 }
@@ -513,9 +511,9 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         {
             if (shouldBacktrack(target_last))
             {
-                for (auto &bt_tick : hacks::tf2::backtrack::bt_data[target_last->m_IDX - 1])
-                {
-                    if (bt_tick.in_range)
+                auto good_ticks = hacks::tf2::backtrack::getGoodTicks(target_last);
+                if (good_ticks)
+                    for (auto &bt_tick : *good_ticks)
                     {
                         hacks::tf2::backtrack::MoveToTick(bt_tick);
                         if (IsTargetStateGood(target_last))
@@ -523,7 +521,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                         // Restore if bad target
                         hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
                     }
-                }
             }
 
             // Check if previous target is still good
@@ -551,9 +548,9 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         static std::optional<hacks::tf2::backtrack::BacktrackData> temp_bt_tick = std::nullopt;
         if (shouldBacktrack(ent))
         {
-            for (auto &bt_tick : hacks::tf2::backtrack::bt_data[ent->m_IDX - 1])
-            {
-                if (bt_tick.in_range)
+            auto good_ticks = tf2::backtrack::getGoodTicks(ent);
+            if (good_ticks)
+                for (auto &bt_tick : *good_ticks)
                 {
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
                     if (IsTargetStateGood(ent))
@@ -564,7 +561,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     }
                     hacks::tf2::backtrack::RestoreEntity(ent->m_IDX);
                 }
-            }
         }
         else
             isTargetGood = IsTargetStateGood(ent);

@@ -22,7 +22,7 @@ settings::Float chams_envmap_tint_b{ "backtrack.chams.envmap.tint.b", "1" };
 
 static bool isEnabled();
 
-#define MAX_BACKTRACK_TICKS 66
+#define MAX_BACKTRACK_TICKS 80
 
 // Check if backtrack is enabled
 static bool isBacktrackEnabled = false;
@@ -37,6 +37,26 @@ bool hasData()
 std::optional<BacktrackData> getData()
 {
     return set_data;
+}
+
+// Function to get usable ticks on given entity
+std::optional<std::vector<BacktrackData>> getGoodTicks(CachedEntity *ent)
+{
+    if (CE_BAD(ent) || !ent->m_bAlivePlayer())
+        return std::nullopt;
+    if (ent->m_IDX <= 0 || ent->m_IDX > bt_data.size())
+        return std::nullopt;
+    if (bt_data[ent->m_IDX - 1].empty())
+        return std::nullopt;
+    std::optional<std::vector<BacktrackData>> valid_ticks = std::vector<BacktrackData>();
+    for (auto &tick : bt_data[ent->m_IDX - 1])
+    {
+        if (!tick.in_range)
+            continue;
+        valid_ticks->push_back(tick);
+    }
+
+    return valid_ticks->empty() ? std::nullopt : valid_ticks;
 }
 
 static int lastincomingsequence = 0;
@@ -78,7 +98,7 @@ float getLatency()
         real_latency = ch->GetLatency(FLOW_OUTGOING) * 1000.0f;
 
     // Clamp and apply rampup, also ensure we do not go out of the 1000.0f bounds
-    float backtrack_latency = latency_rampup * std::clamp(*latency, 0.0f, 800.0f - real_latency);
+    float backtrack_latency = latency_rampup * std::clamp(*latency, 0.0f, 900.0f - real_latency);
 
     return backtrack_latency;
 }
@@ -215,6 +235,8 @@ void MoveToTick(BacktrackData data)
 // Restore ent to original state
 void RestoreEntity(int entidx)
 {
+    if (entidx > bt_data.size() || bt_data[entidx - 1].empty())
+        return;
     MoveToTick(bt_data[entidx - 1][0]);
     // Undo tick setting
     set_data = std::nullopt;
@@ -325,6 +347,7 @@ void CreateMoveLate()
     // Still no data set, be sad and return
     if (!set_data)
         return;
+    logging::Info("delta: %f", TICKS_TO_TIME(current_user_cmd->tick_count - set_data->tickcount));
     current_user_cmd->tick_count = set_data->tickcount;
     red_position                 = set_data->hitboxes.at(0).center;
     RestoreEntity(set_data->entidx);

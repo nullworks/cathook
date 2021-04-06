@@ -360,16 +360,18 @@ static bool doBacktrackStab(bool legit = false)
         if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
             continue;
 
-        for (auto &bt_tick : hacks::tf2::backtrack::bt_data[i - 1])
-        {
-            if (bt_tick.in_range && IsTickGood(bt_tick))
+        auto good_ticks = hacks::tf2::backtrack::getGoodTicks(ent);
+        if (good_ticks)
+            for (auto &bt_tick : *good_ticks)
             {
-                // We found something matching the criterias, break out
-                stab_data = bt_tick;
-                stab_ent  = ent;
-                break;
+                if (IsTickGood(bt_tick))
+                {
+                    // We found something matching the criterias, break out
+                    stab_data = bt_tick;
+                    stab_ent  = ent;
+                    break;
+                }
             }
-        }
     }
 
     // We found a good ent

@@ -181,6 +181,7 @@ void MoveToTick(BacktrackData data)
 
     // Mark all the hitboxes as valid so we don't recalc them and use the old data
     // We already have
+    target->hitboxes.m_CacheInternal.resize(data.hitboxes.size());
     for (int i = hitbox_t::head; i <= foot_R; i++)
     {
         target->hitboxes.m_CacheValidationFlags[i] = true;

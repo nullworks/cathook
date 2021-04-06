@@ -348,7 +348,11 @@ void CreateMoveLate()
     // Still no data set, be sad and return
     if (!set_data)
         return;
-    logging::Info("delta: %f", TICKS_TO_TIME(current_user_cmd->tick_count - set_data->tickcount));
+    if (!getGoodTicks(ENTITY(set_data->entidx)))
+    {
+        set_data = std::nullopt;
+        return;
+    }
     current_user_cmd->tick_count = set_data->tickcount;
     red_position                 = set_data->hitboxes.at(0).center;
     RestoreEntity(set_data->entidx);

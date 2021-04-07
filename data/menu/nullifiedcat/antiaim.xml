@@ -6,6 +6,7 @@
             <AutoVariable width="fill" target="antiaim.crouch" label="Fake crouch"/>
             <AutoVariable width="fill" target="antiaim.no-clamp" label="No clamping" tooltip="Don't clamp angles (keep pitch within ±89° and yaw within ±180°)."/>
             <AutoVariable width="fill" target="misc.fakelag" label="Fakelag" min="0" max="22"/>
+            <AutoVariable width="fill" target="misc.fakelag-midair-only" label="Fakelag midair only"/>
             <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" tooltip="Speed for yaw spin." min="-45" max="45" step="0.1"/>
             <AutoVariable width="fill" target="antiaim.roll" label="Roll"/>
             <LabeledObject width="fill" label="Pitch mode">

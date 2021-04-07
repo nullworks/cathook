@@ -304,6 +304,9 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                         break;
                     }
 
+                    if (fakelag_midair && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND)
+                        do_fakelag = false;
+
                     if (do_fakelag)
                     {
                         int fakelag_amnt = (*fakelag_amount > 1) ? *fakelag_amount : 1;

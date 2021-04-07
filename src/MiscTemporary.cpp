@@ -33,6 +33,7 @@ settings::Boolean nolerp{ "misc.no-lerp", "false" };
 #endif
 float backup_lerp = 0.0f;
 settings::Int fakelag_amount{ "misc.fakelag", "0" };
+settings::Boolean fakelag_midair{ "misc.fakelag-midair-only", "false" };
 settings::Boolean no_zoom{ "remove.zoom", "false" };
 settings::Boolean no_scope{ "remove.scope", "false" };
 settings::Boolean disable_visuals{ "visual.disable", "false" };

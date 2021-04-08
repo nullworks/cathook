@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <inetmessage.h>
 
 class CUserCmd;
 
@@ -17,4 +18,5 @@ void SetSafeSpace(int safespace);
 bool ShouldAA(CUserCmd *cmd);
 void ProcessUserCmd(CUserCmd *cmd);
 bool isEnabled();
+void SendNetMessage(INetMessage &msg);
 } // namespace hacks::shared::antiaim

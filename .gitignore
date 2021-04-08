@@ -290,3 +290,5 @@ scripts/updater-preferences
 
 *.autosave
 
+# clangd
+.cache

@@ -5,6 +5,7 @@
 
 #include <MiscTemporary.hpp>
 #include <settings/Int.hpp>
+#include "AntiAim.hpp"
 #include "HookedMethods.hpp"
 #include <MiscTemporary.hpp>
 #include "nullnexus.hpp"
@@ -291,12 +292,14 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         }
     }*/
     if (!strcmp(msg.GetName(), "clc_CmdKeyValues"))
+    {
+        hacks::shared::antiaim::SendNetMessage(msg);
         hacks::shared::catbot::SendNetMsg(msg);
+    }
     if (log_sent && msg.GetType() != 3 && msg.GetType() != 9)
     {
         if (!strcmp(msg.GetName(), "clc_CmdKeyValues"))
-            if ((KeyValues *) (((unsigned *) &msg)[4]))
-                ParseKeyValue((KeyValues *) (((unsigned *) &msg)[4]));
+            ParseKeyValue((KeyValues *) (((unsigned *) &msg)[4]));
         logging::Info("=> %s [%i] %s", msg.GetName(), msg.GetType(), msg.ToString());
         unsigned char buf[4096];
         bf_write buffer("cathook_debug_buffer", buf, 4096);

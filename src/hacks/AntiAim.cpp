@@ -10,7 +10,6 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
-
 namespace hacks::shared::antiaim
 {
 bool force_fakelag = false;
@@ -199,6 +198,22 @@ void SetSafeSpace(int safespace)
         safe_space = safespace;
 }
 
+/* checks if action slot is being used */
+void SendNetMessage(INetMessage &msg)
+{
+    if (!enable)
+        return;
+
+    auto name = ((KeyValues *) (((unsigned *) &msg)[4]))->GetName();
+
+    if (CE_BAD(LOCAL_E))
+        return;
+
+    /* checks if action slot has been used & grapple is equipped */
+    if (!strcmp(name, "+use_action_slot_item_server") && HasWeapon(LOCAL_E, 1152))
+        SetSafeSpace(2);
+}
+
 bool ShouldAA(CUserCmd *cmd)
 {
     if (hacks::tf2::antibackstab::noaa)
@@ -213,6 +228,10 @@ bool ShouldAA(CUserCmd *cmd)
     }
     if ((cmd->buttons & IN_ATTACK2) && classid == CL_CLASS(CTFLunchBox))
         return false;
+    if ((cmd->buttons & IN_ATTACK) && classid == CL_CLASS(CTFGrapplingHook) || (cmd->buttons & IN_ATTACK != g_pLocalPlayer->bAttackLastTick))
+    {
+        SetSafeSpace(2);
+    }
     switch (mode)
     {
     case weapon_projectile:

@@ -7,6 +7,8 @@ namespace hacks::shared::tracers
 {
 
 static settings::Boolean enabled("tracers.enabled", "false");
+static settings::Boolean teammates("tracers.teammates", "false");
+static settings::Int coloring_mode("tracers.coloring-mode", "0");
 static settings::Float green_dist("tracers.green-distance", "1500");
 static settings::Float max_dist("tracers.max-dist", "0");
 static settings::Float min_fov("tracers.min-fov", "0");
@@ -60,18 +62,27 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
 {
     if (ent->m_Type() == ENTITY_BUILDING)
     {
-        if (!ent->m_bEnemy() || !ent->m_vecDormantOrigin())
+        if (!ent->m_vecDormantOrigin())
+            return std::nullopt;
+        if (!ent->m_bEnemy() && !teammates)
             return std::nullopt;
         float dist = ent->m_vecDormantOrigin()->DistTo(LOCAL_E->m_vecOrigin());
         if (*max_dist && dist > *max_dist)
             return std::nullopt;
         if (GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, *ent->m_vecDormantOrigin()) < *min_fov)
             return std::nullopt;
-        float hf = float(std::min(dist, *green_dist)) / float(*green_dist);
-        rgba_t color(0.0f, 2.0f * hf, 2.0f * (1.0f - hf));
-        color.g = std::min(1.0f, color.g);
-        color.b = std::min(1.0f, color.b);
-        return color;
+        if (*coloring_mode == 0)
+        {
+            float hf = float(std::min(dist, *green_dist)) / float(*green_dist);
+            rgba_t color(0.0f, 2.0f * hf, 2.0f * (1.0f - hf));
+            color.g = std::min(1.0f, color.g);
+            color.b = std::min(1.0f, color.b);
+            return color;
+        }
+        else if (*coloring_mode == 1)
+        {
+            return colors::EntityF(ent);
+        }
     }
     else
     {
@@ -79,22 +90,27 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
         auto state = playerlist::AccessData(ent->player_info.friendsID);
         if (state.state == playerlist::k_EState::DEFAULT)
         {
-            if (!ent->m_bEnemy() || !ent->m_vecDormantOrigin())
+            if (!ent->m_vecDormantOrigin())
+                return std::nullopt;
+            if (!ent->m_bEnemy() && !teammates)
                 return std::nullopt;
             float dist = ent->m_vecDormantOrigin()->DistTo(LOCAL_E->m_vecOrigin());
             if (*max_dist && dist > *max_dist)
                 return std::nullopt;
-            return colors::Health(std::min(dist, *green_dist), *green_dist);
+            if (*coloring_mode == 0)
+                return colors::Health(std::min(dist, *green_dist), *green_dist);
+            else if (*coloring_mode == 1)
+                return colors::EntityF(ent);
         }
         if (!player_tools::shouldTargetSteamId(ent->player_info.friendsID))
         {
             if (*draw_friendlies == 1)
             {
                 if (ent->m_bEnemy())
-                    return colors::blu;
+                    return colors::white;
             }
             else if (*draw_friendlies == 2)
-                return colors::blu;
+                return colors::white;
             return std::nullopt;
         }
         if (!ent->m_bEnemy())
@@ -117,9 +133,9 @@ void draw()
 
         if (CE_INVALID(ent))
         {
-            if (i > g_IEngine->GetMaxClients())
+            if (i > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(i))
                 continue;
-            if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team || !g_pPlayerResource->isAlive(i))
+            if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team && !teammates)
                 continue;
             auto vec = soundcache::GetSoundLocation(i);
             if (!vec)

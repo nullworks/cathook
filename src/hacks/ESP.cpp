@@ -17,20 +17,16 @@ static settings::Boolean enable{ "esp.enable", "false" };
 static settings::Int max_dist{ "esp.range", "4096" };
 
 static settings::Int box_esp{ "esp.box.mode", "2" };
-static settings::Int box_corner_size{ "esp.box.corner-size", "10" };
+static settings::Int box_corner_size_height{ "esp.box.corner-size.height", "10" };
+static settings::Int box_corner_size_width{ "esp.box.corner-size.width", "10" };
 static settings::Boolean box_3d_player{ "esp.box.player-3d", "false" };
 static settings::Boolean box_3d_building{ "esp.box.building-3d", "false" };
 
-static settings::Int tracers{ "esp.tracers-mode", "0" };
-
-static settings::Int emoji_esp{ "esp.emoji.mode", "0" };
-static settings::Int emoji_esp_size{ "esp.emoji.size", "32" };
-static settings::Boolean emoji_esp_scaling{ "esp.emoji.scaling", "true" };
-static settings::Int emoji_min_size{ "esp.emoji.min-size", "20" };
+static settings::Boolean draw_bones{ "esp.bones", "false" };
+static settings::Float bones_thickness{ "esp.bones.thickness", "0.5" };
+static settings::Boolean bones_color{ "esp.bones.color", "false" };
 
 static settings::Int healthbar{ "esp.health-bar", "3" };
-static settings::Boolean draw_bones{ "esp.bones", "false" };
-static settings::Boolean bones_color{ "esp.bones.color", "false" };
 static settings::Int sightlines{ "esp.sightlines", "0" };
 static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
@@ -87,7 +83,7 @@ void AddEntityString(CachedEntity *entity, const std::string &string, const rgba
 // Entity Processing
 void __attribute__((fastcall)) ProcessEntity(CachedEntity *ent);
 void __attribute__((fastcall)) ProcessEntityPT(CachedEntity *ent);
-void __attribute__((fastcall)) emoji(CachedEntity *ent);
+void __attribute__((fastcall)) hitboxUpdate(CachedEntity *ent);
 // helper funcs
 void __attribute__((fastcall)) Draw3DBox(CachedEntity *ent, const rgba_t &clr);
 void __attribute__((fastcall)) DrawBox(CachedEntity *ent, const rgba_t &clr);
@@ -204,7 +200,7 @@ struct bonelist_s
             }
             if (i > 0)
             {
-                draw::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, 0.5f);
+                draw::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, *bones_thickness);
             }
             last_screen = current_screen;
         }
@@ -342,9 +338,6 @@ static void Draw()
     for (auto &i : entities_need_repaint)
     {
         ProcessEntityPT(ENTITY(i.first));
-#ifndef FEATURE_EMOJI_ESP_DISABLED
-        emoji(ENTITY(i.first));
-#endif
     }
 }
 
@@ -378,22 +371,24 @@ static void cm()
     { // Prof section ends when out of scope, these brackets here.
         PROF_SECTION(CM_ESP_EntityLoop);
         // Loop through entities
-        for (int i = 0; i < limit; i++)
+        for (int i = 0; i <= limit; i++)
         {
             // Get an entity from the loop tick and process it
             CachedEntity *ent = ENTITY(i);
             if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
                 continue;
 
-            bool player = i <= max_clients;
+            bool player = i < max_clients;
 
             if (player)
             {
                 ProcessEntity(ent);
+                hitboxUpdate(ent);
             }
             else if (entity_tick)
             {
                 ProcessEntity(ent);
+                hitboxUpdate(ent);
             }
 
             if (data[ent->m_IDX].needs_paint)
@@ -409,9 +404,6 @@ static void cm()
     std::sort(entities_need_repaint.begin(), entities_need_repaint.end(), [](std::pair<int, float> &a, std::pair<int, float> &b) { return a.second > b.second; });
 } // namespace hacks::shared::esp
 
-static draw::Texture atlas{ paths::getDataPath("/textures/atlas.png") };
-static draw::Texture idspec{ paths::getDataPath("/textures/idspec.png") };
-
 Timer retry{};
 void Init()
 {
@@ -424,61 +416,21 @@ void Init()
         });*/
 }
 
-void _FASTCALL emoji(CachedEntity *ent)
+// This is used to stop the bone ESP from lagging
+void _FASTCALL hitboxUpdate(CachedEntity *ent)
 {
     // Check to prevent crashes
     if (CE_BAD(ent) || !ent->m_bAlivePlayer())
         return;
-    // Emoji esp
-    if (emoji_esp)
+    if (ent->m_Type() == ENTITY_PLAYER)
     {
-        if (ent->m_Type() == ENTITY_PLAYER)
+        auto hit = ent->hitboxes.GetHitbox(0);
+        if (!hit)
+            return;
+        Vector hbm, hbx;
+        if (draw::WorldToScreen(hit->min, hbm) && draw::WorldToScreen(hit->max, hbx))
         {
-            auto hit = ent->hitboxes.GetHitbox(0);
-            if (!hit)
-                return;
-            Vector hbm, hbx;
-            if (draw::WorldToScreen(hit->min, hbm) && draw::WorldToScreen(hit->max, hbx))
-            {
-                Vector head_scr;
-                if (draw::WorldToScreen(hit->center, head_scr))
-                {
-                    float size = emoji_esp_scaling ? fabs(hbm.y - hbx.y) : *emoji_esp_size;
-                    if (!size || !emoji_min_size)
-                        return;
-                    if (emoji_esp_scaling && (size < *emoji_min_size))
-                        size = *emoji_min_size;
-                    player_info_s info{};
-                    unsigned int steamID = 0;
-                    unsigned int steamidarray[32]{};
-                    bool hascall    = false;
-                    steamidarray[0] = 479487126;
-                    steamidarray[1] = 263966176;
-                    steamidarray[2] = 840255344;
-                    steamidarray[3] = 147831332;
-                    steamidarray[4] = 854198748;
-                    if (g_IEngine->GetPlayerInfo(ent->m_IDX, &info))
-                        steamID = info.friendsID;
-                    if (playerlist::AccessData(steamID).state == playerlist::k_EState::CAT)
-                        draw::RectangleTextured(head_scr.x - size / 2, head_scr.y - size / 2, size, size, colors::white, idspec, 2 * 64, 1 * 64, 64, 64, 0);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (steamID == steamidarray[i])
-                        {
-                            static int ii = 1;
-                            while (i > 3)
-                            {
-                                ii++;
-                                i -= 4;
-                            }
-                            draw::RectangleTextured(head_scr.x - size / 2, head_scr.y - size / 2, size, size, colors::white, idspec, i * 64, ii * 64, 64, 64, 0);
-                            hascall = true;
-                        }
-                    }
-                    if (!hascall)
-                        draw::RectangleTextured(head_scr.x - size / 2, head_scr.y - size / 2, size, size, colors::white, atlas, (3 + (int) emoji_esp) * 64, 4 * 64, 64, 64, 0);
-                }
-            }
+            Vector head_scr;
         }
     }
 }
@@ -532,28 +484,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 
     // Get if ent should be transparent
     bool transparent = vischeck && ent_data.transparent;
-
-    // Tracers
-    if (tracers && type == ENTITY_PLAYER)
-    {
-
-        // Grab the screen resolution and save to some vars
-        int width, height;
-        g_IEngine->GetScreenSize(width, height);
-
-        // Center values on screen
-        width = width / 2;
-        // Only center height if we are using center mode
-        if ((int) tracers == 1)
-            height = height / 2;
-
-        // Get world to screen
-        Vector scn;
-        draw::WorldToScreen(*position, scn);
-
-        // Draw a line
-        draw::Line(scn.x, scn.y, width - scn.x, height - scn.y, fg, 0.5f);
-    }
 
     // Sightline esp
     if (sightlines && type == ENTITY_PLAYER)
@@ -741,7 +671,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
             bone_color = colors::Transparent(bone_color);
 
         bonelist_s bl;
-        if (!CE_INVALID(ent) && ent->m_bAlivePlayer() && !RAW_ENT(ent)->IsDormant() && LOCAL_E->m_bAlivePlayer())
+        if (!CE_INVALID(ent) && ent->m_bAlivePlayer() && !RAW_ENT(ent)->IsDormant())
         {
             if (bones_color)
                 bl.Draw(ent, bone_color);
@@ -750,8 +680,8 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         }
     }
 
-    // Top horizontal health bar
-    if (*healthbar == 1)
+    // Health bar
+    if (*healthbar != 0)
     {
 
         // We only want health bars on players and buildings
@@ -786,104 +716,29 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 // Get Colors
                 rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
                 rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
-                // Get bar width
+                // Get bar width and height
                 int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
-
-                // Draw
-                draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
-                draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
-            }
-        }
-    }
-
-    // Bottom horizontal health bar
-    else if (*healthbar == 2)
-    {
-
-        // We only want health bars on players and buildings
-        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
-        {
-
-            // Get collidable from the cache
-            if (GetCollide(ent))
-            {
-
-                // Pull the cached collide info
-                int max_x = ent_data.collide_max.x;
-                int max_y = ent_data.collide_max.y;
-                int min_x = ent_data.collide_min.x;
-                int min_y = ent_data.collide_min.y;
-
-                // Get health values
-                int health    = 0;
-                int healthmax = 0;
-                switch (type)
-                {
-                case ENTITY_PLAYER:
-                    health    = g_pPlayerResource->GetHealth(ent);
-                    healthmax = g_pPlayerResource->GetMaxHealth(ent);
-                    break;
-                case ENTITY_BUILDING:
-                    health    = CE_INT(ent, netvar.iBuildingHealth);
-                    healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
-                    break;
-                }
-
-                // Get Colors
-                rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
-                rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
-                // Get bar width
-                int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
-
-                // Draw
-                draw::RectangleOutlined(min_x, max_y, max_x - min_x + 1, 7, border, 0.5f);
-                draw::Rectangle(min_x + hbw, max_y + 1, -hbw, 5, hp);
-            }
-        }
-    }
-
-    // Vertical health bar
-    else if (*healthbar == 3)
-    {
-
-        // We only want health bars on players and buildings
-        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
-        {
-
-            // Get collidable from the cache
-            if (GetCollide(ent))
-            {
-
-                // Pull the cached collide info
-                int max_x = ent_data.collide_max.x;
-                int max_y = ent_data.collide_max.y;
-                int min_x = ent_data.collide_min.x;
-                int min_y = ent_data.collide_min.y;
-
-                // Get health values
-                int health    = 0;
-                int healthmax = 0;
-                switch (type)
-                {
-                case ENTITY_PLAYER:
-                    health    = g_pPlayerResource->GetHealth(ent);
-                    healthmax = g_pPlayerResource->GetMaxHealth(ent);
-                    break;
-                case ENTITY_BUILDING:
-                    health    = CE_INT(ent, netvar.iBuildingHealth);
-                    healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
-                    break;
-                }
-
-                // Get Colors
-                rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
-                rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
-                // Get bar height
                 int hbh = (max_y - min_y - 2) * std::min((float) health / (float) healthmax, 1.0f);
 
-                // Draw
-                draw::RectangleOutlined(min_x - 7, min_y, 7, max_y - min_y, border, 0.5f);
-                draw::Rectangle(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
+                // Top horizontal health bar
+                if (*healthbar == 1)
+                {
+                    draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
+                    draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
+                        
+                }
+                // Bottom horizontal health bar
+                else if (*healthbar == 2)
+                {
+                    draw::RectangleOutlined(min_x, max_y, max_x - min_x + 1, 7, border, 0.5f);
+                    draw::Rectangle(min_x + hbw, max_y + 1, -hbw, 5, hp);
+                }
+                // Vertical health bar
+                else if (*healthbar == 3)
+                {
+                    draw::RectangleOutlined(min_x - 7, min_y, 7, max_y - min_y, border, 0.5f);
+                    draw::Rectangle(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
+                }
             }
         }
     }
@@ -934,7 +789,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 }
                 break;
                 case 3:
-                { // ABOVE
+                { // ABOVE CENTER
                     draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
                 }
                 break;
@@ -1820,36 +1675,37 @@ void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 // Function to draw box corners, Used by DrawBox
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, bool transparent)
 {
-    const rgba_t &black = transparent ? colors::Transparent(colors::black) : colors::black;
-    const int size      = *box_corner_size;
+    const rgba_t &black  = transparent ? colors::Transparent(colors::black) : colors::black;
+    const float heightSize = ((float) *box_corner_size_height / 100) * (maxy - miny - 3);
+    const float widthSize  = ((float) *box_corner_size_width / 100) * (maxx - minx - 2);
 
     // Black corners
     // Top Left
-    draw::Rectangle(minx, miny, size, 3, black);
-    draw::Rectangle(minx, miny + 3, 3, size - 3, black);
+    draw::Rectangle(minx, miny, widthSize + 1, 3, black);
+    draw::Rectangle(minx, miny + 3, 3, heightSize - 3, black);
     // Top Right
-    draw::Rectangle(maxx - size + 1, miny, size, 3, black);
-    draw::Rectangle(maxx - 3 + 1, miny + 3, 3, size - 3, black);
+    draw::Rectangle(maxx, miny, -widthSize - 1, 3, black);
+    draw::Rectangle(maxx - 3 + 1, miny + 3, 3, heightSize - 3, black);
     // Bottom Left
-    draw::Rectangle(minx, maxy - 3, size, 3, black);
-    draw::Rectangle(minx, maxy - size, 3, size - 3, black);
+    draw::Rectangle(minx, maxy - 3, widthSize + 1, 3, black);
+    draw::Rectangle(minx, maxy, 3, -heightSize - 3, black);
     // Bottom Right
-    draw::Rectangle(maxx - size + 1, maxy - 3, size, 3, black);
-    draw::Rectangle(maxx - 2, maxy - size, 3, size - 3, black);
+    draw::Rectangle(maxx, maxy - 3, -widthSize - 1, 3, black);
+    draw::Rectangle(maxx - 2, maxy, 3, -heightSize - 3, black);
 
     // Colored corners
     // Top Left
-    draw::Line(minx + 1, miny + 1, size - 2, 0, color, 0.5f);
-    draw::Line(minx + 1, miny + 1, 0, size - 2, color, 0.5f);
+    draw::Line(minx + 1, miny + 1, widthSize, 0, color, 0.5f);
+    draw::Line(minx + 1, miny + 1, 0, heightSize, color, 0.5f);
     // Top Right
-    draw::Line(maxx - 1, miny + 1, -(size - 2), 0, color, 0.5f);
-    draw::Line(maxx - 1, miny + 1, 0, size - 2, color, 0.5f);
+    draw::Line(maxx - 1, miny + 1, -widthSize, 0, color, 0.5f);
+    draw::Line(maxx - 1, miny + 1, 0, heightSize, color, 0.5f);
     // Bottom Left
-    draw::Line(minx + 1, maxy - 2, size - 2, 0, color, 0.5f);
-    draw::Line(minx + 1, maxy - 2, 0, -(size - 2), color, 0.5f);
+    draw::Line(minx + 1, maxy - 2, widthSize, 0, color, 0.5f);
+    draw::Line(minx + 1, maxy - 2, 0, -heightSize, color, 0.5f);
     // Bottom Right
-    draw::Line(maxx - 1, maxy - 2, -(size - 2), 0, color, 0.5f);
-    draw::Line(maxx - 1, maxy - 2, 0, -(size - 2), color, 0.5f);
+    draw::Line(maxx - 1, maxy - 2, -widthSize, 0, color, 0.5f);
+    draw::Line(maxx - 1, maxy - 2, 0, -heightSize, color, 0.5f);
 }
 
 // Used for caching collidable bounds

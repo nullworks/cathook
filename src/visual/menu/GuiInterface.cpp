@@ -32,59 +32,6 @@ static zerokernel::special::PlayerListData createPlayerListData(int userid)
     return data;
 }
 
-class PlayerListEventListener : public IGameEventListener
-{
-public:
-    void FireGameEvent(KeyValues *event) override
-    {
-        if (!controller)
-            return;
-
-        auto userid = event->GetInt("userid");
-        if (!userid)
-            return;
-
-        std::string name = event->GetName();
-        if (name == "player_connect_client")
-        {
-            logging::Info("addPlayer %d", userid);
-            controller->addPlayer(userid, createPlayerListData(userid));
-        }
-        else if (name == "player_disconnect")
-        {
-            // logging::Info("removePlayer %d", userid);
-            controller->removePlayer(userid);
-        }
-        else if (name == "player_team")
-        {
-            // logging::Info("updatePlayerTeam %d", userid);
-            controller->updatePlayerTeam(userid, event->GetInt("team") - 1);
-        }
-        else if (name == "player_changeclass")
-        {
-            // logging::Info("updatePlayerClass %d", userid);
-            controller->updatePlayerClass(userid, event->GetInt("class"));
-        }
-        else if (name == "player_changename")
-        {
-            // logging::Info("updatePlayerName %d", userid);
-            controller->updatePlayerName(userid, event->GetString("newname"));
-        }
-        else if (name == "player_death")
-        {
-            // logging::Info("updatePlayerLifeState %d", userid);
-            controller->updatePlayerLifeState(userid, true);
-        }
-        else if (name == "player_spawn")
-        {
-            // logging::Info("updatePlayerLifeState %d", userid);
-            controller->updatePlayerLifeState(userid, false);
-        }
-    }
-};
-
-static PlayerListEventListener listener{};
-
 static void initPlayerlist()
 {
     auto pl = dynamic_cast<zerokernel::Table *>(zerokernel::Menu::instance->wm->getElementById("special-player-list"));
@@ -117,6 +64,102 @@ static void initPlayerlist()
         logging::Info("PlayerList element not found\n");
     }
 }
+
+void sortPList()
+{
+    for (auto i = 1; i <= MAX_PLAYERS; ++i)
+    {
+        player_info_s info{};
+        if (g_IEngine->GetPlayerInfo(i, &info))
+        {
+            auto idx = g_IEngine->GetPlayerForUserID(info.userID);
+            if (g_pPlayerResource->getTeam(idx) == 2)
+            {
+                controller->addPlayer(info.userID, createPlayerListData(info.userID));
+            }
+        }
+    }
+    for (auto i = 1; i <= MAX_PLAYERS; ++i)
+    {
+        player_info_s info{};
+        if (g_IEngine->GetPlayerInfo(i, &info))
+        {
+            auto idx = g_IEngine->GetPlayerForUserID(info.userID);
+            if (g_pPlayerResource->getTeam(idx) == 3)
+            {
+                controller->addPlayer(info.userID, createPlayerListData(info.userID));
+            }
+        }
+    }
+    for (auto i = 1; i <= MAX_PLAYERS; ++i)
+    {
+        player_info_s info{};
+        if (g_IEngine->GetPlayerInfo(i, &info))
+        {
+            auto idx = g_IEngine->GetPlayerForUserID(info.userID);
+            if (g_pPlayerResource->getTeam(idx) != 2 && g_pPlayerResource->getTeam(idx) != 3)
+            {
+                controller->addPlayer(info.userID, createPlayerListData(info.userID));
+            }
+        }
+    }
+}
+
+class PlayerListEventListener : public IGameEventListener
+{
+public:
+    void FireGameEvent(KeyValues *event) override
+    {
+        if (!controller)
+            return;
+
+        auto userid = event->GetInt("userid");
+        if (!userid)
+            return;
+
+        std::string name = event->GetName();
+        if (name == "player_connect_client")
+        {
+            logging::Info("addPlayer %d", userid);
+            controller->removeAll();
+            sortPList();
+        }
+        else if (name == "player_disconnect")
+        {
+            // logging::Info("removePlayer %d", userid);
+            controller->removeAll();
+            sortPList();
+        }
+        else if (name == "player_team")
+        {
+            // logging::Info("updatePlayerTeam %d", userid);
+            controller->removeAll();
+            sortPList();
+        }
+        else if (name == "player_changeclass")
+        {
+            // logging::Info("updatePlayerClass %d", userid);
+            controller->updatePlayerClass(userid, event->GetInt("class"));
+        }
+        else if (name == "player_changename")
+        {
+            // logging::Info("updatePlayerName %d", userid);
+            controller->updatePlayerName(userid, event->GetString("newname"));
+        }
+        else if (name == "player_death")
+        {
+            // logging::Info("updatePlayerLifeState %d", userid);
+            controller->updatePlayerLifeState(userid, true);
+        }
+        else if (name == "player_spawn")
+        {
+            // logging::Info("updatePlayerLifeState %d", userid);
+            controller->updatePlayerLifeState(userid, false);
+        }
+    }
+};
+
+static PlayerListEventListener listener{};
 
 static void load()
 {
@@ -170,6 +213,7 @@ void gui::draw()
     zerokernel::Menu::instance->update();
     zerokernel::Menu::instance->render();
 }
+
 static Timer update_players{};
 bool gui::handleSdlEvent(SDL_Event *event)
 {
@@ -178,14 +222,7 @@ bool gui::handleSdlEvent(SDL_Event *event)
     if (controller && CE_GOOD(LOCAL_E) && update_players.test_and_set(10000))
     {
         controller->removeAll();
-        for (auto i = 1; i <= MAX_PLAYERS; ++i)
-        {
-            player_info_s info{};
-            if (g_IEngine->GetPlayerInfo(i, &info))
-            {
-                controller->addPlayer(info.userID, createPlayerListData(info.userID));
-            }
-        }
+        sortPList();
     }
     if (event->type == SDL_KEYDOWN)
     {
@@ -222,13 +259,6 @@ void gui::onLevelLoad()
     if (controller)
     {
         controller->removeAll();
-        for (auto i = 1; i < MAX_PLAYERS; ++i)
-        {
-            player_info_s info{};
-            if (g_IEngine->GetPlayerInfo(i, &info))
-            {
-                controller->addPlayer(info.userID, createPlayerListData(info.userID));
-            }
-        }
+        sortPList();
     }
 }

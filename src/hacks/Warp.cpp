@@ -27,6 +27,7 @@ static settings::Boolean wait_full{ "warp.rapidfire.wait-full", "true" };
 static settings::Button rapidfire_key{ "warp.rapidfire.key", "<null>" };
 static settings::Int rapidfire_key_mode{ "warp.rapidfire.key-mode", "1" };
 static settings::Int rf_disable_on{ "warp.rapidfire.disable-on", "0" };
+static settings::Boolean rapidfire_airblast{ "warp.rapidfire.airblast", "false" };
 static settings::Float speed{ "warp.speed", "23" };
 static settings::Boolean draw{ "warp.draw", "false" };
 static settings::Boolean draw_bar{ "warp.draw-bar", "false" };
@@ -226,7 +227,7 @@ bool shouldRapidfire()
 
     // Unless we are on a flamethrower, where we only want m2.
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-        buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK2;
+        buttons_pressed = rapidfire_airblast && current_user_cmd && current_user_cmd->buttons & IN_ATTACK2;
 
     if (g_pLocalPlayer->holding_sniper_rifle)
     {

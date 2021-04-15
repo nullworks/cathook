@@ -532,7 +532,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
 
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams && !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)))
+    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)*/))
         return original::DrawModelExecute(this_, state, info, bone);
 
     PROF_SECTION(DrawModelExecute);
@@ -695,7 +695,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             if (!do_draw)
                 return;
 
-            if (should_draw_fp_chams && should_draw_fp_chams_timer.check(500) && local_weapon_chams && info.entity_index == -1 && sname.find("arms") == std::string::npos && (sname.find("models/weapons") != std::string::npos || sname.find("models/workshop/weapons") != std::string::npos || sname.find("models/workshop_partner/weapons") != std::string::npos))
+            if (should_draw_fp_chams && should_draw_fp_chams_timer.check(500) && local_weapon_chams && info.entity_index == -1 && sname.find("arms") == std::string::npos && sname.find("arrow") == std::string::npos && (sname.find("models/weapons") != std::string::npos || sname.find("models/workshop/weapons") != std::string::npos || sname.find("models/workshop_partner/weapons") != std::string::npos))
             {
                 // Backup original colors
                 rgba_t original_color;
@@ -770,35 +770,38 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             }
                         }
                         // Backtrack chams
-                        using namespace hacks::tf2;
-                        if (backtrack::chams && backtrack::isBacktrackEnabled)
+                        namespace bt = hacks::tf2::backtrack;
+                        if (bt::chams && bt::backtrackEnabled())
                         {
                             // TODO: Allow for a fade between the entity's color and a specified color, it would look cool but i'm lazy
-                            if (ent->m_bAlivePlayer())
+                            if (ent->m_bAlivePlayer() && (int) bt::bt_data.size() >= info.entity_index && info.entity_index > 0)
                             {
                                 // Get ticks
-                                auto good_ticks = backtrack::getGoodTicks(info.entity_index);
-                                if (!good_ticks.empty())
+                                auto ticks = bt::bt_data.at(info.entity_index - 1);
+
+                                auto good_ticks = bt::getGoodTicks(ENTITY(info.entity_index));
+                                if (good_ticks)
                                 {
                                     // Setup chams according to user settings
                                     ChamColors backtrack_colors;
-                                    backtrack_colors.rgba         = *backtrack::chams_color;
-                                    backtrack_colors.rgba_overlay = *backtrack::chams_color_overlay;
-                                    backtrack_colors.envmap_r     = *backtrack::chams_envmap_tint_r;
-                                    backtrack_colors.envmap_g     = *backtrack::chams_envmap_tint_g;
-                                    backtrack_colors.envmap_b     = *backtrack::chams_envmap_tint_b;
+                                    backtrack_colors.rgba         = *bt::chams_color;
+                                    backtrack_colors.rgba_overlay = *bt::chams_color_overlay;
+                                    backtrack_colors.envmap_r     = *bt::chams_envmap_tint_r;
+                                    backtrack_colors.envmap_g     = *bt::chams_envmap_tint_g;
+                                    backtrack_colors.envmap_b     = *bt::chams_envmap_tint_b;
 
-                                    for (unsigned i = 0; i <= (unsigned) std::max(*backtrack::chams_ticks, 1); i++)
+                                    for (unsigned i = 0; i <= (unsigned) std::max(*bt::chams_ticks, 1); i++)
                                     {
                                         // Can't draw more than we have
-                                        if (i >= good_ticks.size())
+                                        if (i >= good_ticks->size())
                                             break;
-                                        if (!good_ticks[i].bones.empty())
-                                            ApplyChams(backtrack_colors, false, false, *backtrack::chams_overlay, false, *backtrack::chams_wireframe, false, entity, this_, state, info, &good_ticks[i].bones[0]);
+                                        if (!(*good_ticks)[i].bones.empty())
+                                            ApplyChams(backtrack_colors, false, false, *bt::chams_overlay, false, *bt::chams_wireframe, false, entity, this_, state, info, (*good_ticks)[i].bones.data());
                                     }
                                 }
                             }
                         }
+
                         // Reset it!
                         g_IVModelRender->ForcedMaterialOverride(nullptr);
                         g_IVRenderView->SetColorModulation(original_color);
@@ -818,7 +821,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 return;
     }
     // Don't do it when we are trying to enforce backtrack chams
-    if (!hacks::tf2::backtrack::isDrawing)
-        return original::DrawModelExecute(this_, state, info, bone);
+    // if (!hacks::tf2::backtrack::isDrawing)
+    return original::DrawModelExecute(this_, state, info, bone);
 } // namespace hooked_methods
 } // namespace hooked_methods

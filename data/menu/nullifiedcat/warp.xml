@@ -30,6 +30,7 @@
             <AutoVariable width="fill" target="warp.rapidfire" label="Enable Rapidfire" tooltip="Allows you to shoot multiple shots at once or reduce time between shots."/>
             <AutoVariable width="fill" target="warp.rapidfire.distance" label="Maximum distance" tooltip="How close an enemy has to be for rapidfire to trigger. 0 = unlimited range."/>
             <AutoVariable width="fill" target="warp.rapidfire.zoom" label="Enable rapid zoom" tooltip="Allows you to instantly zoom in."/>
+            <AutoVariable width="fill" target="warp.rapidfire.airblast" label="Enable rapid airblast" tooltip="Allows rapidfire when airblasting."/>
             <AutoVariable width="fill" target="warp.rapidfire.no-movement" label="Prevent movement in rapidfire" tooltip="Attempt to not move when Rapidfiring."/>
             <AutoVariable width="fill" target="warp.rapidfire.key" label="Rapidfire key" tooltip="Optional. If set you can use this key to control when to rapidfire."/>
             <LabeledObject width="fill" label="Rapidfire key mode" tooltip="Controls what the rapidfire key does.">

@@ -1044,6 +1044,25 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
     return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || !trace->DidHit());
 }
 
+// Get all the corners of a box. Taken from sauce engine.
+void GenerateBoxVertices(const Vector &vOrigin, const QAngle &angles, const Vector &vMins, const Vector &vMaxs, Vector pVerts[8])
+{
+    // Build a rotation matrix from orientation
+    matrix3x4_t fRotateMatrix;
+    AngleMatrix(angles, fRotateMatrix);
+
+    Vector vecPos;
+    for (int i = 0; i < 8; ++i)
+    {
+        vecPos[0] = (i & 0x1) ? vMaxs[0] : vMins[0];
+        vecPos[1] = (i & 0x2) ? vMaxs[1] : vMins[1];
+        vecPos[2] = (i & 0x4) ? vMaxs[2] : vMins[2];
+
+        VectorRotate(vecPos, fRotateMatrix, pVerts[i]);
+        pVerts[i] += vOrigin;
+    }
+}
+
 // For when you need to vis check something that isnt the local player
 bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
 {
@@ -1209,6 +1228,7 @@ weaponmode GetWeaponMode(CachedEntity *ent)
     case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFCannon):
     case CL_CLASS(CTFMechanicalArm):
+    case CL_CLASS(CTFFlameThrower):
         return weaponmode::weapon_projectile;
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarMilk):
@@ -1288,7 +1308,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFGrenadeLauncher):
     {
-        rspeed       = 1216.6f;
+        rspeed       = 1217.0f;
         rgrav        = 1.0f;
         rinitial_vel = 200.0f;
         IF_GAME(IsTF2())
@@ -1329,20 +1349,20 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFFlareGun_Revenge): // Detonator
     {
         rspeed = 2000.0f;
-        rgrav  = 0.25f;
+        rgrav  = 0.3f;
         break;
     }
     case CL_CLASS(CTFSyringeGun):
     {
-        rgrav  = 0.2f;
         rspeed = 1000.0f;
+        rgrav  = 0.2f;
         break;
     }
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
     {
-        rgrav  = 0.2f;
         rspeed = 2400.0f;
+        rgrav  = 0.2f;
         break;
     }
     case CL_CLASS(CTFDRGPomson):
@@ -1355,6 +1375,11 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFCleaver):
     {
         rspeed = 3000.0f;
+        break;
+    }
+    case CL_CLASS(CTFFlameThrower):
+    {
+        rspeed = 1000.0f;
         break;
     }
     case CL_CLASS(CTFGrapplingHook):
@@ -1608,6 +1633,11 @@ float GetFov(Vector angle, Vector src, Vector dst)
 
     mag     = sqrtf(pow(aim.x, 2) + pow(aim.y, 2) + pow(aim.z, 2));
     u_dot_v = aim.Dot(ang);
+
+    // Congratulations! you managed to go out of domain. That means you are directly on the target
+    // And floating point inprecision breaks this function making it return NAN, so we "fix" it via this.
+    if (u_dot_v / (pow(mag, 2)) > 1.0f)
+        return 0;
 
     return RAD2DEG(acos(u_dot_v / (pow(mag, 2))));
 }

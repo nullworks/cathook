@@ -42,7 +42,6 @@ weaponmode GetWeaponModeloc()
         return weaponmode::weapon_consumable;
     case CL_CLASS(CTFRocketLauncher_DirectHit):
     case CL_CLASS(CTFRocketLauncher):
-    case CL_CLASS(CTFParticleCannon):
     case CL_CLASS(CTFGrenadeLauncher):
     case CL_CLASS(CTFPipebombLauncher):
     case CL_CLASS(CTFCompoundBow):
@@ -57,9 +56,11 @@ weaponmode GetWeaponModeloc()
     case CL_CLASS(CTFWeaponFlameBall):
     case CL_CLASS(CTFRaygun):
     case CL_CLASS(CTFGrapplingHook):
+    case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFCannon):
     case CL_CLASS(CTFMechanicalArm):
+    case CL_CLASS(CTFFlameThrower):
         return weaponmode::weapon_projectile;
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarMilk):

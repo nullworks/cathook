@@ -25,8 +25,10 @@
         <List width="150">
             <AutoVariable width="fill" target="radar.show.ammo" label="Ammo packs"/>
             <AutoVariable width="fill" target="radar.show.health" label="Health packs"/>
+            <AutoVariable width="fill" target="radar.show.enemy-buildings" label="Buildings"/>
             <AutoVariable width="fill" target="radar.show.teammates" label="Teammates"/>
-            <AutoVariable width="fill" target="radar.show.team.buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="radar.show.team-buildings" label="Team buildings"/>
+            <AutoVariable width="fill" target="radar.building-icon-size-multiplier" label="Building size multiplier" min="1" max="3"/>
             <AutoVariable width="fill" target="radar.hide-invis" label="Hide invisible"/>
         </List>
     </Box>

@@ -14,6 +14,8 @@ static settings::Button zoom_key{ "visual.zoom-key", "<null>" };
 static settings::Int zoom_fov{ "visual.zoom-key.fov", "20" };
 bool freecam_is_toggled{ false };
 bool zoomed_last_tick{ false };
+bool user_sensitivity_ratio_set{ true };
+float zoom_sensitivity_ratio_user;
 
 namespace hooked_methods
 {
@@ -119,6 +121,25 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
         freecam_is_toggled = false;
 
     draw::fov = setup->fov;
+
+    auto zoom_sensitivity_ratio = g_ICvar->FindVar("zoom_sensitivity_ratio");
+
+    if (g_pLocalPlayer->bZoomed) {
+        // At least one of the requirements are false, so user zoom_sensitivity_ratio will be reset to what they had it to on zoom
+        if (!no_zoom || !no_scope) {
+            if (user_sensitivity_ratio_set)
+                zoom_sensitivity_ratio_user = zoom_sensitivity_ratio->GetFloat();
+            else {
+                zoom_sensitivity_ratio->SetValue(zoom_sensitivity_ratio_user);
+                user_sensitivity_ratio_set = true;
+            }
+        }
+        // Both requirements are true, so change the zoom_sensitivity_ratio to 4
+        else {
+            zoom_sensitivity_ratio->SetValue(4);
+            user_sensitivity_ratio_set = false;
+        }
+    }
 }
 static InitRoutine override_init([]() {
     EC::Register(

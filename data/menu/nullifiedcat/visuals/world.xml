@@ -33,7 +33,7 @@
             <AutoVariable width="fill" target="remove.hats" label="Remove hats"/>
             <AutoVariable width="fill" target="remove.contracker" label="Remove contracker"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove scope"/>
-            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Use the command 'zoom_sensitivity_ratio' to adjust mouse sensitivity while zoomed."/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Enabling Remove scope as well will set zoom_sensitivity_ratio to 4 when zooming in."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="125">

@@ -79,10 +79,6 @@
 #include "copypasted/Netvar.h"
 #include "copypasted/CSignature.h"
 
-#if ENABLE_GUI
-// FIXME add gui
-#endif
-
 #include <core/sdk.hpp>
 
 template <typename T> constexpr T _clamp(T _min, T _max, T _val)

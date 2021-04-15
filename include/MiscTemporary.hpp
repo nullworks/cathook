@@ -20,6 +20,7 @@ extern std::array<Timer, 32> timers;
 extern Timer DelayTimer;
 extern bool firstcm;
 extern bool ignoredc;
+extern bool user_sensitivity_ratio_set;
 
 extern bool calculated_can_shoot;
 extern float prevflow;
@@ -27,6 +28,7 @@ extern int prevflowticks;
 #if ENABLE_VISUALS
 extern int spectator_target;
 extern CLC_VoiceData *voicecrash;
+extern bool freecam_is_toggled;
 #endif
 extern settings::Boolean clean_chat;
 
@@ -36,15 +38,13 @@ extern settings::Boolean nolerp;
 extern float backup_lerp;
 extern settings::Int fakelag_amount;
 extern settings::Boolean no_zoom;
+extern settings::Boolean no_scope;
 extern settings::Boolean disable_visuals;
 extern settings::Int print_r;
 extern settings::Int print_g;
 extern settings::Int print_b;
 extern Color menu_color;
 extern int stored_buttons;
-#if ENABLE_VISUALS
-extern bool freecam_is_toggled;
-#endif
 typedef void (*CL_SendMove_t)();
 extern DetourHook cl_warp_sendmovedetour;
 extern DetourHook cl_nospread_sendmovedetour;

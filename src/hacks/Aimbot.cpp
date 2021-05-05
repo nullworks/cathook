@@ -128,6 +128,9 @@ int CurrentX, CurrentY;
 float last_mouse_check = 0;
 float stop_moving_time = 0;
 
+// Used to make rapidfire not knock your enemies out of range
+unsigned last_target_ignore_timer = 0;
+
 int GetSentry()
 {
     for (int i = 1; i <= HIGHEST_ENTITY; i++)
@@ -420,7 +423,7 @@ bool MouseMoving()
 
     if (PreviousX != CurrentX || PreviousY != CurrentY)
         stop_moving_time = g_GlobalVars->curtime + 0.5;
-    
+
     if (g_GlobalVars->curtime <= stop_moving_time)
         return true;
     else
@@ -587,7 +590,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         {
             if (g_pLocalPlayer->weapon_mode != weapon_melee)
             {
-                if (entity->m_flDistance() > EffectiveTargetingRange())
+                if (entity->m_flDistance() > EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                     return false;
             }
             else
@@ -739,7 +742,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             else if (!IsVectorVisible(pos, entity->hitboxes.GetHitbox(cd.hitbox)->center, false, ENTITY(sentry)))
                 return false;
         }
-        if (fov > 0.0f && cd.fov > fov)
+        if (fov > 0.0f && cd.fov > fov && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         return true;
@@ -760,7 +763,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         if (EffectiveTargetingRange())
         {
-            if (entity->m_flDistance() > (int) EffectiveTargetingRange())
+            if (entity->m_flDistance() > (int) EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
         }
 
@@ -796,7 +799,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             if (!IsVectorVisible(pos, GetBuildingPosition(entity), false, ENTITY(sentry)))
                 return false;
         }
-        if (fov > 0.0f && cd.fov > fov)
+        if (fov > 0.0f && cd.fov > fov && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         return true;
@@ -819,7 +822,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         if (EffectiveTargetingRange())
         {
-            if (entity->m_flDistance() > (int) EffectiveTargetingRange())
+            if (entity->m_flDistance() > (int) EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
         }
 
@@ -828,7 +831,7 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         if (!VischeckPredictedEntity(entity))
             return false;
-        if (fov > 0.0f && cd.fov > fov)
+        if (fov > 0.0f && cd.fov > fov && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
         return true;
     }

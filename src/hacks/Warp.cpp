@@ -15,6 +15,7 @@
 #include "WeaponData.hpp"
 #include "MiscTemporary.hpp"
 #include "Think.hpp"
+#include "Aimbot.hpp"
 
 namespace hacks::tf2::warp
 {
@@ -357,6 +358,8 @@ void Warp(float accumulated_extra_samples, bool finalTick)
             {
                 choke_packet = false;
                 packets_sent = -1;
+                if (i == calls - 1)
+                    hacks::shared::aimbot::last_target_ignore_timer = tickcount + 5;
             }
             else
                 hooked_methods::UpdatePred();

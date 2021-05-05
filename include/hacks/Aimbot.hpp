@@ -15,7 +15,7 @@ class IClientEntity;
 namespace hacks::shared::aimbot
 {
 extern settings::Boolean ignore_cloak;
-
+extern unsigned last_target_ignore_timer;
 // Used to store aimbot data to prevent calculating it again
 struct AimbotCalculatedData_s
 {

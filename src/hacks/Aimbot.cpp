@@ -61,6 +61,7 @@ static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "0" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "0" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "0" };
+static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 static settings::Boolean backtrackVischeckAll{ "aimbot.backtrack.vischeck-all", "0" };
 
@@ -169,6 +170,27 @@ bool shouldBacktrack(CachedEntity *ent)
         return false;
     if (!tf2::backtrack::getGoodTicks(ent))
         return false;
+    return true;
+}
+
+// Reduce Backtrack lag by checking if the ticks hitboxes are within a reasonable FOV range
+bool validateTickFOV(tf2::backtrack::BacktrackData &tick)
+{
+    if (fov)
+    {
+        bool valid_fov = false;
+        for (auto &hitbox : tick.hitboxes)
+        {
+            float score = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, hitbox.center);
+            // Check if the FOV is within a 2.0f threshhold
+            if (score < fov + 2.0f)
+            {
+                valid_fov = true;
+                break;
+            }
+        }
+        return valid_fov;
+    }
     return true;
 }
 
@@ -511,16 +533,26 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         {
             if (shouldBacktrack(target_last))
             {
-                auto good_ticks = hacks::tf2::backtrack::getGoodTicks(target_last);
-                if (good_ticks)
-                    for (auto &bt_tick : *good_ticks)
+                auto good_ticks_tmp = hacks::tf2::backtrack::getGoodTicks(target_last);
+                if (good_ticks_tmp)
+                {
+                    auto good_ticks = *good_ticks_tmp;
+                    if (backtrackLastTickOnly)
                     {
+                        good_ticks.clear();
+                        good_ticks.push_back(good_ticks_tmp->back());
+                    }
+                    for (auto &bt_tick : good_ticks)
+                    {
+                        if (!validateTickFOV(bt_tick))
+                            continue;
                         hacks::tf2::backtrack::MoveToTick(bt_tick);
                         if (IsTargetStateGood(target_last))
                             return target_last;
                         // Restore if bad target
                         hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
                     }
+                }
             }
 
             // Check if previous target is still good
@@ -548,10 +580,19 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         static std::optional<hacks::tf2::backtrack::BacktrackData> temp_bt_tick = std::nullopt;
         if (shouldBacktrack(ent))
         {
-            auto good_ticks = tf2::backtrack::getGoodTicks(ent);
-            if (good_ticks)
-                for (auto &bt_tick : *good_ticks)
+            auto good_ticks_tmp = tf2::backtrack::getGoodTicks(ent);
+            if (good_ticks_tmp)
+            {
+                auto good_ticks = *good_ticks_tmp;
+                if (backtrackLastTickOnly)
                 {
+                    good_ticks.clear();
+                    good_ticks.push_back(good_ticks_tmp->back());
+                }
+                for (auto &bt_tick : good_ticks)
+                {
+                    if (!validateTickFOV(bt_tick))
+                        continue;
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
                     if (IsTargetStateGood(ent))
                     {
@@ -561,6 +602,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     }
                     hacks::tf2::backtrack::RestoreEntity(ent->m_IDX);
                 }
+            }
         }
         else
             isTargetGood = IsTargetStateGood(ent);

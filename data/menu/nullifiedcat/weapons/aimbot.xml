@@ -123,6 +123,7 @@
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking" tooltip="Allow hitting enemies where they were in the past."/>
             <AutoVariable width="fill" target="aimbot.backtrack" label="Aim at backtracking" tooltip="Aim at backtrack ticks."/>
+            <AutoVariable width="fill" target="aimbot.backtrack.only-last-tick" label="Aim at only the last tick" tooltip="Aim at only the last backtrack tick. !DISABLING THIS MAY CAUSE LAG!"/>
             <AutoVariable width="fill" target="misc.ping-reducer.enable" label="Ping reducer" tooltip="Try to reduce your ping to the number set below."/>
             <AutoVariable width="fill" target="misc.ping-reducer.target" label="Target ping"/>
             <AutoVariable width="fill" target="backtrack.latency" label="Fake latency" tooltip="Amount of fake latency." min="0" max="1000" step="25"/>
@@ -140,7 +141,7 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="340" y="220">
+    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="340" y="230">
         <List width="150">
             <AutoVariable width="fill" target="sandwichaim.enable" label="Enable Sandvich aimbot"/>
             <AutoVariable width="fill" target="sandwichaim.aimkey" label="Aimkey"/>

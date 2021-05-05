@@ -475,20 +475,10 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
     auto position = ent->m_vecDormantOrigin();
     if (!position)
         return;
-    static Vector screen;
-    if (!draw::EntityCenterToScreen(ent, screen))
-        return;
-
-    // Reset the collide cache
-    ent_data.has_collide = false;
-
-    // Get if ent should be transparent
-    bool transparent = vischeck && ent_data.transparent;
 
     // Sightline esp
     if (sightlines && type == ENTITY_PLAYER)
     {
-
         // Logic for using the enum to sort out snipers
         if ((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper))
         {
@@ -527,8 +517,8 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 // Get the end distance from the trace
                 float end_distance = trace.endpos.DistTo(eye_position);
 
-                // Loop and look back untill we have a vector on screen
-                for (int i = 1; i > 400; i++)
+                // Loop and look back until we have a vector on screen
+                for (int i = 1; i < 500; i++)
                 {
                     // Subtract 40 multiplyed by the tick from the end distance
                     // and use that as our length to check
@@ -555,9 +545,9 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                     found_scn1 = false;
 
                     // Loop and look back untill we have a vector on screen
-                    for (int i = 1; i > 400; i++)
+                    for (int i = 1; i < 500; i++)
                     {
-                        // Multiply starting distance by 40, multiplyed by the
+                        // Multiply starting distance by 15, multiplyed by the
                         // loop tick
                         Vector start_vector = forward_t * (10 * i) + eye_position;
                         // We dont want it to go too far
@@ -580,6 +570,17 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
             }
         }
     }
+
+    static Vector screen;
+    if (!draw::EntityCenterToScreen(ent, screen))
+        return;
+
+    // Reset the collide cache
+    ent_data.has_collide = false;
+
+    // Get if ent should be transparent
+    bool transparent = vischeck && ent_data.transparent;
+
     // Box esp
     if (box_esp || box_3d_player || box_3d_building)
     {
@@ -725,7 +726,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 {
                     draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
                     draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
-                        
                 }
                 // Bottom horizontal health bar
                 else if (*healthbar == 2)
@@ -910,7 +910,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     {
         // We don't actually care about this vector at all. It just exists so WorldToScreen can function normally
         static Vector origin_screen;
-        if (!draw::WorldToScreen(*origin, origin_screen))
+        if (!sightlines && ent->m_Type() != ENTITY_PLAYER && !draw::WorldToScreen(*origin, origin_screen))
             return;
     }
 
@@ -1348,7 +1348,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     }
     else if (ent->m_Type() == ENTITY_PLAYER && ent->m_bAlivePlayer())
     {
-
         // Local player handling
         if (!(local_esp && g_IInput->CAM_IsThirdPerson()) && ent->m_IDX == g_IEngine->GetLocalPlayer())
             return;
@@ -1675,7 +1674,7 @@ void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 // Function to draw box corners, Used by DrawBox
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, bool transparent)
 {
-    const rgba_t &black  = transparent ? colors::Transparent(colors::black) : colors::black;
+    const rgba_t &black    = transparent ? colors::Transparent(colors::black) : colors::black;
     const float heightSize = ((float) *box_corner_size_height / 100) * (maxy - miny - 3);
     const float widthSize  = ((float) *box_corner_size_width / 100) * (maxx - minx - 2);
 

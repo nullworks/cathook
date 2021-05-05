@@ -7,7 +7,7 @@
             <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP" tooltip="Show a red and green dot on the heads of enemies."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="81">
+    <Box padding="12 6 6 6" width="content" height="content" name="Targets" y="65">
         <List width="150">
             <AutoVariable width="fill" target="esp.show.teammates" label="Teammate ESP" tooltip="Shows ESP on teammates."/>
             <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Shows ESP on yourself."/>
@@ -71,7 +71,13 @@
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
             <AutoVariable width="fill" target="esp.bones.color" label="Bone color" tooltip="Colors bones according to player state."/>
-            <AutoVariable width="fill" target="esp.sightlines" label="Sightlines"/>
+            <LabeledObject width="fill" label="Sightlines">
+                <Select target="esp.sightlines">
+                    <Option name="Off" value="0"/>
+                    <Option name="Snipers only" value="1"/>
+                    <Option name="All" value="2"/>
+                </Select>
+            </LabeledObject>
             <AutoVariable width="fill" target="esp.expand" label="Expand" tooltip="Make ESP larger or smaller."/>
             <LabeledObject width="fill" label="Text position">
                 <Select target="esp.text-position">
@@ -91,13 +97,6 @@
                     <Option name="Corners" value="2"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Tracer mode">
-                <Select target="esp.tracers-mode">
-                    <Option name="Off" value="0"/>
-                    <Option name="Center" value="1"/>
-                    <Option name="Bottom" value="2"/>
-                </Select>
-            </LabeledObject>
             <LabeledObject width="fill" label="Health mode" tooltip="Sets the healthbar mode.">
                 <Select target="esp.health-bar">
                     <Option name="None" value="0"/>
@@ -109,7 +108,7 @@
             <AutoVariable width="fill" target="esp.hide-invis" label="Hide invisible"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="170" y="300">
+    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="170" y="270">
         <List width="150">
             <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D over head"/>
             <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's how Mafia works"/>
@@ -131,21 +130,7 @@
             <AutoVariable width="fill" target="esp.online.software" label="Online: software"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Emoji" x="340" y="155">
-        <List width="150">
-            <LabeledObject width="fill" label="Mode" tooltip="Shows an emoji on the heads of ESP targets.">
-                <Select target="esp.emoji.mode">
-                    <Option name="None" value="0"/>
-                    <Option name="Joy" value="1"/>
-                    <Option name="Thinking" value="2"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="esp.emoji.min-size" label="Min size"/>
-            <AutoVariable width="fill" target="esp.emoji.scaling" label="Scaling"/>
-            <AutoVariable width="fill" target="esp.emoji.size" label="Size"/>
-        </List>
-    </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="240">
+    <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="340" y="155">
         <List width="150">
             <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to the one shown if someone is dominating you."/>
             <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>

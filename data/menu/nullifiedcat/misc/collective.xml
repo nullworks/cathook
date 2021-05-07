@@ -40,6 +40,8 @@
             <AutoVariable width="fill" target="killstreak.enable" label="Enable killstreak"/>
             <AutoVariable width="fill" target="misc.backpack-expander.enabled" label="Expand backpack"/>
             <AutoVariable width="fill" target="misc.backpack-expander.slot-count" label="Backpack slots" min="1" max="3000"/>
+            <AutoVariable width="fill" target="mvmtools.instant-revive" label="MVM Instant revive"/>
+            <AutoVariable width="fill" target="mvmtools.auto-f4" label="Auto F4"/>
         </List>
     </Box>
 </Tab>

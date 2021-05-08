@@ -702,9 +702,9 @@ bool IsTargetStateGood(CachedEntity *entity)
                     }
                     else
                     {
-                        if (ignore_cloak)
+                        if (ignore_cloak && !(HasCondition<TFCond_OnFire>(entity)) && !(HasCondition<TFCond_CloakFlicker>(entity)))
                             return false;
-                    }
+                    }                    
                 }
             }
             // Vaccinator

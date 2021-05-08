@@ -42,10 +42,39 @@ static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false
 
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
-static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 // Useful for debugging with showlagcompensation
 static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
+static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
+static settings::Boolean show_spectators_use_loc{ "misc.show-spectators.custom-location", "false" };
+static settings::Int draw_string_x{ "misc.show-spectators.x", "930" };
+static settings::Int draw_string_y{ "misc.show-spectators.y", "200" };
+
+// Need our own Text drawing
+static std::array<std::string, 32> spectator_strings;
+static size_t spectator_strings_count{ 0 };
+static std::array<rgba_t, 32> spectator_strings_colors{ colors::empty };
+
+void AddSpectatorString(const std::string &string, const rgba_t &color)
+{
+    spectator_strings[spectator_strings_count]        = string;
+    spectator_strings_colors[spectator_strings_count] = color;
+    ++spectator_strings_count;
+}
+
+void DrawSpectatorStrings()
+{
+    float x = *draw_string_x;
+    float y = *draw_string_y;
+    for (size_t i = 0; i < spectator_strings_count; ++i)
+    {
+        float sx, sy;
+        fonts::menu->stringSize(spectator_strings[i], &sx, &sy);
+        draw::String(x, y, spectator_strings_colors[i], spectator_strings[i].c_str(), *fonts::center_screen);
+        y += fonts::center_screen->size + 1;
+    }
+    spectator_strings_count = 0;
+}
 #endif
 
 #if ENABLE_TEXTMODE
@@ -370,9 +399,10 @@ void Draw()
                     observermode = "Freecam";
                     break;
                 }
-                AddSideString(format(info.name, " - (", observermode, ")"), color);
+                show_spectators_use_loc ? AddSpectatorString(format(info.name, " - (", observermode, ")"), color) : AddSideString(format(info.name, " - (", observermode, ")"), color);
             }
         }
+        DrawSpectatorStrings();
     }
     if (!debug_info)
         return;

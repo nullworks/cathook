@@ -1219,12 +1219,12 @@ int BestHitbox(CachedEntity *target)
                 // Rocket launcher
             }
             // These weapons should aim at the foot if the target is grounded
-            else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar))
+            else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar) || ci == CL_CLASS(CTFRocketLauncher_DirectHit))
             {
                 preferred = hitbox_t::foot_L;
             }
             // These weapons should aim at the center of mass due to little/no splash
-            else if (ci == CL_CLASS(CTFRocketLauncher_DirectHit) || ci == CL_CLASS(CTFGrenadeLauncher))
+            else if (ci == CL_CLASS(CTFGrenadeLauncher))
             {
                 preferred = hitbox_t::spine_3;
             }

@@ -22,11 +22,13 @@ static settings::Boolean show_cross{ "radar.show-cross", "true" };
 static settings::Int healthbar{ "radar.healthbar", "2" };
 static settings::Boolean enemies_over_teammates{ "radar.enemies-over-teammates", "true" };
 static settings::Int icon_size{ "radar.icon-size", "20" };
+static settings::Int building_icon_size_multiplier{ "radar.building-icon-size-multiplier", "1" };
 static settings::Int radar_x{ "radar.x", "100" };
 static settings::Int radar_y{ "radar.y", "100" };
 static settings::Boolean use_icons{ "radar.use-icons", "true" };
+static settings::Boolean show_enemybuildings{ "radar.show.enemy-buildings", "true" };
 static settings::Boolean show_teammates{ "radar.show.teammates", "true" };
-static settings::Boolean show_teambuildings{ "radar.show.team.buildings", "true" };
+static settings::Boolean show_teambuildings{ "radar.show.team-buildings", "true" };
 static settings::Boolean show_healthpacks{ "radar.show.health", "true" };
 static settings::Boolean show_ammopacks{ "radar.show.ammo", "true" };
 static settings::Boolean hide_invis{ "radar.hide-invis", "false" };
@@ -148,12 +150,12 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                 if (!ent->m_vecDormantOrigin())
                     return;
                 const auto &wtr = WorldToRadar(ent->m_vecDormantOrigin()->x, ent->m_vecDormantOrigin()->y);
-                tx_teams[CE_INT(ent, netvar.iTeamNum) - 2].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
+                tx_teams[CE_INT(ent, netvar.iTeamNum) - 2].draw(x + wtr.first, y + wtr.second, *icon_size * *building_icon_size_multiplier, *icon_size * *building_icon_size_multiplier, colors::white);
                 switch (ent->m_iClassID())
                 {
                 case CL_CLASS(CObjectDispenser):
                 {
-                    tx_buildings[0].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
+                    tx_buildings[0].draw(x + wtr.first, y + wtr.second, *icon_size * *building_icon_size_multiplier, *icon_size * *building_icon_size_multiplier, colors::white);
                     break;
                 }
                 case CL_CLASS(CObjectSentrygun):
@@ -162,12 +164,12 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                     bool IsMini = CE_BYTE(ent, netvar.m_bMiniBuilding);
                     if (IsMini)
                         level = 4;
-                    tx_sentry[level - 1].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
+                    tx_sentry[level - 1].draw(x + wtr.first, y + wtr.second, *icon_size * *building_icon_size_multiplier, *icon_size * *building_icon_size_multiplier, colors::white);
                     break;
                 }
                 case CL_CLASS(CObjectTeleporter):
                 {
-                    tx_buildings[1].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
+                    tx_buildings[1].draw(x + wtr.first, y + wtr.second, *icon_size * *building_icon_size_multiplier, *icon_size * *building_icon_size_multiplier, colors::white);
                     break;
                 }
                 }
@@ -177,8 +179,8 @@ void DrawEntity(int x, int y, CachedEntity *ent)
                     clr     = colors::Health(ent->m_iHealth(), ent->m_iMaxHealth());
                     if (healthp > 1.0f)
                         healthp = 1.0f;
-                    draw::RectangleOutlined(x + wtr.first, y + wtr.second + (int) icon_size * 1.5f, (int) icon_size * 1.5f, 4, colors::black, 0.5f);
-                    draw::Rectangle(x + wtr.first + 1, y + wtr.second + ((int) icon_size + 1) * 1.5f, (*icon_size * 1.5f - 2.0f) * healthp, *healthbar, clr);
+                    draw::RectangleOutlined(x + wtr.first, y + wtr.second + (int) icon_size * *building_icon_size_multiplier, (int) icon_size * *building_icon_size_multiplier, 4, colors::black, 0.5f);
+                    draw::Rectangle(x + wtr.first + 1, y + wtr.second + ((int) icon_size + 1) * *building_icon_size_multiplier, (*icon_size * *building_icon_size_multiplier - 2.0f) * healthp, *healthbar, clr);
                 }
             }
         }
@@ -247,6 +249,8 @@ void Draw()
         if (!ent->m_bAlivePlayer())
             continue;
         if (i == g_IEngine->GetLocalPlayer())
+            continue;
+        if (!show_enemybuildings && ent->m_Type() == ENTITY_BUILDING && ent->m_bEnemy())
             continue;
         if (!show_teammates && ent->m_Type() == ENTITY_PLAYER && !ent->m_bEnemy())
             continue;

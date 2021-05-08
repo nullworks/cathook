@@ -11,7 +11,10 @@
             <AutoVariable width="fill" target="misc.force-halloween" label="Force halloween"/>
             <AutoVariable width="fill" target="misc.no-lerp" label="Nolerp"/>
             <AutoVariable width="fill" target="misc.full-auto" label="Fully automated firing"/>
-            <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>
+            <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators" tooltip="Shows spectators below cathook label at top left of the screen."/>
+            <AutoVariable width="fill" target="misc.show-spectators.custom-location" label="Spec list custom location" tooltip="Use a custom location defined below instead of top left for spectator list."/>
+            <AutoVariable width="fill" target="misc.show-spectators.x" label="Spec list x position"/>
+            <AutoVariable width="fill" target="misc.show-spectators.y" label="Spec list y position"/>
             <AutoVariable width="fill" target="misc.tauntslide" label="Tauntslide"/>
             <AutoVariable width="fill" target="announcer" label="Enable announcer"/>
         </List>

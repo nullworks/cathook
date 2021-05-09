@@ -359,7 +359,7 @@ void Warp(float accumulated_extra_samples, bool finalTick)
                 choke_packet = false;
                 packets_sent = -1;
                 if (i == calls - 1)
-                    hacks::shared::aimbot::last_target_ignore_timer = tickcount + 5;
+                    hacks::shared::aimbot::last_target_ignore_timer = tickcount + 12;
             }
             else
                 hooked_methods::UpdatePred();

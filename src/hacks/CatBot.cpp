@@ -710,8 +710,7 @@ static void cm()
     if (*auto_disguise && g_pPlayerResource->GetClass(LOCAL_E) == tf_spy && !IsPlayerDisguised(LOCAL_E) && disguise.test_and_set(3000))
     {
         int teamtodisguise = (LOCAL_E->m_iTeam() == TEAM_RED) ? TEAM_RED - 1 : TEAM_BLU - 1;
-        int classtojoin    = classes[rand() % 3];
-        g_IEngine->ClientCmd_Unrestricted(format("disguise ", classtojoin, " ", teamtodisguise).c_str());
+        g_IEngine->ClientCmd_Unrestricted(format("disguise ", tf_spy, " ", teamtodisguise).c_str());
     }
     if (*autoReport && report_timer.test_and_set(60000))
         reportall();

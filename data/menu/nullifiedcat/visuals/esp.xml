@@ -13,65 +13,70 @@
             <AutoVariable width="fill" target="esp.show.local" label="ESP on local player" tooltip="Shows ESP on yourself."/>
             <AutoVariable width="fill" target="esp.show.buildings" label="Building ESP"/>
             <AutoVariable width="fill" target="esp.show.team-buildings" label="Teammate building ESP"/>
-            <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
-            <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
-            <AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP"/>
-            <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP"/>
-            <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
             <AutoVariable width="fill" target="esp.show.npc" label="NPC ESP"/>
-            <AutoVariable width="fill" target="esp.item.money" label="MvM money" tooltip="Regular MvM money that needs to be picked up."/>
-            <AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red MvM money that is automatically picked up."/>
-            <AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
-            <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
-            <AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intel, carts and mvm bombs"/>
-            <AutoVariable width="fill" target="esp.item.explosive" label="Explosives" tooltip="Environmental hazards like bombs"/>
-            <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits"/>
-            <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps"/>
+        </List>
+        <Box padding="12 6 6 6" width="content" height="content" name="Item ESP" y="75">
+            <List width="150">
+            	<AutoVariable width="fill" target="esp.item.enable" label="Enable item ESP" tooltip="Master switch for all below items."/>
+            	<AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
+            	<AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
+            	<AutoVariable width="fill" target="esp.item.money" label="MvM money" tooltip="Regular MvM money that needs to be picked up."/>
+            	<AutoVariable width="fill" target="esp.item.money-red" label="MvM red money" tooltip="Red MvM money that is automatically picked up."/>
+            	<AutoVariable width="fill" target="esp.item.powerup" label="Mannpower powerups"/>
+            	<AutoVariable width="fill" target="esp.item.spellbook" label="Spellbooks"/>
+            	<AutoVariable width="fill" target="esp.item.objectives" label="Objectives" tooltip="Intel, carts and mvm bombs."/>
+            	<AutoVariable width="fill" target="esp.item.explosive" label="Explosives" tooltip="Environmental hazards like bombs."/>
+            	<AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin" tooltip="Ammo box that also gives crits."/>
+            	<AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle" tooltip="Soul gargoyle pickup on halloween maps."/>
+            </List>
+        </Box>
             <!-- <AutoVariable width="fill" target="esp.item.weapons" label="HL2:DM weapons"/>
             <AutoVariable width="fill" target="esp.item.adrenaline" label="TF2C adrenaline"/>
             <AutoVariable width="fill" target="esp.item.weapon-spawner" label="TC2C weapon spawner"/> -->
-        </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectiles" x="170">
         <List width="150">
+            <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP" tooltip="Master switch for projectile ESP."/>
+            <AutoVariable width="fill" target="esp.projectile.enemy-only" label="Only enemy projectiles"/>
             <LabeledObject width="fill" label="Arrows">
                 <Select target="esp.projectile.arrows">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Enemy" value="1"/>
-                    <Option name="Crit" value="2"/>
+                    <Option name="Off" value="0"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Crit only" value="2"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Pipes">
                 <Select target="esp.projectile.pipes">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Enemy" value="1"/>
-                    <Option name="Crit" value="2"/>
+                    <Option name="Off" value="0"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Crit only" value="2"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Rockets">
                 <Select target="esp.projectile.rockets">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Enemy" value="1"/>
-                    <Option name="Crit" value="2"/>
+                    <Option name="Off" value="0"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Crit only" value="2"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Stickies">
                 <Select target="esp.projectile.stickies">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Enemy" value="1"/>
-                    <Option name="Crit" value="2"/>
+                    <Option name="Off" value="0"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Crit only" value="2"/>
                 </Select>
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="ESP settings" x="170" y="90">
+    <Box padding="12 6 6 6" width="content" height="content" name="ESP settings" x="170" y="115">
         <List width="150">
-            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players"/>
+            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players" tooltip="Overrides setting for 'Box mode'."/>
             <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
+            <AutoVariable width="fill" target="esp.bones.thickness" label="Bone thickness" min="0.1" max="5" step="0.1"/>
             <AutoVariable width="fill" target="esp.bones.color" label="Bone color" tooltip="Colors bones according to player state."/>
-            <LabeledObject width="fill" label="Sightlines">
+            <LabeledObject width="fill" label="Sightlines" tooltip="Shows where players are looking.">
                 <Select target="esp.sightlines">
                     <Option name="Off" value="0"/>
                     <Option name="Snipers only" value="1"/>
@@ -97,6 +102,8 @@
                     <Option name="Corners" value="2"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="esp.box.corner-size.height" label="Corner height" tooltip="Height of box corners. Will only have an effect if 'Box mode' is set to 'corners'." min="1" max="50" step="1"/>
+            <AutoVariable width="fill" target="esp.box.corner-size.width" label="Corner width" tooltip="Width of box corners. Will only have an effect if 'Box mode' is set to 'corners'." min="1" max="50" step="1"/>
             <LabeledObject width="fill" label="Health mode" tooltip="Sets the healthbar mode.">
                 <Select target="esp.health-bar">
                     <Option name="None" value="0"/>
@@ -108,7 +115,7 @@
             <AutoVariable width="fill" target="esp.hide-invis" label="Hide invisible"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="170" y="270">
+    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="340" y="290">
         <List width="150">
             <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D over head"/>
             <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's how Mafia works"/>
@@ -135,6 +142,21 @@
             <AutoVariable width="fill" target="dominatemark.enable" label="Enable" tooltip="Enables a mark on people you are dominating, similar to the one shown if someone is dominating you."/>
             <AutoVariable width="fill" target="dominatemark.min-size" label="Draw min size"/>
             <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Head ESP" x="340" y="220">
+        <List width="150">
+            <LabeledObject width="fill" label="Head ESP mode" tooltip="Puts a certain icon over players' heads, independent of regular ESP settings.">
+                <Select target="headesp.mode">
+                    <Option name="Off" value="0"/>
+                    <Option name="Circle" value="1"/>
+                    <Option name="Class" value="2"/>
+                    <Option name="Joy" value="3"/>
+                    <Option name="Thinking" value="4"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="headesp.size-scaling" label="Size scaling" tooltip="Sets the size of the head ESP." min="2.5" max="8.01" step="0.1"/>
+            <AutoVariable width="fill" target="headesp.teammates" label="Teammates" tooltip="Toggles whether teammates have the head ESP."/>
         </List>
     </Box>
     <!-- <Box padding="12 6 6 6" width="content" height="content" y="260" name="Debug">

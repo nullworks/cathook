@@ -94,6 +94,11 @@ case "$OS" in
         requestPermissions "${gentoo_packages[@]}"
         # -U (--newuse): Installed packages that have no changes are excluded.
         USE=abi_x86_32 $SUDO emerge -vU "${gentoo_packages[@]}"
+        out=$?
+        if [ "$out" = 1 ]; then
+            printf "\nemerge failed to install required dependencies. Try restarting the script. Exiting.\n"
+            exit 1
+        fi
     ;;
     "arch")
         pacman -Qi "${arch_packages[@]}" > /dev/null 2>&1
@@ -101,6 +106,11 @@ case "$OS" in
         if [ "$out" = 1 ]; then
             requestPermissions "${arch_packages[@]}"
             $SUDO pacman -S --noconfirm --needed "${arch_packages[@]}"
+            out=$?
+            if [ "$out" = 1 ]; then
+                printf "\nPacman failed to install required dependencies. Try restarting the script. Exiting.\n"
+                exit 1
+            fi
         fi
     ;;
     "ubuntu")
@@ -114,11 +124,21 @@ case "$OS" in
             requestPermissions "${ubuntu_packages[@]}"
             pkgs="${ubuntu_packages[*]}"
             $SUDO bash -c "apt-get update;dpkg --add-architecture i386;apt-get update;apt-get install -y $pkgs"
+            out=$?
+            if [ "$out" = 1 ]; then
+                printf "\nAPT failed to install required dependencies. Try restarting the script. Exiting.\n"
+                exit 1
+            fi
             # Check if cmake is up to date enough
             dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
             out=$?
             if [ "$out" = 1 ]; then
                 $SUDO bash -c "apt install -y software-properties-common && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main' && apt-get install -y cmake"
+                out=$?
+                if [ "$out" = 1 ]; then
+                    printf "\nAPT failed to install kitsune's cmake. Try restarting the script. Exiting.\n"
+                    exit 1
+                fi
             fi
         fi
     ;;
@@ -128,6 +148,11 @@ case "$OS" in
         if [ "$out" != 0 ]; then
             requestPermissions "${fedora_packages[@]}"
             $SUDO dnf install -y "${fedora_packages[@]}"
+            out=$?
+            if [ "$out" = 1 ]; then
+                printf "\nDNF failed to install required dependencies. Try restarting the script. Exiting.\n"
+                exit 1
+            fi
         fi
     ;;
     "void")
@@ -138,6 +163,11 @@ case "$OS" in
             # libs and dev files require this repo to be enabled
             $SUDO xbps-install -S void-repo-multilib
             $SUDO xbps-install -S "${void_packages[@]}"
+            out=$?
+            if [ "$out" = 1 ]; then
+                printf "\nxbps-install failed to install required dependencies. Try restarting the script. Exiting.\n"
+                exit 1
+            fi
         fi
     ;;
     "*")

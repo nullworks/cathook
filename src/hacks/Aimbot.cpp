@@ -556,6 +556,8 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                         hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
                     }
                 }
+                // No last_target found, reset the timer.
+                hacks::shared::aimbot::last_target_ignore_timer = 0;
             }
 
             // Check if previous target is still good
@@ -775,7 +777,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                     {
                         if (ignore_cloak && !(HasCondition<TFCond_OnFire>(entity)) && !(HasCondition<TFCond_CloakFlicker>(entity)))
                             return false;
-                    }                    
+                    }
                 }
             }
             // Vaccinator

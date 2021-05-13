@@ -556,18 +556,18 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                         hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
                     }
                 }
-                // No last_target found, reset the timer.
-                hacks::shared::aimbot::last_target_ignore_timer = 0;
             }
 
             // Check if previous target is still good
-            else if (IsTargetStateGood(target_last))
+            else if (!shouldbacktrack_cache && IsTargetStateGood(target_last))
             {
                 // If it is then return it again
                 return target_last;
             }
         }
     }
+    // No last_target found, reset the timer.
+    hacks::shared::aimbot::last_target_ignore_timer = 0;
 
     float target_highest_score, scr = 0.0f;
     CachedEntity *ent;

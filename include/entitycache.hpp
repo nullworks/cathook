@@ -23,6 +23,7 @@
 #include "classinfo/classinfo.hpp"
 #include "client_class.h"
 #include "Constants.hpp"
+#include <optional>
 
 struct matrix3x4_t;
 

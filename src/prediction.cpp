@@ -536,13 +536,17 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
 
     if (debug_pp_bsearch)
     {
+        Vector stepvel = velocity;
         float mintime = currenttime, maxtime = currenttime + range * 2;
 
         for (int steps = 0; steps < maxsteps; steps++)
         {
             const float latency = g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
 
+            // Hack as PredictStep() updates velocity
+            stepvel = velocity;
             Vector minloc = PredictStep(origin, velocity, acceleration, &minmax, mintime, strafe_pred ? &*strafe_pred : nullptr);
+            stepvel = velocity;
             Vector maxloc = PredictStep(origin, velocity, acceleration, &minmax, maxtime, strafe_pred ? &*strafe_pred : nullptr);
 
             if (onground)

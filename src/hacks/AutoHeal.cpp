@@ -473,7 +473,7 @@ void UpdateData()
 bool CanHeal(int idx)
 {
     // Already healing, no need to check
-    if(idx == HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)))
+    if (idx == HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)))
         return true;
     
     CachedEntity *ent = ENTITY(idx);

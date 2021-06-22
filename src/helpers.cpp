@@ -1627,7 +1627,7 @@ float ATTRIB_HOOK_FLOAT(float base_value, const char *search_string, IClientEnti
 {
     typedef float (*AttribHookFloat_t)(float, const char *, IClientEntity *, void *, bool);
 
-    static uintptr_t AttribHookFloat = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 96 ? ? ? ? D9 5D"));
+    static uintptr_t AttribHookFloat = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 03 89 1C 24 D9 5D ? FF 90 ? ? ? ? 89 C7 8B 06 89 34 24 FF 90 ? ? ? ? 89 FA C1 E2 08 09 C2 33 15 ? ? ? ? 39 93 ? ? ? ? 74 ? 89 93 ? ? ? ? 89 14 24 E8 ? ? ? ? C7 44 24 ? 0F 27 00 00 BE 01 00 00 00"));
     static auto AttribHookFloat_fn   = AttribHookFloat_t(AttribHookFloat);
 
     return AttribHookFloat_fn(base_value, search_string, ent, buffer, is_global_const_string);
@@ -1752,24 +1752,26 @@ void ValidateUserCmd(CUserCmd *cmd, int sequence_nr)
 }
 
 // Used for getting class names
-CatCommand print_classnames("debug_print_classnames", "Lists classnames currently available in console", []() {
-    // Create a tmp ent for the loop
-    CachedEntity *ent;
+CatCommand print_classnames("debug_print_classnames", "Lists classnames currently available in console",
+                            []()
+                            {
+                                // Create a tmp ent for the loop
+                                CachedEntity *ent;
 
-    // Go through all the entities
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
-    {
+                                // Go through all the entities
+                                for (int i = 0; i <= HIGHEST_ENTITY; i++)
+                                {
 
-        // Get an entity
-        ent = ENTITY(i);
-        // Check for null/dormant
-        if (CE_BAD(ent))
-            continue;
+                                    // Get an entity
+                                    ent = ENTITY(i);
+                                    // Check for null/dormant
+                                    if (CE_BAD(ent))
+                                        continue;
 
-        // Print in console, the class name of the ent
-        logging::Info(format(RAW_ENT(ent)->GetClientClass()->m_pNetworkName).c_str());
-    }
-});
+                                    // Print in console, the class name of the ent
+                                    logging::Info(format(RAW_ENT(ent)->GetClientClass()->m_pNetworkName).c_str());
+                                }
+                            });
 
 void PrintChat(const char *fmt, ...)
 {

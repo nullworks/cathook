@@ -120,10 +120,12 @@ static void updateAntiAfk()
     }
 }
 
-CatCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible", []() {
-    g_ISurface->LockCursor();
-    g_ISurface->SetCursorAlwaysVisible(false);
-});
+CatCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible",
+                      []()
+                      {
+                          g_ISurface->LockCursor();
+                          g_ISurface->SetCursorAlwaysVisible(false);
+                      });
 
 // Use to send a autobalance request to the server that doesnt prevent you from
 // using it again, Allowing infinite use of it.
@@ -529,67 +531,79 @@ void Schema_Reload()
 
 CatCommand schema("schema", "Load custom schema", Schema_Reload);
 
-CatCommand update_gui_color("gui_color_update", "Update the GUI Color", []() {
-    hack::command_stack().push("cat set zk.style.tab-button.color.selected.background 446498ff;cat set zk.style.tab-button.color.separator 446498ff;cat set zk.style.tab-button.color.hover.underline 446498ff;cat set zk.style.tab-button.color.selected.underline 446498ff;cat set zk.style.tooltip.border 446498ff;cat set zk.style.box.color.border 446498ff;cat set zk.style.color-preview.color.border 446498ff;cat set zk.style.modal-container.color.border 446498ff;cat set zk.style.tab-selection.color.border 446498ff;cat set zk.style.table.color.border 446498ff;cat set zk.style.checkbox.color.border 446498ff;cat set zk.style.checkbox.color.checked 446498ff;cat set zk.style.checkbox.color.hover 00a098ff;cat set zk.style.input.color.border 446498ff;cat set zk.style.input.key.color.border 446498ff;cat set zk.style.input.select.border 446498ff;cat set zk.style.input.slider.color.handle_border 446498ff;cat set zk.style.input.slider.color.bar 446498ff;cat set zk.style.input.text.color.border.active 42BC99ff");
-    hack::command_stack().push("cat set zk.style.input.text.color.border.inactive 446498ff;cat set zk.style.tree-list-entry.color.lines 42BC99ff;cat set zk.style.task.color.background.hover 446498ff;cat set zk.style.task.color.border 446498ff;cat set zk.style.taskbar.color.border 446498ff;cat set zk.style.window.color.border 446498ff;cat set zk.style.window-close-button.color.border 446498ff;cat set zk.style.window-header.color.background.active 446498ff;cat set zk.style.window-header.color.border.inactive 446498ff;cat set zk.style.window-header.color.border.active 446498ff");
-});
+CatCommand update_gui_color("gui_color_update", "Update the GUI Color",
+                            []()
+                            {
+                                hack::command_stack().push("cat set zk.style.tab-button.color.selected.background 446498ff;cat set zk.style.tab-button.color.separator 446498ff;cat set zk.style.tab-button.color.hover.underline 446498ff;cat set zk.style.tab-button.color.selected.underline 446498ff;cat set zk.style.tooltip.border 446498ff;cat set zk.style.box.color.border 446498ff;cat set zk.style.color-preview.color.border 446498ff;cat set zk.style.modal-container.color.border 446498ff;cat set zk.style.tab-selection.color.border 446498ff;cat set zk.style.table.color.border 446498ff;cat set zk.style.checkbox.color.border 446498ff;cat set zk.style.checkbox.color.checked 446498ff;cat set zk.style.checkbox.color.hover 00a098ff;cat set zk.style.input.color.border 446498ff;cat set zk.style.input.key.color.border 446498ff;cat set zk.style.input.select.border 446498ff;cat set zk.style.input.slider.color.handle_border 446498ff;cat set zk.style.input.slider.color.bar 446498ff;cat set zk.style.input.text.color.border.active 42BC99ff");
+                                hack::command_stack().push("cat set zk.style.input.text.color.border.inactive 446498ff;cat set zk.style.tree-list-entry.color.lines 42BC99ff;cat set zk.style.task.color.background.hover 446498ff;cat set zk.style.task.color.border 446498ff;cat set zk.style.taskbar.color.border 446498ff;cat set zk.style.window.color.border 446498ff;cat set zk.style.window-close-button.color.border 446498ff;cat set zk.style.window-header.color.background.active 446498ff;cat set zk.style.window-header.color.border.inactive 446498ff;cat set zk.style.window-header.color.border.active 446498ff");
+                            });
 
-CatCommand name("name_set", "Immediate name change", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        logging::Info("Set a name, silly");
-        return;
-    }
-    if (g_Settings.bInvalid)
-    {
-        logging::Info("Only works ingame!");
-        return;
-    }
-    std::string new_name(args.ArgS());
-    ReplaceSpecials(new_name);
-    NET_SetConVar setname("name", new_name.c_str());
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    if (ch)
-    {
-        setname.SetNetChannel(ch);
-        setname.SetReliable(false);
-        ch->SendNetMsg(setname, false);
-    }
-});
-CatCommand set_value("set", "Set value", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-        return;
-    ConVar *var = g_ICvar->FindVar(args.Arg(1));
-    if (!var)
-        return;
-    std::string value(args.Arg(2));
-    ReplaceSpecials(value);
-    var->m_fMaxVal = 999999999.9f;
-    var->m_fMinVal = -999999999.9f;
-    var->SetValue(value.c_str());
-    logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
-});
-CatCommand say_lines("say_lines", "Say with newlines (\\n)", [](const CCommand &args) {
-    std::string message(args.ArgS());
-    ReplaceSpecials(message);
-    std::string cmd = format("say ", message);
-    g_IEngine->ServerCmd(cmd.c_str());
-});
-CatCommand disconnect("disconnect", "Disconnect with custom reason", [](const CCommand &args) {
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    if (!ch)
-        return;
-    std::string string = args.ArgS();
-    ReplaceSpecials(string);
-    ch->Shutdown(string.c_str());
-});
+CatCommand name("name_set", "Immediate name change",
+                [](const CCommand &args)
+                {
+                    if (args.ArgC() < 2)
+                    {
+                        logging::Info("Set a name, silly");
+                        return;
+                    }
+                    if (g_Settings.bInvalid)
+                    {
+                        logging::Info("Only works ingame!");
+                        return;
+                    }
+                    std::string new_name(args.ArgS());
+                    ReplaceSpecials(new_name);
+                    NET_SetConVar setname("name", new_name.c_str());
+                    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                    if (ch)
+                    {
+                        setname.SetNetChannel(ch);
+                        setname.SetReliable(false);
+                        ch->SendNetMsg(setname, false);
+                    }
+                });
+CatCommand set_value("set", "Set value",
+                     [](const CCommand &args)
+                     {
+                         if (args.ArgC() < 2)
+                             return;
+                         ConVar *var = g_ICvar->FindVar(args.Arg(1));
+                         if (!var)
+                             return;
+                         std::string value(args.Arg(2));
+                         ReplaceSpecials(value);
+                         var->m_fMaxVal = 999999999.9f;
+                         var->m_fMinVal = -999999999.9f;
+                         var->SetValue(value.c_str());
+                         logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
+                     });
+CatCommand say_lines("say_lines", "Say with newlines (\\n)",
+                     [](const CCommand &args)
+                     {
+                         std::string message(args.ArgS());
+                         ReplaceSpecials(message);
+                         std::string cmd = format("say ", message);
+                         g_IEngine->ServerCmd(cmd.c_str());
+                     });
+CatCommand disconnect("disconnect", "Disconnect with custom reason",
+                      [](const CCommand &args)
+                      {
+                          INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                          if (!ch)
+                              return;
+                          std::string string = args.ArgS();
+                          ReplaceSpecials(string);
+                          ch->Shutdown(string.c_str());
+                      });
 
-CatCommand disconnect_vac("disconnect_vac", "Disconnect (fake VAC)", []() {
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    if (!ch)
-        return;
-    ch->Shutdown("VAC banned from secure server\n");
-});
+CatCommand disconnect_vac("disconnect_vac", "Disconnect (fake VAC)",
+                          []()
+                          {
+                              INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                              if (!ch)
+                                  return;
+                              ch->Shutdown("VAC banned from secure server\n");
+                          });
 
 // Netvars stuff
 void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *ft, unsigned acc_offset)
@@ -635,57 +649,63 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
 }
 
 // CatCommand to dumb netvar info
-static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-        return;
-    if (!atoi(args[1]))
-        return;
-    int idx           = atoi(args[1]);
-    CachedEntity *ent = ENTITY(idx);
-    if (CE_BAD(ent))
-        return;
-    ClientClass *clz = RAW_ENT(ent)->GetClientClass();
-    logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
-    const char *ft = (args.ArgC() > 1 ? args[2] : 0);
-    DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
-});
-static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-        return;
-    std::string name(args.Arg(1));
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
-    {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
-        ClientClass *clz = RAW_ENT(ent)->GetClientClass();
-        if (!clz)
-            continue;
-        std::string clazz_name(clz->GetName());
-        if (clazz_name.find(name) == clazz_name.npos)
-            continue;
-        logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
-        const char *ft = (args.ArgC() > 1 ? args[2] : 0);
-        DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
-    }
-});
+static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
+                            [](const CCommand &args)
+                            {
+                                if (args.ArgC() < 2)
+                                    return;
+                                if (!atoi(args[1]))
+                                    return;
+                                int idx           = atoi(args[1]);
+                                CachedEntity *ent = ENTITY(idx);
+                                if (CE_BAD(ent))
+                                    return;
+                                ClientClass *clz = RAW_ENT(ent)->GetClientClass();
+                                logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
+                                const char *ft = (args.ArgC() > 1 ? args[2] : 0);
+                                DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
+                            });
+static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name",
+                                    [](const CCommand &args)
+                                    {
+                                        if (args.ArgC() < 2)
+                                            return;
+                                        std::string name(args.Arg(1));
+                                        for (int i = 0; i <= HIGHEST_ENTITY; i++)
+                                        {
+                                            CachedEntity *ent = ENTITY(i);
+                                            if (CE_BAD(ent))
+                                                continue;
+                                            ClientClass *clz = RAW_ENT(ent)->GetClientClass();
+                                            if (!clz)
+                                                continue;
+                                            std::string clazz_name(clz->GetName());
+                                            if (clazz_name.find(name) == clazz_name.npos)
+                                                continue;
+                                            logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
+                                            const char *ft = (args.ArgC() > 1 ? args[2] : 0);
+                                            DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
+                                        }
+                                    });
 
-static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs of all currently equiped weapons", [](const CCommand &) {
-    // Invalid player
-    if (CE_BAD(LOCAL_E))
-        return;
-    int *hWeapons = &CE_INT(LOCAL_E, netvar.hMyWeapons);
-    // Go through the handle array and search for the item
-    for (int i = 0; hWeapons[i]; i++)
-    {
-        if (IDX_BAD(HandleToIDX(hWeapons[i])))
-            continue;
-        // Get the weapon
-        CachedEntity *weapon = ENTITY(HandleToIDX(hWeapons[i]));
-        // Print weaponid
-        logging::Info("weapon %i: %i", i, re::C_TFWeaponBase::GetWeaponID(RAW_ENT(weapon)));
-    }
-});
+static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs of all currently equiped weapons",
+                                       [](const CCommand &)
+                                       {
+                                           // Invalid player
+                                           if (CE_BAD(LOCAL_E))
+                                               return;
+                                           int *hWeapons = &CE_INT(LOCAL_E, netvar.hMyWeapons);
+                                           // Go through the handle array and search for the item
+                                           for (int i = 0; hWeapons[i]; i++)
+                                           {
+                                               if (IDX_BAD(HandleToIDX(hWeapons[i])))
+                                                   continue;
+                                               // Get the weapon
+                                               CachedEntity *weapon = ENTITY(HandleToIDX(hWeapons[i]));
+                                               // Print weaponid
+                                               logging::Info("weapon %i: %i", i, re::C_TFWeaponBase::GetWeaponID(RAW_ENT(weapon)));
+                                           }
+                                       });
 
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
 // This makes us able to see enemy class and status in scoreboard and player panel
@@ -755,50 +775,53 @@ Color &GetDeadPlayerColor()
     return GetPlayerColor(playerIndex, team, true);
 }
 
-static InitRoutine init([]() {
-    // 012BA7E4
-    addr1 = gSignatures.GetClientSignature("89 04 24 FF 92 ? ? ? ? 8B 00") + 3;
-    // 012BA105
-    addr2 = gSignatures.GetClientSignature("75 1B 83 FB 02") + 2;
-    if (addr1 == 3 || addr2 == 2)
-        return;
-    logging::Info("Patching scoreboard colors");
+static InitRoutine init(
+    []()
+    {
+        // 012BA7E4
+        addr1 = gSignatures.GetClientSignature("89 04 24 FF 92 ? ? ? ? 8B 00") + 3;
+        // 012BA105
+        addr2 = gSignatures.GetClientSignature("75 1B 83 FB 02") + 2;
+        if (addr1 == 3 || addr2 == 2)
+            return;
+        logging::Info("Patching scoreboard colors");
 
-    // Used to Detour, we need to detour at two parts in order to do this properly
-    auto relAddr1 = ((uintptr_t) GetTeamColor - (uintptr_t) addr1) - 5;
-    auto relAddr2 = ((uintptr_t) GetDeadPlayerColor - (uintptr_t) addr2) - 5;
+        // Used to Detour, we need to detour at two parts in order to do this properly
+        auto relAddr1 = ((uintptr_t) GetTeamColor - (uintptr_t) addr1) - 5;
+        auto relAddr2 = ((uintptr_t) GetDeadPlayerColor - (uintptr_t) addr2) - 5;
 
-    // Construct BytePatch1
-    std::vector<unsigned char> patch1 = { 0xE8 };
-    for (size_t i = 0; i < sizeof(uintptr_t); i++)
-        patch1.push_back(((unsigned char *) &relAddr1)[i]);
-    for (int i = patch1.size(); i < 6; i++)
-        patch1.push_back(0x90);
+        // Construct BytePatch1
+        std::vector<unsigned char> patch1 = { 0xE8 };
+        for (size_t i = 0; i < sizeof(uintptr_t); i++)
+            patch1.push_back(((unsigned char *) &relAddr1)[i]);
+        for (int i = patch1.size(); i < 6; i++)
+            patch1.push_back(0x90);
 
-    // Construct BytePatch2
-    std::vector<unsigned char> patch2 = { 0xE8 };
-    for (size_t i = 0; i < sizeof(uintptr_t); i++)
-        patch2.push_back(((unsigned char *) &relAddr2)[i]);
-    patch2.push_back(0x8B);
-    patch2.push_back(0x00);
-    for (int i = patch2.size(); i < 27; i++)
-        patch2.push_back(0x90);
+        // Construct BytePatch2
+        std::vector<unsigned char> patch2 = { 0xE8 };
+        for (size_t i = 0; i < sizeof(uintptr_t); i++)
+            patch2.push_back(((unsigned char *) &relAddr2)[i]);
+        patch2.push_back(0x8B);
+        patch2.push_back(0x00);
+        for (int i = patch2.size(); i < 27; i++)
+            patch2.push_back(0x90);
 
-    patch_scoreboardcolor1 = std::make_unique<BytePatch>(addr1, patch1);
-    patch_scoreboardcolor2 = std::make_unique<BytePatch>(addr2, patch2);
+        patch_scoreboardcolor1 = std::make_unique<BytePatch>(addr1, patch1);
+        patch_scoreboardcolor2 = std::make_unique<BytePatch>(addr2, patch2);
 
-    // Patch!
-    patch_scoreboardcolor1->Patch();
-    patch_scoreboardcolor2->Patch();
+        // Patch!
+        patch_scoreboardcolor1->Patch();
+        patch_scoreboardcolor2->Patch();
 
-    EC::Register(
-        EC::LevelInit,
-        []() {
-            // Remove truce status
-            setTruce(false);
-        },
-        "truce_reset");
-});
+        EC::Register(
+            EC::LevelInit,
+            []()
+            {
+                // Remove truce status
+                setTruce(false);
+            },
+            "truce_reset");
+    });
 } // namespace ScoreboardColoring
 
 typedef void (*UpdateLocalPlayerVisionFlags_t)();
@@ -829,71 +852,79 @@ void UpdateLocalPlayerVisionFlags()
 }
 #define access_ptr(p, i) ((unsigned char *) &p)[i]
 
-static InitRoutine init_pyrovision([]() {
-    uintptr_t addr                        = gSignatures.GetClientSignature("8B 35 ? ? ? ? 75 27");
-    g_nLocalPlayerVisionFlags             = *reinterpret_cast<int **>(addr + 2);
-    g_nLocalPlayerVisionFlagsWeaponsCheck = *reinterpret_cast<int **>(addr + 8 + 2);
-    addr                                  = gSignatures.GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
-    if (!addr)
-        return;
-    addr += 17;
-    UpdateLocalPlayerVisionFlags_fn = UpdateLocalPlayerVisionFlags_t(e8call_direct(addr));
-
-    auto relAddr = ((uintptr_t) UpdateLocalPlayerVisionFlags - (uintptr_t) addr) - 5;
-
-    static BytePatch patch{ addr, { 0xE8, access_ptr(relAddr, 0), access_ptr(relAddr, 1), access_ptr(relAddr, 2), access_ptr(relAddr, 3) } };
-    patch.Patch();
-    EC::Register(
-        EC::Shutdown, []() { patch.Shutdown(); }, "shutdown_pyrovis");
-#if !ENFORCE_STREAM_SAFETY
-    EC::Register(
-        EC::Paint,
-        []() {
-            if (CE_GOOD(LOCAL_E))
-            {
-                if (HasCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E))
-                    RemoveCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E);
-                if (HasCondition<TFCond_FreezeInput>(LOCAL_E))
-                    RemoveCondition<TFCond_FreezeInput>(LOCAL_E);
-            }
-        },
-        "remove_cart_cond");
-    static BytePatch cart_patch1(gSignatures.GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
-    static BytePatch cart_patch2(gSignatures.GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
-    if (unlimit_bumpercart_movement)
+static InitRoutine init_pyrovision(
+    []()
     {
-        cart_patch1.Patch();
-        cart_patch2.Patch();
-    }
-    unlimit_bumpercart_movement.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        if (after)
+        uintptr_t addr                        = gSignatures.GetClientSignature("8B 35 ? ? ? ? 75 27");
+        g_nLocalPlayerVisionFlags             = *reinterpret_cast<int **>(addr + 2);
+        g_nLocalPlayerVisionFlagsWeaponsCheck = *reinterpret_cast<int **>(addr + 8 + 2);
+        addr                                  = gSignatures.GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
+        if (!addr)
+            return;
+        addr += 17;
+        UpdateLocalPlayerVisionFlags_fn = UpdateLocalPlayerVisionFlags_t(e8call_direct(addr));
+
+        auto relAddr = ((uintptr_t) UpdateLocalPlayerVisionFlags - (uintptr_t) addr) - 5;
+
+        static BytePatch patch{ addr, { 0xE8, access_ptr(relAddr, 0), access_ptr(relAddr, 1), access_ptr(relAddr, 2), access_ptr(relAddr, 3) } };
+        patch.Patch();
+        EC::Register(
+            EC::Shutdown, []() { patch.Shutdown(); }, "shutdown_pyrovis");
+#if !ENFORCE_STREAM_SAFETY
+        EC::Register(
+            EC::Paint,
+            []()
+            {
+                if (CE_GOOD(LOCAL_E))
+                {
+                    if (HasCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E))
+                        RemoveCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E);
+                    if (HasCondition<TFCond_FreezeInput>(LOCAL_E))
+                        RemoveCondition<TFCond_FreezeInput>(LOCAL_E);
+                }
+            },
+            "remove_cart_cond");
+        static BytePatch cart_patch1(gSignatures.GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
+        static BytePatch cart_patch2(gSignatures.GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+        if (unlimit_bumpercart_movement)
         {
             cart_patch1.Patch();
             cart_patch2.Patch();
         }
-        else
-        {
-            cart_patch1.Shutdown();
-            cart_patch2.Shutdown();
-        }
-    });
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            cart_patch1.Shutdown();
-            cart_patch2.Shutdown();
-        },
-        "cartpatch_shutdown");
-    ping_reducer.installChangeCallback([](settings::VariableBase<bool> &, bool) {
-        static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-        if (cmdrate == nullptr)
-        {
-            cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            return;
-        }
-    });
+        unlimit_bumpercart_movement.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
+            {
+                if (after)
+                {
+                    cart_patch1.Patch();
+                    cart_patch2.Patch();
+                }
+                else
+                {
+                    cart_patch1.Shutdown();
+                    cart_patch2.Shutdown();
+                }
+            });
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                cart_patch1.Shutdown();
+                cart_patch2.Shutdown();
+            },
+            "cartpatch_shutdown");
+        ping_reducer.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool)
+            {
+                static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+                if (cmdrate == nullptr)
+                {
+                    cmdrate = g_ICvar->FindVar("cl_cmdrate");
+                    return;
+                }
+            });
 #endif
-});
+    });
 #endif
 
 static CatCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
@@ -961,59 +992,64 @@ void callback_force_wait(settings::VariableBase<bool> &, bool after)
     force_wait_func(after);
 }
 
-static InitRoutine init([]() {
-    HookNetvar({ "DT_TFPlayer", "m_bViewingCYOAPDA" }, cyoa_anim_hook, cyoaview_nethook);
+static InitRoutine init(
+    []()
+    {
+        HookNetvar({ "DT_TFPlayer", "m_bViewingCYOAPDA" }, cyoa_anim_hook, cyoaview_nethook);
 
-    force_wait.installChangeCallback(callback_force_wait);
-    force_wait_func(true);
+        force_wait.installChangeCallback(callback_force_wait);
+        force_wait_func(true);
 
-    teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
-    EC::Register(EC::Shutdown, Shutdown, "draw_local_player", EC::average);
-    EC::Register(EC::CreateMove, CreateMove, "cm_misc_hacks", EC::average);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_misc_hacks", EC::average);
+        teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
+        EC::Register(EC::Shutdown, Shutdown, "draw_local_player", EC::average);
+        EC::Register(EC::CreateMove, CreateMove, "cm_misc_hacks", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_misc_hacks", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "draw_misc_hacks", EC::average);
+        EC::Register(EC::Draw, Draw, "draw_misc_hacks", EC::average);
 #if !ENFORCE_STREAM_SAFETY
-    if (render_zoomed)
-        tryPatchLocalPlayerShouldDraw(true);
-    render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
-    patch_playerpanel     = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 DF", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
-    uintptr_t addr_scrbrd = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
+        if (render_zoomed)
+            tryPatchLocalPlayerShouldDraw(true);
+        render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
+        patch_playerpanel     = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 ? 85 C0 0F 8E", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
+        uintptr_t addr_scrbrd = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
 
-    // Address to the function we need to jump to
-    uintptr_t target_addr = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
-    uintptr_t rel_addr    = ((uintptr_t) target_addr - ((uintptr_t) addr_scrbrd + 2)) - 5;
+        // Address to the function we need to jump to
+        uintptr_t target_addr = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
+        uintptr_t rel_addr    = ((uintptr_t) target_addr - ((uintptr_t) addr_scrbrd + 2)) - 5;
 
-    patch_scoreboard1 = std::make_unique<BytePatch>(addr_scrbrd, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3), 0xE9, 0xC9, 0x06, 0x00, 0x00 });
-    patch_scoreboard2 = std::make_unique<BytePatch>(addr_scrbrd + 0xA0, std::vector<unsigned char>{ 0xE9, 0x5D, 0xFF, 0xFF, 0xFF });
-    patch_scoreboard3 = std::make_unique<BytePatch>(addr_scrbrd + 0x84A, std::vector<unsigned char>{ 0x87, 0xFE });
-    patch_playerpanel->Patch();
-    patch_scoreboard1->Patch();
-    patch_scoreboard2->Patch();
-    patch_scoreboard3->Patch();
+        patch_scoreboard1 = std::make_unique<BytePatch>(addr_scrbrd, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3), 0xE9, 0xC9, 0x06, 0x00, 0x00 });
+        patch_scoreboard2 = std::make_unique<BytePatch>(addr_scrbrd + 0xA0, std::vector<unsigned char>{ 0xE9, 0x5D, 0xFF, 0xFF, 0xFF });
+        patch_scoreboard3 = std::make_unique<BytePatch>(addr_scrbrd + 0x84A, std::vector<unsigned char>{ 0x8f, 0xFE });
+        patch_playerpanel->Patch();
+        patch_scoreboard1->Patch();
+        patch_scoreboard2->Patch();
+        patch_scoreboard3->Patch();
 
-    static BytePatch stealth_kill{ gSignatures.GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
-    stealth_kill.Patch();
-    static BytePatch cyoa_patch{ gSignatures.GetClientSignature, "74 20 A1 ? ? ? ? 8B 10 C7 44 24 ? ? ? ? ? 89 04 24", 0, { 0xEB } };
-    cyoa_patch.Patch();
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            stealth_kill.Shutdown();
-            cyoa_patch.Shutdown();
-            tryPatchLocalPlayerShouldDraw(false);
-            force_wait_func(false);
-        },
-        "shutdown_stealthkill");
-    dont_hide_stealth_kills.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        if (after)
-            stealth_kill.Patch();
-        else
-            stealth_kill.Shutdown();
+        static BytePatch stealth_kill{ gSignatures.GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
+        stealth_kill.Patch();
+        static BytePatch cyoa_patch{ gSignatures.GetClientSignature, "74 20 A1 ? ? ? ? 8B 10 C7 44 24 ? ? ? ? ? 89 04 24", 0, { 0xEB } };
+        cyoa_patch.Patch();
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                stealth_kill.Shutdown();
+                cyoa_patch.Shutdown();
+                tryPatchLocalPlayerShouldDraw(false);
+                force_wait_func(false);
+            },
+            "shutdown_stealthkill");
+        dont_hide_stealth_kills.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
+            {
+                if (after)
+                    stealth_kill.Patch();
+                else
+                    stealth_kill.Shutdown();
+            });
+#endif
+#endif
     });
-#endif
-#endif
-});
 } // namespace hacks::shared::misc
 
 /*void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char*

@@ -47,11 +47,10 @@
 							<Option name="Spin" value="6"/>
 							<Option name="Edge" value="7"/>
 							<Option name="Sideways" value="8"/>
-							<Option name="Jitter" value="9"/>
-							<Option name="Heck" value="10"/>
-							<Option name="Omega" value="11"/>
-							<Option name="Random" value="12"/>
-							<Option name="Random Clamped" value="13"/>
+							<Option name="Heck" value="9"/>
+							<Option name="Omega" value="10"/>
+							<Option name="Random" value="11"/>
+							<Option name="Random Clamped" value="12"/>
 						</Select>
 					</LabeledObject>
 					<LabeledObject width="fill" label="Real Yaw">
@@ -65,11 +64,10 @@
 							<Option name="Spin" value="6"/>
 							<Option name="Edge" value="7"/>
 							<Option name="Sideways" value="8"/>
-							<Option name="Jitter" value="9"/>
-							<Option name="Heck" value="10"/>
-							<Option name="Omega" value="11"/>
-							<Option name="Random" value="12"/>
-							<Option name="Random Clamped" value="13"/>
+							<Option name="Heck" value="9"/>
+							<Option name="Omega" value="10"/>
+							<Option name="Random" value="11"/>
+							<Option name="Random Clamped" value="12"/>
 						</Select>
 					</LabeledObject>
 					<AutoVariable width="fill" target="antiaim.yaw.fake.static" label="Custom Fake" tooltip="Used when 'Fake Yaw' is set to 'Custom'."/>

@@ -15,17 +15,19 @@ namespace hacks::shared::antiaim
 bool force_fakelag = false;
 float used_yaw     = 0.0f;
 static settings::Boolean enable{ "antiaim.enable", "0" };
-static settings::Float yaw{ "antiaim.yaw.static", "0" };
-static settings::Int yaw_mode{ "antiaim.yaw.mode", "0" };
-static settings::Int yaw_sideways_min{ "antiaim.yaw.sideways.min", "0" };
-static settings::Int yaw_sideways_max{ "antiaim.yaw.sideways.max", "4" };
 
-static settings::Float pitch{ "antiaim.pitch.static", "0" };
-static settings::Int pitch_mode{ "antiaim.pitch.mode", "0" };
-
-static settings::Float roll{ "antiaim.roll", "0" };
 static settings::Boolean no_clamping{ "antiaim.no-clamp", "0" };
+static settings::Float roll{ "antiaim.roll", "0" };
 static settings::Float spin{ "antiaim.spin-speed", "10" };
+
+static settings::Int pitch_fake{ "antiaim.pitch.fake", "0" };
+static settings::Int pitch_real{ "antiaim.pitch.real", "0" };
+static settings::Float pitch_static{ "antiaim.pitch.static", "0" };
+
+static settings::Int yaw_fake{ "antiaim.yaw.fake", "0" };
+static settings::Float yaw_fake_static{ "antiaim.yaw.fake.static", "0" };
+static settings::Int yaw_real{ "antiaim.yaw.real", "0" };
+static settings::Float yaw_real_static{ "antiaim.yaw.real.static", "0" };
 
 static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "0" };
 static settings::Float aaaa_interval{ "antiaim.aaaa.interval.seconds", "0" };
@@ -34,7 +36,12 @@ static settings::Float aaaa_interval_random_low{ "antiaim.aaaa.interval.random-l
 static settings::Int aaaa_mode{ "antiaim.aaaa.mode", "0" };
 static settings::Button aaaa_flip_key{ "antiaim.aaaa.flip-key", "<null>" };
 
-float cur_yaw  = 0.0f;
+// Unused?
+static settings::Int yaw_sideways_min{ "antiaim.yaw.sideways.min", "0" };
+static settings::Int yaw_sideways_max{ "antiaim.yaw.sideways.max", "4" };
+
+float cur_yaw_fake  = 0.0f;
+float cur_yaw_real  = 0.0f;
 int safe_space = 0;
 
 float aaaa_timer_start = 0.0f;
@@ -385,13 +392,14 @@ float useEdge(float edgeViewAngle)
 static float randyaw = 0.0f;
 void ProcessUserCmd(CUserCmd *cmd)
 {
+	// Not running
     if (!enable)
         return;
     if (!ShouldAA(cmd))
         return;
-    // Not running
-    if (!pitch_mode && !yaw_mode)
+    if (!pitch_fake && !pitch_real && !yaw_fake && !yaw_real)
         return;
+    
     static bool keepmode = true;
     keepmode             = !keepmode;
     float &p             = cmd->viewangles.x;
@@ -401,200 +409,184 @@ void ProcessUserCmd(CUserCmd *cmd)
 
     static int ticksUntilSwap = 0;
     static bool swap          = true;
-
-    if (ticksUntilSwap > 0 && *yaw_mode != 18)
+	
+	// Reset the ticks and swap for some reason...
+    if (ticksUntilSwap > 0 && *yaw_mode != 8)
     {
         swap           = true;
         ticksUntilSwap = 0;
     }
-    switch ((int) yaw_mode)
+    
+    // Yaw logic
+    if (g_pLocalPlayer->isFakeAngleCM)
+		switch ((int) yaw_fake)
+		{
+		case 1: // Custom
+			y = (float) yaw_fake_static;
+			break;
+		case 2: // Custom Offset
+			y += (float) yaw_fake_static;
+			break;
+		case 3: // Left
+			y -= 90.0f;
+			break;
+		case 4: // Right
+			y += 90.0f;
+			break;
+		case 5: // Back
+			y += 180.0f;
+			break;
+		case 6: // Spin
+			cur_yaw_fake += (float) spin;
+			while (cur_yaw_fake > 180)
+				cur_yaw_fake += -360;
+			while (cur_yaw_fake < -180)
+				cur_yaw_fake += 360;
+			y = cur_yaw_fake;
+			break;
+		case 7: // Edge
+			// Attempt to find an edge and if found, rotate around it
+			if (findEdge(y))
+				y = useEdge(y);
+			break;
+		case 8: // Sideways
+			if (ticksUntilSwap--)
+			{
+				ticksUntilSwap = UniformRandomInt(*yaw_sideways_min, *yaw_sideways_max);
+				swap           = !swap;
+			}
+			y += swap ? 90.0f : -90.0f;
+			break;
+		case 9: // Jitter
+			if (flip)
+				y += 90;
+			else
+				y -= 90;
+			break;
+		case 10: // Heck
+			FuckYaw(y);
+			clamp = false;
+			break;
+		case 11: // Omega
+			randyaw += RandFloatRange(-30.0f, 30.0f);
+			y = randyaw;
+			break;
+		case 12: // Random
+			y     = RandFloatRange(-65536.0f, 65536.0f);
+			clamp = false;
+			break;
+		case 13: // Random Clamped
+			y = RandFloatRange(-180.0f, 180.0f);
+			break;
+		default:
+			break;
+		}
+    
+    switch ((int) yaw_real)
     {
-    case 1: // FIXED
-        y = (float) yaw;
+    case 1: // Custom
+        y = (float) yaw_real_static;
         break;
-    case 2: // JITTER
+    case 2: // Custom Offset
+        y += (float) yaw_real_static;
+        break;
+    case 3: // Left
+        y -= 90.0f;
+        break;
+    case 4: // Right
+        y += 90.0f;
+        break;
+    case 5: // Back
+        y += 180.0f;
+        break;
+    case 6: // Spin
+        cur_yaw_real += (float) spin;
+        while (cur_yaw_real > 180)
+            cur_yaw_real += -360;
+        while (cur_yaw_real < -180)
+            cur_yaw_real += 360;
+        y = cur_yaw_real;
+        break;
+    case 7: // Edge
+        // Attempt to find an edge and if found, rotate around it
+        if (findEdge(y))
+            y = useEdge(y);
+        break;
+    case 8: // Sideways
+		if (ticksUntilSwap--)
+        {
+            ticksUntilSwap = UniformRandomInt(*yaw_sideways_min, *yaw_sideways_max);
+            swap           = !swap;
+        }
+        y += swap ? 90.0f : -90.0f;
+        break;
+    case 9: // Jitter
         if (flip)
             y += 90;
         else
             y -= 90;
         break;
-    case 3: // BIGRANDOM
-        y     = RandFloatRange(-65536.0f, 65536.0f);
-        clamp = false;
-        break;
-    case 4: // RANDOM
-        y = RandFloatRange(-180.0f, 180.0f);
-        break;
-    case 5: // SPIN
-        cur_yaw += (float) spin;
-        while (cur_yaw > 180)
-            cur_yaw += -360;
-        while (cur_yaw < -180)
-            cur_yaw += 360;
-        y = cur_yaw;
-        break;
-    case 6: // OFFSETKEEP
-        y += (float) yaw;
-        break;
-    case 7: // Edge
-        // Attemt to find an edge and if found, edge
-        if (findEdge(y))
-            y = useEdge(y);
-        break;
-    case 8: // HECK
+    case 10: // Heck
         FuckYaw(y);
         clamp = false;
         break;
-    case 9: // Fake keep (basically just spam random angles)
-        if (keepmode && !g_pLocalPlayer->isFakeAngleCM)
-        {
-            cur_yaw += (float) spin;
-            while (cur_yaw > 180)
-                cur_yaw -= 360;
-            while (cur_yaw < -180)
-                cur_yaw += 360;
-            y = cur_yaw;
-        }
-        else if (!keepmode && !g_pLocalPlayer->isFakeAngleCM)
-        {
-            if (flip)
-                y += 90;
-            else
-                y -= 90;
-            break;
-        }
+    case 11: // Omega
+        y = randyaw - 180.0f + RandFloatRange(-40.0f, 40.0f);
+        break;
+    case 12: // Random
+        y     = RandFloatRange(-65536.0f, 65536.0f);
         clamp = false;
         break;
-    case 10: // Fake Static
-        if (g_pLocalPlayer->isFakeAngleCM)
-            y = (float) yaw;
+    case 13: // Random Clamped
+        y = RandFloatRange(-180.0f, 180.0f);
         break;
-    case 11: // Fake jitter
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            if (flip)
-                y += 90;
-            else
-                y -= 90;
-        }
-        break;
-    case 12: // Fake bigrandom
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            y     = RandFloatRange(-65536.0f, 65536.0f);
-            clamp = false;
-        }
-        break;
-    case 13: // Fake random
-        if (g_pLocalPlayer->isFakeAngleCM)
-            y = RandFloatRange(-180.0f, 180.0f);
-        break;
-    case 14: // Fake spin
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            cur_yaw += (float) spin;
-            while (cur_yaw > 180)
-                cur_yaw -= 360;
-            while (cur_yaw < -180)
-                cur_yaw += 360;
-            y = cur_yaw;
-        }
-        break;
-    case 15: // Fake offsetkeep
-        if (g_pLocalPlayer->isFakeAngleCM)
-            y += (float) yaw;
-        break;
-    case 16: // Fake edge
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            // Attemt to find an edge and if found, edge
-            if (findEdge(y))
-                y = useEdge(y);
-        }
-        break;
-    case 17: // Fake heck
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            FuckYaw(y);
-            clamp = false;
-        }
-        break;
-    case 18: // Fake sideways
-        if (g_pLocalPlayer->isFakeAngleCM && ticksUntilSwap--)
-        {
-            ticksUntilSwap = UniformRandomInt(*yaw_sideways_min, *yaw_sideways_max);
-            swap           = !swap;
-        }
-        y += g_pLocalPlayer->isFakeAngleCM ^ swap ? 90.0f : -90.0f;
-        break;
-    case 20: // Fake right
-        y += g_pLocalPlayer->isFakeAngleCM ? -90.0f : 90.0f;
-        break;
-    case 19: // Fake left
-        y += g_pLocalPlayer->isFakeAngleCM ? 90.0f : -90.0f;
-        break;
-    case 21: // Fake reverse edge
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            // Attemt to find an edge and if found, edge
-            if (findEdge(y))
-                y = useEdge(y) + 180.0f;
-        }
-        break;
-    case 22: // Omegayaw
-        if (g_pLocalPlayer->isFakeAngleCM)
-        {
-            randyaw += RandFloatRange(-30.0f, 30.0f);
-            y = randyaw;
-        }
-        else
-            y = randyaw - 180.0f + RandFloatRange(-40.0f, 40.0f);
     default:
         break;
     }
-    switch (int(pitch_mode))
+    
+    // Pitch logic
+    switch (int(pitch_real))
     {
-    case 1:
+    case 1: // Custom
         p = float(pitch);
         break;
-    case 2:
+    case 2: // Up
+        p = -89.0f;
+        break;
+    case 3: // Down
+        p = 89.0f;
+        break;
+    case 4: // Jitter
         if (flip)
             p += 30.0f;
         else
             p -= 30.0f;
         break;
-    case 3:
+    case 5: // Random
         p = RandFloatRange(-89.0f, 89.0f);
         break;
-    case 4:
+    case 6: // Flip
         p = flip ? 89.0f : -89.0f;
         break;
-    case 5:
-        p     = flip ? 271.0f : -271.0f;
-        clamp = false;
-        break;
-    case 6:
-        p     = -271.0f;
-        clamp = false;
-        break;
-    case 7:
-        p     = 271.0f;
-        clamp = false;
-        break;
-    case 8:
-        p     = 360.0f;
-        clamp = false;
-        break;
-    case 9:
-        p = -89.0f;
-        break;
-    case 10:
-        p = 89.0f;
-        break;
-    case 11:
+    case 7: // Heck
         FuckPitch(p);
         clamp = false;
     }
+    
+    // Fake is done afterwards so that they can be applied on top of the real angles set above
+    switch (int(pitch_fake))
+    {
+    case 1: // Up
+        p -= 360.0f;
+        break;
+    case 2: // Down
+        p += 360.0f;
+        break;
+    case 3: // Inverse
+        p = -p;
+        break;
+    }
+    
     if (g_pLocalPlayer->isFakeAngleCM)
         flip = !flip;
     if (clamp)

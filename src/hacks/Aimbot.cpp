@@ -1231,20 +1231,20 @@ int BestHitbox(CachedEntity *target)
     switch (*hitbox_mode)
     {
     case 0:
-    { // AUTO-HEAD priority
+    { // AUTO priority
         int preferred = int(hitbox);
         bool headonly = false; // Var to keep if we can bodyshot
 
         IF_GAME(IsTF())
         {
             int ci    = g_pLocalPlayer->weapon()->m_iClassID();
-            preferred = hitbox_t::spine_2;
+            preferred = hitbox_t::spine_3;
+            
             // Sniper rifle
             if (g_pLocalPlayer->holding_sniper_rifle)
-            {
                 headonly = CanHeadshot();
-                // Hunstman
-            }
+            
+            // Hunstman
             else if (ci == CL_CLASS(CTFCompoundBow))
             {
                 float begincharge = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargeBeginTime);
@@ -1255,6 +1255,8 @@ int BestHitbox(CachedEntity *target)
                 else
                     preferred = hitbox_t::head;
             }
+            
+            // Ambassador
             else if (IsAmbassador(g_pLocalPlayer->weapon()))
             {
                 headonly = AmbassadorCanHeadshot();
@@ -1263,54 +1265,39 @@ int BestHitbox(CachedEntity *target)
                 // potentially be higher
                 if (target->m_iHealth() <= 18 || IsPlayerCritBoosted(g_pLocalPlayer->entity) || target->m_flDistance() > 1200)
                     headonly = false;
-                // Rocket launcher
             }
-            // These weapons should aim at the foot if the target is grounded
-            else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar))
+            
+            // Rockets and stickies should aim at the foot if the target is on the ground
+            else if (ci == CL_CLASS(CTFPipebombLauncher) || 
+				ci == CL_CLASS(CTFRocketLauncher) || 
+				ci == CL_CLASS(CTFParticleCannon) || 
+				ci == CL_CLASS(CTFRocketLauncher_AirStrike) || 
+				ci == CL_CLASS(CTFRocketLauncher_Mortar) ||
+				ci == CL_CLASS(CTFRocketLauncher_DirectHit))
             {
-                preferred = hitbox_t::foot_L;
-            }
-            // These weapons should aim at the center of mass due to little/no splash
-            else if (ci == CL_CLASS(CTFRocketLauncher_DirectHit) || ci == CL_CLASS(CTFGrenadeLauncher))
-            {
-                preferred = hitbox_t::spine_3;
-            }
-
-            // Airborn targets should always get hit in center
-            if (GetWeaponMode() == weaponmode::weapon_projectile)
-            {
-                if (g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFCompoundBow))
-                {
-                    bool ground = CE_INT(target, netvar.iFlags) & (1 << 0);
-                    if (!ground)
-                        preferred = hitbox_t::spine_3;
-                }
+				bool ground = CE_INT(target, netvar.iFlags) & (1 << 0);
+				if (ground) preferred = hitbox_t::foot_L;
             }
 
             // Bodyshot handling
             if (g_pLocalPlayer->holding_sniper_rifle)
             {
-
                 float cdmg = CE_FLOAT(LOCAL_W, netvar.flChargedDamage);
                 float bdmg = 50;
+                 // Vaccinator damage correction, protects against 20% of damage
                 if (CarryingHeatmaker())
                 {
                     bdmg = (bdmg * .80) - 1;
                     cdmg = (cdmg * .80) - 1;
                 }
-                // Darwins damage correction, protects against 15% of damage
-                //                if (HasDarwins(target))
-                //                {
-                //                    bdmg = (bdmg * .85) - 1;
-                //                    cdmg = (cdmg * .85) - 1;
-                //                }
                 // Vaccinator damage correction, protects against 75% of damage
                 if (HasCondition<TFCond_UberBulletResist>(target))
                 {
                     bdmg = (bdmg * .25) - 1;
                     cdmg = (cdmg * .25) - 1;
-                    // Passive bullet resist protects against 10% of damage
+                    
                 }
+                // Passive bullet resist protects against 10% of damage
                 else if (HasCondition<TFCond_SmallBulletResist>(target))
                 {
                     bdmg = (bdmg * .90) - 1;
@@ -1335,12 +1322,11 @@ int BestHitbox(CachedEntity *target)
                     headonly  = false;
                 }
             }
-            // In counter-strike source, headshots are what we want
         }
+        // In counter-strike source, headshots are what we want
         else IF_GAME(IsCSS())
-        {
             headonly = true;
-        }
+        
         // Head only
         if (headonly)
         {
@@ -1355,19 +1341,17 @@ int BestHitbox(CachedEntity *target)
             return preferred;
         // Else attempt to find any hitbox at all
         for (int i = projectile_mode ? 1 : 0; i < target->hitboxes.GetNumHitboxes() && i < 6; i++)
-        {
             if (target->hitboxes.VisibilityCheck(i))
                 return i;
-        }
     }
     break;
     case 1:
-    { // AUTO-CLOSEST priority, Return closest hitbox to crosshair
+    { // AUTO priority, return closest hitbox to crosshair
         return ClosestHitbox(target);
     }
     break;
     case 2:
-    { // STATIC priority, Return a user chosen hitbox
+    { // STATIC priority, return a user chosen hitbox
         return *hitbox;
     }
     break;

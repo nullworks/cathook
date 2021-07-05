@@ -287,7 +287,6 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     }
     // Turn it into an actual average
     average_spread /= nBulletsPerShot;
-    fClampAngle(average_spread);
 
     // What we set our Vector to, start with FLT_MAX as deviation
     Vector fixed_spread(FLT_MAX);

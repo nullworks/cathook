@@ -267,8 +267,8 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
     void **predictionVtable  = *((void ***) g_IPrediction);
-    SetupMoveFn oSetupMove   = (SetupMoveFn)(*(unsigned *) (predictionVtable + 19));
-    FinishMoveFn oFinishMove = (FinishMoveFn)(*(unsigned *) (predictionVtable + 20));
+    SetupMoveFn oSetupMove   = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
+    FinishMoveFn oFinishMove = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
 
     // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
     // 0x1F69C0C);  CMoveData movedata {};
@@ -541,32 +541,35 @@ float DistanceToGround(Vector origin)
     return std::fabs(origin.z - ground_trace.endpos.z);
 }
 
-static InitRoutine init([]() {
-    previous_positions.fill(boost::circular_buffer<Vector>(*sample_size));
-    sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(boost::circular_buffer<Vector>(after)); });
-    EC::Register(
-        EC::CreateMove,
-        []() {
-            for (int i = 1; i < g_GlobalVars->maxClients; i++)
+static InitRoutine init(
+    []()
+    {
+        previous_positions.fill(boost::circular_buffer<Vector>(*sample_size));
+        sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(boost::circular_buffer<Vector>(after)); });
+        EC::Register(
+            EC::CreateMove,
+            []()
             {
-                auto ent     = ENTITY(i);
-                auto &buffer = previous_positions.at(i - 1);
-
-                if (CE_BAD(ent) || !ent->m_bAlivePlayer())
+                for (int i = 1; i < g_GlobalVars->maxClients; i++)
                 {
-                    buffer.clear();
-                    continue;
-                }
-                Vector vel;
-                velocity::EstimateAbsVelocity(RAW_ENT(ent), vel);
-                if (vel.IsZero())
-                {
-                    buffer.clear();
-                    continue;
-                }
+                    auto ent     = ENTITY(i);
+                    auto &buffer = previous_positions.at(i - 1);
 
-                buffer.push_front(ent->m_vecOrigin());
-            }
-        },
-        "cm_prediction", EC::very_early);
-});
+                    if (CE_BAD(LOCAL_E) || CE_BAD(ent) || !ent->m_bAlivePlayer())
+                    {
+                        buffer.clear();
+                        continue;
+                    }
+                    Vector vel;
+                    velocity::EstimateAbsVelocity(RAW_ENT(ent), vel);
+                    if (vel.IsZero())
+                    {
+                        buffer.clear();
+                        continue;
+                    }
+
+                    buffer.push_front(ent->m_vecOrigin());
+                }
+            },
+            "cm_prediction", EC::very_early);
+    });

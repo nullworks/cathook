@@ -314,9 +314,29 @@ bool shouldCrit()
     // Melee mode with melee out and in range?
     if (shouldMeleeCrit())
         return true;
+    static bool pressed_key_last_tick = false;
+    static int loose_cannon_countdown = 0;
     // Crit key + enabled, for melee, the crit key MUST be set
     if (enabled && ((g_pLocalPlayer->weapon_mode != weapon_melee && !crit_key) || crit_key.isKeyDown()))
+    {
+        pressed_key_last_tick = true;
         return true;
+    }
+    // Special code for loose cannon since projectile is delayed
+    if (!crit_key.isKeyDown() && (pressed_key_last_tick || loose_cannon_countdown))
+    {
+        if (pressed_key_last_tick)
+            loose_cannon_countdown = 7;
+        pressed_key_last_tick          = false;
+        static unsigned last_tickcount = 0;
+        if (tickcount != last_tickcount)
+        {
+            last_tickcount = tickcount;
+            loose_cannon_countdown--;
+        }
+        if (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon))
+            return true;
+    }
     // Force crits on sticky launcher
     /*if (force_ticks)
     {
@@ -353,7 +373,7 @@ bool canWeaponCrit(bool draw = false)
     // Misc checks
     if (!isAllowedToWithdrawFromBucket(weapon))
         return false;
-    if (!draw && !CanShoot() && !isRapidFire(weapon))
+    if (!draw && !CanShoot() && !isRapidFire(weapon) && LOCAL_W->m_iClassID() != CL_CLASS(CTFCannon))
         return false;
     if (!draw && CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730 && !can_beggars_crit)
         return false;
@@ -688,6 +708,9 @@ void CreateMove()
             }
             else
                 return;
+        }
+        else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon))
+        {
         }
         else if (!can_beggars_crit)
             return;
@@ -1062,49 +1085,54 @@ void LevelShutdown()
 }
 
 // Prints basically everything you need to know about crits
-static CatCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch of useful crit info", []() {
-    if (CE_BAD(LOCAL_E))
-        return;
+static CatCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch of useful crit info",
+                                        []()
+                                        {
+                                            if (CE_BAD(LOCAL_E))
+                                                return;
 
-    logging::Info("Player specific information:");
-    logging::Info("Ranged Damage this round: %d", cached_damage - round_damage);
-    logging::Info("Melee Damage this round: %d", melee_damage);
-    logging::Info("Crit Damage this round: %d", crit_damage);
-    logging::Info("Observed crit chance: %f", getObservedCritChance());
-    if (CE_GOOD(LOCAL_W))
+                                            logging::Info("Player specific information:");
+                                            logging::Info("Ranged Damage this round: %d", cached_damage - round_damage);
+                                            logging::Info("Melee Damage this round: %d", melee_damage);
+                                            logging::Info("Crit Damage this round: %d", crit_damage);
+                                            logging::Info("Observed crit chance: %f", getObservedCritChance());
+                                            if (CE_GOOD(LOCAL_W))
+                                            {
+                                                IClientEntity *wep = RAW_ENT(LOCAL_W);
+                                                weapon_info info(wep);
+                                                logging::Info("Weapon specific information:");
+                                                logging::Info("Crit bucket: %f", info.crit_bucket);
+                                                logging::Info("Needed Crit chance: %f", critMultInfo(wep).second);
+                                                logging::Info("Added per shot: %f", added_per_shot);
+                                                if (isRapidFire(wep))
+                                                    logging::Info("Subtracted per Rapidfire crit: %f", getWithdrawAmount(wep));
+                                                else
+                                                    logging::Info("Subtracted per crit: %f", getWithdrawAmount(wep));
+                                                logging::Info("Damage Until crit: %d", damageUntilToCrit(wep));
+                                                logging::Info("Shots until crit: %d", shotsUntilCrit(wep));
+                                            }
+                                        });
+
+static InitRoutine init(
+    []()
     {
-        IClientEntity *wep = RAW_ENT(LOCAL_W);
-        weapon_info info(wep);
-        logging::Info("Weapon specific information:");
-        logging::Info("Crit bucket: %f", info.crit_bucket);
-        logging::Info("Needed Crit chance: %f", critMultInfo(wep).second);
-        logging::Info("Added per shot: %f", added_per_shot);
-        if (isRapidFire(wep))
-            logging::Info("Subtracted per Rapidfire crit: %f", getWithdrawAmount(wep));
-        else
-            logging::Info("Subtracted per crit: %f", getWithdrawAmount(wep));
-        logging::Info("Damage Until crit: %d", damageUntilToCrit(wep));
-        logging::Info("Shots until crit: %d", shotsUntilCrit(wep));
-    }
-});
-
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMoveLate, CreateMove, "crit_cm");
+        EC::Register(EC::CreateMoveLate, CreateMove, "crit_cm");
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "crit_draw");
+        EC::Register(EC::Draw, Draw, "crit_draw");
 #endif
-    EC::Register(EC::LevelShutdown, LevelShutdown, "crit_lvlshutdown");
-    g_IGameEventManager->AddListener(&listener, false);
-    HookNetvar({ "DT_TFWeaponBase", "LocalActiveTFWeaponData", "m_flObservedCritChance" }, observed_crit_chance_hook, observedcritchance_nethook);
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            g_IGameEventManager->RemoveListener(&listener);
-            observed_crit_chance_hook.restore();
-        },
-        "crit_shutdown");
-    // Attached in game, out of sync
-    if (g_IEngine->IsInGame())
-        is_out_of_sync = true;
-});
+        EC::Register(EC::LevelShutdown, LevelShutdown, "crit_lvlshutdown");
+        g_IGameEventManager->AddListener(&listener, false);
+        HookNetvar({ "DT_TFWeaponBase", "LocalActiveTFWeaponData", "m_flObservedCritChance" }, observed_crit_chance_hook, observedcritchance_nethook);
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                g_IGameEventManager->RemoveListener(&listener);
+                observed_crit_chance_hook.restore();
+            },
+            "crit_shutdown");
+        // Attached in game, out of sync
+        if (g_IEngine->IsInGame())
+            is_out_of_sync = true;
+    });
 } // namespace criticals

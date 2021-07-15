@@ -119,6 +119,11 @@ static void spectatorUpdate()
     };
 }
 
+static bool playerTeamCheck(CachedEntity *entity)
+{
+    return (int) teammates == 2 || (entity->m_bEnemy() && !teammates) || (!entity->m_bEnemy() && teammates) || (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow) && entity->m_iHealth() < entity->m_iMaxHealth());
+}
+
 #if ENABLE_VISUALS
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
@@ -347,37 +352,56 @@ static void CreateMove()
     // flNextPrimaryAttack meme
     if (only_can_shoot && g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFMinigun) && g_pLocalPlayer->weapon()->m_iClassID() != CL_CLASS(CTFLaserPointer))
     {
-        // Handle Compound bow
+        // Handle Huntsman
         if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow))
         {
             bool release = false;
+            if (autoshoot)
+                current_user_cmd->buttons |= IN_ATTACK;
             // Grab time when charge began
-            current_user_cmd->buttons |= IN_ATTACK;
             float begincharge = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargeBeginTime);
             float charge      = g_GlobalVars->curtime - begincharge;
+            if (!begincharge)
+                charge = 0.0f;
             int damage        = std::floor(50.0f + 70.0f * fminf(1.0f, charge));
             int charge_damage = std::floor(50.0f + 70.0f * fminf(1.0f, charge)) * 3.0f;
-            if (!wait_for_charge || (damage >= target_entity->m_iHealth() || charge_damage >= target_entity->m_iHealth()))
+            if (HasCondition<TFCond_Slowed>(LOCAL_E) && (autoshoot || !(current_user_cmd->buttons & IN_ATTACK)) && (!wait_for_charge || (charge >= 1.0f || damage >= target_entity->m_iHealth() || charge_damage >= target_entity->m_iHealth())))
                 release = true;
+            // Shoot projectile
             if (release)
-                DoAutoshoot();
-            static bool currently_charging_huntsman = false;
-
-            // Hunstman started charging
-            if (CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargeBeginTime) != 0)
-                currently_charging_huntsman = true;
-
-            // Huntsman was released
-            if (!(current_user_cmd->buttons & IN_ATTACK) && currently_charging_huntsman)
             {
-                currently_charging_huntsman = false;
+                DoAutoshoot();
                 Aim(target_entity);
             }
-            else
-                return;
-
-            // Not release type weapon
         }
+        // Loose cannon
+        else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon))
+        {
+            // TODO: add logic for charge time
+            bool release = false;
+            if (autoshoot)
+                current_user_cmd->buttons |= IN_ATTACK;
+            float detonate_time = CE_FLOAT(LOCAL_W, netvar.flDetonateTime);
+            // Currently charging up
+            if (detonate_time > g_GlobalVars->curtime)
+            {
+                if (wait_for_charge)
+                {
+                    // Shoot when a straight shot would result in only 100ms left on fuse upon target hit
+                    float best_charge = PredictEntity(target_entity, false).DistTo(g_pLocalPlayer->v_Eye) / cur_proj_speed + 0.1;
+                    if (detonate_time - g_GlobalVars->curtime <= best_charge)
+                        release = true;
+                }
+                else
+                    release = true;
+            }
+            if (release)
+            {
+                DoAutoshoot();
+                Aim(target_entity);
+            }
+        }
+        // Not release type weapon
         else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
         {
             float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
@@ -655,6 +679,11 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     break;
                 }
             }
+            // Crossbow logic
+            if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
+            {
+                scr = ((ent->m_iMaxHealth() - ent->m_iHealth()) / ent->m_iMaxHealth()) * (*priority_mode == 2 ? 16384.0f : 2000.0f);
+            }
             // Compare the top score to our current ents score
             if (scr > target_highest_score)
             {
@@ -689,7 +718,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (!entity->m_bAlivePlayer())
             return false;
         // Teammates
-        if ((int) teammates != 2 && ((!entity->m_bEnemy() && !teammates) || (entity->m_bEnemy() && teammates)))
+        if (!playerTeamCheck(entity))
             return false;
         // Distance
         if (EffectiveTargetingRange())
@@ -1055,22 +1084,21 @@ void DoAutoshoot(CachedEntity *target_entity)
         return;
     if (IsPlayerDisguised(g_pLocalPlayer->entity) && !autoshoot_disguised)
         return;
-    // Handle Compound bow
-    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow))
+    // Handle Huntsman/Loose cannon
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) || g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCannon))
     {
-        // Release hunstman if over huntsmans limit
-        if (begancharge)
+        if (!only_can_shoot)
         {
-            current_user_cmd->buttons &= ~IN_ATTACK;
-            hacks::shared::antiaim::SetSafeSpace(5);
-            begancharge = false;
+            if (!begancharge)
+            {
+                current_user_cmd->buttons |= IN_ATTACK;
+                begancharge = true;
+                return;
+            }
         }
-        // Pull string if charge isnt enough
-        else
-        {
-            current_user_cmd->buttons |= IN_ATTACK;
-            begancharge = true;
-        }
+        begancharge = false;
+        current_user_cmd->buttons &= ~IN_ATTACK;
+        hacks::shared::antiaim::SetSafeSpace(5);
         return;
     }
     else
@@ -1491,6 +1519,7 @@ bool UpdateAimkey()
     static bool aimkey_flip       = false;
     static bool pressed_last_tick = false;
     bool allow_aimkey             = true;
+    static bool last_allow_aimkey = true;
 
     // Check if aimkey is used
     if (aimkey && aimkey_mode)
@@ -1516,6 +1545,19 @@ bool UpdateAimkey()
         default:
             break;
         }
+        // Huntsman and Loose Cannon need special logic since we aim upon m1 being released
+        if (!autoshoot && CE_GOOD(LOCAL_W) && (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) || LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon)))
+        {
+            if (!allow_aimkey && last_allow_aimkey)
+            {
+                allow_aimkey      = true;
+                last_allow_aimkey = false;
+            }
+            else
+                last_allow_aimkey = allow_aimkey;
+        }
+        else
+            last_allow_aimkey = allow_aimkey;
         pressed_last_tick = key_down;
     }
     // Return whether the aimkey allows aiming
@@ -1608,15 +1650,17 @@ void rvarCallback(settings::VariableBase<float> &, float after)
 {
     force_backtrack_aimbot = after >= 200.0f;
 }
-static InitRoutine EC([]() {
-    hacks::tf2::backtrack::latency.installChangeCallback(rvarCallback);
-    EC::Register(EC::LevelInit, Reset, "INIT_Aimbot", EC::average);
-    EC::Register(EC::LevelShutdown, Reset, "RESET_Aimbot", EC::average);
-    EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
-    EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
+static InitRoutine EC(
+    []()
+    {
+        hacks::tf2::backtrack::latency.installChangeCallback(rvarCallback);
+        EC::Register(EC::LevelInit, Reset, "INIT_Aimbot", EC::average);
+        EC::Register(EC::LevelShutdown, Reset, "RESET_Aimbot", EC::average);
+        EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
+        EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
+        EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
 #endif
-});
+    });
 
 } // namespace hacks::shared::aimbot

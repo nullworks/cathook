@@ -5,6 +5,7 @@
  *      Author: nullifiedcat
  */
 #include "common.hpp"
+#include "navparser.hpp"
 #include <settings/Bool.hpp>
 #include <boost/circular_buffer.hpp>
 
@@ -144,7 +145,7 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
     Vector result = pos;
 
     // If we should do strafe prediction, then we still need to do the calculations, but instead of applying them we simply calculate the distance traveled and use that info together with strafe pred
-    if (strafepred && (grounddistance ? *grounddistance > 0.1f : DistanceToGround(pos, minmax->first, minmax->second) > 0.1f))
+    if (strafepred && (grounddistance ? *grounddistance > 0.1f : (minmax ? DistanceToGround(pos, minmax->first, minmax->second) : DistanceToGround(pos)) > 0.1f))
     {
         auto newpos = result + (acceleration / 2.0f) * pow(steplength, 2) + vel * steplength;
         // Strafe pred does not predict Z! The player can't control his Z anyway, so it is pointless.
@@ -153,9 +154,9 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
     }
     else
         result += (acceleration / 2.0f) * pow(steplength, 2) + vel * steplength;
-
     vel += acceleration * steplength;
 
+    bool moved_upwards = false;
     if (vischeck)
     {
         Vector modify = result;
@@ -166,22 +167,110 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
 
         {
             PROF_SECTION(PredictTraces)
-            Ray_t ray;
-            trace_t trace;
-            if (minmax)
-                ray.Init(modify, low, minmax->first, minmax->second);
-            else
-                ray.Init(modify, low);
-            g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &trace);
 
-            float dist = pos.z - trace.endpos.z;
-            if (trace.m_pEnt && std::fabs(dist) < 63.0f)
-                grounddistance = dist;
+            // First, ensure we're not slightly below the floor, up to 18 HU will snap up
+            trace_t upwards_trace;
+            Ray_t ray;
+            Vector endpos = result;
+            endpos.z += 18;
+            if (minmax)
+                ray.Init(endpos, result, minmax->first, minmax->second);
+            else
+                ray.Init(endpos, result);
+            g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &upwards_trace);
+
+            // We hit something, snap to it
+            if (upwards_trace.DidHit() && !upwards_trace.startsolid)
+            {
+                result         = upwards_trace.endpos;
+                grounddistance = 0.0f;
+                moved_upwards  = true;
+            }
+
+            // Now check actual ground distance
+            else
+            {
+                trace_t trace;
+                if (minmax)
+                    ray.Init(modify, low, minmax->first, minmax->second);
+                else
+                    ray.Init(modify, low);
+                g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &trace);
+
+                float dist = pos.z - trace.endpos.z;
+                if (trace.m_pEnt && grounddistance > -18.0f)
+                    grounddistance = dist;
+            }
         }
     }
     if (grounddistance)
         if (result.z < pos.z - *grounddistance)
             result.z = pos.z - *grounddistance;
+
+    // Check if we hit a wall, if so, snap to it and distance ourselves a bit from it
+    if (vischeck && !moved_upwards)
+    {
+        {
+            PROF_SECTION(PredictTraces)
+            Ray_t ray;
+            trace_t trace;
+            if (minmax)
+                ray.Init(pos, result, minmax->first, minmax->second);
+            else
+                ray.Init(pos, result);
+            g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &trace);
+
+            // Hit a wall, scratch along it
+            if (trace.DidHit())
+            {
+                Vector hitpos      = trace.endpos;
+                Vector normal_wall = trace.plane.normal;
+                Vector normal_trace(hitpos.x - pos.x, hitpos.y - pos.y, 0.0f);
+                normal_trace = normal_trace.Normalized();
+
+                // Angle of impact determines speed
+                float impact_angle = acos(normal_trace.Dot(normal_wall));
+
+                // Ignore floor planes (They have no components we can use)
+                if (!normal_wall.AsVector2D().IsZero(0.001f))
+                {
+                    // We can get a plane in Normal form and determine the direction from there
+                    // aka n1*x+n2*y+n3*z=d
+                    float d = normal_wall.Dot(hitpos);
+
+                    Vector point1;
+                    Vector point2;
+
+                    // The above will be invalid due to a division by 0
+                    if (normal_wall.y == 0.0f)
+                    {
+                        point1 = Vector((d - normal_wall.y * vel.y - normal_wall.z * hitpos.z) / normal_wall.x, vel.y, hitpos.z);
+                        point2 = Vector((d - normal_wall.y * 2.0f * vel.y - normal_wall.z * hitpos.z) / normal_wall.x, vel.y * 2.0f, hitpos.z);
+                    }
+                    else
+                    {
+                        point1 = Vector(vel.x, (d - normal_wall.x * vel.x - normal_wall.z * hitpos.z) / normal_wall.y, hitpos.z);
+                        point2 = Vector(vel.x * 2.0f, (d - normal_wall.x * vel.x * 2.0f - normal_wall.z * hitpos.z) / normal_wall.y, hitpos.z);
+                    }
+
+                    hitpos += normal_wall * vel * steplength;
+                    result = hitpos;
+                    // Adjust velocity depending on angle
+                    float speed = vel.Length2D() * (PI - impact_angle);
+
+                    // Adjust new velocity
+                    Vector2D new_vel = (point2.AsVector2D() - point1.AsVector2D());
+                    // Ensure we have no 0 length
+                    if (new_vel.Length())
+                    {
+                        new_vel /= new_vel.Length();
+                        vel.x = new_vel.x * speed;
+                        vel.y = new_vel.y * speed;
+                    }
+                }
+            }
+        }
+    }
     return result;
 }
 
@@ -479,6 +568,7 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
 
     auto strafe_pred = initializeStrafePrediction(ent);
 
+    float currenttime_before = currenttime;
     for (int steps = 0; steps < maxsteps; steps++, currenttime += steplength)
     {
         current = last = PredictStep(last, velocity, acceleration, &minmax, steplength, strafe_pred ? &*strafe_pred : nullptr);
@@ -505,7 +595,7 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
     // S = at^2/2 ; t = sqrt(2S/a)*/
     Vector result            = bestpos + hitbox_offset;
     Vector initialvel_result = result;
-    initialvel_result.z -= proj_startvelocity * besttime;
+    initialvel_result.z -= proj_startvelocity * (besttime - currenttime_before);
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/
     return { result, initialvel_result };
@@ -521,10 +611,20 @@ float DistanceToGround(CachedEntity *ent)
 
 float DistanceToGround(Vector origin, Vector mins, Vector maxs)
 {
-    trace_t ground_trace;
+    // First, ensure we're not slightly below the floor, up to 18 HU will snap up
+    trace_t upwards_trace;
     Ray_t ray;
     Vector endpos = origin;
-    endpos.z -= 8192;
+    endpos.z += 18;
+    ray.Init(endpos, origin, mins, maxs);
+    g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &upwards_trace);
+
+    // We hit something, snap to it
+    if (upwards_trace.DidHit() && !upwards_trace.startsolid)
+        return -std::fabs(origin.z - upwards_trace.endpos.z);
+
+    trace_t ground_trace;
+    endpos.z = origin.z - 8192;
     ray.Init(origin, endpos, mins, maxs);
     g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &ground_trace);
     return std::fabs(origin.z - ground_trace.endpos.z);
@@ -532,10 +632,20 @@ float DistanceToGround(Vector origin, Vector mins, Vector maxs)
 
 float DistanceToGround(Vector origin)
 {
-    trace_t ground_trace;
+    // First, ensure we're not slightly below the floor, up to 18 HU will snap up
+    trace_t upwards_trace;
     Ray_t ray;
     Vector endpos = origin;
-    endpos.z -= 8192;
+    endpos.z += 18;
+    ray.Init(endpos, origin);
+    g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &upwards_trace);
+
+    // We hit something, snap to it
+    if (upwards_trace.DidHit() && !upwards_trace.startsolid)
+        return -std::fabs(origin.z - upwards_trace.endpos.z);
+
+    trace_t ground_trace;
+    endpos.z = origin.z - 8192;
     ray.Init(origin, endpos);
     g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_no_player, &ground_trace);
     return std::fabs(origin.z - ground_trace.endpos.z);

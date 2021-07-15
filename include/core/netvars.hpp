@@ -130,6 +130,7 @@ public:
     offset_t hObserverTarget;
 
     offset_t flChargeBeginTime;
+    offset_t flDetonateTime;
     offset_t flLastFireTime;
     offset_t flObservedCritChance;
     offset_t hThrower;

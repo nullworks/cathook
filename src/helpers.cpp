@@ -1283,7 +1283,9 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFCannon):
     {
-        rspeed = 1453.9f;
+        rspeed       = 1453.9f;
+        rgrav        = 1.0f;
+        rinitial_vel = 200.0f;
         break;
     }
     case CL_CLASS(CTFGrenadeLauncher):
@@ -1314,8 +1316,21 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFCompoundBow):
     {
         float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
-        rspeed           = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
-        rgrav            = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1) - 0.05;
+        if (CE_FLOAT(weapon, netvar.flChargeBeginTime) == 0)
+            chargetime = 0;
+        else
+        {
+            static const ConVar *pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+            if (!pUpdateRate)
+                pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+            else
+            {
+                chargetime += TICKS_TO_TIME(1);
+                // chargetime += ROUND_TO_TICKS(MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / pUpdateRate->GetFloat()));
+            }
+        }
+        rspeed = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
+        rgrav  = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1);
         break;
     }
     case CL_CLASS(CTFBat_Giftwrap):
@@ -1834,10 +1849,10 @@ Vector getShootPos(Vector angle)
         vecOffset = Vector(16.0f, 6.0f, -8.0f);
         break;
 
-        // Huntsman
-        /*case CL_CLASS(CTFCompoundBow):
-            vecOffset = Vector(23.5f, -8.0f, -3.0f);
-            break;*/
+    // Huntsman
+    case CL_CLASS(CTFCompoundBow):
+        vecOffset = Vector(23.5f, -8.0f, -3.0f);
+        break;
 
     default:
         break;

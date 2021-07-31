@@ -45,7 +45,7 @@ static void vote_rage_back()
         if (CE_BAD(ent) || ent == LOCAL_E || ent->m_Type() != ENTITY_PLAYER || ent->m_bEnemy())
             continue;
 
-        if (!g_IEngine->GetPlayerInfo(ent->m_IDX, &info))
+        if (!GetPlayerInfo(ent->m_IDX, &info))
             continue;
 
         auto &pl = playerlist::AccessData(info.friendsID);
@@ -91,7 +91,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         // info is the person getting kicked,
         // info2 is the person calling the kick.
         player_info_s info{}, info2{};
-        if (!g_IEngine->GetPlayerInfo(target, &info) || !g_IEngine->GetPlayerInfo(caller, &info2))
+        if (!GetPlayerInfo(target, &info) || !GetPlayerInfo(caller, &info2))
             break;
 
         kicked_player = target;
@@ -181,7 +181,8 @@ static void setup_paint_abandon()
 {
     EC::Register(
         EC::Paint,
-        []() {
+        []()
+        {
             if (vote_command.content != "" && vote_command.timer.test_and_set(vote_command.time))
             {
                 g_IEngine->ClientCmd_Unrestricted(vote_command.content.c_str());
@@ -223,7 +224,7 @@ public:
             int eid = event->GetInt("entityid");
 
             player_info_s info{};
-            if (!g_IEngine->GetPlayerInfo(eid, &info))
+            if (!GetPlayerInfo(eid, &info))
                 return;
             if (chat_partysay)
             {
@@ -240,19 +241,23 @@ public:
     }
 };
 static VoteEventListener listener{};
-static InitRoutine init([]() {
-    if (*vote_rage_vote)
-        setup_vote_rage();
-    setup_paint_abandon();
-
-    vote_rage_vote.installChangeCallback([](settings::VariableBase<bool> &var, bool new_val) {
-        if (new_val)
+static InitRoutine init(
+    []()
+    {
+        if (*vote_rage_vote)
             setup_vote_rage();
-        else
-            reset_vote_rage();
+        setup_paint_abandon();
+
+        vote_rage_vote.installChangeCallback(
+            [](settings::VariableBase<bool> &var, bool new_val)
+            {
+                if (new_val)
+                    setup_vote_rage();
+                else
+                    reset_vote_rage();
+            });
+        g_IGameEventManager->AddListener(&listener, false);
+        EC::Register(
+            EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&listener); }, "event_shutdown_vote");
     });
-    g_IGameEventManager->AddListener(&listener, false);
-    EC::Register(
-        EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&listener); }, "event_shutdown_vote");
-});
 } // namespace votelogger

@@ -66,7 +66,7 @@ void Update(CachedEntity *player)
                 // logging::Info("[ac] %d deviation %.2f #%d", player->m_IDX,
                 // deviation, data.detections);
                 player_info_t info;
-                g_IEngine->GetPlayerInfo(player->m_IDX, &info);
+                GetPlayerInfo(player->m_IDX, &info);
                 if (am > 5)
                 {
                     hacks::shared::anticheat::SetRage(info);
@@ -109,8 +109,8 @@ void Event(KeyValues *event)
         int vid      = g_IEngine->GetPlayerForUserID(victim);
         if (eid > 0 && eid <= MAX_PLAYERS && vid > 0 && vid <= MAX_PLAYERS)
         {
-            auto &Po_v             = Player_origs[vid];
-            auto &Po_e             = Player_origs[eid];
+            auto &Po_v = Player_origs[vid];
+            auto &Po_e = Player_origs[eid];
             if (Po_v.z != 0 && Po_e.z != 0)
                 if (Po_v.DistTo(Po_e) > 250)
                 {

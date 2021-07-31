@@ -50,7 +50,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
             for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
             {
                 player_info_s player_info;
-                if (g_IEngine->GetPlayerInfo(i, &player_info))
+                if (GetPlayerInfo(i, &player_info))
                     player_names[player_info.name] = i;
             }
         }
@@ -62,35 +62,38 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
         for (auto &name : names_array)
         {
             player_info_s pinfo;
-            if (player_names[name] != 0 && g_IEngine->GetPlayerInfo(player_names[name], &pinfo))
+            if (player_names[name] != 0 && GetPlayerInfo(player_names[name], &pinfo))
                 displayed_players.push_back(pinfo);
         }
 
         if (sort_names)
         {
             // Sort by state so we display the most important color
-            std::sort(displayed_players.begin(), displayed_players.end(), [](player_info_s a, player_info_s b) {
-                auto a_data = playerlist::AccessData(a.friendsID);
-                auto b_data = playerlist::AccessData(b.friendsID);
+            std::sort(displayed_players.begin(), displayed_players.end(),
+                      [](player_info_s a, player_info_s b)
+                      {
+                          auto a_data = playerlist::AccessData(a.friendsID);
+                          auto b_data = playerlist::AccessData(b.friendsID);
 
-                // Function to get priority of a state, RAGE > CAT/FRIEND > DEFAULT
-                static auto getPriority = [](playerlist::k_EState state) {
-                    switch (state)
-                    {
-                    case playerlist::k_EState::DEFAULT:
-                        return 0;
-                    case playerlist::k_EState::CAT:
-                    case playerlist::k_EState::FRIEND:
-                        return 2;
-                    case playerlist::k_EState::RAGE:
-                        return 3;
-                    default:
-                        return 1;
-                    }
-                };
+                          // Function to get priority of a state, RAGE > CAT/FRIEND > DEFAULT
+                          static auto getPriority = [](playerlist::k_EState state)
+                          {
+                              switch (state)
+                              {
+                              case playerlist::k_EState::DEFAULT:
+                                  return 0;
+                              case playerlist::k_EState::CAT:
+                              case playerlist::k_EState::FRIEND:
+                                  return 2;
+                              case playerlist::k_EState::RAGE:
+                                  return 3;
+                              default:
+                                  return 1;
+                              }
+                          };
 
-                return getPriority(a_data.state) > getPriority(b_data.state);
-            });
+                          return getPriority(a_data.state) > getPriority(b_data.state);
+                      });
         }
 
         if (!displayed_players.empty())
@@ -137,12 +140,14 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
     }
 }
 
-static InitRoutine init([] {
-    auto drawtext_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C A1 ? ? ? ? 8B 4D");
-    drawtext_detour.Init(drawtext_addr, (void *) DrawText_hook);
+static InitRoutine init(
+    []
+    {
+        auto drawtext_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C A1 ? ? ? ? 8B 4D");
+        drawtext_detour.Init(drawtext_addr, (void *) DrawText_hook);
 
-    EC::Register(
-        EC::Shutdown, []() { drawtext_detour.Shutdown(); }, "shutdown_kf");
-});
+        EC::Register(
+            EC::Shutdown, []() { drawtext_detour.Shutdown(); }, "shutdown_kf");
+    });
 } // namespace hacks::tf2::killfeed
 #endif

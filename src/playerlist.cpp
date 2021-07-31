@@ -246,41 +246,45 @@ bool ChangeState(CachedEntity *entity, k_EState state, bool force)
 CatCommand pl_save("pl_save", "Save playerlist", Save);
 CatCommand pl_load("pl_load", "Load playerlist", Load);
 
-CatCommand pl_print("pl_print", "Print current player list", [](const CCommand &args) {
-    userdata empty{};
-    bool include_all = args.ArgC() >= 2 && *args.Arg(1) == '1';
+CatCommand pl_print("pl_print", "Print current player list",
+                    [](const CCommand &args)
+                    {
+                        userdata empty{};
+                        bool include_all = args.ArgC() >= 2 && *args.Arg(1) == '1';
 
-    logging::Info("Known entries: %lu", data.size());
-    for (auto it = data.begin(); it != data.end(); ++it)
-    {
-        if (!include_all && !std::memcmp(&it->second, &empty, sizeof(empty)))
-            continue;
+                        logging::Info("Known entries: %lu", data.size());
+                        for (auto it = data.begin(); it != data.end(); ++it)
+                        {
+                            if (!include_all && !std::memcmp(&it->second, &empty, sizeof(empty)))
+                                continue;
 
-        const auto &ent = it->second;
+                            const auto &ent = it->second;
 #if ENABLE_VISUALS
-        logging::Info("%u -> %d (%f,%f,%f,%f) %f %u %u", it->first, ent.state, ent.color.r, ent.color.g, ent.color.b, ent.color.a, ent.inventory_value, ent.deaths_to, ent.kills);
+                            logging::Info("%u -> %d (%f,%f,%f,%f) %f %u %u", it->first, ent.state, ent.color.r, ent.color.g, ent.color.b, ent.color.a, ent.inventory_value, ent.deaths_to, ent.kills);
 #else
         logging::Info("%u -> %d %f %u %u", it->first, ent.state,
             ent.inventory_value, ent.deaths_to, ent.kills);
 #endif
-    }
-});
+                        }
+                    });
 
-CatCommand pl_add_id("pl_add_id", "Sets state for steamid", [](const CCommand &args) {
-    if (args.ArgC() <= 2)
-        return;
+CatCommand pl_add_id("pl_add_id", "Sets state for steamid",
+                     [](const CCommand &args)
+                     {
+                         if (args.ArgC() <= 2)
+                             return;
 
-    uint32_t id       = std::strtoul(args.Arg(1), nullptr, 10);
-    const char *state = args.Arg(2);
-    for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
-        if (k_Names[i] == state)
-        {
-            AccessData(id).state = k_EState(i);
-            return;
-        }
+                         uint32_t id       = std::strtoul(args.Arg(1), nullptr, 10);
+                         const char *state = args.Arg(2);
+                         for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
+                             if (k_Names[i] == state)
+                             {
+                                 AccessData(id).state = k_EState(i);
+                                 return;
+                             }
 
-    logging::Info("Unknown State");
-});
+                         logging::Info("Unknown State");
+                     });
 
 static void pl_cleanup()
 {
@@ -301,47 +305,49 @@ static void pl_cleanup()
 
 CatCommand pl_clean("pl_clean", "Removes empty entries to reduce RAM usage", pl_cleanup);
 
-CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (Tab to autocomplete)", [](const CCommand &args) {
-    if (args.ArgC() != 3)
-    {
-        logging::Info("Invalid call");
-        return;
-    }
-    auto name = args.Arg(1);
-    int id    = -1;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        player_info_s info;
-        if (!g_IEngine->GetPlayerInfo(i, &info))
-            continue;
-        std::string currname(info.name);
-        std::replace(currname.begin(), currname.end(), ' ', '-');
-        std::replace_if(
-            currname.begin(), currname.end(), [](char x) { return !isprint(x); }, '*');
-        if (currname.find(name) != 0)
-            continue;
-        id = i;
-        break;
-    }
-    if (id == -1)
-    {
-        logging::Info("Unknown Player Name. (Use tab for autocomplete)");
-        return;
-    }
-    std::string state = args.Arg(2);
-    boost::to_upper(state);
-    player_info_s info;
-    g_IEngine->GetPlayerInfo(id, &info);
+CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (Tab to autocomplete)",
+                        [](const CCommand &args)
+                        {
+                            if (args.ArgC() != 3)
+                            {
+                                logging::Info("Invalid call");
+                                return;
+                            }
+                            auto name = args.Arg(1);
+                            int id    = -1;
+                            for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+                            {
+                                player_info_s info;
+                                if (!GetPlayerInfo(i, &info))
+                                    continue;
+                                std::string currname(info.name);
+                                std::replace(currname.begin(), currname.end(), ' ', '-');
+                                std::replace_if(
+                                    currname.begin(), currname.end(), [](char x) { return !isprint(x); }, '*');
+                                if (currname.find(name) != 0)
+                                    continue;
+                                id = i;
+                                break;
+                            }
+                            if (id == -1)
+                            {
+                                logging::Info("Unknown Player Name. (Use tab for autocomplete)");
+                                return;
+                            }
+                            std::string state = args.Arg(2);
+                            boost::to_upper(state);
+                            player_info_s info;
+                            GetPlayerInfo(id, &info);
 
-    for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
-        if (k_Names[i] == state)
-        {
-            AccessData(info.friendsID).state = k_EState(i);
-            return;
-        }
+                            for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
+                                if (k_Names[i] == state)
+                                {
+                                    AccessData(info.friendsID).state = k_EState(i);
+                                    return;
+                                }
 
-    logging::Info("Unknown State %s. (Use tab for autocomplete)", state.c_str());
-});
+                            logging::Info("Unknown State %s. (Use tab for autocomplete)", state.c_str());
+                        });
 
 static int cat_pl_set_state_completionCallback(const char *c_partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])
 {
@@ -374,7 +380,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
     for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
     {
         player_info_s info;
-        if (!g_IEngine->GetPlayerInfo(i, &info))
+        if (!GetPlayerInfo(i, &info))
             continue;
         std::string name(info.name);
         std::replace(name.begin(), name.end(), ' ', '-');
@@ -411,53 +417,59 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 }
 
 #if ENABLE_VISUALS
-CatCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b", [](const CCommand &args) {
-    if (args.ArgC() < 5)
-    {
-        logging::Info("Invalid call");
-        return;
-    }
-    unsigned steamid          = strtoul(args.Arg(1), nullptr, 10);
-    int r                     = strtol(args.Arg(2), nullptr, 10);
-    int g                     = strtol(args.Arg(3), nullptr, 10);
-    int b                     = strtol(args.Arg(4), nullptr, 10);
-    rgba_t color              = colors::FromRGBA8(r, g, b, 255);
-    AccessData(steamid).color = color;
-    logging::Info("Changed %d's color", steamid);
-});
+CatCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b",
+                        [](const CCommand &args)
+                        {
+                            if (args.ArgC() < 5)
+                            {
+                                logging::Info("Invalid call");
+                                return;
+                            }
+                            unsigned steamid          = strtoul(args.Arg(1), nullptr, 10);
+                            int r                     = strtol(args.Arg(2), nullptr, 10);
+                            int g                     = strtol(args.Arg(3), nullptr, 10);
+                            int b                     = strtol(args.Arg(4), nullptr, 10);
+                            rgba_t color              = colors::FromRGBA8(r, g, b, 255);
+                            AccessData(steamid).color = color;
+                            logging::Info("Changed %d's color", steamid);
+                        });
 #endif
-CatCommand pl_info("pl_info", "pl_info uniqueid", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        logging::Info("Invalid call");
-        return;
-    }
-    unsigned steamid;
-    try
-    {
-        steamid = strtoul(args.Arg(1), nullptr, 10);
-    }
-    catch (const std::invalid_argument &)
-    {
-        return;
-    }
-    auto &pl = AccessData(steamid);
-    const char *str_state;
-    if (pl.state < k_EState::STATE_FIRST || pl.state > k_EState::STATE_LAST)
-        str_state = "UNKNOWN";
-    else
-        str_state = k_pszNames[int(pl.state)];
+CatCommand pl_info("pl_info", "pl_info uniqueid",
+                   [](const CCommand &args)
+                   {
+                       if (args.ArgC() < 2)
+                       {
+                           logging::Info("Invalid call");
+                           return;
+                       }
+                       unsigned steamid;
+                       try
+                       {
+                           steamid = strtoul(args.Arg(1), nullptr, 10);
+                       }
+                       catch (const std::invalid_argument &)
+                       {
+                           return;
+                       }
+                       auto &pl = AccessData(steamid);
+                       const char *str_state;
+                       if (pl.state < k_EState::STATE_FIRST || pl.state > k_EState::STATE_LAST)
+                           str_state = "UNKNOWN";
+                       else
+                           str_state = k_pszNames[int(pl.state)];
 
-    logging::Info("Data for %i: ", steamid);
-    logging::Info("State: %i %s", pl.state, str_state);
-    /*int clr = AccessData(steamid).color;
-    if (clr) {
-        ConColorMsg(*reinterpret_cast<::Color*>(&clr), "[CUSTOM COLOR]\n");
-    }*/
-});
+                       logging::Info("Data for %i: ", steamid);
+                       logging::Info("State: %i %s", pl.state, str_state);
+                       /*int clr = AccessData(steamid).color;
+                       if (clr) {
+                           ConColorMsg(*reinterpret_cast<::Color*>(&clr), "[CUSTOM COLOR]\n");
+                       }*/
+                   });
 
-static InitRoutine init([]() {
-    pl_set_state.cmd->m_bHasCompletionCallback = true;
-    pl_set_state.cmd->m_fnCompletionCallback   = cat_pl_set_state_completionCallback;
-});
+static InitRoutine init(
+    []()
+    {
+        pl_set_state.cmd->m_bHasCompletionCallback = true;
+        pl_set_state.cmd->m_fnCompletionCallback   = cat_pl_set_state_completionCallback;
+    });
 } // namespace playerlist

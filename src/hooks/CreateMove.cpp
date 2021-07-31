@@ -42,8 +42,8 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
     void **predictionVtable  = *((void ***) g_IPrediction);
-    SetupMoveFn oSetupMove   = (SetupMoveFn)(*(unsigned *) (predictionVtable + 19));
-    FinishMoveFn oFinishMove = (FinishMoveFn)(*(unsigned *) (predictionVtable + 20));
+    SetupMoveFn oSetupMove   = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
+    FinishMoveFn oFinishMove = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
     // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
     // 0x1F69C0C);  CMoveData movedata {};
     auto object          = std::make_unique<char[]>(165);
@@ -200,20 +200,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
 
-    INetChannel *ch;
-    ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-    if (ch && !hooks::netchannel.IsHooked((void *) ch))
-    {
-        hooks::netchannel.Set(ch);
-        hooks::netchannel.HookMethod(HOOK_ARGS(SendDatagram));
-        hooks::netchannel.HookMethod(HOOK_ARGS(CanPacket));
-        hooks::netchannel.HookMethod(HOOK_ARGS(SendNetMsg));
-        hooks::netchannel.HookMethod(HOOK_ARGS(Shutdown));
-        hooks::netchannel.Apply();
-#if ENABLE_IPC
-        ipc::UpdateServerAddress();
-#endif
-    }
     if (*fuckmode)
     {
         static int prevbuttons = 0;

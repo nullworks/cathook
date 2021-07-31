@@ -346,28 +346,30 @@ void DoResistSwitching()
 
 unsigned int steamid = 0;
 
-static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with SteamID", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        logging::Info("Invalid call!");
-        steam_var = 0;
-        return;
-    }
-    if (strtol(args.Arg(1), nullptr, 10) == 0x0)
-    {
-        steam_var = 0;
-        return;
-    }
-    try
-    {
-        steam_var = std::stoul(args.Arg(1));
-    }
-    catch (const std::invalid_argument &)
-    {
-        logging::Info("Invalid steamid! Setting current to null.");
-        steam_var = 0;
-    }
-});
+static CatCommand heal_steamid("autoheal_heal_steamid", "Heals a player with SteamID",
+                               [](const CCommand &args)
+                               {
+                                   if (args.ArgC() < 2)
+                                   {
+                                       logging::Info("Invalid call!");
+                                       steam_var = 0;
+                                       return;
+                                   }
+                                   if (strtol(args.Arg(1), nullptr, 10) == 0x0)
+                                   {
+                                       steam_var = 0;
+                                       return;
+                                   }
+                                   try
+                                   {
+                                       steam_var = std::stoul(args.Arg(1));
+                                   }
+                                   catch (const std::invalid_argument &)
+                                   {
+                                       logging::Info("Invalid steamid! Setting current to null.");
+                                       steam_var = 0;
+                                   }
+                               });
 
 static CatCommand vaccinator_bullet("vacc_bullet", "Bullet Vaccinator", []() { SetResistance(0); });
 static CatCommand vaccinator_blast("vacc_blast", "Blast Vaccinator", []() { SetResistance(1); });
@@ -475,7 +477,7 @@ bool CanHeal(int idx)
     // Already healing, no need to check
     if (idx == HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)))
         return true;
-    
+
     CachedEntity *ent = ENTITY(idx);
     if (!ent)
         return false;
@@ -576,7 +578,7 @@ int HealingPriority(int idx)
     }
 #endif
     /*    player_info_s info;
-        g_IEngine->GetPlayerInfo(idx, &info);
+        GetPlayerInfo(idx, &info);
         info.name[31] = 0;
         if (strcasestr(info.name, ignore.GetString()))
             priority = 0.0f;*/
@@ -721,9 +723,11 @@ void rvarCallback(settings::VariableBase<int> &var, int after)
 
 // void LevelInit(){}
 
-static InitRoutine Init([]() {
-    steam_var.installChangeCallback(rvarCallback);
-    EC::Register(EC::CreateMove, CreateMove, "autoheal", EC::average);
-    // EC::Register(EC::LevelInit, LevelInit, "autoheal_lvlinit", EC::average);
-});
+static InitRoutine Init(
+    []()
+    {
+        steam_var.installChangeCallback(rvarCallback);
+        EC::Register(EC::CreateMove, CreateMove, "autoheal", EC::average);
+        // EC::Register(EC::LevelInit, LevelInit, "autoheal_lvlinit", EC::average);
+    });
 } // namespace hacks::tf::autoheal

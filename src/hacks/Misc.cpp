@@ -354,7 +354,7 @@ void Draw()
             // Assign the for loops tick number to an ent
             CachedEntity *ent = ENTITY(i);
             player_info_s info;
-            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && g_IEngine->GetPlayerInfo(i, &info))
+            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
                 rgba_t color      = colors::green;
@@ -743,7 +743,7 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
     }
 
     player_info_s pinfo;
-    if (g_IEngine->GetPlayerInfo(idx, &pinfo))
+    if (GetPlayerInfo(idx, &pinfo))
     {
         rgba_t cust = playerlist::Color(pinfo.friendsID);
         if (cust != colors::empty)

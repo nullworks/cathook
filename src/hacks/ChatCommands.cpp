@@ -83,10 +83,10 @@ void handleChatMessage(std::string message, int senderid)
     for (auto cmd : ccmd->second.getCommands())
     {
         player_info_s localinfo{};
-        if (!g_IEngine->GetPlayerInfo(g_pLocalPlayer->entity_idx, &localinfo))
+        if (!GetPlayerInfo(g_pLocalPlayer->entity_idx, &localinfo))
             return;
         player_info_s senderinfo{};
-        if (!g_IEngine->GetPlayerInfo(senderid, &senderinfo))
+        if (!GetPlayerInfo(senderid, &senderinfo))
             return;
 
         ReplaceString(cmd, "%myname%", std::string(localinfo.name));
@@ -97,53 +97,59 @@ void handleChatMessage(std::string message, int senderid)
     }
 }
 
-static CatCommand chatcommands_add("chatcommands_add", "chatcommands_add <chat command> <command>", [](const CCommand &args) {
-    if (args.ArgC() != 3)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "usage: chatcommands_add <chat command> <command>\n");
-        return;
-    }
-    std::string prefix = args.Arg(1);
-    if (prefix.find(' ') != prefix.npos)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "The chat command mustn't contain spaces!\n");
-        return;
-    }
-    std::string command = args.Arg(2);
+static CatCommand chatcommands_add("chatcommands_add", "chatcommands_add <chat command> <command>",
+                                   [](const CCommand &args)
+                                   {
+                                       if (args.ArgC() != 3)
+                                       {
+                                           g_ICvar->ConsoleColorPrintf(MENU_COLOR, "usage: chatcommands_add <chat command> <command>\n");
+                                           return;
+                                       }
+                                       std::string prefix = args.Arg(1);
+                                       if (prefix.find(' ') != prefix.npos)
+                                       {
+                                           g_ICvar->ConsoleColorPrintf(MENU_COLOR, "The chat command mustn't contain spaces!\n");
+                                           return;
+                                       }
+                                       std::string command = args.Arg(2);
 
-    auto &chatcommand = commands[prefix];
+                                       auto &chatcommand = commands[prefix];
 
-    logging::Info("%s: %s", prefix.c_str(), command.c_str());
-    chatcommand.addcommand(command);
-});
+                                       logging::Info("%s: %s", prefix.c_str(), command.c_str());
+                                       chatcommand.addcommand(command);
+                                   });
 
-static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>", [](const CCommand &args) {
-    if (args.ArgC() != 3)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, ("usage: chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>\n").c_str());
-        return;
-    }
-    std::string prefix = args.Arg(1);
-    if (prefix.find(' ') != prefix.npos)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "The chat command mustn't contain spaces!\n");
-        return;
-    }
-    std::string file = args.Arg(2);
+static CatCommand chatcommands_file("chatcommands_file", "chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>",
+                                    [](const CCommand &args)
+                                    {
+                                        if (args.ArgC() != 3)
+                                        {
+                                            g_ICvar->ConsoleColorPrintf(MENU_COLOR, ("usage: chatcommands_add <chat command> <filename in " + paths::getDataPath() + "/chatcommands>\n").c_str());
+                                            return;
+                                        }
+                                        std::string prefix = args.Arg(1);
+                                        if (prefix.find(' ') != prefix.npos)
+                                        {
+                                            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "The chat command mustn't contain spaces!\n");
+                                            return;
+                                        }
+                                        std::string file = args.Arg(2);
 
-    auto &chatcommand = commands[prefix];
+                                        auto &chatcommand = commands[prefix];
 
-    if (!chatcommand.readFile(file))
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Couldn't open the file!\n");
-        return;
-    }
-    logging::Info("%s: %s", prefix.c_str(), file.c_str());
-});
+                                        if (!chatcommand.readFile(file))
+                                        {
+                                            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Couldn't open the file!\n");
+                                            return;
+                                        }
+                                        logging::Info("%s: %s", prefix.c_str(), file.c_str());
+                                    });
 
-static CatCommand chatcommands_reset_all("chatcommands_reset_all", "Clears all chatcommands", [](const CCommand &args) {
-    commands.clear();
-    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Chat commands cleared!\n");
-});
+static CatCommand chatcommands_reset_all("chatcommands_reset_all", "Clears all chatcommands",
+                                         [](const CCommand &args)
+                                         {
+                                             commands.clear();
+                                             g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Chat commands cleared!\n");
+                                         });
 
 } // namespace hacks::shared::ChatCommands

@@ -141,6 +141,19 @@ int TFPlayerResource::GetDamage(int idx)
         return 0;
     return *(int *) ((unsigned) ent + netvar.m_iDamage_Resource + 4 * idx);
 }
+
+unsigned TFPlayerResource::GetAccountID(int idx)
+{
+    IClientEntity *ent;
+
+    if (idx >= MAX_PLAYERS || idx < 1)
+        return 0;
+    ent = g_IEntityList->GetClientEntity(entity);
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+        return 0;
+    return *(unsigned *) ((unsigned) ent + netvar.m_iAccountID_Resource + 4 * idx);
+}
+
 int TFPlayerResource::GetPing(int idx)
 {
     IClientEntity *ent;

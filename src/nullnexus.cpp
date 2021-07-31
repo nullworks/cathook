@@ -62,7 +62,7 @@ void authedplayers(std::vector<std::string> steamids)
     for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
     {
         player_info_s pinfo{};
-        if (g_IEngine->GetPlayerInfo(i, &pinfo))
+        if (GetPlayerInfo(i, &pinfo))
         {
             if (pinfo.friendsID == 0)
                 continue;
@@ -74,16 +74,18 @@ void authedplayers(std::vector<std::string> steamids)
             for (auto i : result.bits)
                 ss << std::setw(2) << std::setfill('0') << (int) i;
             steamidhash = ss.str();
-            std::remove_if(steamids.begin(), steamids.end(), [&steamidhash, &pinfo](std::string &steamid) {
-                if (steamid == steamidhash)
-                {
-                    // Use actual steamid to set cat status
-                    if (playerlist::ChangeState(pinfo.friendsID, playerlist::k_EState::CAT))
-                        PrintChat("\x07%06X%s\x01 Marked as CAT (Nullnexus user)", 0xe05938, pinfo.name);
-                    return true;
-                }
-                return false;
-            });
+            std::remove_if(steamids.begin(), steamids.end(),
+                           [&steamidhash, &pinfo](std::string &steamid)
+                           {
+                               if (steamid == steamidhash)
+                               {
+                                   // Use actual steamid to set cat status
+                                   if (playerlist::ChangeState(pinfo.friendsID, playerlist::k_EState::CAT))
+                                       PrintChat("\x07%06X%s\x01 Marked as CAT (Nullnexus user)", 0xe05938, pinfo.name);
+                                   return true;
+                               }
+                               return false;
+                           });
         }
     }
 }
@@ -102,7 +104,7 @@ void updateServer(NullNexus::UserSettings &settings)
         if (!addr.IsReservedAdr())
         {
             player_info_s pinfo{};
-            if (g_IEngine->GetPlayerInfo(g_pLocalPlayer->entity_idx, &pinfo))
+            if (GetPlayerInfo(g_pLocalPlayer->entity_idx, &pinfo))
             {
                 MD5Value_t result;
                 std::string steamidhash = std::to_string(pinfo.friendsID) + pinfo.name;
@@ -167,9 +169,55 @@ bool sendmsg(std::string &msg)
 
 template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
 {
-    std::thread reload([]() {
-        std::this_thread::sleep_for(std::chrono_literals::operator""ms(500));
+    std::thread reload(
+        []()
+        {
+            std::this_thread::sleep_for(std::chrono_literals::operator""ms(500));
+            updateData();
+            if (*enabled)
+            {
+                if (*proxyenabled)
+                    nexus.connectunix(*proxysocket, *endpoint, true);
+                else
+                    nexus.connect(*address, *port, *endpoint, true);
+            }
+            else
+                nexus.disconnect();
+        });
+    reload.detach();
+}
+
+template <typename T> void rvarDataCallback(settings::VariableBase<T> &, T)
+{
+    std::thread reload(
+        []()
+        {
+            std::this_thread::sleep_for(std::chrono_literals::operator""ms(500));
+            updateData();
+        });
+    reload.detach();
+}
+
+static InitRoutine init(
+    []()
+    {
         updateData();
+        enabled.installChangeCallback(rvarCallback<bool>);
+        address.installChangeCallback(rvarCallback<std::string>);
+        port.installChangeCallback(rvarCallback<std::string>);
+        endpoint.installChangeCallback(rvarCallback<std::string>);
+
+        proxyenabled.installChangeCallback(rvarCallback<bool>);
+        proxysocket.installChangeCallback(rvarCallback<std::string>);
+
+#if ENABLE_VISUALS
+        colour.installChangeCallback(rvarDataCallback<rgba_t>);
+#endif
+        anon.installChangeCallback(rvarDataCallback<bool>);
+        authenticate.installChangeCallback(rvarDataCallback<bool>);
+
+        nexus.setHandlerChat(handlers::message);
+        nexus.setHandlerAuthedplayers(handlers::authedplayers);
         if (*enabled)
         {
             if (*proxyenabled)
@@ -177,57 +225,19 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
             else
                 nexus.connect(*address, *port, *endpoint, true);
         }
-        else
-            nexus.disconnect();
+
+        EC::Register(
+            EC::Shutdown, []() { nexus.disconnect(); }, "shutdown_nullnexus");
+        EC::Register(
+            EC::FirstCM, []() { updateServer(); }, "firstcm_nullnexus");
+        EC::Register(
+            EC::LevelShutdown, []() { updateServer(); }, "firstcm_nullnexus");
     });
-    reload.detach();
-}
-
-template <typename T> void rvarDataCallback(settings::VariableBase<T> &, T)
-{
-    std::thread reload([]() {
-        std::this_thread::sleep_for(std::chrono_literals::operator""ms(500));
-        updateData();
-    });
-    reload.detach();
-}
-
-static InitRoutine init([]() {
-    updateData();
-    enabled.installChangeCallback(rvarCallback<bool>);
-    address.installChangeCallback(rvarCallback<std::string>);
-    port.installChangeCallback(rvarCallback<std::string>);
-    endpoint.installChangeCallback(rvarCallback<std::string>);
-
-    proxyenabled.installChangeCallback(rvarCallback<bool>);
-    proxysocket.installChangeCallback(rvarCallback<std::string>);
-
-#if ENABLE_VISUALS
-    colour.installChangeCallback(rvarDataCallback<rgba_t>);
-#endif
-    anon.installChangeCallback(rvarDataCallback<bool>);
-    authenticate.installChangeCallback(rvarDataCallback<bool>);
-
-    nexus.setHandlerChat(handlers::message);
-    nexus.setHandlerAuthedplayers(handlers::authedplayers);
-    if (*enabled)
-    {
-        if (*proxyenabled)
-            nexus.connectunix(*proxysocket, *endpoint, true);
-        else
-            nexus.connect(*address, *port, *endpoint, true);
-    }
-
-    EC::Register(
-        EC::Shutdown, []() { nexus.disconnect(); }, "shutdown_nullnexus");
-    EC::Register(
-        EC::FirstCM, []() { updateServer(); }, "firstcm_nullnexus");
-    EC::Register(
-        EC::LevelShutdown, []() { updateServer(); }, "firstcm_nullnexus");
-});
-static CatCommand nullnexus_send("nullnexus_send", "Send message to IRC", [](const CCommand &args) {
-    std::string msg(args.ArgS());
-    sendmsg(msg);
-});
+static CatCommand nullnexus_send("nullnexus_send", "Send message to IRC",
+                                 [](const CCommand &args)
+                                 {
+                                     std::string msg(args.ArgS());
+                                     sendmsg(msg);
+                                 });
 } // namespace nullnexus
 #endif

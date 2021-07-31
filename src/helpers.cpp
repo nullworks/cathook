@@ -1403,7 +1403,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
 /*const char* MakeInfoString(IClientEntity* player) {
     char* buf = new char[256]();
     player_info_t info;
-    if (!engineClient->GetPlayerInfo(player->entindex(), &info)) return (const
+    if (!GetPlayerInfo(player->entindex(), &info)) return (const
 char*)0; logging::Info("a"); int hWeapon = NET_INT(player,
 netvar.hActiveWeapon); if (NET_BYTE(player, netvar.iLifeState)) { sprintf(buf,
 "%s is dead %s", info.name, tfclasses[NET_INT(player, netvar.iClass)]); return
@@ -1945,6 +1945,16 @@ int SharedRandomInt(unsigned iseed, const char *sharedname, int iMinVal, int iMa
     int seed = SeedFileLineHash(iseed, sharedname, additionalSeed);
     g_pUniformStream->SetSeed(seed);
     return g_pUniformStream->RandomInt(iMinVal, iMaxVal);
+}
+
+bool GetPlayerInfo(int idx, player_info_s *info)
+{
+    bool res = g_IEngine->GetPlayerInfo(idx, info);
+    if (!res)
+        return res;
+    // Fix friends ID
+    info->friendsID = g_pPlayerResource->GetAccountID(idx);
+    return res;
 }
 
 bool HookNetvar(std::vector<std::string> path, ProxyFnHook &hook, RecvVarProxyFn function)

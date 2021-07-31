@@ -23,6 +23,7 @@ public:
     int GetDeaths(int idx);
     int GetLevel(int idx);
     int GetDamage(int idx);
+    unsigned GetAccountID(int idx);
 
     int GetPing(int idx);
     int getClass(int idx);

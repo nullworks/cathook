@@ -40,32 +40,36 @@ static settings::Boolean autozoom_if_idle{ "follow-bot.autozoom-if-idle", "true"
 static Timer navBotInterval{};
 static unsigned steamid = 0x0;
 
-static CatCommand follow_steam("fb_steam", "Follow Steam Id", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        steam_var = 0;
-        return;
-    }
-    try
-    {
-        steam_var = std::stoul(args.Arg(1));
-        logging::Info("Stored Steamid: %u", steamid);
-    }
-    catch (const std::invalid_argument &)
-    {
-        logging::Info("Invalid Argument! resetting steamid.");
-        steam_var = 0;
-        return;
-    }
-});
+static CatCommand follow_steam("fb_steam", "Follow Steam Id",
+                               [](const CCommand &args)
+                               {
+                                   if (args.ArgC() < 2)
+                                   {
+                                       steam_var = 0;
+                                       return;
+                                   }
+                                   try
+                                   {
+                                       steam_var = std::stoul(args.Arg(1));
+                                       logging::Info("Stored Steamid: %u", steamid);
+                                   }
+                                   catch (const std::invalid_argument &)
+                                   {
+                                       logging::Info("Invalid Argument! resetting steamid.");
+                                       steam_var = 0;
+                                       return;
+                                   }
+                               });
 
-static CatCommand steam_debug("debug_steamid", "Print steamids", []() {
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        auto ent = ENTITY(i);
-        logging::Info("%u", ent->player_info.friendsID);
-    }
-});
+static CatCommand steam_debug("debug_steamid", "Print steamids",
+                              []()
+                              {
+                                  for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+                                  {
+                                      auto ent = ENTITY(i);
+                                      logging::Info("%u", ent->player_info.friendsID);
+                                  }
+                              });
 
 // Something to store breadcrumbs created by followed players
 static std::vector<Vector> breadcrumbs;
@@ -716,38 +720,40 @@ bool isEnabled()
 }
 
 #if ENABLE_IPC
-static CatCommand follow_me("fb_follow_me", "IPC connected bots will follow you", []() {
-    if (!ipc::peer)
-    {
-        logging::Info("IPC isnt connected");
-        return;
-    }
-    auto local_ent = LOCAL_E;
-    if (!local_ent)
-    {
-        logging::Info("Cant get a local player");
-        return;
-    }
-    player_info_s info;
-    g_IEngine->GetPlayerInfo(local_ent->m_IDX, &info);
-    auto steam_id = info.friendsID;
-    if (!steam_id)
-    {
-        logging::Info("Cant get steam-id, the game module probably doesnt "
-                      "support it.");
-        return;
-    }
-    // Construct the command
-    std::string tmp = CON_PREFIX + follow_steam.name + " " + std::to_string(steam_id);
-    if (tmp.length() >= 63)
-    {
-        ipc::peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, tmp.c_str(), tmp.length() + 1);
-    }
-    else
-    {
-        ipc::peer->SendMessage(tmp.c_str(), -1, ipc::commands::execute_client_cmd, 0, 0);
-    }
-});
+static CatCommand follow_me("fb_follow_me", "IPC connected bots will follow you",
+                            []()
+                            {
+                                if (!ipc::peer)
+                                {
+                                    logging::Info("IPC isnt connected");
+                                    return;
+                                }
+                                auto local_ent = LOCAL_E;
+                                if (!local_ent)
+                                {
+                                    logging::Info("Cant get a local player");
+                                    return;
+                                }
+                                player_info_s info;
+                                GetPlayerInfo(local_ent->m_IDX, &info);
+                                auto steam_id = info.friendsID;
+                                if (!steam_id)
+                                {
+                                    logging::Info("Cant get steam-id, the game module probably doesnt "
+                                                  "support it.");
+                                    return;
+                                }
+                                // Construct the command
+                                std::string tmp = CON_PREFIX + follow_steam.name + " " + std::to_string(steam_id);
+                                if (tmp.length() >= 63)
+                                {
+                                    ipc::peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, tmp.c_str(), tmp.length() + 1);
+                                }
+                                else
+                                {
+                                    ipc::peer->SendMessage(tmp.c_str(), -1, ipc::commands::execute_client_cmd, 0, 0);
+                                }
+                            });
 #endif
 void rvarCallback(settings::VariableBase<int> &var, int after)
 {
@@ -756,11 +762,13 @@ void rvarCallback(settings::VariableBase<int> &var, int after)
     steamid = after;
 }
 
-static InitRoutine runinit([]() {
-    EC::Register(EC::CreateMove_NoEnginePred, cm, "cm_followbot", EC::average);
+static InitRoutine runinit(
+    []()
+    {
+        EC::Register(EC::CreateMove_NoEnginePred, cm, "cm_followbot", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, draw, "draw_followbot", EC::average);
+        EC::Register(EC::Draw, draw, "draw_followbot", EC::average);
 #endif
-    steam_var.installChangeCallback(rvarCallback);
-});
+        steam_var.installChangeCallback(rvarCallback);
+    });
 } // namespace hacks::shared::followbot

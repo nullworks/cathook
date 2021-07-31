@@ -6,13 +6,16 @@
 #include <settings/String.hpp>
 #include "HookedMethods.hpp"
 #include "PlayerTools.hpp"
+#include "SteamIDStealer.hpp"
 
 static settings::String ipc_name{ "name.ipc", "" };
 settings::String force_name{ "name.custom", "" };
 std::string name_forced = "";
 static settings::Int namesteal{ "name.namesteal", "0" };
+static settings::Boolean namesteal_reconnect("name.namesteal.reconnect", "true");
 
 static std::string stolen_name;
+static unsigned stolen_target;
 
 int getRng(int min, int max)
 {
@@ -28,7 +31,6 @@ int getRng(int min, int max)
 // been found
 bool StolenName()
 {
-
     // Array to store potential namestealer targets with a bookkeeper to tell
     // how full it is
     int potential_targets[MAX_PLAYERS];
@@ -37,20 +39,15 @@ bool StolenName()
     // Go through entities looking for potential targets
     for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
-        CachedEntity *ent = ENTITY(i);
-
         // Check if ent is a good target
-        if (!ent)
+        if (i == g_pLocalPlayer->entity_idx)
             continue;
-        if (ent == LOCAL_E)
+        if (g_pPlayerResource->GetTeam(i) != g_pLocalPlayer->team)
             continue;
-        if (ent->m_Type() != ENTITY_PLAYER)
-            continue;
-        if (ent->m_bEnemy())
-            continue;
+
         // Check if name is current one
         player_info_s info;
-        if (g_IEngine->GetPlayerInfo(ent->m_IDX, &info))
+        if (GetPlayerInfo(i, &info))
         {
             // Should be ignored
             if (!player_tools::shouldTargetSteamId(info.friendsID))
@@ -64,10 +61,9 @@ bool StolenName()
             // If our name is the same as current, then change it
             if (stolen_name == info.name && *namesteal == 1)
                 return true;
-
-            // a ent without a name is no ent we need, contine for a different
-            // one
         }
+        // a ent without a name is no ent we need, contine for a different
+        // one
         else
             continue;
 
@@ -92,17 +88,21 @@ bool StolenName()
 
     // Grab username of user
     player_info_s info;
-    if (g_IEngine->GetPlayerInfo(new_target, &info))
+    if (GetPlayerInfo(new_target, &info))
     {
-
         // If our name is the same as current, than change it and return true
-        stolen_name = std::string(info.name);
+        stolen_name   = std::string(info.name);
+        stolen_target = info.friendsID;
+        hacks::tf2::steamidstealer::SetSteamID(hacks::tf2::steamidstealer::IDStorage(stolen_target, "namestealer"));
         return true;
     }
 
     // Didnt get playerinfo
     return false;
 }
+
+// Used to reconnect after changing name
+static bool has_changed = false;
 
 std::string GetNamestealName(CSteamID steam_id)
 {
@@ -118,15 +118,19 @@ std::string GetNamestealName(CSteamID steam_id)
         if (g_IEngine->IsInGame() && g_pLocalPlayer->team)
         {
 
+            std::string previous_name = stolen_name;
             // Check if we have a username to steal, func automaticly steals a
             // name in it.
-            if (StolenName())
-            {
+            StolenName();
 
+            has_changed = stolen_name != previous_name;
+
+            if (stolen_name != "")
                 // Return the name that has changed from the func above
                 return format(stolen_name, "\e");
-            }
         }
+        else if (stolen_name != "")
+            return format(stolen_name, "\e");
     }
 
 #if ENABLE_IPC
@@ -172,31 +176,49 @@ DEFINE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *this_, C
 }
 
 std::string netvar_name;
-static InitRoutine init([]() {
-    namesteal.installChangeCallback([](settings::VariableBase<int> &var, int new_val) {
-        if (new_val != 0)
-        {
-            std::string new_name = GetNamestealName(g_ISteamUser->GetSteamID());
-            if (CE_BAD(LOCAL_E) || new_name.empty() || !strcmp(LOCAL_E->player_info.name, new_name.c_str()))
-                return;
-            netvar_name = std::move(new_name);
-            NET_SetConVar setname("name", netvar_name.c_str());
-            INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
-            if (ch)
+static InitRoutine init(
+    []()
+    {
+        namesteal.installChangeCallback(
+            [](settings::VariableBase<int> &, int new_val)
             {
-                setname.SetNetChannel(ch);
-                setname.SetReliable(false);
-                ch->SendNetMsg(setname, false);
-            }
-        }
+                if (new_val != 0)
+                {
+                    std::string new_name = GetNamestealName(g_ISteamUser->GetSteamID());
+                    if (CE_BAD(LOCAL_E) || new_name.empty() || !strcmp(LOCAL_E->player_info.name, new_name.c_str()))
+                        return;
+                    netvar_name = std::move(new_name);
+                    NET_SetConVar setname("name", netvar_name.c_str());
+                    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                    if (ch)
+                    {
+                        setname.SetNetChannel(ch);
+                        setname.SetReliable(false);
+                        ch->SendNetMsg(setname, false);
+                    }
+                }
+                // Reset steamid stealer
+                else
+                {
+                    hacks::tf2::steamidstealer::SetSteamID(std::nullopt);
+                }
+            });
     });
-});
 static Timer set_name{};
+static Timer reconnect{};
 static void cm()
 {
     if (!namesteal)
         return;
-    if (!set_name.test_and_set(300000))
+    // Reconnect after name change
+    if (has_changed && reconnect.test_and_set(120000) && namesteal_reconnect)
+    {
+        has_changed = false;
+        // Only passive should reconnect
+        if (*namesteal == 1)
+            g_IEngine->ClientCmd_Unrestricted("retry");
+    }
+    if (!set_name.test_and_set(30000))
         return;
     std::string new_name = GetNamestealName(g_ISteamUser->GetSteamID());
     if (CE_BAD(LOCAL_E) || new_name.empty())
@@ -207,6 +229,7 @@ static void cm()
         set_name.last -= std::chrono::seconds(170);
         return;
     }
+    has_changed = true;
     netvar_name = std::move(new_name);
     NET_SetConVar setname("name", netvar_name.c_str());
     INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();

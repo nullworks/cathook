@@ -87,7 +87,7 @@ void draw()
                 steamidarray[2] = 840255344;
                 steamidarray[3] = 147831332;
                 steamidarray[4] = 854198748;
-                if (g_IEngine->GetPlayerInfo(pEntity->m_IDX, &info))
+                if (GetPlayerInfo(pEntity->m_IDX, &info))
                     steamID = info.friendsID;
                 if (playerlist::AccessData(steamID).state == playerlist::k_EState::CAT)
                     draw::RectangleTextured(out.x - size / 2, out.y - size / 2, size, size, colors::white, idspec, 2 * 64, 1 * 64, 64, 64, 0);
@@ -119,12 +119,14 @@ void draw()
     }
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, cm, "cm_headesp", EC::average);
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, cm, "cm_headesp", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, draw, "draw_headesp", EC::average);
+        EC::Register(EC::Draw, draw, "draw_headesp", EC::average);
 #endif
-});
+    });
 
 } // namespace hacks::shared::headesp
 #endif

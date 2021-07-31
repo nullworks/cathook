@@ -948,7 +948,6 @@ void SendNetMessage(INetMessage &msg)
 {
     if (!enabled)
         return;
-
     // Credits to MrSteyk for this btw
     if (msg.GetGroup() == INetChannelInfo::MOVE)
     {
@@ -1047,7 +1046,7 @@ public:
         player_info_s vinfo{};
 
         // Check if both are valid (Attacker & victim)
-        if (IDX_BAD(attacker_idx) || IDX_BAD(victim_idx) || !g_IEngine->GetPlayerInfo(attacker_idx, &vinfo) || !g_IEngine->GetPlayerInfo(victim_idx, &kinfo))
+        if (IDX_BAD(attacker_idx) || IDX_BAD(victim_idx) || !GetPlayerInfo(attacker_idx, &vinfo) || !GetPlayerInfo(victim_idx, &kinfo))
             return;
         // Check if victim is local player
         if (victim_idx != g_pLocalPlayer->entity_idx)
@@ -1083,30 +1082,33 @@ void rvarCallback(settings::VariableBase<bool> &, bool)
         yaw_selections.push_back(90.0f);
 }
 
-static InitRoutine init([]() {
-    static auto cl_move_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC 9C 00 00 00 83 3D ? ? ? ? 01");
-    cl_move_detour.Init(cl_move_addr, (void *) CL_Move_hook);
+static InitRoutine init(
+    []()
+    {
+        static auto cl_move_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC 9C 00 00 00 83 3D ? ? ? ? 01");
+        cl_move_detour.Init(cl_move_addr, (void *) CL_Move_hook);
 
-    EC::Register(EC::LevelShutdown, LevelShutdown, "warp_levelshutdown");
-    EC::Register(EC::CreateMove, CreateMove, "warp_createmove", EC::very_late);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "warp_createmovew", EC::very_late);
-    EC::Register(EC::CreateMove_NoEnginePred, CreateMovePrePredict, "warp_prepredict");
-    EC::Register(EC::CreateMoveEarly, CreateMoveEarly, "warp_createmove_early", EC::very_early);
-    g_IEventManager2->AddListener(&listener, "player_hurt", false);
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            g_IEventManager2->RemoveListener(&listener);
-            cl_move_detour.Shutdown();
-        },
-        "warp_shutdown");
-    warp_forward.installChangeCallback(rvarCallback);
-    warp_backwards.installChangeCallback(rvarCallback);
-    warp_left.installChangeCallback(rvarCallback);
-    warp_right.installChangeCallback(rvarCallback);
+        EC::Register(EC::LevelShutdown, LevelShutdown, "warp_levelshutdown");
+        EC::Register(EC::CreateMove, CreateMove, "warp_createmove", EC::very_late);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "warp_createmovew", EC::very_late);
+        EC::Register(EC::CreateMove_NoEnginePred, CreateMovePrePredict, "warp_prepredict");
+        EC::Register(EC::CreateMoveEarly, CreateMoveEarly, "warp_createmove_early", EC::very_early);
+        g_IEventManager2->AddListener(&listener, "player_hurt", false);
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                g_IEventManager2->RemoveListener(&listener);
+                cl_move_detour.Shutdown();
+            },
+            "warp_shutdown");
+        warp_forward.installChangeCallback(rvarCallback);
+        warp_backwards.installChangeCallback(rvarCallback);
+        warp_left.installChangeCallback(rvarCallback);
+        warp_right.installChangeCallback(rvarCallback);
 
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "warp_draw");
+        EC::Register(EC::Draw, Draw, "warp_draw");
 #endif
-});
+    });
 } // namespace hacks::tf2::warp

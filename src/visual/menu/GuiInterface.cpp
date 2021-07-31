@@ -22,7 +22,7 @@ static zerokernel::special::PlayerListData createPlayerListData(int userid)
     zerokernel::special::PlayerListData data{};
     auto idx = g_IEngine->GetPlayerForUserID(userid);
     player_info_s info{};
-    g_IEngine->GetPlayerInfo(idx, &info);
+    GetPlayerInfo(idx, &info);
     data.classId = g_pPlayerResource->getClass(idx);
     data.teamId  = g_pPlayerResource->getTeam(idx) - 1;
     data.dead    = !g_pPlayerResource->isAlive(idx);
@@ -39,25 +39,29 @@ static void initPlayerlist()
     {
         controller = std::make_unique<zerokernel::special::PlayerListController>(*pl);
         controller->setKickButtonCallback([](int uid) { hack::command_stack().push(format("callvote kick ", uid)); });
-        controller->setOpenSteamCallback([](unsigned steam) {
-            CSteamID id{};
-            id.Set(steam, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
-            g_ISteamFriends->ActivateGameOverlayToUser("steamid", id);
-        });
-        controller->setChangeStateCallback([](unsigned steam, int userid) {
-            auto &pl = playerlist::AccessData(steam);
-            for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; i++)
+        controller->setOpenSteamCallback(
+            [](unsigned steam)
             {
-                if (pl.state == playerlist::k_arrGUIStates.at(i).first)
+                CSteamID id{};
+                id.Set(steam, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
+                g_ISteamFriends->ActivateGameOverlayToUser("steamid", id);
+            });
+        controller->setChangeStateCallback(
+            [](unsigned steam, int userid)
+            {
+                auto &pl = playerlist::AccessData(steam);
+                for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; i++)
                 {
-                    pl.state = playerlist::k_arrGUIStates.at(i + 1).first;
-                    controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
-                    return;
+                    if (pl.state == playerlist::k_arrGUIStates.at(i).first)
+                    {
+                        pl.state = playerlist::k_arrGUIStates.at(i + 1).first;
+                        controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
+                        return;
+                    }
                 }
-            }
-            pl.state = playerlist::k_arrGUIStates.front().first;
-            controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
-        });
+                pl.state = playerlist::k_arrGUIStates.front().first;
+                controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);
+            });
     }
     else
     {
@@ -70,7 +74,7 @@ void sortPList()
     for (auto i = 1; i <= MAX_PLAYERS; ++i)
     {
         player_info_s info{};
-        if (g_IEngine->GetPlayerInfo(i, &info))
+        if (GetPlayerInfo(i, &info))
         {
             auto idx = g_IEngine->GetPlayerForUserID(info.userID);
             if (g_pPlayerResource->getTeam(idx) == 2)
@@ -82,7 +86,7 @@ void sortPList()
     for (auto i = 1; i <= MAX_PLAYERS; ++i)
     {
         player_info_s info{};
-        if (g_IEngine->GetPlayerInfo(i, &info))
+        if (GetPlayerInfo(i, &info))
         {
             auto idx = g_IEngine->GetPlayerForUserID(info.userID);
             if (g_pPlayerResource->getTeam(idx) == 3)
@@ -94,7 +98,7 @@ void sortPList()
     for (auto i = 1; i <= MAX_PLAYERS; ++i)
     {
         player_info_s info{};
-        if (g_IEngine->GetPlayerInfo(i, &info))
+        if (GetPlayerInfo(i, &info))
         {
             auto idx = g_IEngine->GetPlayerForUserID(info.userID);
             if (g_pPlayerResource->getTeam(idx) != 2 && g_pPlayerResource->getTeam(idx) != 3)
@@ -172,7 +176,7 @@ static void load()
         list.construct();
         printf("SV found\n");
     }
-    
+
     zerokernel::Container *cl = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("cfg-list"));
     if (cl)
     {
@@ -180,7 +184,7 @@ static void load()
         list.construct();
         printf("CL found\n");
     }
-    
+
     initPlayerlist();
 
     zerokernel::Menu::instance->update();

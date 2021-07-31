@@ -205,6 +205,7 @@ public:
     offset_t m_iActiveDominations_Resource;
     offset_t m_flNextRespawnTime_Resource;
     offset_t m_iDamage_Resource;
+    offset_t m_iAccountID_Resource;
     offset_t m_iDamageAssist_Resource;
     offset_t m_iHealing_Resource;
     offset_t m_iHealingAssist_Resource;

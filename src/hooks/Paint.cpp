@@ -28,6 +28,21 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
     if (!g_IEngine->IsInGame())
         g_Settings.bInvalid = true;
 
+    INetChannel *ch;
+    ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    if (ch && !hooks::netchannel.IsHooked((void *) ch))
+    {
+        hooks::netchannel.Set(ch);
+        hooks::netchannel.HookMethod(HOOK_ARGS(SendDatagram));
+        hooks::netchannel.HookMethod(HOOK_ARGS(CanPacket));
+        hooks::netchannel.HookMethod(HOOK_ARGS(SendNetMsg));
+        hooks::netchannel.HookMethod(HOOK_ARGS(Shutdown));
+        hooks::netchannel.Apply();
+#if ENABLE_IPC
+        ipc::UpdateServerAddress();
+#endif
+    }
+
     if (mode & PaintMode_t::PAINT_UIPANELS)
     {
         hitrate::Update();

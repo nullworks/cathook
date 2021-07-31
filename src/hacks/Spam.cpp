@@ -75,7 +75,7 @@ bool PlayerPassesQuery(Query query, int idx)
         if (!(query.flags & static_cast<int>(QueryFlags::LOCALPLAYER)))
             return false;
     }
-    if (!g_IEngine->GetPlayerInfo(idx, &pinfo))
+    if (!GetPlayerInfo(idx, &pinfo))
         return false;
     CachedEntity *player = ENTITY(idx);
     if (!RAW_ENT(player))
@@ -214,7 +214,7 @@ bool SubstituteQueries(std::string &input)
         if (!p)
             return false;
         player_info_s pinfo;
-        if (!g_IEngine->GetPlayerInfo(p, &pinfo))
+        if (!GetPlayerInfo(p, &pinfo))
             return false;
         std::string name = std::string(pinfo.name);
         input.replace(index, 8 + closing, name);

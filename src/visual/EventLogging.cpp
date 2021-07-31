@@ -36,7 +36,7 @@ static void handlePlayerActivate(KeyValues *kv)
     int uid    = kv->GetInt("userid");
     int entity = g_IEngine->GetPlayerForUserID(uid);
     player_info_s info{};
-    if (g_IEngine->GetPlayerInfo(entity, &info))
+    if (GetPlayerInfo(entity, &info))
         PrintChat("\x07%06X%s\x01 connected", 0xa06ba0, info.name);
 }
 
@@ -69,7 +69,7 @@ static void handlePlayerHurt(KeyValues *kv)
     int health   = kv->GetInt("health");
     player_info_s kinfo{};
     player_info_s vinfo{};
-    if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim), &vinfo) || !g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(attacker), &kinfo))
+    if (!GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim), &vinfo) || !GetPlayerInfo(g_IEngine->GetPlayerForUserID(attacker), &kinfo))
         return;
     CachedEntity *vic = ENTITY(g_IEngine->GetPlayerForUserID(victim));
     CachedEntity *att = ENTITY(g_IEngine->GetPlayerForUserID(attacker));
@@ -86,7 +86,7 @@ static void handlePlayerDeath(KeyValues *kv)
     int attacker = kv->GetInt("attacker");
     player_info_s kinfo{};
     player_info_s vinfo{};
-    if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim), &vinfo) || !g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(attacker), &kinfo))
+    if (!GetPlayerInfo(g_IEngine->GetPlayerForUserID(victim), &vinfo) || !GetPlayerInfo(g_IEngine->GetPlayerForUserID(attacker), &kinfo))
         return;
     CachedEntity *vic = ENTITY(g_IEngine->GetPlayerForUserID(victim));
     CachedEntity *att = ENTITY(g_IEngine->GetPlayerForUserID(attacker));
@@ -101,7 +101,7 @@ static void handlePlayerSpawn(KeyValues *kv)
 {
     int id = kv->GetInt("userid");
     player_info_s info{};
-    if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info))
+    if (!GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info))
         return;
     CachedEntity *player = ENTITY(g_IEngine->GetPlayerForUserID(id));
     if (player == nullptr || RAW_ENT(player) == nullptr)
@@ -115,7 +115,7 @@ static void handlePlayerChangeClass(KeyValues *kv)
     if (id > PLAYER_ARRAY_SIZE || id < 0)
         return;
     player_info_s info{};
-    if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info))
+    if (!GetPlayerInfo(g_IEngine->GetPlayerForUserID(id), &info))
         return;
     CachedEntity *player = ENTITY(g_IEngine->GetPlayerForUserID(id));
     if (player == nullptr || RAW_ENT(player) == nullptr)
@@ -130,7 +130,7 @@ static void handleVoteCast(KeyValues *kv)
     int idx         = kv->GetInt("entityid");
     player_info_s info{};
     const char *team_s = teamname(team);
-    if (g_IEngine->GetPlayerInfo(idx, &info))
+    if (GetPlayerInfo(idx, &info))
         PrintChat("\x07%06X%s\x01 Voted \x07%06X%d\x01 on team \x07%06X%s\x01", colors::chat::team(team), info.name, colors::chat::team(team), vote_option, colors::chat::team(team), team_s);
 }
 std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
@@ -254,11 +254,13 @@ public:
 
 static LoggingEventListener event_listener{};
 
-InitRoutine init([]() {
-    g_IGameEventManager->AddListener(&event_listener, false);
-    EC::Register(
-        EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&event_listener); }, "shutdown_eventlogger");
-});
+InitRoutine init(
+    []()
+    {
+        g_IGameEventManager->AddListener(&event_listener, false);
+        EC::Register(
+            EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&event_listener); }, "shutdown_eventlogger");
+    });
 
 bool isEnabled()
 {

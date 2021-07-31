@@ -24,7 +24,7 @@ static settings::Boolean skip_local{ "find-cheaters.ignore-local", "1" };
 void Accuse(int eid, const std::string &hack, const std::string &details)
 {
     player_info_s info;
-    if (g_IEngine->GetPlayerInfo(eid, &info))
+    if (GetPlayerInfo(eid, &info))
     {
         CachedEntity *ent = ENTITY(eid);
         if (accuse_chat)
@@ -123,11 +123,13 @@ void Shutdown()
     g_IGameEventManager->RemoveListener(&listener);
 }
 
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, CreateMove, "cm_AntiCheat", EC::average);
-    EC::Register(EC::LevelInit, ResetEverything, "init_AntiCheat", EC::average);
-    EC::Register(EC::LevelShutdown, ResetEverything, "reset_AntiCheat", EC::average);
-    EC::Register(EC::Shutdown, Shutdown, "shutdown_AntiCheat", EC::average);
-    Init();
-});
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "cm_AntiCheat", EC::average);
+        EC::Register(EC::LevelInit, ResetEverything, "init_AntiCheat", EC::average);
+        EC::Register(EC::LevelShutdown, ResetEverything, "reset_AntiCheat", EC::average);
+        EC::Register(EC::Shutdown, Shutdown, "shutdown_AntiCheat", EC::average);
+        Init();
+    });
 } // namespace hacks::shared::anticheat

@@ -198,12 +198,12 @@ void do_random_votekick()
     std::vector<int> targets;
     player_info_s local_info;
 
-    if (CE_BAD(LOCAL_E) || !g_IEngine->GetPlayerInfo(LOCAL_E->m_IDX, &local_info))
+    if (CE_BAD(LOCAL_E) || !GetPlayerInfo(LOCAL_E->m_IDX, &local_info))
         return;
     for (int i = 1; i < g_GlobalVars->maxClients; ++i)
     {
         player_info_s info;
-        if (!g_IEngine->GetPlayerInfo(i, &info) || !info.friendsID)
+        if (!GetPlayerInfo(i, &info) || !info.friendsID)
             continue;
         if (g_pPlayerResource->GetTeam(i) != g_pLocalPlayer->team)
             continue;
@@ -223,7 +223,7 @@ void do_random_votekick()
 
     int target = targets[rand() % targets.size()];
     player_info_s info;
-    if (!g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(target), &info))
+    if (!GetPlayerInfo(g_IEngine->GetPlayerForUserID(target), &info))
         return;
     hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " cheating\"");
 }
@@ -576,7 +576,7 @@ void reportall()
         if (ent == LOCAL_E)
             continue;
         player_info_s info;
-        if (g_IEngine->GetPlayerInfo(i, &info) && info.friendsID)
+        if (GetPlayerInfo(i, &info) && info.friendsID)
         {
             if (!player_tools::shouldTargetSteamId(info.friendsID))
                 continue;
@@ -587,32 +587,34 @@ void reportall()
 }
 
 CatCommand report("report_all", "Report all players", []() { reportall(); });
-CatCommand report_uid("report_steamid", "Report with steamid", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-        return;
-    unsigned steamid = 0;
-    try
-    {
-        steamid = std::stoi(args.Arg(1));
-    }
-    catch (const std::invalid_argument &)
-    {
-        logging::Info("Report machine broke");
-        return;
-    }
-    if (!steamid)
-    {
-        logging::Info("Report machine broke");
-        return;
-    }
-    typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
-    static uintptr_t addr1                = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
-    static ReportPlayer_t ReportPlayer_fn = ReportPlayer_t(addr1);
-    if (!addr1)
-        return;
-    CSteamID id(steamid, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
-    ReportPlayer_fn(id.ConvertToUint64(), 1);
-});
+CatCommand report_uid("report_steamid", "Report with steamid",
+                      [](const CCommand &args)
+                      {
+                          if (args.ArgC() < 2)
+                              return;
+                          unsigned steamid = 0;
+                          try
+                          {
+                              steamid = std::stoi(args.Arg(1));
+                          }
+                          catch (const std::invalid_argument &)
+                          {
+                              logging::Info("Report machine broke");
+                              return;
+                          }
+                          if (!steamid)
+                          {
+                              logging::Info("Report machine broke");
+                              return;
+                          }
+                          typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
+                          static uintptr_t addr1                = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+                          static ReportPlayer_t ReportPlayer_fn = ReportPlayer_t(addr1);
+                          if (!addr1)
+                              return;
+                          CSteamID id(steamid, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
+                          ReportPlayer_fn(id.ConvertToUint64(), 1);
+                      });
 
 Timer crouchcdr{};
 void smart_crouch()
@@ -661,13 +663,15 @@ void smart_crouch()
         current_user_cmd->buttons |= IN_DUCK;
 }
 
-CatCommand print_ammo("debug_print_ammo", "debug", []() {
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
-        return;
-    logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
-    for (int i = 0; i < 10; i++)
-        logging::Info("Ammo Table %d: %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
-});
+CatCommand print_ammo("debug_print_ammo", "debug",
+                      []()
+                      {
+                          if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+                              return;
+                          logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
+                          for (int i = 0; i < 10; i++)
+                              logging::Info("Ammo Table %d: %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
+                      });
 static Timer disguise{};
 static Timer report_timer{};
 static std::string health = "Health: 0/0";
@@ -790,7 +794,7 @@ void update()
                 continue;
 
             player_info_s info{};
-            if (!g_IEngine->GetPlayerInfo(i, &info))
+            if (!GetPlayerInfo(i, &info))
                 continue;
             if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT)
                 --count_total;
@@ -934,14 +938,16 @@ static void draw()
 }
 #endif
 
-static InitRoutine runinit([]() {
-    EC::Register(EC::CreateMove, cm, "cm_catbot", EC::average);
-    EC::Register(EC::CreateMove, update, "cm2_catbot", EC::average);
-    EC::Register(EC::LevelInit, level_init, "levelinit_catbot", EC::average);
-    EC::Register(EC::Shutdown, shutdown, "shutdown_catbot", EC::average);
+static InitRoutine runinit(
+    []()
+    {
+        EC::Register(EC::CreateMove, cm, "cm_catbot", EC::average);
+        EC::Register(EC::CreateMove, update, "cm2_catbot", EC::average);
+        EC::Register(EC::LevelInit, level_init, "levelinit_catbot", EC::average);
+        EC::Register(EC::Shutdown, shutdown, "shutdown_catbot", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, draw, "draw_catbot", EC::average);
+        EC::Register(EC::Draw, draw, "draw_catbot", EC::average);
 #endif
-    init();
-});
+        init();
+    });
 } // namespace hacks::shared::catbot

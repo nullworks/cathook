@@ -12,6 +12,7 @@
 #include "e8call.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
+#include "SteamIDStealer.hpp"
 
 static settings::Int newlines_msg{ "chat.prefix-newlines", "0" };
 static settings::Boolean log_sent{ "debug.log-sent-chat", "false" };
@@ -46,17 +47,19 @@ void sendIdentifyMessage(bool reply)
     reply ? sendDrawlineKv(CAT_REPLY, AUTH_MESSAGE) : sendDrawlineKv(CAT_IDENTIFY, AUTH_MESSAGE);
 }
 
-static CatCommand debug_drawpanel("debug_drawline", "debug", []() {
-    KeyValues *kv = new KeyValues("cl_drawline");
-    // Has to be this to get broadcasted
-    kv->SetInt("panel", 2);
-    // "New" line
-    kv->SetInt("line", 0);
+static CatCommand debug_drawpanel("debug_drawline", "debug",
+                                  []()
+                                  {
+                                      KeyValues *kv = new KeyValues("cl_drawline");
+                                      // Has to be this to get broadcasted
+                                      kv->SetInt("panel", 2);
+                                      // "New" line
+                                      kv->SetInt("line", 0);
 
-    kv->SetFloat("x", CAT_IDENTIFY);
-    kv->SetFloat("y", AUTH_MESSAGE);
-    g_IEngine->ServerCmdKeyValues(kv);
-});
+                                      kv->SetFloat("x", CAT_IDENTIFY);
+                                      kv->SetFloat("y", AUTH_MESSAGE);
+                                      g_IEngine->ServerCmdKeyValues(kv);
+                                  });
 
 #if ENABLE_TEXTMODE
 settings::Boolean identify{ "chat.identify", "true" };
@@ -77,7 +80,7 @@ void ProcessSendline(IGameEvent *kv)
     if (player_idx != 0xDEAD && panel_type == 2 && line_type == 0 && message_type == AUTH_MESSAGE && (id == CAT_IDENTIFY || id == CAT_REPLY))
     {
         player_info_s info;
-        if (!g_IEngine->GetPlayerInfo(player_idx, &info))
+        if (!GetPlayerInfo(player_idx, &info))
             return;
         // CA7 = Reply and change state
         // CA8 = Change state
@@ -185,25 +188,28 @@ static CatCommand send_identify("debug_send_identify", "debug", []() { sendIdent
 
 static IdentifyListener event_listener{};
 
-static InitRoutine run_identify([]() {
-    EC::Register(
-        EC::CreateMove,
-        []() {
-            if (send_drawline_reply && reply_timer.test_and_set(1000))
+static InitRoutine run_identify(
+    []()
+    {
+        EC::Register(
+            EC::CreateMove,
+            []()
             {
-                sendIdentifyMessage(true);
-                send_drawline_reply = false;
-            }
-            // It is safe to send every 15ish seconds, small packet
-            if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(15000))
-                return;
-            sendIdentifyMessage(false);
-        },
-        "sendnetmsg_createmove");
-    g_IEventManager2->AddListener(&event_listener, "cl_drawline", false);
-    EC::Register(
-        EC::Shutdown, []() { g_IEventManager2->RemoveListener(&event_listener); }, "shutdown_event");
-});
+                if (send_drawline_reply && reply_timer.test_and_set(1000))
+                {
+                    sendIdentifyMessage(true);
+                    send_drawline_reply = false;
+                }
+                // It is safe to send every 15ish seconds, small packet
+                if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(15000))
+                    return;
+                sendIdentifyMessage(false);
+            },
+            "sendnetmsg_createmove");
+        g_IEventManager2->AddListener(&event_listener, "cl_drawline", false);
+        EC::Register(
+            EC::Shutdown, []() { g_IEventManager2->RemoveListener(&event_listener); }, "shutdown_event");
+    });
 
 DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, bool force_reliable, bool voice)
 {
@@ -214,6 +220,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     std::string newlines{};
     NET_StringCmd stringcmd;
 
+    hacks::tf2::steamidstealer::SendNetMessage(msg);
     // Do we have to force reliable state?
     if (hacks::tf2::nospread::SendNetMessage(&msg))
         force_reliable = true;

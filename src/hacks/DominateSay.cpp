@@ -14,13 +14,7 @@ static settings::String filename{ "dominatesay.file", "dominatesay.txt" };
 
 //	a much better default dominatesay would be appreciated.
 const std::vector<std::string> builtin_default = {
-    "dominating %name%! (%dominum% dominations)",
-    "%name%, nice skill, you sell?",
-    "%name%, umad?",
-    "smh i have %dominum% dominations",
-    "Well, off to vist %name%'s mother!",
-    "Cleanup on asile 3, %name% left their skill!",
-    "Congrats %name%! You just won 50 precent off another asswhoopin! Call now and get a third absolutely free!",
+    "dominating %name%! (%dominum% dominations)", "%name%, nice skill, you sell?", "%name%, umad?", "smh i have %dominum% dominations", "Well, off to vist %name%'s mother!", "Cleanup on asile 3, %name% left their skill!", "Congrats %name%! You just won 50 precent off another asswhoopin! Call now and get a third absolutely free!",
 };
 const std::string tf_classes_dominatesay[] = { "class", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer" };
 const std::string tf_teams_dominatesay[]   = { "RED", "BLU" };
@@ -62,7 +56,7 @@ std::string ComposeDominateSay(IGameEvent *event)
     lastmsg = msg;
     player_info_s info{};
 
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
     ReplaceSpecials(msg);
 
     CachedEntity *ent = ENTITY(g_IEngine->GetPlayerForUserID(vid));
@@ -70,7 +64,7 @@ std::string ComposeDominateSay(IGameEvent *event)
 
     ReplaceString(msg, "%class%", tf_classes_dominatesay[clz]);
     player_info_s infok{};
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
 
     ReplaceString(msg, "%dominum%", std::to_string(dnum));
     ReplaceString(msg, "%killer%", std::string(infok.name));
@@ -112,9 +106,11 @@ void shutdown()
 
 static CatCommand reload_command("dominatesay_reload", "Reload dominatesays", []() { reload(); });
 
-static InitRoutine EC([]() {
-    EC::Register(EC::Shutdown, shutdown, "shutdown_dominatesay", EC::average);
-    init();
-});
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::Shutdown, shutdown, "shutdown_dominatesay", EC::average);
+        init();
+    });
 
 } // namespace hacks::shared::dominatesay

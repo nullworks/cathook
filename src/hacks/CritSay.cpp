@@ -63,14 +63,14 @@ std::string ComposeCritSay(IGameEvent *event)
         msg = source->at(rand() % source->size());
     lastmsg = msg;
     player_info_s info{};
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
 
     ReplaceSpecials(msg);
     CachedEntity *ent = ENTITY(g_IEngine->GetPlayerForUserID(vid));
     int clz           = g_pPlayerResource->GetClass(ent);
     ReplaceString(msg, "%class%", tf_classes_killsay[clz]);
     player_info_s infok{};
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
     ReplaceString(msg, "%killer%", std::string(infok.name));
     ReplaceString(msg, "%team%", tf_teams_killsay[ent->m_iTeam() - 2]);
     ReplaceString(msg, "%myteam%", tf_teams_killsay[LOCAL_E->m_iTeam() - 2]);
@@ -131,14 +131,18 @@ void shutdown()
     g_IEventManager2->RemoveListener(&listener);
 }
 
-static InitRoutine runinit([]() {
-    EC::Register(EC::Paint, ProcessCritsay, "paint_critsay", EC::average);
-    EC::Register(EC::Shutdown, shutdown, "shutdown_critsay", EC::average);
-    critsay_mode.installChangeCallback([](settings::VariableBase<int> &a, int value) {
-        if (value == 1)
-            reload();
+static InitRoutine runinit(
+    []()
+    {
+        EC::Register(EC::Paint, ProcessCritsay, "paint_critsay", EC::average);
+        EC::Register(EC::Shutdown, shutdown, "shutdown_critsay", EC::average);
+        critsay_mode.installChangeCallback(
+            [](settings::VariableBase<int> &a, int value)
+            {
+                if (value == 1)
+                    reload();
+            });
+        init();
     });
-    init();
-});
 
 } // namespace hacks::shared::critsay

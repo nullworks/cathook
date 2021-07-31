@@ -68,7 +68,7 @@ void CachedEntity::Update()
     m_bVisCheckComplete = false;
 
     if (m_Type() == EntityType::ENTITY_PLAYER)
-        g_IEngine->GetPlayerInfo(m_IDX, &player_info);
+        GetPlayerInfo(m_IDX, &player_info);
 }
 
 // FIXME maybe disable this by default

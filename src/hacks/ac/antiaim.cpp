@@ -45,7 +45,7 @@ void Update(CachedEntity *player)
         {
             am++;
             player_info_t info;
-            g_IEngine->GetPlayerInfo(player->m_IDX, &info);
+            GetPlayerInfo(player->m_IDX, &info);
             if (am > 5)
             {
                 hacks::shared::anticheat::SetRage(info);

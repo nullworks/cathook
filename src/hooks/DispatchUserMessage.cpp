@@ -198,7 +198,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         else if (chat_filter_enable && data[0] != LOCAL_E->m_IDX && event.find("TF_Chat") == 0)
         {
             player_info_s info{};
-            g_IEngine->GetPlayerInfo(LOCAL_E->m_IDX, &info);
+            GetPlayerInfo(LOCAL_E->m_IDX, &info);
             const char *claz  = nullptr;
             std::string name1 = info.name;
 

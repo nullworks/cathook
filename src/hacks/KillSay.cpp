@@ -24,16 +24,7 @@ struct KillsayStorage
 static std::unordered_map<int, KillsayStorage> killsay_storage{};
 
 // Thanks HellJustFroze for linking me http://daviseford.com/shittalk/
-const std::vector<std::string> builtin_default = { "Don't worry guys, I'm a garbage collector. I'm used to carrying trash.",
-                                                   "%name% is the human equivalent of a participation award.",
-                                                   "I would insult %name%, but nature did a better job.",
-                                                   "%name%, perhaps your strategy should include trying.",
-                                                   "Some people get paid to suck, you do it for free, %name%.",
-                                                   "You must really like that respawn timer, %name%.",
-                                                   "If your main is %class%, you should give up.",
-                                                   "Hey %name%, i see you can't play %class%. Try quitting the game.",
-                                                   "%name%@gmail.com to vacreview@valvesoftware.com\nFOUND CHEATER",
-                                                   "\n☐ Not rekt\n ☑ Rekt\n ☑ Really Rekt\n ☑ Tyrannosaurus Rekt" };
+const std::vector<std::string> builtin_default = { "Don't worry guys, I'm a garbage collector. I'm used to carrying trash.", "%name% is the human equivalent of a participation award.", "I would insult %name%, but nature did a better job.", "%name%, perhaps your strategy should include trying.", "Some people get paid to suck, you do it for free, %name%.", "You must really like that respawn timer, %name%.", "If your main is %class%, you should give up.", "Hey %name%, i see you can't play %class%. Try quitting the game.", "%name%@gmail.com to vacreview@valvesoftware.com\nFOUND CHEATER", "\n☐ Not rekt\n ☑ Rekt\n ☑ Really Rekt\n ☑ Tyrannosaurus Rekt" };
 
 const std::vector<std::string> builtin_nonecore_mlg = { "GET REKT U SCRUB", "GET REKT M8", "U GOT NOSCOPED M8", "U GOT QUICKSCOPED M8", "2 FAST 4 U, SCRUB", "U GOT REKT, M8" };
 const std::string tf_classes_killsay[]              = { "class", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer" };
@@ -77,14 +68,14 @@ std::string ComposeKillSay(IGameEvent *event)
         msg = source->at(rand() % source->size());
     lastmsg = msg;
     player_info_s info{};
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(vid), &info);
 
     ReplaceSpecials(msg);
     CachedEntity *ent = ENTITY(g_IEngine->GetPlayerForUserID(vid));
     int clz           = g_pPlayerResource->GetClass(ent);
     ReplaceString(msg, "%class%", tf_classes_killsay[clz]);
     player_info_s infok{};
-    g_IEngine->GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
+    GetPlayerInfo(g_IEngine->GetPlayerForUserID(kid), &infok);
     ReplaceString(msg, "%killer%", std::string(infok.name));
     ReplaceString(msg, "%team%", tf_teams_killsay[ent->m_iTeam() - 2]);
     ReplaceString(msg, "%myteam%", tf_teams_killsay[LOCAL_E->m_iTeam() - 2]);
@@ -146,10 +137,12 @@ void shutdown()
     g_IEventManager2->RemoveListener(&listener);
 }
 
-static InitRoutine runinit([]() {
-    EC::Register(EC::Paint, ProcessKillsay, "paint_killsay", EC::average);
-    EC::Register(EC::Shutdown, shutdown, "shutdown_killsay", EC::average);
-    init();
-});
+static InitRoutine runinit(
+    []()
+    {
+        EC::Register(EC::Paint, ProcessKillsay, "paint_killsay", EC::average);
+        EC::Register(EC::Shutdown, shutdown, "shutdown_killsay", EC::average);
+        init();
+    });
 
 } // namespace hacks::shared::killsay

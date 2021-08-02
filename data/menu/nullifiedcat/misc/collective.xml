@@ -27,11 +27,13 @@
                     <Option name="Active" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="name.namesteal.reconnect" label="Namesteal Reconnect"/>
+            <AutoVariable width="fill" target="name.namesteal.reconnect" label="Namesteal reconnect"/>
+            <AutoVariable width="fill" target="name.namesteal.use-newlines" label="Namesteal newlines" tooltip="Use glitchy newlines, will make your name invisible."/>
+            <AutoVariable width="fill" target="name.namesteal.steamid-zero" label="Invisible avatar" tooltip="Use a steamid of 0, will make your avatar invisible."/>
             <AutoVariable width="fill" target="misc.random-name" label="Random name"/>
         </List>
     </Box>
-    <Box height="content" width="content" padding="12 6 6 6" name="Extra" x="215" y="75">
+    <Box height="content" width="content" padding="12 6 6 6" name="Extra" x="215" y="115">
         <List width="200">
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Noisemaker spam"/>
             <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit"/>

@@ -2,10 +2,6 @@
 ![banner](http://i.imgur.com/w96wdtE.png)
 [![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/nullworks/cathook)
 
-## Moving back to GitHub
-
-GitHub has restored our repo and we have decided to move everything back to GitHub. The update process will be automatic.
-
 ## Risk of VAC detection
 
 The software could be detected by VAC in the future. Only use it on accounts you won't regret getting VAC banned.

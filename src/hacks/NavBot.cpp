@@ -63,6 +63,9 @@ static Timer ammo_cooldown{};
 // Should we search health at all?
 bool shouldSearchHealth(bool low_priority = false)
 {
+    if (!search_health)
+        return false;
+
     // Check if being gradually healed in any way
     if (HasCondition<TFCond_Healing>(LOCAL_E))
         return false;
@@ -78,6 +81,9 @@ bool shouldSearchHealth(bool low_priority = false)
 // Should we search ammo at all?
 bool shouldSearchAmmo()
 {
+    if (!search_ammo)
+        return false;
+        
     if (CE_BAD(LOCAL_W))
         return false;
     // Priority too high

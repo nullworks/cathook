@@ -133,20 +133,20 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
             if (user_sensitivity_ratio_set)
                 zoom_sensitivity_ratio_user = zoom_sensitivity_ratio->GetFloat();
 
-            // No removing zoom, so user zoom_sensitivity_ratio will be reset to what they had it to on zoom
+            // Both requirements are true, so change the zoom_sensitivity_ratio to 4
             if (no_zoom && no_scope)
+            {
+                zoom_sensitivity_ratio->SetValue(4);
+                user_sensitivity_ratio_set = false;
+            }
+            // No removing zoom, so user zoom_sensitivity_ratio will be reset to what they had it to on zoom
+            else
             {
                 if (!user_sensitivity_ratio_set)
                 {
                     zoom_sensitivity_ratio->SetValue(zoom_sensitivity_ratio_user);
                     user_sensitivity_ratio_set = true;
                 }
-            }
-            // Both requirements are true, so change the zoom_sensitivity_ratio to 4
-            else
-            {
-                zoom_sensitivity_ratio->SetValue(4);
-                user_sensitivity_ratio_set = false;
             }
         }
         last_zoom_state = current_zoom_state;

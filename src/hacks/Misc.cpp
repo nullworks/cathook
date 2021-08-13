@@ -17,6 +17,7 @@
 #include "core/sharedobj.hpp"
 #include "filesystem.h"
 #include "DetourHook.hpp"
+#include "AntiCheatBypass.hpp"
 
 #include "hack.hpp"
 #include <thread>
@@ -85,28 +86,12 @@ static void updateAntiAfk()
     }
     else
     {
-        Vector vel(0.0f);
-        if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
-            velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
-        // We are moving, make the timer a bit longer (only a bit to avoid issues with random movement)
-        if (!vel.IsZero(1.0f))
-        {
-            anti_afk_timer.last += std::chrono::milliseconds(400);
-            if (anti_afk_timer.last > std::chrono::system_clock::now())
-                anti_afk_timer.update();
-        }
         static auto afk_timer = g_ICvar->FindVar("mp_idlemaxtime");
         if (!afk_timer)
             afk_timer = g_ICvar->FindVar("mp_idlemaxtime");
         // Trigger 10 seconds before kick
         else if (afk_timer->GetInt() != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
         {
-            // Just duck tf
-            if (current_user_cmd->buttons & (IN_DUCK | IN_JUMP))
-                current_user_cmd->buttons &= ~(IN_DUCK | IN_JUMP);
-            else
-                current_user_cmd->buttons = IN_DUCK | IN_JUMP;
-
             // Game also checks if you move if you are in spawn, so spam movement keys alternatingly
             bool flip = false;
             current_user_cmd->buttons |= flip ? IN_FORWARD : IN_BACK;
@@ -117,6 +102,7 @@ static void updateAntiAfk()
                 anti_afk_timer.update();
             }
         }
+        last_buttons = current_user_cmd->buttons;
     }
 }
 
@@ -306,7 +292,7 @@ void CreateMove()
             teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
 
         // Ping Reducer
-        if (ping_reducer)
+        if (ping_reducer && !hacks::tf2::antianticheat::enabled)
         {
             static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
             if (cmdrate == nullptr)

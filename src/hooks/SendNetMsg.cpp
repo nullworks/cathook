@@ -12,6 +12,7 @@
 #include "e8call.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
+#include "AntiCheatBypass.hpp"
 #include "SteamIDStealer.hpp"
 
 static settings::Int newlines_msg{ "chat.prefix-newlines", "0" };
@@ -227,6 +228,8 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     // Don't use warp with nospread
     else
         hacks::tf2::warp::SendNetMessage(msg);
+
+    hacks::tf2::antianticheat::SendNetMsg(msg);
 
     // net_StringCmd
     if (msg.GetType() == 4 && (newlines_msg || crypt_chat))

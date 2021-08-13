@@ -3,6 +3,7 @@
 #include "Backtrack.hpp"
 #include "WeaponData.hpp"
 #include "netadr.h"
+#include "AntiCheatBypass.hpp"
 
 std::unordered_map<int, int> command_number_mod{};
 
@@ -214,6 +215,7 @@ static int nextCritTick(int loops = 4096)
     for (int i = 0; i < loops; i++)
     {
         int cmd_number = current_late_user_cmd->command_number + i;
+
         // Set random seed
         *g_PredictionRandomSeed = MD5_PseudoRandom(cmd_number) & 0x7FFFFFFF;
         // Save weapon state to not break anything
@@ -420,8 +422,29 @@ bool prevent_crit()
 // Main function that forces a crit
 void force_crit()
 {
+    // Can't use normal methods here
+    if (hacks::tf2::antianticheat::enabled)
+    {
+        // We have to ignore these sadly
+        if (CE_GOOD(LOCAL_W) && (LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon) || LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730))
+            return;
+        // May only go up to 60 ticks in the future
+        int next_crit = nextCritTick(60);
+
+        // None found, release m1
+        if (next_crit == -1)
+            current_late_user_cmd->buttons &= ~IN_ATTACK;
+        // Force crit
+        else
+        {
+            current_late_user_cmd->command_number = next_crit;
+            current_late_user_cmd->random_seed    = MD5_PseudoRandom(current_late_user_cmd->command_number) & 0x7FFFFFFF;
+            current_index++;
+        }
+    }
+
     // New mode stuff (well when not using melee nor using pipe launcher)
-    if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
+    else if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
     {
         // We have valid crit command numbers
         if (crit_cmds.size() && crit_cmds.find(LOCAL_W->m_IDX) != crit_cmds.end() && crit_cmds.find(LOCAL_W->m_IDX)->second.size())

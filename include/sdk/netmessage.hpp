@@ -105,8 +105,8 @@ public:
     {
         // Call original to be sure nothing breaks
         typedef bool (*BIncomingMessageForProcessing_t)(CNetMessage *, double, int);
-        static auto addr = gSignatures.GetEngineSignature("55 89 E5 56 53 83 EC 10 8B 5D ? F2 0F 10 45");
-        BIncomingMessageForProcessing_t BIncomingMessageForProcessing_fn = (BIncomingMessageForProcessing_t)addr;
+        static auto addr                                                 = gSignatures.GetEngineSignature("55 89 E5 56 53 83 EC 10 8B 5D ? F2 0F 10 45");
+        BIncomingMessageForProcessing_t BIncomingMessageForProcessing_fn = (BIncomingMessageForProcessing_t) addr;
         return BIncomingMessageForProcessing_fn(this, param_1, param_2);
     };
     // I don't get what it does but we need it
@@ -114,8 +114,8 @@ public:
     {
         // Call original to be sure nothing breaks
         typedef bool (*SetRatePolicy_t)(CNetMessage *);
-        static auto addr = gSignatures.GetEngineSignature("55 89 E5 83 EC 18 C7 04 24 2C 00 00 00");
-        SetRatePolicy_t SetRatePolicy_fn = (SetRatePolicy_t)addr;
+        static auto addr                 = gSignatures.GetEngineSignature("55 89 E5 83 EC 18 C7 04 24 2C 00 00 00");
+        SetRatePolicy_t SetRatePolicy_fn = (SetRatePolicy_t) addr;
         SetRatePolicy_fn(this);
     };
 
@@ -214,6 +214,7 @@ class CLC_RespondCvarValue : public CNetMessage
 public:
     DECLARE_CLC_MESSAGE(RespondCvarValue);
 
+    char pad[4];
     QueryCvarCookie_t m_iCookie;
 
     const char *m_szCvarName;

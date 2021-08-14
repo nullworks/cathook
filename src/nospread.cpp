@@ -82,16 +82,7 @@ void CreateMove()
     // Credits to https://www.unknowncheats.me/forum/team-fortress-2-a/139094-projectile-nospread.html
 
     // Set up Random Seed
-    int cmd_num = current_user_cmd->command_number;
-    // Crithack uses different things
-    if (criticals::isEnabled() && g_pLocalPlayer->weapon_mode != weapon_melee && criticals::crit_cmds.find(LOCAL_W->m_IDX) != criticals::crit_cmds.end() && criticals::crit_cmds.find(LOCAL_W->m_IDX)->second.size())
-    {
-        int array_index = criticals::current_index;
-        if (array_index >= criticals::crit_cmds.at(LOCAL_W->m_IDX).size())
-            array_index = 0;
-        // Adjust for nospread
-        cmd_num = criticals::crit_cmds.at(LOCAL_W->m_IDX).at(array_index);
-    }
+    int cmd_num = current_late_user_cmd->command_number;
     RandomSeed(MD5_PseudoRandom(cmd_num) & 0x7FFFFFFF);
     SharedRandomInt(MD5_PseudoRandom(cmd_num) & 0x7FFFFFFF, "SelectWeightedSequence", 0, 0, 0);
     for (int i = 0; i < 6; ++i)
@@ -106,7 +97,7 @@ void CreateMove()
     {
         // Check if we released the barrage by releasing m1, also lock bool so people don't just release m1 and tap it again
         if (!should_nospread)
-            should_nospread = !(current_user_cmd->buttons & IN_ATTACK) && g_pLocalPlayer->bAttackLastTick;
+            should_nospread = !(current_late_user_cmd->buttons & IN_ATTACK) && g_pLocalPlayer->bAttackLastTick;
 
         if (!CE_INT(LOCAL_W, netvar.m_iClip1) && CE_INT(LOCAL_W, netvar.iReloadMode) == 0)
         {
@@ -121,29 +112,29 @@ void CreateMove()
     // Huntsman check
     else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow))
     {
-        if (!g_pLocalPlayer->bAttackLastTick || (current_user_cmd->buttons & IN_ATTACK))
+        if (!g_pLocalPlayer->bAttackLastTick || (current_late_user_cmd->buttons & IN_ATTACK))
             return;
     }
     // Rest of weapons
-    else if (!(current_user_cmd->buttons & IN_ATTACK))
+    else if (!(current_late_user_cmd->buttons & IN_ATTACK))
         return;
 
     switch (LOCAL_W->m_iClassID())
     {
     case CL_CLASS(CTFSyringeGun):
     {
-        if (g_pLocalPlayer->v_OrigViewangles == current_user_cmd->viewangles)
+        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
             g_pLocalPlayer->bUseSilentAngles = true;
         float spread = 1.5f;
-        current_user_cmd->viewangles.x -= RandomFloat(-spread, spread);
-        current_user_cmd->viewangles.y -= RandomFloat(-spread, spread);
-        fClampAngle(current_user_cmd->viewangles);
+        current_late_user_cmd->viewangles.x -= RandomFloat(-spread, spread);
+        current_late_user_cmd->viewangles.y -= RandomFloat(-spread, spread);
+        fClampAngle(current_late_user_cmd->viewangles);
         break;
     }
     case CL_CLASS(CTFCompoundBow):
     {
         Vector view = re::C_BasePlayer::GetLocalEyeAngles(RAW_ENT(LOCAL_E));
-        if (g_pLocalPlayer->v_OrigViewangles == current_user_cmd->viewangles)
+        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
             g_pLocalPlayer->bUseSilentAngles = true;
 
         Vector spread;
@@ -152,25 +143,25 @@ void CreateMove()
         re::C_TFWeaponBase::GetProjectileFireSetupHuntsman(RAW_ENT(LOCAL_W), RAW_ENT(LOCAL_E), Vector(23.5f, -8.f, 8.f), &src, &spread, false, 2000.0f);
 
         spread -= view;
-        current_user_cmd->viewangles -= spread;
-        fClampAngle(current_user_cmd->viewangles);
+        current_late_user_cmd->viewangles -= spread;
+        fClampAngle(current_late_user_cmd->viewangles);
         break;
     }
     default:
         Vector view = re::C_BasePlayer::GetLocalEyeAngles(RAW_ENT(LOCAL_E));
-        if (g_pLocalPlayer->v_OrigViewangles == current_user_cmd->viewangles)
+        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
             g_pLocalPlayer->bUseSilentAngles = true;
 
         Vector spread = re::C_TFWeaponBase::GetSpreadAngles(RAW_ENT(LOCAL_W));
 
         spread -= view;
-        current_user_cmd->viewangles -= spread;
-        fClampAngle(current_user_cmd->viewangles);
+        current_late_user_cmd->viewangles -= spread;
+        fClampAngle(current_late_user_cmd->viewangles);
         break;
     }
 }
 
-static InitRoutine init([]() { EC::Register(EC::CreateMove, CreateMove, "nospread_cm", EC::very_late); });
+static InitRoutine init([]() { EC::Register(EC::CreateMoveLate, CreateMove, "nospread_cm", EC::very_late); });
 
 enum nospread_sync_state
 {
@@ -306,57 +297,63 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     fClampAngle(angles);
 }
 
-CatCommand debug_mantissa("test_mantissa", "For debug purposes", [](const CCommand &rCmd) {
-    if (rCmd.ArgC() < 2)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "You must provide float to test.\n");
-        return;
-    }
+CatCommand debug_mantissa("test_mantissa", "For debug purposes",
+                          [](const CCommand &rCmd)
+                          {
+                              if (rCmd.ArgC() < 2)
+                              {
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "You must provide float to test.\n");
+                                  return;
+                              }
 
-    try
-    {
-        float float_value   = atof(rCmd.Arg(1));
-        float mantissa_step = CalculateMantissaStep(float_value);
+                              try
+                              {
+                                  float float_value   = atof(rCmd.Arg(1));
+                                  float mantissa_step = CalculateMantissaStep(float_value);
 
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Mantissa step for %.3f: %.10f\n", float_value, mantissa_step);
-    }
-    catch (const std::invalid_argument &)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid float.\n");
-    }
-    return;
-});
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Mantissa step for %.3f: %.10f\n", float_value, mantissa_step);
+                              }
+                              catch (const std::invalid_argument &)
+                              {
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid float.\n");
+                              }
+                              return;
+                          });
 
-static CatCommand nospread_sync("nospread_sync", "Try to sync client and server time", []() {
-    if (!bullet)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Set nospread.enable to true first.\n");
-        return;
-    }
-    should_update_time = true;
-    no_spread_synced   = NOT_SYNCED;
-    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Trying to sync Seed...\n");
-});
+static CatCommand nospread_sync("nospread_sync", "Try to sync client and server time",
+                                []()
+                                {
+                                    if (!bullet)
+                                    {
+                                        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Set nospread.enable to true first.\n");
+                                        return;
+                                    }
+                                    should_update_time = true;
+                                    no_spread_synced   = NOT_SYNCED;
+                                    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Trying to sync Seed...\n");
+                                });
 
-static CatCommand nospread_resync("nospread_resync", "Try to sync client and server time", []() {
-    if (!bullet)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Set nospread.enable to true first.\n");
-        return;
-    }
-    if (no_spread_synced == CORRECTING)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Already syncing.");
-        return;
-    }
-    if (no_spread_synced != SYNCED)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Can't resync when not previously synced! Use cat_nospread_sync\n");
-        return;
-    }
-    no_spread_synced = CORRECTING;
-    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Trying to resync Seed...\n");
-});
+static CatCommand nospread_resync("nospread_resync", "Try to sync client and server time",
+                                  []()
+                                  {
+                                      if (!bullet)
+                                      {
+                                          g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Set nospread.enable to true first.\n");
+                                          return;
+                                      }
+                                      if (no_spread_synced == CORRECTING)
+                                      {
+                                          g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Already syncing.");
+                                          return;
+                                      }
+                                      if (no_spread_synced != SYNCED)
+                                      {
+                                          g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Can't resync when not previously synced! Use cat_nospread_sync\n");
+                                          return;
+                                      }
+                                      no_spread_synced = CORRECTING;
+                                      g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Trying to resync Seed...\n");
+                                  });
 
 // Our Detour hooks
 DetourHook cl_writeusercmd_detour;
@@ -627,7 +624,8 @@ void CL_SendMove_hook()
 
     int new_packets = 1 + *choked_packets;
 
-    auto RecheckIfresync_needed = [&new_packets](double asumed_time) -> void {
+    auto RecheckIfresync_needed = [&new_packets](double asumed_time) -> void
+    {
         static Timer s_NextCheck;
         // we use it as 1 sec delay
         if (s_NextCheck.check(1000) && new_packets == 1 && (no_spread_synced != SYNCED || !LOCAL_E->m_bAlivePlayer()) && !waiting_perf_data)
@@ -879,101 +877,109 @@ void CreateMove2()
     }
 }
 
-static InitRoutine init_bulletnospread([]() {
-    // Get our detour hooks running
-    static auto writeusercmd_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
-    cl_writeusercmd_detour.Init(writeusercmd_addr, (void *) WriteUserCmd_hook);
-    static auto fx_firebullets_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC 0C 01 00 00 8B 45 ? 8B 7D ? 89 85");
-    fx_firebullets_detour.Init(fx_firebullets_addr, (void *) FX_FireBullets_hook);
-    /*static auto net_sendpacket_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC EC 20 00 00 C7 85 ? ? ? ? 00 00 00 00 8B 45");
-    net_sendpacket_detour.Init(net_sendpacket_addr, (void *) NET_SendPacket_hook);*/
+static InitRoutine init_bulletnospread(
+    []()
+    {
+        // Get our detour hooks running
+        static auto writeusercmd_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
+        cl_writeusercmd_detour.Init(writeusercmd_addr, (void *) WriteUserCmd_hook);
+        static auto fx_firebullets_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC 0C 01 00 00 8B 45 ? 8B 7D ? 89 85");
+        fx_firebullets_detour.Init(fx_firebullets_addr, (void *) FX_FireBullets_hook);
+        /*static auto net_sendpacket_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC EC 20 00 00 C7 85 ? ? ? ? 00 00 00 00 8B 45");
+        net_sendpacket_detour.Init(net_sendpacket_addr, (void *) NET_SendPacket_hook);*/
 
-    // Register Event callbacks
-    EC::Register(EC::CreateMove, CreateMove2, "nospread_createmove2");
-    EC::Register(EC::CreateMoveWarp, CreateMove2, "nospread_createmove2w");
+        // Register Event callbacks
+        EC::Register(EC::CreateMove, CreateMove2, "nospread_createmove2");
+        EC::Register(EC::CreateMoveWarp, CreateMove2, "nospread_createmove2w");
 
-    bullet.installChangeCallback([](settings::VariableBase<bool> &, bool after) {
-        if (!after)
-        {
-            is_syncing       = false;
-            no_spread_synced = NOT_SYNCED;
-        }
-    });
-#if ENABLE_VISUALS
-    EC::Register(
-        EC::Draw,
-        []() {
-            if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+        bullet.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
             {
-                std::string draw_string = "";
-                rgba_t draw_color       = colors::white;
-                switch (no_spread_synced)
+                if (!after)
                 {
-                case NOT_SYNCED:
+                    is_syncing       = false;
+                    no_spread_synced = NOT_SYNCED;
+                }
+            });
+#if ENABLE_VISUALS
+        EC::Register(
+            EC::Draw,
+            []()
+            {
+                if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
                 {
-                    if (bad_mantissa)
+                    std::string draw_string = "";
+                    rgba_t draw_color       = colors::white;
+                    switch (no_spread_synced)
                     {
-                        draw_color  = colors::red_s;
-                        draw_string = "Server uptime too Low!";
-                    }
-                    else
+                    case NOT_SYNCED:
                     {
-                        draw_color  = colors::orange;
-                        draw_string = "Not Syncing";
+                        if (bad_mantissa)
+                        {
+                            draw_color  = colors::red_s;
+                            draw_string = "Server uptime too Low!";
+                        }
+                        else
+                        {
+                            draw_color  = colors::orange;
+                            draw_string = "Not Syncing";
+                        }
+                        break;
                     }
-                    break;
+                    case CORRECTING:
+                    case DEAD_SYNC:
+                    {
+                        draw_color  = colors::yellow;
+                        draw_string = "Syncing...";
+                        break;
+                    }
+                    case SYNCED:
+                    {
+                        draw_color  = colors::green;
+                        draw_string = "Synced.";
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                    if (draw)
+                        AddCenterString(draw_string, draw_color);
+                    if (draw_mantissa && no_spread_synced != NOT_SYNCED)
+                        AddCenterString("Mantissa step size: " + std::to_string((int) CalculateMantissaStep(1000.0 * (Plat_FloatTime() + float_time_delta))), draw_color);
                 }
-                case CORRECTING:
-                case DEAD_SYNC:
-                {
-                    draw_color  = colors::yellow;
-                    draw_string = "Syncing...";
-                    break;
-                }
-                case SYNCED:
-                {
-                    draw_color  = colors::green;
-                    draw_string = "Synced.";
-                    break;
-                }
-                default:
-                    break;
-                }
-                if (draw)
-                    AddCenterString(draw_string, draw_color);
-                if (draw_mantissa && no_spread_synced != NOT_SYNCED)
-                    AddCenterString("Mantissa step size: " + std::to_string((int) CalculateMantissaStep(1000.0 * (Plat_FloatTime() + float_time_delta))), draw_color);
-            }
-        },
-        "nospread_draw");
+            },
+            "nospread_draw");
 #endif
-    EC::Register(
-        EC::LevelInit,
-        []() {
-            no_spread_synced     = NOT_SYNCED;
-            last_was_player_perf = false;
-            bad_mantissa         = false;
-            waiting_perf_data    = false;
-        },
-        "nospread_levelinit");
+        EC::Register(
+            EC::LevelInit,
+            []()
+            {
+                no_spread_synced     = NOT_SYNCED;
+                last_was_player_perf = false;
+                bad_mantissa         = false;
+                waiting_perf_data    = false;
+            },
+            "nospread_levelinit");
 
-    EC::Register(
-        EC::LevelShutdown,
-        []() {
-            no_spread_synced     = NOT_SYNCED;
-            last_was_player_perf = false;
-            bad_mantissa         = false;
-            waiting_perf_data    = false;
-        },
-        "nospread_levelshutdown");
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            cl_writeusercmd_detour.Shutdown();
-            fx_firebullets_detour.Shutdown();
-            // net_sendpacket_detour.Shutdown();
-        },
-        "nospread_shutdown");
-});
+        EC::Register(
+            EC::LevelShutdown,
+            []()
+            {
+                no_spread_synced     = NOT_SYNCED;
+                last_was_player_perf = false;
+                bad_mantissa         = false;
+                waiting_perf_data    = false;
+            },
+            "nospread_levelshutdown");
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                cl_writeusercmd_detour.Shutdown();
+                fx_firebullets_detour.Shutdown();
+                // net_sendpacket_detour.Shutdown();
+            },
+            "nospread_shutdown");
+    });
 
 } // namespace hacks::tf2::nospread

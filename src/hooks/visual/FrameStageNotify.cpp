@@ -29,7 +29,7 @@ static bool update_override_textures = false;
 std::vector<std::string> world_strings         = { "World" };
 std::vector<std::string> skybox_strings        = { "SkyBox" };
 std::vector<std::string> gui_strings           = { "Other", "VGUI" };
-std::vector<std::string> dont_override_strings = { "glass", "door", "water", "tools", "player" };
+std::vector<std::string> dont_override_strings = { "glass", "door", "water", "tools", "player", "wall28", "wall26" };
 std::vector<std::string> nodraw_strings        = { "decal", "overlay", "hay" };
 
 namespace hooked_methods
@@ -58,6 +58,8 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
                 // Ensure world mat
                 if (name.find("World") == std::string::npos)
                     continue;
+                if (pMaterial->IsErrorMaterial() || !pMaterial->IsPrecached() || pMaterial->IsTranslucent() || pMaterial->IsSpriteCard())
+                    continue;
                 // Don't override this stuff
                 bool good = true;
                 for (auto &entry : dont_override_strings)
@@ -77,9 +79,9 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
 
                 if (!pMaterial->GetMaterialVarFlag(MATERIAL_VAR_NO_DRAW))
                 {
-                    auto *kv = new KeyValues(pMaterial->GetShaderName());
+                    auto *kv = new KeyValues("LightmappedGeneric" /*pMaterial->GetShaderName()*/);
                     kv->SetString("$basetexture", (*override_textures_texture).c_str());
-                    kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
+                    //kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
                     kv->SetString("$surfaceprop", "concrete");
                     pMaterial->SetShaderAndParams(kv);
                 }

@@ -1,9 +1,15 @@
 <Tab name="Movement" padding="6 6 6 6">
-    <Box padding="12 6 6 6" width="content" height="content" name="Bunny hop">
+    <Box padding="12 6 6 6" width="content" height="content" name="General">
         <List width="150">
             <AutoVariable width="fill" target="bunnyhop.enable" label="Enable bunny hop"/>
             <AutoVariable width="fill" target="bunnyhop.chance" label="Bhop chance" tooltip="% chance of a successful bunnyhop."/>
-            <AutoVariable width="fill" target="misc.autostrafe" label="Enable auto strafe"/>
+            <LabeledObject width="fill" label="Auto strafe">
+                <Select target="misc.autostrafe">
+                    <Option name="Off" value="0"/>
+                    <Option name="Regular" value="1"/>
+                    <Option name="Multidir" value="2"/>
+                </Select>
+            </LabeledObject>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="FollowBot" x="170">

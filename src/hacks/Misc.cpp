@@ -28,7 +28,7 @@ namespace hacks::shared::misc
 static settings::Boolean render_zoomed{ "visual.render-local-zoomed", "true" };
 #endif
 static settings::Boolean anti_afk{ "misc.anti-afk", "false" };
-static settings::Boolean auto_strafe{ "misc.autostrafe", "false" };
+static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 static settings::Boolean tauntslide{ "misc.tauntslide-tf2c", "false" };
 static settings::Boolean tauntslide_tf2{ "misc.tauntslide", "false" };
 static settings::Boolean flashlight_spam{ "misc.flashlight-spam", "false" };
@@ -182,6 +182,29 @@ void DrawWireframeHitbox(wireframe_data data)
 }
 
 #endif
+
+static float normalizeRad(float a) noexcept
+{
+    return std::isfinite(a) ? std::remainder(a, PI * 2) : 0.0f;
+}
+static float angleDiffRad(float a1, float a2) noexcept
+{
+    float delta;
+
+    delta = normalizeRad(a1 - a2);
+    if (a1 > a2)
+    {
+        if (delta >= PI)
+            delta -= PI * 2;
+    }
+    else
+    {
+        if (delta <= -PI)
+            delta += PI * 2;
+    }
+    return delta;
+}
+
 void CreateMove()
 {
 #if ENABLE_VISUALS
@@ -206,18 +229,85 @@ void CreateMove()
     // Automatically strafes in the air
     if (auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
-        static bool was_jumping = false;
-        auto flags              = CE_INT(LOCAL_E, netvar.iFlags);
-        bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
+        auto flags    = CE_INT(LOCAL_E, netvar.iFlags);
+        auto movetype = (unsigned) CE_VAR(LOCAL_E, 0x194, unsigned char);
 
-        if (!(flags & FL_ONGROUND) && !(flags & FL_INWATER) && (!is_jumping || was_jumping))
+        // Noclip
+        if (movetype != 8)
         {
-            if (current_user_cmd->mousedx)
+            switch (*auto_strafe)
             {
-                current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
+            case 0: // Off
+                return;
+                break;
+            case 1: // Regular strafe
+            {
+                static bool was_jumping = false;
+                bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
+
+                if (!(flags & FL_ONGROUND) || !(flags & FL_INWATER) && (!is_jumping || was_jumping))
+                    if (current_user_cmd->mousedx)
+                        current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
+
+                was_jumping = is_jumping;
+
+                break;
+            }
+            case 2: // Multidirectional Airstrafe,
+                    // Huge Credits to https://github.com/degeneratehyperbola/NEPS, as their airstrafe
+                    // Apparently just works for tf2
+                    // Also credits to "zelta" for porting it to tf2,
+                    // And "Cyanide" for making it work with cathook.
+            {
+                static bool lastHeldJump = current_user_cmd->buttons & IN_JUMP;
+                const float speed        = CE_VECTOR(LOCAL_E, netvar.vVelocity).Length2D();
+                auto vel                 = CE_VECTOR(LOCAL_E, netvar.vVelocity);
+
+                if (flags & FL_ONGROUND || flags & FL_INWATER)
+                    return;
+                if (current_user_cmd->buttons & IN_JUMP)
+                    return;
+                if (~current_user_cmd->buttons & current_user_cmd->buttons & IN_JUMP && !lastHeldJump)
+                    return;
+                if (speed < 2.0f)
+                    return;
+
+                constexpr auto perfectDelta = [](float speed) noexcept
+                {
+                    static auto speedVar = CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed);
+                    static auto airVar   = g_ICvar->FindVar("sv_airaccelerate");
+                    // This is hardcoded for tf2, unless you run sourcemod
+                    static auto wishSpeed = 30.0f;
+
+                    const auto term = wishSpeed / airVar->GetFloat() / speedVar * 100.0f / speed;
+
+                    if (term < 1.0f && term > -1.0f)
+                        return acosf(term);
+
+                    return 0.0f;
+                };
+
+                const float pDelta = perfectDelta(speed);
+                if (pDelta)
+                {
+                    const float yaw     = DEG2RAD(g_pLocalPlayer->v_OrigViewangles.y);
+                    const float velDir  = atan2f(vel.y, vel.x) - yaw;
+                    const float wishAng = atan2f(-current_user_cmd->sidemove, current_user_cmd->forwardmove);
+                    const float delta   = angleDiffRad(velDir, wishAng); // Helpers::angleDiffRad(velDir, wishAng);
+
+                    float moveDir = delta < 0.0f ? velDir + pDelta : velDir - pDelta;
+
+                    current_user_cmd->forwardmove = cosf(moveDir) * 450.0f;
+                    current_user_cmd->sidemove    = -sinf(moveDir) * 450.0f;
+                }
+                lastHeldJump = current_user_cmd->buttons & current_user_cmd->buttons & IN_JUMP;
+
+                break;
+            }
+            default:
+                break;
             }
         }
-        was_jumping = is_jumping;
     }
 
     // TF2c Tauntslide
@@ -386,6 +476,7 @@ void Draw()
         if (local->m_iClassID() == CL_CLASS(CTFMinigun))
             AddSideString(format("Weapon state: ", CE_INT(local, netvar.iWeaponState)));
         AddSideString(format("ItemDefinitionIndex: ", CE_INT(local, netvar.iItemDefinitionIndex)));
+        AddSideString(format("Maxspeed: ", CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed)));
         /*AddSideString(colors::white, "Weapon: %s [%i]",
         RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
         g_pLocalPlayer->weapon()->m_iClassID());
@@ -562,6 +653,16 @@ CatCommand set_value("set", "Set value",
                          var->m_fMinVal = -999999999.9f;
                          var->SetValue(value.c_str());
                          logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
+                     });
+CatCommand get_value("get", "Set value",
+                     [](const CCommand &args)
+                     {
+                         if (args.ArgC() < 2)
+                             return;
+                         ConVar *var = g_ICvar->FindVar(args.Arg(1));
+                         if (!var)
+                             return;
+                         logging::Info("'%s': '%s'", args.Arg(1), var->GetString());
                      });
 CatCommand say_lines("say_lines", "Say with newlines (\\n)",
                      [](const CCommand &args)

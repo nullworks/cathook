@@ -1349,7 +1349,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFSyringeGun):
     {
-        rgrav  = 0.2f;
+        rgrav  = 0.3f;
         rspeed = 1000.0f;
         break;
     }

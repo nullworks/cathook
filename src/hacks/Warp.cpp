@@ -620,7 +620,7 @@ void warpLogic()
         return;
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return;
-    if (CE_BAD(LOCAL_W)
+    if (CE_BAD(LOCAL_W))
         return;
 
     // Handle minigun in rapidfire

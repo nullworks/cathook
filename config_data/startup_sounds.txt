@@ -1,0 +1,9 @@
+vo/heavy_mvm_get_upgrade03.mp3
+vo/items/wheatley_sapper/wheatley_sapper_attached14.mp3
+vo/sniper_laughevil02.mp3
+vo/compmode/cm_engie_pregamefirst_rare_06.mp3
+vo/compmode/cm_engie_pregamelostlast_07.mp3
+vo/soldier_mvm_loot_godlike03.mp3
+vo/soldier_robot15.mp3
+vo/soldier_mvm_get_upgrade01.mp3
+vo/medic_mvm_loot_godlike02.mp3

@@ -497,9 +497,16 @@ bool WorldToScreen(const Vector &origin, Vector &screen)
 void StartupSound()
 {
     // 100% based unique meowhook only feature do not steal
-    std::vector<std::string> sound_list = { "vo/heavy_mvm_get_upgrade03.mp3", "vo/items/wheatley_sapper/wheatley_sapper_attached14.mp3", "vo/sniper_laughevil02.mp3", "vo/compmode/cm_engie_pregamefirst_rare_06.mp3", "vo/compmode/cm_engie_pregamelostlast_07.mp3", "vo/soldier_mvm_loot_godlike03.mp3", "vo/soldier_robot15.mp3", "vo/soldier_mvm_get_upgrade01.mp3", "vo/medic_mvm_loot_godlike02.mp3" };
-    std::string curSound = sound_list[rand() % sound_list.size()];
-    g_ISurface->PlaySound(curSound.c_str());
+    std::string cur_line;
+    std::vector<std::string> line_count;
+    std::ifstream sfile(paths::getDataPath("/startup_sounds.txt"));
+    int total_lines=0;
+    while(getline(sfile,cur_line)){
+    total_lines++; 
+    line_count.push_back(cur_line);  
+    }
+    int random_number=rand()%total_lines;
+    g_ISurface->PlaySound(line_count[random_number].c_str());
 }
 
 #if ENABLE_ENGINE_DRAWING

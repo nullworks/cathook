@@ -2,7 +2,7 @@
 
 namespace hacks::tf2::mvmtools
 {
-static settings::Boolean auto_revive("mvmtools.instant-revive", "false");
+static settings::Button auto_revive{ "mvmtools.revive-button", "<null>" };
 static settings::Boolean auto_f4("mvmtools.auto-f4", "false");
 
 static Timer revive_timer{};
@@ -10,13 +10,11 @@ static Timer ready_timer{};
 
 void CreateMove()
 {
-    if (CE_INVALID(LOCAL_E))
-        return;
     // only in MVM
-    if (!g_pGameRules->isPVEMode)
-        return;
+    size_t map = GetLevelName().find("mvm_");
+    if (map != std::string::npos)
 
-    if (auto_revive && !LOCAL_E->m_bAlivePlayer() && revive_timer.test_and_set(1000))
+    if (auto_revive.isKeyDown() && !LOCAL_E->m_bAlivePlayer() && revive_timer.test_and_set(1000))
     {
         auto *kv = new KeyValues("MVM_Revive_Response");
         kv->SetInt("accepted", 1);

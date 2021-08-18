@@ -493,6 +493,15 @@ bool WorldToScreen(const Vector &origin, Vector &screen)
         return true;
     return false;
 }
+    
+void StartupSound()
+{
+    // 100% based unique meowhook only feature do not steal
+    std::vector<std::string> sound_list = { "vo/heavy_mvm_get_upgrade03.mp3", "vo/items/wheatley_sapper/wheatley_sapper_attached14.mp3", "vo/sniper_laughevil02.mp3", "vo/compmode/cm_engie_pregamefirst_rare_06.mp3", "vo/compmode/cm_engie_pregamelostlast_07.mp3", "vo/soldier_mvm_loot_godlike03.mp3", "vo/soldier_robot15.mp3", "vo/soldier_mvm_get_upgrade01.mp3", "vo/medic_mvm_loot_godlike02.mp3" };
+    std::string curSound = sound_list[rand() % sound_list.size()];
+    g_ISurface->PlaySound(curSound.c_str());
+}
+
 #if ENABLE_ENGINE_DRAWING
 bool Texture::load()
 {
@@ -583,6 +592,7 @@ void InitGL()
 
 #if ENABLE_GUI
     gui::init();
+    StartupSound();
 #endif
 }
 

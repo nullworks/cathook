@@ -56,11 +56,12 @@ std::string ComposeCritSay(IGameEvent *event)
         return "";
     if (GetPlayerForUserID(kid) != g_IEngine->GetLocalPlayer())
         return "";
-    std::string msg = source->at(rand() % source->size());
     //	checks if the killsays.txt file is not 1 line. 100% sure it's going
     // to crash if it is.
-    while (msg == lastmsg && source->size() > 1)
+    std::string msg;
+    do {
         msg = source->at(rand() % source->size());
+    } while (msg == lastmsg && source->size() > 1);
     lastmsg = msg;
     player_info_s info{};
     GetPlayerInfo(GetPlayerForUserID(vid), &info);

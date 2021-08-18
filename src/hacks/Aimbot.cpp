@@ -512,7 +512,7 @@ bool ShouldAim()
     if (g_pLocalPlayer->using_action_slot_item)
         return false;
     // Using a forbidden weapon?
-    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife))
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
         return false;
 
     IF_GAME(IsTF2())

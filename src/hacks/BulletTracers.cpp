@@ -15,6 +15,7 @@ static settings::Boolean draw_local{ "visual.bullet-tracers.draw-local", "true" 
 static settings::Int team_mode{ "visual.bullet-tracers.teammode", "0" };
 static settings::Boolean one_trace_only{ "visual.bullet-tracers.one-trace-only", "false" };
 static settings::Boolean sentry_tracers{ "visual.bullet-tracers.sentry", "true" };
+static settings::Int tracer_type{ "visual.bullet-tracers.type", "0" };
 
 class CEffectData
 {
@@ -44,10 +45,37 @@ CalcZoomedMuzzleLocation_t CalcZoomedMuzzleLocation_fn;
 
 const char *AppropiateBeam(int team)
 {
-    if (team == TEAM_RED)
-        return "dxhr_sniper_rail_red";
-    else
-        return "dxhr_sniper_rail_blue";
+    switch (*tracer_type)
+    {
+    case 0:
+        //Machina
+        if (team == TEAM_RED)
+            return "dxhr_sniper_rail_red";
+        else
+            return "dxhr_sniper_rail_blue";
+    case 1:
+        //C.A.P.P.E.R
+        if (re::CTFPlayerShared::IsCritBoosted(re::CTFPlayerShared::GetPlayerShared(RAW_ENT(LOCAL_E))))
+        {
+            if (team == TEAM_RED)
+                return "bullet_tracer_raygun_red_crit";
+            else
+                return "bullet_tracer_raygun_blue_crit";
+        }
+        else
+        {
+            if (team == TEAM_RED)
+                return "bullet_tracer_raygun_red";
+            else
+                return "bullet_tracer_raygun_blue";
+        }
+    case 2:
+        //Short Circuit Zap
+        if (team == TEAM_RED)
+            return "dxhr_lightningball_hit_zap_red";
+        else
+            return "dxhr_lightningball_hit_zap_blue";
+    }
 }
 
 const char *GetParticleSystemNameFromIndex__detour(CEffectData &data)

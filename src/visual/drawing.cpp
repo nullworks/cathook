@@ -165,30 +165,36 @@ std::unique_ptr<font> esp{ nullptr };
 std::unique_ptr<font> center_screen{ nullptr };
 } // namespace fonts
 
-static InitRoutine font_size([]() {
-    esp_font_size.installChangeCallback([](settings::VariableBase<int> &var, int after) {
-        if (after > 0 && after < 100)
-        {
+static InitRoutine font_size(
+    []()
+    {
+        esp_font_size.installChangeCallback(
+            [](settings::VariableBase<int> &var, int after)
+            {
+                if (after > 0 && after < 100)
+                {
 #if ENABLE_GLEZ_DRAWING
-            fonts::esp->unload();
-            fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
+                    fonts::esp->unload();
+                    fonts::esp.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
 #else
-            fonts::esp->changeSize(after);
+                    fonts::esp->changeSize(after);
 #endif
-        }
-    });
-    center_font_size.installChangeCallback([](settings::VariableBase<int> &var, int after) {
-        if (after > 0 && after < 100)
-        {
+                }
+            });
+        center_font_size.installChangeCallback(
+            [](settings::VariableBase<int> &var, int after)
+            {
+                if (after > 0 && after < 100)
+                {
 #if ENABLE_GLEZ_DRAWING
-            fonts::center_screen->unload();
-            fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
+                    fonts::center_screen->unload();
+                    fonts::center_screen.reset(new fonts::font(paths::getDataPath("/menu/Verdana.ttf"), after));
 #else
-            fonts::center_screen->changeSize(after);
+                    fonts::center_screen->changeSize(after);
 #endif
-        }
+                }
+            });
     });
-});
 namespace draw
 {
 
@@ -421,7 +427,8 @@ void RectangleTextured(float x, float y, float w, float h, rgba_t color, Texture
         float cx = x + float(w) / 2.0f;
         float cy = y + float(h) / 2.0f;
 
-        auto f = [&](Vector2D &v) {
+        auto f = [&](Vector2D &v)
+        {
             v.x = cx + cosf(angle) * (v.x - cx) - sinf(angle) * (v.y - cy);
             v.y = cy + sinf(angle) * (v.x - cx) + cosf(angle) * (v.y - cy);
         };
@@ -475,10 +482,10 @@ VMatrix wts{};
 
 void UpdateWTS()
 {
-    CViewSetup gay;
+    CViewSetup view;
     VMatrix _, __, ___;
-    g_IBaseClient->GetPlayerView(gay);
-    g_IVRenderView->GetMatricesForView(gay, &_, &__, &wts, &___);
+    g_IBaseClient->GetPlayerView(view);
+    g_IVRenderView->GetMatricesForView(view, &_, &__, &wts, &___);
 }
 
 bool WorldToScreen(const Vector &origin, Vector &screen)
@@ -493,19 +500,20 @@ bool WorldToScreen(const Vector &origin, Vector &screen)
         return true;
     return false;
 }
-    
+
 void StartupSound()
 {
     // 100% based unique meowhook only feature do not steal
     std::string cur_line;
     std::vector<std::string> line_count;
     std::ifstream sfile(paths::getDataPath("/startup_sounds.txt"));
-    int total_lines=0;
-    while(getline(sfile,cur_line)){
-    total_lines++; 
-    line_count.push_back(cur_line);  
+    int total_lines = 0;
+    while (getline(sfile, cur_line))
+    {
+        total_lines++;
+        line_count.push_back(cur_line);
     }
-    int random_number=rand()%total_lines;
+    int random_number = rand() % total_lines;
     g_ISurface->PlaySound(line_count[random_number].c_str());
 }
 

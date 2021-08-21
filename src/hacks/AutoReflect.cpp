@@ -137,7 +137,7 @@ void CreateMove()
         return;
 
     // Check if player is using a flame thrower
-    if (LOCAL_W->m_iClassID() != CL_CLASS(CTFFlameThrower) && CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 528)
+    if (LOCAL_W->m_iClassID() != CL_CLASS(CTFFlameThrower) && LOCAL_W->m_iClassID() != CL_CLASS(CTFWeaponFlameBall) && CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 528)
         return;
 
     // Check for phlogistinator, which is item 594

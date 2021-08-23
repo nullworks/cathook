@@ -75,6 +75,12 @@ const char *AppropiateBeam(int team)
             return "dxhr_lightningball_hit_zap_red";
         else
             return "dxhr_lightningball_hit_zap_blue";
+    case 3:
+        //Merasmus Vortex
+        return "merasmus_zap_beam02";
+    case 4:
+        //Merasmus Zap
+        return "merasmus_zap";
     }
 }
 

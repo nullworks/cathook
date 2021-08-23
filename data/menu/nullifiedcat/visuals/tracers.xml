@@ -7,6 +7,8 @@
                     <Option name="Machina" value="0"/>
                     <Option name="C.A.P.P.E.R" value="1"/>
                     <Option name="Short Circuit Zap" value="2"/>
+                    <Option name="Merasmus Vortex" value="3"/>
+                    <Option name="Merasmus Zap" value="4"/>
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="visual.bullet-tracers.sniper-only" label="Sniperrifles only" tooltip="Only snipers have bullet tracers."/>

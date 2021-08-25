@@ -384,6 +384,13 @@ public:
                 // Actual building check
                 for (auto &i : navfile.m_areas)
                 {
+                    // Does sentry have ammo?
+                    int sentry_ammo = CE_INT(ent, netvar.m_iAmmoShells);
+                    int sentry_lvl = CE_INT(ent, netvar.iUpgradeLevel);
+                    if (sentry_lvl == 3 && (CE_INT(ent, netvar.m_iAmmoRockets) == 0 && sentry_ammo == 0))
+                        continue;
+                    else if ((sentry_lvl == 2 || sentry_lvl == 1) && sentry_ammo == 0)
+                        continue;
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range

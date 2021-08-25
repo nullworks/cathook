@@ -368,7 +368,9 @@ public:
                 // Should we even ignore the sentry?
                 // Soldier/Heavy do not care about Level 1 or mini sentries
                 bool is_strong_class = g_pLocalPlayer->clazz == tf_soldier || g_pLocalPlayer->clazz == tf_heavy;
-                if (is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1))
+                int bullet = CE_INT(ent, netvar.m_iAmmoShells);
+                int rocket = CE_INT(ent, netvar.m_iAmmoRockets);
+                if (is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1) || (bullet == 0 && rocket == 0))
                     continue;
 
                 // It's still building/being sapped, ignore.

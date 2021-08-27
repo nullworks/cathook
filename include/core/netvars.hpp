@@ -103,6 +103,7 @@ public:
     offset_t m_iSecondaryAmmoType;
     offset_t iHitboxSet;
     offset_t vVelocity;
+    offset_t m_vecBaseVelocity;
     offset_t bGlowEnabled;
     offset_t iGlowIndex;
     offset_t iReloadMode;

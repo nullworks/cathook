@@ -330,28 +330,25 @@ void Prediction_PaintTraverse()
                 Vector original_origin = ent->m_vecOrigin();
                 Vector new_origin      = original_origin;
 
-                Vector original_velocity = CE_VECTOR(ent, 0x14c);
-                Vector new_velocity      = original_velocity;
+                Vector new_velocity = velocity;
 
-                Vector ent_mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
-                Vector ent_maxs = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
+                Vector mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
+                Vector maxs = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
 
                 for (int i = 0; i < 64; i++)
                 {
                     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = new_origin;
                     CE_VECTOR(ent, 0x354)                              = new_origin;
-                    CE_VECTOR(ent, 0x14c)                              = new_velocity;
                     ent->m_vecOrigin()                                 = new_origin;
-                    new_origin                                         = EnginePrediction(ent, g_GlobalVars->interval_per_tick);
-                    // If we aren't grounded, apply velocity
-                    if (DistanceToGround(new_origin, ent_mins, ent_maxs) > 0.0f)
-                        new_velocity.z -= sv_gravity->GetFloat() * g_GlobalVars->interval_per_tick;
+                    new_origin                                         = EnginePrediction(ent, g_GlobalVars->interval_per_tick, &new_velocity);
+                    if (DistanceToGround(new_origin, mins, maxs) > 0.0f)
+                        new_velocity.z -= sv_gravity->GetFloat() * PlayerGravityMod(ent) * g_GlobalVars->interval_per_tick;
+
                     data.push_back(new_origin);
                 }
+                CE_VECTOR(ent, 0x354)                              = original_origin;
                 ent->m_vecOrigin()                                 = original_origin;
                 const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = original_origin;
-                CE_VECTOR(ent, 0x354)                              = original_origin;
-                CE_VECTOR(ent, 0x14c)                              = original_velocity;
 
                 Vector previous_screen;
                 if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
@@ -371,6 +368,16 @@ void Prediction_PaintTraverse()
                     }
                     color.b -= 1.0f / 20.0f;
                 }
+                /*if (!ent->m_bEnemy())
+                    continue;
+                auto pos  = ProjectilePrediction_Engine(ent, hitbox_t::spine_3, 1980.0f, 0.0f, 1.0f, 0.0f);
+                auto pos2 = ProjectilePrediction(ent, hitbox_t::spine_3, 1980.0f, 0.0f, 1.0f, 0.0f);
+
+                Vector aaa;
+                if (draw::WorldToScreen(pos.first, aaa))
+                    draw::Rectangle(aaa.x, aaa.y, 5, 5, colors::yellow);
+                if (draw::WorldToScreen(pos2.first, aaa))
+                    draw::Rectangle(aaa.x, aaa.y, 5, 5, colors::orange);*/
             }
             if (debug_pp_draw)
             {
@@ -407,10 +414,13 @@ void Prediction_PaintTraverse()
     }
 }
 #endif
-Vector EnginePrediction(CachedEntity *entity, float time)
+
+Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
 {
-    Vector result      = entity->m_vecOrigin();
-    IClientEntity *ent = RAW_ENT(entity);
+    Vector result          = entity->m_vecOrigin();
+    IClientEntity *ent     = RAW_ENT(entity);
+    Vector old_vecVelocity = NET_VECTOR(ent, 0x110);
+    Vector old_absVelocity = NET_VECTOR(ent, 0x14c);
 
     typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
@@ -428,14 +438,24 @@ Vector EnginePrediction(CachedEntity *entity, float time)
 
     CUserCmd fakecmd{};
 
-    Vector vel;
+    Vector vel /* = NET_VECTOR(ent, 0x14c)*/;
     velocity::EstimateAbsVelocity(RAW_ENT(entity), vel);
+
+    Vector vel_angles;
+    VectorAngles(vel, vel_angles);
+
+    float cosang = cos(vel_angles.y);
+    float sinang = sin(vel_angles.y);
+
+    float fmove = vel.x * cosang - vel.y * sinang;
+    float smove = vel.x * sinang + vel.y * cosang;
+
     fakecmd.command_number = last_cmd_number;
-    fakecmd.forwardmove    = vel.x;
-    fakecmd.sidemove       = -vel.y;
+    fakecmd.forwardmove    = fmove;
+    fakecmd.sidemove       = smove;
     Vector oldangles       = CE_VECTOR(entity, netvar.m_angEyeAngles);
-    static Vector zerov{ 0, 0, 0 };
-    CE_VECTOR(entity, netvar.m_angEyeAngles) = zerov;
+    // static Vector zerov{ 0, 0, 0 };
+    // CE_VECTOR(entity, netvar.m_angEyeAngles) = zerov;
 
     CUserCmd *original_cmd = NET_VAR(ent, 4188, CUserCmd *);
 
@@ -444,23 +464,36 @@ Vector EnginePrediction(CachedEntity *entity, float time)
     g_GlobalVars->curtime   = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = time;
 
-    Vector old_origin      = entity->m_vecOrigin();
+    Vector old_origin = entity->m_vecOrigin();
+    // Apply Velocity overwrite
+    /*if (vecVelocity)
+    {
+        NET_VECTOR(ent, 0x14c) = *vecVelocity;
+        NET_VECTOR(ent, 0x110) = *vecVelocity;
+    }*/
+
     NET_VECTOR(ent, 0x354) = entity->m_vecOrigin();
 
     *g_PredictionRandomSeed = MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
     g_IGameMovement->StartTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
     oSetupMove(g_IPrediction, ent, &fakecmd, nullptr, pMoveData.get());
+
+    if (vecVelocity)
+        pMoveData->m_vecVelocity = *vecVelocity;
+
     g_IGameMovement->ProcessMovement(reinterpret_cast<CBasePlayer *>(ent), pMoveData.get());
     oFinishMove(g_IPrediction, ent, &fakecmd, pMoveData.get());
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
 
-    NET_VAR(entity, 4188, CUserCmd *) = original_cmd;
+    NET_VAR(ent, 4188, CUserCmd *) = original_cmd;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
 
     result                                    = ent->GetAbsOrigin();
     NET_VECTOR(ent, 0x354)                    = old_origin;
+    NET_VECTOR(ent, 0x110)                    = old_vecVelocity;
+    NET_VECTOR(ent, 0x14c)                    = old_absVelocity;
     CE_VECTOR(entity, netvar.m_angEyeAngles)  = oldangles;
     const_cast<Vector &>(ent->GetAbsOrigin()) = old_origin;
     const_cast<QAngle &>(ent->GetAbsAngles()) = VectorToQAngle(oldangles);
@@ -470,8 +503,9 @@ Vector EnginePrediction(CachedEntity *entity, float time)
 
 std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravity, float entgmod, float proj_startvelocity)
 {
-    Vector origin   = ent->m_vecOrigin();
-    Vector velocity = CE_VECTOR(ent, 0x14c);
+    Vector origin = ent->m_vecOrigin();
+    Vector velocity;
+    velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
     Vector hitbox;
     GetHitbox(ent, hb, hitbox);
     Vector hitbox_offset = hitbox - origin;
@@ -492,15 +526,9 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     float mindelta          = 65536.0f;
     Vector bestpos          = origin;
     Vector current          = origin;
-    Vector current_velocity = CE_VECTOR(ent, 0x14c);
-    int maxsteps            = 40;
-    bool onground           = false;
-    if (ent->m_Type() == ENTITY_PLAYER)
-    {
-        if (CE_INT(ent, netvar.iFlags) & FL_ONGROUND)
-            onground = true;
-    }
-    float steplength = ((float) (2 * range) / (float) maxsteps);
+    Vector current_velocity = velocity;
+    int maxsteps            = 300;
+    float steplength        = g_GlobalVars->interval_per_tick;
 
     Vector ent_mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
     Vector ent_maxs = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
@@ -510,15 +538,15 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         ent->m_vecOrigin()                                 = current;
         const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
         CE_VECTOR(ent, 0x354)                              = current;
-        CE_VECTOR(ent, 0x14c)                              = current_velocity;
-        current                                            = EnginePrediction(ent, steplength);
+        current                                            = EnginePrediction(ent, steplength, &current_velocity);
 
-        // If we aren't grounded, apply velocity
+        // Apply velocity
         if (DistanceToGround(current, ent_mins, ent_maxs) > 0.0f)
             current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
+
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
-        // rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+        rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
         if (fabs(rockettime - currenttime) < mindelta)
         {
             besttime = currenttime;
@@ -526,11 +554,11 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
             mindelta = fabs(rockettime - currenttime);
         }
     }
+    // logging::Info("besttime: %f, currenttime: %f, old currenttime: %f", besttime, currenttime, currenttime - steplength * maxsteps);
     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = origin;
     CE_VECTOR(ent, 0x354)                              = origin;
-    CE_VECTOR(ent, 0x14c)                              = velocity;
     // Compensate for ping
-    // besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+    besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
     bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravity);
     // S = at^2/2 ; t = sqrt(2S/a)*/
     Vector result            = bestpos + hitbox_offset;

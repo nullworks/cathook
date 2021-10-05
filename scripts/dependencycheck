@@ -9,6 +9,7 @@ FORCEYES=${CH_DEPENDENCYCHECK_FORCEYES:-false}
 gentoo_packages=(dev-vcs/git dev-libs/boost dev-util/cmake sys-devel/gcc sys-devel/gdb media-libs/libsdl2 media-libs/glew media-libs/freetype net-misc/rsync media-libs/libglvnd dev-util/dialog net-misc/curl)
 arch_packages=(git boost cmake make gcc gdb lib32-sdl2 lib32-glew lib32-freetype2 rsync lib32-libglvnd dialog curl)
 ubuntu_packages=(build-essential git g++ g++-multilib libboost-dev gdb libsdl2-dev:i386 libfreetype6-dev:i386 cmake dialog rsync curl)
+debian_packages=(build-essential git g++ g++-multilib libboost-dev gdb libsdl2-dev:i386 libfreetype6-dev:i386 cmake dialog rsync curl)
 fedora_packages=(cmake dialog make gcc-c++ glibc-devel.i686 freetype-devel.i686 SDL2-devel.i686 glew-devel.i686 boost-devel rsync gdb git curl)
 void_packages=(git gcc gdb gcc-multilib boost boost-devel-32bit SDL2-devel-32bit glew-devel-32bit freetype-devel-32bit libglvnd-devel-32bit rsync curl)
 
@@ -17,6 +18,7 @@ if [ "$GIT" == true ]; then
     gentoo_packages=(dev-vcs/git)
     arch_packages=(git)
     ubuntu_packages=(git)
+    debian_packages=(git)
     fedora_packages=(git)
     void_packages=(git)
 fi
@@ -76,7 +78,7 @@ case "$DISTRO" in
     ;;
     "debian")
         [ "$(type apt-get)" ] || { printf "/etc/os-release outputs 'ID=debian' but APT is not present, exiting.."; exit; }
-        OS="ubuntu"
+        OS="debian"
     ;;
     # package names are the same. Also kitware's Ubuntu CMake works just fine on Debian
     "fedora")
@@ -118,7 +120,26 @@ case "$OS" in
             dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
             out=$?
             if [ "$out" = 1 ]; then
-                $SUDO bash -c "apt install -y software-properties-common && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main' && apt-get install -y cmake"
+                $SUDO bash -c "apt install -y software-properties-common && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ $(lsb_release -c -s) main' && apt-get install -y cmake kitware-archive-keyring"
+            fi
+        fi
+    ;;
+    "debian")
+	dpkg -s "${debian_packages[@]}" > /dev/null 2>&1
+	out=$?
+        if [ "$out" = 0 ]; then
+            dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+            out=$?
+        fi
+        if [ "$out" = 1 ]; then
+            requestPermissions "${debian_packages[@]}"
+            pkgs="${debian_packages[*]}"
+            $SUDO bash -c "apt-get update;dpkg --add-architecture i386;apt-get update;apt-get install -y $pkgs"
+            # Check if cmake is up to date enough
+            dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}' cmake)" ge 3.12
+            out=$?
+            if [ "$out" = 1 ]; then
+                $SUDO bash -c "apt-get install -y cmake"
             fi
         fi
     ;;

@@ -16,7 +16,6 @@
             <AutoVariable width="fill" target="debug.ve.smooth" label="VE smooth"/>
             <AutoVariable width="fill" target="debug.ve.window" label="VE window"/>
             <AutoVariable width="fill" target="aimbot.debug" label="Debug aimbot"/>
-            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug engine PP"/>
         </List>
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Cathook" x="215">

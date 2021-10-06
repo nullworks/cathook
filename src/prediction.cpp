@@ -17,6 +17,7 @@ extern settings::Boolean engine_projpred;
 static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
 static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
 static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
+static settings::Int debug_pp_steps{ "debug.pp-steps", "66" };
 // The higher the sample size, the more previous positions we will take into account to calculate the next position. Lower = Faster reaction Higher = Stability
 static settings::Int sample_size("debug.strafepred.samplesize", "10");
 // TODO there is a Vector() object created each call.
@@ -513,21 +514,19 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     if (!sv_gravity)
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
-    if (speed == 0.0f || !sv_gravity)
+    if (speed == 0.0f || !sv_gravity) 
         return { Vector(), Vector() };
-
-    // TODO ProjAim
-    float medianTime  = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed;
-    float range       = 1.5f;
-    float currenttime = medianTime - range;
-    if (currenttime <= 0.0f)
+    
+    float currenttime = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed - 1.5f;
+    if (currenttime <= 0.0f) 
         currenttime = 0.01f;
+    
     float besttime          = currenttime;
     float mindelta          = 65536.0f;
     Vector bestpos          = origin;
     Vector current          = origin;
     Vector current_velocity = velocity;
-    int maxsteps            = std::max(40.0f, 2.0f * range / g_GlobalVars->interval_per_tick);
+    int maxsteps            = (int) debug_pp_steps;
     float steplength        = g_GlobalVars->interval_per_tick;
 
     Vector ent_mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
@@ -540,18 +539,19 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         CE_VECTOR(ent, 0x354)                              = current;
         current                                            = EnginePrediction(ent, steplength, &current_velocity);
 
-        // Apply velocity
-        if (DistanceToGround(current, ent_mins, ent_maxs) > 0.0f)
+        // Apply velocity if not touching the ground
+        if (!(CE_INT(ent, netvar.iFlags) & (1 << 0)))
             current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
 
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        if (fabs(rockettime - currenttime) < mindelta)
+        float timedelta = fabs(rockettime - currenttime);
+        if (timedelta < mindelta)
         {
             besttime = currenttime;
             bestpos  = current;
-            mindelta = fabs(rockettime - currenttime);
+            mindelta = timedelta;
         }
     }
     // logging::Info("besttime: %f, currenttime: %f, old currenttime: %f", besttime, currenttime, currenttime - steplength * maxsteps);
@@ -573,11 +573,6 @@ std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec,
     if (!vec.z || CE_BAD(building))
         return { Vector(), Vector() };
     Vector result = vec;
-    // if (not debug_pp_extrapolate) {
-    //} else {
-    //        result = SimpleLatencyPrediction(ent, hb);
-    //
-    //}
 
     if (!sv_gravity)
         sv_gravity = g_ICvar->FindVar("sv_gravity");
@@ -586,37 +581,17 @@ std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec,
         return { Vector(), Vector() };
 
     trace::filter_no_player.SetSelf(RAW_ENT(building));
-
-    // TODO ProjAim
-    float medianTime  = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
-    float range       = 1.5f;
-    float currenttime = medianTime - range;
-    if (currenttime <= 0.0f)
-        currenttime = 0.01f;
-    float besttime = currenttime;
-    float mindelta = 65536.0f;
-    Vector bestpos = result;
-    int maxsteps   = 300;
-    for (int steps = 0; steps < maxsteps; steps++, currenttime += ((float) (2 * range) / (float) maxsteps))
-    {
-        Vector curpos    = result;
-        float rockettime = g_pLocalPlayer->v_Eye.DistTo(curpos) / speed;
-        // Compensate for ping
-        rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        if (fabs(rockettime - currenttime) < mindelta)
-        {
-            besttime = currenttime;
-            bestpos  = curpos;
-            mindelta = fabs(rockettime - currenttime);
-        }
-    }
+    
+    // Buildings do not move. We don't need to do any steps here
+    float time = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
     // Compensate for ping
-    besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-    bestpos.z += (sv_gravity->GetFloat() / 2.0f * besttime * besttime * gravity);
-    Vector bestpos_initialvel = bestpos;
-    bestpos_initialvel.z -= proj_startvelocity * besttime;
+    time += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+    
+    result.z += (sv_gravity->GetFloat() / 2.0f * time * time * gravity);
+    Vector result_initialvel = result;
+    result_initialvel.z -= proj_startvelocity * time;
     // S = at^2/2 ; t = sqrt(2S/a)*/
-    return { bestpos, bestpos_initialvel };
+    return { result, result_initialvel };
 }
 
 std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity)
@@ -642,7 +617,7 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
     float mindelta = 65536.0f;
     Vector bestpos = origin;
     Vector current = origin;
-    int maxsteps   = 40;
+    int maxsteps   = (int) debug_pp_steps;
     bool onground  = false;
     if (ent->m_Type() == ENTITY_PLAYER)
     {

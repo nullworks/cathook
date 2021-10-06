@@ -25,7 +25,9 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="210">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
+            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Engine prediction"/>
             <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
+            <AutoVariable width="fill" target="debug.pp-steps" label="Prediction steps" min="1" max="300"/>
             <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
             <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial velocity"/>
             <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>

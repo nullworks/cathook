@@ -19,7 +19,7 @@
     <Box height="content" width="content" padding="12 6 6 6" name="Fake name" x="215">
         <List width="200">
             <AutoVariable width="fill" target="name.custom" label="Custom name"/>
-            <AutoVariable width="fill" target="name.custom.ipc" label="IPC name"/>
+            <AutoVariable width="fill" target="name.ipc" label="IPC name"/>
             <LabeledObject width="fill" label="Namesteal">
                 <Select target="name.namesteal">
                     <Option name="Disabled" value="0"/>

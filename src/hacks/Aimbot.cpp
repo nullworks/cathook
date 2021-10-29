@@ -623,6 +623,9 @@ bool ShouldAim()
         // Deadringer out?
         if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
             return false;
+        // Is bonked?
+        if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
+            return false;
         // Is taunting?
         if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
             return false;

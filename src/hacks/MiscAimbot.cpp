@@ -12,7 +12,7 @@
 #include "DetourHook.hpp"
 #include "Backtrack.hpp"
 
-namespace hacks::tf2::misc_aimbot
+namespace hacks::misc_aimbot
 {
 static settings::Boolean sandwichaim_enabled{ "sandwichaim.enable", "false" };
 static settings::Button sandwichaim_aimkey{ "sandwichaim.aimkey", "<null>" };
@@ -661,4 +661,4 @@ static InitRoutine init(
         EC::Register(
             EC::Shutdown, []() { CAM_CapYaw_detour.Shutdown(); }, "chargeaim_shutdown");
     });
-} // namespace hacks::tf2::misc_aimbot
+} // namespace hacks::misc_aimbot

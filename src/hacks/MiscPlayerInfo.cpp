@@ -2,7 +2,7 @@
 #include "playerlist.hpp"
 #include <boost/format.hpp>
 
-namespace hacks::tf2::miscplayerinfo
+namespace hacks::miscplayerinfo
 {
 static settings::Boolean draw_kda{ "misc.playerinfo.draw-kda", "false" };
 static settings::Boolean mafia_city{ "misc.playerinfo.draw-level", "false" };
@@ -161,4 +161,4 @@ void Paint()
 }
 static InitRoutine init([]() { EC::Register(EC::Draw, Paint, "DRAW_Miscplayerinfo", EC::average); });
 #endif
-}; // namespace hacks::tf2::miscplayerinfo
+}; // namespace hacks::miscplayerinfo

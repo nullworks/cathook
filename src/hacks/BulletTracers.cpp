@@ -3,7 +3,7 @@
  */
 #include "common.hpp"
 
-namespace hacks::tf2::bullettracers
+namespace hacks::bullettracers
 {
 
 // CatEnum bullet_tracers_enum({ "OFF", "SNIPER RIFLES", "ALL WEAPONS", "LOCAL: SNIPER RIFLES", "LOCAL: ALL WEAPONS" });
@@ -322,4 +322,4 @@ static InitRoutine init(
             },
             "shutdown_bullettrace");
     });
-} // namespace hacks::tf2::bullettracers
+} // namespace hacks::bullettracers

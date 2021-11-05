@@ -251,9 +251,11 @@ void LevelInit()
     objective_resource = nullptr;
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, UpdateObjectiveResource, "cpcontroller_updateent");
-    EC::Register(EC::CreateMove, UpdateControlPoints, "cpcontroller_updatecp");
-    EC::Register(EC::LevelInit, LevelInit, "levelinit_cocontroller");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, UpdateObjectiveResource, "cpcontroller_updateent");
+        EC::Register(EC::CreateMove, UpdateControlPoints, "cpcontroller_updatecp");
+        EC::Register(EC::LevelInit, LevelInit, "levelinit_cocontroller");
+    });
 } // namespace cpcontroller

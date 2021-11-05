@@ -65,10 +65,11 @@ void Draw()
     }
 }
 
-static InitRoutine init([]() {
+static InitRoutine init(
+    []()
+    {
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "config_ui", EC::average);
+        EC::Register(EC::Draw, Draw, "config_ui", EC::average);
 #endif
-});
+    });
 } // namespace settings::configui
-

@@ -9,7 +9,7 @@
 #include "sdk/dt_recv_redef.h"
 #include "Ragdolls.hpp"
 
-namespace hacks::shared::ragdolls
+namespace hacks::ragdolls
 {
 
 static settings::Int mode{ "visual.ragdoll-mode", "0" };
@@ -198,9 +198,11 @@ void unhook()
     ice_hook.restore();
 }
 
-static InitRoutine init([]() {
-    hook();
-    EC::Register(EC::Shutdown, unhook, "ragdoll_shutdown");
-});
+static InitRoutine init(
+    []()
+    {
+        hook();
+        EC::Register(EC::Shutdown, unhook, "ragdoll_shutdown");
+    });
 
-} // namespace hacks::shared::ragdolls
+} // namespace hacks::ragdolls

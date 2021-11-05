@@ -11,8 +11,6 @@ static bool hoovy_list[PLAYER_ARRAY_SIZE] = { 0 };
 
 bool HasSandvichOut(CachedEntity *entity)
 {
-    IF_GAME(!IsTF2()) return false;
-
     int weapon_idx;
     CachedEntity *weapon;
 

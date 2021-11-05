@@ -9,7 +9,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 
-namespace hacks::tf::autodetonator
+namespace hacks::autodetonator
 {
 static settings::Boolean enable{ "auto-detonator.enable", "0" };
 static settings::Boolean legit{ "auto-detonator.ignore-cloaked", "0" };
@@ -54,16 +54,14 @@ bool IsTarget(CachedEntity *ent)
         // Global checks
         if (!player_tools::shouldTarget(ent))
             return false;
-        IF_GAME(IsTF())
-        {
-            // Dont target invulnerable players, ex: uber, bonk
-            if (IsPlayerInvulnerable(ent))
-                return false;
 
-            // If settings allow, dont target cloaked players
-            if (legit && IsPlayerInvisible(ent))
-                return false;
-        }
+        // Dont target invulnerable players, ex: uber, bonk
+        if (IsPlayerInvulnerable(ent))
+            return false;
+
+        // If settings allow, dont target cloaked players
+        if (legit && IsPlayerInvisible(ent))
+            return false;
 
         // Target is good
         return true;
@@ -127,4 +125,4 @@ void CreateMove()
 }
 
 static InitRoutine EC([]() { EC::Register(EC::CreateMove, CreateMove, "auto_detonator", EC::average); });
-} // namespace hacks::tf::autodetonator
+} // namespace hacks::autodetonator

@@ -930,7 +930,8 @@ struct ImGuiColorMod
 struct ImGuiStyleMod
 {
     ImGuiStyleVar VarIdx;
-    union {
+    union
+    {
         int BackupInt[2];
         float BackupFloat[2];
     };

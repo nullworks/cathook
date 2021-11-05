@@ -22,7 +22,7 @@ constexpr int CAT_IDENTIFY   = 0xCA7;
 constexpr int CAT_REPLY      = 0xCA8;
 constexpr float AUTH_MESSAGE = 1234567.0f;
 
-namespace hacks::shared::catbot
+namespace hacks::catbot
 {
 void SendNetMsg(INetMessage &msg);
 }
@@ -251,13 +251,13 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     NET_StringCmd stringcmd;
 
     // Do we have to force reliable state?
-    if (hacks::tf2::nospread::SendNetMessage(&msg))
+    if (hacks::nospread::SendNetMessage(&msg))
         force_reliable = true;
     // Don't use warp with nospread
     else
-        hacks::tf2::warp::SendNetMessage(msg);
+        hacks::warp::SendNetMessage(msg);
 
-    hacks::tf2::antianticheat::SendNetMsg(msg);
+    hacks::antianticheat::SendNetMsg(msg);
 
     // net_StringCmd
     if (msg.GetType() == 4 && (newlines_msg || crypt_chat))
@@ -331,8 +331,8 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     }*/
     if (!strcmp(msg.GetName(), "clc_CmdKeyValues"))
     {
-        hacks::shared::antiaim::SendNetMessage(msg);
-        hacks::shared::catbot::SendNetMsg(msg);
+        hacks::antiaim::SendNetMessage(msg);
+        hacks::catbot::SendNetMsg(msg);
     }
     if (log_sent && msg.GetType() != 3 && msg.GetType() != 9)
     {
@@ -353,7 +353,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         logging::Info("%i bytes => %s", buffer.GetNumBytesWritten(), bytes.c_str());
     }
     bool ret_val = original::SendNetMsg(this_, msg, force_reliable, voice);
-    hacks::tf2::nospread::SendNetMessagePost();
+    hacks::nospread::SendNetMessagePost();
     return ret_val;
 }
 } // namespace hooked_methods

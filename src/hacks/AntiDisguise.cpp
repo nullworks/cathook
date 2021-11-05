@@ -8,7 +8,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 
-namespace hacks::tf2::antidisguise
+namespace hacks::antidisguise
 {
 #if ENABLE_TEXTMODE
 static settings::Boolean enable{ "remove.disguise", "true" };
@@ -39,8 +39,10 @@ void cm()
         }
     }
 }
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, cm, "antidisguise", EC::average);
-    EC::Register(EC::CreateMoveWarp, cm, "antidisguise_w", EC::average);
-});
-} // namespace hacks::tf2::antidisguise
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, cm, "antidisguise", EC::average);
+        EC::Register(EC::CreateMoveWarp, cm, "antidisguise_w", EC::average);
+    });
+} // namespace hacks::antidisguise

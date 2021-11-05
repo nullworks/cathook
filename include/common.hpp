@@ -88,9 +88,6 @@ template <typename T> constexpr T _clamp(T _min, T _max, T _val)
 
 #define _FASTCALL __attribute__((fastcall))
 #define STRINGIFY(x) #x
-
-#include "gameinfo.hpp"
-
 #define SQR(x) (x) * (x)
 
 #define SUPER_VERBOSE_DEBUG false
@@ -106,5 +103,5 @@ template <typename T> constexpr T _clamp(T _min, T _max, T _val)
 
 #define STR(c) #c
 
-#define GET_RENDER_CONTEXT (IsTF2() ? g_IMaterialSystem->GetRenderContext() : g_IMaterialSystemHL->GetRenderContext())
+#define GET_RENDER_CONTEXT (g_IMaterialSystem->GetRenderContext())
 #endif

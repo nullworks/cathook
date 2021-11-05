@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.21.0)
 
 set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
 if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
@@ -25,11 +25,6 @@ project(cathook VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 add_library(cathook SHARED "")
-
-set(GameSpecific 1 CACHE BOOL "Build for specific target game (As opposed to universal, but slower, lib)")
-set(Game "tf2" CACHE STRING "Target game")
-set(GameValues "tf2;hl2dm;dab;tf2c;css;dynamic" CACHE INTERNAL "List of supported game types")
-set_property(CACHE Game PROPERTY STRINGS ${GameValues})
 
 set(Visuals_DrawType "IMGUI" CACHE STRING "Target drawing api")
 set(DrawTypes "Textmode;No Visuals;Glez;Engine;IMGUI;IMGUI Streamproof" CACHE INTERNAL "Select the drawing api that cathook should use")
@@ -123,7 +118,7 @@ execute_process(COMMAND
         OUTPUT_VARIABLE GIT_COMMITTER_DATE
         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set( CMAKE_SKIP_RPATH true )
+set(CMAKE_SKIP_RPATH true)
 find_library(ValveLibraryVStdLib NAMES vstdlib PATHS "${PROJECT_SOURCE_DIR}/lib" NO_DEFAULT_PATH)
 
 if(EnableIPC)
@@ -160,12 +155,12 @@ endif()
 configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
-set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -fno-gnu-unique -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-rdynamic -ggdb -Og")
+set(CMAKE_CXX_FLAGS "-m32 -mavx2 -O3 -fexceptions -fno-gnu-unique -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-m32 -mavx2 -Og -rdynamic -ggdb")
 if (Internal_Symbolized)
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-m32 -mavx2 -O3 -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-m32 -mavx2 -O3 -s -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
 
 target_compile_definitions(cathook PRIVATE
@@ -221,7 +216,7 @@ endif()
 
 if (NOT Internal_Symbolized)
     add_custom_command(TARGET cathook POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook>")
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook>")
 else()
     message("Symbolized build")
     set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent" FORCE)

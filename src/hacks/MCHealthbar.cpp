@@ -15,12 +15,14 @@ static settings::Float size("mc_health.size", "32");
 static std::vector<textures::sprite> absorption;
 static std::vector<textures::sprite> hearts;
 
-static InitRoutine init_textures([]() {
-    for (int i = 0; i < 2; i++)
-        absorption.push_back(textures::atlas().create_sprite(320 + 64 * i, 64, 64, 64));
-    for (int i = 0; i < 3; i++)
-        hearts.push_back(textures::atlas().create_sprite(256 + 64 * i, 192, 64, 64));
-});
+static InitRoutine init_textures(
+    []()
+    {
+        for (int i = 0; i < 2; i++)
+            absorption.push_back(textures::atlas().create_sprite(320 + 64 * i, 64, 64, 64));
+        for (int i = 0; i < 3; i++)
+            hearts.push_back(textures::atlas().create_sprite(256 + 64 * i, 192, 64, 64));
+    });
 
 void draw_func()
 {

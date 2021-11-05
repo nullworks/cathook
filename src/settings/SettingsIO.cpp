@@ -226,8 +226,7 @@ struct migration_struct
 };
 /* clang-format off */
 // Use one per line, from -> to
-static std::array<migration_struct, 8> migrations({
-    migration_struct{ "misc.semi-auto", "misc.full-auto" },
+static std::array<migration_struct, 7> migrations({
     migration_struct{ "cat-bot.abandon-if.bots-gte", "cat-bot.abandon-if.ipc-bots-gte" },
     migration_struct{ "votelogger.partysay-casts", "votelogger.chat.casts" },
     migration_struct{ "votelogger.partysay-casts.f1-only", "votelogger.chat.casts.f1-only" },

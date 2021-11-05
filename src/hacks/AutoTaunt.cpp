@@ -10,7 +10,7 @@
 #include "hack.hpp"
 #include "PlayerTools.hpp"
 
-namespace hacks::tf::autotaunt
+namespace hacks::autotaunt
 {
 static settings::Boolean enable{ "autotaunt.enable", "false" };
 static settings::Float chance{ "autotaunt.chance", "100" };
@@ -81,34 +81,37 @@ public:
 
 AutoTauntListener listener;
 
-InitRoutine init([]() {
-    g_IEventManager2->AddListener(&listener, "player_death", false);
-    EC::Register(
-        EC::Shutdown, []() { g_IEventManager2->RemoveListener(&listener); }, "Shutdown_Autotaunt");
-    EC::Register(
-        EC::CreateMove,
-        []() {
-            if (prev_slot != -1 && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer() && taunt_t.test_and_set(100))
+InitRoutine init(
+    []()
+    {
+        g_IEventManager2->AddListener(&listener, "player_death", false);
+        EC::Register(
+            EC::Shutdown, []() { g_IEventManager2->RemoveListener(&listener); }, "Shutdown_Autotaunt");
+        EC::Register(
+            EC::CreateMove,
+            []()
             {
-                if (in_taunt)
+                if (prev_slot != -1 && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer() && taunt_t.test_and_set(100))
                 {
-                    if (!HasCondition<TFCond_Taunting>(LOCAL_E))
+                    if (in_taunt)
                     {
-                        hack::ExecuteCommand(format("slot", prev_slot + 1));
-                        prev_slot = -1;
-                        in_taunt  = false;
+                        if (!HasCondition<TFCond_Taunting>(LOCAL_E))
+                        {
+                            hack::ExecuteCommand(format("slot", prev_slot + 1));
+                            prev_slot = -1;
+                            in_taunt  = false;
+                        }
+                        else
+                            taunt_t.update();
                     }
                     else
+                    {
+                        hack::ExecuteCommand("taunt");
+                        in_taunt = true;
                         taunt_t.update();
+                    }
                 }
-                else
-                {
-                    hack::ExecuteCommand("taunt");
-                    in_taunt = true;
-                    taunt_t.update();
-                }
-            }
-        },
-        "Autotaunt_CM");
-});
-} // namespace hacks::tf::autotaunt
+            },
+            "Autotaunt_CM");
+    });
+} // namespace hacks::autotaunt

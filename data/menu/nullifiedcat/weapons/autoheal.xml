@@ -2,10 +2,10 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Auto heal">
         <List width="160">
             <AutoVariable width="fill" target="autoheal.enable" label="Enable auto heal"/>
-            <AutoVariable width="fill" target="autoheal.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen. Crosshair movement is still visible for spectators."/>
-            <AutoVariable width="fill" target="autoheal.look-at-target" label="Look at target" tooltip="Autoheal will permanently look at the target."/>
+            <AutoVariable width="fill" target="autoheal.silent" label="Silent" tooltip="Stops your crosshair from moving on your screen. Crosshair movement is still visible for spectators"/>
+            <AutoVariable width="fill" target="autoheal.look-at-target" label="Look at target" tooltip="Autoheal will permanently look at the target"/>
             <AutoVariable width="fill" target="autoheal.steam-only" label="Heal SteamID only"/>
-            <AutoVariable width="fill" target="autoheal.steamid" label="SteamID" tooltip="SteamID for the above."/>
+            <AutoVariable width="fill" target="autoheal.steamid" label="SteamID" tooltip="SteamID for the above"/>
             <AutoVariable width="fill" target="autoheal.uber.enable" label="Auto uber"/>
             <AutoVariable width="fill" target="autoheal.uber.share" label="Share uber"/>
             <AutoVariable width="fill" target="autoheal.disguised" label="Disguised Spies"/>
@@ -58,7 +58,7 @@
                 <AutoVariable width="fill" target="autoheal.vacc.blast.enable" label="Enable"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.crit-pop" label="Pop on near crit"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.danger-range" label="Danger range" min="0" max="1000"/>
-                <AutoVariable width="fill" target="autoheal.vacc.blast.pop-near-rocket-health" label="Rocket health pop" tooltip="Health value to pop ubercharge at if rocket is near." min="0" max="450"/>
+                <AutoVariable width="fill" target="autoheal.vacc.blast.pop-near-rocket-health" label="Rocket health pop" tooltip="Health value to pop ubercharge at if rocket is near" min="0" max="450"/>
                 <AutoVariable width="fill" target="autoheal.vacc.blast.min-charges" label="Min. charges" min="0" max="4"/>
             </List>
         </Box>

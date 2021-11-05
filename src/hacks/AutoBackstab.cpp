@@ -13,7 +13,7 @@
 #include "helpers.hpp"
 #include "DetourHook.hpp"
 
-namespace hacks::tf2::autobackstab
+namespace hacks::autobackstab
 {
 static settings::Boolean enabled("autobackstab.enabled", "false");
 static settings::Boolean decrease_range("autobackstab.decrease-range", "false");
@@ -122,7 +122,7 @@ int ClosestDistanceHitbox(CachedEntity *target)
     }
     return closest;
 }
-int ClosestDistanceHitbox(hacks::tf2::backtrack::BacktrackData btd)
+int ClosestDistanceHitbox(hacks::backtrack::BacktrackData btd)
 {
     int closest        = -1;
     float closest_dist = FLT_MAX, dist = 0.0f;
@@ -321,7 +321,7 @@ static bool doRageBackstab()
 static bool legit_stab = false;
 static Vector newangle_apply;
 
-bool IsTickGood(hacks::tf2::backtrack::BacktrackData tick)
+bool IsTickGood(hacks::backtrack::BacktrackData tick)
 {
     CachedEntity *ent = ENTITY(tick.entidx);
     Vector target_vec = tick.m_vecOrigin;
@@ -349,7 +349,7 @@ bool IsTickGood(hacks::tf2::backtrack::BacktrackData tick)
 static bool doBacktrackStab(bool legit = false)
 {
     CachedEntity *stab_ent = nullptr;
-    hacks::tf2::backtrack::BacktrackData stab_data;
+    hacks::backtrack::BacktrackData stab_data;
     // Set for our filter
     legit_stab = legit;
     // Get the Best tick
@@ -363,7 +363,7 @@ static bool doBacktrackStab(bool legit = false)
         if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
             continue;
 
-        auto good_ticks = hacks::tf2::backtrack::getGoodTicks(ent);
+        auto good_ticks = hacks::backtrack::getGoodTicks(ent);
         if (good_ticks)
             for (auto &bt_tick : *good_ticks)
             {
@@ -380,7 +380,7 @@ static bool doBacktrackStab(bool legit = false)
     // We found a good ent
     if (stab_ent)
     {
-        hacks::tf2::backtrack::MoveToTick(stab_data);
+        hacks::backtrack::MoveToTick(stab_data);
         current_user_cmd->buttons |= IN_ATTACK;
         current_user_cmd->viewangles     = newangle_apply;
         g_pLocalPlayer->bUseSilentAngles = true;
@@ -418,7 +418,7 @@ void CreateMove()
     case 2:
         if (shouldBacktrack)
         {
-            if (*hacks::tf2::backtrack::latency <= 190 && doRageBackstab())
+            if (*hacks::backtrack::latency <= 190 && doRageBackstab())
                 break;
             doBacktrackStab(false);
         }
@@ -430,7 +430,7 @@ void CreateMove()
     case 3:
         if (shouldBacktrack)
         {
-            if (*hacks::tf2::backtrack::latency <= 190 && doLegitBackstab())
+            if (*hacks::backtrack::latency <= 190 && doLegitBackstab())
                 break;
             doBacktrackStab(true);
         }
@@ -444,8 +444,10 @@ void CreateMove()
     }
 }
 
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, CreateMove, "autobackstab", EC::average);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "autobackstab_w", EC::average);
-});
-} // namespace hacks::tf2::autobackstab
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "autobackstab", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "autobackstab_w", EC::average);
+    });
+} // namespace hacks::autobackstab

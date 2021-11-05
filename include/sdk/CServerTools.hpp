@@ -4,5 +4,5 @@
 class CServerTools
 {
 public:
-    IServerEntity *GetIServerEntity( IClientEntity *pClientEntity );
+    IServerEntity *GetIServerEntity(IClientEntity *pClientEntity);
 };

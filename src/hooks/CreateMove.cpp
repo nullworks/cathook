@@ -15,18 +15,14 @@
 #include "NavBot.hpp"
 #include "HookTools.hpp"
 #include "teamroundtimer.hpp"
-
 #include "HookedMethods.hpp"
 #include "nospread.hpp"
 #include "Warp.hpp"
 
-static settings::Boolean minigun_jump{ "misc.minigun-jump-tf2c", "false" };
 static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
 static settings::Boolean forward_speedhack{ "misc.roll-speedhack.forward", "false" };
 settings::Boolean engine_pred{ "misc.engine-prediction", "true" };
 static settings::Boolean debug_projectiles{ "debug.projectiles", "false" };
-static settings::Int fullauto{ "misc.full-auto", "0" };
-static settings::Boolean fuckmode{ "misc.fuckmode", "false" };
 
 class CMoveData;
 namespace engine_prediction
@@ -128,7 +124,6 @@ void PrecalculateCanShoot()
     calculated_can_shoot = next_attack <= server_time;
 }
 
-static int attackticks = 0;
 namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUserCmd *cmd)
@@ -140,11 +135,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     current_user_cmd = cmd;
     EC::run(EC::CreateMoveEarly);
-    IF_GAME(IsTF2C())
-    {
-        if (CE_GOOD(LOCAL_W) && minigun_jump && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
-            CE_INT(LOCAL_W, netvar.iWeaponState) = 0;
-    }
     ret = original::CreateMove(this_, input_sample_time, cmd);
 
     if (!cmd)
@@ -198,7 +188,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         last_cmd_number = current_user_cmd->command_number;
 
     /**bSendPackets = true;
-    if (hacks::shared::lagexploit::ExploitActive()) {
+    if (hacks::lagexploit::ExploitActive()) {
         *bSendPackets = ((current_user_cmd->command_number % 4) == 0);
         //logging::Info("%d", *bSendPackets);
     }*/
@@ -208,13 +198,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
-
-    if (*fuckmode)
-    {
-        static int prevbuttons = 0;
-        current_user_cmd->buttons |= prevbuttons;
-        prevbuttons |= current_user_cmd->buttons;
-    }
 
     if (!g_Settings.bInvalid && CE_GOOD(g_pLocalPlayer->entity))
     {
@@ -229,7 +212,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     //	PROF_BEGIN();
     // Do not update if in warp, since the entities will stay identical either way
-    if (!hacks::tf2::warp::in_warp)
+    if (!hacks::warp::in_warp)
     {
         PROF_SECTION(EntityCache);
         entity_cache::Update();
@@ -266,18 +249,10 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 g_Settings.is_create_move = false;
                 return ret;
             }
-            if (current_user_cmd->buttons & IN_ATTACK)
-                ++attackticks;
-            else
-                attackticks = 0;
-            if (fullauto)
-                if (current_user_cmd->buttons & IN_ATTACK)
-                    if (attackticks % *fullauto + 1 < *fullauto)
-                        current_user_cmd->buttons &= ~IN_ATTACK;
             g_pLocalPlayer->isFakeAngleCM = false;
             static int fakelag_queue      = 0;
             if (CE_GOOD(LOCAL_E))
-                if (!hacks::tf2::nospread::is_syncing && (fakelag_amount || (hacks::shared::antiaim::force_fakelag && hacks::shared::antiaim::isEnabled())))
+                if (!hacks::nospread::is_syncing && (fakelag_amount || (hacks::antiaim::force_fakelag && hacks::antiaim::isEnabled())))
                 {
                     // Do not fakelag when trying to attack
                     bool do_fakelag = true;
@@ -315,7 +290,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 }
             {
                 PROF_SECTION(CM_antiaim);
-                hacks::shared::antiaim::ProcessUserCmd(cmd);
+                hacks::antiaim::ProcessUserCmd(cmd);
             }
             if (debug_projectiles)
                 projectile_logging::Update();
@@ -331,7 +306,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             g_pLocalPlayer->UpdateEye();
         }
 
-        if (hacks::tf2::warp::in_warp)
+        if (hacks::warp::in_warp)
             EC::run(EC::CreateMoveWarp);
         else
             EC::run(EC::CreateMove);
@@ -430,8 +405,9 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             pUpdateRate = g_pCVar->FindVar("cl_updaterate");
         else
         {
-            float interp = MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / pUpdateRate->GetFloat());
-            cmd->tick_count += TIME_TO_TICKS(interp);
+            auto ratio      = std::clamp(cl_interp_ratio->GetFloat(), sv_client_min_interp_ratio->GetFloat(), sv_client_max_interp_ratio->GetFloat());
+            auto lerptime   = (std::max)(cl_interp->GetFloat(), (ratio / ((sv_maxupdaterate) ? sv_maxupdaterate->GetFloat() : cl_updaterate->GetFloat())));
+            cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(LOCAL_E, netvar.m_flSimulationTime) + lerptime);
         }
     }
     return ret;

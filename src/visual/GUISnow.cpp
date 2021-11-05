@@ -175,24 +175,26 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
     snow_manager.Clear();
 }
 
-static InitRoutine init([]() {
-    std::time_t theTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::tm *aTime      = std::localtime(&theTime);
-
-    int day   = aTime->tm_mday;
-    int month = aTime->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
-
-    // We only want to draw around christmas time, let's use 12th of december+ til 12th of january
-    if ((month == 12 && day >= 12) || (month == 1 && day <= 12))
+static InitRoutine init(
+    []()
     {
-        // Very early to not draw over the menu
-        EC::Register(EC::Draw, DrawSnowflakes, "draw_snowflakes", EC::ec_priority::very_early);
-        min_snowflake_speed_x.installChangeCallback(rvarCallback<float>);
-        max_snowflake_speed_x.installChangeCallback(rvarCallback<float>);
-        min_snowflake_speed_y.installChangeCallback(rvarCallback<float>);
-        max_snowflake_speed_y.installChangeCallback(rvarCallback<float>);
-        snowflake_speed_deviation_x.installChangeCallback(rvarCallback<float>);
-        snowflake_speed_deviation_y.installChangeCallback(rvarCallback<float>);
-    }
-});
+        std::time_t theTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::tm *aTime      = std::localtime(&theTime);
+
+        int day   = aTime->tm_mday;
+        int month = aTime->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
+
+        // We only want to draw around christmas time, let's use 12th of december+ til 12th of january
+        if ((month == 12 && day >= 12) || (month == 1 && day <= 12))
+        {
+            // Very early to not draw over the menu
+            EC::Register(EC::Draw, DrawSnowflakes, "draw_snowflakes", EC::ec_priority::very_early);
+            min_snowflake_speed_x.installChangeCallback(rvarCallback<float>);
+            max_snowflake_speed_x.installChangeCallback(rvarCallback<float>);
+            min_snowflake_speed_y.installChangeCallback(rvarCallback<float>);
+            max_snowflake_speed_y.installChangeCallback(rvarCallback<float>);
+            snowflake_speed_deviation_x.installChangeCallback(rvarCallback<float>);
+            snowflake_speed_deviation_y.installChangeCallback(rvarCallback<float>);
+        }
+    });
 } // namespace snowflakes

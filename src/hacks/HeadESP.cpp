@@ -2,7 +2,7 @@
 #if ENABLE_VISUALS
 #include "common.hpp"
 
-namespace hacks::shared::headesp
+namespace hacks::headesp
 {
 static settings::Int mode{ "headesp.mode", "0" };
 static settings::Float size_scaling{ "headesp.size-scaling", "2" };
@@ -73,7 +73,7 @@ void draw()
             if (*mode == 1)
             {
                 float thickness = ((1250.0f * *size_scaling) / (distance + 10)) + 15;
-                draw::Circle(out.x, out.y, 1, hacks::shared::headesp::HeadESPColor(pEntity), thickness, 100);
+                draw::Circle(out.x, out.y, 1, hacks::headesp::HeadESPColor(pEntity), thickness, 100);
             }
             else if (*mode == 2 || *mode == 3 || *mode == 4)
             {
@@ -128,5 +128,5 @@ static InitRoutine init(
 #endif
     });
 
-} // namespace hacks::shared::headesp
+} // namespace hacks::headesp
 #endif

@@ -347,7 +347,7 @@ void UpdateTemporaryData()
             }
 
             data.ingame.player_count = players;
-            hacks::shared::catbot::update_ipc_data(data);
+            hacks::catbot::update_ipc_data(data);
         }
         else
         {

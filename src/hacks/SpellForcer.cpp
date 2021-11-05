@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "AntiCheatBypass.hpp"
 
-namespace hacks::tf2::spellforcer
+namespace hacks::spellforcer
 {
 static settings::Boolean enabled("spellforce.enabled", "false");
 
@@ -282,4 +282,4 @@ static InitRoutine init(
         EC::Register(EC::CreateMoveLate, CreateMoveLate, "spellforcer_cml", EC::early);
     });
 
-} // namespace hacks::tf2::spellforcer
+} // namespace hacks::spellforcer

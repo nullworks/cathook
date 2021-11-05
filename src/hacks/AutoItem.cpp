@@ -21,7 +21,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include "common.hpp"
 
-namespace hacks::tf2::autoitem
+namespace hacks::autoitem
 {
 
 static settings::Boolean enable{ "auto-item.enable", "false" };
@@ -526,4 +526,4 @@ static InitRoutine init(
         ach_items[1170] = { 166, "TF_PASS_TIME_HAT" };                    // PASS Time Miniature Half JACK - Tune Merasmus's Multi-Dimensional Television
         ach_items[267]  = { 1909, "TF_HALLOWEEN_BOSS_KILL_MELEE" };       // Haunted Metal Scrap - Gored!
     });
-} // namespace hacks::tf2::autoitem
+} // namespace hacks::autoitem

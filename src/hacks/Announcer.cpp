@@ -8,7 +8,7 @@
 #include <settings/Registered.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::announcer
+namespace hacks::announcer
 {
 static settings::Boolean enable{ "announcer", "false" };
 
@@ -166,4 +166,4 @@ static InitRoutine EC(
         EC::Register(EC::Shutdown, shutdown, "shutdown_announcer", EC::average);
         init();
     });
-} // namespace hacks::shared::announcer
+} // namespace hacks::announcer

@@ -9,7 +9,7 @@
 #include <hacks/UberSpam.hpp>
 #include <settings/Int.hpp>
 
-namespace hacks::tf::uberspam
+namespace hacks::uberspam
 {
 static settings::Int source{ "uberspam.source", "0" };
 static settings::Boolean team_chat{ "uberspam.team-chat", "true" };
@@ -114,4 +114,4 @@ static InitRoutine register_EC([]() { EC::Register(EC::CreateMove, CreateMove, "
 
 const std::vector<std::string> builtin_cathook  = { "-> I am charged!", "-> Not a step back! UBERCHARGE USED!", "-> My Ubercharge comes to an end!", "-> I have %i%% of ubercharge!", "-> I have half of the ubercharge!", "-> Ubercharge almost ready! (%i%%)" };
 const std::vector<std::string> builtin_nonecore = { ">>> GET READY TO RUMBLE! <<<", ">>> CHEATS ACTIVATED! <<<", ">>> RUMBLE COMPLETE! <<<", ">>> RUMBLE IS %i%% CHARGED! <<<" };
-} // namespace hacks::tf::uberspam
+} // namespace hacks::uberspam

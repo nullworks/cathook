@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace hacks::shared::ChatCommands
+namespace hacks::ChatCommands
 {
 void handleChatMessage(std::string message, int userid);
-}
+} // namespace hacks::ChatCommands

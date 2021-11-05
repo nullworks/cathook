@@ -6,7 +6,7 @@
  */
 
 #include "common.hpp"
-
+#include "DetourHook.hpp"
 #include <sys/mman.h>
 #include "settings/Bool.hpp"
 #include "MiscTemporary.hpp"
@@ -623,8 +623,6 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
 {
     if (CE_BAD(player))
         return powerup_type::not_powerup;
-    //	if (!HasCondition<TFCond_HasRune>(player)) return
-    // powerup_type::not_powerup;
     if (HasCondition<TFCond_RuneStrength>(player))
         return powerup_type::strength;
     if (HasCondition<TFCond_RuneHaste>(player))
@@ -976,12 +974,10 @@ void FixMovement(CUserCmd &cmd, Vector &viewangles)
 
 bool AmbassadorCanHeadshot()
 {
-    if (IsAmbassador(g_pLocalPlayer->weapon()))
+    if (IsAmbassador(LOCAL_W))
     {
-        if ((g_GlobalVars->curtime - CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flLastFireTime)) <= 1.0)
-        {
+        if ((CE_FLOAT(LOCAL_W, netvar.flLastFireTime) - SERVER_TIME) <= 1.0f)
             return false;
-        }
     }
     return true;
 }
@@ -1213,6 +1209,7 @@ weaponmode GetWeaponMode(CachedEntity *ent)
     case CL_CLASS(CTFGrenadeLauncher):
     case CL_CLASS(CTFPipebombLauncher):
     case CL_CLASS(CTFCompoundBow):
+    case CL_CLASS(CTFFlameThrower):
     case CL_CLASS(CTFBat_Wood):
     case CL_CLASS(CTFBat_Giftwrap):
     case CL_CLASS(CTFFlareGun):
@@ -1275,8 +1272,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
 {
     float rspeed, rgrav, rinitial_vel;
 
-    IF_GAME(!IsTF()) return false;
-
     if (CE_BAD(weapon))
         return false;
     rspeed       = 0.0f;
@@ -1309,20 +1304,17 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFGrenadeLauncher):
     {
-        rspeed       = 1216.6f;
+        rspeed       = 1217.0f;
         rgrav        = 1.0f;
         rinitial_vel = 200.0f;
-        IF_GAME(IsTF2())
-        {
-            // Loch'n Load
-            if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 308)
-                rspeed = 1513.3f;
-        }
+        // Loch'n Load
+        if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 308)
+            rspeed = 1513.3f;
         break;
     }
     case CL_CLASS(CTFPipebombLauncher):
     {
-        float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
+        float chargetime = SERVER_TIME - CE_FLOAT(weapon, netvar.flChargeBeginTime);
         if (!CE_FLOAT(weapon, netvar.flChargeBeginTime))
             chargetime = 0.0f;
         rspeed       = RemapValClamped(chargetime, 0.0f, 4.0f, 925.38, 2409.2);
@@ -1334,7 +1326,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFCompoundBow):
     {
-        float chargetime = g_GlobalVars->curtime - CE_FLOAT(weapon, netvar.flChargeBeginTime);
+        float chargetime = SERVER_TIME - CE_FLOAT(weapon, netvar.flChargeBeginTime);
         if (CE_FLOAT(weapon, netvar.flChargeBeginTime) == 0)
             chargetime = 0;
         else
@@ -1345,7 +1337,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
             else
             {
                 chargetime += TICKS_TO_TIME(1);
-                // chargetime += ROUND_TO_TICKS(MAX(cl_interp->GetFloat(), cl_interp_ratio->GetFloat() / pUpdateRate->GetFloat()));
             }
         }
         rspeed = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
@@ -1363,20 +1354,20 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFFlareGun_Revenge): // Detonator
     {
         rspeed = 2000.0f;
-        rgrav  = 0.25f;
+        rgrav  = 0.3f;
         break;
     }
     case CL_CLASS(CTFSyringeGun):
     {
-        rgrav  = 0.3f;
         rspeed = 1000.0f;
+        rgrav  = 0.3f;
         break;
     }
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
     {
-        rgrav  = 0.2f;
         rspeed = 2400.0f;
+        rgrav  = 0.2f;
         break;
     }
     case CL_CLASS(CTFDRGPomson):
@@ -1389,6 +1380,11 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     case CL_CLASS(CTFCleaver):
     {
         rspeed = 3000.0f;
+        break;
+    }
+    case CL_CLASS(CTFFlameThrower):
+    {
+        rspeed = 1000.0f;
         break;
     }
     case CL_CLASS(CTFGrapplingHook):
@@ -1418,27 +1414,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     start_velocity = rinitial_vel;
     return (rspeed || rgrav || rinitial_vel);
 }
-
-/*const char* MakeInfoString(IClientEntity* player) {
-    char* buf = new char[256]();
-    player_info_t info;
-    if (!GetPlayerInfo(player->entindex(), &info)) return (const
-char*)0; logging::Info("a"); int hWeapon = NET_INT(player,
-netvar.hActiveWeapon); if (NET_BYTE(player, netvar.iLifeState)) { sprintf(buf,
-"%s is dead %s", info.name, tfclasses[NET_INT(player, netvar.iClass)]); return
-buf;
-    }
-    if (hWeapon) {
-        IClientEntity* weapon = ENTITY(hWeapon & 0xFFF);
-        sprintf(buf, "%s is %s with %i health using %s", info.name,
-tfclasses[NET_INT(player, netvar.iClass)], NET_INT(player, netvar.iHealth),
-weapon->GetClientClass()->GetName()); } else { sprintf(buf, "%s is %s with %i
-health", info.name, tfclasses[NET_INT(player, netvar.iClass)], NET_INT(player,
-netvar.iHealth));
-    }
-    logging::Info("Result: %s", buf);
-    return buf;
-}*/
 
 bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedEntity *self, unsigned int mask)
 {
@@ -1540,7 +1515,6 @@ bool IsSentryBuster(CachedEntity *entity)
 
 bool IsAmbassador(CachedEntity *entity)
 {
-    IF_GAME(!IsTF2()) return false;
     if (entity->m_iClassID() != CL_CLASS(CTFRevolver))
         return false;
     const int &defidx = CE_INT(entity, netvar.iItemDefinitionIndex);
@@ -1653,7 +1627,7 @@ float GetFov(Vector angle, Vector src, Vector dst)
 
 bool CanHeadshot()
 {
-    return (g_pLocalPlayer->flZoomBegin > 0.0f && (g_GlobalVars->curtime - g_pLocalPlayer->flZoomBegin > 0.2f));
+    return (g_pLocalPlayer->flZoomBegin > 0.0f && (SERVER_TIME - g_pLocalPlayer->flZoomBegin > 0.2f));
 }
 
 bool CanShoot()
@@ -1844,40 +1818,75 @@ Vector getShootPos(Vector angle)
     std::optional<Vector> vecOffset(0.0f);
     switch (LOCAL_W->m_iClassID())
     {
-    // Rocket launchers and flare guns/Pomson
-    case CL_CLASS(CTFRocketLauncher):
-    case CL_CLASS(CTFRocketLauncher_Mortar):
-    case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFRocketLauncher_DirectHit):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFRocketLauncher):
     case CL_CLASS(CTFFlareGun):
-    case CL_CLASS(CTFFlareGun_Revenge):
+    case CL_CLASS(CTFFlareGun_Revenge): // Detonator
+    {
+        vecOffset = Vector(23.5f, 12.0f, -3.0f);
+        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 513) // The Original
+            vecOffset->y = 0.0f;
+        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+            vecOffset->z = 8.0f;
+        break;
+    }
+    case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFDRGPomson):
-        // The original shoots centered, rest doesn't
-        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513)
+    case CL_CLASS(CTFRaygun): // Righteous Bison
+    case CL_CLASS(CTFCompoundBow):
+    case CL_CLASS(CTFCrossbow):
+    case CL_CLASS(CTFShotgunBuildingRescue):
+    case CL_CLASS(CTFGrapplingHook):
+    {
+        vecOffset = Vector(23.5f, 8.0f, -3.0f);
+        switch (LOCAL_W->m_iClassID())
         {
-            vecOffset = Vector(23.5f, 12.0f, -3.0f);
-            // Ducking changes offset
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
-                vecOffset->z = 8.0f;
+            case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
+            case CL_CLASS(CTFRaygun): // Righteous Bison
+            {
+                if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+                    vecOffset->z = 8.0f;
+                break;
+            }
+            default:
+                break;
         }
         break;
-
-    // Pill/Pipebomb launchers
-    case CL_CLASS(CTFPipebombLauncher):
-    case CL_CLASS(CTFGrenadeLauncher):
+    }
     case CL_CLASS(CTFCannon):
+    case CL_CLASS(CTFGrenadeLauncher):
+    case CL_CLASS(CTFPipebombLauncher):
+    case CL_CLASS(CTFJarMilk):
+    case CL_CLASS(CTFJar):
+    case CL_CLASS(CTFJarGas):
+    {
         vecOffset = Vector(16.0f, 8.0f, -6.0f);
         break;
-
+    }
+    case CL_CLASS(CTFBat_Giftwrap):
+    case CL_CLASS(CTFBat_Wood):
+    case CL_CLASS(CTFCleaver):
+    {
+        vecOffset = Vector(32.0f, 0.0f, -15.0f);
+        break;
+    }
     case CL_CLASS(CTFSyringeGun):
+    {
         vecOffset = Vector(16.0f, 6.0f, -8.0f);
         break;
-
-    // Huntsman
-    case CL_CLASS(CTFCompoundBow):
-        vecOffset = Vector(23.5f, -8.0f, -3.0f);
+    }
+    case CL_CLASS(CTFFlameThrower):
+    case CL_CLASS(CTFWeaponFlameBall):
+    {
+        vecOffset = Vector(0.0f, 12.0f, 0.0f);
         break;
-
+    }
+    case CL_CLASS(CTFLunchBox):
+    {
+        vecOffset = Vector(0.0f, 0.0f, -8.0f);
+        break;
+    }
     default:
         break;
     }

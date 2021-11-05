@@ -57,7 +57,7 @@ rgba_t colors::EntityF(CachedEntity *ent)
     type   = ent->m_ItemType();
     if (type)
     {
-        if ((type >= ITEM_HEALTH_SMALL && type <= ITEM_HEALTH_LARGE) || type == ITEM_TF2C_PILL)
+        if ((type >= ITEM_HEALTH_SMALL && type <= ITEM_HEALTH_LARGE))
             result = green;
         else if (type >= ITEM_POWERUP_FIRST && type <= ITEM_POWERUP_LAST)
         {
@@ -68,21 +68,6 @@ rgba_t colors::EntityF(CachedEntity *ent)
                 result = blu;
             else
                 result = yellow;
-        }
-        else if (type >= ITEM_TF2C_W_FIRST && type <= ITEM_TF2C_W_LAST)
-        {
-            if (CE_BYTE(ent, netvar.bRespawning))
-            {
-                result = red;
-            }
-            else
-            {
-                result = yellow;
-            }
-        }
-        else if (type == ITEM_HL_BATTERY)
-        {
-            result = yellow;
         }
     }
 

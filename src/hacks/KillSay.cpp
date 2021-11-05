@@ -8,7 +8,7 @@
 #include <settings/Int.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::killsay
+namespace hacks::killsay
 {
 static settings::Int killsay_mode{ "killsay.mode", "0" };
 static settings::String filename{ "killsay.file", "killsays.txt" };
@@ -90,7 +90,7 @@ class KillSayEventListener : public IGameEventListener2
     {
         if (!killsay_mode)
             return;
-        std::string message = hacks::shared::killsay::ComposeKillSay(event);
+        std::string message = hacks::killsay::ComposeKillSay(event);
         if (!message.empty())
         {
             int vid                    = event->GetInt("userid");
@@ -145,4 +145,4 @@ static InitRoutine runinit(
         init();
     });
 
-} // namespace hacks::shared::killsay
+} // namespace hacks::killsay

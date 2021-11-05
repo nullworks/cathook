@@ -10,7 +10,7 @@
 #include <settings/Bool.hpp>
 #include "soundcache.hpp"
 
-namespace hacks::tf::autosticky
+namespace hacks::autosticky
 {
 static settings::Boolean enable{ "autosticky.enable", "false" };
 static settings::Boolean buildings{ "autosticky.buildings", "true" };
@@ -63,20 +63,17 @@ bool IsTarget(CachedEntity *ent)
         if (!player_tools::shouldTarget(ent))
             return false;
 
-        IF_GAME(IsTF())
-        {
-            // Dont target invulnerable players, ex: uber, bonk
-            if (IsPlayerInvulnerable(ent))
-                return false;
+        // Dont target invulnerable players, ex: uber, bonk
+        if (IsPlayerInvulnerable(ent))
+            return false;
 
-            // If settings allow, ignore taunting players
-            // if (ignore_taunting && HasCondition<TFCond_Taunting>(ent)) return
-            // false;
+        // If settings allow, ignore taunting players
+        // if (ignore_taunting && HasCondition<TFCond_Taunting>(ent)) return
+        // false;
 
-            // If settings don't allow, dont target cloaked players
-            if (*legit && IsPlayerInvisible(ent))
-                return false;
-        }
+        // If settings don't allow, dont target cloaked players
+        if (*legit && IsPlayerInvisible(ent))
+            return false;
 
         // Target is good
         return true;
@@ -98,9 +95,6 @@ void CreateMove()
     // Check user settings if auto-sticky is enabled
     if (!enable)
         return;
-
-    // Check if game is a tf game
-    // IF_GAME (!IsTF()) return;
 
     // Check if player is demoman
     if (g_pLocalPlayer->clazz != tf_demoman)
@@ -188,7 +182,7 @@ void CreateMove()
                             shouldExplode = true;
                         else if (*legit == 2 && CE_GOOD(target) && IsVectorVisible(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), true) && IsVectorVisible(g_pLocalPlayer->v_Eye, *position, true))
                             shouldExplode = true;
-                        
+
                         if (shouldExplode)
                         {
                             // Aim at bomb
@@ -210,4 +204,4 @@ void CreateMove()
 }
 
 static InitRoutine EC([]() { EC::Register(EC::CreateMove, CreateMove, "auto_sticky", EC::average); });
-} // namespace hacks::tf::autosticky
+} // namespace hacks::autosticky

@@ -16,16 +16,18 @@ struct EventCallbackData
 };
 
 static std::vector<EventCallbackData> events[ec_types::EcTypesSize];
-CatCommand evt_print("debug_print_events", "Print EC events", []() {
-    for (int i = 0; i < int(ec_types::EcTypesSize); ++i)
-    {
-        logging::Info("%d events:", i);
+CatCommand evt_print("debug_print_events", "Print EC events",
+                     []()
+                     {
+                         for (int i = 0; i < int(ec_types::EcTypesSize); ++i)
+                         {
+                             logging::Info("%d events:", i);
 
-        for (auto it = events[i].begin(); it != events[i].end(); ++it)
-            logging::Info("%s", it->event_name.c_str());
-        logging::Info("");
-    }
-});
+                             for (auto it = events[i].begin(); it != events[i].end(); ++it)
+                                 logging::Info("%s", it->event_name.c_str());
+                             logging::Info("");
+                         }
+                     });
 
 void Register(enum ec_types type, const EventFunction &function, const std::string &name, enum ec_priority priority)
 {

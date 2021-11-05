@@ -2081,7 +2081,8 @@ struct ImGuiStorage
     struct Pair
     {
         ImGuiID key;
-        union {
+        union
+        {
             int val_i;
             float val_f;
             void *val_p;

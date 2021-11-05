@@ -19,7 +19,7 @@
 #include "MiscTemporary.hpp"
 #include <iostream>
 
-namespace hacks::shared::ChatCommands
+namespace hacks::ChatCommands
 {
 
 static settings::Boolean enabled("chatcommands.enabled", "false");
@@ -152,4 +152,4 @@ static CatCommand chatcommands_reset_all("chatcommands_reset_all", "Clears all c
                                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Chat commands cleared!\n");
                                          });
 
-} // namespace hacks::shared::ChatCommands
+} // namespace hacks::ChatCommands

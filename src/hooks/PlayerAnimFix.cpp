@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "DetourHook.hpp"
 
-namespace hacks::tf2::animfix
+namespace hacks::animfix
 {
 static settings::Boolean enabled("misc.animfix.enabled", "false");
 DetourHook frameadvance_detour{};
@@ -87,25 +87,28 @@ void LevelInit()
     previous_simtimes.resize(g_IEngine->GetMaxClients());
 }
 
-static InitRoutine init([]() {
-    static auto ShouldInterpolate_signature = gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 A1 ? ? ? ? 8B 5D ? 8B 10 89 04 24 FF 52 ? 8B 53");
-    shouldinterpolate_detour.Init(ShouldInterpolate_signature, (void *) ShouldInterpolate_hook);
+static InitRoutine init(
+    []()
+    {
+        static auto ShouldInterpolate_signature = gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 A1 ? ? ? ? 8B 5D ? 8B 10 89 04 24 FF 52 ? 8B 53");
+        shouldinterpolate_detour.Init(ShouldInterpolate_signature, (void *) ShouldInterpolate_hook);
 
-    /*static auto CheckForSequenceChange_signature = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C 8B 45 ? 8B 75 ? 8B 4D ? 8B 7D");
-     checkforsequencechange_detour.Init(CheckForSequenceChange_signature, (void *) CheckForSequenceChange_hook);*/
+        /*static auto CheckForSequenceChange_signature = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C 8B 45 ? 8B 75 ? 8B 4D ? 8B 7D");
+         checkforsequencechange_detour.Init(CheckForSequenceChange_signature, (void *) CheckForSequenceChange_hook);*/
 
-    static auto FrameAdvance_signature = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 4C 8B 5D ? 80 BB ? ? ? ? 00 0F 85 ? ? ? ? 8B B3");
-    frameadvance_detour.Init(FrameAdvance_signature, (void *) FrameAdvance_hook);
-    EC::Register(EC::LevelInit, LevelInit, "levelinit_animfix");
-    LevelInit();
+        static auto FrameAdvance_signature = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 4C 8B 5D ? 80 BB ? ? ? ? 00 0F 85 ? ? ? ? 8B B3");
+        frameadvance_detour.Init(FrameAdvance_signature, (void *) FrameAdvance_hook);
+        EC::Register(EC::LevelInit, LevelInit, "levelinit_animfix");
+        LevelInit();
 
-    EC::Register(
-        EC::Shutdown,
-        []() {
-            frameadvance_detour.Shutdown();
-            // checkforsequencechange_detour.Shutdown();
-            frameadvance_detour.Shutdown();
-        },
-        "shutdown_animfix");
-});
-} // namespace hacks::tf2::animfix
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                frameadvance_detour.Shutdown();
+                // checkforsequencechange_detour.Shutdown();
+                frameadvance_detour.Shutdown();
+            },
+            "shutdown_animfix");
+    });
+} // namespace hacks::animfix

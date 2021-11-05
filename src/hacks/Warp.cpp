@@ -17,7 +17,7 @@
 #include "Think.hpp"
 #include "Aimbot.hpp"
 
-namespace hacks::tf2::warp
+namespace hacks::warp
 {
 static settings::Boolean enabled{ "warp.enabled", "false" };
 static settings::Boolean no_movement{ "warp.rapidfire.no-movement", "true" };
@@ -28,6 +28,7 @@ static settings::Boolean wait_full{ "warp.rapidfire.wait-full", "true" };
 static settings::Button rapidfire_key{ "warp.rapidfire.key", "<null>" };
 static settings::Int rapidfire_key_mode{ "warp.rapidfire.key-mode", "1" };
 static settings::Int rf_disable_on{ "warp.rapidfire.disable-on", "0" };
+static settings::Int rf_flamethrower_modes{ "warp.rapidfire.flmaethrower-modes", "0" };
 static settings::Float speed{ "warp.speed", "23" };
 static settings::Boolean draw{ "warp.draw", "false" };
 static settings::Boolean draw_bar{ "warp.draw-bar", "false" };
@@ -44,8 +45,6 @@ static settings::Boolean warp_forward{ "warp.on-hit.forward", "false" };
 static settings::Boolean warp_backwards{ "warp.on-hit.backwards", "false" };
 static settings::Boolean warp_left{ "warp.on-hit.left", "true" };
 static settings::Boolean warp_right{ "warp.on-hit.right", "true" };
-
-static settings::Boolean debug_seqout{ "debug.warp_seqout", "false" };
 
 // Hidden control rvars for communtiy servers
 static settings::Int maxusrcmdprocessticks("warp.maxusrcmdprocessticks", "24");
@@ -158,7 +157,7 @@ float getFireDelay()
 
 bool canInstaZoom()
 {
-    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= g_GlobalVars->curtime);
+    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= SERVER_TIME);
 }
 
 // This is needed in order to make zoom/unzoom smooth even with insta zoom
@@ -227,9 +226,34 @@ bool shouldRapidfire()
     // Mouse 1 is held, do it.
     bool buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
 
-    // Unless we are on a flamethrower, where we want both m1 and m2.
-    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-        buttons_pressed = current_user_cmd && current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2);
+    switch (*rf_flamethrower_modes)
+    {
+    case 0: // Any mode
+    {
+        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+            buttons_pressed = current_user_cmd && current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2);
+        break;
+    }
+    case 1: // "Flame" mode / mouse 1
+    {
+        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+            buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
+        break;
+    }
+    case 2: // Airblast mode / mouse 2
+    {
+        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+            buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK2;
+        break;
+    }
+    case 3: // Disable all
+    default:
+    {
+        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+            return false;
+        break;
+    }
+    }
 
     if (g_pLocalPlayer->holding_sniper_rifle)
     {
@@ -242,6 +266,7 @@ bool shouldRapidfire()
 
     switch (*rf_disable_on)
     {
+    default:
     case 0: // Always on
         return buttons_pressed;
     case 1: // Disable on projectile
@@ -365,7 +390,7 @@ void Warp(float accumulated_extra_samples, bool finalTick)
                 hooked_methods::UpdatePred();
 
             if (in_rapidfire)
-                hacks::shared::aimbot::last_target_ignore_timer = tickcount + 12;
+                hacks::aimbot::last_target_ignore_timer = tickcount + 12;
             original(accumulated_extra_samples, finalTick);
             // Only decrease ticks for the final CL_Move tick
             if (finalTick)
@@ -557,7 +582,7 @@ void CreateMoveEarly()
 {
     // Update key state
     key_valid = UpdateRFKey();
-    if (hacks::tf2::warp::in_rapidfire && current_user_cmd)
+    if (hacks::warp::in_rapidfire && current_user_cmd)
     {
         if (current_user_cmd)
         {
@@ -577,10 +602,10 @@ void CreateMovePrePredict()
         FastStop();
     if (in_rapidfire_zoom)
     {
-        float adjusted_curtime = g_GlobalVars->curtime;
+        float adjusted_curtime = SERVER_TIME;
         // Original curtime we need to use while in here
         if (first_warp_tick)
-            original_curtime = g_GlobalVars->curtime;
+            original_curtime = SERVER_TIME;
 
         // Update the data
         g_pLocalPlayer->bZoomed     = true;
@@ -620,9 +645,7 @@ void warpLogic()
 {
     if (!enabled)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
-        return;
-    if (CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
         return;
 
     // Handle minigun in rapidfire
@@ -1115,4 +1138,4 @@ static InitRoutine init(
         EC::Register(EC::Draw, Draw, "warp_draw");
 #endif
     });
-} // namespace hacks::tf2::warp
+} // namespace hacks::warp

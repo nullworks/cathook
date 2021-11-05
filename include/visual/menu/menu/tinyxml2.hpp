@@ -493,7 +493,8 @@ private:
     MemPoolT(const MemPoolT &);       // not supported
     void operator=(const MemPoolT &); // not supported
 
-    union Item {
+    union Item
+    {
         Item *next;
         char itemData[ITEM_SIZE];
     };

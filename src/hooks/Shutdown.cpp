@@ -48,7 +48,7 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
     if (autoabandon && !ignoredc)
         tfmm::disconnectAndAbandon();
     ignoredc = false;
-    hacks::shared::autojoin::onShutdown();
+    hacks::autojoin::onShutdown();
     std::string message = reason;
     votelogger::onShutdown(message);
     if (*random_name)

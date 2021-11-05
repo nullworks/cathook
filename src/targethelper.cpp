@@ -105,7 +105,7 @@ int GetScoreForEntity(CachedEntity *entity)
         total = 999;
     if (IsSentryBuster(entity))
         total = 0;
-    if (clazz == tf_medic && g_pGameRules->isPVEMode)
+    if (g_pGameRules->isPVEMode && clazz == tf_medic)
         total = 999;
     return total;
 }

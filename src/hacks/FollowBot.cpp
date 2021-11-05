@@ -14,7 +14,7 @@
 #include "playerresource.h"
 #include "PlayerTools.hpp"
 
-namespace hacks::shared::followbot
+namespace hacks::followbot
 {
 static settings::Boolean enable{ "follow-bot.enable", "false" };
 static settings::Boolean roambot{ "follow-bot.roaming", "true" };
@@ -689,7 +689,7 @@ static void cm()
     }
     else
         idle_time.update();
-} // namespace hacks::shared::followbot
+}
 
 #if ENABLE_VISUALS
 static void draw()
@@ -771,4 +771,4 @@ static InitRoutine runinit(
 #endif
         steam_var.installChangeCallback(rvarCallback);
     });
-} // namespace hacks::shared::followbot
+} // namespace hacks::followbot

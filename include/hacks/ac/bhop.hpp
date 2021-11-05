@@ -12,7 +12,6 @@ class CachedEntity;
 
 namespace ac::bhop
 {
-
 struct ac_data
 {
     int detections{ 0 };

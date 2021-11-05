@@ -600,11 +600,13 @@ template <typename BasicJsonType, typename CompatibleArrayType> void from_json_a
     using std::begin;
     using std::end;
 
-    std::transform(j.begin(), j.end(), std::inserter(arr, end(arr)), [](const BasicJsonType &i) {
-        // get<BasicJsonType>() returns *this, this won't call a from_json
-        // method when value_type is BasicJsonType
-        return i.template get<typename CompatibleArrayType::value_type>();
-    });
+    std::transform(j.begin(), j.end(), std::inserter(arr, end(arr)),
+                   [](const BasicJsonType &i)
+                   {
+                       // get<BasicJsonType>() returns *this, this won't call a from_json
+                       // method when value_type is BasicJsonType
+                       return i.template get<typename CompatibleArrayType::value_type>();
+                   });
 }
 
 template <typename BasicJsonType, typename CompatibleArrayType> auto from_json_array_impl(const BasicJsonType &j, CompatibleArrayType &arr, priority_tag<1>) -> decltype(arr.reserve(std::declval<typename CompatibleArrayType::size_type>()), void())
@@ -613,11 +615,13 @@ template <typename BasicJsonType, typename CompatibleArrayType> auto from_json_a
     using std::end;
 
     arr.reserve(j.size());
-    std::transform(j.begin(), j.end(), std::inserter(arr, end(arr)), [](const BasicJsonType &i) {
-        // get<BasicJsonType>() returns *this, this won't call a from_json
-        // method when value_type is BasicJsonType
-        return i.template get<typename CompatibleArrayType::value_type>();
-    });
+    std::transform(j.begin(), j.end(), std::inserter(arr, end(arr)),
+                   [](const BasicJsonType &i)
+                   {
+                       // get<BasicJsonType>() returns *this, this won't call a from_json
+                       // method when value_type is BasicJsonType
+                       return i.template get<typename CompatibleArrayType::value_type>();
+                   });
 }
 
 template <typename BasicJsonType, typename CompatibleArrayType, enable_if_t<is_compatible_array_type<BasicJsonType, CompatibleArrayType>::value and not std::is_same<typename BasicJsonType::array_t, CompatibleArrayType>::value, int> = 0> void from_json(const BasicJsonType &j, CompatibleArrayType &arr)
@@ -1447,7 +1451,7 @@ public:
 
 private:
     /// helper for exception-safe object creation
-    template <typename T, typename... Args> static T *create(Args &&... args)
+    template <typename T, typename... Args> static T *create(Args &&...args)
     {
         AllocatorType<T> alloc;
         auto deleter = [&](T *object) { alloc.deallocate(object, 1); };
@@ -1485,7 +1489,8 @@ private:
 
     @since version 1.0.0
     */
-    union json_value {
+    union json_value
+    {
         /// object (stored with pointer to save storage)
         object_t *object;
         /// array (stored with pointer to save storage)
@@ -5160,7 +5165,7 @@ public:
 
     @since version 2.0.8
     */
-    template <class... Args> void emplace_back(Args &&... args)
+    template <class... Args> void emplace_back(Args &&...args)
     {
         // emplace_back only works for null objects or arrays
         if (not(is_null() or is_array()))
@@ -5207,7 +5212,7 @@ public:
 
     @since version 2.0.8
     */
-    template <class... Args> std::pair<iterator, bool> emplace(Args &&... args)
+    template <class... Args> std::pair<iterator, bool> emplace(Args &&...args)
     {
         // emplace only works for null objects or arrays
         if (not(is_null() or is_object()))
@@ -6100,10 +6105,13 @@ public:
     {
         // assertion to check that the iterator range is indeed contiguous,
         // see http://stackoverflow.com/a/35008842/266378 for more discussion
-        assert(std::accumulate(first, last, std::pair<bool, int>(true, 0), [&first](std::pair<bool, int> res, decltype(*first) val) {
-                   res.first &= (val == *(std::next(std::addressof(*first), res.second++)));
-                   return res;
-               }).first);
+        assert(std::accumulate(first, last, std::pair<bool, int>(true, 0),
+                               [&first](std::pair<bool, int> res, decltype(*first) val)
+                               {
+                                   res.first &= (val == *(std::next(std::addressof(*first), res.second++)));
+                                   return res;
+                               })
+                   .first);
 
         // assertion to check that each element is 1 byte long
         static_assert(sizeof(typename std::iterator_traits<IteratorType>::value_type) == 1, "each element in the iterator range must have the size of 1 byte");
@@ -7763,34 +7771,36 @@ private:
     */
     static std::size_t extra_space(const string_t &s) noexcept
     {
-        return std::accumulate(s.begin(), s.end(), size_t{}, [](size_t res, typename string_t::value_type c) {
-            switch (c)
-            {
-            case '"':
-            case '\\':
-            case '\b':
-            case '\f':
-            case '\n':
-            case '\r':
-            case '\t':
-            {
-                // from c (1 byte) to \x (2 bytes)
-                return res + 1;
-            }
+        return std::accumulate(s.begin(), s.end(), size_t{},
+                               [](size_t res, typename string_t::value_type c)
+                               {
+                                   switch (c)
+                                   {
+                                   case '"':
+                                   case '\\':
+                                   case '\b':
+                                   case '\f':
+                                   case '\n':
+                                   case '\r':
+                                   case '\t':
+                                   {
+                                       // from c (1 byte) to \x (2 bytes)
+                                       return res + 1;
+                                   }
 
-            default:
-            {
-                if (c >= 0x00 and c <= 0x1f)
-                {
-                    // from c (1 byte) to \uxxxx (6
-                    // bytes)
-                    return res + 5;
-                }
+                                   default:
+                                   {
+                                       if (c >= 0x00 and c <= 0x1f)
+                                       {
+                                           // from c (1 byte) to \uxxxx (6
+                                           // bytes)
+                                           return res + 5;
+                                       }
 
-                return res;
-            }
-            }
-        });
+                                       return res;
+                                   }
+                                   }
+                               });
     }
 
     /*!
@@ -12033,7 +12043,8 @@ public:
             invalid
         };
 
-        const auto get_op = [](const std::string op) {
+        const auto get_op = [](const std::string op)
+        {
             if (op == "add")
             {
                 return patch_operations::add;
@@ -12063,7 +12074,8 @@ public:
         };
 
         // wrapper for "add" operation; add value at ptr
-        const auto operation_add = [&result](json_pointer &ptr, basic_json val) {
+        const auto operation_add = [&result](json_pointer &ptr, basic_json val)
+        {
             // adding to the root of the target document means replacing it
             if (ptr.is_root())
             {
@@ -12126,7 +12138,8 @@ public:
         };
 
         // wrapper for "remove" operation; remove value at ptr
-        const auto operation_remove = [&result](json_pointer &ptr) {
+        const auto operation_remove = [&result](json_pointer &ptr)
+        {
             // get reference to parent of JSON pointer ptr
             const auto last_path = ptr.pop_back();
             basic_json &parent   = result.at(ptr);
@@ -12163,7 +12176,8 @@ public:
         for (const auto &val : json_patch)
         {
             // wrapper to get a value for an operation
-            const auto get_value = [&val](const std::string &op, const std::string &member, bool string_type) -> basic_json & {
+            const auto get_value = [&val](const std::string &op, const std::string &member, bool string_type) -> basic_json &
+            {
                 // find value
                 auto it = val.m_value.object->find(member);
 

@@ -12,7 +12,6 @@ class CachedEntity;
 
 namespace ac::antiaim
 {
-
 extern int amount[MAX_PLAYERS];
 void ResetEverything();
 void ResetPlayer(int idx);

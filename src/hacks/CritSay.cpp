@@ -6,7 +6,7 @@
 #include <settings/Int.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::critsay
+namespace hacks::critsay
 {
 static settings::Int critsay_mode{ "critsay.mode", "0" };
 static settings::String filename{ "critsay.file", "critsay.txt" };
@@ -59,7 +59,8 @@ std::string ComposeCritSay(IGameEvent *event)
     //	checks if the killsays.txt file is not 1 line. 100% sure it's going
     // to crash if it is.
     std::string msg;
-    do {
+    do
+    {
         msg = source->at(rand() % source->size());
     } while (msg == lastmsg && source->size() > 1);
     lastmsg = msg;
@@ -86,7 +87,7 @@ class CritSayEventListener : public IGameEventListener2
     {
         if (!critsay_mode)
             return;
-        std::string message = hacks::shared::critsay::ComposeCritSay(event);
+        std::string message = hacks::critsay::ComposeCritSay(event);
         if (!message.empty())
         {
             int vid                    = event->GetInt("userid");
@@ -146,4 +147,4 @@ static InitRoutine runinit(
         init();
     });
 
-} // namespace hacks::shared::critsay
+} // namespace hacks::critsay

@@ -7,7 +7,7 @@
 #include <settings/Int.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::dominatesay
+namespace hacks::dominatesay
 {
 static settings::Int dominatesay_mode{ "dominatesay.mode", "0" };
 static settings::String filename{ "dominatesay.file", "dominatesay.txt" };
@@ -81,7 +81,7 @@ class DominateSayEventListener : public IGameEventListener2
     {
         if (!dominatesay_mode)
             return;
-        std::string message = hacks::shared::dominatesay::ComposeDominateSay(event);
+        std::string message = hacks::dominatesay::ComposeDominateSay(event);
         if (!message.empty())
             chat_stack::Say(message, false);
     }
@@ -113,4 +113,4 @@ static InitRoutine EC(
         init();
     });
 
-} // namespace hacks::shared::dominatesay
+} // namespace hacks::dominatesay

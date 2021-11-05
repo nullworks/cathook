@@ -39,18 +39,20 @@ void EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG()
 
 CatCommand fixvac("fixvac", "Lemme in to secure servers", []() { EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG(); });
 
-static InitRoutine init_textmode([]() {
+static InitRoutine init_textmode(
+    []()
+    {
 #if ENABLE_TEXTMODE_STDIN
-    logging::Info("[TEXTMODE] Setting up input handling");
-    int flags = fcntl(0, F_GETFL, 0);
-    flags |= O_NONBLOCK;
-    fcntl(0, F_SETFL, flags);
-    logging::Info("[TEXTMODE] stdin is now non-blocking");
+        logging::Info("[TEXTMODE] Setting up input handling");
+        int flags = fcntl(0, F_GETFL, 0);
+        flags |= O_NONBLOCK;
+        fcntl(0, F_SETFL, flags);
+        logging::Info("[TEXTMODE] stdin is now non-blocking");
 #endif
 #if ENABLE_VAC_BYPASS
-    EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG();
+        EXPOSED_Epic_VACBypass_1337_DoNotSteal_xXx_$1_xXx_MLG();
 #endif
-});
+    });
 
 #if ENABLE_TEXTMODE_STDIN
 void UpdateInput()

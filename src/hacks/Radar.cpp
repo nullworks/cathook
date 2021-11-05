@@ -11,7 +11,7 @@
 #ifndef FEATURE_RADAR_DISABLED
 #if ENABLE_VISUALS
 
-namespace hacks::tf::radar
+namespace hacks::radar
 {
 static settings::Boolean radar_enabled{ "radar.enable", "false" };
 static settings::Int shape{ "radar.shape", "0" };
@@ -128,7 +128,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             else
             {
                 tx_class[2 - idx][clazz - 1].draw(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, colors::white);
-                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, *aimbot_highlight ? (ent == hacks::shared::aimbot::CurrentTarget() ? colors::target : (idx ? colors::blu_v : colors::red_v)) : (idx ? colors::blu_v : colors::red_v), 1.0f);
+                draw::RectangleOutlined(x + wtr.first, y + wtr.second, (int) icon_size, (int) icon_size, *aimbot_highlight ? (ent == hacks::aimbot::CurrentTarget() ? colors::target : (idx ? colors::blu_v : colors::red_v)) : (idx ? colors::blu_v : colors::red_v), 1.0f);
             }
 
             if (ent->m_iMaxHealth() && *healthbar > 0)
@@ -221,7 +221,7 @@ void Draw()
     int radar_size = *size;
     int half_size  = radar_size / 2;
 
-    rgba_t outlineclr = *aimbot_highlight ? (hacks::shared::aimbot::CurrentTarget() != null ? colors::target : colors::gui) : colors::gui;
+    rgba_t outlineclr = *aimbot_highlight ? (hacks::aimbot::CurrentTarget() != null ? colors::target : colors::gui) : colors::gui;
 
     if (*shape == 0)
     {
@@ -282,28 +282,30 @@ void Draw()
     }
 }
 
-static InitRoutine init([]() {
-    // Background circles
-    for (int i = 0; i < 2; ++i)
-        tx_teams.push_back(textures::atlas().create_sprite(704, 384 + i * 64, 64, 64));
-    // Items
-    for (int i = 0; i < 2; ++i)
-        tx_items.push_back(textures::atlas().create_sprite(640, 384 + i * 64, 64, 64));
-    // Classes
-    for (int i = 0; i < 3; ++i)
+static InitRoutine init(
+    []()
     {
-        tx_class.emplace_back();
-        for (int j = 0; j < 9; ++j)
-            tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
-    }
-    for (int i = 0; i < 2; i++)
-        tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
-    for (int i = 0; i < 4; i++)
-        tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
-    logging::Info("Radar sprites loaded");
-    EC::Register(EC::Draw, Draw, "radar", EC::average);
-});
-} // namespace hacks::tf::radar
+        // Background circles
+        for (int i = 0; i < 2; ++i)
+            tx_teams.push_back(textures::atlas().create_sprite(704, 384 + i * 64, 64, 64));
+        // Items
+        for (int i = 0; i < 2; ++i)
+            tx_items.push_back(textures::atlas().create_sprite(640, 384 + i * 64, 64, 64));
+        // Classes
+        for (int i = 0; i < 3; ++i)
+        {
+            tx_class.emplace_back();
+            for (int j = 0; j < 9; ++j)
+                tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
+        }
+        for (int i = 0; i < 2; i++)
+            tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
+        for (int i = 0; i < 4; i++)
+            tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
+        logging::Info("Radar sprites loaded");
+        EC::Register(EC::Draw, Draw, "radar", EC::average);
+    });
+} // namespace hacks::radar
 
 #endif
 #endif

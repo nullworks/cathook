@@ -8,7 +8,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::bunnyhop
+namespace hacks::bunnyhop
 {
 static settings::Boolean enable{ "bunnyhop.enable", "false" };
 static settings::Int bhop_chance{ "bunnyhop.chance", "100" };
@@ -57,4 +57,4 @@ static void CreateMove()
         ticks_last_jump = 0;
 }
 static InitRoutine EC([]() { EC::Register(EC::CreateMove_NoEnginePred, CreateMove, "Bunnyhop", EC::early); });
-} // namespace hacks::shared::bunnyhop
+} // namespace hacks::bunnyhop

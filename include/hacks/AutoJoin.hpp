@@ -8,11 +8,11 @@
 #pragma once
 #include "config.h"
 #include "timer.hpp"
-namespace hacks::shared::autojoin
+namespace hacks::autojoin
 {
 void updateSearch();
 void onShutdown();
 #if !ENABLE_VISUALS
 extern Timer queue_time;
 #endif
-} // namespace hacks::shared::autojoin
+} // namespace hacks::autojoin

@@ -187,24 +187,21 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
         g_Settings.bInvalid = true;
     {
         PROF_SECTION(FSN_antiantiaim);
-        hacks::shared::anti_anti_aim::frameStageNotify(stage);
+        hacks::anti_anti_aim::frameStageNotify(stage);
     }
     {
         PROF_SECTION(FSN_skinchanger);
-        hacks::tf2::skinchanger::FrameStageNotify(stage);
+        hacks::skinchanger::FrameStageNotify(stage);
     }
     std::optional<Vector> backup_punch;
     if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
     {
-        IF_GAME(IsTF())
+        if (no_shake && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
         {
-            if (no_shake && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
-            {
-                backup_punch                                       = NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle);
-                NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle) = { 0.0f, 0.0f, 0.0f };
-            }
+            backup_punch                                       = NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle);
+            NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle) = { 0.0f, 0.0f, 0.0f };
         }
-        hacks::tf::thirdperson::frameStageNotify();
+        hacks::thirdperson::frameStageNotify();
     }
     original::FrameStageNotify(this_, stage);
     if (backup_punch)
@@ -214,16 +211,24 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
 {
     update_nightmode = true;
 }
-static InitRoutine init_fsn([]() {
-    nightmode_gui.installChangeCallback(rvarCallback<float>);
-    nightmode_world.installChangeCallback(rvarCallback<float>);
-    nightmode_skybox.installChangeCallback(rvarCallback<float>);
-    nightmode_gui_color.installChangeCallback(rvarCallback<rgba_t>);
-    nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
-    nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
-    override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
-    override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
-    EC::Register(
-        EC::LevelInit, []() { update_nightmode = true; update_override_textures = true; }, "levelinit_fsn");
+static InitRoutine init_fsn(
+    []()
+    {
+        nightmode_gui.installChangeCallback(rvarCallback<float>);
+        nightmode_world.installChangeCallback(rvarCallback<float>);
+        nightmode_skybox.installChangeCallback(rvarCallback<float>);
+        nightmode_gui_color.installChangeCallback(rvarCallback<rgba_t>);
+        nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
+        nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
+        override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
+        override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
+        EC::Register(
+            EC::LevelInit,
+            []()
+            {
+                update_nightmode = true;
+                update_override_textures = true;
+                
+            }, "levelinit_fsn");
 });
 } // namespace hooked_methods

@@ -69,158 +69,172 @@ static std::string getAutoSaveConfigPath()
     return path = paths::getConfigPath() + "/autosaves/" + timeString + ".conf";
 }
 
-static CatCommand cat("cat", "", [](const CCommand &args) {
-    if (args.ArgC() < 3)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set/get> <variable> [value]\n");
-        return;
-    }
+static CatCommand cat("cat", "",
+                      [](const CCommand &args)
+                      {
+                          if (args.ArgC() < 3)
+                          {
+                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set/get> <variable> [value]\n");
+                              return;
+                          }
 
-    auto variable = settings::Manager::instance().lookup(args.Arg(2));
-    if (variable == nullptr)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Variable not found: %s\n", args.Arg(2));
-        return;
-    }
+                          auto variable = settings::Manager::instance().lookup(args.Arg(2));
+                          if (variable == nullptr)
+                          {
+                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Variable not found: %s\n", args.Arg(2));
+                              return;
+                          }
 
-    if (!strcmp(args.Arg(1), "set"))
-    {
-        if (args.ArgC() < 4)
-        {
-            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set> <variable> <value>\n");
-            return;
-        }
-        variable->fromString(args.Arg(3));
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", args.Arg(2), variable->toString().c_str());
-        if (autosave)
-        {
-            settings::SettingsWriter writer{ settings::Manager::instance() };
-            writer.saveTo(getAutoSaveConfigPath(), true);
-        }
-        return;
-    }
-    else if (!strcmp(args.Arg(1), "get"))
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", args.Arg(2), variable->toString().c_str());
-        return;
-    }
-    else
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set/get> <variable> <value>\n");
-        return;
-    }
-});
+                          if (!strcmp(args.Arg(1), "set"))
+                          {
+                              if (args.ArgC() < 4)
+                              {
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set> <variable> <value>\n");
+                                  return;
+                              }
+                              variable->fromString(args.Arg(3));
+                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", args.Arg(2), variable->toString().c_str());
+                              if (autosave)
+                              {
+                                  settings::SettingsWriter writer{ settings::Manager::instance() };
+                                  writer.saveTo(getAutoSaveConfigPath(), true);
+                              }
+                              return;
+                          }
+                          else if (!strcmp(args.Arg(1), "get"))
+                          {
+                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", args.Arg(2), variable->toString().c_str());
+                              return;
+                          }
+                          else
+                          {
+                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat <set/get> <variable> <value>\n");
+                              return;
+                          }
+                      });
 
-static CatCommand toggle("toggle", "", [](const CCommand &args) {
-    if (args.ArgC() < 4)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat_toggle <variable> <value 1> <value 2>\n");
-        return;
-    }
+static CatCommand toggle("toggle", "",
+                         [](const CCommand &args)
+                         {
+                             if (args.ArgC() < 4)
+                             {
+                                 g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Usage: cat_toggle <variable> <value 1> <value 2>\n");
+                                 return;
+                             }
 
-    std::string rvar = args.Arg(1);
-    auto variable    = settings::Manager::instance().lookup(rvar);
+                             std::string rvar = args.Arg(1);
+                             auto variable    = settings::Manager::instance().lookup(rvar);
 
-    if (variable == nullptr)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Variable not found: %s\n", rvar.c_str());
-        return;
-    }
+                             if (variable == nullptr)
+                             {
+                                 g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Variable not found: %s\n", rvar.c_str());
+                                 return;
+                             }
 
-    std::string Value1 = args.Arg(2);
-    std::string Value2 = args.Arg(3);
+                             std::string Value1 = args.Arg(2);
+                             std::string Value2 = args.Arg(3);
 
-    if (variable->toString() == Value1)
-        variable->fromString(Value2);
-    else
-        variable->fromString(Value1);
-    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", rvar.c_str(), variable->toString().c_str());
-});
+                             if (variable->toString() == Value1)
+                                 variable->fromString(Value2);
+                             else
+                                 variable->fromString(Value1);
+                             g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", rvar.c_str(), variable->toString().c_str());
+                         });
 
-static CatCommand save("save", "", [](const CCommand &args) {
-    settings::SettingsWriter writer{ settings::Manager::instance() };
+static CatCommand save("save", "",
+                       [](const CCommand &args)
+                       {
+                           settings::SettingsWriter writer{ settings::Manager::instance() };
 
-    DIR *config_directory = opendir(paths::getConfigPath().c_str());
-    if (!config_directory)
-    {
-        logging::Info("Configs directory doesn't exist, creating one!");
-        mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
-    }
+                           DIR *config_directory = opendir(paths::getConfigPath().c_str());
+                           if (!config_directory)
+                           {
+                               logging::Info("Configs directory doesn't exist, creating one!");
+                               mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
+                           }
 
-    if (args.ArgC() == 1)
-    {
-        writer.saveTo((paths::getConfigPath() + "/default.conf").c_str());
-    }
-    else
-    {
-        writer.saveTo(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
-    }
-    logging::Info("cat_save: Sorting configs...");
-    getAndSortAllConfigs();
-    logging::Info("cat_save: Closing dir...");
+                           if (args.ArgC() == 1)
+                           {
+                               writer.saveTo((paths::getConfigPath() + "/default.conf").c_str());
+                           }
+                           else
+                           {
+                               writer.saveTo(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
+                           }
+                           logging::Info("cat_save: Sorting configs...");
+                           getAndSortAllConfigs();
+                           logging::Info("cat_save: Closing dir...");
 #if ENABLE_VISUALS
-    refreshConfigList();
+                           refreshConfigList();
 #endif
-    closedir(config_directory);
-});
+                           closedir(config_directory);
+                       });
 
-static CatCommand load("load", "", [](const CCommand &args) {
-    settings::SettingsReader loader{ settings::Manager::instance() };
-    if (args.ArgC() == 1)
-    {
-        loader.loadFrom((paths::getConfigPath() + "/default.conf").c_str());
-    }
-    else
-    {
-        loader.loadFrom(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
-    }
-});
+static CatCommand load("load", "",
+                       [](const CCommand &args)
+                       {
+                           settings::SettingsReader loader{ settings::Manager::instance() };
+                           if (args.ArgC() == 1)
+                           {
+                               loader.loadFrom((paths::getConfigPath() + "/default.conf").c_str());
+                           }
+                           else
+                           {
+                               loader.loadFrom(paths::getConfigPath() + "/" + args.Arg(1) + ".conf");
+                           }
+                       });
 
 #if ENABLE_VISUALS
-static CatCommand delete_config("delete_config", "", [](const CCommand &args) {
-    if (args.ArgC() == 2)
-    {
-        remove((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str());
-        refreshConfigList();
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
-    }
-    else
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
-    }
-});
+static CatCommand delete_config("delete_config", "",
+                                [](const CCommand &args)
+                                {
+                                    if (args.ArgC() == 2)
+                                    {
+                                        remove((paths::getConfigPath() + "/" + args.Arg(1) + ".conf").c_str());
+                                        refreshConfigList();
+                                        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: Config Deleted!\n");
+                                    }
+                                    else
+                                    {
+                                        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: cat_config_delete: No config specified!\n");
+                                    }
+                                });
 
-static CatCommand list_config("list_config", "", [](const CCommand &args) {
-    DIR *direc;
-    struct dirent *directory;
+static CatCommand list_config("list_config", "",
+                              [](const CCommand &args)
+                              {
+                                  DIR *direc;
+                                  struct dirent *directory;
 
-    direc = opendir(paths::getConfigPath().c_str());
-    if (direc)
-    {
-        while ((directory = readdir(direc)) != NULL)
-        {
-            if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
-                g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
-        }
+                                  direc = opendir(paths::getConfigPath().c_str());
+                                  if (direc)
+                                  {
+                                      while ((directory = readdir(direc)) != NULL)
+                                      {
+                                          if (std::string(directory->d_name) != "." && std::string(directory->d_name) != "..")
+                                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, (std::string(directory->d_name) + std::string("\n")).c_str());
+                                      }
 
-        closedir(direc);
-    }
-});
+                                      closedir(direc);
+                                  }
+                              });
 #endif
 
 static std::vector<std::string> sortedVariables{};
 #if ENABLE_VISUALS
-static CatCommand list_missing("list_missing", "List rvars missing in menu", []() {
-    auto *sv = zerokernel::Menu::instance->wm->getElementById("special-variables");
-    if (!sv)
-    {
-        logging::Info("Special Variables tab missing!");
-        return;
-    }
-    for (auto &var : sortedVariables)
-        if (!zerokernel::special::SettingsManagerList::isVariableMarked(var))
-            logging::Info("%s", var.c_str());
-});
+static CatCommand list_missing("list_missing", "List rvars missing in menu",
+                               []()
+                               {
+                                   auto *sv = zerokernel::Menu::instance->wm->getElementById("special-variables");
+                                   if (!sv)
+                                   {
+                                       logging::Info("Special Variables tab missing!");
+                                       return;
+                                   }
+                                   for (auto &var : sortedVariables)
+                                       if (!zerokernel::special::SettingsManagerList::isVariableMarked(var))
+                                           logging::Info("%s", var.c_str());
+                               });
 #endif
 
 static void getAndSortAllVariables()
@@ -264,37 +278,39 @@ static void getAndSortAllConfigs()
     logging::Info("Sorted %u config files\n", sortedConfigs.size());
 }
 
-static CatCommand cat_find("find", "Find a command by name", [](const CCommand &args) {
-    // We need arguments
-    if (args.ArgC() < 2)
-        return logging::Info("Usage: cat_find (name)");
-    // Store all found rvars
-    std::vector<std::string> found_rvars;
-    for (const auto &s : sortedVariables)
-    {
-        // Store std::tolower'd rvar
-        std::string lowered_str;
-        for (auto &i : s)
-            lowered_str += std::tolower(i);
-        std::string to_find = args.Arg(1);
-        // store rvar to find in lowercase too
-        std::string to_find_lower;
-        for (auto &s : to_find)
-            to_find_lower += std::tolower(s);
-        // If it matches then add to vector
-        if (lowered_str.find(to_find_lower) != lowered_str.npos)
-            found_rvars.push_back(s);
-    }
-    // Yes
-    g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Found rvars:\n");
-    // Nothing found :C
-    if (found_rvars.empty())
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "No rvars found.\n");
-    // Found rvars
-    else
-        for (auto &s : found_rvars)
-            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s\n", s.c_str());
-});
+static CatCommand cat_find("find", "Find a command by name",
+                           [](const CCommand &args)
+                           {
+                               // We need arguments
+                               if (args.ArgC() < 2)
+                                   return logging::Info("Usage: cat_find (name)");
+                               // Store all found rvars
+                               std::vector<std::string> found_rvars;
+                               for (const auto &s : sortedVariables)
+                               {
+                                   // Store std::tolower'd rvar
+                                   std::string lowered_str;
+                                   for (auto &i : s)
+                                       lowered_str += std::tolower(i);
+                                   std::string to_find = args.Arg(1);
+                                   // store rvar to find in lowercase too
+                                   std::string to_find_lower;
+                                   for (auto &s : to_find)
+                                       to_find_lower += std::tolower(s);
+                                   // If it matches then add to vector
+                                   if (lowered_str.find(to_find_lower) != lowered_str.npos)
+                                       found_rvars.push_back(s);
+                               }
+                               // Yes
+                               g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Found rvars:\n");
+                               // Nothing found :C
+                               if (found_rvars.empty())
+                                   g_ICvar->ConsoleColorPrintf(MENU_COLOR, "No rvars found.\n");
+                               // Found rvars
+                               else
+                                   for (auto &s : found_rvars)
+                                       g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s\n", s.c_str());
+                           });
 
 static int cat_completionCallback(const char *c_partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])
 {
@@ -477,16 +493,18 @@ static int toggle_CompletionCallback(const char *c_partial, char commands[COMMAN
     return count;
 }
 
-static InitRoutine init([]() {
-    getAndSortAllVariables();
-    getAndSortAllConfigs();
-    cat.cmd->m_bHasCompletionCallback    = true;
-    cat.cmd->m_fnCompletionCallback      = cat_completionCallback;
-    load.cmd->m_bHasCompletionCallback   = true;
-    load.cmd->m_fnCompletionCallback     = load_CompletionCallback;
-    save.cmd->m_bHasCompletionCallback   = true;
-    save.cmd->m_fnCompletionCallback     = save_CompletionCallback;
-    toggle.cmd->m_bHasCompletionCallback = true;
-    toggle.cmd->m_fnCompletionCallback   = toggle_CompletionCallback;
-});
+static InitRoutine init(
+    []()
+    {
+        getAndSortAllVariables();
+        getAndSortAllConfigs();
+        cat.cmd->m_bHasCompletionCallback    = true;
+        cat.cmd->m_fnCompletionCallback      = cat_completionCallback;
+        load.cmd->m_bHasCompletionCallback   = true;
+        load.cmd->m_fnCompletionCallback     = load_CompletionCallback;
+        save.cmd->m_bHasCompletionCallback   = true;
+        save.cmd->m_fnCompletionCallback     = save_CompletionCallback;
+        toggle.cmd->m_bHasCompletionCallback = true;
+        toggle.cmd->m_fnCompletionCallback   = toggle_CompletionCallback;
+    });
 } // namespace settings::commands

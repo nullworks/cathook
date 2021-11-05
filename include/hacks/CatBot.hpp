@@ -9,7 +9,7 @@
 
 #include "common.hpp"
 
-namespace hacks::shared::catbot
+namespace hacks::catbot
 {
 extern Timer timer_votekicks;
 void update();
@@ -21,4 +21,4 @@ extern settings::Boolean anti_motd;
 #if ENABLE_IPC
 void update_ipc_data(ipc::user_data_s &data);
 #endif
-} // namespace hacks::shared::catbot
+} // namespace hacks::catbot

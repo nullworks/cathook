@@ -336,7 +336,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 
     if (CE_BAD(ent))
         return ChamColors(colors::white);
-    if (ent == hacks::shared::aimbot::CurrentTarget() && aimbot_color)
+    if (ent == hacks::aimbot::CurrentTarget() && aimbot_color)
         return ChamColors(colors::target);
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {
@@ -532,7 +532,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
 
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)*/))
+    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::backtrack::chams && hacks::backtrack::isBacktrackEnabled)*/))
         return original::DrawModelExecute(this_, state, info, bone);
 
     PROF_SECTION(DrawModelExecute);
@@ -770,7 +770,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                             }
                         }
                         // Backtrack chams
-                        namespace bt = hacks::tf2::backtrack;
+                        namespace bt = hacks::backtrack;
                         if (bt::chams && bt::backtrackEnabled())
                         {
                             // TODO: Allow for a fade between the entity's color and a specified color, it would look cool but i'm lazy
@@ -821,7 +821,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 return;
     }
     // Don't do it when we are trying to enforce backtrack chams
-    // if (!hacks::tf2::backtrack::isDrawing)
+    // if (!hacks::backtrack::isDrawing)
     return original::DrawModelExecute(this_, state, info, bone);
 } // namespace hooked_methods
 } // namespace hooked_methods

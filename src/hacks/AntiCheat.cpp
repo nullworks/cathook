@@ -14,7 +14,7 @@
 #include "hack.hpp"
 #include "angles.hpp"
 
-namespace hacks::shared::anticheat
+namespace hacks::anticheat
 {
 static settings::Boolean enable{ "find-cheaters.enable", "0" };
 static settings::Boolean accuse_chat{ "find-cheaters.accuse-in-chat", "0" };
@@ -132,4 +132,4 @@ static InitRoutine EC(
         EC::Register(EC::Shutdown, Shutdown, "shutdown_AntiCheat", EC::average);
         Init();
     });
-} // namespace hacks::shared::anticheat
+} // namespace hacks::anticheat

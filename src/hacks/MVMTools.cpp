@@ -1,6 +1,6 @@
 #include "common.hpp"
 
-namespace hacks::tf2::mvmtools
+namespace hacks::mvmtools
 {
 static settings::Boolean auto_revive("mvmtools.instant-revive", "false");
 static settings::Boolean auto_f4("mvmtools.auto-f4", "false");
@@ -27,4 +27,4 @@ void CreateMove()
 }
 
 static InitRoutine init([]() { EC::Register(EC::CreateMove, CreateMove, "mvmtools_createmove"); });
-} // namespace hacks::tf2::mvmtools
+} // namespace hacks::mvmtools

@@ -74,17 +74,7 @@ const std::string &hack::GetType()
     version += " GUI";
 #endif
 
-#ifndef DYNAMIC_CLASSES
-
-#ifdef GAME_SPECIFIC
-    version += " GAME " TO_STRING(GAME);
-#else
-    version += " UNIVERSAL";
-#endif
-
-#else
-    version += " DYNAMIC";
-#endif
+version += " GAME " TO_STRING(GAME);
 
 #if not ENABLE_VISUALS
     version += " NOVISUALS";
@@ -337,11 +327,6 @@ free(logname);*/
     CreateInterfaces();
     CDumper dumper;
     dumper.SaveDump();
-    logging::Info("Is TF2? %d", IsTF2());
-    logging::Info("Is TF2C? %d", IsTF2C());
-    logging::Info("Is HL2DM? %d", IsHL2DM());
-    logging::Info("Is CSS? %d", IsCSS());
-    logging::Info("Is TF? %d", IsTF());
     InitClassTable();
 
     BeginConVars();

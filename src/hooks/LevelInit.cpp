@@ -49,7 +49,7 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     else if (holiday->m_nValue == 2)
         holiday->SetValue(0);
 #endif
-    hacks::shared::anti_anti_aim::resolver_map.clear();
+    hacks::anti_anti_aim::resolver_map.clear();
     g_IEngine->ClientCmd_Unrestricted("exec cat_matchexec");
     chat_stack::Reset();
     original::LevelInit(this_, name);

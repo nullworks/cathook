@@ -3,7 +3,7 @@
 #include <array>
 #include <stdint.h>
 
-namespace hacks::tf2::NavBot
+namespace hacks::NavBot
 {
 bool init(bool first_cm);
 namespace task
@@ -70,5 +70,5 @@ struct bot_class_config
     float preferred;
     float max;
 };
-} // namespace hacks::tf2::NavBot
+} // namespace hacks::NavBot
 */

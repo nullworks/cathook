@@ -19,7 +19,7 @@
             </LabeledObject>
             <AutoVariable width="fill" target="autotaunt.chance" label="Autotaunt chance" min="0" max="100.1" step="1"/>
             <AutoVariable width="fill" target="autotaunt.safety-distance" label="Autotaunt safety distance"/>
-            <LabeledObject width="fill" label="Autojoin class" tooltip="Automatically pick a class.">
+            <LabeledObject width="fill" label="Autojoin class" tooltip="Automatically pick a class">
                 <Select target="autojoin.class">
                     <Option name="None" value="0"/>
                     <Option name="Scout" value="1"/>
@@ -33,7 +33,7 @@
                     <Option name="Engineer" value="9"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="autojoin.team" label="Autojoin team" tooltip="Automatically join a team."/>
+            <AutoVariable width="fill" target="autojoin.team" label="Autojoin team" tooltip="Automatically join a team"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Engineer-Bot" y="165">

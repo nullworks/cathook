@@ -12,7 +12,7 @@
 class ConVar;
 class IClientEntity;
 
-namespace hacks::shared::aimbot
+namespace hacks::aimbot
 {
 extern settings::Boolean ignore_cloak;
 extern unsigned last_target_ignore_timer;
@@ -49,4 +49,4 @@ int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);
 bool UpdateAimkey();
 float EffectiveTargetingRange();
-} // namespace hacks::shared::aimbot
+} // namespace hacks::aimbot

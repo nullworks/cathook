@@ -27,18 +27,20 @@ SpoofedConVar::SpoofedConVar(ConVar *var) : original(var)
     spoof = svar;
 }
 
-CatCommand spoof_convar("spoof", "Spoof ConVar", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        logging::Info("Invalid call");
-        return;
-    }
-    ConVar *var = g_ICvar->FindVar(args.Arg(1));
-    if (!var)
-    {
-        logging::Info("Not found");
-        return;
-    }
-    convars.push_back(new SpoofedConVar(var));
-});
+CatCommand spoof_convar("spoof", "Spoof ConVar",
+                        [](const CCommand &args)
+                        {
+                            if (args.ArgC() < 2)
+                            {
+                                logging::Info("Invalid call");
+                                return;
+                            }
+                            ConVar *var = g_ICvar->FindVar(args.Arg(1));
+                            if (!var)
+                            {
+                                logging::Info("Not found");
+                                return;
+                            }
+                            convars.push_back(new SpoofedConVar(var));
+                        });
 } // namespace sconvar

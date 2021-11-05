@@ -78,24 +78,28 @@ unsigned long long CEconItemView::UUID()
     return b | a;
 }
 
-static CatCommand equip_debug("equip_debug", "Debug auto equip stuff", []() {
-    auto invmng    = CTFInventoryManager::GTFInventoryManager();
-    auto inv       = invmng->GTFPlayerInventory();
-    auto item_view = inv->GetFirstItemOfItemDef(56);
-    if (item_view)
-    {
-        logging::Info("%llu", item_view->UUID());
-        logging::Info("Equip item: %d", invmng->EquipItemInLoadout(tf_sniper, 0, item_view->UUID()));
-    }
-});
+static CatCommand equip_debug("equip_debug", "Debug auto equip stuff",
+                              []()
+                              {
+                                  auto invmng    = CTFInventoryManager::GTFInventoryManager();
+                                  auto inv       = invmng->GTFPlayerInventory();
+                                  auto item_view = inv->GetFirstItemOfItemDef(56);
+                                  if (item_view)
+                                  {
+                                      logging::Info("%llu", item_view->UUID());
+                                      logging::Info("Equip item: %d", invmng->EquipItemInLoadout(tf_sniper, 0, item_view->UUID()));
+                                  }
+                              });
 
-static CatCommand list_debug("equip_list_debug", "Debug item def listing", []() {
-    auto invmng = CTFInventoryManager::GTFInventoryManager();
-    auto inv    = invmng->GTFPlayerInventory();
-    auto items  = inv->GetItemsOfItemDef(5000);
-    for (auto item : items)
-        logging::Info("%llu", item);
-});
+static CatCommand list_debug("equip_list_debug", "Debug item def listing",
+                             []()
+                             {
+                                 auto invmng = CTFInventoryManager::GTFInventoryManager();
+                                 auto inv    = invmng->GTFPlayerInventory();
+                                 auto items  = inv->GetItemsOfItemDef(5000);
+                                 for (auto item : items)
+                                     logging::Info("%llu", item);
+                             });
 
 // Crafting slots on crafting page
 #define CRAFTING_SLOTS_INPUT_ROWS 3

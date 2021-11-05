@@ -9,7 +9,7 @@
 #include "common.hpp"
 #include "PlayerTools.hpp"
 
-namespace hacks::tf::spyalert
+namespace hacks::spyalert
 {
 static settings::Boolean enable{ "spy-alert.enable", "false" };
 static settings::Float distance_warning{ "spy-alert.distance.warning", "500" };
@@ -50,7 +50,7 @@ void Draw()
             continue;
         if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team)
             continue;
-        if (IsPlayerInvisible(ent) && !invisible)
+        if (!invisible && IsPlayerInvisible(ent))
             continue;
         if (!player_tools::shouldTarget(ent))
             continue;
@@ -106,6 +106,10 @@ void Draw()
     }
 }
 #if ENABLE_VISUALS
-static InitRoutine EC([]() { EC::Register(EC::Draw, Draw, "spyalert", EC::average); });
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::Draw, Draw, "spyalert", EC::average);
+    });
 #endif
-} // namespace hacks::tf::spyalert
+} // namespace hacks::spyalert

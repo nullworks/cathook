@@ -263,19 +263,19 @@ bool shouldMeleeCrit()
 {
     if (!melee || g_pLocalPlayer->weapon_mode != weapon_melee)
         return false;
-    if (hacks::tf2::backtrack::backtrackEnabled())
+    if (hacks::backtrack::backtrackEnabled())
     {
         // Closest tick for melee
-        std::optional<hacks::tf2::backtrack::BacktrackData> closest_tick = std::nullopt;
+        std::optional<hacks::backtrack::BacktrackData> closest_tick = std::nullopt;
         float best_distance                                              = FLT_MAX;
 
-        if (hacks::tf2::backtrack::hasData())
+        if (hacks::backtrack::hasData())
         {
-            closest_tick = hacks::tf2::backtrack::getData();
+            closest_tick = hacks::backtrack::getData();
         }
         else
         {
-            for (auto &ent_data : hacks::tf2::backtrack::bt_data)
+            for (auto &ent_data : hacks::backtrack::bt_data)
             {
                 for (auto &tick : ent_data)
                 {
@@ -423,7 +423,7 @@ bool prevent_crit()
 void force_crit()
 {
     // Can't use normal methods here
-    if (hacks::tf2::antianticheat::enabled)
+    if (hacks::antianticheat::enabled)
     {
         // We have to ignore these sadly
         if (CE_GOOD(LOCAL_W) && (LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon) || LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730))
@@ -861,14 +861,14 @@ void Draw()
             // Weapon can't randomly crit
             if (!re::C_TFWeaponBase::CanFireCriticalShot(RAW_ENT(LOCAL_W), false, nullptr) || !added_per_shot)
             {
-                AddCritString("Weapon cannot randomly crit.", colors::red_s);
+                AddCritString("Weapon cannot randomly crit", colors::red_s);
                 DrawCritStrings();
                 return;
             }
 
             // We are out of sync. RIP
             if (is_out_of_sync)
-                AddCritString("Out of sync.", colors::red_s);
+                AddCritString("Out of sync", colors::red_s);
             // Observed crit chance is not low enough, display how much damage is needed until we can crit again
             else if (crit_mult_info.first > crit_mult_info.second && g_pLocalPlayer->weapon_mode != weapon_melee)
                 AddCritString("Damage Until crit: " + std::to_string(damageUntilToCrit(wep)), colors::orange);
@@ -950,7 +950,7 @@ void Draw()
                     draw::Rectangle(*bar_x, *bar_y, bar_bg_x_size * bucket_percentage, bar_bg_y_size, bucket_color);
 
                     if (is_out_of_sync)
-                        bar_string = "Out of sync.";
+                        bar_string = "Out of sync";
                     else if (crit_mult_info.first > crit_mult_info.second && g_pLocalPlayer->weapon_mode != weapon_melee)
                         bar_string = std::to_string(damageUntilToCrit(wep)) + " Damage until Crit!";
                     else

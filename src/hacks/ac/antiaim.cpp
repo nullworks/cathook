@@ -48,7 +48,7 @@ void Update(CachedEntity *player)
             GetPlayerInfo(player->m_IDX, &info);
             if (am > 5)
             {
-                hacks::shared::anticheat::SetRage(info);
+                hacks::anticheat::SetRage(info);
                 am = 0;
             }
             std::string reason = format("Pitch: ", d.angles[idx].x, " Yaw: ", d.angles[idx].y);
@@ -60,7 +60,7 @@ void Update(CachedEntity *player)
             {
                 reason += " (Fakedown)";
             }
-            hacks::shared::anticheat::Accuse(player->m_IDX, "AntiAim", reason);
+            hacks::anticheat::Accuse(player->m_IDX, "AntiAim", reason);
             last_accusation[player->m_IDX - 1] = tickcount;
         }
     }

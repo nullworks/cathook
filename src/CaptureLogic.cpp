@@ -486,7 +486,9 @@ void LevelInit()
     cpcontroller::LevelInit();
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, CreateMove, "capturelogic_update");
-    EC::Register(EC::LevelInit, LevelInit, "capturelogic_levelinit");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "capturelogic_update");
+        EC::Register(EC::LevelInit, LevelInit, "capturelogic_levelinit");
+    });

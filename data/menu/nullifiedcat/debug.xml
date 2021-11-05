@@ -5,7 +5,7 @@
             <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine pred others"/>
             <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast vischeck"/>
             <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam wait time"/>
-            <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log dispatched user messages"/>
+            <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="DUMs" tooltip="Dispatched User Messages"/>
             <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>
             <AutoVariable width="fill" target="debug.pp-extrapolate" label="PP extrapolate"/>
             <AutoVariable width="fill" target="debug.pp-rocket-time-ping" label="PP rocket time ping"/>

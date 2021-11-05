@@ -7,7 +7,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 
-namespace hacks::shared::deadringer
+namespace hacks::deadringer
 {
 static settings::Boolean enable{ "auto-deadringer.enable", "0" };
 static settings::Int trigger_health{ "auto-deadringer.health", "30" };
@@ -93,4 +93,4 @@ static void CreateMove()
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 static InitRoutine EC([]() { EC::Register(EC::CreateMove, CreateMove, "AutoDeadringer", EC::average); });
-} // namespace hacks::shared::deadringer
+} // namespace hacks::deadringer

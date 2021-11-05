@@ -3,8 +3,6 @@
 #define OFF 0
 #define ON 1
 
-#define GAME_SPECIFIC @GameSpecific@
-#define GAME @Game@
 #define ENABLE_GUI @EnableGUI@
 #define ENABLE_IPC @EnableIPC@
 #define DATA_PATH "@DataPath@"

@@ -21,7 +21,8 @@ std::string wrapString(const std::string &input, fonts::font &font, int width, i
     int lineCount{ 1 };
     int maxWidth{ 0 };
 
-    auto splitWord = [&](bool newln) {
+    auto splitWord = [&](bool newln)
+    {
         std::string word = wordStream.str();
         wordStream.str("");
         if (not word.empty())

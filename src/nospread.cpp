@@ -30,7 +30,7 @@
 #include "AntiAim.hpp"
 #include "WeaponData.hpp"
 
-namespace hacks::tf2::nospread
+namespace hacks::nospread
 {
 static settings::Boolean projectile("nospread.projectile", "false");
 /*
@@ -67,7 +67,8 @@ bool shouldNoSpread(bool _projectile)
     case 2:
         if (g_pLocalPlayer->spectator_state != g_pLocalPlayer->NONE)
             return false;
-    };
+        break;
+    }
     return _projectile ? *projectile : *bullet;
 }
 
@@ -203,17 +204,10 @@ static float CalculateMantissaStep(float flValue)
     return powf(2, iExponent - (127 + 23));
 }
 
-float GetServerCurTime()
-{
-    // Calculate on our own accord
-    float server_time = g_GlobalVars->interval_per_tick * CE_INT(LOCAL_E, netvar.nTickBase);
-    return server_time;
-}
-
 // Does the shot have any spread in general?
 bool IsPerfectShot(IClientEntity *weapon, float provided_time = 0.0 /*used for optimization*/)
 {
-    float server_time       = provided_time == 0.0 ? GetServerCurTime() : provided_time;
+    float server_time       = provided_time == 0.0 ? SERVER_TIME : provided_time;
     float time_since_attack = server_time - NET_FLOAT(weapon, netvar.flLastFireTime);
 
     int nBulletsPerShot = GetWeaponData(weapon)->m_nBulletsPerShot;
@@ -665,7 +659,7 @@ void CL_SendMove_hook()
 
     if (correct_ping)
         // Ping changed, adjust (Provided we are not fakelagging)
-        if (!(fakelag_amount || (hacks::shared::antiaim::isEnabled() && hacks::shared::antiaim::force_fakelag)) && (int) (ping * 1000.0) != (int) (ping_at_send * 1000.0))
+        if (!(fakelag_amount || (hacks::antiaim::isEnabled() && hacks::antiaim::force_fakelag)) && (int) (ping * 1000.0) != (int) (ping_at_send * 1000.0))
             predicted_time += ping - ping_at_send;
 
     // Check if we need to sync
@@ -705,7 +699,7 @@ void CL_SendMove_hook()
         return;
     }
 
-    float current_time = GetServerCurTime();
+    float current_time = SERVER_TIME;
 
     // Check if we are attacking, if not then no point in adjusting
     if (!current_user_cmd || !(current_user_cmd->buttons & IN_ATTACK))
@@ -982,4 +976,4 @@ static InitRoutine init_bulletnospread(
             "nospread_shutdown");
     });
 
-} // namespace hacks::tf2::nospread
+} // namespace hacks::nospread

@@ -126,21 +126,27 @@ public:
     };
     int m_iMaxHealth()
     {
-        if (m_Type() == ENTITY_PLAYER)
+        switch (m_Type())
+        {
+        case ENTITY_PLAYER:
             return g_pPlayerResource->GetMaxHealth(this);
-        else if (m_Type() == ENTITY_BUILDING)
+        case ENTITY_BUILDING:
             return NET_INT(RAW_ENT(this), netvar.iBuildingMaxHealth);
-        else
+        default:
             return 0.0f;
+        }
     };
     int m_iHealth()
     {
-        if (m_Type() == ENTITY_PLAYER)
+        switch (m_Type())
+        {
+        case ENTITY_PLAYER:
             return NET_INT(RAW_ENT(this), netvar.iHealth);
-        else if (m_Type() == ENTITY_BUILDING)
+        case ENTITY_BUILDING:
             return NET_INT(RAW_ENT(this), netvar.iBuildingHealth);
-        else
+        default:
             return 0.0f;
+        }
     };
     Vector &m_vecAngle()
     {
@@ -152,16 +158,53 @@ public:
     {
         EntityType ret = ENTITY_GENERIC;
         int classid    = m_iClassID();
-        if (classid == CL_CLASS(CTFPlayer))
+        switch (classid)
+        {
+        case CL_CLASS(CTFPlayer):
+        {
             ret = ENTITY_PLAYER;
-        else if (classid == CL_CLASS(CTFGrenadePipebombProjectile) || classid == CL_CLASS(CTFProjectile_Cleaver) || classid == CL_CLASS(CTFProjectile_Jar) || classid == CL_CLASS(CTFProjectile_JarMilk) || classid == CL_CLASS(CTFProjectile_Arrow) || classid == CL_CLASS(CTFProjectile_EnergyBall) || classid == CL_CLASS(CTFProjectile_EnergyRing) || classid == CL_CLASS(CTFProjectile_GrapplingHook) || classid == CL_CLASS(CTFProjectile_HealingBolt) || classid == CL_CLASS(CTFProjectile_Rocket) || classid == CL_CLASS(CTFProjectile_SentryRocket) || classid == CL_CLASS(CTFProjectile_BallOfFire) || classid == CL_CLASS(CTFProjectile_Flare))
+            break;
+        }
+        case CL_CLASS(CTFGrenadePipebombProjectile):
+        case CL_CLASS(CTFProjectile_Cleaver):
+        case CL_CLASS(CTFProjectile_Jar):
+        case CL_CLASS(CTFProjectile_JarMilk):
+        case CL_CLASS(CTFProjectile_Arrow):
+        case CL_CLASS(CTFProjectile_EnergyBall):
+        case CL_CLASS(CTFProjectile_EnergyRing):
+        case CL_CLASS(CTFProjectile_GrapplingHook):
+        case CL_CLASS(CTFProjectile_HealingBolt):
+        case CL_CLASS(CTFProjectile_Rocket):
+        case CL_CLASS(CTFProjectile_SentryRocket):
+        case CL_CLASS(CTFProjectile_BallOfFire):
+        case CL_CLASS(CTFProjectile_Flare):
+        {
             ret = ENTITY_PROJECTILE;
-        else if (classid == CL_CLASS(CObjectTeleporter) || classid == CL_CLASS(CObjectSentrygun) || classid == CL_CLASS(CObjectDispenser))
+            break;
+        }
+        case CL_CLASS(CObjectTeleporter):
+        case CL_CLASS(CObjectSentrygun):
+        case CL_CLASS(CObjectDispenser):
+        {
             ret = ENTITY_BUILDING;
-        else if (classid == CL_CLASS(CZombie) || classid == CL_CLASS(CTFTankBoss) || classid == CL_CLASS(CMerasmus) || classid == CL_CLASS(CMerasmusDancer) || classid == CL_CLASS(CEyeballBoss) || classid == CL_CLASS(CHeadlessHatman))
+            break;
+        }
+        case CL_CLASS(CZombie):
+        case CL_CLASS(CTFTankBoss):
+        case CL_CLASS(CMerasmus):
+        case CL_CLASS(CMerasmusDancer):
+        case CL_CLASS(CEyeballBoss):
+        case CL_CLASS(CHeadlessHatman):
+        {
             ret = ENTITY_NPC;
-        else
+            break;
+        }
+        default:
+        {
             ret = ENTITY_GENERIC;
+            break;
+        }
+        }
         return ret;
     };
 
@@ -175,10 +218,13 @@ public:
 
     bool m_bCritProjectile()
     {
-        if (m_Type() == EntityType::ENTITY_PROJECTILE)
+        switch (m_Type())
+        {
+        case EntityType::ENTITY_PROJECTILE:
             return IsProjectileACrit(this);
-        else
+        default:
             return false;
+        }
     };
     bool m_bGrenadeProjectile()
     {

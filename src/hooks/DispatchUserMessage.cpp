@@ -34,7 +34,7 @@ const static std::string clear("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
 std::string lastfilter{};
 std::string lastname{};
 
-namespace hacks::tf::autoheal
+namespace hacks::autoheal
 {
 extern std::vector<int> called_medic;
 }
@@ -98,7 +98,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         retrun = false;
     }
     // We should bail out
-    if (!hacks::tf2::nospread::DispatchUserMessage(&buf, type))
+    if (!hacks::nospread::DispatchUserMessage(&buf, type))
         return true;
     std::string data;
     switch (type)
@@ -115,7 +115,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         int command_id = buf.ReadByte();
 
         if (voice_menu == 1 && command_id == 6)
-            hacks::tf::autoheal::called_medic.push_back(ent_id);
+            hacks::autoheal::called_medic.push_back(ent_id);
         // If we don't .Seek(0) the game will have a bad  time reading
         buf.Seek(0);
         break;
@@ -137,7 +137,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         break;
     }
     case 12:
-        if (hacks::shared::catbot::anti_motd && hacks::shared::catbot::catbotmode)
+        if (hacks::catbot::anti_motd && hacks::catbot::catbotmode)
         {
             data = std::string(buf_data);
             if (data.find("class_") != data.npos)
@@ -263,7 +263,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
                 }
         }
         if (event.find("TF_Chat") == 0)
-            hacks::shared::ChatCommands::handleChatMessage(message, data[0]);
+            hacks::ChatCommands::handleChatMessage(message, data[0]);
         chatlog::LogMessage(data[0], message);
         buf = bf_read(data.c_str(), data.size());
         buf.Seek(0);

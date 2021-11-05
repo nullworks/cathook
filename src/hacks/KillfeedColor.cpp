@@ -11,7 +11,7 @@
 #include <string>
 
 #if !ENFORCE_STREAM_SAFETY
-namespace hacks::tf2::killfeed
+namespace hacks::killfeed
 {
 static settings::Boolean enable{ "visual.killfeedcolor.enable", "true" };
 static settings::Boolean sort_names{ "visual.killfeedcolor.sort-names", "false" };
@@ -149,5 +149,5 @@ static InitRoutine init(
         EC::Register(
             EC::Shutdown, []() { drawtext_detour.Shutdown(); }, "shutdown_kf");
     });
-} // namespace hacks::tf2::killfeed
+} // namespace hacks::killfeed
 #endif

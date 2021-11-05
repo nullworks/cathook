@@ -25,7 +25,7 @@
 #include "Trigger.hpp"
 #include "UberSpam.hpp"
 #include "Spam.hpp"
-#include "NavBot.hpp"
+//#include "NavBot.hpp"
 #include "FollowBot.hpp"
 #include "CatBot.hpp"
 #include "Backtrack.hpp"

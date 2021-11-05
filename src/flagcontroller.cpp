@@ -149,8 +149,10 @@ ETFFlagStatus getStatus(int team)
     // Mark as home if nothing is found
     return TF_FLAGINFO_HOME;
 }
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, Update, "flagcontroller_update");
-    EC::Register(EC::LevelInit, LevelInit, "flagcontroller_levelinit");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, Update, "flagcontroller_update");
+        EC::Register(EC::LevelInit, LevelInit, "flagcontroller_levelinit");
+    });
 } // namespace flagcontroller

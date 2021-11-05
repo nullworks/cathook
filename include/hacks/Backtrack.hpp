@@ -2,7 +2,7 @@
 #include "common.hpp"
 #include "entityhitboxcache.hpp"
 
-namespace hacks::tf2::backtrack
+namespace hacks::backtrack
 {
 class CIncomingSequence
 {
@@ -61,4 +61,4 @@ extern settings::Float chams_envmap_tint_r;
 extern settings::Float chams_envmap_tint_g;
 extern settings::Float chams_envmap_tint_b;
 #endif
-} // namespace hacks::tf2::backtrack
+} // namespace hacks::backtrack

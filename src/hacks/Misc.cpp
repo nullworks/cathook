@@ -22,14 +22,13 @@
 #include "hack.hpp"
 #include <thread>
 
-namespace hacks::shared::misc
+namespace hacks::misc
 {
 #if !ENFORCE_STREAM_SAFETY && ENABLE_VISUALS
 static settings::Boolean render_zoomed{ "visual.render-local-zoomed", "true" };
 #endif
 static settings::Boolean anti_afk{ "misc.anti-afk", "false" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
-static settings::Boolean tauntslide{ "misc.tauntslide-tf2c", "false" };
 static settings::Boolean tauntslide_tf2{ "misc.tauntslide", "false" };
 static settings::Boolean flashlight_spam{ "misc.flashlight-spam", "false" };
 static settings::Boolean auto_balance_spam{ "misc.auto-balance-spam", "false" };
@@ -302,100 +301,79 @@ void CreateMove()
         }
     }
 
-    // TF2c Tauntslide
-    IF_GAME(IsTF2C())
+    // Tauntslide needs improvement for movement but it mostly works
+    if (tauntslide_tf2)
     {
-        if (tauntslide)
-            RemoveCondition<TFCond_Taunting>(LOCAL_E);
-    }
-
-    // HL2DM flashlight spam
-    IF_GAME(IsHL2DM())
-    {
-        if (flashlight_spam)
+        // Check to prevent crashing
+        if (CE_GOOD(LOCAL_E))
         {
-            if (flash_light_spam_switch && !current_user_cmd->impulse)
-                current_user_cmd->impulse = 100;
-            flash_light_spam_switch = !flash_light_spam_switch;
-        }
-    }
-
-    IF_GAME(IsTF2())
-    {
-        // Tauntslide needs improvement for movement but it mostly works
-        if (tauntslide_tf2)
-        {
-            // Check to prevent crashing
-            if (CE_GOOD(LOCAL_E))
+            if (HasCondition<TFCond_Taunting>(LOCAL_E))
             {
-                if (HasCondition<TFCond_Taunting>(LOCAL_E))
-                {
-                    // get directions
-                    float forward = 0;
-                    float side    = 0;
-                    if (current_user_cmd->buttons & IN_FORWARD)
-                        forward += 450;
-                    if (current_user_cmd->buttons & IN_BACK)
-                        forward -= 450;
-                    if (current_user_cmd->buttons & IN_MOVELEFT)
-                        side -= 450;
-                    if (current_user_cmd->buttons & IN_MOVERIGHT)
-                        side += 450;
-                    current_user_cmd->forwardmove = forward;
-                    current_user_cmd->sidemove    = side;
+                // get directions
+                float forward = 0;
+                float side    = 0;
+                if (current_user_cmd->buttons & IN_FORWARD)
+                    forward += 450;
+                if (current_user_cmd->buttons & IN_BACK)
+                    forward -= 450;
+                if (current_user_cmd->buttons & IN_MOVELEFT)
+                    side -= 450;
+                if (current_user_cmd->buttons & IN_MOVERIGHT)
+                    side += 450;
+                current_user_cmd->forwardmove = forward;
+                current_user_cmd->sidemove    = side;
 
-                    QAngle camera_angle;
-                    g_IEngine->GetViewAngles(camera_angle);
+                QAngle camera_angle;
+                g_IEngine->GetViewAngles(camera_angle);
 
-                    // Doesnt work with anti-aim as well as I hoped... I guess
-                    // this is as far as I can go with such a simple tauntslide
-                    if (!hacks::shared::antiaim::isEnabled())
-                        current_user_cmd->viewangles.y = camera_angle[1];
-                    g_pLocalPlayer->v_OrigViewangles.y = camera_angle[1];
+                // Doesnt work with anti-aim as well as I hoped... I guess
+                // this is as far as I can go with such a simple tauntslide
+                if (!hacks::antiaim::isEnabled())
+                    current_user_cmd->viewangles.y = camera_angle[1];
+                g_pLocalPlayer->v_OrigViewangles.y = camera_angle[1];
 
-                    // Use silent since we dont want to prevent the player from
-                    // looking around
-                    g_pLocalPlayer->bUseSilentAngles = true;
-                }
+                // Use silent since we dont want to prevent the player from
+                // looking around
+                g_pLocalPlayer->bUseSilentAngles = true;
             }
         }
+    }
 
-        // Spams infinite autobalance spam function
-        if (auto_balance_spam && auto_balance_timer.test_and_set(150))
-            SendAutoBalanceRequest();
+    // Spams infinite autobalance spam function
+    if (auto_balance_spam && auto_balance_timer.test_and_set(150))
+        SendAutoBalanceRequest();
 
-        // Simple No-Push through cvars
-        if (teammatesPushaway)
+    // Simple No-Push through cvars
+    if (teammatesPushaway)
+    {
+        if (*nopush_enabled == teammatesPushaway->GetBool())
+            teammatesPushaway->SetValue(!nopush_enabled);
+    }
+    else
+        teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
+
+    // Ping Reducer
+    if (ping_reducer && !hacks::antianticheat::enabled)
+    {
+        static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
+        if (cmdrate == nullptr)
         {
-            if (*nopush_enabled == teammatesPushaway->GetBool())
-                teammatesPushaway->SetValue(!nopush_enabled);
+            cmdrate = g_ICvar->FindVar("cl_cmdrate");
+            return;
         }
-        else
-            teammatesPushaway = g_ICvar->FindVar("tf_avoidteammates_pushaway");
-
-        // Ping Reducer
-        if (ping_reducer && !hacks::tf2::antianticheat::enabled)
+        int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
+        static Timer updateratetimer{};
+        if (updateratetimer.test_and_set(500))
         {
-            static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            if (cmdrate == nullptr)
+            if (*force_ping <= ping)
             {
-                cmdrate = g_ICvar->FindVar("cl_cmdrate");
-                return;
+                NET_SetConVar command("cl_cmdrate", "-1");
+                ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
             }
-            int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
-            static Timer updateratetimer{};
-            if (updateratetimer.test_and_set(500))
+            else if (*force_ping > ping)
             {
-                if (*force_ping <= ping)
-                {
-                    NET_SetConVar command("cl_cmdrate", "-1");
-                    ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
-                }
-                else if (*force_ping > ping)
-                {
-                    NET_SetConVar command("cl_cmdrate", std::to_string(cmdrate->GetInt()).c_str());
-                    ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
-                }
+                NET_SetConVar command("cl_cmdrate", std::to_string(cmdrate->GetInt()).c_str());
+                ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
             }
         }
     }
@@ -469,81 +447,6 @@ void Draw()
             AddSideString(format("Weapon state: ", CE_INT(local, netvar.iWeaponState)));
         AddSideString(format("ItemDefinitionIndex: ", CE_INT(local, netvar.iItemDefinitionIndex)));
         AddSideString(format("Maxspeed: ", CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed)));
-        /*AddSideString(colors::white, "Weapon: %s [%i]",
-        RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
-        g_pLocalPlayer->weapon()->m_iClassID());
-        //AddSideString(colors::white, "flNextPrimaryAttack: %f",
-        CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flNextPrimaryAttack));
-        //AddSideString(colors::white, "nTickBase: %f",
-        (float)(CE_INT(g_pLocalPlayer->entity, netvar.nTickBase)) *
-        gvars->interval_per_tick); AddSideString(colors::white, "CanShoot: %i",
-        CanShoot());
-        //AddSideString(colors::white, "Damage: %f",
-        CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargedDamage)); if (TF2)
-        AddSideString(colors::white, "DefIndex: %i",
-        CE_INT(g_pLocalPlayer->weapon(), netvar.iItemDefinitionIndex));
-        //AddSideString(colors::white, "GlobalVars: 0x%08x", gvars);
-        //AddSideString(colors::white, "realtime: %f", gvars->realtime);
-        //AddSideString(colors::white, "interval_per_tick: %f",
-        gvars->interval_per_tick);
-        //if (TF2) AddSideString(colors::white, "ambassador_can_headshot: %i",
-        (gvars->curtime - CE_FLOAT(g_pLocalPlayer->weapon(),
-        netvar.flLastFireTime)) > 0.95); AddSideString(colors::white,
-        "WeaponMode: %i", GetWeaponMode(g_pLocalPlayer->entity));
-        AddSideString(colors::white, "ToGround: %f",
-        DistanceToGround(g_pLocalPlayer->v_Origin));
-        AddSideString(colors::white, "ServerTime: %f",
-        CE_FLOAT(g_pLocalPlayer->entity, netvar.nTickBase) *
-        g_GlobalVars->interval_per_tick); AddSideString(colors::white, "CurTime:
-        %f", g_GlobalVars->curtime); AddSideString(colors::white, "FrameCount:
-        %i", g_GlobalVars->framecount); float speed, gravity;
-        GetProjectileData(g_pLocalPlayer->weapon(), speed, gravity);
-        AddSideString(colors::white, "ALT: %i",
-        g_pLocalPlayer->bAttackLastTick); AddSideString(colors::white, "Speed:
-        %f", speed); AddSideString(colors::white, "Gravity: %f", gravity);
-        AddSideString(colors::white, "CIAC: %i", *(bool*)(RAW_ENT(LOCAL_W) +
-        2380)); if (TF2) AddSideString(colors::white, "Melee: %i",
-        vfunc<bool(*)(IClientEntity*)>(RAW_ENT(LOCAL_W), 1860 / 4,
-        0)(RAW_ENT(LOCAL_W))); if (TF2) AddSideString(colors::white, "Bucket:
-        %.2f", *(float*)((uintptr_t)RAW_ENT(LOCAL_W) + 2612u));
-        //if (TF2C) AddSideString(colors::white, "Seed: %i",
-        *(int*)(sharedobj::client->lmap->l_addr + 0x00D53F68ul));
-        //AddSideString(colors::white, "IsZoomed: %i", g_pLocalPlayer->bZoomed);
-        //AddSideString(colors::white, "CanHeadshot: %i", CanHeadshot());
-        //AddSideString(colors::white, "IsThirdPerson: %i",
-        iinput->CAM_IsThirdPerson());
-        //if (TF2C) AddSideString(colors::white, "Crits: %i", s_bCrits);
-        //if (TF2C) AddSideString(colors::white, "CritMult: %i",
-        RemapValClampedNC( CE_INT(LOCAL_E, netvar.iCritMult), 0, 255, 1.0, 6 ));
-        for (int i = 0; i <= HIGHEST_ENTITY; i++) {
-            CachedEntity* e = ENTITY(i);
-            if (CE_GOOD(e)) {
-                if (e->m_Type() == EntityType::ENTITY_PROJECTILE) {
-                    //logging::Info("Entity %i [%s]: V %.2f (X: %.2f, Y: %.2f,
-        Z: %.2f) ACC %.2f (X: %.2f, Y: %.2f, Z: %.2f)", i,
-        RAW_ENT(e)->GetClientClass()->GetName(), e->m_vecVelocity.Length(),
-        e->m_vecVelocity.x, e->m_vecVelocity.y, e->m_vecVelocity.z,
-        e->m_vecAcceleration.Length(), e->m_vecAcceleration.x,
-        e->m_vecAcceleration.y, e->m_vecAcceleration.z);
-                    AddSideString(colors::white, "Entity %i [%s]: V %.2f (X:
-        %.2f, Y: %.2f, Z: %.2f) ACC %.2f (X: %.2f, Y: %.2f, Z: %.2f)", i,
-        RAW_ENT(e)->GetClientClass()->GetName(), e->m_vecVelocity.Length(),
-        e->m_vecVelocity.x, e->m_vecVelocity.y, e->m_vecVelocity.z,
-        e->m_vecAcceleration.Length(), e->m_vecAcceleration.x,
-        e->m_vecAcceleration.y, e->m_vecAcceleration.z);
-                }
-            }
-        }//AddSideString(draw::white, draw::black, "???: %f",
-        NET_FLOAT(g_pLocalPlayer->entity, netvar.test));
-        //AddSideString(draw::white, draw::black, "VecPunchAngle: %f %f %f",
-        pa.x, pa.y, pa.z);
-        //draw::DrawString(10, y, draw::white, draw::black, false,
-        "VecPunchAngleVel: %f %f %f", pav.x, pav.y, pav.z);
-        //y += 14;
-        //AddCenterString(fonts::font_handle,
-        input->GetAnalogValue(AnalogCode_t::MOUSE_X),
-        input->GetAnalogValue(AnalogCode_t::MOUSE_Y), draw::white,
-        L"S\u0FD5");*/
     }
 }
 
@@ -1127,7 +1030,7 @@ static InitRoutine init(
 #endif
 #endif
     });
-} // namespace hacks::shared::misc
+} // namespace hacks::misc
 
 /*void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char*
 ft, unsigned acc_offset) { bool forcetable = ft && strlen(ft); if (!forcetable

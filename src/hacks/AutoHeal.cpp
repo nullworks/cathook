@@ -11,7 +11,7 @@
 #include "PlayerTools.hpp"
 #include "MiscAimbot.hpp"
 
-namespace hacks::tf::autoheal
+namespace hacks::autoheal
 {
 std::vector<int> called_medic{};
 static settings::Boolean enable{ "autoheal.enable", "false" };
@@ -541,7 +541,7 @@ int HealingPriority(int idx)
     float overhealp     = ((float) overheal / (float) maxoverheal);
     float healthp       = ((float) health / (float) maxhealth);
     // Base Class priority
-    priority += hacks::shared::followbot::ClassPriority(ent) * 1.3;
+    priority += hacks::followbot::ClassPriority(ent) * 1.3;
 
     // wait that's illegal
     if (g_pPlayerResource->GetClass(ent) == 0)
@@ -571,7 +571,7 @@ int HealingPriority(int idx)
 #if ENABLE_IPC
     if (ipc::peer)
     {
-        if (hacks::shared::followbot::isEnabled() && hacks::shared::followbot::follow_target == idx)
+        if (hacks::followbot::isEnabled() && hacks::followbot::follow_target == idx)
         {
             priority *= 6.0f;
         }
@@ -686,7 +686,7 @@ void CreateMove()
 
             // If we are already healing our target, then follow the target using slowaim
             if (target_is_healing_target)
-                hacks::tf2::misc_aimbot::DoSlowAim(angles);
+                hacks::misc_aimbot::DoSlowAim(angles);
 
             current_user_cmd->viewangles = angles;
             if (!target_is_healing_target && (g_GlobalVars->tickcount % 2) == 0)
@@ -730,4 +730,4 @@ static InitRoutine Init(
         EC::Register(EC::CreateMove, CreateMove, "autoheal", EC::average);
         // EC::Register(EC::LevelInit, LevelInit, "autoheal_lvlinit", EC::average);
     });
-} // namespace hacks::tf::autoheal
+} // namespace hacks::autoheal

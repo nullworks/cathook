@@ -10,7 +10,7 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
-namespace hacks::shared::antiaim
+namespace hacks::antiaim
 {
 bool force_fakelag = false;
 float used_yaw     = 0.0f;
@@ -230,19 +230,19 @@ void SendNetMessage(INetMessage &msg)
 
 bool ShouldAA(CUserCmd *cmd)
 {
-    if (hacks::tf2::antibackstab::noaa)
+    if (hacks::antibackstab::noaa)
         return false;
     if (cmd->buttons & IN_USE)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    if ((cmd->buttons & IN_ATTACK) && !(IsTF2() && (classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee)) && CanShoot())
+    if (!(classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee) && CanShoot() && (cmd->buttons & IN_ATTACK))
     {
         return false;
     }
-    if ((cmd->buttons & IN_ATTACK2) && classid == CL_CLASS(CTFLunchBox))
+    if (classid == CL_CLASS(CTFLunchBox) && (cmd->buttons & IN_ATTACK2))
         return false;
-    if ((cmd->buttons & IN_ATTACK) && classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick)
+    if (classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick && (cmd->buttons & IN_ATTACK))
     {
         SetSafeSpace(2);
     }
@@ -553,4 +553,4 @@ bool isEnabled()
 }
 
 static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0 ? true : false; }); });
-} // namespace hacks::shared::antiaim
+} // namespace hacks::antiaim

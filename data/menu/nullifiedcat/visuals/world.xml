@@ -7,21 +7,21 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Freecam" y="55">
         <List width="180">
-            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button" tooltip="Press this button to toggle freecam."/>
+            <AutoVariable width="fill" target="visual.freecam-button" label="Freecam button" tooltip="Press this button to toggle freecam"/>
             <AutoVariable width="fill" target="visual.freecam-speed" label="Freecam speed (HU/s)"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
         <List width="180">
             <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson button" tooltip="Set a button to toggle thirdperson."/>
-            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show angles in thirdperson" tooltip="Show real antiaim angles in third person."/>
-            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable when zoomed" tooltip="Disables thirdperson when zoomed in."/>
+            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson button" tooltip="Set a button to toggle thirdperson"/>
+            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show angles in thirdperson" tooltip="Show real antiaim angles in third person"/>
+            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable when zoomed" tooltip="Disables thirdperson when zoomed in"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Zooming" y="190">
         <List width="180">
-            <AutoVariable width="fill" target="visual.zoom-key" label="Zoom key" tooltip="Hold down this key to override your FOV to the one set below."/>
+            <AutoVariable width="fill" target="visual.zoom-key" label="Zoom key" tooltip="Hold down this key to override your FOV to the one set below"/>
             <AutoVariable width="fill" target="visual.zoom-key.fov" label="Zoom FOV"/>
         </List>
     </Box>
@@ -34,7 +34,7 @@
             <AutoVariable width="fill" target="remove.hats" label="Remove hats"/>
             <AutoVariable width="fill" target="remove.contracker" label="Remove contracker"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove scope"/>
-            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Enabling Remove scope as well will set zoom_sensitivity_ratio to 4 when zooming in."/>
+            <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle" tooltip="Disables scope zoom and keeps the sniper rifle. Enabling Remove scope as well will set zoom_sensitivity_ratio to 4 when zooming in"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="135">
@@ -45,7 +45,7 @@
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode color (world)"/>
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
-            <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw explosion spheres" tooltip="Show explosion radius of Stickybombs."/>
+            <AutoVariable width="fill" target="explosionspheres.enabled" label="Draw explosion spheres" tooltip="Show explosion radius of Stickybombs"/>
             <LabeledObject width="fill" label="Ragdoll override">
                 <Select target="visual.ragdoll-mode">
                     <Option name="Auto" value="0"/>
@@ -94,7 +94,7 @@
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only override local player kills"/>
-            <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
+            <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>
                     <Option name="On" value="1"/>

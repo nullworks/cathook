@@ -72,7 +72,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
     {
     case 45:
         // Vote setup Failed, Refresh vote timer for catbot so it can try again
-        hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(4);
+        hacks::catbot::timer_votekicks.last -= std::chrono::seconds(4);
         break;
     case 46:
     {
@@ -133,7 +133,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         }
 #if ENABLE_VISUALS
         if (chat)
-            PrintChat("Votekick called: \x07%06X%s\x01 => \x07%06X%s\x01 (%s)", colors::chat::team(g_pPlayerResource->getTeam(caller)), info2.name, colors::chat::team(g_pPlayerResource->getTeam(target)), info.name, reason);
+            PrintChat("\x07%06X%s\x01 called a votekick on \x07%06X%s\x01 for the reason \"%s\".", 0xe1ad01, info2.name, 0xe1ad01, info.name, reason);
 #endif
         break;
     }
@@ -229,13 +229,27 @@ public:
             if (chat_partysay)
             {
                 char formated_string[256];
-                std::snprintf(formated_string, sizeof(formated_string), "[CAT] %s [U:1:%u] %s", info.name, info.friendsID, vote_option ? "F2" : "F1");
+                std::snprintf(formated_string, sizeof(formated_string), "[CAT] %s voted %s", info.name, vote_option ? "No" : "Yes");
 
                 re::CTFPartyClient::GTFPartyClient()->SendPartyChat(formated_string);
             }
 #if ENABLE_VISUALS
             if (chat)
-                PrintChat("\x07%06X%s\x01 [U:1:%u] %s", colors::chat::team(g_pPlayerResource->getTeam(eid)), info.name, info.friendsID, vote_option ? "F2" : "F1");
+            {
+                switch (vote_option)
+                {
+                case true:
+                {
+                    PrintChat("\x07%06X%s\x01 voted \x07%06XNo\x01.", 0xe1ad01, info.name, 0x00ff00);
+                    break;
+                }
+                case false:
+                {
+                    PrintChat("\x07%06X%s\x01 voted \x07%06XYes\x01.", 0xe1ad01, info.name, 0xff0000);
+                    break;
+                }
+                }
+            }
 #endif
         }
     }

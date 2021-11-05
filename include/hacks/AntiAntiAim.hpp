@@ -17,10 +17,10 @@ struct brutedata
     Vector new_angle{};
 };
 
-namespace hacks::shared::anti_anti_aim
+namespace hacks::anti_anti_aim
 {
 extern std::unordered_map<unsigned, brutedata> resolver_map;
 void increaseBruteNum(int idx);
 void frameStageNotify(ClientFrameStage_t stage);
 // void resolveEnt(int IDX, IClientEntity *entity = nullptr);
-} // namespace hacks::shared::anti_anti_aim
+} // namespace hacks::anti_anti_aim

@@ -14,7 +14,7 @@
 #include <hacks/hacklist.hpp>
 #include <settings/Bool.hpp>
 
-namespace hacks::shared::walkbot
+namespace hacks::walkbot
 {
 static settings::Button recording_key{ "walkbot.recording-key", "<null>" };
 
@@ -410,24 +410,28 @@ bool Load(std::string filename)
     return false;
 }
 
-static CatCommand save("wb_save", "Save", [](const CCommand &args) {
-    logging::Info("Saving");
-    std::string filename = "default";
-    if (args.ArgC() > 1)
-    {
-        filename = args.Arg(1);
-    }
-    Save(filename);
-});
-static CatCommand load("wb_load", "Load", [](const CCommand &args) {
-    logging::Info("Loading");
-    std::string filename = "default";
-    if (args.ArgC() > 1)
-    {
-        filename = args.Arg(1);
-    }
-    Load(filename);
-});
+static CatCommand save("wb_save", "Save",
+                       [](const CCommand &args)
+                       {
+                           logging::Info("Saving");
+                           std::string filename = "default";
+                           if (args.ArgC() > 1)
+                           {
+                               filename = args.Arg(1);
+                           }
+                           Save(filename);
+                       });
+static CatCommand load("wb_load", "Load",
+                       [](const CCommand &args)
+                       {
+                           logging::Info("Loading");
+                           std::string filename = "default";
+                           if (args.ArgC() > 1)
+                           {
+                               filename = args.Arg(1);
+                           }
+                           Load(filename);
+                       });
 
 index_t CreateNode(const Vector &xyz)
 {
@@ -442,138 +446,158 @@ index_t CreateNode(const Vector &xyz)
 
 CatCommand c_start_recording("wb_record", "Start recording", []() { state::state = WB_RECORDING; });
 CatCommand c_start_editing("wb_edit", "Start editing", []() { state::state = WB_EDITING; });
-CatCommand c_start_replaying("wb_replay", "Start replaying", []() {
-    state::last_node   = state::active_node;
-    state::active_node = state::closest_node;
-    state::state       = WB_REPLAYING;
-});
+CatCommand c_start_replaying("wb_replay", "Start replaying",
+                             []()
+                             {
+                                 state::last_node   = state::active_node;
+                                 state::active_node = state::closest_node;
+                                 state::state       = WB_REPLAYING;
+                             });
 CatCommand c_exit("wb_exit", "Exit", []() { state::state = WB_DISABLED; });
 
 // Selects closest node, clears selection if node is selected
-CatCommand c_select_node("wb_select", "Select node", []() {
-    if (state::active_node == state::closest_node)
-    {
-        state::active_node = BAD_NODE;
-    }
-    else
-    {
-        state::active_node = state::closest_node;
-    }
-});
+CatCommand c_select_node("wb_select", "Select node",
+                         []()
+                         {
+                             if (state::active_node == state::closest_node)
+                             {
+                                 state::active_node = BAD_NODE;
+                             }
+                             else
+                             {
+                                 state::active_node = state::closest_node;
+                             }
+                         });
 // Makes a new node in the middle of connection between 2 nodes
-CatCommand c_split_connection("wb_split", "Split connection", []() {
-    if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
-        return;
+CatCommand c_split_connection("wb_split", "Split connection",
+                              []()
+                              {
+                                  if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
+                                      return;
 
-    if (state::active_node == state::closest_node)
-        return;
+                                  if (state::active_node == state::closest_node)
+                                      return;
 
-    auto &a = state::nodes[state::active_node];
-    auto &b = state::nodes[state::closest_node];
+                                  auto &a = state::nodes[state::active_node];
+                                  auto &b = state::nodes[state::closest_node];
 
-    a.unlink(state::closest_node);
-    b.unlink(state::active_node);
+                                  a.unlink(state::closest_node);
+                                  b.unlink(state::active_node);
 
-    index_t node = CreateNode((a.xyz() + b.xyz()) / 2);
-    auto &n      = state::nodes[node];
-    a.link(node);
-    n.link(state::active_node);
-    b.link(node);
-    n.link(state::closest_node);
-});
+                                  index_t node = CreateNode((a.xyz() + b.xyz()) / 2);
+                                  auto &n      = state::nodes[node];
+                                  a.link(node);
+                                  n.link(state::active_node);
+                                  b.link(node);
+                                  n.link(state::closest_node);
+                              });
 // Deletes closest node and its connections
 CatCommand c_delete_node("wb_delete", "Delete node", []() { DeleteNode(state::closest_node); });
 // Creates a new node under your feet and connects it to closest node to your
 // crosshair
-CatCommand c_create_node("wb_create", "Create node", []() {
-    index_t node = CreateNode(g_pLocalPlayer->v_Origin);
-    auto &n      = state::nodes[node];
-    if (current_user_cmd->buttons & IN_DUCK)
-        n.flags |= NF_DUCK;
-    if (state::node_good(state::closest_node))
-    {
-        auto &c = state::nodes[state::closest_node];
-        n.link(state::closest_node);
-        c.link(node);
-        logging::Info("[wb] Node %u linked to node %u at (%.2f %.2f %.2f)", node, state::closest_node, c.x, c.y, c.z);
-    }
-});
+CatCommand c_create_node("wb_create", "Create node",
+                         []()
+                         {
+                             index_t node = CreateNode(g_pLocalPlayer->v_Origin);
+                             auto &n      = state::nodes[node];
+                             if (current_user_cmd->buttons & IN_DUCK)
+                                 n.flags |= NF_DUCK;
+                             if (state::node_good(state::closest_node))
+                             {
+                                 auto &c = state::nodes[state::closest_node];
+                                 n.link(state::closest_node);
+                                 c.link(node);
+                                 logging::Info("[wb] Node %u linked to node %u at (%.2f %.2f %.2f)", node, state::closest_node, c.x, c.y, c.z);
+                             }
+                         });
 // Connects selected node to closest one
-CatCommand c_connect_node("wb_connect", "Connect nodes", []() {
-    if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
-        return;
-    // Don't link a node to itself, idiot
-    if (state::active_node == state::closest_node)
-        return;
+CatCommand c_connect_node("wb_connect", "Connect nodes",
+                          []()
+                          {
+                              if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
+                                  return;
+                              // Don't link a node to itself, idiot
+                              if (state::active_node == state::closest_node)
+                                  return;
 
-    auto &a = state::nodes[state::active_node];
-    auto &b = state::nodes[state::closest_node];
+                              auto &a = state::nodes[state::active_node];
+                              auto &b = state::nodes[state::closest_node];
 
-    a.link(state::closest_node);
-    b.link(state::active_node);
-});
+                              a.link(state::closest_node);
+                              b.link(state::active_node);
+                          });
 // Makes a one-way connection
-CatCommand c_connect_single_node("wb_connect_single", "Connect nodes (one-way)", []() {
-    if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
-        return;
-    // Don't link a node to itself, idiot
-    if (state::active_node == state::closest_node)
-        return;
+CatCommand c_connect_single_node("wb_connect_single", "Connect nodes (one-way)",
+                                 []()
+                                 {
+                                     if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
+                                         return;
+                                     // Don't link a node to itself, idiot
+                                     if (state::active_node == state::closest_node)
+                                         return;
 
-    auto &a = state::nodes[state::active_node];
+                                     auto &a = state::nodes[state::active_node];
 
-    a.link(state::closest_node);
-});
+                                     a.link(state::closest_node);
+                                 });
 // Connects selected node to closest one
-CatCommand c_disconnect_node("wb_disconnect", "Disconnect nodes", []() {
-    if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
-        return;
-    // Don't link a node to itself, idiot
-    if (state::active_node == state::closest_node)
-        return;
+CatCommand c_disconnect_node("wb_disconnect", "Disconnect nodes",
+                             []()
+                             {
+                                 if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
+                                     return;
+                                 // Don't link a node to itself, idiot
+                                 if (state::active_node == state::closest_node)
+                                     return;
 
-    auto &a = state::nodes[state::active_node];
-    auto &b = state::nodes[state::closest_node];
+                                 auto &a = state::nodes[state::active_node];
+                                 auto &b = state::nodes[state::closest_node];
 
-    a.unlink(state::closest_node);
-    b.unlink(state::active_node);
-});
+                                 a.unlink(state::closest_node);
+                                 b.unlink(state::active_node);
+                             });
 // Makes a one-way connection
-CatCommand c_disconnect_single_node("wb_disconnect_single", "Connect nodes (one-way)", []() {
-    if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
-        return;
-    // Don't link a node to itself, idiot
-    if (state::active_node == state::closest_node)
-        return;
+CatCommand c_disconnect_single_node("wb_disconnect_single", "Connect nodes (one-way)",
+                                    []()
+                                    {
+                                        if (not(state::node_good(state::active_node) and state::node_good(state::closest_node)))
+                                            return;
+                                        // Don't link a node to itself, idiot
+                                        if (state::active_node == state::closest_node)
+                                            return;
 
-    auto &a = state::nodes[state::active_node];
+                                        auto &a = state::nodes[state::active_node];
 
-    a.unlink(state::closest_node);
-});
+                                        a.unlink(state::closest_node);
+                                    });
 // Toggles jump flag on closest node
-CatCommand c_update_duck("wb_duck", "Toggle duck flag", []() {
-    if (not state::node_good(state::closest_node))
-        return;
+CatCommand c_update_duck("wb_duck", "Toggle duck flag",
+                         []()
+                         {
+                             if (not state::node_good(state::closest_node))
+                                 return;
 
-    auto &n = state::nodes[state::closest_node];
+                             auto &n = state::nodes[state::closest_node];
 
-    if (n.flags & NF_DUCK)
-        n.flags &= ~NF_DUCK;
-    else
-        n.flags |= NF_DUCK;
-});
+                             if (n.flags & NF_DUCK)
+                                 n.flags &= ~NF_DUCK;
+                             else
+                                 n.flags |= NF_DUCK;
+                         });
 // Toggles jump flag on closest node
-CatCommand c_update_jump("wb_jump", "Toggle jump flag", []() {
-    if (not state::node_good(state::closest_node))
-        return;
+CatCommand c_update_jump("wb_jump", "Toggle jump flag",
+                         []()
+                         {
+                             if (not state::node_good(state::closest_node))
+                                 return;
 
-    auto &n = state::nodes[state::closest_node];
+                             auto &n = state::nodes[state::closest_node];
 
-    if (n.flags & NF_JUMP)
-        n.flags &= ~NF_JUMP;
-    else
-        n.flags |= NF_JUMP;
-});
+                             if (n.flags & NF_JUMP)
+                                 n.flags &= ~NF_JUMP;
+                             else
+                                 n.flags |= NF_JUMP;
+                         });
 // Assuming node is good and conn is in range [0; MAX_CONNECTIONS)
 std::string DescribeConnection(index_t node, connection conn)
 {
@@ -608,117 +632,127 @@ std::string DescribeConnection(index_t node, connection conn)
     std::string result = format(node, ' ', (broken ? "-x>" : (oneway ? "-->" : "<->")), ' ', c.node, ' ', extra);
     return result;
 }
-CatCommand c_toggle_cf_ammo("wb_conn_ammo", "Toggle 'ammo' flag on connection from ACTIVE to CLOSEST node", []() {
-    auto a = state::active();
-    auto b = state::closest();
-    if (not(a and b))
-        return;
-    for (connection i = 0; i < MAX_CONNECTIONS; i++)
-    {
-        auto &c = a->connections[i];
-        if (c.free())
-            continue;
-        if (c.node != state::closest_node)
-            continue;
-        // Actually flip the flag
-        if (c.flags & CF_LOW_AMMO)
-            c.flags &= ~CF_LOW_AMMO;
-        else
-            c.flags |= CF_LOW_AMMO;
-    }
-});
-CatCommand c_toggle_cf_health("wb_conn_health", "Toggle 'health' flag on connection from ACTIVE to CLOSEST node", []() {
-    auto a = state::active();
-    auto b = state::closest();
-    if (not(a and b))
-        return;
-    for (connection i = 0; i < MAX_CONNECTIONS; i++)
-    {
-        auto &c = a->connections[i];
-        if (c.free())
-            continue;
-        if (c.node != state::closest_node)
-            continue;
-        // Actually flip the flag
-        if (c.flags & CF_LOW_HEALTH)
-            c.flags &= ~CF_LOW_HEALTH;
-        else
-            c.flags |= CF_LOW_HEALTH;
-    }
-});
-CatCommand c_toggle_cf_sticky("wb_conn_sticky", "Toggle 'Sticky' flag on connection from ACTIVE to CLOSEST node", []() {
-    auto a = state::active();
-    auto b = state::closest();
-    if (not(a and b))
-        return;
-    for (connection i = 0; i < MAX_CONNECTIONS; i++)
-    {
-        auto &c = a->connections[i];
-        if (c.free())
-            continue;
-        if (c.node != state::closest_node)
-            continue;
-        // Actually flip the flag
-        if (c.flags & CF_STICKYBOMB)
-            c.flags &= ~CF_STICKYBOMB;
-        else
-            c.flags |= CF_STICKYBOMB;
-    }
-});
+CatCommand c_toggle_cf_ammo("wb_conn_ammo", "Toggle 'ammo' flag on connection from ACTIVE to CLOSEST node",
+                            []()
+                            {
+                                auto a = state::active();
+                                auto b = state::closest();
+                                if (not(a and b))
+                                    return;
+                                for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                {
+                                    auto &c = a->connections[i];
+                                    if (c.free())
+                                        continue;
+                                    if (c.node != state::closest_node)
+                                        continue;
+                                    // Actually flip the flag
+                                    if (c.flags & CF_LOW_AMMO)
+                                        c.flags &= ~CF_LOW_AMMO;
+                                    else
+                                        c.flags |= CF_LOW_AMMO;
+                                }
+                            });
+CatCommand c_toggle_cf_health("wb_conn_health", "Toggle 'health' flag on connection from ACTIVE to CLOSEST node",
+                              []()
+                              {
+                                  auto a = state::active();
+                                  auto b = state::closest();
+                                  if (not(a and b))
+                                      return;
+                                  for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                  {
+                                      auto &c = a->connections[i];
+                                      if (c.free())
+                                          continue;
+                                      if (c.node != state::closest_node)
+                                          continue;
+                                      // Actually flip the flag
+                                      if (c.flags & CF_LOW_HEALTH)
+                                          c.flags &= ~CF_LOW_HEALTH;
+                                      else
+                                          c.flags |= CF_LOW_HEALTH;
+                                  }
+                              });
+CatCommand c_toggle_cf_sticky("wb_conn_sticky", "Toggle 'Sticky' flag on connection from ACTIVE to CLOSEST node",
+                              []()
+                              {
+                                  auto a = state::active();
+                                  auto b = state::closest();
+                                  if (not(a and b))
+                                      return;
+                                  for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                  {
+                                      auto &c = a->connections[i];
+                                      if (c.free())
+                                          continue;
+                                      if (c.node != state::closest_node)
+                                          continue;
+                                      // Actually flip the flag
+                                      if (c.flags & CF_STICKYBOMB)
+                                          c.flags &= ~CF_STICKYBOMB;
+                                      else
+                                          c.flags |= CF_STICKYBOMB;
+                                  }
+                              });
 // Displays all info about closest node and its connections
-CatCommand c_info("wb_dump", "Show info", []() {
-    index_t node = state::closest_node;
-    if (not node_good(node))
-        return;
+CatCommand c_info("wb_dump", "Show info",
+                  []()
+                  {
+                      index_t node = state::closest_node;
+                      if (not node_good(node))
+                          return;
 
-    auto &n = nodes[node];
+                      auto &n = nodes[node];
 
-    logging::Info("[wb] Info about node %u", node);
-    logging::Info("[wb] Flags: Duck=%d, Jump=%d, Raw=%u", n.flags & NF_DUCK, n.flags & NF_JUMP, n.flags);
-    logging::Info("[wb] X: %.2f | Y: %.2f | Z: %.2f", n.x, n.y, n.z);
-    logging::Info("[wb] Connections:");
-    for (size_t i = 0; i < MAX_CONNECTIONS; i++)
-    {
-        if (n.connections[i].free())
-            continue;
-        logging::Info("[wb] %s", DescribeConnection(node, i).c_str());
-    }
-});
+                      logging::Info("[wb] Info about node %u", node);
+                      logging::Info("[wb] Flags: Duck=%d, Jump=%d, Raw=%u", n.flags & NF_DUCK, n.flags & NF_JUMP, n.flags);
+                      logging::Info("[wb] X: %.2f | Y: %.2f | Z: %.2f", n.x, n.y, n.z);
+                      logging::Info("[wb] Connections:");
+                      for (size_t i = 0; i < MAX_CONNECTIONS; i++)
+                      {
+                          if (n.connections[i].free())
+                              continue;
+                          logging::Info("[wb] %s", DescribeConnection(node, i).c_str());
+                      }
+                  });
 // Deletes a whole region of nodes
 // Deletes a single closest node if no node is selected
-CatCommand c_delete_region("wb_delete_region", "Delete region of nodes", []() {
-    logging::Info("< DISABLED >");
-    /*index_t a = state::active_node;
-    index_t b = state::closest_node;
+CatCommand c_delete_region("wb_delete_region", "Delete region of nodes",
+                           []()
+                           {
+                               logging::Info("< DISABLED >");
+                               /*index_t a = state::active_node;
+                               index_t b = state::closest_node;
 
-    if (not (state::node_good(a) and state::node_good(b)))
-        return;
+                               if (not (state::node_good(a) and state::node_good(b)))
+                                   return;
 
-    index_t current = state::closest_node;
-    index_t next = INVALID_NODE;
+                               index_t current = state::closest_node;
+                               index_t next = INVALID_NODE;
 
-    do {
-        auto& n = state::nodes[current];
+                               do {
+                                   auto& n = state::nodes[current];
 
-        if (n.connection_count > 2) {
-            logging::Info("[wb] More than 2 connections on a node! Quitting.");
-            return;
-        }
-        bool found_next = false;
-        for (size_t i = 0; i < 2; i++) {
-            if (n.connections[i] != current) {
-                next = n.connections[i];
-                found_next = true;
-            }
-        }
-        DeleteNode(current);
-        current = next;
-        if (not found_next) {
-            logging::Info("[wb] Dead end? Can't find next node after %u",
-    current); break;
-        }
-    } while (state::node_good(current) and (current != a));*/
-});
+                                   if (n.connection_count > 2) {
+                                       logging::Info("[wb] More than 2 connections on a node! Quitting.");
+                                       return;
+                                   }
+                                   bool found_next = false;
+                                   for (size_t i = 0; i < 2; i++) {
+                                       if (n.connections[i] != current) {
+                                           next = n.connections[i];
+                                           found_next = true;
+                                       }
+                                   }
+                                   DeleteNode(current);
+                                   current = next;
+                                   if (not found_next) {
+                                       logging::Info("[wb] Dead end? Can't find next node after %u",
+                               current); break;
+                                   }
+                               } while (state::node_good(current) and (current != a));*/
+                           });
 // Clears the state
 CatCommand c_clear("wb_clear", "Removes all nodes", []() { state::nodes.clear(); });
 
@@ -827,7 +861,7 @@ index_t SelectNextNode()
                         if ((chargetime >= 0.1f) && begansticky > 3)
                         {
                             current_user_cmd->buttons &= ~IN_ATTACK;
-                            hacks::shared::antiaim::SetSafeSpace(3);
+                            hacks::antiaim::SetSafeSpace(3);
                             begansticky = 0;
                         }
                         // Else just keep charging
@@ -1197,15 +1231,15 @@ static void cm()
                 lagexploit::pointarr[2] || lagexploit::pointarr[3] ||
                 lagexploit::pointarr[4])
             {
-                hacks::shared::followbot::followbot  = 1;
-                hacks::shared::followbot::roambot    = 1;
-                hacks::shared::followbot::followcart = true;
+                hacks::followbot::followbot  = 1;
+                hacks::followbot::roambot    = 1;
+                hacks::followbot::followcart = true;
             }
             else
             {
-                hacks::shared::followbot::followbot  = 0;
-                hacks::shared::followbot::roambot    = 0;
-                hacks::shared::followbot::followcart = false;
+                hacks::followbot::followbot  = 0;
+                hacks::followbot::roambot    = 0;
+                hacks::followbot::followcart = false;
             }
         }*/
         if (nodes.size() == 0)
@@ -1218,12 +1252,14 @@ static void cm()
     }
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove_NoEnginePred, cm, "cm_walkbot", EC::average);
-    EC::Register(EC::LevelInit, OnLevelInit, "init_walkbot", EC::average);
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove_NoEnginePred, cm, "cm_walkbot", EC::average);
+        EC::Register(EC::LevelInit, OnLevelInit, "init_walkbot", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "draw_walkbot", EC::average);
+        EC::Register(EC::Draw, Draw, "draw_walkbot", EC::average);
 #endif
-});
+    });
 
-} // namespace hacks::shared::walkbot
+} // namespace hacks::walkbot

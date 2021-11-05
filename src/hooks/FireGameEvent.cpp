@@ -24,7 +24,7 @@ DEFINE_HOOKED_METHOD(FireGameEvent, void, void *this_, IGameEvent *event)
                 return;
             }
         }
-//		hacks::tf2::killstreak::fire_event(event);
+//		hacks::killstreak::fire_event(event);
 #endif
     }
     original::FireGameEvent(this_, event);

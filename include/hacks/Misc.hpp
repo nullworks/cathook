@@ -9,7 +9,7 @@
 
 #include "config.h"
 
-namespace hacks::shared::misc
+namespace hacks::misc
 {
 void generate_schema();
 void Schema_Reload();
@@ -21,4 +21,4 @@ int getCarriedBuilding();
 extern int last_number;
 
 extern float last_bucket;
-} // namespace hacks::shared::misc
+} // namespace hacks::misc

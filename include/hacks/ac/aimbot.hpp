@@ -16,7 +16,6 @@ class CachedEntity;
 
 namespace ac::aimbot
 {
-
 struct ac_data
 {
     size_t detections;

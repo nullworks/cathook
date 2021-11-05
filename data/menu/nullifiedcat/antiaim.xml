@@ -4,10 +4,10 @@
             <AutoVariable width="fill" target="antiaim.enable" label="Enable"/>
             <AutoVariable width="fill" target="antiaim.draw-fakes" label="Draw fakes"/>
             <AutoVariable width="fill" target="antiaim.crouch" label="Fake crouch"/>
-            <AutoVariable width="fill" target="antiaim.no-clamp" label="No clamping" tooltip="Don't clamp angles (keep pitch within ±89° and yaw within ±180°)."/>
+            <AutoVariable width="fill" target="antiaim.no-clamp" label="No clamping" tooltip="Don't clamp angles (keep pitch within ±89° and yaw within ±180°)"/>
             <AutoVariable width="fill" target="misc.fakelag" label="Fakelag" min="0" max="22"/>
             <AutoVariable width="fill" target="misc.fakelag-midair-only" label="Fakelag midair only"/>
-            <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" tooltip="Speed for yaw spin." min="-45" max="45" step="0.1"/>
+            <AutoVariable width="fill" target="antiaim.spin-speed" label="Spin speed" tooltip="Speed for yaw spin" min="-45" max="45" step="0.1"/>
             <AutoVariable width="fill" target="antiaim.roll" label="Roll"/>
             <Box padding="12 6 6 6" width="content" height="content" name="Pitch" y="90">
 				<List width="138">
@@ -31,7 +31,7 @@
 							<Option name="Heck" value="7"/>
 						</Select>
 					</LabeledObject>
-					<AutoVariable width="fill" target="antiaim.pitch.static" label="Custom" tooltip="Used when 'Real Pitch' is set to 'Custom'."/>
+					<AutoVariable width="fill" target="antiaim.pitch.static" label="Custom" tooltip="Used when 'Real Pitch' is set to 'Custom'"/>
 				</List>
 			</Box>
 			<Box padding="12 6 6 6" width="content" height="content" name="Yaw" y="120">
@@ -70,15 +70,15 @@
 							<Option name="Random Clamped" value="12"/>
 						</Select>
 					</LabeledObject>
-					<AutoVariable width="fill" target="antiaim.yaw.fake.static" label="Custom Fake" tooltip="Used when 'Fake Yaw' is set to 'Custom'."/>
-					<AutoVariable width="fill" target="antiaim.yaw.real.static" label="Custom Real" tooltip="Used when 'Real Yaw' is set to 'Custom'."/>
+					<AutoVariable width="fill" target="antiaim.yaw.fake.static" label="Custom Fake" tooltip="Used when 'Fake Yaw' is set to 'Custom'"/>
+					<AutoVariable width="fill" target="antiaim.yaw.real.static" label="Custom Real" tooltip="Used when 'Real Yaw' is set to 'Custom'"/>
 				</List>
 			</Box>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Resolver" x="170">
         <List width="150">
-            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Attempt to bruteforce enemy antiaim."/>
+            <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Attempt to bruteforce enemy antiaim"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" name="Anti-resolver" width="content" height="content" x="340">

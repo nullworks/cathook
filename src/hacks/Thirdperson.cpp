@@ -9,7 +9,7 @@
 #include <core/sdk.hpp>
 #include "AntiAntiAim.hpp"
 
-namespace hacks::tf::thirdperson
+namespace hacks::thirdperson
 {
 static settings::Boolean enable{ "visual.thirdperson.enable", "false" };
 static settings::Button thirdperson_key{ "visual.thirdperson-button", "<null>" };
@@ -70,4 +70,4 @@ void frameStageNotify()
         CE_FLOAT(LOCAL_E, netvar.deadflag + 8) = g_pLocalPlayer->realAngles.y;
     }
 }
-} // namespace hacks::tf::thirdperson
+} // namespace hacks::thirdperson

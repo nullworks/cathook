@@ -8,6 +8,7 @@
             <AutoVariable width="fill" target="dc.toggle-south-america" label="Toggle South America"/>
             <AutoVariable width="fill" target="dc.toggle-asia" label="Toggle Asia"/>
             <AutoVariable width="fill" target="dc.toggle-oceania" label="Toggle Oceania"/>
+            <AutoVariable width="fill" target="dc.toggle-africa" label="Toggle Africa"/>
             <AutoVariable width="fill" target="dc.regions" label="Region list (advanced users only)"/>
         </List>
     </Box>

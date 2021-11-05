@@ -9,11 +9,11 @@
 #include "common.hpp"
 #include "hack.hpp"
 
-namespace hacks::tf2::autobackstab
+namespace hacks::autobackstab
 {
 extern bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vector> target_pos, Vector from_angle);
 }
-namespace hacks::tf2::antibackstab
+namespace hacks::antibackstab
 {
 static settings::Boolean enable{ "antibackstab.enable", "0" };
 static settings::Float distance{ "antibackstab.distance", "200" };
@@ -121,7 +121,7 @@ void CreateMove()
         Vector spy_angle;
         spy_angle = CE_VECTOR(spy, netvar.m_angEyeAngles);
         fClampAngle(spy_angle);
-        bool couldbebackstabbed = hacks::tf2::autobackstab::angleCheck(spy, LOCAL_E, std::nullopt, spy_angle);
+        bool couldbebackstabbed = hacks::autobackstab::angleCheck(spy, LOCAL_E, std::nullopt, spy_angle);
         if (couldbebackstabbed || CE_INT(spy, netvar.iClass) == tf_class::tf_heavy)
             current_user_cmd->viewangles.x = 150.0f;
         g_pLocalPlayer->bUseSilentAngles = true;
@@ -133,8 +133,10 @@ void CreateMove()
         noaa = false;
 }
 
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, CreateMove, "antibackstab", EC::late);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "antibackstab_w", EC::late);
-});
-} // namespace hacks::tf2::antibackstab
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "antibackstab", EC::late);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "antibackstab_w", EC::late);
+    });
+} // namespace hacks::antibackstab

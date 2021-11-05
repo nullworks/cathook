@@ -69,7 +69,7 @@ void Update(CachedEntity *player)
                 GetPlayerInfo(player->m_IDX, &info);
                 if (am > 5)
                 {
-                    hacks::shared::anticheat::SetRage(info);
+                    hacks::anticheat::SetRage(info);
                     am = 0;
                 }
                 if (++data.detections > int(detections_warning))
@@ -90,7 +90,7 @@ void Update(CachedEntity *player)
                             if (wname) wp_name = wname;
                         }*/
                     }
-                    hacks::shared::anticheat::Accuse(player->m_IDX, "Aimbot", format("Weapon: ", wp_name, " | Deviation: ", deviation, "° | ", data.detections));
+                    hacks::anticheat::Accuse(player->m_IDX, "Aimbot", format("Weapon: ", wp_name, " | Deviation: ", deviation, "° | ", data.detections));
                 }
             }
         }

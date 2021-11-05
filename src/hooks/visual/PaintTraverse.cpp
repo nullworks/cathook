@@ -20,18 +20,22 @@ extern settings::Boolean minecraftHP;
 }
 int spamdur = 0;
 Timer joinspam{};
-CatCommand join_spam("join_spam", "Spam joins server for X seconds", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-        return;
-    int id = atoi(args.Arg(1));
-    joinspam.update();
-    spamdur = id;
-});
-CatCommand join("mm_join", "Join mm Match", []() {
-    auto gc = re::CTFGCClientSystem::GTFGCClientSystem();
-    if (gc)
-        gc->JoinMMMatch();
-});
+CatCommand join_spam("join_spam", "Spam joins server for X seconds",
+                     [](const CCommand &args)
+                     {
+                         if (args.ArgC() < 2)
+                             return;
+                         int id = atoi(args.Arg(1));
+                         joinspam.update();
+                         spamdur = id;
+                     });
+CatCommand join("mm_join", "Join mm Match",
+                []()
+                {
+                    auto gc = re::CTFGCClientSystem::GTFGCClientSystem();
+                    if (gc)
+                        gc->JoinMMMatch();
+                });
 
 bool replaced = false;
 namespace hooked_methods
@@ -80,7 +84,7 @@ DEFINE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *this_, vgui::VPANEL pane
         replaced = true;
     }
     call_default = true;
-    if (isHackActive() && (health_panel || panel_scope || motd_panel || motd_panel_sd) && ((panel == health_panel && mchealthbar::minecraftHP) || (hacks::shared::catbot::catbotmode && hacks::shared::catbot::anti_motd && (panel == motd_panel || panel == motd_panel_sd))))
+    if (isHackActive() && (health_panel || panel_scope || motd_panel || motd_panel_sd) && ((panel == health_panel && mchealthbar::minecraftHP) || (hacks::catbot::catbotmode && hacks::catbot::anti_motd && (panel == motd_panel || panel == motd_panel_sd))))
         call_default = false;
 
     if (software_cursor_mode)

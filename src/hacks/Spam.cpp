@@ -11,7 +11,7 @@
 #include "common.hpp"
 #include "MiscTemporary.hpp"
 
-namespace hacks::shared::spam
+namespace hacks::spam
 {
 static settings::Int spam_source{ "spam.source", "0" };
 static settings::Boolean random_order{ "spam.random", "0" };
@@ -228,11 +228,8 @@ bool FormatSpamMessage(std::string &message)
     ReplaceSpecials(message);
     bool team       = g_pLocalPlayer->team - 2;
     bool enemy_team = !team;
-    IF_GAME(IsTF2())
-    {
-        ReplaceString(message, "%myteam%", teams[team]);
-        ReplaceString(message, "%enemyteam%", teams[enemy_team]);
-    }
+    ReplaceString(message, "%myteam%", teams[team]);
+    ReplaceString(message, "%enemyteam%", teams[enemy_team]);
     return SubstituteQueries(message);
 }
 
@@ -243,50 +240,47 @@ static size_t current_teamspam_idx = 0;
 
 void createMove()
 {
-    IF_GAME(IsTF2())
+    // Spam changes the tournament name in casual and compeditive gamemodes
+    if (teamname_spam)
     {
-        // Spam changes the tournament name in casual and compeditive gamemodes
-        if (teamname_spam)
+        if (!(g_GlobalVars->tickcount % 10))
         {
-            if (!(g_GlobalVars->tickcount % 10))
+            if (teamspam_text.size())
             {
-                if (teamspam_text.size())
-                {
-                    // We've hit the end of the vector, loop back to the front
-                    // We need to do it like this, otherwise a file reload happening could cause this to crash at ".at"
-                    if (current_teamspam_idx >= teamspam_text.size())
-                        current_teamspam_idx = 0;
-                    g_IEngine->ServerCmd(format("tournament_teamname ", teamspam_text.at(current_teamspam_idx)).c_str());
-                    current_teamspam_idx++;
-                }
+                // We've hit the end of the vector, loop back to the front
+                // We need to do it like this, otherwise a file reload happening could cause this to crash at ".at"
+                if (current_teamspam_idx >= teamspam_text.size())
+                    current_teamspam_idx = 0;
+                g_IEngine->ServerCmd(format("tournament_teamname ", teamspam_text.at(current_teamspam_idx)).c_str());
+                current_teamspam_idx++;
             }
         }
+    }
 
-        if (voicecommand_spam)
+    if (voicecommand_spam)
+    {
+        static Timer last_voice_spam;
+        if (last_voice_spam.test_and_set(4000))
         {
-            static Timer last_voice_spam;
-            if (last_voice_spam.test_and_set(4000))
+            switch (*voicecommand_spam)
             {
-                switch (*voicecommand_spam)
-                {
-                case 1: // RANDOM
-                    g_IEngine->ServerCmd(format("voicemenu ", UniformRandomInt(0, 2), " ", UniformRandomInt(0, 8)).c_str());
-                    break;
-                case 2: // MEDIC
-                    g_IEngine->ServerCmd("voicemenu 0 0");
-                    break;
-                case 3: // THANKS
-                    g_IEngine->ServerCmd("voicemenu 0 1");
-                    break;
-                case 4: // NICE SHOT
-                    g_IEngine->ServerCmd("voicemenu 2 6");
-                    break;
-                case 5: // CHEERS
-                    g_IEngine->ServerCmd("voicemenu 2 2");
-                    break;
-                case 6: // JEERS
-                    g_IEngine->ServerCmd("voicemenu 2 3");
-                }
+            case 1: // RANDOM
+                g_IEngine->ServerCmd(format("voicemenu ", UniformRandomInt(0, 2), " ", UniformRandomInt(0, 8)).c_str());
+                break;
+            case 2: // MEDIC
+                g_IEngine->ServerCmd("voicemenu 0 0");
+                break;
+            case 3: // THANKS
+                g_IEngine->ServerCmd("voicemenu 0 1");
+                break;
+            case 4: // NICE SHOT
+                g_IEngine->ServerCmd("voicemenu 2 6");
+                break;
+            case 5: // CHEERS
+                g_IEngine->ServerCmd("voicemenu 2 2");
+                break;
+            case 6: // JEERS
+                g_IEngine->ServerCmd("voicemenu 2 3");
             }
         }
     }
@@ -383,13 +377,13 @@ void init()
 const std::vector<std::string> builtin_default    = { "Cathook - more fun than a ball of yarn!", "GNU/Linux is the best OS!", "Visit https://cathook.club for more information!", "Cathook - Free and Open-Source tf2 cheat!", "Cathook - ca(n)t stop me meow!" };
 const std::vector<std::string> builtin_lennyfaces = { "( ͡° ͜ʖ ͡°)", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง", "(◕‿◕✿)", "༼ つ  ͡° ͜ʖ ͡° ༽つ" };
 const std::vector<std::string> builtin_blanks     = { "\e"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-                                                  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" };
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                                                      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" };
 
 const std::vector<std::string> builtin_nonecore = { "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!", "NULL CORE - WAY TO THE TOP!", "NULL CORE - BEST TF2 CHEAT!", "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!", "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!", "NULL CORE - WHOLE SERVER OBSERVING!", "NULL CORE - GET BACK TO PWNING!", "NULL CORE - WHEN PVP IS TOO HARDCORE!", "NULL CORE - CAN CAUSE KIDS TO RAGE!", "NULL CORE - F2P NOOBS WILL BE 100% NERFED!" };
 const std::vector<std::string> builtin_lmaobox  = { "GET GOOD, GET LMAOBOX!", "LMAOBOX - WAY TO THE TOP", "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!" };
@@ -416,13 +410,15 @@ void teamspam_reload_command()
 {
     teamspam_reload(*teamname_file);
 }
-static InitRoutine EC([]() {
-    teamname_file.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { teamspam_reload(after); });
-    EC::Register(EC::CreateMove, createMove, "spam", EC::average);
-    init();
-});
+static InitRoutine EC(
+    []()
+    {
+        teamname_file.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { teamspam_reload(after); });
+        EC::Register(EC::CreateMove, createMove, "spam", EC::average);
+        init();
+    });
 
 static CatCommand reload_ts("teamspam_reload", "Relaod teamspam file", teamspam_reload_command);
 
-static CatCommand reload_cc("spam_reload", "Reload spam file", hacks::shared::spam::reloadSpamFile);
-} // namespace hacks::shared::spam
+static CatCommand reload_cc("spam_reload", "Reload spam file", hacks::spam::reloadSpamFile);
+} // namespace hacks::spam

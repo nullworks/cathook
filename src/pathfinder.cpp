@@ -2,7 +2,7 @@
 #include "external/PathFinder/src/PathFinder.h"
 #include "external/PathFinder/src/AStar.h"
 
-namespace hacks::shared::pathfinder
+namespace hacks::pathfinder
 {
 Vector loc;
 // std::vector<Vector> findPath(Vector loc, Vector dest);
@@ -136,4 +136,4 @@ std::vector<Vector> findPath(Vector loc, Vector dest)
     }
     return path;
 }
-} // namespace hacks::shared::pathfinder
+} // namespace hacks::pathfinder

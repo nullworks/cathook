@@ -62,8 +62,10 @@ void LevelInit()
         entry.clear();
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, Update, "plcreatemove");
-    EC::Register(EC::LevelInit, LevelInit, "levelinit_plcontroller");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, Update, "plcreatemove");
+        EC::Register(EC::LevelInit, LevelInit, "levelinit_plcontroller");
+    });
 } // namespace plcontroller

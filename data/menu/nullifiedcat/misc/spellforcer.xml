@@ -1,7 +1,7 @@
 <Tab name="Spellforcer" padding="4 4 4 4">
     <Box height="content" width="content" padding="12 6 6 6" name="Spellforcer">
         <List width="250">
-            <AutoVariable width="fill" target="spellforce.enabled" label="Enable Spell forcer" tooltip="Attempts to force a specific spell for yourself, and a different one and onto enemies."/>
+            <AutoVariable width="fill" target="spellforce.enabled" label="Enable Spell forcer" tooltip="Attempts to force a specific spell for yourself, and a different one and onto enemies"/>
             <LabeledObject width="fill" label="Default spell">
                 <Select target="spellforce.default_spell">
                     <Option name="Disabled" value="-1"/>
@@ -26,7 +26,7 @@
                     <Option name="Skeleton Army" value="11"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Default enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup.">
+            <LabeledObject width="fill" label="Default enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup">
                 <Select target="spellforce.default_spell.enemies">
                     <Option name="Disabled" value="-1"/>
                     <Option name="Fireball/Meteors" value="0"/>
@@ -52,7 +52,7 @@
                     <Option name="Teleport" value="6"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Helltower enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup.">
+            <LabeledObject width="fill" label="Helltower enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup">
                 <Select target="spellforce.helltower_spell.enemies">
                     <Option name="Disabled" value="-1"/>
                     <Option name="Fireball/Skeletons" value="0"/>
@@ -82,7 +82,7 @@
                     <Option name="Monoculus" value="10"/>
                 </Select>
             </LabeledObject>
-            <LabeledObject width="fill" label="Carnival of Carnage enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup.">
+            <LabeledObject width="fill" label="Carnival of Carnage enemy spell" tooltip="Left side is the normal spell pickup, right side is the rare spell pickup">
                 <Select target="spellforce.doomsday_spell.enemies">
                     <Option name="Disabled" value="-1"/>
                     <Option name="Fireball/Meteor" value="0"/>

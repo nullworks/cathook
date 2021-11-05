@@ -2,7 +2,7 @@
 #include "Backtrack.hpp"
 #include "AntiCheatBypass.hpp"
 
-namespace hacks::tf2::backtrack
+namespace hacks::backtrack
 {
 static settings::Boolean enabled("backtrack.enabled", "false");
 settings::Float latency("backtrack.latency", "0");
@@ -107,7 +107,7 @@ float getLatency()
 bool isTickInRange(int tickcount)
 {
     int delta_tickcount = abs(tickcount - current_user_cmd->tick_count + TIME_TO_TICKS(getLatency() / 1000.0f));
-    if (!hacks::tf2::antianticheat::enabled)
+    if (!hacks::antianticheat::enabled)
         return TICKS_TO_TIME(delta_tickcount) <= 0.2f - TICKS_TO_TIME(2);
     else
         return delta_tickcount <= TICKS_TO_TIME(1);
@@ -121,7 +121,7 @@ bool isEnabled()
     CachedEntity *wep = LOCAL_W;
     if (CE_BAD(wep))
     {
-        if (hacks::tf2::antianticheat::enabled)
+        if (hacks::antianticheat::enabled)
             return true;
         return false;
     }
@@ -238,8 +238,8 @@ void MoveToTick(BacktrackData data)
 
     // Mark for update
     int *entity_flags = (int *) ((uintptr_t) RAW_ENT(target) + 400);
-    // (EFL_DIRTY_SPATIAL_PARTITION)
-    *entity_flags |= (1 << 15);
+    // (EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS | EFL_DIRTY_SPATIAL_PARTITION)
+    *entity_flags |= (1 << 14) | (1 << 15);
 
     // Update
     UpdatePartition_fn(collisionprop);
@@ -258,7 +258,7 @@ void RestoreEntity(int entidx)
 
 void CreateMoveEarly()
 {
-    if (hacks::tf2::antianticheat::enabled && *latency > 200.0f)
+    if (hacks::antianticheat::enabled && *latency > 200.0f)
         latency = 200.0f;
     draw_positions.clear();
     isBacktrackEnabled = isEnabled();
@@ -417,4 +417,4 @@ static InitRoutine init(
 #endif
     });
 
-} // namespace hacks::tf2::backtrack
+} // namespace hacks::backtrack

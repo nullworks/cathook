@@ -152,8 +152,10 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
         last_zoom_state = current_zoom_state;
     }
 }
-static InitRoutine override_init([]() {
-    EC::Register(
-        EC::Shutdown, []() { g_CHUD->GetSensitivityFactor() = 0.0f; }, "override_shutdown");
-});
+static InitRoutine override_init(
+    []()
+    {
+        EC::Register(
+            EC::Shutdown, []() { g_CHUD->GetSensitivityFactor() = 0.0f; }, "override_shutdown");
+    });
 } // namespace hooked_methods

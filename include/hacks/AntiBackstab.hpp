@@ -7,8 +7,7 @@
 
 #pragma once
 
-namespace hacks::tf2::antibackstab
+namespace hacks::antibackstab
 {
-
 extern bool noaa;
-} // namespace hacks::tf2::antibackstab
+} // namespace hacks::antibackstab

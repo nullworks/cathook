@@ -53,9 +53,11 @@ std::optional<Vector> GetSoundLocation(int entid)
     return it->second.sound.m_pOrigin;
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, CreateMove, "CM_SoundCache");
-    EC::Register(
-        EC::LevelInit, []() { sound_cache.clear(); }, "soundcache_levelinit");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "CM_SoundCache");
+        EC::Register(
+            EC::LevelInit, []() { sound_cache.clear(); }, "soundcache_levelinit");
+    });
 } // namespace soundcache

@@ -6,7 +6,7 @@
 #include "hacks/AntiAntiAim.hpp"
 #include "sdk/dt_recv_redef.h"
 
-namespace hacks::shared::anti_anti_aim
+namespace hacks::anti_anti_aim
 {
 static settings::Boolean enable{ "anti-anti-aim.enable", "false" };
 static settings::Boolean debug{ "anti-anti-aim.debug.enable", "false" };
@@ -144,7 +144,7 @@ void increaseBruteNum(int idx)
     auto ent = ENTITY(idx);
     if (CE_BAD(ent) || !ent->player_info.friendsID)
         return;
-    auto &data = hacks::shared::anti_anti_aim::resolver_map[ent->player_info.friendsID];
+    auto &data = hacks::anti_anti_aim::resolver_map[ent->player_info.friendsID];
     if (data.hits_in_a_row >= 4)
         data.hits_in_a_row = 2;
     else if (data.hits_in_a_row >= 2)
@@ -255,14 +255,16 @@ static void shutdown()
     *original_ptrY = original_ProxyFnY;
 }
 
-static InitRoutine init([]() {
-    hook();
-    EC::Register(EC::Shutdown, shutdown, "antiantiaim_shutdown");
-    EC::Register(EC::CreateMove, CreateMove, "cm_antiantiaim");
-    EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_antiantiaim");
+static InitRoutine init(
+    []()
+    {
+        hook();
+        EC::Register(EC::Shutdown, shutdown, "antiantiaim_shutdown");
+        EC::Register(EC::CreateMove, CreateMove, "cm_antiantiaim");
+        EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_antiantiaim");
 #if ENABLE_TEXTMODE
-    EC::Register(EC::CreateMove, modifyAngles, "cm_textmodeantiantiaim");
-    EC::Register(EC::CreateMoveWarp, modifyAngles, "cmw_textmodeantiantiaim");
+        EC::Register(EC::CreateMove, modifyAngles, "cm_textmodeantiantiaim");
+        EC::Register(EC::CreateMoveWarp, modifyAngles, "cmw_textmodeantiantiaim");
 #endif
-});
-} // namespace hacks::shared::anti_anti_aim
+    });
+} // namespace hacks::anti_anti_aim

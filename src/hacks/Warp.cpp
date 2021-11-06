@@ -46,6 +46,8 @@ static settings::Boolean warp_backwards{ "warp.on-hit.backwards", "false" };
 static settings::Boolean warp_left{ "warp.on-hit.left", "true" };
 static settings::Boolean warp_right{ "warp.on-hit.right", "true" };
 
+static settings::Boolean debug_seqout{ "debug.warp_seqout", "false" };
+
 // Hidden control rvars for communtiy servers
 static settings::Int maxusrcmdprocessticks("warp.maxusrcmdprocessticks", "24");
 

@@ -238,8 +238,8 @@ void MoveToTick(BacktrackData data)
 
     // Mark for update
     int *entity_flags = (int *) ((uintptr_t) RAW_ENT(target) + 400);
-    // (EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS | EFL_DIRTY_SPATIAL_PARTITION)
-    *entity_flags |= (1 << 14) | (1 << 15);
+    // (EFL_DIRTY_SPATIAL_PARTITION)
+    *entity_flags |= (1 << 15);
 
     // Update
     UpdatePartition_fn(collisionprop);

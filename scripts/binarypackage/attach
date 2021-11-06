@@ -24,13 +24,6 @@ fi
 echo Running instances: "${arr[@]}"
 echo Attaching to "$proc"
 
-#sudo ./detach $inst bin/libcathook.so
-
-#if grep -q "$(realpath bin/libcathook.so)" /proc/"$proc"/maps; then
-#  echo already loaded
-#  exit
-#fi
-
 FILENAME="/tmp/.gl$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 6)"
 
 cp "libcathook.so" "$FILENAME"

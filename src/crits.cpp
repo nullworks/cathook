@@ -716,7 +716,7 @@ void CreateMove()
     {
         if (LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
         {
-            float chargebegin = *((float *) ((uintptr_t) RAW_ENT(LOCAL_W) + 3152));
+            float chargebegin = *((float *) ((uintptr_t) RAW_ENT(LOCAL_W) + 3156));
             float chargetime  = g_GlobalVars->curtime - chargebegin;
 
             static bool currently_charging_pipe = false;

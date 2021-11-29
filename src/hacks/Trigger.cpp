@@ -158,6 +158,9 @@ bool ShouldShoot()
             if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
                 return false;
         }
+        // Check if player is bonked
+        if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
+            return false;
         // Check if player is taunting
         if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
             return false;

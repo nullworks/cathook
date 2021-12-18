@@ -1499,68 +1499,33 @@ bool VischeckPredictedEntity(CachedEntity *entity)
     return cd.visible;
 }
 
-static float slow_change_dist_p = 0;
-static float slow_change_dist_y = 0;
-
 // A helper function to find a user angle that isnt directly on the target
 // angle, effectively slowing the aiming process
 void DoSlowAim(Vector &input_angle)
 {
-    auto viewangles = current_user_cmd->viewangles;
+    auto viewangles   = current_user_cmd->viewangles;
+    Vector slow_delta = { 0, 0, 0 };
 
-    // Yaw
-    if (viewangles.y != input_angle.y)
+    // Don't bother if we're already on target
+    if (viewangles != input_angle)
     {
+        slow_delta = input_angle - viewangles;
 
-        // Check if input angle and user angle are on opposing sides of yaw so
-        // we can correct for that
-        bool slow_opposing = false;
-        if ((input_angle.y < -90 && viewangles.y > 90) || (input_angle.y > 90 && viewangles.y < -90))
-            slow_opposing = true;
+        if (slow_delta.y > 180)
+            slow_delta.y -= 360;
+        if (slow_delta.y < -180)
+            slow_delta.y += 360;
 
-        // Direction
-        bool slow_dir = false;
-        if (slow_opposing)
-        {
-            if (input_angle.y > 90 && viewangles.y < -90)
-                slow_dir = true;
-        }
-        else if (viewangles.y > input_angle.y)
-            slow_dir = true;
+        slow_delta /= slow_aim;
+        input_angle = viewangles + slow_delta;
 
-        // Speed, check if opposing. We dont get a new distance due to the
-        // opposing sides making the distance spike, so just cheap out and reuse
-        // our last one.
-        if (!slow_opposing)
-            slow_change_dist_y = std::abs(viewangles.y - input_angle.y) / (int) slow_aim;
-
-        // Move in the direction of the input angle
-        if (slow_dir)
-            input_angle.y = viewangles.y - slow_change_dist_y;
-        else
-            input_angle.y = viewangles.y + slow_change_dist_y;
+        // Clamp as we changed angles
+        fClampAngle(input_angle);
     }
-
-    // Pitch
-    if (viewangles.x != input_angle.x)
-    {
-        // Get speed
-        slow_change_dist_p = std::abs(viewangles.x - input_angle.x) / (int) slow_aim;
-
-        // Move in the direction of the input angle
-        if (viewangles.x > input_angle.x)
-            input_angle.x = viewangles.x - slow_change_dist_p;
-        else
-            input_angle.x = viewangles.x + slow_change_dist_p;
-    }
-
     // 0.17 is a good amount in general
     slow_can_shoot = false;
-    if (slow_change_dist_y < 0.17 && slow_change_dist_p < 0.17)
+    if (std::abs(slow_delta.y) < 0.17 && std::abs(slow_delta.x) < 0.17)
         slow_can_shoot = true;
-
-    // Clamp as we changed angles
-    fClampAngle(input_angle);
 }
 
 // A function that determins whether aimkey allows aiming

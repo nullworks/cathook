@@ -280,6 +280,9 @@ static bool doRageBackstab()
                 continue;
             if (doSwingTraceAngle(angle, trace))
             {
+                // Make sure trace hit the enemy
+                if ((IClientEntity *) trace.m_pEnt != g_IEntityList->GetClientEntity(ent->m_IDX))
+                    return false;
                 current_user_cmd->buttons |= IN_ATTACK;
                 g_pLocalPlayer->bUseSilentAngles = true;
                 current_user_cmd->viewangles     = angle;
@@ -444,8 +447,10 @@ void CreateMove()
     }
 }
 
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, CreateMove, "autobackstab", EC::average);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "autobackstab_w", EC::average);
-});
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "autobackstab", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "autobackstab_w", EC::average);
+    });
 } // namespace hacks::tf2::autobackstab

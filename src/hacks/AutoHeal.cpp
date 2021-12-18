@@ -672,27 +672,36 @@ void CreateMove()
     if (!CurrentHealingTargetIDX)
         return;
 
-    CachedEntity *target          = ENTITY(CurrentHealingTargetIDX);
+    CachedEntity *target = ENTITY(CurrentHealingTargetIDX);
+
     bool target_is_healing_target = HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) == CurrentHealingTargetIDX;
-
-    if (!target_is_healing_target || look_at_target)
+    auto out                      = target->hitboxes.GetHitbox(spine_2);
+    if (out)
     {
-        auto out = target->hitboxes.GetHitbox(spine_2);
-        if (out)
+        if (silent)
+            g_pLocalPlayer->bUseSilentAngles = true;
+
+        // Follow the target using slowaim
+        if (target_is_healing_target && look_at_target)
         {
-            if (silent)
-                g_pLocalPlayer->bUseSilentAngles = true;
-            auto angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, out->center);
-
-            // If we are already healing our target, then follow the target using slowaim
-            if (target_is_healing_target)
-                hacks::tf2::misc_aimbot::DoSlowAim(angles);
-
+            Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, out->center);
+            hacks::tf2::misc_aimbot::DoSlowAim(angles);
             current_user_cmd->viewangles = angles;
-            if (!target_is_healing_target && (g_GlobalVars->tickcount % 2) == 0)
-                current_user_cmd->buttons |= IN_ATTACK;
         }
+
+        // Set angles to new target
+        if (!target_is_healing_target)
+            current_user_cmd->viewangles = GetAimAtAngles(g_pLocalPlayer->v_Eye, out->center);
     }
+
+    int autoheal_mode = g_ICvar->FindVar("tf_medigun_autoheal")->GetInt();
+    // Hold down if we are currently healing our target or not healing anyone
+    if (autoheal_mode == 0 && (target_is_healing_target || CE_INT(LOCAL_W, netvar.m_hHealingTarget) == -1))
+        current_user_cmd->buttons |= IN_ATTACK;
+
+    // Press once if we are not healing our target
+    else if (autoheal_mode == 1 && !target_is_healing_target)
+        current_user_cmd->buttons |= IN_ATTACK;
 
     if (IsVaccinator() && CE_GOOD(target) && auto_vacc)
     {
@@ -702,6 +711,16 @@ void CreateMove()
         if (pop && CurrentResistance() == opt)
         {
             current_user_cmd->buttons |= IN_ATTACK2;
+        }
+        // Uber on "CHARGE ME DOCTOR!"
+        if (pop_uber_voice)
+        {
+            auto uber_array = std::move(called_medic);
+            for (auto i : uber_array)
+                if (i == CurrentHealingTargetIDX)
+                {
+                    current_user_cmd->buttons |= IN_ATTACK2;
+                }
         }
     }
     else

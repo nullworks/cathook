@@ -29,6 +29,8 @@
             <AutoVariable width="fill" target="zk.style.tab-button.color.selected.underline" label="Tab active underline"/>
             <AutoVariable width="fill" target="zk.style.tab-button.color.hover.underline" label="Tab hover underline"/>
             <AutoVariable width="fill" target="zk.style.menu.color.text" label="Text"/>
+            <AutoVariable width="fill" target="zk.style.tooltip.background" label="Tooltip background"/>
+            <AutoVariable width="fill" target="zk.style.tooltip.border" label="Tooltip border"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="List select" x="170">

@@ -389,15 +389,6 @@ bool ShouldChargePlayer(int idx)
     const float damage_accum_duration = g_GlobalVars->curtime - data[idx].accum_damage_start;
     const int health                  = target->m_iHealth();
 
-    // Uber on "CHARGE ME DOCTOR!"
-    if (pop_uber_voice)
-    {
-        // Hey you wanna get deleted?
-        auto uber_array = std::move(called_medic);
-        for (auto i : uber_array)
-            if (i == idx)
-                return true;
-    }
     if (health > g_pPlayerResource->GetMaxHealth(target))
         return false;
     if (!data[idx].accum_damage_start)
@@ -712,21 +703,21 @@ void CreateMove()
         {
             current_user_cmd->buttons |= IN_ATTACK2;
         }
-        // Uber on "CHARGE ME DOCTOR!"
-        if (pop_uber_voice)
-        {
-            auto uber_array = std::move(called_medic);
-            for (auto i : uber_array)
-                if (i == CurrentHealingTargetIDX)
-                {
-                    current_user_cmd->buttons |= IN_ATTACK2;
-                }
-        }
     }
     else
     {
         if (pop_uber_auto && ShouldPop())
             current_user_cmd->buttons |= IN_ATTACK2;
+    }
+
+    // Uber on "CHARGE ME DOCTOR!"
+    if (pop_uber_voice)
+    {
+        // Hey you wanna get deleted?
+        auto uber_array = std::move(called_medic);
+        for (auto i : uber_array)
+            if (i == CurrentHealingTargetIDX)
+                current_user_cmd->buttons |= IN_ATTACK2;
     }
 }
 

@@ -209,40 +209,43 @@ public:
 
 std::vector<DrawEntry> attachment_draw_list;
 
-static InitRoutine init_dme([]() {
-    EC::Register(
-        EC::LevelShutdown,
-        []() {
-            if (init_mat)
+static InitRoutine init_dme(
+    []()
+    {
+        EC::Register(
+            EC::LevelShutdown,
+            []()
             {
-                mats.Shutdown();
-                init_mat = false;
-            }
-            attachment_draw_list.clear();
-        },
-        "dme_lvl_shutdown");
+                if (init_mat)
+                {
+                    mats.Shutdown();
+                    init_mat = false;
+                }
+                attachment_draw_list.clear();
+            },
+            "dme_lvl_shutdown");
 
-    halfambert.installChangeCallback(rvarCallback<bool>);
-    additive.installChangeCallback(rvarCallback<int>);
-    pearlescent.installChangeCallback(rvarCallback<int>);
+        halfambert.installChangeCallback(rvarCallback<bool>);
+        additive.installChangeCallback(rvarCallback<int>);
+        pearlescent.installChangeCallback(rvarCallback<int>);
 
-    phong_enable.installChangeCallback(rvarCallback<bool>);
-    phong_boost.installChangeCallback(rvarCallback<int>);
-    phong_exponent.installChangeCallback(rvarCallback<float>);
-    phong_fresnelrange.installChangeCallback(rvarCallback<bool>);
-    phong_fresnelrange_1.installChangeCallback(rvarCallback<float>);
-    phong_fresnelrange_2.installChangeCallback(rvarCallback<float>);
-    phong_fresnelrange_3.installChangeCallback(rvarCallback<float>);
+        phong_enable.installChangeCallback(rvarCallback<bool>);
+        phong_boost.installChangeCallback(rvarCallback<int>);
+        phong_exponent.installChangeCallback(rvarCallback<float>);
+        phong_fresnelrange.installChangeCallback(rvarCallback<bool>);
+        phong_fresnelrange_1.installChangeCallback(rvarCallback<float>);
+        phong_fresnelrange_2.installChangeCallback(rvarCallback<float>);
+        phong_fresnelrange_3.installChangeCallback(rvarCallback<float>);
 
-    rimlighting.installChangeCallback(rvarCallback<bool>);
-    rimlighting_boost.installChangeCallback(rvarCallback<float>);
-    rimlighting_exponent.installChangeCallback(rvarCallback<float>);
+        rimlighting.installChangeCallback(rvarCallback<bool>);
+        rimlighting_boost.installChangeCallback(rvarCallback<float>);
+        rimlighting_exponent.installChangeCallback(rvarCallback<float>);
 
-    envmap.installChangeCallback(rvarCallback<bool>);
-    envmapfresnel.installChangeCallback(rvarCallback<float>);
-    envmap_tint.installChangeCallback(rvarCallback<bool>);
-    envmap_matt.installChangeCallback(rvarCallback<bool>);
-});
+        envmap.installChangeCallback(rvarCallback<bool>);
+        envmapfresnel.installChangeCallback(rvarCallback<float>);
+        envmap_tint.installChangeCallback(rvarCallback<bool>);
+        envmap_matt.installChangeCallback(rvarCallback<bool>);
+    });
 
 // Purpose => Returns true if we should render provided internal entity
 bool ShouldRenderChams(IClientEntity *entity)
@@ -532,7 +535,7 @@ void ApplyChams(ChamColors colors, bool recurse, bool render_original, bool over
 
 DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawModelState_t &state, const ModelRenderInfo_t &info, matrix3x4_t *bone)
 {
-    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)*/))
+    if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || disable_visuals || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::tf2::backtrack::chams && hacks::tf2::backtrack::isBacktrackEnabled)*/))
         return original::DrawModelExecute(this_, state, info, bone);
 
     PROF_SECTION(DrawModelExecute);

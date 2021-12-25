@@ -94,25 +94,13 @@ void CreateMove()
     // Beggars check
     if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730)
     {
-        bool should_nospread = !(current_late_user_cmd->buttons & IN_ATTACK);
-
-        // Check if player is charging rockets
-        if (!CE_INT(LOCAL_W, netvar.m_iClip1) && CE_INT(LOCAL_W, netvar.iReloadMode) == 0)
-            should_nospread = false;
-
-        if (!should_nospread)
+        if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0 || CE_INT(LOCAL_W, netvar.iReloadMode) != 0)
             return;
     }
     // Huntsman check
     else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow))
     {
-        bool should_nospread = !(current_late_user_cmd->buttons & IN_ATTACK);
-
-        // Check if player is charging an arrow
-        if (CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime) == 0)
-            should_nospread = false;
-
-        if (!should_nospread)
+        if (current_late_user_cmd->buttons & IN_ATTACK || CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime) == 0)
             return;
     }
     // Rest of weapons

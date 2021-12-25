@@ -278,11 +278,8 @@ static bool doRageBackstab()
             auto angle     = GetAimAtAngles(g_pLocalPlayer->v_Eye, aim_pos, LOCAL_E);
             if (!angleCheck(ent, std::nullopt, angle) && !canFaceStab(ent))
                 continue;
-            if (doSwingTraceAngle(angle, trace))
+            if (doSwingTraceAngle(angle, trace) && ((IClientEntity *) trace.m_pEnt)->entindex() == i)
             {
-                // Make sure trace hit the enemy
-                if ((IClientEntity *) trace.m_pEnt != g_IEntityList->GetClientEntity(ent->m_IDX))
-                    return false;
                 current_user_cmd->buttons |= IN_ATTACK;
                 g_pLocalPlayer->bUseSilentAngles = true;
                 current_user_cmd->viewangles     = angle;

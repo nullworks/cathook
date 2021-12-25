@@ -213,9 +213,9 @@ void DoSlowAim(Vector &input_angle, int speed)
     {
         Vector slow_delta = input_angle - viewangles;
 
-        if (slow_delta.y > 180)
+        while (slow_delta.y > 180)
             slow_delta.y -= 360;
-        if (slow_delta.y < -180)
+        while (slow_delta.y < -180)
             slow_delta.y += 360;
 
         slow_delta /= speed;

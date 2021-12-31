@@ -94,7 +94,11 @@ void CreateMove()
     // Beggars check
     if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730)
     {
-        if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0 || CE_INT(LOCAL_W, netvar.iReloadMode) != 0)
+        // Player has 0 loaded rockets and reload mode is not 2 (reloading and ready to release)
+        bool no_loaded_rockets = CE_INT(LOCAL_W, netvar.m_iClip1) == 0 && CE_INT(LOCAL_W, netvar.iReloadMode) != 2;
+        // Player is attacking and reload is not 0 (not reloading)
+        bool loading_rockets = current_late_user_cmd->buttons & IN_ATTACK && CE_INT(LOCAL_W, netvar.iReloadMode) != 0;
+        if (no_loaded_rockets || loading_rockets)
             return;
     }
     // Huntsman check

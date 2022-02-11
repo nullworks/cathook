@@ -1,3 +1,0 @@
-REPLACE CONTENTS OF THIS FILE WITH ACTUAL KILLSAYS.
-Usable killsay macros: 
-%team% %class% %killer% %name% %myteam% %myclass% \n

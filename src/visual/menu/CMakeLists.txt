@@ -1,5 +1,0 @@
-if (NOT Unity_ZeroKernel)
-    add_subdirectory(menu)
-endif()
-set(files "${CMAKE_CURRENT_LIST_DIR}/GuiInterface.cpp" "${CMAKE_CURRENT_LIST_DIR}/ZeroKernelUnity.cpp")
-target_sources(cathook PRIVATE ${files})

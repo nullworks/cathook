@@ -1,4 +1,0 @@
-#pragma once
-
-#define GIT_COMMIT_HASH @GIT_COMMIT_HASH@
-#define GIT_COMMITTER_DATE @GIT_COMMITTER_DATE@

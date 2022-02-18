@@ -546,7 +546,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        float timedelta = fabs(rockettime - currenttime);
+        float timedelta = fabs(currenttime - rockettime);
         if (timedelta < mindelta)
         {
             besttime = currenttime;
@@ -650,7 +650,7 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        if (fabs(rockettime - currenttime) < mindelta)
+        if (fabs(currenttime - rockettime) < mindelta)
         {
             besttime = currenttime;
             bestpos  = current;

@@ -12,15 +12,12 @@ assignees: ''
 **Cathook Version:**  
 
 ## Config used
-<!-- Add the .conf file you were using from /opt/cathook/data/configs/. -->
-<!-- Drag and drop the file here. -->
-<!-- You can delete this line if you don't have any crash reports to give. -->
-
+<!-- Add the .conf file you were using from /opt/cathook/data/configs/. Drag and drop the file here. -->
 
 ## Logs / Crash Report  
-<!-- Add logs from /tmp/. if it crashes, paste symbolize-crash-log here. -->
-<!-- Drag and drop the file here. -->
-<!-- You can delete this line if you don't have any crash reports to give. -->
+<!-- Add the logs from /tmp/. If cathook crashed, paste symbolize-crash-log here. Drag and drop the file here.-->
+<!-- If cathook crashed, paste symbolize-crash-log here instead. -->
+<!-- You can delete this line if you don't have any logs or crash reports to give. -->
 
 ## Description  
 <!-- Please provide a clear and concise description of what the bug is. -->
@@ -38,11 +35,7 @@ Steps to reproduce the behavior:
 ## Additional context 
 <!-- Is there anything specific else that we should know that could help us find/fix this bug? -->
 
-## Screenshot of cheats enabled  
-<!-- Even if you don't think it could effect what happened, sometimes some cheats may break others. We don't know! We may never know, if you don't show us what cheats are enabled. -->
-
-
 ## Checklist  
 - [ ] I have included my DE, WM, and version of Cathook.
 - [ ] I have included the steps to reproduce and my logs to the best I am able to share.
-- [ ] The Developers are allowed to contact me on [the official telegram](https://t.me/nullworks) for further information if they need to. (Put your username here)
+- [ ] The Developers are allowed to contact me on [the official telegram](https://t.me/nullworks) for further information if they need it. (Put your username here)

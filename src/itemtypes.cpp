@@ -32,6 +32,10 @@ ItemManager::ItemManager() : mapper()
     RegisterModelMapping("models/workshop/weapons/c_models/c_buffalo_steak/plate_buffalo_steak.mdl", EDIBLE_SMALL);
     RegisterModelMapping("models/workshop/weapons/c_models/c_chocolate/plate_chocolate.mdl", EDIBLE_SMALL);
     RegisterModelMapping("models/items/banana/plate_banana.mdl", EDIBLE_SMALL);
+    
+    // lockers
+    RegisterModelMapping("models/props_gameplay/resupply_locker.mdl", RESUPPLY_LOCKER);
+    RegisterModelMapping("models/props_medieval/medieval_resupply.mdl", RESUPPLY_LOCKER);
 
     // == AMMOPACKS
     // Normal

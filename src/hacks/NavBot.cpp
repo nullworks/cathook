@@ -172,7 +172,7 @@ bool getHealth(bool low_priority = false)
             if (!repath_timer.test_and_set(2000))
                 return true;
         }
-        auto healthpacks = getEntities({ ITEM_HEALTH_SMALL, ITEM_HEALTH_MEDIUM, ITEM_HEALTH_LARGE });
+        auto healthpacks = getEntities({ ITEM_HEALTH_SMALL, ITEM_HEALTH_MEDIUM, ITEM_HEALTH_LARGE, EDIBLE_SMALL, EDIBLE_MEDIUM, RESUPPLY_LOCKER });
         auto dispensers  = getDispensers();
 
         auto total_ents = healthpacks;
@@ -213,7 +213,7 @@ bool getAmmo(bool force = false)
         }
         else
             was_force = false;
-        auto ammopacks  = getEntities({ ITEM_AMMO_SMALL, ITEM_AMMO_MEDIUM, ITEM_AMMO_LARGE });
+        auto ammopacks  = getEntities({ ITEM_AMMO_SMALL, ITEM_AMMO_MEDIUM, ITEM_AMMO_LARGE, RESUPPLY_LOCKER });
         auto dispensers = getDispensers();
 
         auto total_ents = ammopacks;

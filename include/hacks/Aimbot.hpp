@@ -29,8 +29,7 @@ struct AimbotCalculatedData_s
 };
 
 // Functions used to calculate aimbot data, and if already calculated use it
-Vector PredictEntity(CachedEntity *entity, bool vischeck);
-bool VischeckPredictedEntity(CachedEntity *entity);
+Vector PredictEntity(CachedEntity *entity);
 bool BacktrackVisCheck(CachedEntity *entity);
 
 // Functions called by other functions for when certian game calls are run
@@ -42,8 +41,13 @@ CachedEntity *CurrentTarget();
 bool ShouldAim();
 CachedEntity *RetrieveBestTarget(bool aimkey_state);
 bool IsTargetStateGood(CachedEntity *entity);
-void Aim(CachedEntity *entity);
+bool Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);
+bool small_box_checker(CachedEntity* target_entity);
+int not_visible_hitbox(CachedEntity *target, int preferred);
+int auto_hitbox(CachedEntity* target);
+bool hitscan_special_cases(CachedEntity* target_entity, int weapon_case);
+bool projectile_special_cases(CachedEntity* target_entity, int weapon_case);
 int BestHitbox(CachedEntity *target);
 int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);

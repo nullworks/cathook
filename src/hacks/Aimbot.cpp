@@ -14,6 +14,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 #include "MiscTemporary.hpp"
+#include <targethelper.hpp>
 #include "hitrate.hpp"
 #include "FollowBot.hpp"
 #include "Warp.hpp"
@@ -753,7 +754,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 {
                 case 0: // Smart Priority
                 {
-                    scr = GetScoreForEntity_aim(ent);
+                    scr = GetScoreForEntity(ent);
                     break;
                 }
                 case 1: // Fov Priority

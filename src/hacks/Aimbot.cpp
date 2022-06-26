@@ -13,8 +13,8 @@
 #include <PlayerTools.hpp>
 #include <settings/Bool.hpp>
 #include "common.hpp"
-#include "MiscTemporary.hpp"
 #include <targethelper.hpp>
+#include "MiscTemporary.hpp"
 #include "hitrate.hpp"
 #include "FollowBot.hpp"
 #include "Warp.hpp"
@@ -414,7 +414,7 @@ static void CreateMove()
                     updateShouldBacktrack(); 
                 target_last = RetrieveBestTarget(aimkey_status);  
                 if(target_last){
-                DoAutoshoot(target_last);
+                DoAutoshoot();
                 }           
         break; 
         }   
@@ -746,10 +746,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         if (isTargetGood)
         {
             // Distance Priority, Uses this is melee is used
-            if (GetWeaponMode() == weaponmode::weapon_melee || (int) priority_mode == 2)
-                scr = 4096.0f - calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
-            else
-            {
                 switch ((int) priority_mode)
                 {
                 case 0: // Smart Priority
@@ -780,7 +776,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 default:
                     break;
                 }
-            }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
             {
@@ -831,9 +826,8 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         
         float targeting_range = EffectiveTargetingRange();
-                if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+                if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // Prevents using bad ray trace engine operations
                     return false;
-
         // Rage only check
         if (rageonly)
         {
@@ -916,8 +910,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             if (ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
                 return false;
         
-
-        
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         cd.hitbox                  = BestHitbox(entity);
         return true;
@@ -959,10 +951,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             }
         }
 
-        // Grab the prediction var
-     
-
-        // Vis and fov check
         return true;
     }
     case(ENTITY_NPC):{
@@ -985,8 +973,6 @@ bool IsTargetStateGood(CachedEntity *entity)
         
             if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
-
-        // Grab the prediction var
     
         return true;
         break;
@@ -1025,11 +1011,6 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (!velocity.IsZero())
             return false;
 
-        // Grab the prediction var
-      
-
-        // Vis and fov check
-     
        return true;
     }
 
@@ -1042,7 +1023,6 @@ bool Aim(CachedEntity *entity)
 {
     if (*miss_chance > 0 && UniformRandomInt(0, 99) < *miss_chance)
         return true;
-
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     bool should_aim; 
@@ -1074,7 +1054,6 @@ bool Aim(CachedEntity *entity)
         current_user_cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(entity, netvar.m_flSimulationTime));
     aimed_this_tick      = true;
     viewangles_this_tick = angles;
-    logging::Info("IT RAN");
     // Finish function
     return true;
 }

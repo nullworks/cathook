@@ -92,7 +92,8 @@ settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "1" };
 int slow_aim;
 float fov;
 bool enable;
-
+bool projectile_self_damage = false;
+int avoidance_size = 11;
 void spectatorUpdate()
 {
     switch (*specmode)
@@ -450,7 +451,9 @@ static void CreateMove()
             {
                 int weapon_case = g_pLocalPlayer->weapon()->m_iClassID();
                 if (projectileSpecialCases(target_last, weapon_case))
-                {
+                {   
+                       
+                                    
                     DoAutoshoot(target_last);
                 }
             }
@@ -459,7 +462,45 @@ static void CreateMove()
     }
     }
 }
+std::mutex new_mut;
+bool checkForWalls(Vector eye_angles, Vector predicted_values){
 
+                    Ray_t avoid_ray; // You can add vectors in any direction
+                    Ray_t avoid_ray2;
+                    Ray_t avoid_ray3;
+                    trace_t tracer;
+                    auto raw_local = RAW_ENT(LOCAL_E);
+                    trace::filter_default.SetSelf(raw_local);
+                    Vector current_location = g_pLocalPlayer->entity->m_vecOrigin();
+                    eye_angles = getShootPos(eye_angles);  // Don't predict too  far forward. Just want to avoid self damage
+                   
+                    eye_angles.y = eye_angles.y-avoidance_size;
+                    
+                    avoid_ray.Init(eye_angles, predicted_values); // This means that you can take self damage!
+                    
+                    g_ITrace->TraceRay(avoid_ray, MASK_SHOT_HULL, &trace::filter_default, &tracer);
+
+                    if (tracer.DidHit())
+                        return false;
+                    eye_angles.y = eye_angles.y+avoidance_size*2;
+                    avoid_ray2.Init(eye_angles, predicted_values);
+                    g_ITrace->TraceRay(avoid_ray2, MASK_SHOT_HULL,&trace::filter_default, &tracer);
+                    if (tracer.DidHit())
+                        return false;
+                    eye_angles.y=eye_angles.y-avoidance_size;    
+                    eye_angles.z = eye_angles.z+6;
+                    avoid_ray3.Init(eye_angles, predicted_values);
+                    g_ITrace->TraceRay(avoid_ray3, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Only check for upward hits because rockets+pipes go for foot shots
+
+                    if (tracer.DidHit())
+                        return false;
+                      
+         
+
+
+return true;
+
+}
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
 
@@ -602,64 +643,6 @@ bool MouseMoving()
         return false;
 }
 #endif
-
-// The first check to see if the player should aim in the first place
-bool ShouldAim()
-{
-    // Checks should be in order: cheap -> expensive
-
-    // Check for +use
-    if (current_user_cmd->buttons & IN_USE)
-        return false;
-    // Check if using action slot item
-    else if (g_pLocalPlayer->using_action_slot_item)
-        return false;
-    // Using a forbidden weapon?
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
-        return false;
-
-    // Carrying A building?
-    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
-        return false;
-    // Deadringer out?
-    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
-        return false;
-    else if (g_pLocalPlayer->holding_sapper)
-        return false;
-    // Is bonked?
-    else if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
-        return false;
-    // Is taunting?
-    else if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
-        return false;
-    // Is cloaked
-    else if (IsPlayerInvisible(g_pLocalPlayer->entity))
-        return false;
-    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
-        return false;
-#if ENABLE_VISUALS
-    if (assistance_only && !MouseMoving())
-        return false;
-#endif
-    switch (GetWeaponMode())
-    {
-    case weapon_hitscan:
-        break;
-    case weapon_melee:
-        break;
-    // Check we need to run projectile Aimbot code
-    case weapon_projectile:
-        if (!projectileAimbotRequired)
-            return false;
-        break;
-    // Check if player doesnt have a weapon usable by aimbot
-    default:
-        return false;
-    };
-
-    return true;
-}
-
 // Function to find a suitable target
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
@@ -1043,9 +1026,19 @@ bool Aim(CachedEntity *entity)
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     bool should_aim;
+    bool check_walls = false;
     trace_t test_trace;
     if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
+    {
         should_aim = IsEntityVectorVisible(entity, is_it_good, true);
+        if(canSelfDamage(g_pLocalPlayer->weapon()->m_iClassID()) || projectileAimbotRequired) // Updates global var about avoidance
+        {
+          check_walls= true;
+        }
+        
+
+
+    }    
     else
     {
         should_aim = IsEntityVectorVisible(entity, is_it_good, false);
@@ -1053,10 +1046,20 @@ bool Aim(CachedEntity *entity)
     if (!should_aim)
         return false;
 
+    
+  
+
+
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (cd.fov > fov)
         return false;
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
+    if(check_walls)
+    {
+        if(!checkForWalls(angles, is_it_good)) // Checks to be sure you don't shoot walls if they're near you
+            return false;
+
+    }
 
     // Slow aim
     if (slow_aim)
@@ -1349,7 +1352,7 @@ int autoHitbox(CachedEntity *target)
     }
 
     // Rockets and stickies should aim at the foot if the target is on the ground
-    else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar) || ci == CL_CLASS(CTFRocketLauncher_DirectHit))
+    else if (canSelfDamage(ci))
     {
         bool ground = CE_INT(target, netvar.iFlags) & (1 << 0);
         if (ground)
@@ -1383,7 +1386,43 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
+bool canSelfDamage(int weapon_case){
+    switch(weapon_case){
 
+        case CL_CLASS(CTFPipebombLauncher):
+        case CL_CLASS(CTFRocketLauncher):
+        case CL_CLASS(CTFParticleCannon):   
+        case CL_CLASS(CTFRocketLauncher_AirStrike):
+        case CL_CLASS(CTFRocketLauncher_Mortar): 
+        case CL_CLASS(CTFRocketLauncher_DirectHit):
+        avoidance_size=11;
+        break;
+        case CL_CLASS(CTFJar):
+        case CL_CLASS(CTFJarMilk):
+        case CL_CLASS(CTFJarGas):
+        case CL_CLASS(CTFCleaver):
+        case CL_CLASS(CTFFlareGun):
+        case CL_CLASS(CTFFlareGun_Revenge):
+        avoidance_size = 6;
+        break;
+        case CL_CLASS(CTFSyringeGun):
+        case CL_CLASS(CTFCrossbow):
+        case CL_CLASS(CTFShotgunBuildingRescue):
+        case CL_CLASS(CTFDRGPomson):
+        case CL_CLASS(CTFWeaponFlameBall):
+        case CL_CLASS(CTFRaygun):
+        case CL_CLASS(CTFGrapplingHook):
+        case CL_CLASS(CTFCompoundBow):
+        avoidance_size = 4;
+        break;
+        default:
+            return false;    
+    }
+    return true;
+
+
+
+}
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)
 {

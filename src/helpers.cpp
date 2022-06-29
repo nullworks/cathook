@@ -1037,7 +1037,6 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
     ray.Init(eye, endpos);
     {
         PROF_SECTION(IEVV_TraceRay);
-        std::lock_guard<std::mutex> lock(trace_lock);
         if (!tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }

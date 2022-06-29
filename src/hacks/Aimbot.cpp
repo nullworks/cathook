@@ -468,27 +468,28 @@ bool checkForWalls(Vector eye_angles, Vector predicted_values){
                     Ray_t avoid_ray; // You can add vectors in any direction
                     Ray_t avoid_ray2;
                     Ray_t avoid_ray3;
+
                     trace_t tracer;
                     auto raw_local = RAW_ENT(LOCAL_E);
                     trace::filter_default.SetSelf(raw_local);
                     Vector current_location = g_pLocalPlayer->entity->m_vecOrigin();
-                    eye_angles = getShootPos(eye_angles);  // Don't predict too  far forward. Just want to avoid self damage
+                    eye_angles = getShootPos(eye_angles);  // Get the absolute shooting position 
                    
-                    eye_angles.y = eye_angles.y-avoidance_size;
+                    eye_angles.y = eye_angles.y-avoidance_size; // avoidance_size changes based (as realistic as possible) on the projectiles hitbox
                     
-                    avoid_ray.Init(eye_angles, predicted_values); // This means that you can take self damage!
+                    avoid_ray.Init(eye_angles, predicted_values); 
                     
-                    g_ITrace->TraceRay(avoid_ray, MASK_SHOT_HULL, &trace::filter_default, &tracer);
+                    g_ITrace->TraceRay(avoid_ray, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Check to the right
 
                     if (tracer.DidHit())
                         return false;
-                    eye_angles.y = eye_angles.y+avoidance_size*2;
+                    eye_angles.y = eye_angles.y+avoidance_size*2; // Check to the left
                     avoid_ray2.Init(eye_angles, predicted_values);
                     g_ITrace->TraceRay(avoid_ray2, MASK_SHOT_HULL,&trace::filter_default, &tracer);
                     if (tracer.DidHit())
                         return false;
                     eye_angles.y=eye_angles.y-avoidance_size;    
-                    eye_angles.z = eye_angles.z+6;
+                    eye_angles.z = eye_angles.z+6; 
                     avoid_ray3.Init(eye_angles, predicted_values);
                     g_ITrace->TraceRay(avoid_ray3, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Only check for upward hits because rockets+pipes go for foot shots
 
@@ -1236,9 +1237,7 @@ Vector PredictEntity(CachedEntity *entity)
         {
             std::pair<Vector, Vector> tmp_result;
             tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-
-            // Don't use the intial velocity compensated one in vischecks
-            result = tmp_result.second;
+            result = tmp_result.first; // Buildings don't have velocity wtf
         }
         else
         {

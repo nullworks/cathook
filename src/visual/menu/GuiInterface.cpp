@@ -11,7 +11,7 @@
 #include <hack.hpp>
 #include <common.hpp>
 
-settings::Button open_gui_button{ "visual.open-gui-button", "Insert" };
+settings::Button open_gui_button{ "visual.open-gui-button", "F11" };
 
 static bool init_done{ false };
 

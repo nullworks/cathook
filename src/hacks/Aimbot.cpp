@@ -463,7 +463,8 @@ static void CreateMove()
     }
 }
 std::mutex new_mut;
-bool checkForWalls(Vector eye_angles, Vector predicted_values){
+bool checkForWalls(Vector eye_angles, Vector predicted_values)
+{
 
                     Ray_t avoid_ray; // You can add vectors in any direction
                     Ray_t avoid_ray2;
@@ -472,7 +473,6 @@ bool checkForWalls(Vector eye_angles, Vector predicted_values){
                     trace_t tracer;
                     auto raw_local = RAW_ENT(LOCAL_E);
                     trace::filter_default.SetSelf(raw_local);
-                    Vector current_location = g_pLocalPlayer->entity->m_vecOrigin();
                     eye_angles = getShootPos(eye_angles);  // Get the absolute shooting position 
                    
                     eye_angles.y = eye_angles.y-avoidance_size; // avoidance_size changes based (as realistic as possible) on the projectiles hitbox
@@ -492,14 +492,13 @@ bool checkForWalls(Vector eye_angles, Vector predicted_values){
                     eye_angles.z = eye_angles.z+6; 
                     avoid_ray3.Init(eye_angles, predicted_values);
                     g_ITrace->TraceRay(avoid_ray3, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Only check for upward hits because rockets+pipes go for foot shots
-
                     if (tracer.DidHit())
                         return false;
                       
          
 
 
-return true;
+        return true;
 
 }
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
@@ -1391,8 +1390,10 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
-bool canSelfDamage(int weapon_case){
-    switch(weapon_case){
+bool canSelfDamage(int weapon_case)
+{
+    switch(weapon_case)
+    {
 
         case CL_CLASS(CTFPipebombLauncher):
         case CL_CLASS(CTFRocketLauncher):

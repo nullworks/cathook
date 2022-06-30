@@ -45,6 +45,7 @@
                     <Option name="Distance (Highest)" value="4"/>
                     <Option name="Health (Lowest)" value="3"/>
                     <Option name="Health (Highest)" value="5"/>
+                    <Option name="Fast" value="6"/>
                 </Select>
             </LabeledObject>
             <LabeledObject width="fill" label="Target team">

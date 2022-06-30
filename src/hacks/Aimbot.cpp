@@ -761,6 +761,12 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     scr = ent->m_iHealth() * 4;
                     break;
                 }
+                case 6: // Fast
+                {
+
+                    return ent; 
+
+                }
                 default:
                     break;
                 }
@@ -1394,7 +1400,7 @@ bool canSelfDamage(int weapon_case){
         case CL_CLASS(CTFRocketLauncher_AirStrike):
         case CL_CLASS(CTFRocketLauncher_Mortar): 
         case CL_CLASS(CTFRocketLauncher_DirectHit):
-        avoidance_size=11;
+        avoidance_size = 11;
         break;
         case CL_CLASS(CTFJar):
         case CL_CLASS(CTFJarMilk):

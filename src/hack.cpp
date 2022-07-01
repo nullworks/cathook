@@ -170,7 +170,7 @@ void hack::Hook()
     uintptr_t *clientMode = 0;
     // Bad way to get clientmode.
     // FIXME [MP]?
-    while (!(clientMode = **(uintptr_t ***) ((uintptr_t)((*(void ***) g_IBaseClient)[10]) + 1)))
+    while (!(clientMode = **(uintptr_t ***) ((uintptr_t) ((*(void ***) g_IBaseClient)[10]) + 1)))
     {
         usleep(10000);
     }
@@ -310,7 +310,7 @@ free(logname);*/
     InitRandom();
     sharedobj::LoadLauncher();
 
-    // remove epic source lock
+    // remove epic source lock (needed for non-preload tf2)
     std::remove("/tmp/source_engine_2925226592.lock");
 
     sharedobj::LoadEarlyObjects();

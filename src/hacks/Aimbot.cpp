@@ -1242,7 +1242,7 @@ Vector PredictEntity(CachedEntity *entity)
         {
             std::pair<Vector, Vector> tmp_result;
             tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-            result = tmp_result.first; // Buildings don't have velocity wtf
+            result = tmp_result.second; // Buildings don't have velocity but I'll keep it in nonetheless
         }
         else
         {
@@ -1401,7 +1401,7 @@ bool canSelfDamage(int weapon_case)
         case CL_CLASS(CTFRocketLauncher_AirStrike):
         case CL_CLASS(CTFRocketLauncher_Mortar): 
         case CL_CLASS(CTFRocketLauncher_DirectHit):
-        avoidance_size = 11;
+        avoidance_size = 8;
         break;
         case CL_CLASS(CTFJar):
         case CL_CLASS(CTFJarMilk):

@@ -93,7 +93,7 @@ int slow_aim;
 float fov;
 bool enable;
 bool projectile_self_damage = false;
-int avoidance_size = 11;
+int avoidance_size = 4;
 void spectatorUpdate()
 {
     switch (*specmode)
@@ -475,7 +475,7 @@ bool checkForWalls(Vector eye_angles, Vector predicted_values)
                     trace::filter_default.SetSelf(raw_local);
                     eye_angles = getShootPos(eye_angles);  // Get the absolute shooting position 
                    
-                    eye_angles.y = eye_angles.y-avoidance_size; // avoidance_size changes based (as realistic as possible) on the projectiles hitbox
+                    predicted_values.y = predicted_values.y-avoidance_size; // avoidance_size changes based (as realistic as possible) on the projectiles hitbox
                     
                     avoid_ray.Init(eye_angles, predicted_values); 
                     
@@ -483,13 +483,13 @@ bool checkForWalls(Vector eye_angles, Vector predicted_values)
 
                     if (tracer.DidHit())
                         return false;
-                    eye_angles.y = eye_angles.y+avoidance_size*2; // Check to the left
+                    predicted_values.y = predicted_values.y+avoidance_size*2; // Check to the left
                     avoid_ray2.Init(eye_angles, predicted_values);
                     g_ITrace->TraceRay(avoid_ray2, MASK_SHOT_HULL,&trace::filter_default, &tracer);
                     if (tracer.DidHit())
                         return false;
-                    eye_angles.y=eye_angles.y-avoidance_size;    
-                    eye_angles.z = eye_angles.z+6; 
+                    predicted_values.y= predicted_values.y-avoidance_size;    
+                    predicted_values.z = predicted_values.z+6; 
                     avoid_ray3.Init(eye_angles, predicted_values);
                     g_ITrace->TraceRay(avoid_ray3, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Only check for upward hits because rockets+pipes go for foot shots
                     if (tracer.DidHit())
@@ -1401,16 +1401,13 @@ bool canSelfDamage(int weapon_case)
         case CL_CLASS(CTFRocketLauncher_AirStrike):
         case CL_CLASS(CTFRocketLauncher_Mortar): 
         case CL_CLASS(CTFRocketLauncher_DirectHit): // Collision hulls are different for every projectile (I believe the hitbox is actually the same being 4x4x4)
-        avoidance_size = 11;
-        break;
+        avoidance_size = 6;
         case CL_CLASS(CTFJar):
         case CL_CLASS(CTFJarMilk):
         case CL_CLASS(CTFJarGas):
         case CL_CLASS(CTFCleaver):
         case CL_CLASS(CTFFlareGun):
         case CL_CLASS(CTFFlareGun_Revenge): // These gravitate towards being smaller
-        avoidance_size = 6;
-        break;
         case CL_CLASS(CTFSyringeGun):
         case CL_CLASS(CTFCrossbow):
         case CL_CLASS(CTFShotgunBuildingRescue):

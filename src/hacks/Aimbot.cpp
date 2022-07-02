@@ -1400,15 +1400,15 @@ bool canSelfDamage(int weapon_case)
         case CL_CLASS(CTFParticleCannon):   
         case CL_CLASS(CTFRocketLauncher_AirStrike):
         case CL_CLASS(CTFRocketLauncher_Mortar): 
-        case CL_CLASS(CTFRocketLauncher_DirectHit):
-        avoidance_size = 8;
+        case CL_CLASS(CTFRocketLauncher_DirectHit): // Collision hulls are different for every projectile (I believe the hitbox is actually the same being 4x4x4)
+        avoidance_size = 11;
         break;
         case CL_CLASS(CTFJar):
         case CL_CLASS(CTFJarMilk):
         case CL_CLASS(CTFJarGas):
         case CL_CLASS(CTFCleaver):
         case CL_CLASS(CTFFlareGun):
-        case CL_CLASS(CTFFlareGun_Revenge):
+        case CL_CLASS(CTFFlareGun_Revenge): // These gravitate towards being smaller
         avoidance_size = 6;
         break;
         case CL_CLASS(CTFSyringeGun):
@@ -1418,7 +1418,7 @@ bool canSelfDamage(int weapon_case)
         case CL_CLASS(CTFWeaponFlameBall):
         case CL_CLASS(CTFRaygun):
         case CL_CLASS(CTFGrapplingHook):
-        case CL_CLASS(CTFCompoundBow):
+        case CL_CLASS(CTFCompoundBow): //These are smaller 
         avoidance_size = 4;
         break;
         default:

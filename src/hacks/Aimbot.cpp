@@ -93,7 +93,6 @@ int slow_aim;
 float fov;
 bool enable;
 bool projectile_self_damage = false;
-int avoidance_size = 4;
 void spectatorUpdate()
 {
     switch (*specmode)
@@ -461,45 +460,6 @@ static void CreateMove()
         break;
     }
     }
-}
-std::mutex new_mut;
-bool checkForWalls(Vector eye_angles, Vector predicted_values)
-{
-
-                    Ray_t avoid_ray; // You can add vectors in any direction
-                    Ray_t avoid_ray2;
-                    Ray_t avoid_ray3;
-
-                    trace_t tracer;
-                    auto raw_local = RAW_ENT(LOCAL_E);
-                    trace::filter_default.SetSelf(raw_local);
-                    eye_angles = getShootPos(eye_angles);  // Get the absolute shooting position 
-                   
-                    predicted_values.y = predicted_values.y-avoidance_size; // avoidance_size changes based (as realistic as possible) on the projectiles hitbox
-                    
-                    avoid_ray.Init(eye_angles, predicted_values); 
-                    
-                    g_ITrace->TraceRay(avoid_ray, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Check to the right
-
-                    if (tracer.DidHit())
-                        return false;
-                    predicted_values.y = predicted_values.y+avoidance_size*2; // Check to the left
-                    avoid_ray2.Init(eye_angles, predicted_values);
-                    g_ITrace->TraceRay(avoid_ray2, MASK_SHOT_HULL,&trace::filter_default, &tracer);
-                    if (tracer.DidHit())
-                        return false;
-                    predicted_values.y= predicted_values.y-avoidance_size;    
-                    predicted_values.z = predicted_values.z+6; 
-                    avoid_ray3.Init(eye_angles, predicted_values);
-                    g_ITrace->TraceRay(avoid_ray3, MASK_SHOT_HULL, &trace::filter_default, &tracer); // Only check for upward hits because rockets+pipes go for foot shots
-                    if (tracer.DidHit())
-                        return false;
-                      
-         
-
-
-        return true;
-
 }
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
@@ -1032,18 +992,10 @@ bool Aim(CachedEntity *entity)
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     bool should_aim;
-    bool check_walls = false;
     trace_t test_trace;
     if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
     {
         should_aim = IsEntityVectorVisible(entity, is_it_good, true);
-        if(canSelfDamage(g_pLocalPlayer->weapon()->m_iClassID()) || projectileAimbotRequired) // Updates global var about avoidance
-        {
-          check_walls= true;
-        }
-        
-
-
     }    
     else
     {
@@ -1060,13 +1012,6 @@ bool Aim(CachedEntity *entity)
     if (cd.fov > fov)
         return false;
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
-    if(check_walls)
-    {
-        if(!checkForWalls(angles, is_it_good)) // Checks to be sure you don't shoot walls if they're near you
-            return false;
-
-    }
-
     // Slow aim
     if (slow_aim)
         DoSlowAim(angles);
@@ -1389,42 +1334,6 @@ int BestHitbox(CachedEntity *target)
     }
     // Hitbox machine :b:roke
     return -1;
-}
-bool canSelfDamage(int weapon_case)
-{
-    switch(weapon_case)
-    {
-
-        case CL_CLASS(CTFPipebombLauncher):
-        case CL_CLASS(CTFRocketLauncher):
-        case CL_CLASS(CTFParticleCannon):   
-        case CL_CLASS(CTFRocketLauncher_AirStrike):
-        case CL_CLASS(CTFRocketLauncher_Mortar): 
-        case CL_CLASS(CTFRocketLauncher_DirectHit): // Collision hulls are different for every projectile (I believe the hitbox is actually the same being 4x4x4)
-        avoidance_size = 6;
-        case CL_CLASS(CTFJar):
-        case CL_CLASS(CTFJarMilk):
-        case CL_CLASS(CTFJarGas):
-        case CL_CLASS(CTFCleaver):
-        case CL_CLASS(CTFFlareGun):
-        case CL_CLASS(CTFFlareGun_Revenge): // These gravitate towards being smaller
-        case CL_CLASS(CTFSyringeGun):
-        case CL_CLASS(CTFCrossbow):
-        case CL_CLASS(CTFShotgunBuildingRescue):
-        case CL_CLASS(CTFDRGPomson):
-        case CL_CLASS(CTFWeaponFlameBall):
-        case CL_CLASS(CTFRaygun):
-        case CL_CLASS(CTFGrapplingHook):
-        case CL_CLASS(CTFCompoundBow): //These are smaller 
-        avoidance_size = 4;
-        break;
-        default:
-            return false;    
-    }
-    return true;
-
-
-
 }
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)

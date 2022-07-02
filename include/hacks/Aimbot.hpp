@@ -47,8 +47,6 @@ int notVisibleHitbox(CachedEntity *target, int preferred);
 int autoHitbox(CachedEntity* target);
 bool hitscanSpecialCases(CachedEntity* target_entity, int weapon_case);
 bool projectileSpecialCases(CachedEntity* target_entity, int weapon_case);
-bool canSelfDamage(int weapon_case);
-bool checkForWalls(Vector eye_angles, Vector predicted_values);
 int BestHitbox(CachedEntity *target);
 int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);

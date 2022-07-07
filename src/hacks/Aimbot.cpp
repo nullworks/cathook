@@ -28,7 +28,7 @@ static settings::Int aimkey_mode{ "aimbot.aimkey.mode", "1" };
 static settings::Boolean autoshoot{ "aimbot.autoshoot", "1" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
 static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
-static settings::Int multipoint{ "aimbot.multipoint", "0" };
+static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
@@ -164,24 +164,12 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     GenerateBoxVertices(origin, rotation, bboxmin, bboxmax, corners);
 
     float shrink_size = 1;
-    switch (*multipoint)
-    {
-    // Shrink alot
-    case 1:
+   
+   if(!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
         shrink_size = 3;
-        break;
-    // Decently shrink
-    case 2:
-        shrink_size = 5;
-        break;
-    // Shrink very little (we still have to shrink a bit else we will wiff due to rotation)
-    case 3:
-        shrink_size = 10;
-        break;
-    default:
-        shrink_size = 6;
-    }
-
+    else
+        shrink_size = 6;    
+   
     // Shrink positions by moving towards opposing corner
     for (int i = 0; i < 8; i++)
         corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
@@ -210,7 +198,26 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 
     return hitpoints;
 }
+bool isHitboxMedium(int hitbox)
+{
+    switch (hitbox){
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    return true;
 
+
+    default:
+            return false;
+    }
+
+
+
+return false;
+
+}
 // Get the best point to aim at for a given hitbox
 std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 {
@@ -560,13 +567,6 @@ bool hitscanSpecialCases(CachedEntity *target_entity, int weapon_case)
         return false;
     }
 }
-bool smallBoxChecker(CachedEntity *target_entity)
-{
-    if (CE_BAD(target_entity) || !g_IEntityList->GetClientEntity(target_entity->m_IDX))
-        return false;
-
-    return true;
-}
 // Just hold m1 if we were aiming at something before and are in rapidfire
 static void CreateMoveWarp()
 {
@@ -628,7 +628,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     if (!validateTickFOV(bt_tick))
                         continue;
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
-                    if (IsTargetStateGood(target_last) && smallBoxChecker(target_last) && Aim(target_last))
+                    if (IsTargetStateGood(target_last)  && Aim(target_last))
                         return target_last;
                     // Restore if bad target
                     hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
@@ -636,7 +636,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
 
             // Check if previous target is still good
-            else if (!shouldbacktrack_cache && IsTargetStateGood(target_last) && smallBoxChecker(target_last) && Aim(target_last))
+            else if (!shouldbacktrack_cache && IsTargetStateGood(target_last)  && Aim(target_last))
             {
                 // If it is then return it again
                 return target_last;
@@ -676,7 +676,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     if (!validateTickFOV(bt_tick))
                         continue;
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
-                    if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
+                    if (IsTargetStateGood(ent) && Aim(ent))
                     {
                         isTargetGood = true;
                         temp_bt_tick = bt_tick;
@@ -688,7 +688,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         }
         else
         {
-            if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
+            if (IsTargetStateGood(ent) && Aim(ent))
                 isTargetGood = true;
         }
         if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
@@ -992,7 +992,6 @@ bool Aim(CachedEntity *entity)
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     bool should_aim;
-    trace_t test_trace;
     if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
     {
         should_aim = IsEntityVectorVisible(entity, is_it_good, true);

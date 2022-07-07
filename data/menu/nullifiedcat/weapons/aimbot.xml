@@ -88,9 +88,7 @@
             <LabeledObject width="fill" label="Multipoint">
                 <Select target="aimbot.multipoint">
                     <Option name="Disabled" value="0"/>
-                    <Option name="Small hitboxes" value="1"/>
-                    <Option name="Medium hitboxes" value="2"/>
-                    <Option name="Big hitboxes" value="3"/>
+                    <Option name="Enabled" value="1"/>
                 </Select>
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only" tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>

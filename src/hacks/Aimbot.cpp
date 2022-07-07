@@ -750,36 +750,36 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         }
         if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
         {
-                switch ((int) priority_mode)
-                {
-                case 0: // Smart Priority
-                {
-                    scr = GetScoreForEntity(ent);
-                    break;
-                }
-                case 1: // Fov Priority
-                {
-                    scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
-                    break;
-                }
-                case 3: // Health Priority (Lowest)
-                {
-                    scr = 450.0f - ent->m_iHealth();
-                    break;
-                }
-                case 4: // Distance Priority (Furthest Away)
-                {
-                    scr = calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
-                    break;
-                }
-                case 5: // Health Priority (Highest)
-                {
-                    scr = ent->m_iHealth() * 4;
-                    break;
-                }
-                default:
-                    break;
-                }
+            switch ((int) priority_mode)
+            {
+            case 0: // Smart Priority
+            {
+                scr = GetScoreForEntity(ent);
+                break;
+            }
+            case 1: // Fov Priority
+            {
+                scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
+                break;
+            }
+            case 3: // Health Priority (Lowest)
+            {
+                scr = 450.0f - ent->m_iHealth();
+                break;
+            }
+            case 4: // Distance Priority (Furthest Away)
+            {
+                scr = calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+                break;
+            }
+            case 5: // Health Priority (Highest)
+            {
+                scr = ent->m_iHealth() * 4;
+                break;
+            }
+            default:
+                break;
+            }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
             {
@@ -832,7 +832,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
 
         float targeting_range = EffectiveTargetingRange();
-        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
+        if (entity->m_flDistance() - 40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
         // Rage only check
@@ -937,7 +937,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         else if (EffectiveTargetingRange())
         {
-            if (entity->m_flDistance()-40 > EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+            if (entity->m_flDistance() - 40 > EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
         }
 
@@ -982,7 +982,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         float targeting_range = EffectiveTargetingRange();
 
-        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+        if (entity->m_flDistance() - 40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         // Grab the prediction var
@@ -1054,7 +1054,7 @@ bool Aim(CachedEntity *entity)
         return false;
 
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
-    if (cd.fov > fov)
+    if (fov > 0 && cd.fov > fov)
         return false;
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
 
@@ -1149,7 +1149,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Ambassador check
 
-   else if (IsAmbassador(g_pLocalPlayer->weapon()))
+    else if (IsAmbassador(g_pLocalPlayer->weapon()))
     {
         // Check if ambasador can headshot
         if (!AmbassadorCanHeadshot() && wait_for_charge)

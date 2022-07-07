@@ -45,10 +45,6 @@ sudo cp "bin/libcathook.so" "/lib/i386-linux-gnu/${FILENAME}"
 echo loading "$FILENAME" to "$proc"
 
 gdbbin="gdb"
-if [ -x "./bin/gdb-arch-2021-02" ]; then
-  gdbbin="./bin/gdb-arch-2021-02"
-fi
-
 $gdbbin -n -q -batch                                                                                \
     -ex "attach $proc"                                                                          \
     -ex "echo \033[1mCalling dlopen\033[0m\n"                                                   \

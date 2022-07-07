@@ -93,7 +93,7 @@ template <typename T> class Variable
 template <typename T> class ArithmeticVariable : public VariableBase<T>
 {
 public:
-    ~ArithmeticVariable<T>() override = default;
+    ~ArithmeticVariable() override = default;
 
     explicit inline operator T() const
     {

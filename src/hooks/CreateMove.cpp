@@ -140,11 +140,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     current_user_cmd = cmd;
     EC::run(EC::CreateMoveEarly);
-    IF_GAME(IsTF2C())
-    {
-        if (CE_GOOD(LOCAL_W) && minigun_jump && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
-            CE_INT(LOCAL_W, netvar.iWeaponState) = 0;
-    }
     ret = original::CreateMove(this_, input_sample_time, cmd);
 
     if (!cmd)
@@ -417,11 +412,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         g_pLocalPlayer->UpdateEnd();
     }
 
-    //	PROF_END("CreateMove");
-    if (!(cmd->buttons & IN_ATTACK))
-    {
-        // LoadSavedState();
-    }
     g_Settings.is_create_move = false;
     if (nolerp)
     {

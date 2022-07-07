@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
 if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
@@ -23,7 +23,7 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_BUILD_TYPE_VALUES})
 
 project(cathook VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 add_library(cathook SHARED "")
 
 set(GameSpecific 1 CACHE BOOL "Build for specific target game (As opposed to universal, but slower, lib)")
@@ -102,13 +102,13 @@ endif()
 find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)
-SET (Boost_NO_SYSTEM_PATHS true)
-find_package(Boost 1.71.0 EXACT)
+
+find_package(Boost 1.76.0 REQUIRED)
 if (NOT ${Boost_FOUND})
     set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
     add_subdirectory(external/boost-cmake)
     SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
-    find_package(Boost 1.71.0 EXACT REQUIRED)
+    find_package(Boost 1.76.0 REQUIRED)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
@@ -162,11 +162,11 @@ configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
 set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -fno-gnu-unique -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-rdynamic -ggdb -Og")
+set(CMAKE_CXX_FLAGS_DEBUG "-march=native -rdynamic -ggdb -Og")
 if (Internal_Symbolized)
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
 
 target_compile_definitions(cathook PRIVATE

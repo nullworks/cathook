@@ -1017,18 +1017,13 @@ std::mutex trace_lock;
 bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset, unsigned int mask, trace_t *trace)
 {
     trace_t trace_object;
+    
     if (!trace)
         trace = &trace_object;
     Ray_t ray;
 
-    if (g_Settings.bInvalid)
-        return false;
     if (entity == g_pLocalPlayer->entity)
         return true;
-    if (CE_BAD(g_pLocalPlayer->entity))
-        return false;
-    if (CE_BAD(entity))
-        return false;
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
     Vector eye = g_pLocalPlayer->v_Eye;
     // Adjust for weapon offsets if needed
@@ -1037,7 +1032,6 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
     ray.Init(eye, endpos);
     {
         PROF_SECTION(IEVV_TraceRay);
-        std::lock_guard<std::mutex> lock(trace_lock);
         if (!tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }

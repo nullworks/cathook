@@ -23,7 +23,7 @@ namespace settings
 template <> class Variable<rgba_t> : public VariableBase<rgba_t>
 {
 public:
-    ~Variable<rgba_t>() override = default;
+    ~Variable() override = default;
 
     VariableType getType() override
     {

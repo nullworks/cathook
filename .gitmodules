@@ -24,4 +24,4 @@
 	url = https://github.com/nullworks/libnullnexus
 [submodule "external/boost-cmake"]
 	path = external/boost-cmake
-	url = https://github.com/Orphis/boost-cmake.git
+	url = https://github.com/STEVE4git/boost-cmake.git

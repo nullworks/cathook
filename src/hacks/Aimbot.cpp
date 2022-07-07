@@ -28,7 +28,7 @@ static settings::Int aimkey_mode{ "aimbot.aimkey.mode", "1" };
 static settings::Boolean autoshoot{ "aimbot.autoshoot", "1" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
 static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
-static settings::Int multipoint{ "aimbot.multipoint", "0" };
+static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
@@ -92,7 +92,7 @@ settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "1" };
 int slow_aim;
 float fov;
 bool enable;
-
+bool projectile_self_damage = false;
 void spectatorUpdate()
 {
     switch (*specmode)
@@ -164,24 +164,12 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     GenerateBoxVertices(origin, rotation, bboxmin, bboxmax, corners);
 
     float shrink_size = 1;
-    switch (*multipoint)
-    {
-    // Shrink alot
-    case 1:
+   
+   if(!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
         shrink_size = 3;
-        break;
-    // Decently shrink
-    case 2:
-        shrink_size = 5;
-        break;
-    // Shrink very little (we still have to shrink a bit else we will wiff due to rotation)
-    case 3:
-        shrink_size = 10;
-        break;
-    default:
-        shrink_size = 6;
-    }
-
+    else
+        shrink_size = 6;    
+   
     // Shrink positions by moving towards opposing corner
     for (int i = 0; i < 8; i++)
         corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
@@ -210,7 +198,27 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 
     return hitpoints;
 }
+bool isHitboxMedium(int hitbox)
+{
+    switch (hitbox)
+    {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    return true;
 
+
+    default:
+            return false;
+    }
+
+
+
+return false;
+
+}
 // Get the best point to aim at for a given hitbox
 std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 {
@@ -244,23 +252,6 @@ float stop_moving_time = 0;
 
 // Used to make rapidfire not knock your enemies out of range
 unsigned last_target_ignore_timer = 0;
-
-int GetSentry()
-{
-    for (int i = 1; i <= HIGHEST_ENTITY; i++)
-    {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
-        else if (ent->m_Type() != ENTITY_BUILDING || ent->m_iClassID() != CL_CLASS(CObjectSentrygun))
-            continue;
-        else if ((CE_INT(ent, netvar.m_hBuilder) & 0xFFF) != g_pLocalPlayer->entity_idx)
-            continue;
-        return i;
-    }
-    return -1;
-}
-
 settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "1" };
 // Projectile info
 bool projectile_mode{ false };
@@ -450,7 +441,9 @@ static void CreateMove()
             {
                 int weapon_case = g_pLocalPlayer->weapon()->m_iClassID();
                 if (projectileSpecialCases(target_last, weapon_case))
-                {
+                {   
+                       
+                                    
                     DoAutoshoot(target_last);
                 }
             }
@@ -459,7 +452,6 @@ static void CreateMove()
     }
     }
 }
-
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
 
@@ -559,13 +551,6 @@ bool hitscanSpecialCases(CachedEntity *target_entity, int weapon_case)
         return false;
     }
 }
-bool smallBoxChecker(CachedEntity *target_entity)
-{
-    if (CE_BAD(target_entity) || !g_IEntityList->GetClientEntity(target_entity->m_IDX))
-        return false;
-
-    return true;
-}
 // Just hold m1 if we were aiming at something before and are in rapidfire
 static void CreateMoveWarp()
 {
@@ -602,64 +587,6 @@ bool MouseMoving()
         return false;
 }
 #endif
-
-// The first check to see if the player should aim in the first place
-bool ShouldAim()
-{
-    // Checks should be in order: cheap -> expensive
-
-    // Check for +use
-    if (current_user_cmd->buttons & IN_USE)
-        return false;
-    // Check if using action slot item
-    else if (g_pLocalPlayer->using_action_slot_item)
-        return false;
-    // Using a forbidden weapon?
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
-        return false;
-
-    // Carrying A building?
-    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
-        return false;
-    // Deadringer out?
-    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
-        return false;
-    else if (g_pLocalPlayer->holding_sapper)
-        return false;
-    // Is bonked?
-    else if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
-        return false;
-    // Is taunting?
-    else if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
-        return false;
-    // Is cloaked
-    else if (IsPlayerInvisible(g_pLocalPlayer->entity))
-        return false;
-    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
-        return false;
-#if ENABLE_VISUALS
-    if (assistance_only && !MouseMoving())
-        return false;
-#endif
-    switch (GetWeaponMode())
-    {
-    case weapon_hitscan:
-        break;
-    case weapon_melee:
-        break;
-    // Check we need to run projectile Aimbot code
-    case weapon_projectile:
-        if (!projectileAimbotRequired)
-            return false;
-        break;
-    // Check if player doesnt have a weapon usable by aimbot
-    default:
-        return false;
-    };
-
-    return true;
-}
-
 // Function to find a suitable target
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
@@ -685,7 +612,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     if (!validateTickFOV(bt_tick))
                         continue;
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
-                    if (IsTargetStateGood(target_last) && smallBoxChecker(target_last) && Aim(target_last))
+                    if (IsTargetStateGood(target_last)  && Aim(target_last))
                         return target_last;
                     // Restore if bad target
                     hacks::tf2::backtrack::RestoreEntity(target_last->m_IDX);
@@ -693,7 +620,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
 
             // Check if previous target is still good
-            else if (!shouldbacktrack_cache && IsTargetStateGood(target_last) && smallBoxChecker(target_last) && Aim(target_last))
+            else if (!shouldbacktrack_cache && IsTargetStateGood(target_last)  && Aim(target_last))
             {
                 // If it is then return it again
                 return target_last;
@@ -733,7 +660,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                     if (!validateTickFOV(bt_tick))
                         continue;
                     hacks::tf2::backtrack::MoveToTick(bt_tick);
-                    if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
+                    if (IsTargetStateGood(ent) && Aim(ent))
                     {
                         isTargetGood = true;
                         temp_bt_tick = bt_tick;
@@ -745,41 +672,47 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         }
         else
         {
-            if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
+            if (IsTargetStateGood(ent) && Aim(ent))
                 isTargetGood = true;
         }
         if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
         {
-            switch ((int) priority_mode)
-            {
-            case 0: // Smart Priority
-            {
-                scr = GetScoreForEntity(ent);
-                break;
-            }
-            case 1: // Fov Priority
-            {
-                scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
-                break;
-            }
-            case 3: // Health Priority (Lowest)
-            {
-                scr = 450.0f - ent->m_iHealth();
-                break;
-            }
-            case 4: // Distance Priority (Furthest Away)
-            {
-                scr = calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
-                break;
-            }
-            case 5: // Health Priority (Highest)
-            {
-                scr = ent->m_iHealth() * 4;
-                break;
-            }
-            default:
-                break;
-            }
+                switch ((int) priority_mode)
+                {
+                case 0: // Smart Priority
+                {
+                    scr = GetScoreForEntity(ent);
+                    break;
+                }
+                case 1: // Fov Priority
+                {
+                    scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
+                    break;
+                }
+                case 3: // Health Priority (Lowest)
+                {
+                    scr = 450.0f - ent->m_iHealth();
+                    break;
+                }
+                case 4: // Distance Priority (Furthest Away)
+                {
+                    scr = calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+                    break;
+                }
+                case 5: // Health Priority (Highest)
+                {
+                    scr = ent->m_iHealth() * 4;
+                    break;
+                }
+                case 6: // Fast
+                {
+
+                    return ent; 
+
+                }
+                default:
+                    break;
+                }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
             {
@@ -1043,9 +976,10 @@ bool Aim(CachedEntity *entity)
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     bool should_aim;
-    trace_t test_trace;
     if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
+    {
         should_aim = IsEntityVectorVisible(entity, is_it_good, true);
+    }    
     else
     {
         should_aim = IsEntityVectorVisible(entity, is_it_good, false);
@@ -1053,11 +987,14 @@ bool Aim(CachedEntity *entity)
     if (!should_aim)
         return false;
 
+    
+  
+
+
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (fov > 0 && cd.fov > fov)
         return false;
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
-
     // Slow aim
     if (slow_aim)
         DoSlowAim(angles);
@@ -1233,9 +1170,7 @@ Vector PredictEntity(CachedEntity *entity)
         {
             std::pair<Vector, Vector> tmp_result;
             tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-
-            // Don't use the intial velocity compensated one in vischecks
-            result = tmp_result.second;
+            result = tmp_result.second; // Buildings don't have velocity but I'll keep it in nonetheless
         }
         else
         {
@@ -1383,7 +1318,6 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
-
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)
 {

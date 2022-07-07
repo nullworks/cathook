@@ -38,17 +38,16 @@ void Reset();
 // Stuff to make storing functions easy
 bool isAiming();
 CachedEntity *CurrentTarget();
-bool ShouldAim();
 CachedEntity *RetrieveBestTarget(bool aimkey_state);
 bool IsTargetStateGood(CachedEntity *entity);
 bool Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);
-bool smallBoxChecker(CachedEntity* target_entity);
 int notVisibleHitbox(CachedEntity *target, int preferred);
 int autoHitbox(CachedEntity* target);
 bool hitscanSpecialCases(CachedEntity* target_entity, int weapon_case);
 bool projectileSpecialCases(CachedEntity* target_entity, int weapon_case);
 int BestHitbox(CachedEntity *target);
+bool isHitboxMedium(int hitbox);
 int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);
 bool UpdateAimkey();

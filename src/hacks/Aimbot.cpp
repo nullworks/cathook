@@ -200,7 +200,8 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 }
 bool isHitboxMedium(int hitbox)
 {
-    switch (hitbox){
+    switch (hitbox)
+    {
     case 1:
     case 2:
     case 3:
@@ -251,23 +252,6 @@ float stop_moving_time = 0;
 
 // Used to make rapidfire not knock your enemies out of range
 unsigned last_target_ignore_timer = 0;
-
-int GetSentry()
-{
-    for (int i = 1; i <= HIGHEST_ENTITY; i++)
-    {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
-        else if (ent->m_Type() != ENTITY_BUILDING || ent->m_iClassID() != CL_CLASS(CObjectSentrygun))
-            continue;
-        else if ((CE_INT(ent, netvar.m_hBuilder) & 0xFFF) != g_pLocalPlayer->entity_idx)
-            continue;
-        return i;
-    }
-    return -1;
-}
-
 settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "1" };
 // Projectile info
 bool projectile_mode{ false };

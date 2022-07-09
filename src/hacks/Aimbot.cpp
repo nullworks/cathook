@@ -203,13 +203,13 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
                 return hitpoints;
         }
         int i = 0;   
-        while(hitpoints.empty() || i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+        while(hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
         {
-            
-            hitpoints = getHitpointsVischeck(ent, i);
-            i++;
-            if(hitbox == i)
+            if(hitbox == i) // Preventing checking existing hitbox (again)
                 i++;
+            hitpoints = getHitpointssVischeck(ent, i);
+            i++;
+           
 
         }
 

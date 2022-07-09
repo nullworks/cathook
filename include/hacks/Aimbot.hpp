@@ -43,6 +43,7 @@ bool IsTargetStateGood(CachedEntity *entity);
 bool Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);
 int notVisibleHitbox(CachedEntity *target, int preferred);
+std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox);
 int autoHitbox(CachedEntity* target);
 bool hitscanSpecialCases(CachedEntity* target_entity, int weapon_case);
 bool projectileSpecialCases(CachedEntity* target_entity, int weapon_case);

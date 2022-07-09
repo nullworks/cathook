@@ -29,6 +29,7 @@ static settings::Boolean autoshoot{ "aimbot.autoshoot", "1" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
 static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
 static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
+static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0"}; 
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
@@ -195,8 +196,79 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
                 hitpoints.push_back(positions[i]);
         }
     }
+    if(vischeck_hitboxes)
+    {
+        if (vischeck_hitboxes == 1 && playerlist::AccessData(ent).state != playerlist::k_EState::RAGE)
+        {
+                return hitpoints;
+        }
+        int i = 0;   
+        while(hitpoints.empty() || i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+        {
+            
+            hitpoints = getHitpointsVischeck(ent, i);
+            i++;
+            if(hitbox == i)
+                i++;
+
+        }
+
+    }
 
     return hitpoints;
+}
+std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
+{
+    std::vector<Vector> hitpoints;
+    auto hb = ent->hitboxes.GetHitbox(hitbox);
+    auto bboxmin = hb->bbox->bbmin;
+    auto bboxmax = hb->bbox->bbmax;
+
+    auto transform = ent->hitboxes.GetBones()[hb->bbox->bone];
+    QAngle rotation;
+    Vector origin;
+
+    MatrixAngles(transform, rotation, origin);
+
+    Vector corners[8];
+    GenerateBoxVertices(origin, rotation, bboxmin, bboxmax, corners);
+
+    float shrink_size = 1;
+
+    if (!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
+        shrink_size = 3;
+    else
+        shrink_size = 6;
+
+    // Shrink positions by moving towards opposing corner
+    for (int i = 0; i < 8; i++)
+        corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
+
+    // Generate middle points on line segments
+    // Define cleans up code
+
+    const Vector line_positions[12] = { GET_MIDDLE(0, 1), GET_MIDDLE(0, 2), GET_MIDDLE(1, 3), GET_MIDDLE(2, 3), GET_MIDDLE(7, 6), GET_MIDDLE(7, 5), GET_MIDDLE(6, 4), GET_MIDDLE(5, 4), GET_MIDDLE(0, 4), GET_MIDDLE(1, 5), GET_MIDDLE(2, 6), GET_MIDDLE(3, 7) };
+
+    // Create combined vector
+    std::vector<Vector> positions;
+
+    positions.reserve(sizeof(Vector) * 20);
+    positions.insert(positions.end(), corners, &corners[8]);
+    positions.insert(positions.end(), line_positions, &line_positions[12]);
+
+    for (int i = 0; i < 20; ++i)
+    {
+        trace_t trace;
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        {
+            if (trace.hitbox == hitbox)
+                hitpoints.push_back(positions[i]);
+        }
+    }
+
+
+    return hitpoints;
+
 }
 bool isHitboxMedium(int hitbox)
 {
@@ -1308,6 +1380,9 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
+
+
+
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)
 {

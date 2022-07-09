@@ -1052,11 +1052,16 @@ bool Aim(CachedEntity *entity)
     }
     if (!should_aim)
         return false;
-
+   
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (fov > 0 && cd.fov > fov)
         return false;
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
+     if(projectileAimbotRequired)
+    {
+        if(!didProjectileHit(getShootPos(angles), is_it_good))
+            return false;
+    }    
     // Slow aim
     if (slow_aim)
         DoSlowAim(angles);

@@ -196,9 +196,9 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
                 hitpoints.push_back(positions[i]);
         }
     }
-    if(vischeck_hitboxes)
+    if(*vischeck_hitboxes)
     {
-        if (vischeck_hitboxes == 1 && playerlist::AccessData(ent).state != playerlist::k_EState::RAGE)
+        if (*vischeck_hitboxes == 1 && playerlist::AccessData(ent).state != playerlist::k_EState::RAGE)
         {
                 return hitpoints;
         }

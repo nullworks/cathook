@@ -654,7 +654,7 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
 bool didProjectileHit(Vector start_point,Vector end_point)
 {       
 
-        Vector size_of_proj = Vector(3,4,4);
+        Vector size_of_proj = Vector(0,4,0); // The foot hitbox is so low you can't check ground at all
         trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
         Ray_t ray;
         trace_t tracer;

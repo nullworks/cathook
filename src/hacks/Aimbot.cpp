@@ -1051,13 +1051,8 @@ bool Aim(CachedEntity *entity)
     
     if(projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
-        Vector vecOffset(23.5f, 12.0f, -3.0f);
-			if (current_user_cmd->buttons == IN_DUCK)
-			{
-				vecOffset.z = 8.0f;
-			}
 
-        if(!didProjectileHit(getShootPos(angles)+vecOffset, is_it_good))
+        if(!didProjectileHit(getShootPos(angles), is_it_good))
             return false;
     }
 
@@ -1213,6 +1208,7 @@ Vector PredictEntity(CachedEntity *entity)
                 tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
 
             // Don't use the intial velocity compensated one in vischecks
+            vischeck_result 
             result = tmp_result.second;
         }
         else

@@ -652,14 +652,19 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
     return powerup_type::not_powerup;
 }
 bool didProjectileHit(Vector start_point,Vector end_point)
-{
+{       
+
+        Vector size_of_proj = Vector(3.8,3.8,3.8);
         trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
         Ray_t ray;
         trace_t tracer;
-		ray.Init(start_point, end_point, Vector(4,4,4), Vector(4,4,4));
+		ray.Init(start_point, end_point, size_of_proj*-1, size_of_proj);
 		g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &tracer);
         if(tracer.DidHit())
             return false;
+
+
+    return true;
 }
 
 // A function to find a weapon by WeaponID

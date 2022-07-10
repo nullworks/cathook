@@ -1041,27 +1041,24 @@ bool Aim(CachedEntity *entity)
 
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
-    bool should_aim;
-    if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
+    if(!projectileAimbotRequired)
     {
-        should_aim = IsEntityVectorVisible(entity, is_it_good, true);
-    }
-    else
-    {
-        should_aim = IsEntityVectorVisible(entity, is_it_good, false);
-    }
-    if (!should_aim)
+       if(!IsEntityVectorVisible(entity,is_it_good,false))
         return false;
+    }
+
+    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
+    
+    if(projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
+    {
+        if(!didProjectileHit(getShootPos(angles), is_it_good))
+            return false;
+    }
+
    
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (fov > 0 && cd.fov > fov)
         return false;
-    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
-     if(projectileAimbotRequired)
-    {
-        if(!didProjectileHit(getShootPos(angles), is_it_good))
-            return false;
-    }    
     // Slow aim
     if (slow_aim)
         DoSlowAim(angles);

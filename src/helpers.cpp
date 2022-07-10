@@ -655,11 +655,10 @@ bool didProjectileHit(Vector start_point,Vector end_point)
 {       
 
         Vector size_of_proj = Vector(4,4,4);
-        Vector size_of_proj_inverse = Vector(-4,-4,-4);
         trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
         Ray_t ray;
         trace_t tracer;
-		ray.Init(start_point, end_point,size_of_proj_inverse, size_of_proj);
+		ray.Init(start_point, end_point,size_of_proj, size_of_proj);
 		g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &tracer);
         if(tracer.DidHit())
             return false;

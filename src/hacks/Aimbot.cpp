@@ -1051,7 +1051,13 @@ bool Aim(CachedEntity *entity)
     
     if(projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
-        if(!didProjectileHit(getShootPos(angles), is_it_good))
+        Vector vecOffset(23.5f, 12.0f, -3.0f);
+			if (current_user_cmd->buttons == IN_DUCK)
+			{
+				vecOffset.z = 8.0f;
+			}
+
+        if(!didProjectileHit(getShootPos(angles)+vecOffset, is_it_good))
             return false;
     }
 

@@ -558,16 +558,15 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         }
         else if(mindelta < previous_delta)
         {
+            has_ran_before = true;
             break;
 
         }
         current_bounds= current_bounds*.5;
     }
-    int max_steps = current_bounds*2;
-    if(current_bounds == 0 )
+    if(has_ran_before)
     {
-        max_steps=25;
-    }
+    int max_steps = current_bounds*2;
     for (int loop_bounds = current_bounds; loop_bounds <= max_steps ; loop_bounds++)
     {
         ent->m_vecOrigin()                                 = current;
@@ -591,7 +590,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
             mindelta = timedelta;
         }
     }
-
+    }
     
     // logging::Info("besttime: %f, currenttime: %f, old currenttime: %f", besttime, currenttime, currenttime - steplength * maxsteps);
     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = origin;
@@ -605,7 +604,6 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         result_initialvel.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/
-                  logging::Info("Current bounds %d", current_bounds);
     return { result, result_initialvel };
 }
 std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity)

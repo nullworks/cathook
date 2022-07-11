@@ -23,7 +23,7 @@ public:
     inline static int GetSlot(IClientEntity *self)
     {
         typedef int (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(397, offsets::undefined, 397), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(398, offsets::undefined, 398), 0)(self);
     }
     inline static const char *GetPrintName(IClientEntity *self)
     {

@@ -1052,8 +1052,8 @@ bool Aim(CachedEntity *entity)
     if(projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
 
-        if(!didProjectileHit(getShootPos(angles), is_it_good))
-            return false;
+       if(!didProjectileHit(getShootPos(angles), is_it_good,entity))
+         return false;
     }
 
    
@@ -1208,7 +1208,6 @@ Vector PredictEntity(CachedEntity *entity)
                 tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
 
             // Don't use the intial velocity compensated one in vischecks
-            vischeck_result 
             result = tmp_result.second;
         }
         else
@@ -1232,16 +1231,8 @@ Vector PredictEntity(CachedEntity *entity)
         // Buildings
     case ENTITY_BUILDING:
     {
-        if (projectileAimbotRequired)
-        {
-            std::pair<Vector, Vector> tmp_result;
-            tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-            result     = tmp_result.second; // Buildings don't have velocity but I'll keep it in nonetheless
-        }
-        else
-        {
+        
             result = GetBuildingPosition(entity);
-        }
         break;
     }
         // NPCs (Skeletons, merasmus, etc)

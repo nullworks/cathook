@@ -24,7 +24,6 @@ Vector SimpleLatencyPrediction(CachedEntity *ent, int hb);
 
 // The first entry ignores initial velocity, the second one does not.
 // Used for vischeck things.
-std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity, float proj_startvelocity = 0.0f);
 std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity = 0.0f);
 std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravitymod, float entgmod, float proj_startvelocity = 0.0f);
 

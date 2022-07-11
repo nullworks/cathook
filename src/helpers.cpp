@@ -654,13 +654,11 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
 bool didProjectileHit(Vector start_point,Vector end_point, CachedEntity* entity)
 {       
 
-        Vector size_of_proj = Vector(3.8f,3.8f, 3.8f);
-        Vector size_of_proj_inverse = Vector(-3.8f,-3.8f,-3.8f);
         trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
         Ray_t ray;
         trace_t trace_obj;
         trace_t *tracer = &trace_obj;
-		ray.Init(start_point, end_point,size_of_proj_inverse, size_of_proj);
+		ray.Init(start_point, end_point,Vector(-3.8f,-3.8f,-3.8f),  Vector(3.8f,3.8f, 3.8f));
 		g_ITrace->TraceRay(ray, MASK_SHOT, &trace::filter_default, tracer);
 
 

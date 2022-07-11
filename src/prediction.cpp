@@ -565,7 +565,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     }
     int max_steps = current_bounds*2;
 
-    for (current_bounds = current_bounds; current_bounds < max_steps ; current_bounds++, solve_time += steplength)
+    for (current_bounds = current_bounds; current_bounds < max_steps ; current_bounds++)
     {
         ent->m_vecOrigin()                                 = current;
         const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
@@ -579,6 +579,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+        solve_time = currenttime + current_bounds*steplength;
         float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
         if (timedelta < mindelta)
         {
@@ -598,7 +599,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     // S = at^2/2 ; t = sqrt(2S/a)*/
     Vector result            = bestpos + hitbox_offset;
     Vector result_initialvel = result;
-    if(!is_on_ground)
+    logging::Info("USED STEP %d", current_bounds);
         result_initialvel.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/

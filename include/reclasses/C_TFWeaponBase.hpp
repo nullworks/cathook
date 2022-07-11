@@ -40,7 +40,7 @@ public:
     inline static int GetWeaponID(IClientEntity *self)
     {
         typedef int (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(447, offsets::undefined, 447), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(448, offsets::undefined, 448), 0)(self);
     }
     inline static bool IsViewModelFlipped(IClientEntity *self)
     {
@@ -50,7 +50,7 @@ public:
     inline static IClientEntity *GetOwnerViaInterface(IClientEntity *self)
     {
         typedef IClientEntity *(*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(454, offsets::undefined, 454), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(455, offsets::undefined, 455), 0)(self);
     }
     inline static bool UsesPrimaryAmmo(IClientEntity *self)
     {
@@ -80,7 +80,7 @@ public:
     inline static bool CanFireCriticalShot(IClientEntity *self, bool unknown1, IClientEntity *unknown2)
     {
         typedef bool (*fn_t)(IClientEntity *, bool, IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(492, offsets::undefined, 492), 0)(self, unknown1, unknown2);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(493, offsets::undefined, 493), 0)(self, unknown1, unknown2);
     }
     inline static float ApplyFireDelay(IClientEntity *self, float delay)
     {

@@ -36,7 +36,7 @@ public:
             }
         }
         typedef int (*fn_t)(IClientEntity *);
-        int return_value = vfunc<fn_t>(self, offsets::PlatformOffset(523, offsets::undefined, 523), 0)(self);
+        int return_value = vfunc<fn_t>(self, offsets::PlatformOffset(524, offsets::undefined, 524), 0)(self);
 
         if (add_charging)
         {

@@ -17,7 +17,6 @@ extern settings::Boolean engine_projpred;
 static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
 static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
 static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
-static settings::Int debug_pp_steps{ "debug.pp-steps", "66" };
 // The higher the sample size, the more previous positions we will take into account to calculate the next position. Lower = Faster reaction Higher = Stability
 static settings::Int sample_size("debug.strafepred.samplesize", "10");
 // TODO there is a Vector() object created each call.
@@ -527,15 +526,13 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     Vector bestpos          = origin;
     Vector current          = origin;
     Vector current_velocity = velocity;
-    int maxsteps            = (int) debug_pp_steps;
     float steplength        = g_GlobalVars->interval_per_tick;
 
-    bool leave_loop = false;
     int current_bounds = 400;
     float solve_time = currenttime;
     bool is_on_ground = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
     bool has_ran_before = false;
-    while(!leave_loop && 0 <= current_bounds)
+    while(0 <= current_bounds)
     {
 
         ent->m_vecOrigin()                                 = current;
@@ -560,7 +557,6 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
         }
         else if(mindelta < previous_delta)
         {
-            leave_loop = true;
             break;
 
         }
@@ -628,21 +624,17 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
         currenttime = 0.01f;
     float besttime = currenttime;
     float mindelta = 65536.0f;
+    float no_regression = 65534.0f;
     Vector bestpos = origin;
     Vector current = origin;
-    int maxsteps   = (int) debug_pp_steps;
-    bool onground  = false;
-    if (ent->m_Type() == ENTITY_PLAYER)
-    {
-        if (CE_INT(ent, netvar.iFlags) & FL_ONGROUND)
-            onground = true;
-    }
-
+    float solve_time = currenttime;
+    bool onground  = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
+    int current_bounds = 400;
     Vector velocity;
     velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
 
     Vector acceleration = { 0.0f, 0.0f, -sv_gravity->GetFloat() * entgmod };
-    float steplength    = ((float) (2 * range) / (float) maxsteps);
+   
     auto minmax         = std::make_pair(RAW_ENT(ent)->GetCollideable()->OBBMins(), RAW_ENT(ent)->GetCollideable()->OBBMaxs());
 
     Vector last = origin;
@@ -650,8 +642,40 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
     auto strafe_pred = initializeStrafePrediction(ent);
 
     float currenttime_before = currenttime;
-    for (int steps = 0; steps < maxsteps; steps++, currenttime += steplength)
+    float steplength = 0;
+    while(0<=current_bounds)
     {
+           steplength = ((float) (2 * range) / (float) current_bounds);
+         current = last = PredictStep(last, velocity, acceleration, &minmax, steplength, strafe_pred ? &*strafe_pred : nullptr);
+
+        if (onground)
+        {
+            float toground = DistanceToGround(current, minmax.first, minmax.second);
+            current.z -= toground;
+        }
+
+        float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
+        // Compensate for ping
+        rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+        solve_time = currenttime + current_bounds*steplength;
+        if (fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time) < mindelta)
+        {
+            besttime = solve_time;
+            bestpos  = current;
+            mindelta = fabs(rockettime - solve_time);
+        }
+        else if(mindelta < no_regression)
+        {
+
+            break;
+            
+        }
+        current_bounds=current_bounds*.5;
+
+    }
+    int max_bounds = current_bounds*2;
+    for(current_bounds = current_bounds; current_bounds < max_bounds; current_bounds++)
+    {   steplength = ((float) (2 * range) / (float) current_bounds);
         current = last = PredictStep(last, velocity, acceleration, &minmax, steplength, strafe_pred ? &*strafe_pred : nullptr);
 
         if (onground)
@@ -663,12 +687,17 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        if (fabs(currenttime > rockettime ? currenttime - rockettime : rockettime - currenttime) < mindelta)
+        solve_time = currenttime + current_bounds*steplength;
+        if (fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time) < mindelta)
         {
-            besttime = currenttime;
+            besttime = solve_time;
             bestpos  = current;
-            mindelta = fabs(rockettime - currenttime);
+            mindelta = fabs(rockettime - solve_time);
         }
+
+
+     current_bounds=current_bounds*.5;
+
     }
     // Compensate for ping
     besttime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();

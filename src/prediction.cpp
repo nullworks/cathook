@@ -529,7 +529,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     Vector current_velocity = velocity;
     float steplength        = g_GlobalVars->interval_per_tick;
 
-    int current_bounds = 400;
+    int current_bounds = 200;
     float solve_time = currenttime;
     bool is_on_ground = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
     bool has_ran_before = false;
@@ -599,7 +599,6 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     // S = at^2/2 ; t = sqrt(2S/a)*/
     Vector result            = bestpos + hitbox_offset;
     Vector result_initialvel = result;
-    logging::Info("USED STEP %d", current_bounds);
         result_initialvel.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/

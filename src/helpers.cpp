@@ -658,11 +658,10 @@ bool didProjectileHit(Vector start_point,Vector end_point, CachedEntity* entity)
         Ray_t ray;
         trace_t trace_obj;
         trace_t *tracer = &trace_obj;
-		ray.Init(start_point, end_point,Vector(-3.8f,-3.8f,-3.8f),  Vector(3.8f,3.8f, 3.8f));
-		g_ITrace->TraceRay(ray, MASK_SHOT, &trace::filter_default, tracer);
-
-
-    return (((IClientEntity *) tracer->m_pEnt) == RAW_ENT(entity) || !tracer->DidHit());
+		ray.Init(start_point, end_point,Vector(0,-4,-4),  Vector(0,4, 4));
+        
+		 g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, tracer);
+         return (((IClientEntity *) tracer->m_pEnt) == RAW_ENT(entity));
 }
 
 // A function to find a weapon by WeaponID
@@ -1049,6 +1048,7 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
         if (!tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }
+
     return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || !trace->DidHit());
 }
 

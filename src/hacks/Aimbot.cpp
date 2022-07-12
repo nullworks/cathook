@@ -1225,8 +1225,10 @@ Vector PredictEntity(CachedEntity *entity)
         // Buildings
     case ENTITY_BUILDING:
     {
-
-        result = GetBuildingPosition(entity);
+        if (cur_proj_grav != 0)
+            result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+        else
+            result = GetBuildingPosition(entity);
         break;
     }
         // NPCs (Skeletons, merasmus, etc)

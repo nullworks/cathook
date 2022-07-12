@@ -688,6 +688,32 @@ float DistanceToGround(CachedEntity *ent)
     return DistanceToGround(origin, mins, maxs);
 }
 
+std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec, float speed, float gravity, float proj_startvelocity)
+{
+    if (!vec.z || CE_BAD(building))
+        return { Vector(), Vector() };
+    Vector result = vec;
+
+    if (!sv_gravity)
+        sv_gravity = g_ICvar->FindVar("sv_gravity");
+
+    if (speed == 0.0f || !sv_gravity)
+        return { Vector(), Vector() };
+
+    trace::filter_no_player.SetSelf(RAW_ENT(building));
+
+    // Buildings do not move. We don't need to do any steps here
+    float time = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
+    // Compensate for ping
+    time += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+
+    result.z += (sv_gravity->GetFloat() / 2.0f * time * time * gravity);
+    Vector result_initialvel = result;
+    result_initialvel.z -= proj_startvelocity * time;
+    // S = at^2/2 ; t = sqrt(2S/a)*/
+    return { result, result_initialvel };
+}
+
 float DistanceToGround(Vector origin, Vector mins, Vector maxs)
 {
     // First, ensure we're not slightly below the floor, up to 18 HU will snap up

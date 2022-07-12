@@ -28,7 +28,7 @@ public:
     inline static const char *GetPrintName(IClientEntity *self)
     {
         typedef const char *(*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(400, offsets::undefined, 400), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(401, offsets::undefined, 401), 0)(self);
     }
 };
 } // namespace re

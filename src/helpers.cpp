@@ -651,17 +651,17 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
         return powerup_type::supernova;
     return powerup_type::not_powerup;
 }
-bool didProjectileHit(Vector start_point,Vector end_point, CachedEntity* entity)
-{       
+bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity)
+{
 
-        trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
-        Ray_t ray;
-        trace_t trace_obj;
-        trace_t *tracer = &trace_obj;
-		ray.Init(start_point, end_point,Vector(0,-4,-4),  Vector(0,4, 4));
-        
-		 g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, tracer);
-         return (((IClientEntity *) tracer->m_pEnt) == RAW_ENT(entity));
+    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    Ray_t ray;
+    trace_t trace_obj;
+    trace_t *tracer = &trace_obj;
+    ray.Init(start_point, end_point, Vector(0, -4, -4), Vector(0, 4, 4));
+
+    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, tracer);
+    return (((IClientEntity *) tracer->m_pEnt) == RAW_ENT(entity));
 }
 
 // A function to find a weapon by WeaponID
@@ -1030,7 +1030,7 @@ std::mutex trace_lock;
 bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset, unsigned int mask, trace_t *trace)
 {
     trace_t trace_object;
-    
+
     if (!trace)
         trace = &trace_object;
     Ray_t ray;

@@ -1226,7 +1226,10 @@ Vector PredictEntity(CachedEntity *entity)
     case ENTITY_BUILDING:
     {
         if (cur_proj_grav != 0)
-            result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+        {
+            std::pair<Vector, Vector> temp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+            result                                = temp_result.second;
+        }
         else
             result = GetBuildingPosition(entity);
         break;

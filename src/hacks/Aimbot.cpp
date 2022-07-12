@@ -1027,7 +1027,34 @@ bool IsTargetStateGood(CachedEntity *entity)
 
     return false;
 }
+int projectileHitboxSize(int projectile_size)
+{
+    int projectile_hitbox_size = 8;
+    switch (projectile_size)
+    {
+    case CL_CLASS(CTFRocketLauncher):
+    case CL_CLASS(CTFRocketLauncher_Mortar):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFRocketLauncher_DirectHit):
+    case CL_CLASS(CTFPipebombLauncher):
+    case CL_CLASS(CTFGrenadeLauncher):
+    case CL_CLASS(CTFCannon):
+        break;
+    case CL_CLASS(CTFFlareGun):
+    case CL_CLASS(CTFFlareGun_Revenge):
+    case CL_CLASS(CTFDRGPomson):
+        projectile_hitbox_size = 5;
+        break;
+    case CL_CLASS(CTFSyringeGun):
+    case CL_CLASS(CTFCompoundBow):
+        projectile_hitbox_size = 1;
+        break;
+    default:
+        break;
+    }
 
+    return projectile_hitbox_size;
+}
 // A function to aim at a specific entitiy
 bool Aim(CachedEntity *entity)
 {
@@ -1047,7 +1074,7 @@ bool Aim(CachedEntity *entity)
     if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
 
-        if (!didProjectileHit(getShootPos(angles), is_it_good, entity))
+        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID())))
             return false;
     }
 

@@ -29,7 +29,7 @@ static settings::Boolean autoshoot{ "aimbot.autoshoot", "1" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
 static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
 static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
-static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0"}; 
+static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0" };
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
@@ -196,23 +196,20 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
                 hitpoints.push_back(positions[i]);
         }
     }
-    if(*vischeck_hitboxes)
+    if (*vischeck_hitboxes)
     {
         if (*vischeck_hitboxes == 1 && playerlist::AccessData(ent).state != playerlist::k_EState::RAGE)
         {
-                return hitpoints;
+            return hitpoints;
         }
-        int i = 0;   
-        while(hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+        int i = 0;
+        while (hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
         {
-             if(hitbox == i)
+            if (hitbox == i)
                 i++;
             hitpoints = getHitpointsVischeck(ent, i);
             i++;
-           
-
         }
-
     }
 
     return hitpoints;
@@ -220,7 +217,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 {
     std::vector<Vector> hitpoints;
-    auto hb = ent->hitboxes.GetHitbox(hitbox);
+    auto hb      = ent->hitboxes.GetHitbox(hitbox);
     auto bboxmin = hb->bbox->bbmin;
     auto bboxmax = hb->bbox->bbmax;
 
@@ -266,9 +263,7 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
         }
     }
 
-
     return hitpoints;
-
 }
 bool isHitboxMedium(int hitbox)
 {
@@ -1041,22 +1036,21 @@ bool Aim(CachedEntity *entity)
 
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
-    if(!projectileAimbotRequired)
+    if (!projectileAimbotRequired)
     {
-       if(!IsEntityVectorVisible(entity,is_it_good,false))
-        return false;
+        if (!IsEntityVectorVisible(entity, is_it_good, false))
+            return false;
     }
 
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
-    
-    if(projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
+
+    if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
 
-       if(!didProjectileHit(getShootPos(angles), is_it_good,entity))
-         return false;
+        if (!didProjectileHit(getShootPos(angles), is_it_good, entity))
+            return false;
     }
 
-   
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (fov > 0 && cd.fov > fov)
         return false;
@@ -1231,8 +1225,8 @@ Vector PredictEntity(CachedEntity *entity)
         // Buildings
     case ENTITY_BUILDING:
     {
-        
-            result = GetBuildingPosition(entity);
+
+        result = GetBuildingPosition(entity);
         break;
     }
         // NPCs (Skeletons, merasmus, etc)
@@ -1375,8 +1369,6 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
-
-
 
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)

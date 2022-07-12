@@ -514,13 +514,13 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     if (!sv_gravity)
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
-    if (speed == 0.0f || !sv_gravity) 
+    if (speed == 0.0f || !sv_gravity)
         return { Vector(), Vector() };
-    
+
     float currenttime = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed - 1.5f;
-    if (currenttime <= 0.0f) 
+    if (currenttime <= 0.0f)
         currenttime = 0.01f;
-    
+
     float besttime          = currenttime;
     float mindelta          = 65536.0f;
     float previous_delta    = 65534.0f;
@@ -529,11 +529,11 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     Vector current_velocity = velocity;
     float steplength        = g_GlobalVars->interval_per_tick;
 
-    int current_bounds = 100;
-    float solve_time = currenttime;
-    bool is_on_ground = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
+    int current_bounds  = 100;
+    float solve_time    = currenttime;
+    bool is_on_ground   = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
     bool has_ran_before = false;
-    while(0 < current_bounds)
+    while (0 < current_bounds)
     {
 
         ent->m_vecOrigin()                                 = current;
@@ -547,7 +547,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
 
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
-        solve_time = currenttime + current_bounds*steplength;
+        solve_time = currenttime + current_bounds * steplength;
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
         float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
         if (timedelta < mindelta)
@@ -556,42 +556,41 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
             bestpos  = current;
             mindelta = timedelta;
         }
-        else if(mindelta < previous_delta)
+        else if (mindelta < previous_delta)
         {
             has_ran_before = true;
             break;
-
         }
-        current_bounds= current_bounds*.5;
+        current_bounds = current_bounds * .5;
     }
-    if(has_ran_before)
+    if (has_ran_before)
     {
-    int max_steps = current_bounds*2;
-    for (int loop_bounds = current_bounds; loop_bounds < max_steps; loop_bounds++)
-    {
-        ent->m_vecOrigin()                                 = current;
-        const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
-        CE_VECTOR(ent, 0x354)                              = current;
-        current                                            = EnginePrediction(ent, steplength, &current_velocity);
-
-        // Apply velocity if not touching the ground
-        if (!is_on_ground)
-            current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
-
-        float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
-        // Compensate for ping
-        rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        solve_time = currenttime + loop_bounds*steplength;
-        float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
-        if (timedelta < mindelta)
+        int max_steps = current_bounds * 2;
+        for (int loop_bounds = current_bounds; loop_bounds < max_steps; loop_bounds++)
         {
-            besttime = solve_time;
-            bestpos  = current;
-            mindelta = timedelta;
+            ent->m_vecOrigin()                                 = current;
+            const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
+            CE_VECTOR(ent, 0x354)                              = current;
+            current                                            = EnginePrediction(ent, steplength, &current_velocity);
+
+            // Apply velocity if not touching the ground
+            if (!is_on_ground)
+                current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
+
+            float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
+            // Compensate for ping
+            rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
+            solve_time      = currenttime + loop_bounds * steplength;
+            float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
+            if (timedelta < mindelta)
+            {
+                besttime = solve_time;
+                bestpos  = current;
+                mindelta = timedelta;
+            }
         }
     }
-    }
-    
+
     // logging::Info("besttime: %f, currenttime: %f, old currenttime: %f", besttime, currenttime, currenttime - steplength * maxsteps);
     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = origin;
     CE_VECTOR(ent, 0x354)                              = origin;
@@ -601,7 +600,7 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     // S = at^2/2 ; t = sqrt(2S/a)*/
     Vector result            = bestpos + hitbox_offset;
     Vector result_initialvel = result;
-        result_initialvel.z -= proj_startvelocity * besttime;
+    result_initialvel.z -= proj_startvelocity * besttime;
     /*logging::Info("[Pred][%d] delta: %.2f   %.2f   %.2f", result.x - origin.x,
                   result.y - origin.y, result.z - origin.z);*/
     return { result, result_initialvel };
@@ -680,7 +679,6 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
                   result.y - origin.y, result.z - origin.z);*/
     return { result, initialvel_result };
 }
-
 
 float DistanceToGround(CachedEntity *ent)
 {

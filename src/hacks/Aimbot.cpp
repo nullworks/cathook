@@ -1029,7 +1029,7 @@ bool IsTargetStateGood(CachedEntity *entity)
 }
 int projectileHitboxSize(int projectile_size)
 {
-    int projectile_hitbox_size = 8;
+    int projectile_hitbox_size = 5;
     switch (projectile_size)
     {
     case CL_CLASS(CTFRocketLauncher):
@@ -1043,7 +1043,7 @@ int projectileHitboxSize(int projectile_size)
     case CL_CLASS(CTFFlareGun):
     case CL_CLASS(CTFFlareGun_Revenge):
     case CL_CLASS(CTFDRGPomson):
-        projectile_hitbox_size = 5;
+        projectile_hitbox_size = 3;
         break;
     case CL_CLASS(CTFSyringeGun):
     case CL_CLASS(CTFCompoundBow):

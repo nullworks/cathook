@@ -148,7 +148,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
             hitpoints.push_back(hb->center);
     }
 
-    if (!multipoint)
+    if (!*multipoint)
         return hitpoints;
 
     // Multipoint
@@ -218,7 +218,7 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 {
     std::vector<Vector> hitpoints;
     auto hb = ent->hitboxes.GetHitbox(hitbox);
-    if (!multipoint)
+    if (!*multipoint)
     {
         hitpoints.push_back(hb->center);
         return hitpoints;
@@ -917,7 +917,8 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         cd.hitbox                  = BestHitbox(entity);
-        if (*vischeck_hitboxes)
+        if (*vischeck_hitboxes && !*multipoint)
+        {
             if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE)
             {
                 return true;
@@ -931,10 +932,11 @@ bool IsTargetStateGood(CachedEntity *entity)
                     return true;
                 while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
                 {
-                    trace_t test_trace;
-                    std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
                     if (i == cd.hitbox)
                         i++;
+                    trace_t test_trace;
+                    std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
+
                     if (IsEntityVectorVisible(entity, centered_hitbox[0], true, MASK_SHOT_HULL, &test_trace))
                     {
                         cd.hitbox = i;
@@ -944,6 +946,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                 }
                 return false; // It looped through every hitbox and found nothing. It isn't visible.
             }
+        }
         return true;
         break;
     }

@@ -1027,9 +1027,9 @@ bool IsTargetStateGood(CachedEntity *entity)
 
     return false;
 }
-int projectileHitboxSize(int projectile_size)
+float projectileHitboxSize(int projectile_size)
 {
-    int projectile_hitbox_size = 5;
+    float projectile_hitbox_size = 5.3f;
     switch (projectile_size)
     {
     case CL_CLASS(CTFRocketLauncher):

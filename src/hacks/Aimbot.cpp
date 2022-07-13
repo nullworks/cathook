@@ -1064,7 +1064,7 @@ bool IsTargetStateGood(CachedEntity *entity)
 }
 float projectileHitboxSize(int projectile_size)
 {
-    float projectile_hitbox_size = 5.3f;
+    float projectile_hitbox_size = 6.3f;
     switch (projectile_size)
     {
     case CL_CLASS(CTFRocketLauncher):

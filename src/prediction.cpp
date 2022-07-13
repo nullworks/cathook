@@ -501,7 +501,6 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
 
     return result;
 }
-
 std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravity, float entgmod, float proj_startvelocity)
 {
     Vector origin = ent->m_vecOrigin();
@@ -523,74 +522,39 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
 
     float besttime          = currenttime;
     float mindelta          = 65536.0f;
-    float previous_delta    = 65534.0f;
+    float no_regression     = 66534.0f;
     Vector bestpos          = origin;
     Vector current          = origin;
     Vector current_velocity = velocity;
+    int maxsteps            = (int) debug_pp_steps;
     float steplength        = g_GlobalVars->interval_per_tick;
-
-    int current_bounds  = 400;
-    float solve_time    = currenttime;
-    bool is_on_ground   = (CE_INT(ent, netvar.iFlags) & FL_ONGROUND);
-    bool has_ran_before = false;
-    while (0 < current_bounds)
+    bool has_run_before     = false;
+    for (int steps = 0; steps < maxsteps; steps++, currenttime += steplength)
     {
-
         ent->m_vecOrigin()                                 = current;
         const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
         CE_VECTOR(ent, 0x354)                              = current;
         current                                            = EnginePrediction(ent, steplength, &current_velocity);
 
         // Apply velocity if not touching the ground
-        if (!is_on_ground)
+        if (!(CE_INT(ent, netvar.iFlags) & (1 << 0)))
             current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
 
         float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
         // Compensate for ping
-        solve_time = currenttime + current_bounds * steplength;
         rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-        float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
+        float timedelta = fabs(currenttime > rockettime ? currenttime - rockettime : rockettime - currenttime);
         if (timedelta < mindelta)
         {
-            besttime = solve_time;
+            besttime = currenttime;
             bestpos  = current;
             mindelta = timedelta;
         }
-        else if (mindelta < previous_delta)
+        else if (mindelta < no_regression)
         {
-            has_ran_before = true;
             break;
         }
-        current_bounds = current_bounds * .5;
     }
-    if (has_ran_before)
-    {
-        int max_steps = current_bounds * 2;
-        for (int loop_bounds = current_bounds; loop_bounds < max_steps; loop_bounds++)
-        {
-            ent->m_vecOrigin()                                 = current;
-            const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = current;
-            CE_VECTOR(ent, 0x354)                              = current;
-            current                                            = EnginePrediction(ent, steplength, &current_velocity);
-
-            // Apply velocity if not touching the ground
-            if (!is_on_ground)
-                current_velocity.z -= sv_gravity->GetFloat() * entgmod * steplength;
-
-            float rockettime = g_pLocalPlayer->v_Eye.DistTo(current) / speed;
-            // Compensate for ping
-            rockettime += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-            solve_time      = currenttime + loop_bounds * steplength;
-            float timedelta = fabs(solve_time > rockettime ? solve_time - rockettime : rockettime - solve_time);
-            if (timedelta < mindelta)
-            {
-                besttime = solve_time;
-                bestpos  = current;
-                mindelta = timedelta;
-            }
-        }
-    }
-
     // logging::Info("besttime: %f, currenttime: %f, old currenttime: %f", besttime, currenttime, currenttime - steplength * maxsteps);
     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = origin;
     CE_VECTOR(ent, 0x354)                              = origin;

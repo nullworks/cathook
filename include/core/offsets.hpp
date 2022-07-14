@@ -232,4 +232,8 @@ struct offsets
     {
         return PlatformOffset(27, undefined, undefined);
     }
+    static constexpr uint32_t CalcIsAttackCriticalHelper_brokenweps()
+    {
+        return PlatformOffset(464, undefined, 464);
+    }
 };

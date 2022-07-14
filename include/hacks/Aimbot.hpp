@@ -38,6 +38,7 @@ void Reset();
 // Stuff to make storing functions easy
 bool isAiming();
 CachedEntity *CurrentTarget();
+bool ShouldAim();
 CachedEntity *RetrieveBestTarget(bool aimkey_state);
 bool IsTargetStateGood(CachedEntity *entity);
 bool Aim(CachedEntity *entity);

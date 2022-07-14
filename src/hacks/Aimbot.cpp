@@ -442,9 +442,8 @@ static void CreateMove()
         target_last = nullptr;
         return;
     }
-    else if (!aimkey_status)
+    else if (!aimkey_status || !ShouldAim())
     {
-
         target_last = nullptr;
         return;
     }
@@ -519,6 +518,7 @@ static void CreateMove()
     }
     }
 }
+
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
 
@@ -654,6 +654,64 @@ bool MouseMoving()
         return false;
 }
 #endif
+
+// The first check to see if the player should aim in the first place
+bool ShouldAim()
+{
+    // Checks should be in order: cheap -> expensive
+
+    // Check for +use
+    if (current_user_cmd->buttons & IN_USE)
+        return false;
+    // Check if using action slot item
+    else if (g_pLocalPlayer->using_action_slot_item)
+        return false;
+    // Using a forbidden weapon?
+    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
+        return false;
+
+    // Carrying A building?
+    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
+        return false;
+    // Deadringer out?
+    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
+        return false;
+    else if (g_pLocalPlayer->holding_sapper)
+        return false;
+    // Is bonked?
+    else if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
+        return false;
+    // Is taunting?
+    else if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
+        return false;
+    // Is cloaked
+    else if (IsPlayerInvisible(g_pLocalPlayer->entity))
+        return false;
+    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
+        return false;
+#if ENABLE_VISUALS
+    if (assistance_only && !MouseMoving())
+        return false;
+#endif
+    switch (GetWeaponMode())
+    {
+    case weapon_hitscan:
+        break;
+    case weapon_melee:
+        break;
+    // Check we need to run projectile Aimbot code
+    case weapon_projectile:
+        if (!projectileAimbotRequired)
+            return false;
+        break;
+    // Check if player doesnt have a weapon usable by aimbot
+    default:
+        return false;
+    };
+
+    return true;
+}
+
 // Function to find a suitable target
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
@@ -843,8 +901,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             }
         }
 
-        // don't aim if holding sapper
-
         // Wait for charge
         if (wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
@@ -953,11 +1009,8 @@ bool IsTargetStateGood(CachedEntity *entity)
     // Check for buildings
     case (ENTITY_BUILDING):
     {
-        // Don't aim if holding sapper
-        if (g_pLocalPlayer->holding_sapper)
-            return false;
         // Enabled check
-        else if (!(buildings_other || buildings_sentry))
+        if (!(buildings_other || buildings_sentry))
             return false;
         // Teammates, Even with friendly fire enabled, buildings can NOT be
         // damaged
@@ -996,12 +1049,8 @@ bool IsTargetStateGood(CachedEntity *entity)
     {
         // NPCs (Skeletons, Merasmus, etc)
 
-        // Sapper aimbot? no.
-        if (g_pLocalPlayer->holding_sapper)
-            return false;
-
         // NPC targeting is disabled
-        else if (!npcs)
+        if (!npcs)
             return false;
 
         // Cannot shoot this

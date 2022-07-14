@@ -852,7 +852,7 @@ bool IsTargetStateGood(CachedEntity *entity)
     PROF_SECTION(PT_aimbot_targetstatecheck);
 
     const int current_type = entity->m_Type();
-    bool is_player = false;
+    bool is_player         = false;
     switch (current_type)
     {
 
@@ -873,7 +873,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         else if (IsPlayerInvulnerable(entity))
             return false;
         // Distance
-        is_player = true;
+        is_player             = true;
         float targeting_range = EffectiveTargetingRange();
         if (entity->m_flDistance() - 40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;

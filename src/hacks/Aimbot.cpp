@@ -693,21 +693,6 @@ bool ShouldAim()
     if (assistance_only && !MouseMoving())
         return false;
 #endif
-    switch (GetWeaponMode())
-    {
-    case weapon_hitscan:
-        break;
-    case weapon_melee:
-        break;
-    // Check we need to run projectile Aimbot code
-    case weapon_projectile:
-        if (!projectileAimbotRequired)
-            return false;
-        break;
-    // Check if player doesnt have a weapon usable by aimbot
-    default:
-        return false;
-    };
 
     return true;
 }
@@ -988,7 +973,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                     return true;
                 while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
                 {
-                    if (i == cd.hitbox)
+                    if (i == cd.hitbox && i != 17)
                         i++;
                     trace_t test_trace;
                     std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);

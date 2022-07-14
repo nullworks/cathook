@@ -96,6 +96,8 @@ DECLARE_HOOKED_METHOD(EmitSound3, void, void *, IRecipientFilter &, int, int, in
 DECLARE_HOOKED_METHOD(RunCommand, void, IPrediction *, IClientEntity *, CUserCmd *, IMoveHelper *);
 // g_IToolFramework
 DECLARE_HOOKED_METHOD(Think, void, IToolFrameworkInternal *, bool);
+// CTFMinigun and CTFFlameThrower
+DECLARE_HOOKED_METHOD(CalcIsAttackCriticalHelper_brokenweps, bool, IClientEntity *);
 } // namespace hooked_methods
 
 // TODO

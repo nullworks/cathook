@@ -26,8 +26,8 @@
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
             <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Engine prediction"/>
-            <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
             <AutoVariable width="fill" target="debug.pp-steps" label="Prediction steps" min="1" max="300"/>
+            <AutoVariable width="fill" target="misc.auto-flip-viewmodel" label="Flip viewmodel" tooltip="Automatically flip the viewmodel for projectile weapons."/>
             <AutoVariable width="fill" target="aimbot.projectile.gravity" label="Gravity override"/>
             <AutoVariable width="fill" target="aimbot.projectile.initial-velocity" label="Initial velocity"/>
             <AutoVariable width="fill" target="aimbot.projectile.speed" label="Velocity override"/>
@@ -86,6 +86,13 @@
             </LabeledObject>
             <AutoVariable width="fill" target="aimbot.target.max-range" label="Max range" tooltip="Entities further than this distance will not be targeted. Measured in Hammer units."/>
              <AutoVariable width="fill" target="aimbot.multipoint" label="Multipoint"/>
+             <LabeledObject width="fill" label="All Hiitboxes" tooltip="This will vischeck as many hitboxes as it can on the target to see if it can shoot. This will reduce your FPS.">
+                <Select target="aimbot.vischeck-hitboxes">
+                    <Option name="Disable" value="0"/>
+                    <Option name="Rage Only" value="1"/>
+                    <Option name="All" value="2"/>
+                </Select>
+            </LabeledObject>
             <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only" tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
             <AutoVariable width="fill" target="aimbot.lock-target" label="Lock target" tooltip="Lock onto a target until they die or leave your FOV."/>
             <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only" tooltip="Only target players set to RAGE."/>

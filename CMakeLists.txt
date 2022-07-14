@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
-if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
-    unset(NativePrecompiledHeaders)
-else()
-    set(NativePrecompiledHeaders 1)
-    unset(EnableCotire CACHE)
-endif()
+set(NativePrecompiledHeaders 1)
 
 # Ensure that only 32 bit libraries are used.
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/Toolchain-cross-m32.cmake")
@@ -21,9 +15,12 @@ endif()
 set(CMAKE_BUILD_TYPE_VALUES "Debug;Release" CACHE INTERNAL "List of supported build")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_BUILD_TYPE_VALUES})
 
-project(cathook VERSION 0.0.1)
+set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for disrepancies in compiler and IDE")
 
-set(CMAKE_CXX_STANDARD 23)
+project(cathook VERSION 0.0.1)
+if (NOT Force_CXX_23B)
+    set(CMAKE_CXX_STANDARD 23)
+endif()
 add_library(cathook SHARED "")
 
 set(GameSpecific 1 CACHE BOOL "Build for specific target game (As opposed to universal, but slower, lib)")
@@ -161,13 +158,20 @@ endif()
 configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
-set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -fno-gnu-unique -DNDEBUG")
+set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -DNDEBUG")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique")
+endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-march=native -rdynamic -ggdb -Og")
 if (Internal_Symbolized)
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
+if (Force_CXX_23B)
+    set(CMAKE_CXX_FLAGS "-std=gnu++2b ${CMAKE_CXX_FLAGS}")
+endif()
+
 
 target_compile_definitions(cathook PRIVATE
         _GLIBCXX_USE_CXX11_ABI=0
@@ -216,9 +220,8 @@ add_subdirectory(include)
 add_subdirectory(external)
 add_subdirectory(modules)
 
-if(EnablePrecompiledHeaders AND NativePrecompiledHeaders)
-    target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
-endif()
+target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
+
 
 if (NOT Internal_Symbolized)
     add_custom_command(TARGET cathook POST_BUILD

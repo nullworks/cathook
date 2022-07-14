@@ -37,7 +37,7 @@ void ApplySwingHook()
     if (!inited)
     {
         inited = true;
-        melee_range_hook.Init((uintptr_t) vfunc<GetSwingRange_o>(RAW_ENT(LOCAL_W), offsets::PlatformOffset(521, offsets::undefined, 521), 0), (void *) GetSwingRange_hook);
+        melee_range_hook.Init((uintptr_t) vfunc<GetSwingRange_o>(RAW_ENT(LOCAL_W), offsets::PlatformOffset(522, offsets::undefined, 522), 0), (void *) GetSwingRange_hook);
     }
     melee_range_hook.RestorePatch();
 }

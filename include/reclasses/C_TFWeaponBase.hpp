@@ -40,47 +40,47 @@ public:
     inline static int GetWeaponID(IClientEntity *self)
     {
         typedef int (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(447, offsets::undefined, 447), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(448, offsets::undefined, 448), 0)(self);
     }
     inline static bool IsViewModelFlipped(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(496, offsets::undefined, 496), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(497, offsets::undefined, 497), 0)(self);
     }
     inline static IClientEntity *GetOwnerViaInterface(IClientEntity *self)
     {
         typedef IClientEntity *(*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(454, offsets::undefined, 454), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(455, offsets::undefined, 455), 0)(self);
     }
     inline static bool UsesPrimaryAmmo(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(450, offsets::undefined, 450), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(451, offsets::undefined, 451), 0)(self);
     }
     inline static bool HasPrimaryAmmo(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(319, offsets::undefined, 319), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(320, offsets::undefined, 320), 0)(self);
     }
     inline static bool AreRandomCritsEnabled(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(469, offsets::undefined, 469), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(470, offsets::undefined, 470), 0)(self);
     }
     inline static bool CalcIsAttackCriticalHelper(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(463, offsets::undefined, 463), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(464, offsets::undefined, 464), 0)(self);
     }
     inline static bool CalcIsAttackCriticalHelperNoCrits(IClientEntity *self)
     {
         typedef bool (*fn_t)(IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(462, offsets::undefined, 462), 0)(self);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(463, offsets::undefined, 463), 0)(self);
     }
     inline static bool CanFireCriticalShot(IClientEntity *self, bool unknown1, IClientEntity *unknown2)
     {
         typedef bool (*fn_t)(IClientEntity *, bool, IClientEntity *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(492, offsets::undefined, 492), 0)(self, unknown1, unknown2);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(493, offsets::undefined, 493), 0)(self, unknown1, unknown2);
     }
     inline static float ApplyFireDelay(IClientEntity *self, float delay)
     {

@@ -29,6 +29,7 @@ static settings::Boolean autoshoot{ "aimbot.autoshoot", "1" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
 static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "1" };
 static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
+static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0" };
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
@@ -147,10 +148,81 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
             hitpoints.push_back(hb->center);
     }
 
-    if (!multipoint)
+    if (!*multipoint)
         return hitpoints;
 
     // Multipoint
+    auto bboxmin = hb->bbox->bbmin;
+    auto bboxmax = hb->bbox->bbmax;
+
+    auto transform = ent->hitboxes.GetBones()[hb->bbox->bone];
+    QAngle rotation;
+    Vector origin;
+
+    MatrixAngles(transform, rotation, origin);
+
+    Vector corners[8];
+    GenerateBoxVertices(origin, rotation, bboxmin, bboxmax, corners);
+
+    float shrink_size = 1;
+
+    if (!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
+        shrink_size = 3;
+    else
+        shrink_size = 6;
+
+    // Shrink positions by moving towards opposing corner
+    for (int i = 0; i < 8; i++)
+        corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
+
+    // Generate middle points on line segments
+    // Define cleans up code
+
+    const Vector line_positions[12] = { GET_MIDDLE(0, 1), GET_MIDDLE(0, 2), GET_MIDDLE(1, 3), GET_MIDDLE(2, 3), GET_MIDDLE(7, 6), GET_MIDDLE(7, 5), GET_MIDDLE(6, 4), GET_MIDDLE(5, 4), GET_MIDDLE(0, 4), GET_MIDDLE(1, 5), GET_MIDDLE(2, 6), GET_MIDDLE(3, 7) };
+
+    // Create combined vector
+    std::vector<Vector> positions;
+
+    positions.reserve(sizeof(Vector) * 20);
+    positions.insert(positions.end(), corners, &corners[8]);
+    positions.insert(positions.end(), line_positions, &line_positions[12]);
+
+    for (int i = 0; i < 20; ++i)
+    {
+        trace_t trace;
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        {
+            if (trace.hitbox == hitbox)
+                hitpoints.push_back(positions[i]);
+        }
+    }
+    if (*vischeck_hitboxes)
+    {
+        if (*vischeck_hitboxes == 1 && playerlist::AccessData(ent).state != playerlist::k_EState::RAGE)
+        {
+            return hitpoints;
+        }
+        int i = 0;
+        while (hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+        {
+            if (hitbox == i)
+                i++;
+            hitpoints = getHitpointsVischeck(ent, i);
+            i++;
+        }
+    }
+
+    return hitpoints;
+}
+std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
+{
+    std::vector<Vector> hitpoints;
+    auto hb = ent->hitboxes.GetHitbox(hitbox);
+    if (!*multipoint)
+    {
+        hitpoints.push_back(hb->center);
+        return hitpoints;
+    }
     auto bboxmin = hb->bbox->bbmin;
     auto bboxmax = hb->bbox->bbmax;
 
@@ -370,9 +442,8 @@ static void CreateMove()
         target_last = nullptr;
         return;
     }
-    else if (!aimkey_status)
+    else if (!aimkey_status || !ShouldAim())
     {
-
         target_last = nullptr;
         return;
     }
@@ -447,6 +518,7 @@ static void CreateMove()
     }
     }
 }
+
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
 
@@ -582,6 +654,49 @@ bool MouseMoving()
         return false;
 }
 #endif
+
+// The first check to see if the player should aim in the first place
+bool ShouldAim()
+{
+    // Checks should be in order: cheap -> expensive
+
+    // Check for +use
+    if (current_user_cmd->buttons & IN_USE)
+        return false;
+    // Check if using action slot item
+    else if (g_pLocalPlayer->using_action_slot_item)
+        return false;
+    // Using a forbidden weapon?
+    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
+        return false;
+
+    // Carrying A building?
+    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
+        return false;
+    // Deadringer out?
+    else if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
+        return false;
+    else if (g_pLocalPlayer->holding_sapper)
+        return false;
+    // Is bonked?
+    else if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
+        return false;
+    // Is taunting?
+    else if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
+        return false;
+    // Is cloaked
+    else if (IsPlayerInvisible(g_pLocalPlayer->entity))
+        return false;
+    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
+        return false;
+#if ENABLE_VISUALS
+    if (assistance_only && !MouseMoving())
+        return false;
+#endif
+
+    return true;
+}
+
 // Function to find a suitable target
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
@@ -771,8 +886,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             }
         }
 
-        // don't aim if holding sapper
-
         // Wait for charge
         if (wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
@@ -845,17 +958,44 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         cd.hitbox                  = BestHitbox(entity);
+        if (*vischeck_hitboxes && !*multipoint)
+        {
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE)
+            {
+                return true;
+            }
+
+            else
+            {
+                int i = 0;
+                trace_t first_tracer;
+                if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer))
+                    return true;
+                while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+                {
+                    if (i == cd.hitbox && i != 17)
+                        i++;
+                    trace_t test_trace;
+                    std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
+
+                    if (IsEntityVectorVisible(entity, centered_hitbox[0], true, MASK_SHOT_HULL, &test_trace))
+                    {
+                        cd.hitbox = i;
+                        return true;
+                    }
+                    i++;
+                }
+                return false; // It looped through every hitbox and found nothing. It isn't visible.
+            }
+        }
         return true;
         break;
     }
     // Check for buildings
     case (ENTITY_BUILDING):
     {
-        // Don't aim if holding sapper
-        if (g_pLocalPlayer->holding_sapper)
-            return false;
         // Enabled check
-        else if (!(buildings_other || buildings_sentry))
+        if (!(buildings_other || buildings_sentry))
             return false;
         // Teammates, Even with friendly fire enabled, buildings can NOT be
         // damaged
@@ -894,12 +1034,8 @@ bool IsTargetStateGood(CachedEntity *entity)
     {
         // NPCs (Skeletons, Merasmus, etc)
 
-        // Sapper aimbot? no.
-        if (g_pLocalPlayer->holding_sapper)
-            return false;
-
         // NPC targeting is disabled
-        else if (!npcs)
+        if (!npcs)
             return false;
 
         // Cannot shoot this
@@ -960,7 +1096,34 @@ bool IsTargetStateGood(CachedEntity *entity)
 
     return false;
 }
+float projectileHitboxSize(int projectile_size)
+{
+    float projectile_hitbox_size = 6.3f;
+    switch (projectile_size)
+    {
+    case CL_CLASS(CTFRocketLauncher):
+    case CL_CLASS(CTFRocketLauncher_Mortar):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFRocketLauncher_DirectHit):
+    case CL_CLASS(CTFPipebombLauncher):
+    case CL_CLASS(CTFGrenadeLauncher):
+    case CL_CLASS(CTFCannon):
+        break;
+    case CL_CLASS(CTFFlareGun):
+    case CL_CLASS(CTFFlareGun_Revenge):
+    case CL_CLASS(CTFDRGPomson):
+        projectile_hitbox_size = 3;
+        break;
+    case CL_CLASS(CTFSyringeGun):
+    case CL_CLASS(CTFCompoundBow):
+        projectile_hitbox_size = 1;
+        break;
+    default:
+        break;
+    }
 
+    return projectile_hitbox_size;
+}
 // A function to aim at a specific entitiy
 bool Aim(CachedEntity *entity)
 {
@@ -969,22 +1132,24 @@ bool Aim(CachedEntity *entity)
 
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
-    bool should_aim;
-    if (extrapolate || projectileAimbotRequired || entity->m_Type() != ENTITY_PLAYER)
+    if (!projectileAimbotRequired)
     {
-        should_aim = IsEntityVectorVisible(entity, is_it_good, true);
+        if (!IsEntityVectorVisible(entity, is_it_good, false))
+            return false;
     }
-    else
+
+    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
+
+    if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
-        should_aim = IsEntityVectorVisible(entity, is_it_good, false);
+
+        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID())))
+            return false;
     }
-    if (!should_aim)
-        return false;
 
     AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
     if (fov > 0 && cd.fov > fov)
         return false;
-    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
     // Slow aim
     if (slow_aim)
         DoSlowAim(angles);
@@ -1156,16 +1321,13 @@ Vector PredictEntity(CachedEntity *entity)
         // Buildings
     case ENTITY_BUILDING:
     {
-        if (projectileAimbotRequired)
+        if (cur_proj_grav != 0)
         {
-            std::pair<Vector, Vector> tmp_result;
-            tmp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-            result     = tmp_result.second; // Buildings don't have velocity but I'll keep it in nonetheless
+            std::pair<Vector, Vector> temp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
+            result                                = temp_result.second;
         }
         else
-        {
             result = GetBuildingPosition(entity);
-        }
         break;
     }
         // NPCs (Skeletons, merasmus, etc)
@@ -1308,6 +1470,7 @@ int BestHitbox(CachedEntity *target)
     // Hitbox machine :b:roke
     return -1;
 }
+
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)
 {

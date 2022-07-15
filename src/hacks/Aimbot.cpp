@@ -191,7 +191,8 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     for (int i = 0; i < 20; ++i)
     {
         trace_t trace;
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        trace_t *pointer_trace = &trace;
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, pointer_trace))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);
@@ -262,7 +263,8 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
     for (int i = 0; i < 20; ++i)
     {
         trace_t trace;
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        trace_t *pointer_trace = &trace;
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, pointer_trace))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);

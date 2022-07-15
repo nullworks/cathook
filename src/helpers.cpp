@@ -651,7 +651,7 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
         return powerup_type::supernova;
     return powerup_type::not_powerup;
 }
-bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, int projectile_size)
+bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size)
 {
 
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));

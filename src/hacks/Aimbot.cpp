@@ -801,6 +801,10 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 scr = 360.0f - calculated_data_array[ent->m_IDX].fov;
                 break;
             }
+            case 2:
+            {
+                scr = 4096.0f - calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+            }
             case 3: // Health Priority (Lowest)
             {
                 scr = 450.0f - ent->m_iHealth();

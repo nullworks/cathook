@@ -142,8 +142,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     auto hb = ent->hitboxes.GetHitbox(hitbox);
 
     trace_t trace;
-    trace_t *new_trace_pointer = &trace;
-    if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, new_trace_pointer))
+    if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, &trace))
     {
         if (trace.hitbox == hitbox)
             hitpoints.push_back(hb->center);
@@ -191,8 +190,8 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     for (int i = 0; i < 20; ++i)
     {
         trace_t trace;
-        trace_t *pointer_trace = &trace;
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, pointer_trace))
+
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);
@@ -263,8 +262,8 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
     for (int i = 0; i < 20; ++i)
     {
         trace_t trace;
-        trace_t *pointer_trace = &trace;
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, pointer_trace))
+
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);
@@ -973,18 +972,18 @@ bool IsTargetStateGood(CachedEntity *entity)
             {
                 int i = 0;
                 trace_t first_tracer;
-                trace_t *send_tracer = &first_tracer;
-                if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, send_tracer))
+
+                if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer))
                     return true;
                 while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
                 {
                     if (i == cd.hitbox && i != 17)
                         i++;
                     trace_t test_trace;
-                    trace_t *new_trace_pointer          = &first_tracer;
+
                     std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
 
-                    if (IsEntityVectorVisible(entity, centered_hitbox[0], true, MASK_SHOT_HULL, new_trace_pointer))
+                    if (IsEntityVectorVisible(entity, centered_hitbox[0], true, MASK_SHOT_HULL, &test_trace))
                     {
                         cd.hitbox = i;
                         return true;

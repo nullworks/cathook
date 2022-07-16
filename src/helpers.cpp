@@ -657,10 +657,9 @@ bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
     Ray_t ray;
     trace_t trace_obj;
-    trace_t *tracer = &trace_obj;
     ray.Init(start_point, end_point, Vector(0, -projectile_size, -projectile_size), Vector(0, projectile_size, projectile_size));
-    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, tracer);
-    return (((IClientEntity *) tracer->m_pEnt) == RAW_ENT(entity) || !tracer->DidHit());
+    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace_obj);
+    return (((IClientEntity *) trace_obj.m_pEnt) == RAW_ENT(entity) || !trace_obj.DidHit());
 }
 
 // A function to find a weapon by WeaponID

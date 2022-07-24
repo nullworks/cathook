@@ -239,7 +239,7 @@ void Draw()
     if (enemies_over_teammates)
         enemies.clear();
     std::vector<CachedEntity *> sentries;
-    for (auto &ent: entity_cache::valid_ents)
+    for (auto &ent : entity_cache::valid_ents)
     {
         if (ent->m_iTeam() == 0)
             continue;
@@ -279,27 +279,29 @@ void Draw()
     }
 }
 
-static InitRoutine init([]() {
-    // Background circles
-    for (int i = 0; i < 2; ++i)
-        tx_teams.push_back(textures::atlas().create_sprite(704, 384 + i * 64, 64, 64));
-    // Items
-    for (int i = 0; i < 2; ++i)
-        tx_items.push_back(textures::atlas().create_sprite(640, 384 + i * 64, 64, 64));
-    // Classes
-    for (int i = 0; i < 3; ++i)
+static InitRoutine init(
+    []()
     {
-        tx_class.emplace_back();
-        for (int j = 0; j < 9; ++j)
-            tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
-    }
-    for (int i = 0; i < 2; i++)
-        tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
-    for (int i = 0; i < 4; i++)
-        tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
-    logging::Info("Radar sprites loaded");
-    EC::Register(EC::Draw, Draw, "radar", EC::average);
-});
+        // Background circles
+        for (int i = 0; i < 2; ++i)
+            tx_teams.push_back(textures::atlas().create_sprite(704, 384 + i * 64, 64, 64));
+        // Items
+        for (int i = 0; i < 2; ++i)
+            tx_items.push_back(textures::atlas().create_sprite(640, 384 + i * 64, 64, 64));
+        // Classes
+        for (int i = 0; i < 3; ++i)
+        {
+            tx_class.emplace_back();
+            for (int j = 0; j < 9; ++j)
+                tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
+        }
+        for (int i = 0; i < 2; i++)
+            tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
+        for (int i = 0; i < 4; i++)
+            tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
+        logging::Info("Radar sprites loaded");
+        EC::Register(EC::Draw, Draw, "radar", EC::average);
+    });
 } // namespace hacks::tf::radar
 
 #endif

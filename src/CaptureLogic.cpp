@@ -22,7 +22,7 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-        for (auto &ent: entity_cache::valid_ents)
+        for (auto &ent : entity_cache::valid_ents)
         {
             // We cannot identify a bad entity as a flag due to the unreliability of it
             if (ent->m_iClassID() != CL_CLASS(CCaptureFlag))
@@ -168,7 +168,7 @@ void Update()
 
         for (auto &ent : entity_cache::valid_ents)
         {
-          
+
             // Not the object we need or invalid (team)
             if (ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
                 continue;

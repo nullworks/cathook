@@ -124,10 +124,10 @@ void CreateMove()
     targets.clear();
 
     // Cycle through the ents and search for valid ents
-    for (auto &ent: entity_cache::valid_ents)
+    for (auto &ent : entity_cache::valid_ents)
     {
         // Assign the for loops index to an ent
-      
+
         // Check if ent is a bomb or suitable target and push to respective
         // arrays
         if (IsBomb(ent))
@@ -185,7 +185,7 @@ void CreateMove()
                             shouldExplode = true;
                         else if (*legit == 2 && CE_GOOD(target) && IsVectorVisible(g_pLocalPlayer->v_Eye, bomb->m_vecOrigin(), true) && IsVectorVisible(g_pLocalPlayer->v_Eye, *position, true))
                             shouldExplode = true;
-                        
+
                         if (shouldExplode)
                         {
                             // Aim at bomb

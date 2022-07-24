@@ -85,9 +85,9 @@ void CreateMove()
     targets.clear();
 
     // Cycle through the ents and search for valid ents
-    for (auto &ent: entity_cache::valid_ents)
+    for (auto &ent : entity_cache::valid_ents)
     {
-       
+
         // Check if ent is a flare or suitable target and push to respective
         // arrays
         if (IsFlare(ent))

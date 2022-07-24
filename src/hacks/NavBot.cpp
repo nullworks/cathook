@@ -137,7 +137,7 @@ std::vector<CachedEntity *> getDispensers()
 std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
 {
     std::vector<CachedEntity *> entities;
-    for (auto &ent: entity_cache::valid_ents)
+    for (auto &ent : entity_cache::valid_ents)
     {
         for (auto &itemtype : itemtypes)
         {

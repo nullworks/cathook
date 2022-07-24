@@ -465,7 +465,7 @@ void EffectGlow::Render(int x, int y, int w, int h)
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     orig = ptr->GetRenderTarget();
     BeginRenderGlow();
-    for (auto &ent_non_raw: entity_cache::valid_ents)
+    for (auto &ent_non_raw : entity_cache::valid_ents)
     {
         auto ent = RAW_ENT(ent_non_raw);
         if (ShouldRenderGlow(ent))
@@ -478,9 +478,9 @@ void EffectGlow::Render(int x, int y, int w, int h)
     {
         ptr->ClearStencilBufferRectangle(x, y, w, h, 0);
         StartStenciling();
-        for (auto &non_raw: entity_cache::valid_ents)
+        for (auto &non_raw : entity_cache::valid_ents)
         {
-           auto ent = RAW_ENT(non_raw);
+            auto ent = RAW_ENT(non_raw);
             if (ShouldRenderGlow(ent))
             {
                 DrawToStencil(ent);

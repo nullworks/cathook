@@ -215,7 +215,7 @@ int BlastDangerValue(CachedEntity *patient)
         return 1;
     }
     // Find rockets/pipes nearby
-    for (auto &ent: entity_cache::valid_ents)
+    for (auto &ent : entity_cache::valid_ents)
     {
         if (!ent->m_bEnemy())
             continue;

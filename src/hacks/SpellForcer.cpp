@@ -135,7 +135,7 @@ CachedEntity *getClosestSpell()
 
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return ent;
-    for (auto &spell: entity_cache::valid_ents)
+    for (auto &spell : entity_cache::valid_ents)
     {
         if (!spell->m_vecDormantOrigin() || (spell->m_ItemType() != ITEM_SPELL && spell->m_ItemType() != ITEM_SPELL_RARE))
             continue;

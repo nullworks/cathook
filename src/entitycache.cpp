@@ -138,7 +138,7 @@ std::optional<Vector> CachedEntity::m_vecDormantOrigin()
 namespace entity_cache
 {
 CachedEntity array[MAX_ENTITIES]{};
-std::vector<CachedEntity*> valid_ents;
+std::vector<CachedEntity *> valid_ents;
 
 void Update()
 {
@@ -157,7 +157,6 @@ void Update()
         {
             array[i].hitboxes.UpdateBones();
             valid_ents.push_back(&array[i]);
-           
         }
     }
 }

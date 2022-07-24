@@ -39,8 +39,10 @@ void cm()
         }
     }
 }
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, cm, "antidisguise", EC::average);
-    EC::Register(EC::CreateMoveWarp, cm, "antidisguise_w", EC::average);
-});
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, cm, "antidisguise", EC::average);
+        EC::Register(EC::CreateMoveWarp, cm, "antidisguise_w", EC::average);
+    });
 } // namespace hacks::tf2::antidisguise

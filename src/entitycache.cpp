@@ -148,7 +148,8 @@ void Update()
     {
         max = MAX_ENTITIES - 1;
     }
-    valid_ents.reserve(800);
+    valid_ents.reserve(500);
+
     for (int i = 0; i <= max; i++)
     {
         array[i].Update();

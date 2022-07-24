@@ -137,19 +137,27 @@ std::optional<Vector> CachedEntity::m_vecDormantOrigin()
 
 namespace entity_cache
 {
-
 CachedEntity array[MAX_ENTITIES]{};
+std::vector<CachedEntity*> valid_ents;
 
 void Update()
 {
     max = g_IEntityList->GetHighestEntityIndex();
+    valid_ents.clear();
     if (max >= MAX_ENTITIES)
+    {
         max = MAX_ENTITIES - 1;
+    }
+    valid_ents.reserve(800);
     for (int i = 0; i <= max; i++)
     {
         array[i].Update();
         if (CE_GOOD((&array[i])))
+        {
             array[i].hitboxes.UpdateBones();
+            valid_ents.push_back(&array[i]);
+           
+        }
     }
 }
 

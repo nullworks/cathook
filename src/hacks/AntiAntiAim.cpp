@@ -32,11 +32,11 @@ static inline void CreateMove()
     // Empty the array
     sniperdot_array.fill(0);
     // Find sniper dots
-    for (int i = g_IEngine->GetMaxClients() + 1; i <= HIGHEST_ENTITY; i++)
+    for (auto &dot_ent : entity_cache::valid_ents)
     {
-        CachedEntity *dot_ent = ENTITY(i);
+
         // Not a sniper dot
-        if (CE_BAD(dot_ent) || dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
+        if (dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
             continue;
         // Get the player it belongs to
         auto ent_idx = HandleToIDX(CE_INT(dot_ent, netvar.m_hOwnerEntity));
@@ -255,14 +255,16 @@ static void shutdown()
     *original_ptrY = original_ProxyFnY;
 }
 
-static InitRoutine init([]() {
-    hook();
-    EC::Register(EC::Shutdown, shutdown, "antiantiaim_shutdown");
-    EC::Register(EC::CreateMove, CreateMove, "cm_antiantiaim");
-    EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_antiantiaim");
+static InitRoutine init(
+    []()
+    {
+        hook();
+        EC::Register(EC::Shutdown, shutdown, "antiantiaim_shutdown");
+        EC::Register(EC::CreateMove, CreateMove, "cm_antiantiaim");
+        EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_antiantiaim");
 #if ENABLE_TEXTMODE
-    EC::Register(EC::CreateMove, modifyAngles, "cm_textmodeantiantiaim");
-    EC::Register(EC::CreateMoveWarp, modifyAngles, "cmw_textmodeantiantiaim");
+        EC::Register(EC::CreateMove, modifyAngles, "cm_textmodeantiantiaim");
+        EC::Register(EC::CreateMoveWarp, modifyAngles, "cmw_textmodeantiantiaim");
 #endif
-});
+    });
 } // namespace hacks::shared::anti_anti_aim

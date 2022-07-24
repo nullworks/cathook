@@ -239,16 +239,13 @@ void Draw()
     if (enemies_over_teammates)
         enemies.clear();
     std::vector<CachedEntity *> sentries;
-    for (int i = 1; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent: entity_cache::valid_ents)
     {
-        ent = ENTITY(i);
-        if (CE_INVALID(ent))
-            continue;
         if (ent->m_iTeam() == 0)
             continue;
         if (!ent->m_bAlivePlayer())
             continue;
-        if (i == g_IEngine->GetLocalPlayer())
+        if (ent->m_IDX == g_IEngine->GetLocalPlayer())
             continue;
         if (!show_teammates && ent->m_Type() == ENTITY_PLAYER && !ent->m_bEnemy())
             continue;

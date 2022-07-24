@@ -124,59 +124,118 @@ void draw()
     if (!enabled || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return;
     // Loop all players
-    for (int i = 1; i < (*buildings ? MAX_ENTITIES : g_IEngine->GetMaxClients()); i++)
+    if (*buildings)
     {
-        // Get and check player
-        auto ent = ENTITY(i);
-        Vector origin;
-        std::optional<rgba_t> color = std::nullopt;
-
-        if (CE_INVALID(ent))
+        for (auto &ent : entity_cache::valid_ents)
         {
-            if (i > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(i))
-                continue;
-            if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team && !teammates)
-                continue;
-            auto vec = soundcache::GetSoundLocation(i);
-            if (!vec)
-                continue;
-            if (*max_dist && vec->DistTo(g_pLocalPlayer->v_Origin) > *max_dist)
-                continue;
-            origin = *vec;
-            color  = colors::FromRGBA8(160, 160, 160, *opaque);
-        }
-        else
-        {
-            if ((!RAW_ENT(ent)->IsDormant() && !ent->m_bAlivePlayer()) || !ent->m_vecDormantOrigin())
-                continue;
-            if (i <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(i))
-                continue;
-            origin = *ent->m_vecDormantOrigin();
-            if (*buildings)
-                if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_BUILDING)
+            // Get and check player
+            const short unsigned int curr_idx = ent->m_IDX;
+            Vector origin;
+            std::optional<rgba_t> color = std::nullopt;
+            if (CE_INVALID(ent))
+            {
+                if (curr_idx > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(curr_idx))
                     continue;
-            if (ent == LOCAL_E)
-                continue;
-            color = getColor(ent);
-            if (!color)
-                continue;
-            if (RAW_ENT(ent)->IsDormant())
-                color = colors::FromRGBA8(160, 160, 160, *opaque);
-            color->a = *opaque;
-        }
+                if (g_pPlayerResource->GetTeam(curr_idx) == g_pLocalPlayer->team && !teammates)
+                    continue;
+                auto vec = soundcache::GetSoundLocation(curr_idx);
+                if (!vec)
+                    continue;
+                if (*max_dist && vec->DistTo(g_pLocalPlayer->v_Origin) > *max_dist)
+                    continue;
+                origin = *vec;
+                color  = colors::FromRGBA8(160, 160, 160, *opaque);
+            }
+            else
+            {
+                if ((!RAW_ENT(ent)->IsDormant() && !ent->m_bAlivePlayer()) || !ent->m_vecDormantOrigin())
+                    continue;
+                if (curr_idx <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(curr_idx))
+                    continue;
+                origin = *ent->m_vecDormantOrigin();
+                if (*buildings)
+                    if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_BUILDING)
+                        continue;
+                if (ent == LOCAL_E)
+                    continue;
+                color = getColor(ent);
+                if (!color)
+                    continue;
+                if (RAW_ENT(ent)->IsDormant())
+                    color = colors::FromRGBA8(160, 160, 160, *opaque);
+                color->a = *opaque;
+            }
 
-        Vector out;
-        if (!draw::WorldToScreen(origin, out))
+            Vector out;
+            if (!draw::WorldToScreen(origin, out))
+            {
+                // We need to flip on both x and y axis in case m_vecOrigin its not actually on screen
+                out.x = draw::width - out.x;
+                out.y = draw::height - out.y;
+
+                auto extended = toBorder(draw::width / 2, draw::height / 2, out.x, out.y, 0, 0, draw::width, draw::height);
+                out.x         = extended.x;
+                out.y         = extended.y;
+            }
+            draw::Line(draw::width / 2, draw::height / 2, out.x - draw::width / 2, out.y - draw::height / 2, *color, *line_thickness);
+        }
+    }
+    else
+    {
+        for (int i = 1; i = g_IEngine->GetMaxClients(); i++)
         {
-            // We need to flip on both x and y axis in case m_vecOrigin its not actually on screen
-            out.x = draw::width - out.x;
-            out.y = draw::height - out.y;
+            // Get and check player
+            auto ent = ENTITY(i);
+            Vector origin;
+            std::optional<rgba_t> color = std::nullopt;
 
-            auto extended = toBorder(draw::width / 2, draw::height / 2, out.x, out.y, 0, 0, draw::width, draw::height);
-            out.x         = extended.x;
-            out.y         = extended.y;
+            if (CE_INVALID(ent))
+            {
+                if (i > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(i))
+                    continue;
+                if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team && !teammates)
+                    continue;
+                auto vec = soundcache::GetSoundLocation(i);
+                if (!vec)
+                    continue;
+                if (*max_dist && vec->DistTo(g_pLocalPlayer->v_Origin) > *max_dist)
+                    continue;
+                origin = *vec;
+                color  = colors::FromRGBA8(160, 160, 160, *opaque);
+            }
+            else
+            {
+                if ((!RAW_ENT(ent)->IsDormant() && !ent->m_bAlivePlayer()) || !ent->m_vecDormantOrigin())
+                    continue;
+                if (i <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(i))
+                    continue;
+                origin = *ent->m_vecDormantOrigin();
+                if (*buildings)
+                    if (ent->m_Type() != ENTITY_PLAYER && ent->m_Type() != ENTITY_BUILDING)
+                        continue;
+                if (ent == LOCAL_E)
+                    continue;
+                color = getColor(ent);
+                if (!color)
+                    continue;
+                if (RAW_ENT(ent)->IsDormant())
+                    color = colors::FromRGBA8(160, 160, 160, *opaque);
+                color->a = *opaque;
+            }
+
+            Vector out;
+            if (!draw::WorldToScreen(origin, out))
+            {
+                // We need to flip on both x and y axis in case m_vecOrigin its not actually on screen
+                out.x = draw::width - out.x;
+                out.y = draw::height - out.y;
+
+                auto extended = toBorder(draw::width / 2, draw::height / 2, out.x, out.y, 0, 0, draw::width, draw::height);
+                out.x         = extended.x;
+                out.y         = extended.y;
+            }
+            draw::Line(draw::width / 2, draw::height / 2, out.x - draw::width / 2, out.y - draw::height / 2, *color, *line_thickness);
         }
-        draw::Line(draw::width / 2, draw::height / 2, out.x - draw::width / 2, out.y - draw::height / 2, *color, *line_thickness);
     }
 }
 

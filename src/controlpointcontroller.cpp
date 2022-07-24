@@ -28,10 +28,9 @@ void UpdateObjectiveResource()
     if (CE_GOOD(objective_resource) && objective_resource->m_iClassID() == CL_CLASS(CTFObjectiveResource))
         return;
     // Find ObjectiveResource and gamerules
-    for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+    for (auto &ent: entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))
+        if (ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))
             continue;
         // Found it
         objective_resource = ent;

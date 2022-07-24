@@ -143,12 +143,11 @@ std::vector<CachedEntity *> valid_ents;
 void Update()
 {
     max = g_IEntityList->GetHighestEntityIndex();
-    valid_ents.clear();
+    valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
     if (max >= MAX_ENTITIES)
     {
         max = MAX_ENTITIES - 1;
     }
-    valid_ents.reserve(500);
 
     for (int i = 0; i <= max; i++)
     {

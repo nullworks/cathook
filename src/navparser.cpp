@@ -352,16 +352,15 @@ public:
         // Sentries make sounds, so we can just rely on soundcache here and always clear sentries
         NavEngine::clearFreeBlacklist(SENTRY);
         // Find sentries and stickies
-        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+        for (auto &ent : entity_cache::valid_ents)
         {
-            CachedEntity *ent = ENTITY(i);
-            if (CE_INVALID(ent) || !ent->m_bAlivePlayer() || ent->m_iTeam() == g_pLocalPlayer->team)
+            if (!ent->m_bAlivePlayer() || ent->m_iTeam() == g_pLocalPlayer->team)
                 continue;
             bool is_sentry = ent->m_iClassID() == CL_CLASS(CObjectSentrygun);
             bool is_sticky = ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) && CE_INT(ent, netvar.iPipeType) == 1 && CE_VECTOR(ent, netvar.vVelocity).IsZero(1.0f);
             // Not sticky/sentry, ignore.
             // (Or dormant sticky)
-            if (!is_sentry && (!is_sticky || CE_BAD(ent)))
+            if (!is_sentry && !is_sticky)
                 continue;
             if (is_sentry)
             {

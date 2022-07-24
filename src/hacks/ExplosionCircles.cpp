@@ -55,11 +55,8 @@ void draw()
         return;
     std::vector<Vector> points;
     Vector screen;
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        auto ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
         if (!ent->m_bEnemy())
             continue;
         if (ent->m_iClassID() != CL_CLASS(CTFGrenadePipebombProjectile))

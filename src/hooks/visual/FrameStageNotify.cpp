@@ -81,7 +81,7 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
                 {
                     auto *kv = new KeyValues("LightmappedGeneric" /*pMaterial->GetShaderName()*/);
                     kv->SetString("$basetexture", (*override_textures_texture).c_str());
-                    //kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
+                    // kv->SetString("$basetexturetransform", "center .5 .5 scale 6 6 rotate 0 translate 0 0");
                     kv->SetString("$surfaceprop", "concrete");
                     pMaterial->SetShaderAndParams(kv);
                 }
@@ -214,16 +214,24 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
 {
     update_nightmode = true;
 }
-static InitRoutine init_fsn([]() {
-    nightmode_gui.installChangeCallback(rvarCallback<float>);
-    nightmode_world.installChangeCallback(rvarCallback<float>);
-    nightmode_skybox.installChangeCallback(rvarCallback<float>);
-    nightmode_gui_color.installChangeCallback(rvarCallback<rgba_t>);
-    nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
-    nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
-    override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
-    override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
-    EC::Register(
-        EC::LevelInit, []() { update_nightmode = true; update_override_textures = true; }, "levelinit_fsn");
-});
+static InitRoutine init_fsn(
+    []()
+    {
+        nightmode_gui.installChangeCallback(rvarCallback<float>);
+        nightmode_world.installChangeCallback(rvarCallback<float>);
+        nightmode_skybox.installChangeCallback(rvarCallback<float>);
+        nightmode_gui_color.installChangeCallback(rvarCallback<rgba_t>);
+        nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
+        nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
+        override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
+        override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
+        EC::Register(
+            EC::LevelInit,
+            []()
+            {
+                update_nightmode         = true;
+                update_override_textures = true;
+            },
+            "levelinit_fsn");
+    });
 } // namespace hooked_methods

@@ -451,41 +451,71 @@ static void cm()
     if (roambot && !foundPreferredTarget && (!follow_target || change || ClassPriority(ENTITY(follow_target)) < 6))
     {
         // Try to get a new target
-        auto ent_count = followcart ? HIGHEST_ENTITY : g_IEngine->GetMaxClients();
-        for (int i = 1; i <= ent_count; i++)
+        if (!followcart)
         {
-            auto entity = ENTITY(i);
-            if (!isValidTarget(entity))
-                continue;
-            if (!follow_target)
+            int ent_count = g_IEngine->GetMaxClients();
+            for (int i = 1; i <= ent_count; i++)
             {
-                if (CE_INVALID(entity))
+                auto entity = ENTITY(i);
+                if (!isValidTarget(entity))
                     continue;
-            }
-            else
-            {
-                if (CE_BAD(entity))
+                if (!follow_target)
+                {
+                    if (CE_INVALID(entity))
+                        continue;
+                }
+                else
+                {
+                    if (CE_BAD(entity))
+                        continue;
+                }
+                if (entity->m_bEnemy())
                     continue;
+                // favor closer entitys
+                if (CE_GOOD(entity))
+                {
+                    if (follow_target && ENTITY(follow_target)->m_flDistance() < entity->m_flDistance()) // favor closer entitys
+                        continue;
+                    // check if new target has a higher priority than current
+                    // target
+                    if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(ENTITY(i)))
+                        continue;
+                }
+                if (startFollow(entity, isNavBotCM))
+                {
+                    // ooooo, a target
+                    navinactivity.update();
+                    follow_target = i;
+                    afkTicks[i].update(); // set afk time to 03
+                    break;
+                }
             }
-            if (entity->m_bEnemy())
-                continue;
-            // favor closer entitys
-            if (CE_GOOD(entity))
+        }
+        else
+        {
+            for (auto &entity : entity_cache::valid_ents)
             {
+                if (!isValidTarget(entity))
+                    continue;
+                if (entity->m_bEnemy())
+                    continue;
+                // favor closer entitys
+
                 if (follow_target && ENTITY(follow_target)->m_flDistance() < entity->m_flDistance()) // favor closer entitys
                     continue;
                 // check if new target has a higher priority than current
                 // target
-                if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(ENTITY(i)))
+                if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(entity))
                     continue;
-            }
-            if (startFollow(entity, isNavBotCM))
-            {
-                // ooooo, a target
-                navinactivity.update();
-                follow_target = i;
-                afkTicks[i].update(); // set afk time to 03
-                break;
+
+                if (startFollow(entity, isNavBotCM))
+                {
+                    // ooooo, a target
+                    navinactivity.update();
+                    follow_target = entity->m_IDX;
+                    afkTicks[follow_target].update(); // set afk time to 03
+                    break;
+                }
             }
         }
     }

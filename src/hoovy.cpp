@@ -11,7 +11,6 @@ static bool hoovy_list[PLAYER_ARRAY_SIZE] = { 0 };
 
 bool HasSandvichOut(CachedEntity *entity)
 {
-    IF_GAME(!IsTF2()) return false;
 
     int weapon_idx;
     CachedEntity *weapon;
@@ -43,7 +42,7 @@ void UpdateHoovyList()
         return;
 
     static CachedEntity *ent;
-    for (int i = 1; i <= MAX_PLAYERS && i < g_IEntityList->GetHighestEntityIndex(); i++)
+    for (int i = 1; i <= MAX_PLAYERS; i++)
     {
         ent = ENTITY(i);
         if (CE_GOOD(ent) && CE_BYTE(ent, netvar.iLifeState) == LIFE_ALIVE)

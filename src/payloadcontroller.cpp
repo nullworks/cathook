@@ -17,11 +17,10 @@ void Update()
         for (auto &entry : payloads)
             entry.clear();
 
-        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+        for (auto &ent : entity_cache::valid_ents)
         {
-            CachedEntity *ent = ENTITY(i);
             // Not the object we need or invalid (team)
-            if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
+            if (ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
                 continue;
             int team = ent->m_iTeam();
 
@@ -62,8 +61,10 @@ void LevelInit()
         entry.clear();
 }
 
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, Update, "plcreatemove");
-    EC::Register(EC::LevelInit, LevelInit, "levelinit_plcontroller");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, Update, "plcreatemove");
+        EC::Register(EC::LevelInit, LevelInit, "levelinit_plcontroller");
+    });
 } // namespace plcontroller

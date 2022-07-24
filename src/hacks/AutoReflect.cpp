@@ -152,15 +152,12 @@ void CreateMove()
     float closest_dist = 0.0f;
     Vector closest_vec;
     // Loop to find the closest entity
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
 
         // Find an ent from the for loops current tick
-        CachedEntity *ent = ENTITY(i);
 
         // Check if null or dormant
-        if (CE_BAD(ent))
-            continue;
 
         // Check if ent should be reflected
         if (!ShouldReflect(ent))
@@ -268,11 +265,13 @@ void Draw()
 #endif
 }
 
-static InitRoutine EC([]() {
-    EC::Register(EC::CreateMove, CreateMove, "cm_auto_reflect", EC::average);
-    EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_auto_reflect", EC::average);
+static InitRoutine EC(
+    []()
+    {
+        EC::Register(EC::CreateMove, CreateMove, "cm_auto_reflect", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_auto_reflect", EC::average);
 #if ENABLE_VISUALS
-    EC::Register(EC::Draw, Draw, "draw_auto_reflect", EC::average);
+        EC::Register(EC::Draw, Draw, "draw_auto_reflect", EC::average);
 #endif
-});
+    });
 } // namespace hacks::tf::autoreflect

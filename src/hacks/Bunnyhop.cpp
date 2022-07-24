@@ -34,7 +34,7 @@ static void CreateMove()
     // Bhop likelihood
     if (UniformRandomInt(0, 99) > *bhop_chance)
         return;
-    
+
     // var for "if on ground" from the flags netvar
     bool ground = CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & (1 << 0);
     // Var for if the player is pressing jump

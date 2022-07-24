@@ -22,11 +22,11 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+        for (auto &ent : entity_cache::valid_ents)
         {
-            CachedEntity *ent = ENTITY(i);
+
             // We cannot identify a bad entity as a flag due to the unreliability of it
-            if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CCaptureFlag))
+            if (ent->m_iClassID() != CL_CLASS(CCaptureFlag))
                 continue;
 
             // Store flags
@@ -149,8 +149,10 @@ ETFFlagStatus getStatus(int team)
     // Mark as home if nothing is found
     return TF_FLAGINFO_HOME;
 }
-static InitRoutine init([]() {
-    EC::Register(EC::CreateMove, Update, "flagcontroller_update");
-    EC::Register(EC::LevelInit, LevelInit, "flagcontroller_levelinit");
-});
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::CreateMove, Update, "flagcontroller_update");
+        EC::Register(EC::LevelInit, LevelInit, "flagcontroller_levelinit");
+    });
 } // namespace flagcontroller

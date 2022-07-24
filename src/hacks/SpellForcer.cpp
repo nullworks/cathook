@@ -135,10 +135,9 @@ CachedEntity *getClosestSpell()
 
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return ent;
-    for (int i = g_IEngine->GetMaxClients(); i < HIGHEST_ENTITY; i++)
+    for (auto &spell : entity_cache::valid_ents)
     {
-        CachedEntity *spell = ENTITY(i);
-        if (CE_INVALID(spell) || !spell->m_vecDormantOrigin() || (spell->m_ItemType() != ITEM_SPELL && spell->m_ItemType() != ITEM_SPELL_RARE))
+        if (!spell->m_vecDormantOrigin() || (spell->m_ItemType() != ITEM_SPELL && spell->m_ItemType() != ITEM_SPELL_RARE))
             continue;
         float dist = spell->m_flDistance();
         if (dist < best_dist || (is_dormant && !RAW_ENT(spell)->IsDormant() && dist <= 300.0f))

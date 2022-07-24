@@ -14,12 +14,12 @@ void TFPlayerResource::Update()
     IClientEntity *ent;
 
     entity = 0;
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent_not_raw : entity_cache::valid_ents)
     {
-        ent = g_IEntityList->GetClientEntity(i);
+        auto ent = RAW_ENT(ent_not_raw);
         if (ent && ent->GetClientClass()->m_ClassID == RCC_PLAYERRESOURCE)
         {
-            entity = i;
+            entity = ent_not_raw->m_IDX;
             return;
         }
     }

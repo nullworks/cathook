@@ -21,11 +21,9 @@ int NearbyEntities()
     int ret = 0;
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return ret;
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
+
         if (ent == LOCAL_E)
             continue;
         if (!ent->m_bAlivePlayer())
@@ -54,11 +52,8 @@ static void CreateMove()
     else
         shouldm2 = false;
 
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
         if (!IsProjectile(ent) && !ent->m_bGrenadeProjectile())
             continue;
         if (!ent->m_bEnemy())

@@ -85,13 +85,9 @@ void CreateMove()
     targets.clear();
 
     // Cycle through the ents and search for valid ents
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        // Assign the for loops tick number to an ent
-        CachedEntity *ent = ENTITY(i);
-        // Check for dormancy and if valid
-        if (CE_BAD(ent))
-            continue;
+
         // Check if ent is a flare or suitable target and push to respective
         // arrays
         if (IsFlare(ent))

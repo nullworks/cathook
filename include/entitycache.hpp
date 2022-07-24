@@ -218,7 +218,9 @@ public:
 namespace entity_cache
 {
 
-extern CachedEntity array[MAX_ENTITIES]; // b1g fat array in
+// b1g fat array in
+extern std::vector<CachedEntity *> valid_ents;
+extern CachedEntity array[MAX_ENTITIES];
 inline CachedEntity &Get(int idx)
 {
     if (idx < 0 || idx >= 2048)

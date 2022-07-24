@@ -215,11 +215,8 @@ int BlastDangerValue(CachedEntity *patient)
         return 1;
     }
     // Find rockets/pipes nearby
-    for (int i = PLAYER_ARRAY_SIZE; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
         if (!ent->m_bEnemy())
             continue;
         if (ent->m_Type() != ENTITY_PROJECTILE)
@@ -228,7 +225,7 @@ int BlastDangerValue(CachedEntity *patient)
             continue;
         if (patient->m_vecOrigin().DistTo(ent->m_vecOrigin()) > (int) auto_vacc_proj_danger_range)
             continue;
-        proj_data_array.push_back(proj_data_s{ i, ent->m_vecOrigin() });
+        proj_data_array.push_back(proj_data_s{ ent->m_IDX, ent->m_vecOrigin() });
     }
     return 0;
 }
@@ -250,11 +247,9 @@ int NearbyEntities()
     int ret = 0;
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return ret;
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
+
         if (ent == LOCAL_E)
             continue;
         if (!ent->m_bAlivePlayer())

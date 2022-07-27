@@ -19,7 +19,7 @@ void Update()
 
         const model_t *model = RAW_ENT(ent)->GetModel();
         bool issandwich      = false;
-        const short unsigned int curr_idx = ent->m_IDX;
+        const uint16_t curr_idx = ent->m_IDX;
         if (model && tickcount % 33 == 0)
         {
             std::string model_name(g_IModelInfo->GetModelName(model));

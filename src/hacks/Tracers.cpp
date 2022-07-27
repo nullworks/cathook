@@ -129,7 +129,7 @@ void draw()
         for (auto &ent : entity_cache::valid_ents)
         {
             // Get and check player
-            const short unsigned int curr_idx = ent->m_IDX;
+            const uint16_t curr_idx = ent->m_IDX;
             Vector origin;
             std::optional<rgba_t> color = std::nullopt;
             if (CE_INVALID(ent))

@@ -13,10 +13,12 @@ void SendNetMsg(INetMessage &msg)
         CLC_RespondCvarValue *cvar_msg = (CLC_RespondCvarValue *) &msg;
         if (!cvar_msg->m_szCvarName)
             return;
-        // Remove cat_ commands and the linux unique sdl_double_click_size from cvar list
-        if (!strcmp(cvar_msg->m_szCvarName, "cat") || !strcmp(cvar_msg->m_szCvarName, "sdl_double_click_size"))
+        // Remove cat_ commands from cvar list
+        if (!strcmp(cvar_msg->m_szCvarName, "cat") || !strncmp(cvar_msg->m_szCvarName, CON_PREFIX, strlen(CON_PREFIX)))
             cvar_msg->m_eStatusCode = EQueryCvarValueStatus::eQueryCvarValueStatus_CvarNotFound;
-
+        // Remove the linux unique sdl_double_click_size
+        else if (!strcmp(cvar_msg->m_szCvarName, "sdl_double_click_size"))
+            cvar_msg->m_eStatusCode = EQueryCvarValueStatus::eQueryCvarValueStatus_CvarNotFound;
         // Spoof ourselves as Windows, bypassing Linux detection addons
         else if (std::string(cvar_msg->m_szCvarName) == "windows_speaker_config")
         {

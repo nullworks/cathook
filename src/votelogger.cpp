@@ -73,8 +73,8 @@ void dispatchUserMessage(bf_read &buffer, int type)
     case 45:
     {
         // Vote setup Failed, Refresh vote timer for catbot so it can try again
-        int reason     = buffer.ReadByte();
-        int cooldown                    = buffer.ReadShort();
+        int reason      = buffer.ReadByte();
+        int cooldown    = buffer.ReadShort();
         
         if ( reason == 2 ) // VOTE_FAILED_RATE_EXCEEDED
         {

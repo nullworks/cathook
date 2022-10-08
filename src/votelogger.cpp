@@ -71,9 +71,20 @@ void dispatchUserMessage(bf_read &buffer, int type)
     switch (type)
     {
     case 45:
+    {
         // Vote setup Failed, Refresh vote timer for catbot so it can try again
-        hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(4);
+        int reason      = buffer.ReadByte();
+        int cooldown    = buffer.ReadShort();
+        
+        if ( reason == 2 ) // VOTE_FAILED_RATE_EXCEEDED
+        {
+            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(cooldown);
+        }
+        else
+            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(4);
+        
         break;
+    }
     case 46:
     {
         // TODO: Add always vote no/vote no on friends. Cvar is "vote option2"

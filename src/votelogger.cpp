@@ -78,7 +78,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         
         if ( reason == VOTE_FAILED_RATE_EXCEEDED )
         {
-            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(static_cast<float>( cooldown ));
+            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(cooldown);
         }
         else
             hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(4);

@@ -76,7 +76,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         vote_create_failed_t reason     = buffer.ReadByte();
         int cooldown                    = buffer.ReadShort();
         
-        if ( reason == VOTE_FAILED_RATE_EXCEEDED )
+        if ( reason == 2 ) // VOTE_FAILED_RATE_EXCEEDED
         {
             hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(cooldown);
         }

@@ -76,13 +76,12 @@ void dispatchUserMessage(bf_read &buffer, int type)
         int reason      = buffer.ReadByte();
         int cooldown    = buffer.ReadShort();
         
-        if ( reason == 2 ) // VOTE_FAILED_RATE_EXCEEDED
-        {
-            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(cooldown);
-        }
-        else
-            hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(4);
+        int delay = 4;
         
+        if ( reason == 2 ) // VOTE_FAILED_RATE_EXCEEDED
+            delay = cooldown;
+        
+        hacks::shared::catbot::timer_votekicks.last -= std::chrono::seconds(delay);
         break;
     }
     case 46:

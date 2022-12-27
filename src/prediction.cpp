@@ -8,7 +8,8 @@
 #include "navparser.hpp"
 #include <settings/Bool.hpp>
 #include <boost/circular_buffer.hpp>
-
+// Found in C_BasePlayer. It represents "m_pCurrentCommand"
+#define CURR_CUSERCMD_PTR 4452
 namespace hacks::shared::aimbot
 {
 extern settings::Boolean engine_projpred;
@@ -458,9 +459,9 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
     // static Vector zerov{ 0, 0, 0 };
     // CE_VECTOR(entity, netvar.m_angEyeAngles) = zerov;
 
-    CUserCmd *original_cmd = NET_VAR(ent, 4188, CUserCmd *);
+    CUserCmd *original_cmd = NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *);
 
-    NET_VAR(ent, 4188, CUserCmd *) = &fakecmd;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = &fakecmd;
 
     g_GlobalVars->curtime   = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = time;
@@ -486,7 +487,7 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
     oFinishMove(g_IPrediction, ent, &fakecmd, pMoveData.get());
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
 
-    NET_VAR(ent, 4188, CUserCmd *) = original_cmd;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = original_cmd;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;

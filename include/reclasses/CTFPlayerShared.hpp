@@ -3,6 +3,7 @@
 #include "reclasses.hpp"
 #include "e8call.hpp"
 
+#define CTF_PLR_SHRD 6356
 namespace re
 {
 
@@ -12,7 +13,7 @@ public:
     // Convert IClientEntity to CTFPlayerShared
     inline static CTFPlayerShared *GetPlayerShared(IClientEntity *ent)
     {
-        return (CTFPlayerShared *) (((uintptr_t) ent) + 0x17cc);
+        return (CTFPlayerShared *) (((uintptr_t) ent) + CTF_PLR_SHRD);
     }
     inline static bool IsDominatingPlayer(CTFPlayerShared *self, int ent_idx)
     {

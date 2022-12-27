@@ -79,7 +79,32 @@ int GetFarthestOwnedControlPoint(int team)
         // If we've hit a point we don't own, we're done
         if (GET_OWNING_TEAM(iPoint) != team)
             break;
-cpcontroller
+
+
+        iFarthestPoint = iPoint;
+    }
+
+    return iFarthestPoint;
+}
+
+// Can we cap this point?
+bool isPointUseable(int index, int team)
+{
+    // We Own it, can't cap it
+    if (GET_OWNING_TEAM(index) == team)
+        return false;
+
+    // Can we cap the point?
+    if (!TeamCanCapPoint(index, team))
+        return false;
+
+    // We are playing a sectioned map, check if the CP is in it
+    if (CE_VAR(objective_resource, netvar.m_bPlayingMiniRounds, bool) && !IN_MINI_ROUND(index))
+        return false;
+
+    // Is the point locked?
+    if (GET_CP_LOCKED(index))
+        return false;
 
     // Linear cap means that it won't require previous points, bail
     static auto tf_caplinear = g_ICvar->FindVar("tf_caplinear");

@@ -39,7 +39,7 @@ public:
     static constexpr int CTEPlayerAnimEvent                    = 164;
     static constexpr int CTFPasstimeLogic                      = 239;
     static constexpr int CPasstimeBall                         = 93;
-    static constexpr int CTFObjectiveResource                  = 234;
+    static constexpr int CTFObjectiveResource                  = 235;
     static constexpr int CTFGlow                               = 213;
     static constexpr int CTEFireBullets                        = 151;
     static constexpr int CTFBuffBanner                         = 0;
@@ -219,7 +219,7 @@ public:
     static constexpr int CTFSMG                                = 306;
     static constexpr int CTFShovel                             = 304;
     static constexpr int CTFShotgunBuildingRescue              = 303;
-    static constexpr int CTFPEPBrawlerBlaster                  = 240;
+    static constexpr int CTFPEPBrawlerBlaster                  = 241;
     static constexpr int CTFSodaPopper                         = 310;
     static constexpr int CTFShotgun_Revenge                    = 301;
     static constexpr int CTFScatterGun                         = 297;
@@ -235,10 +235,10 @@ public:
     static constexpr int CTFRevolver                           = 286;
     static constexpr int CTFDRGPomson                          = 201;
     static constexpr int CTFRaygun                             = 284;
-    static constexpr int CTFPistol_ScoutSecondary              = 245;
-    static constexpr int CTFPistol_ScoutPrimary                = 244;
-    static constexpr int CTFPistol_Scout                       = 243;
-    static constexpr int CTFPistol                             = 242;
+    static constexpr int CTFPistol_ScoutSecondary              = 246;
+    static constexpr int CTFPistol_ScoutPrimary                = 245;
+    static constexpr int CTFPistol_Scout                       = 244;
+    static constexpr int CTFPistol                             = 243;
     static constexpr int CTFPipebombLauncher                   = 241;
     static constexpr int CTFWeaponPDA_Spy                      = 332;
     static constexpr int CTFWeaponPDA_Engineer_Destroy         = 331;
@@ -247,10 +247,10 @@ public:
     static constexpr int CTFWeaponPDAExpansion_Dispenser       = 333;
     static constexpr int CTFWeaponPDA                          = 329;
     static constexpr int CPasstimeGun                          = 94;
-    static constexpr int CTFParticleCannon                     = 238;
-    static constexpr int CTFParachute_Secondary                = 237;
-    static constexpr int CTFParachute_Primary                  = 236;
-    static constexpr int CTFParachute                          = 235;
+    static constexpr int CTFParticleCannon                     = 239;
+    static constexpr int CTFParachute_Secondary                = 238;
+    static constexpr int CTFParachute_Primary                  = 237;
+    static constexpr int CTFParachute                          = 236;
     static constexpr int CTFMinigun                            = 233;
     static constexpr int CTFMedigunShield                      = 230;
     static constexpr int CWeaponMedigun                        = 352;

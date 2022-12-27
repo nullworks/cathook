@@ -88,7 +88,7 @@ void LevelInit()
 }
 
 static InitRoutine init([]() {
-    static auto ShouldInterpolate_signature = gSignatures.GetClientSignature("55 89 E5 53 83 EC 14 A1 ? ? ? ? 8B 5D ? 8B 10 89 04 24 FF 52 ? 8B 53");
+    static auto ShouldInterpolate_signature = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 A1 ? ? ? ? 8B 5D ? 8B 10 89 04 24 FF 52 ? 8B 53");
     shouldinterpolate_detour.Init(ShouldInterpolate_signature, (void *) ShouldInterpolate_hook);
 
     /*static auto CheckForSequenceChange_signature = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C 8B 45 ? 8B 75 ? 8B 4D ? 8B 7D");

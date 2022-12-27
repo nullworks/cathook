@@ -52,7 +52,7 @@ void NetVars::Init()
         // "m_flObservedCritChance");
         this->iItemDefinitionIndex      = gNetvars.get_offset("DT_EconEntity", "m_AttributeManager", "m_Item", "m_iItemDefinitionIndex");
         this->AttributeList             = gNetvars.get_offset("DT_EconEntity", "m_AttributeManager", "m_Item",
-                                                  "m_AttributeList"); // hmmm
+                                                              "m_AttributeList"); // hmmm
         this->flChargeBeginTime         = gNetvars.get_offset("DT_WeaponPipebombLauncher", "PipebombLauncherLocalData", "m_flChargeBeginTime");
         this->flDetonateTime            = gNetvars.get_offset("DT_WeaponGrenadeLauncher", "m_flDetonateTime");
         this->flLastFireTime            = gNetvars.get_offset("DT_TFWeaponBase", "LocalActiveTFWeaponData", "m_flLastFireTime");
@@ -79,18 +79,19 @@ void NetVars::Init()
     this->res_iScore = gNetvars.get_offset("DT_TFPlayerResource", "baseclass", "m_iScore");
     IF_GAME(IsTF())
     {
-        this->m_hOwnerEntity     = gNetvars.get_offset("DT_BaseEntity", "m_hOwnerEntity");
-        this->res_iMaxHealth     = gNetvars.get_offset("DT_TFPlayerResource", "m_iMaxHealth");
-        this->res_iPlayerClass   = gNetvars.get_offset("DT_TFPlayerResource", "m_iPlayerClass");
-        this->m_bReadyToBackstab = gNetvars.get_offset("DT_TFWeaponKnife", "m_bReadyToBackstab");
-        this->m_bDucked          = gNetvars.get_offset("DT_TFPlayer", "localdata", "m_Local", "m_bDucked");
-        this->m_flDuckTimer      = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_flDuckTimer");
-        this->iCond              = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCond");
-        this->iCond1             = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx");
-        this->iCond2             = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx2");
-        this->iCond3             = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx3");
-        this->iClass             = gNetvars.get_offset("DT_TFPlayer", "m_PlayerClass", "m_iClass");
-        this->flChargedDamage    = gNetvars.get_offset("DT_TFSniperRifle", "SniperRifleLocalData", "m_flChargedDamage");
+        this->m_hOwnerEntity      = gNetvars.get_offset("DT_BaseEntity", "m_hOwnerEntity");
+        this->m_hOriginalLauncher = gNetvars.get_offset("DT_BaseProjectile", "m_hOriginalLauncher");
+        this->res_iMaxHealth      = gNetvars.get_offset("DT_TFPlayerResource", "m_iMaxHealth");
+        this->res_iPlayerClass    = gNetvars.get_offset("DT_TFPlayerResource", "m_iPlayerClass");
+        this->m_bReadyToBackstab  = gNetvars.get_offset("DT_TFWeaponKnife", "m_bReadyToBackstab");
+        this->m_bDucked           = gNetvars.get_offset("DT_TFPlayer", "localdata", "m_Local", "m_bDucked");
+        this->m_flDuckTimer       = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_flDuckTimer");
+        this->iCond               = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCond");
+        this->iCond1              = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx");
+        this->iCond2              = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx2");
+        this->iCond3              = gNetvars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCondEx3");
+        this->iClass              = gNetvars.get_offset("DT_TFPlayer", "m_PlayerClass", "m_iClass");
+        this->flChargedDamage     = gNetvars.get_offset("DT_TFSniperRifle", "SniperRifleLocalData", "m_flChargedDamage");
 
         // sentry
         this->m_iAmmoShells       = gNetvars.get_offset("DT_ObjectSentrygun", "m_iAmmoShells");

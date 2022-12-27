@@ -23,7 +23,7 @@ static settings::Boolean debug{ "skinchanger.debug", "false" };
 const char *sig_GetAttributeDefinition   = "55 89 E5 57 56 53 83 EC 6C C7 45 9C 00 00 00 00";
 const char *sig_SetRuntimeAttributeValue = "55 89 E5 57 56 53 83 EC 3C 8B 5D 08 8B 4B 10 85 C9 7E 33";
 const char *sig_GetItemSchema            = "55 89 E5 57 56 53 83 EC 1C 8B 1D ? ? ? ? 85 "
-                                "DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3";
+                                           "DB 89 D8 74 0B 83 C4 1C 5B 5E 5F 5D C3";
 
 ItemSystem_t ItemSystem{ nullptr };
 GetAttributeDefinition_t GetAttributeDefinitionFn{ nullptr };
@@ -35,7 +35,7 @@ ItemSchemaPtr_t GetItemSchema(void)
     {
         ItemSystem = (ItemSystem_t) gSignatures.GetClientSignature((char *) sig_GetItemSchema);
     }
-    return (void *) ((uint32_t)(ItemSystem()) + 4);
+    return (void *) ((uint32_t) (ItemSystem()) + 4);
 }
 
 CAttribute::CAttribute(uint16_t iAttributeDefinitionIndex, float flValue)
@@ -98,143 +98,163 @@ void CAttributeList::SetAttribute(int index, float value)
 
 static std::array<int, 46> australium_table{ 4, 7, 13, 14, 15, 16, 18, 19, 20, 21, 29, 36, 38, 45, 61, 132, 141, 194, 197, 200, 201, 202, 203, 205, 206, 207, 208, 211, 228, 424, 654, 658, 659, 662, 663, 664, 665, 669, 1000, 1004, 1006, 1007, 1078, 1082, 1085, 1149 };
 static std::array<std::pair<int, int>, 12> redirects{ std::pair{ 264, 1071 }, std::pair{ 18, 205 }, std::pair{ 13, 200 }, std::pair{ 21, 208 }, std::pair{ 19, 206 }, std::pair{ 20, 207 }, std::pair{ 15, 202 }, std::pair{ 7, 197 }, std::pair{ 29, 211 }, std::pair{ 14, 201 }, std::pair{ 16, 203 }, std::pair{ 4, 194 } };
-static CatCommand australize("australize", "Make everything australium", []() {
-    enable = true;
-    for (auto i : redirects)
-        GetModifier(i.first).defidx_redirect = i.second;
-    for (auto i : australium_table)
-    {
-        GetModifier(i).Set(2027, 1);
-        GetModifier(i).Set(2022, 1);
-        GetModifier(i).Set(542, 1);
-    }
-    InvalidateCookie();
-});
-static CatCommand set_attr("skinchanger_set", "Set Attribute", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
-        return;
-    }
-    enable = true;
-    try
-    {
-        if (CE_BAD(LOCAL_W))
-            return;
-        unsigned attrid = std::strtoul(args.Arg(1), nullptr, 10);
-        float attrv     = std::strtof(args.Arg(2), nullptr);
-        GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Set(attrid, attrv);
-        InvalidateCookie();
-    }
-    catch (const std::invalid_argument &)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
-    }
-});
-static CatCommand remove_attr("skinchanger_remove", "Remove attribute", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
-        return;
-    }
-    try
-    {
-        if (CE_BAD(LOCAL_W))
-            return;
-        enable          = true;
-        unsigned attrid = std::strtoul(args.Arg(1), nullptr, 10);
-        GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Remove(attrid);
-        InvalidateCookie();
-    }
-    catch (const std::invalid_argument &)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
-    }
-});
-static CatCommand set_redirect("skinchanger_redirect", "Set Redirect", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
-        return;
-    }
-    try
-    {
-        if (CE_BAD(LOCAL_W))
-            return;
-        enable                                                                    = true;
-        unsigned redirect                                                         = std::strtoul(args.Arg(1), nullptr, 10);
-        GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).defidx_redirect = redirect;
-        InvalidateCookie();
-    }
-    catch (const std::invalid_argument &)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
-    }
-});
-static CatCommand dump_attrs("skinchanger_debug_attrs", "Dump attributes", []() {
-    CAttributeList *list = (CAttributeList *) ((uintptr_t)(RAW_ENT(LOCAL_W)) + netvar.AttributeList);
-    logging::Info("ATTRIBUTE LIST: %i", list->m_Attributes.Size());
-    for (int i = 0; i < list->m_Attributes.Size(); i++)
-    {
-        logging::Info("%i %.2f", list->m_Attributes[i].defidx, list->m_Attributes[i].value);
-    }
-});
+static CatCommand australize("australize", "Make everything australium",
+                             []()
+                             {
+                                 enable = true;
+                                 for (auto i : redirects)
+                                     GetModifier(i.first).defidx_redirect = i.second;
+                                 for (auto i : australium_table)
+                                 {
+                                     GetModifier(i).Set(2027, 1);
+                                     GetModifier(i).Set(2022, 1);
+                                     GetModifier(i).Set(542, 1);
+                                 }
+                                 InvalidateCookie();
+                             });
+static CatCommand set_attr("skinchanger_set", "Set Attribute",
+                           [](const CCommand &args)
+                           {
+                               if (args.ArgC() < 2)
+                               {
+                                   g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
+                                   return;
+                               }
+                               enable = true;
+                               try
+                               {
+                                   if (CE_BAD(LOCAL_W))
+                                       return;
+                                   unsigned attrid = std::strtoul(args.Arg(1), nullptr, 10);
+                                   float attrv     = std::strtof(args.Arg(2), nullptr);
+                                   GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Set(attrid, attrv);
+                                   InvalidateCookie();
+                               }
+                               catch (const std::invalid_argument &)
+                               {
+                                   g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
+                               }
+                           });
+static CatCommand remove_attr("skinchanger_remove", "Remove attribute",
+                              [](const CCommand &args)
+                              {
+                                  if (args.ArgC() < 2)
+                                  {
+                                      g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
+                                      return;
+                                  }
+                                  try
+                                  {
+                                      if (CE_BAD(LOCAL_W))
+                                          return;
+                                      enable          = true;
+                                      unsigned attrid = std::strtoul(args.Arg(1), nullptr, 10);
+                                      GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).Remove(attrid);
+                                      InvalidateCookie();
+                                  }
+                                  catch (const std::invalid_argument &)
+                                  {
+                                      g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
+                                  }
+                              });
+static CatCommand set_redirect("skinchanger_redirect", "Set Redirect",
+                               [](const CCommand &args)
+                               {
+                                   if (args.ArgC() < 2)
+                                   {
+                                       g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an Argument\n");
+                                       return;
+                                   }
+                                   try
+                                   {
+                                       if (CE_BAD(LOCAL_W))
+                                           return;
+                                       enable                                                                    = true;
+                                       unsigned redirect                                                         = std::strtoul(args.Arg(1), nullptr, 10);
+                                       GetModifier(CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)).defidx_redirect = redirect;
+                                       InvalidateCookie();
+                                   }
+                                   catch (const std::invalid_argument &)
+                                   {
+                                       g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please pass a valid int\n");
+                                   }
+                               });
+static CatCommand dump_attrs("skinchanger_debug_attrs", "Dump attributes",
+                             []()
+                             {
+                                 CAttributeList *list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
+                                 logging::Info("ATTRIBUTE LIST: %i", list->m_Attributes.Size());
+                                 for (int i = 0; i < list->m_Attributes.Size(); i++)
+                                 {
+                                     logging::Info("%i %.2f", list->m_Attributes[i].defidx, list->m_Attributes[i].value);
+                                 }
+                             });
 
-static CatCommand list_redirects("skinchanger_redirect_list", "Dump redirects", []() {
-    for (const auto &mod : modifier_map)
-    {
-        if (mod.second.defidx_redirect)
-        {
-            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%d -> %d\n", mod.first, mod.second.defidx_redirect);
-        }
-    }
-});
-static CatCommand save("skinchanger_save", "Save", [](const CCommand &args) {
-    std::string filename = "skinchanger";
-    if (args.ArgC() > 1)
-    {
-        filename = args.Arg(1);
-    }
-    Save(filename);
-});
-static CatCommand load("skinchanger_load", "Load", [](const CCommand &args) {
-    enable               = true;
-    std::string filename = "skinchanger";
-    if (args.ArgC() > 1)
-    {
-        filename = args.Arg(1);
-    }
-    Load(filename);
-});
-static CatCommand load_merge("skinchanger_load_merge", "Load with merge", [](const CCommand &args) {
-    enable               = true;
-    std::string filename = "skinchanger";
-    if (args.ArgC() > 1)
-    {
-        filename = args.Arg(1);
-    }
-    Load(filename, true);
-});
-static CatCommand remove_redirect("skinchanger_remove_redirect", "Remove redirect", [](const CCommand &args) {
-    if (args.ArgC() < 2)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an argument\n");
-    }
-    try
-    {
-        if (CE_BAD(LOCAL_W))
-            return;
-        enable                                  = true;
-        unsigned redirectid                     = std::strtoul(args.Arg(1), nullptr, 10);
-        GetModifier(redirectid).defidx_redirect = 0;
-        logging::Info("Redirect removed");
-        InvalidateCookie();
-    }
-    catch (const std::invalid_argument &)
-    {
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please supply a valid int\n");
-    }
-});
+static CatCommand list_redirects("skinchanger_redirect_list", "Dump redirects",
+                                 []()
+                                 {
+                                     for (const auto &mod : modifier_map)
+                                     {
+                                         if (mod.second.defidx_redirect)
+                                         {
+                                             g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%d -> %d\n", mod.first, mod.second.defidx_redirect);
+                                         }
+                                     }
+                                 });
+static CatCommand save("skinchanger_save", "Save",
+                       [](const CCommand &args)
+                       {
+                           std::string filename = "skinchanger";
+                           if (args.ArgC() > 1)
+                           {
+                               filename = args.Arg(1);
+                           }
+                           Save(filename);
+                       });
+static CatCommand load("skinchanger_load", "Load",
+                       [](const CCommand &args)
+                       {
+                           enable               = true;
+                           std::string filename = "skinchanger";
+                           if (args.ArgC() > 1)
+                           {
+                               filename = args.Arg(1);
+                           }
+                           Load(filename);
+                       });
+static CatCommand load_merge("skinchanger_load_merge", "Load with merge",
+                             [](const CCommand &args)
+                             {
+                                 enable               = true;
+                                 std::string filename = "skinchanger";
+                                 if (args.ArgC() > 1)
+                                 {
+                                     filename = args.Arg(1);
+                                 }
+                                 Load(filename, true);
+                             });
+static CatCommand remove_redirect("skinchanger_remove_redirect", "Remove redirect",
+                                  [](const CCommand &args)
+                                  {
+                                      if (args.ArgC() < 2)
+                                      {
+                                          g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please Provide an argument\n");
+                                      }
+                                      try
+                                      {
+                                          if (CE_BAD(LOCAL_W))
+                                              return;
+                                          enable                                  = true;
+                                          unsigned redirectid                     = std::strtoul(args.Arg(1), nullptr, 10);
+                                          GetModifier(redirectid).defidx_redirect = 0;
+                                          logging::Info("Redirect removed");
+                                          InvalidateCookie();
+                                      }
+                                      catch (const std::invalid_argument &)
+                                      {
+                                          g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Please supply a valid int\n");
+                                      }
+                                  });
 static CatCommand reset("skinchanger_reset", "Reset", []() { modifier_map.clear(); });
 
 static CatCommand invalidate_cookies("skinchanger_bite_cookie", "Bite Cookie", InvalidateCookie);
@@ -254,18 +274,18 @@ void FrameStageNotify(int stage)
 
     if (!SetRuntimeAttributeValueFn)
     {
-        SetRuntimeAttributeValueFn = (SetRuntimeAttributeValue_t)(gSignatures.GetClientSignature((char *) sig_SetRuntimeAttributeValue));
+        SetRuntimeAttributeValueFn = (SetRuntimeAttributeValue_t) (gSignatures.GetClientSignature((char *) sig_SetRuntimeAttributeValue));
         logging::Info("SetRuntimeAttributeValue: 0x%08x", SetRuntimeAttributeValueFn);
     }
     if (!GetAttributeDefinitionFn)
     {
-        GetAttributeDefinitionFn = (GetAttributeDefinition_t)(gSignatures.GetClientSignature((char *) sig_GetAttributeDefinition));
+        GetAttributeDefinitionFn = (GetAttributeDefinition_t) (gSignatures.GetClientSignature((char *) sig_GetAttributeDefinition));
         logging::Info("GetAttributeDefinition: 0x%08x", GetAttributeDefinitionFn);
     }
 
     weapon_list   = (int *) ((unsigned) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
     my_weapon     = CE_INT(g_pLocalPlayer->entity, netvar.hActiveWeapon);
-    my_weapon_ptr = g_IEntityList->GetClientEntity(my_weapon & 0xFFF);
+    my_weapon_ptr = g_IEntityList->GetClientEntity(HandleToIDX(my_weapon));
     if (!my_weapon_ptr)
         return;
     if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(my_weapon_ptr))
@@ -273,7 +293,7 @@ void FrameStageNotify(int stage)
     for (int i = 0; i < 4; i++)
     {
         handle = weapon_list[i];
-        eid    = handle & 0xFFF;
+        eid    = HandleToIDX(handle);
         if (eid <= MAX_PLAYERS || eid > HIGHEST_ENTITY)
             continue;
         // logging::Info("eid, %i", eid);
@@ -290,7 +310,7 @@ void FrameStageNotify(int stage)
         }
     }
     if ((my_weapon_ptr != last_weapon_out) || !cookie.Check())
-        cookie.Update(my_weapon & 0xFFF);
+        cookie.Update(HandleToIDX(my_weapon));
     last_weapon_out = my_weapon_ptr;
 }
 
@@ -305,7 +325,7 @@ void DrawText()
     if (CE_GOOD(LOCAL_W))
     {
         AddSideString(format("dIDX: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
-        list = (CAttributeList *) ((uintptr_t)(RAW_ENT(LOCAL_W)) + netvar.AttributeList);
+        list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
         for (int i = 0; i < list->m_Attributes.Size(); i++)
         {
             AddSideString(format('[', i, "] ", list->m_Attributes[i].defidx, ": ", list->m_Attributes[i].value));

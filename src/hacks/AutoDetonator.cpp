@@ -26,7 +26,7 @@ bool IsFlare(CachedEntity *ent)
         return false;
 
     // Check if we're the owner of the flare
-    if ((CE_INT(ent, 0x894) & 0xFFF) != LOCAL_W->m_IDX)
+    if (HandleToIDX((CE_INT(ent, netvar.m_hOwnerEntity))) != LOCAL_W->m_IDX)
         return false;
 
     // Check passed, return true

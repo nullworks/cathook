@@ -34,7 +34,7 @@ bool IsBomb(CachedEntity *ent)
         return false;
 
     // Check if the stickybomb is the players own
-    if ((CE_INT(ent, netvar.hThrower) & 0xFFF) != g_pLocalPlayer->entity->m_IDX)
+    if (HandleToIDX(CE_INT(ent, netvar.hThrower)) != g_pLocalPlayer->entity->m_IDX)
         return false;
 
     // Check passed, return true

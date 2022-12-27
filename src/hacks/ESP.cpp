@@ -1464,7 +1464,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         for (int i = 0; weapon_list[i]; i++)
                         {
                             int handle = weapon_list[i];
-                            int eid    = handle & 0xFFF;
+                            int eid    = HandleToIDX(handle);
                             if (eid > MAX_PLAYERS && eid <= HIGHEST_ENTITY)
                             {
                                 CachedEntity *weapon = ENTITY(eid);
@@ -1542,7 +1542,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
 
                     // We want revving, zoomed and slowed to be mutually exclusive. Otherwise slowed and zoomed/revving will show at the same time.
                     // Revving
-                    auto weapon_idx      = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                    auto weapon_idx      = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                     CachedEntity *weapon = IDX_GOOD(weapon_idx) ? ENTITY(weapon_idx) : nullptr;
                     if (CE_GOOD(weapon) && weapon->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(weapon, netvar.iWeaponState) != 0)
                         AddEntityString(ent, revving_str, colors::FromRGBA8(220.0f, 220.0f, 220.0f, 255.0f));
@@ -1571,7 +1571,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Active weapon esp
             if (show_weapon)
             {
-                int widx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                int widx = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                 if (IDX_GOOD(widx))
                 {
                     CachedEntity *weapon = ENTITY(widx);

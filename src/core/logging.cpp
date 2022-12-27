@@ -64,9 +64,9 @@ void logging::Info(const char *fmt, ...)
     va_list list;
     va_start(list, fmt);
     // Allocate buffer
-    char result[512];
+    char result[1024];
     // Fill buffer
-    int size = vsnprintf(result, 512, fmt, list);
+    int size = vsnprintf(result, 1024, fmt, list);
     va_end(list);
     if (size < 0)
         return;

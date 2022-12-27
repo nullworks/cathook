@@ -136,7 +136,7 @@ bool AmbassadorCanHeadshot();
 void ValidateUserCmd(CUserCmd *cmd, int sequence_nr);
 
 // Convert a TF2 handle into an IDX -> ENTITY(IDX)
-int HandleToIDX(int handle);
+#define HandleToIDX(handle) (handle & 0xFFFF)
 
 inline const char *teamname(int team)
 {

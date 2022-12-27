@@ -196,6 +196,7 @@ public:
     offset_t m_angRotation;
 
     offset_t m_hOwnerEntity;
+    offset_t m_hOriginalLauncher;
 
     offset_t m_nStreaks_Player;
     offset_t m_nStreaks_Resource;

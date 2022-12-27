@@ -100,7 +100,7 @@ bool shouldSearchAmmo()
     for (int i = 0; weapon_list[i]; i++)
     {
         int handle = weapon_list[i];
-        int eid    = handle & 0xFFF;
+        int eid    = HandleToIDX(handle);
         if (eid > MAX_PLAYERS && eid <= HIGHEST_ENTITY)
         {
             IClientEntity *weapon = g_IEntityList->GetClientEntity(eid);

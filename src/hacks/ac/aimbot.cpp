@@ -56,7 +56,7 @@ void Update(CachedEntity *player)
         {
             auto &angles      = angles::data(player);
             float deviation   = angles.deviation(2);
-            int widx          = CE_INT(player, netvar.hActiveWeapon) & 0xFFF;
+            int widx          = HandleToIDX(CE_INT(player, netvar.hActiveWeapon));
             CachedEntity *wep = ENTITY(widx);
             if (!CE_GOOD(wep))
                 return;
@@ -76,7 +76,7 @@ void Update(CachedEntity *player)
                 {
 
                     const char *wp_name = "[unknown]";
-                    int widx            = CE_INT(player, netvar.hActiveWeapon) & 0xFFF;
+                    int widx            = HandleToIDX(CE_INT(player, netvar.hActiveWeapon));
                     if (IDX_GOOD(widx))
                     {
                         CachedEntity *weapon = ENTITY(widx);

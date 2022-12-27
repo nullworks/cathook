@@ -58,7 +58,7 @@ bool trace::FilterDefault::ShouldHitEntity(IHandleEntity *handle, int mask)
                 if (CE_GOOD(ent) && ent->m_bAlivePlayer())
                 {
                     // Get held weapon
-                    auto weapon_idx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                    auto weapon_idx = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                     // Check if weapon is valid
                     if (IDX_GOOD(weapon_idx))
                     {

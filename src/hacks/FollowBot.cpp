@@ -677,7 +677,7 @@ static void cm()
             last_slot_check = g_GlobalVars->curtime;
 
             // Get the follow targets active weapon
-            int owner_weapon_eid        = (CE_INT(ENTITY(follow_target), netvar.hActiveWeapon) & 0xFFF);
+            int owner_weapon_eid        = HandleToIDX(CE_INT(ENTITY(follow_target), netvar.hActiveWeapon));
             IClientEntity *owner_weapon = g_IEntityList->GetClientEntity(owner_weapon_eid);
 
             // If both the follow targets and the local players weapons are

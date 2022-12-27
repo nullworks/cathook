@@ -73,7 +73,7 @@ CachedEntity *ClosestSpy()
         {
             if (CE_INT(ent, netvar.iClass) != tf_class::tf_pyro && CE_INT(ent, netvar.iClass) != tf_class::tf_heavy)
                 continue;
-            int idx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+            int idx = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
             if (IDX_BAD(idx))
                 continue;
             CachedEntity *pyro_weapon = ENTITY(idx);

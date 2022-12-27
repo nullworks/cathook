@@ -296,7 +296,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                     if (pipes)
                     {
                         if (pipes_local && chamsself)
-                            if ((CE_INT(ent, netvar.hThrower) & 0xFFF) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                            if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
                                 return true;
                         if (ent->m_bEnemy())
                             return true;
@@ -305,7 +305,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                         return false;
                 }
                 if (stickies_local && chamsself)
-                    if ((CE_INT(ent, netvar.hThrower) & 0xFFF) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                    if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
                         return true;
                 if (ent->m_bEnemy())
                     return true;
@@ -471,13 +471,13 @@ void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVMode
     IClientEntity *attach;
     int passes = 0;
 
-    attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24) & 0xFFF);
+    attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24)));
     while (attach && passes++ < 32)
     {
         chams_attachment_drawing = true;
         RenderAttachment(entity, attach, mat);
         chams_attachment_drawing = false;
-        attach                   = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
+        attach                   = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20)));
     }
 #endif
 }

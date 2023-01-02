@@ -165,6 +165,8 @@ void Update()
                 CachedEntity *proj_ptr = &array[i];
 
                 velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
+                // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
+                // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
                 if (1 < eav.Length())
                 {
                     Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
@@ -178,7 +180,9 @@ void Update()
                     float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
                     if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
                         add_grav = true;
+                    // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
                     curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+                    // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
                     while (displacement_temp < displacement)
                     {
 
@@ -195,7 +199,6 @@ void Update()
                     }
                     if (min_displacement < 20000)
                     {
-                        Vector res = (eav * multipler) + proj_pos;
                         proj_map.insert({ eav, proj_ptr });
                         skip_these.push_back(proj_ptr);
                     }

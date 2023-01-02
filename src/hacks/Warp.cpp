@@ -270,11 +270,14 @@ void dodgeProj()
     {
         if (CE_GOOD(val))
         {
+            // Since we are sending this warp next tick we need to compensate for fast moving projectiles
+            // 2 Ticks in advance is a fairly safe interval
             Vector velocity_comp = key * 2 * TICK_INTERVAL;
             velocity_comp.z -= 2 * TICK_INTERVAL * g_ICvar->FindVar("sv_gravity")->GetFloat() * ProjGravMult(val->m_iClassID(), key.Length());
             Vector proj_next_tik = RAW_ENT(val)->GetAbsOrigin() + velocity_comp;
             float diff           = proj_next_tik.DistToSqr(player_pos);
-            if (diff < (15000 * (key.Length() / 1000))) // Distance is ~100 time to avoid. Sadly a trace is needed
+            // Warp sooner for fast moving projectiles.
+            if (diff < (15000 * (key.Length() / 1000)))
             {
                 trace_t trace;
                 Ray_t ray;
@@ -283,15 +286,15 @@ void dodgeProj()
                 if (trace.DidHit())
                 {
 
-                    float dist      = trace.endpos.DistToSqr(player_pos);
-                    float velc_comp = velocity_comp.Length() * velocity_comp.Length();
-                    Vector result   = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
+                    float dist = trace.endpos.DistToSqr(player_pos);
+                    // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
+                    Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
                     if (0 <= result.y)
                         yaw_amount = -90.0f;
                     else
                         yaw_amount = 90.0f;
 
-                    if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E) || dist < (15000 - velc_comp) || dist < 15000)
+                    if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E) || dist < 15000)
                     {
                         was_hurt   = true;
                         warp_dodge = true;
@@ -299,7 +302,7 @@ void dodgeProj()
                         auto iterator = entity_cache::proj_map.find(key);
                         entity_cache::proj_map.erase(key);
                     }
-                }
+                } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
                 else
                 {
                     was_hurt      = true;

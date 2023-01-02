@@ -18,10 +18,9 @@
 #include "filesystem.h"
 #include "DetourHook.hpp"
 #include "AntiCheatBypass.hpp"
-
+#include <Warp.hpp>
 #include "hack.hpp"
 #include <thread>
-
 namespace hacks::shared::misc
 {
 #if !ENFORCE_STREAM_SAFETY && ENABLE_VISUALS
@@ -40,7 +39,6 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
@@ -181,6 +179,7 @@ void DrawWireframeHitbox(wireframe_data data)
 }
 
 #endif
+
 
 static float normalizeRad(float a) noexcept
 {

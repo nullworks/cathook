@@ -10,6 +10,7 @@
 #include <time.h>
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
+#include <Warp.hpp>
 
 bool IsProjectileACrit(CachedEntity *ent)
 {
@@ -134,11 +135,12 @@ std::optional<Vector> CachedEntity::m_vecDormantOrigin()
         return *vec;
     return std::nullopt;
 }
-
 namespace entity_cache
 {
 CachedEntity array[MAX_ENTITIES]{};
 std::vector<CachedEntity *> valid_ents;
+std::map<Vector, CachedEntity *> proj_map;
+std::vector<CachedEntity *> skip_these;
 
 void Update()
 {
@@ -156,6 +158,59 @@ void Update()
         {
             array[i].hitboxes.UpdateBones();
             valid_ents.push_back(&array[i]);
+            if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
+            {
+
+                Vector eav;
+                CachedEntity *proj_ptr = &array[i];
+
+                velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
+                if (1 < eav.Length())
+                {
+                    Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
+                    Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+
+                    float displacement      = proj_pos.DistToSqr(player_pos);
+                    float displacement_temp = displacement - 1;
+                    float min_displacement  = displacement_temp - 1;
+                    float multipler         = 0.01f;
+                    bool add_grav           = false;
+                    float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
+                    if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
+                        add_grav = true;
+                    curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+                    while (displacement_temp < displacement)
+                    {
+
+                        Vector temp_pos = (eav * multipler) + proj_pos;
+                        if (add_grav)
+                            temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
+                        displacement_temp = temp_pos.DistToSqr(player_pos);
+                        if (displacement_temp < min_displacement)
+                            min_displacement = displacement_temp;
+                        else
+                            break;
+
+                        multipler += 0.01f;
+                    }
+                    if (min_displacement < 20000)
+                    {
+                        Vector res = (eav * multipler) + proj_pos;
+                        proj_map.insert({ eav, proj_ptr });
+                        skip_these.push_back(proj_ptr);
+                    }
+                    else
+                        skip_these.push_back(proj_ptr);
+                }
+                else
+                    skip_these.push_back(proj_ptr);
+            }
+        }
+        else if ((bool) hacks::tf2::warp::dodge_projectile)
+        {
+            auto iter = std::find(skip_these.begin(), skip_these.end(), &array[i]);
+            if (iter != skip_these.end())
+                skip_these.erase(iter);
         }
     }
 }

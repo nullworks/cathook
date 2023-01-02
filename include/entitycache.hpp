@@ -221,6 +221,8 @@ namespace entity_cache
 // b1g fat array in
 extern std::vector<CachedEntity *> valid_ents;
 extern CachedEntity array[MAX_ENTITIES];
+extern std::map<Vector,CachedEntity* > proj_map;
+extern std::vector<CachedEntity *> skip_these;
 inline CachedEntity &Get(int idx)
 {
     if (idx < 0 || idx >= 2048)

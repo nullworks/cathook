@@ -205,8 +205,6 @@ void Update()
                     else
                         skip_these.push_back(proj_ptr);
                 }
-                else
-                    skip_these.push_back(proj_ptr);
             }
         }
         else if ((bool) hacks::tf2::warp::dodge_projectile)

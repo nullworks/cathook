@@ -182,7 +182,7 @@ void draw()
     }
     else
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
             // Get and check player
             auto ent = ENTITY(i);

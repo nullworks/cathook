@@ -35,7 +35,7 @@ void draw_sphere(Vector center, double r, std::vector<Vector> &spherePoints)
         spherePoints.emplace_back(center.x, center.y, center.z - r);
         int vecsize = spherePoints.size();
         Vector prev = spherePoints.front();
-        for (int i = 1; i < vecsize; i++)
+        for (int i = 1; i < vecsize; ++i)
         {
             if (draw::WorldToScreen(prev, screen) && draw::WorldToScreen(spherePoints[i], screen2))
             {

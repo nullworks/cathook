@@ -97,7 +97,7 @@ bool shouldSearchAmmo()
         return false;
     if (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) <= 5)
         return true;
-    for (int i = 0; weapon_list[i]; i++)
+    for (int i = 0; weapon_list[i]; ++i)
     {
         int handle = weapon_list[i];
         int eid    = HandleToIDX(handle);
@@ -259,7 +259,7 @@ static std::pair<CachedEntity *, float> getNearestPlayerDistance()
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_VALID(ent) && ent->m_vecDormantOrigin() && g_pPlayerResource->isAlive(ent->m_IDX) && ent->m_bEnemy() && g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin()) < distance && player_tools::shouldTarget(ent) && !IsPlayerInvisible(ent))
@@ -491,7 +491,7 @@ void updateEnemyBlacklist(int slot)
     std::unordered_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
 
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         CachedEntity *ent = ENTITY(i);
         // Entity is generally invalid, ignore
@@ -841,7 +841,7 @@ bool stayNear()
 
     int calls = 0;
     // Test all entities
-    for (int i = lowest_check_index; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = lowest_check_index; i <= g_IEngine->GetMaxClients(); ++i)
     {
         if (calls >= advance_count)
             break;

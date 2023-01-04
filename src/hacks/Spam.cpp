@@ -182,7 +182,7 @@ int QueryPlayer(Query query)
     }
     std::vector<int> candidates{};
     int index_result = 0;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         if (PlayerPassesQuery(query, i))
         {

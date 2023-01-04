@@ -19,7 +19,7 @@ void CreateMove()
 
     // Should we test if a flip would help?
     bool should_test_viewmodel = true;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent) || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || ent == LOCAL_E)
@@ -39,7 +39,7 @@ void CreateMove()
     if (should_test_viewmodel)
     {
         cl_flipviewmodels->SetValue(!cl_flipviewmodels->GetBool());
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
         {
             CachedEntity *ent = ENTITY(i);
             if (CE_BAD(ent) || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || ent == LOCAL_E)

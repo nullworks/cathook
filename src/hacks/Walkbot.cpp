@@ -126,7 +126,7 @@ struct walkbot_node_s
 
     connection free_connection() const
     {
-        for (connection i = 0; i < MAX_CONNECTIONS; i++)
+        for (connection i = 0; i < MAX_CONNECTIONS; ++i)
         {
             if (connections[i].free())
                 return i;
@@ -147,7 +147,7 @@ struct walkbot_node_s
 
     void unlink(index_t node)
     {
-        for (connection i = 0; i < MAX_CONNECTIONS; i++)
+        for (connection i = 0; i < MAX_CONNECTIONS; ++i)
         {
             if (connections[i].good() and connections[i].node == node)
             {
@@ -222,7 +222,7 @@ std::chrono::system_clock::time_point time{};
 // no free slots exist
 index_t free_node()
 {
-    for (index_t i = 0; i < nodes.size(); i++)
+    for (index_t i = 0; i < nodes.size(); ++i)
     {
         if (not(nodes[i].flags & NF_GOOD))
             return i;
@@ -239,7 +239,7 @@ using state::nodes;
 bool HasLowAmmo()
 {
     int *weapon_list = (int *) ((unsigned) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
-    for (int i = 0; weapon_list[i]; i++)
+    for (int i = 0; weapon_list[i]; ++i)
     {
         int handle = weapon_list[i];
         int eid    = HandleToIDX(handle);
@@ -266,7 +266,7 @@ void DeleteNode(index_t node)
         return;
     logging::Info("[wb] Deleting node %u", node);
     auto &n = nodes[node];
-    for (size_t i = 0; i < MAX_CONNECTIONS; i++)
+    for (size_t i = 0; i < MAX_CONNECTIONS; ++i)
     {
         if (n.connections[i].good() and node_good(n.connections[i].node))
         {
@@ -639,7 +639,7 @@ CatCommand c_toggle_cf_ammo("wb_conn_ammo", "Toggle 'ammo' flag on connection fr
                                 auto b = state::closest();
                                 if (not(a and b))
                                     return;
-                                for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                for (connection i = 0; i < MAX_CONNECTIONS; ++i)
                                 {
                                     auto &c = a->connections[i];
                                     if (c.free())
@@ -660,7 +660,7 @@ CatCommand c_toggle_cf_health("wb_conn_health", "Toggle 'health' flag on connect
                                   auto b = state::closest();
                                   if (not(a and b))
                                       return;
-                                  for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                  for (connection i = 0; i < MAX_CONNECTIONS; ++i)
                                   {
                                       auto &c = a->connections[i];
                                       if (c.free())
@@ -681,7 +681,7 @@ CatCommand c_toggle_cf_sticky("wb_conn_sticky", "Toggle 'Sticky' flag on connect
                                   auto b = state::closest();
                                   if (not(a and b))
                                       return;
-                                  for (connection i = 0; i < MAX_CONNECTIONS; i++)
+                                  for (connection i = 0; i < MAX_CONNECTIONS; ++i)
                                   {
                                       auto &c = a->connections[i];
                                       if (c.free())
@@ -709,7 +709,7 @@ CatCommand c_info("wb_dump", "Show info",
                       logging::Info("[wb] Flags: Duck=%d, Jump=%d, Raw=%u", n.flags & NF_DUCK, n.flags & NF_JUMP, n.flags);
                       logging::Info("[wb] X: %.2f | Y: %.2f | Z: %.2f", n.x, n.y, n.z);
                       logging::Info("[wb] Connections:");
-                      for (size_t i = 0; i < MAX_CONNECTIONS; i++)
+                      for (size_t i = 0; i < MAX_CONNECTIONS; ++i)
                       {
                           if (n.connections[i].free())
                               continue;
@@ -739,7 +739,7 @@ CatCommand c_delete_region("wb_delete_region", "Delete region of nodes",
                                        return;
                                    }
                                    bool found_next = false;
-                                   for (size_t i = 0; i < 2; i++) {
+                                   for (size_t i = 0; i < 2; ++i) {
                                        if (n.connections[i] != current) {
                                            next = n.connections[i];
                                            found_next = true;
@@ -765,7 +765,7 @@ void UpdateClosestNode()
     float n_fov   = 360.0f;
     index_t n_idx = BAD_NODE;
 
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
     {
         auto &node = state::nodes[i];
 
@@ -795,7 +795,7 @@ index_t FindNearestNode(bool traceray)
     index_t r_node{ BAD_NODE };
     float r_dist{ 65536.0f };
 
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
     {
         if (state::node_good(i))
         {
@@ -822,7 +822,7 @@ index_t SelectNextNode()
     }
     auto &n = state::nodes[state::active_node];
     std::vector<index_t> chance{};
-    for (index_t i = 0; i < MAX_CONNECTIONS; i++)
+    for (index_t i = 0; i < MAX_CONNECTIONS; ++i)
     {
         if (n.connections[i].good() and n.connections[i].node != state::last_node and node_good(n.connections[i].node))
         {
@@ -1064,7 +1064,7 @@ void DrawNode(index_t node, bool draw_back)
 
     auto &n = state::nodes[node];
 
-    for (size_t i = 0; i < MAX_CONNECTIONS; i++)
+    for (size_t i = 0; i < MAX_CONNECTIONS; ++i)
     {
         DrawConnection(node, n.connections[i]);
     }
@@ -1111,7 +1111,7 @@ void DrawNode(index_t node, bool draw_back)
 
 void DrawPath()
 {
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
     {
         DrawNode(i, true);
     }

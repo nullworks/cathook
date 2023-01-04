@@ -47,7 +47,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
         if (last_sort_tickcount != tickcount)
         {
             player_names.clear();
-            for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
+            for (int i = 1; i < g_IEngine->GetMaxClients(); ++i)
             {
                 player_info_s player_info;
                 if (GetPlayerInfo(i, &player_info))

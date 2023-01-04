@@ -38,7 +38,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 
     bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 1; ++i)
     {
         if (prevent != -1)
         {
@@ -123,7 +123,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         }
     }
     prevent = -1;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent) || !(ent->m_bAlivePlayer()) || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
@@ -315,7 +315,7 @@ static void SapperAimbot()
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
 
-    for (int i = 0; i < entity_cache::max; i++)
+    for (int i = 0; i < entity_cache::max; ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
@@ -455,7 +455,7 @@ CachedEntity *targetBuilding(bool priority)
     float wrench_range   = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
-    for (int i = 0; i < entity_cache::max; i++)
+    for (int i = 0; i < entity_cache::max; ++i)
     {
         CachedEntity *ent = ENTITY(i);
 

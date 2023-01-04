@@ -52,7 +52,7 @@ void CreateMove()
         return;
     angles::Update();
     ac::aimbot::player_orgs().clear();
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         if (skip_local && (i == g_IEngine->GetLocalPlayer()))
             continue;

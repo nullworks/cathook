@@ -136,14 +136,14 @@ void repopulate(std::string str)
         }
         auto &peer_data                           = ipc::peer->memory->peer_user_data;
         std::vector<struct ipc_peer> sorted_peers = {};
-        for (int i = 0; i < cat_ipc::max_peers; i++)
+        for (int i = 0; i < cat_ipc::max_peers; ++i)
         {
             ipc::user_data_s &data = peer_data[i];
             struct ipc_peer peer   = { .friendid = data.friendid, .ts_injected = data.ts_injected };
             sorted_peers.push_back(peer);
         }
         std::sort(sorted_peers.begin(), sorted_peers.end(), compare_ts);
-        for (int i = 0; i < *ipc_count; i++)
+        for (int i = 0; i < *ipc_count; ++i)
         {
             party_hosts.push_back(sorted_peers[i].friendid);
         }
@@ -166,7 +166,7 @@ void repopulate(std::string str)
 bool is_host()
 {
     uint32 id = g_ISteamUser->GetSteamID().GetAccountID();
-    for (int i = 0; i < party_hosts.size(); i++)
+    for (int i = 0; i < party_hosts.size(); ++i)
     {
         if (party_hosts.at(i) == id)
         {
@@ -180,7 +180,7 @@ bool is_host()
 void find_party()
 {
     log_debug("No party members and not a party host; requesting to join with each party host");
-    for (int i = 0; i < party_hosts.size(); i++)
+    for (int i = 0; i < party_hosts.size(); ++i)
     {
         hack::ExecuteCommand("tf_party_request_join_user " + std::to_string(party_hosts[i]));
     }
@@ -285,7 +285,7 @@ void party_routine()
                     if (*kick_rage)
                     {
                         bool should_ret = false;
-                        for (int i = 0; i < members.size(); i++)
+                        for (int i = 0; i < members.size(); ++i)
                         {
                             auto &pl = playerlist::AccessData(members[i]);
                             if (pl.state == playerlist::k_EState::RAGE)
@@ -318,7 +318,7 @@ void party_routine()
                         logging::Info("AutoParty: %s", message.c_str());
                         if (*message_kicks)
                             client->SendPartyChat(message.c_str());
-                        for (int i = 0; i < num_to_kick; i++)
+                        for (int i = 0; i < num_to_kick; ++i)
                         {
                             CSteamID id = CSteamID(members[members.size() - (1 + i)], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
                             client->KickPlayer(id);

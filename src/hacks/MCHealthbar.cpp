@@ -16,9 +16,9 @@ static std::vector<textures::sprite> absorption;
 static std::vector<textures::sprite> hearts;
 
 static InitRoutine init_textures([]() {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; ++i)
         absorption.push_back(textures::atlas().create_sprite(320 + 64 * i, 64, 64, 64));
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; ++i)
         hearts.push_back(textures::atlas().create_sprite(256 + 64 * i, 192, 64, 64));
 });
 
@@ -40,7 +40,7 @@ void draw_func()
     int absorb_halfh          = ((float) absorption_health / (float) maxAdditionalHealth) * 20.0f;
     int absorb_fullh          = (absorb_halfh - 1) / 2;
     float iconPixel           = (iconSize / 8);
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; ++i)
     {
         // (iconSize / 8) = 1 pixel in the icon
 
@@ -55,7 +55,7 @@ void draw_func()
                            colors::white); // empty
     }
     if (absorb_halfh >= 1.0f)
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; ++i)
         {
 
             if (absorb_fullh >= i + 1)

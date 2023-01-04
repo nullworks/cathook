@@ -97,7 +97,7 @@ int BulletDangerValue(CachedEntity *patient)
         return 0;
     bool any_zoomed_snipers = false;
     // Find dangerous snipers in other team
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
@@ -142,7 +142,7 @@ int FireDangerValue(CachedEntity *patient)
     uint8_t should_switch = 0;
     if (auto_vacc_pop_if_pyro)
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
             CachedEntity *ent = ENTITY(i);
             if (CE_BAD(ent))
@@ -424,7 +424,7 @@ bool IsVaccinator()
 
 void UpdateData()
 {
-    for (int i = 1; i <= MAX_PLAYERS; i++)
+    for (int i = 1; i <= MAX_PLAYERS; ++i)
     {
         if (reset_cd[i].test_and_set(10000))
             data[i] = {};
@@ -577,7 +577,7 @@ int BestTarget()
     int best_score = INT_MIN;
     if (steamid_only)
         return best;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
     {
         int score = HealingPriority(i);
         if (score > best_score && score != -1)
@@ -622,7 +622,7 @@ void CreateMove()
         }
         if (current_id != steamid)
         {
-            for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+            for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
             {
                 CachedEntity *ent = ENTITY(i);
                 if (CE_BAD(ent) || !ent->player_info.friendsID)

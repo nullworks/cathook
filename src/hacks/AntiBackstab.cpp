@@ -60,7 +60,7 @@ CachedEntity *ClosestSpy()
     closest      = nullptr;
     closest_dist = 0.0f;
 
-    for (int i = 1; i < PLAYER_ARRAY_SIZE && i < g_IEntityList->GetHighestEntityIndex(); i++)
+    for (int i = 1; i < PLAYER_ARRAY_SIZE && i < g_IEntityList->GetHighestEntityIndex(); ++i)
     {
         ent = ENTITY(i);
         if (CE_BAD(ent))

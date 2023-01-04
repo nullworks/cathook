@@ -108,7 +108,7 @@ int ClosestDistanceHitbox(CachedEntity *target)
 {
     int closest        = -1;
     float closest_dist = FLT_MAX, dist = 0.0f;
-    for (int i = pelvis; i < spine_3; i++)
+    for (int i = pelvis; i < spine_3; ++i)
     {
         auto hitbox = target->hitboxes.GetHitbox(i);
         if (!hitbox)
@@ -126,7 +126,7 @@ int ClosestDistanceHitbox(hacks::tf2::backtrack::BacktrackData btd)
 {
     int closest        = -1;
     float closest_dist = FLT_MAX, dist = 0.0f;
-    for (int i = pelvis; i < spine_3; i++)
+    for (int i = pelvis; i < spine_3; ++i)
     {
         dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes.at(i).center);
         if (dist < closest_dist)
@@ -262,7 +262,7 @@ static bool doRageBackstab()
     float swingrange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     // AimAt Autobackstab
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
             auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_flDistance() > swingrange * 4 || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || g_pLocalPlayer->entity_idx == ent->m_IDX || IsPlayerInvulnerable(ent))
@@ -353,7 +353,7 @@ static bool doBacktrackStab(bool legit = false)
     // Set for our filter
     legit_stab = legit;
     // Get the Best tick
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
     {
         // Found a target, break out
         if (stab_ent)

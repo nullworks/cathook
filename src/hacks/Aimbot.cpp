@@ -172,7 +172,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
         shrink_size = 6;
 
     // Shrink positions by moving towards opposing corner
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
         corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
 
     // Generate middle points on line segments
@@ -207,9 +207,9 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
         while (hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
         {
             if (hitbox == i)
-                i++;
+                ++i;
             hitpoints = getHitpointsVischeck(ent, i);
-            i++;
+            ++i;
         }
     }
 
@@ -244,7 +244,7 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
         shrink_size = 6;
 
     // Shrink positions by moving towards opposing corner
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
         corners[i] += (corners[7 - i] - corners[i]) / shrink_size;
 
     // Generate middle points on line segments
@@ -981,7 +981,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                 while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
                 {
                     if (i == cd.hitbox && i != 17)
-                        i++;
+                        ++i;
                     trace_t test_trace;
 
                     std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
@@ -991,7 +991,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                         cd.hitbox = i;
                         return true;
                     }
-                    i++;
+                    ++i;
                 }
                 return false; // It looped through every hitbox and found nothing. It isn't visible.
             }
@@ -1489,7 +1489,7 @@ int ClosestHitbox(CachedEntity *target)
 
     closest     = -1;
     closest_fov = 256;
-    for (int i = 0; i < target->hitboxes.GetNumHitboxes(); i++)
+    for (int i = 0; i < target->hitboxes.GetNumHitboxes(); ++i)
     {
         fov = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, target->hitboxes.GetHitbox(i)->center);
         if (fov < closest_fov || closest == -1)
@@ -1647,7 +1647,7 @@ static void DrawText()
     // Debug stuff
     if (!aimbot_debug)
         return;
-    for (int i = 1; i < PLAYER_ARRAY_SIZE; i++)
+    for (int i = 1; i < PLAYER_ARRAY_SIZE; ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_GOOD(ent))

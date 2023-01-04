@@ -297,9 +297,9 @@ static InitRoutine init(
             for (int j = 0; j < 9; ++j)
                 tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
         }
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; ++i)
             tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; ++i)
             tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
         logging::Info("Radar sprites loaded");
         EC::Register(EC::Draw, Draw, "radar", EC::average);

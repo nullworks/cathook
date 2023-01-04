@@ -274,6 +274,7 @@ void dodgeProj()
             // 2 Ticks in advance is a fairly safe interval
             Vector velocity_comp = key * 2 * TICK_INTERVAL;
             velocity_comp.z -= 2 * TICK_INTERVAL * g_ICvar->FindVar("sv_gravity")->GetFloat() * ProjGravMult(val->m_iClassID(), key.Length());
+
             Vector proj_next_tik = RAW_ENT(val)->GetAbsOrigin() + velocity_comp;
             float diff           = proj_next_tik.DistToSqr(player_pos);
             // Warp sooner for fast moving projectiles.
@@ -289,12 +290,12 @@ void dodgeProj()
                     float dist = trace.endpos.DistToSqr(player_pos);
                     // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
                     Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
+
                     if (0 <= result.y)
                         yaw_amount = -90.0f;
                     else
                         yaw_amount = 90.0f;
-
-                    if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E) || dist < 15000)
+                    if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E))
                     {
                         was_hurt   = true;
                         warp_dodge = true;
@@ -414,7 +415,7 @@ void Warp(float accumulated_extra_samples, bool finalTick)
 
         // Starts at 1 for the previous packet we already stored
         int packets_sent = 1;
-        for (int i = 0; i < calls; i++)
+        for (int i = 0; i < calls; ++i)
         {
             if (!i)
                 first_warp_tick = true;
@@ -492,7 +493,7 @@ int approximateTicksForDist(float distance, float initial_speed, int max_ticks)
             has_booties = true;
     }
     float travelled_dist = 0.0f;
-    for (int i = 0; i <= max_ticks; i++)
+    for (int i = 0; i <= max_ticks; ++i)
     {
         // Compensate for the skullcutter (booties don't speed up, besides with skullcutter)
         travelled_dist += approximateSpeedAtTick(i, initial_speed, is_skullcutter ? (has_booties ? 701.0f : 637.0f) : 750.0f);
@@ -803,7 +804,7 @@ void warpLogic()
                 // Find an entity meeting the Criteria and closest to crosshair
                 std::pair<CachedEntity *, float> result{ nullptr, FLT_MAX };
 
-                for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+                for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
                 {
                     CachedEntity *ent = ENTITY(i);
                     if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))

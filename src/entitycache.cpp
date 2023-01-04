@@ -141,29 +141,24 @@ CachedEntity array[MAX_ENTITIES]{};
 std::vector<CachedEntity *> valid_ents;
 std::map<Vector, CachedEntity *> proj_map;
 std::vector<CachedEntity *> skip_these;
-
 void Update()
 {
     max = g_IEntityList->GetHighestEntityIndex();
     valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
     if (max >= MAX_ENTITIES)
-    {
         max = MAX_ENTITIES - 1;
-    }
-
-    for (int i = 0; i <= max; i++)
+    for (int i = 0; i <= max; ++i)
     {
         array[i].Update();
+
         if (CE_GOOD((&array[i])))
         {
             array[i].hitboxes.UpdateBones();
             valid_ents.push_back(&array[i]);
             if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
             {
-
                 Vector eav;
                 CachedEntity *proj_ptr = &array[i];
-
                 velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
                 // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
                 // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air

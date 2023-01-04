@@ -112,13 +112,10 @@ public:
     bool transparent{ false };
 };
 
-// Unknown
-std::mutex threadsafe_mutex;
 // Storage array for keeping strings and other data
 std::array<ESPData, 2048> data;
 // Storage vars for entities that need to be re-drawn
 std::vector<std::pair<int, float>> entities_need_repaint{};
-std::mutex entities_need_repaint_mutex{};
 
 // :b:one stuff needs to be up here as puting it in the header for sorting would
 // be a pain.
@@ -137,10 +134,12 @@ const std::string bonenames_up[]     = { "bip_upperArm_R", "bip_spine_3", "bip_u
 // NOTE: No idea on why we cant just use gethitbox and use the displacement on
 // that insted of having all this extra code. Shouldnt gethitbox use cached
 // hitboxes, if so it should be nicer on performance
-struct bonelist_s
+class bonelist_s
 {
+private:
     bool setup{ false };
     bool success{ false };
+    std::unordered_map<std::string, int> bones{};
     int leg_r[3]{ 0 };
     int leg_l[3]{ 0 };
     int bottom[3]{ 0 };
@@ -149,103 +148,74 @@ struct bonelist_s
     int arm_l[3]{ 0 };
     int up[3]{ 0 };
 
-    void Setup(const studiohdr_t *hdr)
-    {
-        if (!hdr)
-        {
-            setup = true;
-            return;
-        }
-        std::unordered_map<std::string, int> bones{};
-        for (int i = 0; i < hdr->numbones; i++)
-        {
-            bones[std::string(hdr->pBone(i)->pszName())] = i;
-        }
-        try
-        {
-            for (int i = 0; i < 3; i++)
-                leg_r[i] = bones.at(bonenames_leg_r[i]);
-            for (int i = 0; i < 3; i++)
-                leg_l[i] = bones.at(bonenames_leg_l[i]);
-            for (int i = 0; i < 3; i++)
-                bottom[i] = bones.at(bonenames_bottom[i]);
-            for (int i = 0; i < 7; i++)
-                spine[i] = bones.at(bonenames_spine[i]);
-            for (int i = 0; i < 3; i++)
-                arm_r[i] = bones.at(bonenames_arm_r[i]);
-            for (int i = 0; i < 3; i++)
-                arm_l[i] = bones.at(bonenames_arm_l[i]);
-            for (int i = 0; i < 3; i++)
-                up[i] = bones.at(bonenames_up[i]);
-            success = true;
-        }
-        catch (std::exception &ex)
-        {
-            logging::Info("Bone list exception: %s", ex.what());
-        }
-        setup = true;
-    }
-
-    void _FASTCALL DrawBoneList(const matrix3x4_t *bones, int *in, int size, const rgba_t &color)
-    {
-        Vector last_screen;
-        Vector current_screen;
-        for (int i = 0; i < size; i++)
-        {
-            const auto &bone = bones[in[i]];
-            Vector position(bone[0][3], bone[1][3], bone[2][3]);
-            if (!draw::WorldToScreen(position, current_screen))
-            {
-                return;
-            }
-            if (i > 0)
-            {
-                draw::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, *bones_thickness);
-            }
-            last_screen = current_screen;
-        }
-    }
-
-    void _FASTCALL Draw(CachedEntity *ent, const rgba_t &color)
-    {
-        const model_t *model = RAW_ENT(ent)->GetModel();
-        if (not model)
-        {
-            return;
-        }
-
-        studiohdr_t *hdr = g_IModelInfo->GetStudiomodel(model);
-
-        if (!setup)
-        {
-            Setup(hdr);
-        }
-        if (!success)
-            return;
-
-        // ent->m_bBonesSetup = false;
-        const auto &bones = ent->hitboxes.GetBones();
-        DrawBoneList(bones, leg_r, 3, color);
-        DrawBoneList(bones, leg_l, 3, color);
-        DrawBoneList(bones, bottom, 3, color);
-        DrawBoneList(bones, spine, 7, color);
-        DrawBoneList(bones, arm_r, 3, color);
-        DrawBoneList(bones, arm_l, 3, color);
-        DrawBoneList(bones, up, 3, color);
-        /*for (int i = 0; i < hdr->numbones; i++) {
-            const auto& bone = ent->GetBones()[i];
-            Vector pos(bone[0][3], bone[1][3], bone[2][3]);
-            //pos += orig;
-            Vector screen;
-            if (draw::WorldToScreen(pos, screen)) {
-                if (hdr->pBone(i)->pszName()) {
-                    draw::FString(fonts::ESP, screen.x, screen.y, fg, 2, "%s
-        [%d]", hdr->pBone(i)->pszName(), i); } else draw::FString(fonts::ESP,
-        screen.x, screen.y, fg, 2, "%d", i);
-            }
-        }*/
-    }
+public:
+    void Setup(const studiohdr_t *hdr);
+    void _FASTCALL DrawBoneList(const matrix3x4_t *bones, int *in, int size, const rgba_t &color);
+    void _FASTCALL Draw(CachedEntity *ent, const rgba_t &color);
 };
+
+void bonelist_s::Setup(const studiohdr_t *hdr)
+{
+    if (!hdr)
+    {
+        setup = false;
+        return;
+    }
+    for (int i = 0; i < hdr->numbones; ++i)
+        bones.emplace(std::make_pair(std::string(hdr->pBone(i)->pszName()), i));
+    for (int i = 0; i < 7; ++i)
+        spine[i] = bones.at(bonenames_spine[i]);
+    for (int i = 0; i < 3; ++i)
+    {
+        arm_l[i]  = bones.at(bonenames_arm_l[i]);
+        up[i]     = bones.at(bonenames_up[i]);
+        arm_r[i]  = bones.at(bonenames_arm_r[i]);
+        bottom[i] = bones.at(bonenames_bottom[i]);
+        leg_l[i]  = bones.at(bonenames_leg_l[i]);
+        leg_r[i]  = bones.at(bonenames_leg_r[i]);
+    }
+
+    success = true;
+    setup   = true;
+}
+
+void _FASTCALL bonelist_s::DrawBoneList(const matrix3x4_t *bones, int *in, int size, const rgba_t &color)
+{
+    Vector last_screen;
+    Vector current_screen;
+    for (int i = 0; i < size; i++)
+    {
+        const auto &bone = bones[in[i]];
+        Vector position(bone[0][3], bone[1][3], bone[2][3]);
+        if (!draw::WorldToScreen(position, current_screen))
+            return;
+        if (i > 0)
+            draw::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, *bones_thickness);
+        last_screen = current_screen;
+    }
+}
+
+void _FASTCALL bonelist_s::Draw(CachedEntity *ent, const rgba_t &color)
+{
+    const model_t *model = RAW_ENT(ent)->GetModel();
+    if (!model)
+        return;
+
+    studiohdr_t *hdr = g_IModelInfo->GetStudiomodel(model);
+
+    if (!setup)
+        Setup(hdr);
+    if (!success)
+        return;
+    const auto &bones = ent->hitboxes.GetBones();
+    DrawBoneList(bones, leg_r, 3, color);
+    DrawBoneList(bones, leg_l, 3, color);
+    DrawBoneList(bones, bottom, 3, color);
+    DrawBoneList(bones, spine, 7, color);
+    DrawBoneList(bones, arm_r, 3, color);
+    DrawBoneList(bones, arm_l, 3, color);
+    DrawBoneList(bones, up, 3, color);
+}
 
 // These are strings that never change and should only be constructed once
 const std::string hoovy_str                = "Hoovy";
@@ -334,11 +304,8 @@ static void Draw()
     if (!enable)
         return;
     PROF_SECTION(DRAW_ESP_PERFORMANCE);
-    std::lock_guard<std::mutex> esp_lock(threadsafe_mutex);
     for (auto &i : entities_need_repaint)
-    {
         ProcessEntityPT(ENTITY(i.first));
-    }
 }
 
 // Function called on create move
@@ -349,8 +316,6 @@ static void cm()
         return;
     if (CE_BAD(LOCAL_E))
         return;
-    // Something
-    std::lock_guard<std::mutex> esp_lock(threadsafe_mutex);
 
     // Update entites every 1/5s
     const bool entity_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.20f) == 0;
@@ -469,6 +434,336 @@ void _FASTCALL hitboxUpdate(CachedEntity *ent)
         }
     }
 }
+void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
+{
+
+    // Logic for using the enum to sort out snipers
+    if (((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
+    {
+        PROF_SECTION(PT_esp_sightlines);
+
+        // Get players angle and head position
+        Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
+        Vector eye_position;
+        eye_position = ent->hitboxes.GetHitbox(0)->center;
+
+        // Main ray tracing area
+        float sy         = sinf(DEG2RAD(eye_angles.y)); // yaw
+        float cy         = cosf(DEG2RAD(eye_angles.y));
+        float sp         = sinf(DEG2RAD(eye_angles.x)); // pitch
+        float cp         = cosf(DEG2RAD(eye_angles.x));
+        Vector forward_t = Vector(cp * cy, cp * sy, -sp);
+        // We dont want the sightlines endpoint to go behind us because the
+        // world to screen check will fail, but keep it at most 4096
+        Vector forward = forward_t * 4096.0F + eye_position;
+        Ray_t ray;
+        ray.Init(eye_position, forward);
+        trace_t trace;
+        g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_no_player, &trace);
+
+        // Screen vectors
+        Vector scn1, scn2;
+
+        // Status vars
+        bool found_scn2 = true;
+
+        // Get end point on screen
+        if (!draw::WorldToScreen(trace.endpos, scn2))
+        {
+            // Set status
+            found_scn2 = false;
+            // Get the end distance from the trace
+            float end_distance = trace.endpos.DistTo(eye_position);
+
+            // Loop and look back until we have a vector on screen
+            for (int i = 1; i < 500; i++)
+            {
+                // Subtract 40 multiplyed by the tick from the end distance
+                // and use that as our length to check
+                Vector end_vector = forward_t * (end_distance - (10 * i)) + eye_position;
+                if (end_vector.DistTo(eye_position) < 1)
+                    break;
+                if (draw::WorldToScreen(end_vector, scn2))
+                {
+                    found_scn2 = true;
+                    break;
+                }
+            }
+        }
+
+        if (found_scn2)
+        {
+            // Set status
+            bool found_scn1 = true;
+
+            // If we dont have a vector on screen, attempt to find one
+            if (!draw::WorldToScreen(eye_position, scn1))
+            {
+                // Set status
+                found_scn1 = false;
+
+                // Loop and look back untill we have a vector on screen
+                for (int i = 1; i < 500; i++)
+                {
+                    // Multiply starting distance by 15, multiplyed by the
+                    // loop tick
+                    Vector start_vector = forward_t * (10 * i) + eye_position;
+                    // We dont want it to go too far
+                    if (start_vector.DistTo(trace.endpos) < 1)
+                        break;
+                    // Check if we have a vector on screen, if we do then we
+                    // set our status
+                    if (draw::WorldToScreen(start_vector, scn1))
+                    {
+                        found_scn1 = true;
+                        break;
+                    }
+                }
+            }
+            // We have both vectors, draw
+            if (found_scn1)
+            {
+                draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg, 0.5f);
+            }
+        }
+    }
+}
+void _FASTCALL Healthbar(EntityType &type, int &classid, rgba_t &fg, ESPData &ent_data, CachedEntity *ent)
+{
+
+    if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
+    {
+        // Get collidable from the cache
+        if (GetCollide(ent))
+        {
+
+            // Pull the cached collide info
+            int max_x = ent_data.collide_max.x;
+            int max_y = ent_data.collide_max.y;
+            int min_x = ent_data.collide_min.x;
+            int min_y = ent_data.collide_min.y;
+
+            // Get health values
+            int health    = 0;
+            int healthmax = 0;
+            switch (type)
+            {
+            case ENTITY_PLAYER:
+                health    = g_pPlayerResource->GetHealth(ent);
+                healthmax = g_pPlayerResource->GetMaxHealth(ent);
+                break;
+            case ENTITY_BUILDING:
+                health    = CE_INT(ent, netvar.iBuildingHealth);
+                healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
+                break;
+            }
+
+            // Get Colors
+            rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
+            rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
+            // Get bar width and height
+            int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
+            int hbh = (max_y - min_y - 2) * std::min((float) health / (float) healthmax, 1.0f);
+
+            // Top horizontal health bar
+            if (*healthbar == 1)
+            {
+                draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
+                draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
+            }
+            // Bottom horizontal health bar
+            else if (*healthbar == 2)
+            {
+                draw::RectangleOutlined(min_x, max_y, max_x - min_x + 1, 7, border, 0.5f);
+                draw::Rectangle(min_x + hbw, max_y + 1, -hbw, 5, hp);
+            }
+            // Vertical health bar
+            else if (*healthbar == 3)
+            {
+                draw::RectangleOutlined(min_x - 7, min_y, 7, max_y - min_y, border, 0.5f);
+                draw::Rectangle(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
+            }
+        }
+    }
+}
+void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPData &ent_data, CachedEntity *ent)
+{
+    PROF_SECTION(PT_esp_drawstrings);
+
+    // Create our initial point at the center of the entity
+
+    bool origin_is_zero = true;
+
+    // Only get collidable for players and buildings
+    if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
+    {
+
+        // Get collidable from the cache
+        if (GetCollide(ent))
+        {
+
+            // Origin could change so we set to false
+            origin_is_zero = false;
+
+            // Pull the cached collide info
+            int max_x = ent_data.collide_max.x;
+            int max_y = ent_data.collide_max.y;
+            int min_x = ent_data.collide_min.x;
+            int min_y = ent_data.collide_min.y;
+
+            // Change the position of the draw point depending on the user
+            // settings
+            switch ((int) esp_text_position)
+            {
+            case 0:
+            { // TOP RIGHT
+                draw_point = Vector(max_x + 2, min_y, 0);
+            }
+            break;
+            case 1:
+            { // BOTTOM RIGHT
+                draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 16, 0);
+            }
+            break;
+            case 2:
+            {                          // CENTER
+                origin_is_zero = true; // origin is still zero so we set to true
+            }
+            break;
+            case 3:
+            { // ABOVE CENTER
+                draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+            }
+            break;
+            case 4:
+            { // BELOW
+                draw_point = Vector((min_x + max_x) / 2.0f, max_y, 0);
+            }
+            break;
+            case 5:
+            { // ABOVE LEFT
+                draw_point = Vector(min_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+            }
+            break;
+            case 6:
+            { // ABOVE RIGHT
+                draw_point = Vector(max_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+            }
+            }
+        }
+    }
+
+    // Loop through strings
+    for (int j = 0; j < ent_data.string_count; j++)
+    {
+
+        // Pull string from the entity's cached string array
+        const ESPString &string = ent_data.strings[j];
+
+        // If string has a color assined to it, apply that otherwise use
+        // entities color
+        rgba_t color = string.color ? string.color : ent_data.color;
+        if (transparent)
+            color = colors::Transparent(color); // Apply transparency if needed
+
+        // If the origin is centered, we use one method. if not, the other
+        if (!origin_is_zero || true)
+        {
+            float draw_pointx_tmp = draw_point.x;
+            // Above/Below text should be centered
+            if (*esp_text_position == 3 || *esp_text_position == 4)
+            {
+                float w, h;
+                fonts::esp->stringSize(string.data, &w, &h);
+                draw_pointx_tmp -= w / 2.0f;
+            }
+            draw::String(draw_pointx_tmp, draw_point.y, color, string.data.c_str(), *fonts::esp);
+        }
+
+        // Add to the y due to their being text in that spot
+        draw_point.y += /*((int)fonts::font_main->height)*/ 15 - 1;
+    }
+}
+void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEntity *ent)
+{
+    switch (type)
+    {
+    case ENTITY_PLAYER:
+        if (!fg)
+            fg = colors::EntityF(ent);
+        if (transparent)
+            fg = colors::Transparent(fg);
+        if (RAW_ENT(ent)->IsDormant())
+        {
+            fg.r *= 0.75f;
+            fg.g *= 0.75f;
+            fg.b *= 0.75f;
+        }
+        if (!box_3d_player && box_esp)
+            DrawBox(ent, fg);
+        else if (box_3d_player)
+            Draw3DBox(ent, fg);
+        break;
+    case ENTITY_BUILDING:
+        if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !team_buildings)
+            break;
+        if (!fg)
+            fg = colors::EntityF(ent);
+        if (transparent)
+            fg = colors::Transparent(fg);
+        if (RAW_ENT(ent)->IsDormant())
+        {
+            fg.r *= 0.75f;
+            fg.g *= 0.75f;
+            fg.b *= 0.75f;
+        }
+        // Draw exit arrow
+        // YawToExit is 0.0f on exit and on newly placed still disabled entrances
+        // m_iState is 0 when the TP is disabled
+        if (ent->m_iClassID() == CL_CLASS(CObjectTeleporter) && CE_FLOAT(ent, netvar.m_flTeleYawToExit) == 0.0f && CE_INT(ent, netvar.m_iTeleState) > 1)
+        {
+            float sin_a, cos_a;
+            // for some reason vAngRotation yaw differs from exit direction, unsure why
+            SinCos(DEG2RAD(CE_VECTOR(ent, netvar.m_angRotation).y - 90.0f), &sin_a, &cos_a);
+
+            // pseudo used to rotate properly
+            // screen is passed to filledpolygon
+            Vector pseudo[3];
+            Vector screen[3];
+
+            // 24 = teleporter width and height
+            // 16 = arrow size
+            pseudo[0].x = 0.0f; // Undefined behaviour bruh
+            pseudo[0].y = 16.0f + 24.0f;
+            pseudo[1].x = -16.0f;
+            pseudo[1].y = 24.0f;
+            pseudo[2].x = 16.0f;
+            pseudo[2].y = 24.0f;
+
+            // pass vector, get vector
+            // 12 is teleporter height, arrow is 12 HU off the ground
+            // sin and cos are already passed in captures
+            auto rotateVector = [sin_a = sin_a, cos_a = cos_a](Vector &in) { return Vector(in.x * cos_a - in.y * sin_a, in.x * sin_a + in.y * cos_a, 12.0f); };
+
+            // fail check
+            bool visible = true;
+
+            // rotate, add vecorigin AND check worldtoscreen at the same time in single loop
+            for (int p = 0; p < 3; p++)
+                if (!(visible = draw::WorldToScreen(rotateVector(pseudo[p]) + ent->m_vecOrigin(), screen[p])))
+                    break;
+
+            // if visible, pass it and draw the whole thing, ez pz
+            if (visible)
+                draw::Triangle(screen[0].x, screen[0].y, screen[1].x, screen[1].y, screen[2].x, screen[2].y, fg);
+        }
+        if (!box_3d_building && box_esp)
+            DrawBox(ent, fg);
+        else if (box_3d_building)
+            Draw3DBox(ent, fg);
+        break;
+    }
+}
 // Used when processing entitys with cached data from createmove in draw
 void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 {
@@ -513,98 +808,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 
     // Sightline esp
     if (sightlines && type == ENTITY_PLAYER)
-    {
-        // Logic for using the enum to sort out snipers
-        if (((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
-        {
-            PROF_SECTION(PT_esp_sightlines);
-
-            // Get players angle and head position
-            Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
-            Vector eye_position;
-            eye_position = ent->hitboxes.GetHitbox(0)->center;
-
-            // Main ray tracing area
-            float sy         = sinf(DEG2RAD(eye_angles.y)); // yaw
-            float cy         = cosf(DEG2RAD(eye_angles.y));
-            float sp         = sinf(DEG2RAD(eye_angles.x)); // pitch
-            float cp         = cosf(DEG2RAD(eye_angles.x));
-            Vector forward_t = Vector(cp * cy, cp * sy, -sp);
-            // We dont want the sightlines endpoint to go behind us because the
-            // world to screen check will fail, but keep it at most 4096
-            Vector forward = forward_t * 4096.0F + eye_position;
-            Ray_t ray;
-            ray.Init(eye_position, forward);
-            trace_t trace;
-            g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_no_player, &trace);
-
-            // Screen vectors
-            Vector scn1, scn2;
-
-            // Status vars
-            bool found_scn2 = true;
-
-            // Get end point on screen
-            if (!draw::WorldToScreen(trace.endpos, scn2))
-            {
-                // Set status
-                found_scn2 = false;
-                // Get the end distance from the trace
-                float end_distance = trace.endpos.DistTo(eye_position);
-
-                // Loop and look back until we have a vector on screen
-                for (int i = 1; i < 500; i++)
-                {
-                    // Subtract 40 multiplyed by the tick from the end distance
-                    // and use that as our length to check
-                    Vector end_vector = forward_t * (end_distance - (10 * i)) + eye_position;
-                    if (end_vector.DistTo(eye_position) < 1)
-                        break;
-                    if (draw::WorldToScreen(end_vector, scn2))
-                    {
-                        found_scn2 = true;
-                        break;
-                    }
-                }
-            }
-
-            if (found_scn2)
-            {
-                // Set status
-                bool found_scn1 = true;
-
-                // If we dont have a vector on screen, attempt to find one
-                if (!draw::WorldToScreen(eye_position, scn1))
-                {
-                    // Set status
-                    found_scn1 = false;
-
-                    // Loop and look back untill we have a vector on screen
-                    for (int i = 1; i < 500; i++)
-                    {
-                        // Multiply starting distance by 15, multiplyed by the
-                        // loop tick
-                        Vector start_vector = forward_t * (10 * i) + eye_position;
-                        // We dont want it to go too far
-                        if (start_vector.DistTo(trace.endpos) < 1)
-                            break;
-                        // Check if we have a vector on screen, if we do then we
-                        // set our status
-                        if (draw::WorldToScreen(start_vector, scn1))
-                        {
-                            found_scn1 = true;
-                            break;
-                        }
-                    }
-                }
-                // We have both vectors, draw
-                if (found_scn1)
-                {
-                    draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg, 0.5f);
-                }
-            }
-        }
-    }
+        Sightlines(ent, fg);
 
     static Vector screen;
     if (!draw::EntityCenterToScreen(ent, screen))
@@ -618,85 +822,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 
     // Box esp
     if (box_esp || box_3d_player || box_3d_building)
-    {
-        switch (type)
-        {
-        case ENTITY_PLAYER:
-            if (!fg)
-                fg = colors::EntityF(ent);
-            if (transparent)
-                fg = colors::Transparent(fg);
-            if (RAW_ENT(ent)->IsDormant())
-            {
-                fg.r *= 0.75f;
-                fg.g *= 0.75f;
-                fg.b *= 0.75f;
-            }
-            if (!box_3d_player && box_esp)
-                DrawBox(ent, fg);
-            else if (box_3d_player)
-                Draw3DBox(ent, fg);
-            break;
-        case ENTITY_BUILDING:
-            if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !team_buildings)
-                break;
-            if (!fg)
-                fg = colors::EntityF(ent);
-            if (transparent)
-                fg = colors::Transparent(fg);
-            if (RAW_ENT(ent)->IsDormant())
-            {
-                fg.r *= 0.75f;
-                fg.g *= 0.75f;
-                fg.b *= 0.75f;
-            }
-            // Draw exit arrow
-            // YawToExit is 0.0f on exit and on newly placed still disabled entrances
-            // m_iState is 0 when the TP is disabled
-            if (ent->m_iClassID() == CL_CLASS(CObjectTeleporter) && CE_FLOAT(ent, netvar.m_flTeleYawToExit) == 0.0f && CE_INT(ent, netvar.m_iTeleState) > 1)
-            {
-                float sin_a, cos_a;
-                // for some reason vAngRotation yaw differs from exit direction, unsure why
-                SinCos(DEG2RAD(CE_VECTOR(ent, netvar.m_angRotation).y - 90.0f), &sin_a, &cos_a);
-
-                // pseudo used to rotate properly
-                // screen is passed to filledpolygon
-                Vector pseudo[3];
-                Vector screen[3];
-
-                // 24 = teleporter width and height
-                // 16 = arrow size
-                pseudo[0].x = 0.0f; // Undefined behaviour bruh
-                pseudo[0].y = 16.0f + 24.0f;
-                pseudo[1].x = -16.0f;
-                pseudo[1].y = 24.0f;
-                pseudo[2].x = 16.0f;
-                pseudo[2].y = 24.0f;
-
-                // pass vector, get vector
-                // 12 is teleporter height, arrow is 12 HU off the ground
-                // sin and cos are already passed in captures
-                auto rotateVector = [sin_a = sin_a, cos_a = cos_a](Vector &in) { return Vector(in.x * cos_a - in.y * sin_a, in.x * sin_a + in.y * cos_a, 12.0f); };
-
-                // fail check
-                bool visible = true;
-
-                // rotate, add vecorigin AND check worldtoscreen at the same time in single loop
-                for (int p = 0; p < 3; p++)
-                    if (!(visible = draw::WorldToScreen(rotateVector(pseudo[p]) + ent->m_vecOrigin(), screen[p])))
-                        break;
-
-                // if visible, pass it and draw the whole thing, ez pz
-                if (visible)
-                    draw::Triangle(screen[0].x, screen[0].y, screen[1].x, screen[1].y, screen[2].x, screen[2].y, fg);
-            }
-            if (!box_3d_building && box_esp)
-                DrawBox(ent, fg);
-            else if (box_3d_building)
-                Draw3DBox(ent, fg);
-            break;
-        }
-    }
+        BoxEsp(type, transparent, fg, ent);
 
     if (draw_bones)
     {
@@ -706,7 +832,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         if (transparent)
             bone_color = colors::Transparent(bone_color);
 
-        bonelist_s bl;
+        static bonelist_s bl;
         if (!CE_INVALID(ent) && ent->m_bAlivePlayer() && !RAW_ENT(ent)->IsDormant())
         {
             if (bones_color)
@@ -718,220 +844,12 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 
     // Health bar
     if (*healthbar != 0)
-    {
-
-        // We only want health bars on players and buildings
-        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
-        {
-
-            // Get collidable from the cache
-            if (GetCollide(ent))
-            {
-
-                // Pull the cached collide info
-                int max_x = ent_data.collide_max.x;
-                int max_y = ent_data.collide_max.y;
-                int min_x = ent_data.collide_min.x;
-                int min_y = ent_data.collide_min.y;
-
-                // Get health values
-                int health    = 0;
-                int healthmax = 0;
-                switch (type)
-                {
-                case ENTITY_PLAYER:
-                    health    = g_pPlayerResource->GetHealth(ent);
-                    healthmax = g_pPlayerResource->GetMaxHealth(ent);
-                    break;
-                case ENTITY_BUILDING:
-                    health    = CE_INT(ent, netvar.iBuildingHealth);
-                    healthmax = CE_INT(ent, netvar.iBuildingMaxHealth);
-                    break;
-                }
-
-                // Get Colors
-                rgba_t hp     = colors::Transparent(colors::Health(health, healthmax), fg.a);
-                rgba_t border = ((classid == RCC_PLAYER) && IsPlayerInvisible(ent)) ? colors::FromRGBA8(160, 160, 160, fg.a * 255.0f) : colors::Transparent(colors::black, fg.a);
-                // Get bar width and height
-                int hbw = (max_x - min_x - 1) * std::min((float) health / (float) healthmax, 1.0f);
-                int hbh = (max_y - min_y - 2) * std::min((float) health / (float) healthmax, 1.0f);
-
-                // Top horizontal health bar
-                if (*healthbar == 1)
-                {
-                    draw::RectangleOutlined(min_x, min_y - 6, max_x - min_x + 1, 7, border, 0.5f);
-                    draw::Rectangle(min_x + hbw, min_y - 5, -hbw, 5, hp);
-                }
-                // Bottom horizontal health bar
-                else if (*healthbar == 2)
-                {
-                    draw::RectangleOutlined(min_x, max_y, max_x - min_x + 1, 7, border, 0.5f);
-                    draw::Rectangle(min_x + hbw, max_y + 1, -hbw, 5, hp);
-                }
-                // Vertical health bar
-                else if (*healthbar == 3)
-                {
-                    draw::RectangleOutlined(min_x - 7, min_y, 7, max_y - min_y, border, 0.5f);
-                    draw::Rectangle(min_x - 6, max_y - hbh - 1, 5, hbh, hp);
-                }
-            }
-        }
-    }
+        Healthbar(type, classid, fg, ent_data, ent);
+    // We only want health bars on players and buildings
 
     // Check if entity has strings to draw
     if (ent_data.string_count)
-    {
-        PROF_SECTION(PT_esp_drawstrings);
-
-        // Create our initial point at the center of the entity
-        Vector draw_point   = screen;
-        bool origin_is_zero = true;
-
-        // Only get collidable for players and buildings
-        if (type == ENTITY_PLAYER || type == ENTITY_BUILDING)
-        {
-
-            // Get collidable from the cache
-            if (GetCollide(ent))
-            {
-
-                // Origin could change so we set to false
-                origin_is_zero = false;
-
-                // Pull the cached collide info
-                int max_x = ent_data.collide_max.x;
-                int max_y = ent_data.collide_max.y;
-                int min_x = ent_data.collide_min.x;
-                int min_y = ent_data.collide_min.y;
-
-                // Change the position of the draw point depending on the user
-                // settings
-                switch ((int) esp_text_position)
-                {
-                case 0:
-                { // TOP RIGHT
-                    draw_point = Vector(max_x + 2, min_y, 0);
-                }
-                break;
-                case 1:
-                { // BOTTOM RIGHT
-                    draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 16, 0);
-                }
-                break;
-                case 2:
-                {                          // CENTER
-                    origin_is_zero = true; // origin is still zero so we set to true
-                }
-                break;
-                case 3:
-                { // ABOVE CENTER
-                    draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
-                }
-                break;
-                case 4:
-                { // BELOW
-                    draw_point = Vector((min_x + max_x) / 2.0f, max_y, 0);
-                }
-                break;
-                case 5:
-                { // ABOVE LEFT
-                    draw_point = Vector(min_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
-                }
-                break;
-                case 6:
-                { // ABOVE RIGHT
-                    draw_point = Vector(max_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
-                }
-                }
-            }
-        }
-
-        // Loop through strings
-        for (int j = 0; j < ent_data.string_count; j++)
-        {
-
-            // Pull string from the entity's cached string array
-            const ESPString &string = ent_data.strings[j];
-
-            // If string has a color assined to it, apply that otherwise use
-            // entities color
-            rgba_t color = string.color ? string.color : ent_data.color;
-            if (transparent)
-                color = colors::Transparent(color); // Apply transparency if needed
-
-            // If the origin is centered, we use one method. if not, the other
-            if (!origin_is_zero || true)
-            {
-                float draw_pointx_tmp = draw_point.x;
-                // Above/Below text should be centered
-                if (*esp_text_position == 3 || *esp_text_position == 4)
-                {
-                    float w, h;
-                    fonts::esp->stringSize(string.data, &w, &h);
-                    draw_pointx_tmp -= w / 2.0f;
-                }
-                draw::String(draw_pointx_tmp, draw_point.y, color, string.data.c_str(), *fonts::esp);
-            }
-            else
-            { /*
-          int size_x;
-          FTGL_StringLength(string.data, fonts::font_main, &size_x);
-          FTGL_Draw(string.data, draw_point.x - size_x / 2, draw_point.y,
-          fonts::font_main, color);
-      */
-            }
-
-            // Add to the y due to their being text in that spot
-            draw_point.y += /*((int)fonts::font_main->height)*/ 15 - 1;
-        }
-    }
-
-    // TODO Add Rotation matix
-    // TODO Currently crashes, needs null check somewhere
-    // Draw Hitboxes
-    /*if (draw_hitbox && type == ENTITY_PLAYER) {
-        PROF_SECTION(PT_esp_drawhitbboxes);
-
-        // Loop through hitboxes
-        for (int i = 0; i <= 17; i++) { // I should probs get how many hitboxes
-    instead of using a fixed number...
-
-            // Get a hitbox from the entity
-            hitbox_cache::CachedHitbox* hb = ent->hitboxes.GetHitbox(i);
-
-            // Create more points from min + max
-            Vector box_points[8];
-            Vector vec_tmp;
-            for (int ii = 0; ii <= 8; ii++) { // 8 points to the box
-
-                // logic le paste from sdk
-                vec_tmp[0] = ( ii & 0x1 ) ? hb->max[0] : hb->min[0];
-                vec_tmp[1] = ( ii & 0x2 ) ? hb->max[1] : hb->min[1];
-                vec_tmp[2] = ( ii & 0x4 ) ? hb->max[2] : hb->min[2];
-
-                // save to points array
-                box_points[ii] = vec_tmp;
-            }
-
-            // Draw box from points
-            // Draws a point to every other point. Ineffient, use now fix
-    later... Vector scn1, scn2; // to screen for (int ii = 0; ii < 8; ii++) {
-
-                // Get first point
-                if (!draw::WorldToScreen(box_points[ii], scn1)) continue;
-
-                for (int iii = 0; iii < 8; iii++) {
-
-                    // Get second point
-                    if (!draw::WorldToScreen(box_points[iii], scn2)) continue;
-
-                    // Draw between points
-                    draw_api::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y -
-    scn1.y, fg);
-                }
-            }
-        }
-    }*/
+        DrawStrings(type, transparent, screen, ent_data, ent);
 }
 
 // Used to process entities from CreateMove
@@ -1016,44 +934,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if ((int) proj_arrows != 2 || ent->m_bCritProjectile())
             {
                 AddEntityString(ent, arrow_str);
-            }
-        }
-    }
-
-    // Hl2DM dropped item esp
-    IF_GAME(IsHL2DM())
-    {
-        if (item_esp && item_dropped_weapons)
-        {
-            if (CE_BYTE(ent, netvar.hOwner) == (unsigned char) -1)
-            {
-                int string_count_backup = data[ent->m_IDX].string_count;
-                if (classid == CL_CLASS(CWeapon_SLAM))
-                    AddEntityString(ent, slam_str);
-                else if (classid == CL_CLASS(CWeapon357))
-                    AddEntityString(ent, point357_str);
-                else if (classid == CL_CLASS(CWeaponAR2))
-                    AddEntityString(ent, ar2_str);
-                else if (classid == CL_CLASS(CWeaponAlyxGun))
-                    AddEntityString(ent, alyx_gun_str);
-                else if (classid == CL_CLASS(CWeaponAnnabelle))
-                    AddEntityString(ent, annabelle_str);
-                else if (classid == CL_CLASS(CWeaponBinoculars))
-                    AddEntityString(ent, binoculars_str);
-                else if (classid == CL_CLASS(CWeaponBugBait))
-                    AddEntityString(ent, bugbait_str);
-                else if (classid == CL_CLASS(CWeaponCrossbow))
-                    AddEntityString(ent, crossbow_str);
-                else if (classid == CL_CLASS(CWeaponShotgun))
-                    AddEntityString(ent, shotgun_str);
-                else if (classid == CL_CLASS(CWeaponSMG1))
-                    AddEntityString(ent, smg_str);
-                else if (classid == CL_CLASS(CWeaponRPG))
-                    AddEntityString(ent, rpg_str);
-                /*if (string_count_backup != data[ent->m_IDX].string_count)
-                {
-                    SetEntityColor(ent, colors::yellow);
-                }*/
             }
         }
     }

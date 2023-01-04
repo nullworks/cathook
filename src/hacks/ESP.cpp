@@ -159,6 +159,7 @@ void bonelist_s::Setup(const studiohdr_t *hdr)
     if (!hdr)
     {
         setup = false;
+        success = false;
         return;
     }
     for (int i = 0; i < hdr->numbones; ++i)
@@ -183,7 +184,7 @@ void _FASTCALL bonelist_s::DrawBoneList(const matrix3x4_t *bones, int *in, int s
 {
     Vector last_screen;
     Vector current_screen;
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; ++i)
     {
         const auto &bone = bones[in[i]];
         Vector position(bone[0][3], bone[1][3], bone[2][3]);
@@ -336,7 +337,7 @@ static void cm()
         { // Prof section ends when out of scope, these brackets here.
             PROF_SECTION(CM_ESP_EntityLoop);
             // Loop through entities
-            for (int i = 0; i <= max_clients; i++)
+            for (int i = 0; i <= max_clients; ++i)
             {
                 // Get an entity from the loop tick and process it
                 CachedEntity *ent = ENTITY(i);
@@ -476,7 +477,7 @@ void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
             float end_distance = trace.endpos.DistTo(eye_position);
 
             // Loop and look back until we have a vector on screen
-            for (int i = 1; i < 500; i++)
+            for (int i = 1; i < 500; ++i)
             {
                 // Subtract 40 multiplyed by the tick from the end distance
                 // and use that as our length to check
@@ -503,7 +504,7 @@ void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
                 found_scn1 = false;
 
                 // Loop and look back untill we have a vector on screen
-                for (int i = 1; i < 500; i++)
+                for (int i = 1; i < 500; ++i)
                 {
                     // Multiply starting distance by 15, multiplyed by the
                     // loop tick
@@ -1316,7 +1317,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // ipc bot esp
             if (show_bot_id && ipc::peer && ent != LOCAL_E)
             {
-                for (unsigned i = 0; i < cat_ipc::max_peers; i++)
+                for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
                 {
                     if (!ipc::peer->memory->peer_data[i].free && ipc::peer->memory->peer_user_data[i].friendid == info.friendsID)
                     {
@@ -1341,7 +1342,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     if (CE_INT(ent, netvar.iClass) == tf_medic)
                     {
                         int *weapon_list = (int *) ((unsigned) (RAW_ENT(ent)) + netvar.hMyWeapons);
-                        for (int i = 0; weapon_list[i]; i++)
+                        for (int i = 0; weapon_list[i]; ++i)
                         {
                             int handle = weapon_list[i];
                             int eid    = HandleToIDX(handle);
@@ -1521,7 +1522,7 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
     corners[7] = mins + Vector(0, y, z);
 
     // Rotate the box and check if any point of the box isnt on the screen
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
     {
         float yaw    = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles).y;
         float s      = sinf(DEG2RAD(yaw));
@@ -1537,7 +1538,7 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
     }
     rgba_t draw_clr = clr;
     // Draw the actual box
-    for (int i = 1; i <= 4; i++)
+    for (int i = 1; i <= 4; ++i)
     {
         draw::Line((points[i - 1].x), (points[i - 1].y), (points[i % 4].x) - (points[i - 1].x), (points[i % 4].y) - (points[i - 1].y), draw_clr, 0.5f);
         draw::Line((points[i - 1].x), (points[i - 1].y), (points[i + 3].x) - (points[i - 1].x), (points[i + 3].y) - (points[i - 1].y), draw_clr, 0.5f);
@@ -1674,7 +1675,7 @@ bool GetCollide(CachedEntity *ent)
         points_r[6] = mins + Vector(x, y, z);
         points_r[7] = mins + Vector(0, y, z);
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; ++i)
         {
             if (!draw::WorldToScreen(points_r[i], points[i]))
                 return false;
@@ -1685,7 +1686,7 @@ bool GetCollide(CachedEntity *ent)
         int max_y = -1;
         int min_x = 65536;
         int min_y = 65536;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; ++i)
         {
             if (points[i].x > max_x)
                 max_x = points[i].x;

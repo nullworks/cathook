@@ -287,21 +287,13 @@ void Update()
 
 void Invalidate()
 {
-    for (auto &[key, val] : array)
-    {
-        // pMuch useless line!
-        // ent.m_pEntity = nullptr;
-        val.Reset();
-    }
+   array.clear();
+  
 }
 
 void Shutdown()
 {
-    for (auto &[key, val] : array)
-    {
-        val.Reset();
-        val.hitboxes.Reset();
-    }
+    array.clear();
 }
 int max = -1;
 } // namespace entity_cache

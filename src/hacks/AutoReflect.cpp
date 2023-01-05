@@ -152,7 +152,7 @@ void CreateMove()
     float closest_dist = 0.0f;
     Vector closest_vec;
     // Loop to find the closest entity
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
 
         // Find an ent from the for loops current tick

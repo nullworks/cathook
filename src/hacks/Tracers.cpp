@@ -126,7 +126,7 @@ void draw()
     // Loop all players
     if (*buildings)
     {
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
             // Get and check player
             const uint16_t curr_idx = ent->m_IDX;

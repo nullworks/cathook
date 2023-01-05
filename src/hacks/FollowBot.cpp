@@ -493,7 +493,7 @@ static void cm()
         }
         else
         {
-            for (auto &entity : entity_cache::valid_ents)
+            for (auto const &entity : entity_cache::valid_ents)
             {
                 if (!isValidTarget(entity))
                     continue;

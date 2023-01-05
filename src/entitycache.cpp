@@ -19,7 +19,7 @@ bool IsProjectileACrit(CachedEntity *ent)
     return CE_BYTE(ent, netvar.Rocket_bCritical);
 }
 // This method of const'ing the index is weird.
-CachedEntity::CachedEntity() : m_IDX(int(((unsigned) this - (unsigned) &entity_cache::array) / sizeof(CachedEntity))), hitboxes(hitbox_cache::Get(unsigned(m_IDX)))
+CachedEntity::CachedEntity(int idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
 {
 #if PROXY_ENTITY != true
     m_pEntity = nullptr;
@@ -51,7 +51,6 @@ static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 void CachedEntity::Update()
 {
     auto raw = RAW_ENT(this);
-
     if (!raw)
         return;
 #if PROXY_ENTITY != true
@@ -137,98 +136,172 @@ std::optional<Vector> CachedEntity::m_vecDormantOrigin()
 }
 namespace entity_cache
 {
-CachedEntity array[MAX_ENTITIES]{};
+std::unordered_map<int, CachedEntity> array;
 std::vector<CachedEntity *> valid_ents;
 std::map<Vector, CachedEntity *> proj_map;
 std::vector<CachedEntity *> skip_these;
+int previous_max = 0;
 void Update()
 {
     max = g_IEntityList->GetHighestEntityIndex();
     valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
+
     if (max >= MAX_ENTITIES)
         max = MAX_ENTITIES - 1;
-    for (int i = 0; i <= max; ++i)
+
+    if (previous_max == max)
     {
-        array[i].Update();
-
-        if (CE_GOOD((&array[i])))
+        for (auto &[key, val] : array)
         {
-            array[i].hitboxes.UpdateBones();
-            valid_ents.push_back(&array[i]);
-            if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
+            val.Update();
+            if (CE_GOOD((&val)))
             {
-                Vector eav;
-                CachedEntity *proj_ptr = &array[i];
-                velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
-                // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
-                // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
-                if (1 < eav.Length())
+                val.hitboxes.UpdateBones();
+                valid_ents.push_back(&val);
+                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && val.m_Type() == ENTITY_PROJECTILE && val.m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &val) == skip_these.end())
                 {
-                    Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
-                    Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
-
-                    float displacement      = proj_pos.DistToSqr(player_pos);
-                    float displacement_temp = displacement - 1;
-                    float min_displacement  = displacement_temp - 1;
-                    float multipler         = 0.01f;
-                    bool add_grav           = false;
-                    float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
-                    if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
-                        add_grav = true;
-                    // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
-                    curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
-                    // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
-                    while (displacement_temp < displacement)
+                    Vector eav;
+                    CachedEntity *proj_ptr = &val;
+                    velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
+                    // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
+                    // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
+                    if (1 < eav.Length())
                     {
+                        Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
+                        Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
 
-                        Vector temp_pos = (eav * multipler) + proj_pos;
-                        if (add_grav)
-                            temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
-                        displacement_temp = temp_pos.DistToSqr(player_pos);
-                        if (displacement_temp < min_displacement)
-                            min_displacement = displacement_temp;
+                        float displacement      = proj_pos.DistToSqr(player_pos);
+                        float displacement_temp = displacement - 1;
+                        float min_displacement  = displacement_temp - 1;
+                        float multipler         = 0.01f;
+                        bool add_grav           = false;
+                        float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
+                        if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
+                            add_grav = true;
+                        // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
+                        curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+                        // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
+                        while (displacement_temp < displacement)
+                        {
+
+                            Vector temp_pos = (eav * multipler) + proj_pos;
+                            if (add_grav)
+                                temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
+                            displacement_temp = temp_pos.DistToSqr(player_pos);
+                            if (displacement_temp < min_displacement)
+                                min_displacement = displacement_temp;
+                            else
+                                break;
+
+                            multipler += 0.01f;
+                        }
+                        if (min_displacement < 20000)
+                        {
+                            proj_map.insert({ eav, proj_ptr });
+                            skip_these.push_back(proj_ptr);
+                        }
                         else
-                            break;
-
-                        multipler += 0.01f;
+                            skip_these.push_back(proj_ptr);
                     }
-                    if (min_displacement < 20000)
-                    {
-                        proj_map.insert({ eav, proj_ptr });
-                        skip_these.push_back(proj_ptr);
-                    }
-                    else
-                        skip_these.push_back(proj_ptr);
                 }
             }
-        }
-        else if ((bool) hacks::tf2::warp::dodge_projectile)
-        {
-            auto iter = std::find(skip_these.begin(), skip_these.end(), &array[i]);
-            if (iter != skip_these.end())
-                skip_these.erase(iter);
+            else if ((bool) hacks::tf2::warp::dodge_projectile)
+            {
+                auto iter = std::find(skip_these.begin(), skip_these.end(), &val);
+                if (iter != skip_these.end())
+                    skip_these.erase(iter);
+            }
         }
     }
+    else
+    {
+
+        for (int i = 0; i <= max; ++i)
+        {
+            CachedEntity test(i);
+            if (!RAW_ENT((&test)))
+                continue;
+            array.emplace(std::make_pair(i, CachedEntity{ i }));
+            array[i].Update();
+            if (CE_GOOD((&array[i])))
+            {
+                array[i].hitboxes.UpdateBones();
+                valid_ents.push_back(&array[i]);
+                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
+                {
+                    Vector eav;
+                    CachedEntity *proj_ptr = &array[i];
+                    velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
+                    // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
+                    // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
+                    if (1 < eav.Length())
+                    {
+                        Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
+                        Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+
+                        float displacement      = proj_pos.DistToSqr(player_pos);
+                        float displacement_temp = displacement - 1;
+                        float min_displacement  = displacement_temp - 1;
+                        float multipler         = 0.01f;
+                        bool add_grav           = false;
+                        float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
+                        if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
+                            add_grav = true;
+                        // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
+                        curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+                        // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
+                        while (displacement_temp < displacement)
+                        {
+
+                            Vector temp_pos = (eav * multipler) + proj_pos;
+                            if (add_grav)
+                                temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
+                            displacement_temp = temp_pos.DistToSqr(player_pos);
+                            if (displacement_temp < min_displacement)
+                                min_displacement = displacement_temp;
+                            else
+                                break;
+
+                            multipler += 0.01f;
+                        }
+                        if (min_displacement < 20000)
+                        {
+                            proj_map.insert({ eav, proj_ptr });
+                            skip_these.push_back(proj_ptr);
+                        }
+                        else
+                            skip_these.push_back(proj_ptr);
+                    }
+                }
+            }
+            else if ((bool) hacks::tf2::warp::dodge_projectile)
+            {
+                auto iter = std::find(skip_these.begin(), skip_these.end(), &array[i]);
+                if (iter != skip_these.end())
+                    skip_these.erase(iter);
+            }
+        }
+    }
+    previous_max = max;
 }
 
 void Invalidate()
 {
-    for (auto &ent : array)
+    for (auto &[key, val] : array)
     {
         // pMuch useless line!
         // ent.m_pEntity = nullptr;
-        ent.Reset();
+        val.Reset();
     }
 }
 
 void Shutdown()
 {
-    for (auto &ent : array)
+    for (auto &[key, val] : array)
     {
-        ent.Reset();
-        ent.hitboxes.Reset();
+        val.Reset();
+        val.hitboxes.Reset();
     }
 }
-
-int max = 0;
+int max = -1;
 } // namespace entity_cache

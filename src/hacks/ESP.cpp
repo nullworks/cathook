@@ -113,7 +113,7 @@ public:
 };
 
 // Storage array for keeping strings and other data
-std::array<ESPData, 2048> data;
+std::unordered_map<CachedEntity *, ESPData> data;
 // Storage vars for entities that need to be re-drawn
 std::vector<std::pair<int, float>> entities_need_repaint{};
 
@@ -158,7 +158,7 @@ void bonelist_s::Setup(const studiohdr_t *hdr)
 {
     if (!hdr)
     {
-        setup = false;
+        setup   = false;
         success = false;
         return;
     }
@@ -324,8 +324,6 @@ static void cm()
     ResetEntityStrings(entity_tick); // Clear any strings entities have
     entities_need_repaint.clear();   // Clear data on entities that need redraw
     int max_clients          = g_GlobalVars->maxClients;
-    int limit                = HIGHEST_ENTITY;
-    bool run_all_ents        = false;
     const bool vischeck_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.50f) == 0;
     // If not using any other special esp, we lower the min to the max
     // clients
@@ -356,12 +354,12 @@ static void cm()
                     ProcessEntity(ent);
                     hitboxUpdate(ent);
                 }
-
-                if (data[ent->m_IDX].needs_paint)
+                data.emplace(std::make_pair(ent, ESPData{}));
+                if (data[ent].needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
                     if (vischeck_tick && vischeck)
-                        data[ent->m_IDX].transparent = !ent->IsVisible();
+                        data[ent].transparent = !ent->IsVisible();
                     entities_need_repaint.push_back({ ent->m_IDX, ent->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) });
                 }
             }
@@ -372,7 +370,7 @@ static void cm()
         { // Prof section ends when out of scope, these brackets here.
             PROF_SECTION(CM_ESP_EntityLoop);
             // Loop through entities
-            for (auto &ent_index : entity_cache::valid_ents)
+            for (auto const &ent_index : entity_cache::valid_ents)
             {
                 // Get an entity from the loop tick and process it
                 if (!ent_index->m_bAlivePlayer())
@@ -390,12 +388,12 @@ static void cm()
                     ProcessEntity(ent_index);
                     hitboxUpdate(ent_index);
                 }
-
-                if (data[ent_index->m_IDX].needs_paint)
+                data.emplace(std::make_pair(ent_index, ESPData{}));
+                if (data[ent_index].needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
                     if (vischeck_tick && vischeck)
-                        data[ent_index->m_IDX].transparent = !ent_index->IsVisible();
+                        data[ent_index].transparent = !ent_index->IsVisible();
                     entities_need_repaint.push_back({ ent_index->m_IDX, ent_index->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) });
                 }
             }
@@ -623,7 +621,7 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 1:
             { // BOTTOM RIGHT
-                draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 16, 0);
+                draw_point = Vector(max_x + 2, max_y - data.at(ent).string_count * 16, 0);
             }
             break;
             case 2:
@@ -633,7 +631,7 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 3:
             { // ABOVE CENTER
-                draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+                draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent).string_count * 16, 0);
             }
             break;
             case 4:
@@ -643,12 +641,12 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 5:
             { // ABOVE LEFT
-                draw_point = Vector(min_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+                draw_point = Vector(min_x + 2, min_y - data.at(ent).string_count * 16, 0);
             }
             break;
             case 6:
             { // ABOVE RIGHT
-                draw_point = Vector(max_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
+                draw_point = Vector(max_x + 2, min_y - data.at(ent).string_count * 16, 0);
             }
             }
         }
@@ -785,7 +783,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
     int classid     = ent->m_iClassID();
     EntityType type = ent->m_Type();
     // Grab esp data
-    ESPData &ent_data = data[ent->m_IDX];
+    ESPData &ent_data = data[ent];
 
     // Get color of entity
     // TODO, check if we can move this after world to screen check
@@ -890,7 +888,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     }
 
     // Get esp data from current ent
-    ESPData &espdata = data[ent->m_IDX];
+    ESPData &espdata = data[ent];
 
     // Projectile esp
     if (ent->m_Type() == ENTITY_PROJECTILE && proj_esp && (ent->m_bEnemy() || (teammates && !proj_enemy)))
@@ -1560,7 +1558,7 @@ void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
         return;
 
     // Pull the cached collide info
-    ESPData &ent_data = data[ent->m_IDX];
+    ESPData &ent_data = data[ent];
     int max_x         = ent_data.collide_max.x;
     int max_y         = ent_data.collide_max.y;
     int min_x         = ent_data.collide_min.x;
@@ -1627,7 +1625,7 @@ bool GetCollide(CachedEntity *ent)
         return false;
 
     // Grab esp data
-    ESPData &ent_data = data[ent->m_IDX];
+    ESPData &ent_data = data[ent];
 
     // If entity has cached collides, return it. Otherwise generate new bounds
     if (!ent_data.has_collide)
@@ -1717,7 +1715,7 @@ bool GetCollide(CachedEntity *ent)
 // Use to add a esp string to an entity
 void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color)
 {
-    ESPData &entity_data = data[entity->m_IDX];
+    ESPData &entity_data = data[entity];
     if (entity_data.string_count >= 15)
         return;
     entity_data.strings[entity_data.string_count].data  = string;
@@ -1730,16 +1728,16 @@ void AddEntityString(CachedEntity *entity, const std::string &string, const rgba
 void ResetEntityStrings(bool full_clear)
 {
     if (full_clear)
-        for (auto &i : data)
+        for (auto &[key, val] : data)
         {
-            i.string_count = 0;
-            i.color        = colors::empty;
-            i.needs_paint  = false;
+            val.string_count = 0;
+            val.color        = colors::empty;
+            val.needs_paint  = false;
         }
     else
-        for (std::size_t i = 0; i < g_GlobalVars->maxClients; ++i)
+        for (int i = 1; i < g_GlobalVars->maxClients; ++i)
         {
-            auto &element        = data[i];
+            auto &element        = data[ENTITY(i)];
             element.string_count = 0;
             element.color        = colors::empty;
             element.needs_paint  = false;
@@ -1751,7 +1749,7 @@ void SetEntityColor(CachedEntity *entity, const rgba_t &color)
 {
     if (entity->m_IDX > 2047 || entity->m_IDX < 0)
         return;
-    data[entity->m_IDX].color = color;
+    data[entity].color = color;
 }
 
 static InitRoutine init(

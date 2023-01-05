@@ -343,7 +343,7 @@ void CreateMoveLate()
     if (!set_data && !g_pLocalPlayer->bUseSilentAngles)
     {
         float cursor_distance = FLT_MAX;
-        for (auto &ent_data : bt_data)
+        for (auto const &ent_data : bt_data)
         {
             for (auto &tick_data : ent_data)
             {

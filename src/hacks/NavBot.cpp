@@ -115,7 +115,7 @@ bool shouldSearchAmmo()
 std::vector<CachedEntity *> getDispensers()
 {
     std::vector<CachedEntity *> entities;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (ent->m_iClassID() != CL_CLASS(CObjectDispenser) || ent->m_iTeam() != g_pLocalPlayer->team)
             continue;
@@ -137,7 +137,7 @@ std::vector<CachedEntity *> getDispensers()
 std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
 {
     std::vector<CachedEntity *> entities;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         for (auto &itemtype : itemtypes)
         {
@@ -377,7 +377,7 @@ void refreshLocalBuildings()
         myDispenser = nullptr;
         if (CE_GOOD(LOCAL_E))
         {
-            for (auto &ent : entity_cache::valid_ents)
+            for (auto const &ent : entity_cache::valid_ents)
             {
                 if (ent->m_bEnemy() || !ent->m_bAlivePlayer())
                     continue;
@@ -744,7 +744,7 @@ bool runReload()
     // Get closest enemy to vicheck
     CachedEntity *closest_visible_enemy = nullptr;
     float best_distance                 = FLT_MAX;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
             continue;
@@ -1037,7 +1037,7 @@ bool snipeSentries()
     if (!snipe_sentries_shortrange && (g_pLocalPlayer->clazz == tf_scout || g_pLocalPlayer->clazz == tf_pyro))
         return false;
 
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         // Invalid sentry
         if (!isSnipeTargetValid(ent))

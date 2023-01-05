@@ -62,13 +62,13 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
                     continue;
                 // Don't override this stuff
                 bool good = true;
-                for (auto &entry : dont_override_strings)
+                for (auto const &entry : dont_override_strings)
                     if (path.find(entry) != path.npos)
                     {
                         good = false;
                     }
                 // Don't draw this stuff
-                for (auto &entry : nodraw_strings)
+                for (auto const &entry : nodraw_strings)
                     if (path.find(entry) != path.npos)
                     {
                         pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
@@ -111,15 +111,15 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
             int should_filter = 0;
             auto name         = std::string(pMaterial->GetTextureGroupName());
 
-            for (auto &entry : gui_strings)
+            for (auto const &entry : gui_strings)
                 if (name.find(entry) != name.npos)
                     should_filter = 1;
 
-            for (auto &entry : world_strings)
+            for (auto const &entry : world_strings)
                 if (name.find(entry) != name.npos)
                     should_filter = 2;
 
-            for (auto &entry : skybox_strings)
+            for (auto const &entry : skybox_strings)
                 if (name.find(entry) != name.npos)
                     should_filter = 3;
 

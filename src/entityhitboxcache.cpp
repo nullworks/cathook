@@ -13,7 +13,7 @@
 namespace hitbox_cache
 {
 
-EntityHitboxCache::EntityHitboxCache() : parent_ref(&entity_cache::Get(((unsigned) this - (unsigned) &hitbox_cache::array) / sizeof(EntityHitboxCache)))
+EntityHitboxCache::EntityHitboxCache(int in_idx) :idx{in_idx}
 {
     Reset();
 }
@@ -53,7 +53,7 @@ void EntityHitboxCache::Init()
     model_t *model;
     studiohdr_t *shdr;
     mstudiohitboxset_t *set;
-
+    parent_ref = &entity_cache::array[idx];
     m_bInit = true;
     if (CE_BAD(parent_ref))
         return;
@@ -109,6 +109,7 @@ static std::mutex setupbones_mutex;
 void EntityHitboxCache::UpdateBones()
 {
     // Do not run for bad ents/non player ents
+    parent_ref = &entity_cache::array[idx];
     if (CE_BAD(parent_ref) || parent_ref->m_Type() != ENTITY_PLAYER)
         return;
     auto bone_ptr = GetBones();
@@ -240,7 +241,7 @@ CachedHitbox *EntityHitboxCache::GetHitbox(int id)
     return &m_CacheInternal[id];
 }
 
-EntityHitboxCache array[MAX_ENTITIES]{};
+std::unordered_map<int,EntityHitboxCache> array;
 
 void Update()
 {

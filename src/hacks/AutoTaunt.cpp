@@ -41,7 +41,7 @@ public:
         if (GetPlayerForUserID(event->GetInt("attacker")) == g_IEngine->GetLocalPlayer())
         {
             bool nearby = false;
-            for (auto &ent : entity_cache::valid_ents)
+            for (auto const &ent : entity_cache::valid_ents)
             {
                 if (CE_VALID(ent) && (ent->m_Type() == ENTITY_PLAYER || ent->m_iClassID() == CL_CLASS(CObjectSentrygun)) && ent->m_bEnemy() && ent->m_bAlivePlayer())
                 {

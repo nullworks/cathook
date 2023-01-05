@@ -62,7 +62,7 @@ void CreateMove()
     if (shouldBacktrack)
     {
         float target_range = EffectiveTargetingRange();
-        for (auto &ent_data : tf2::backtrack::bt_data)
+        for (auto const &ent_data : tf2::backtrack::bt_data)
         {
             if (state_good)
                 break;

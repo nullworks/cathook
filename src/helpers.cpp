@@ -1828,10 +1828,9 @@ CatCommand print_classnames("debug_print_classnames", "Lists classnames currentl
                             []()
                             {
                                 // Create a tmp ent for the loop
-                                CachedEntity *ent;
-
+                               
                                 // Go through all the entities
-                                for (auto &ent : entity_cache::valid_ents)
+                                for (auto const &ent : entity_cache::valid_ents)
                                 {
 
                                     // Print in console, the class name of the ent

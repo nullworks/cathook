@@ -55,7 +55,7 @@ void draw()
         return;
     std::vector<Vector> points;
     Vector screen;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (!ent->m_bEnemy())
             continue;

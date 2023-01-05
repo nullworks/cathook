@@ -529,7 +529,6 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     Vector current_velocity = velocity;
     int maxsteps            = (int) debug_pp_steps;
     float steplength        = g_GlobalVars->interval_per_tick;
-    bool has_run_before     = false;
     for (int steps = 0; steps < maxsteps; steps++, currenttime += steplength)
     {
         ent->m_vecOrigin()                                 = current;

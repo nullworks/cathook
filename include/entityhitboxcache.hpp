@@ -31,7 +31,8 @@ struct CachedHitbox
 class EntityHitboxCache
 {
 public:
-    EntityHitboxCache();
+    EntityHitboxCache() = default;
+    EntityHitboxCache(int idx);
     ~EntityHitboxCache();
 
     CachedHitbox *GetHitbox(int id);
@@ -50,7 +51,7 @@ public:
     bool m_bModelSet;
     bool m_bInit;
     bool m_bSuccess;
-
+    int idx;
     model_t *m_pLastModel;
     CachedEntity *parent_ref; // TODO FIXME turn this into an actual reference
 
@@ -63,11 +64,15 @@ public:
     bool bones_setup{ false };
 };
 
-extern EntityHitboxCache array[2048];
-inline EntityHitboxCache &Get(unsigned i)
+extern std::unordered_map<int, EntityHitboxCache> array;
+inline EntityHitboxCache *Get(unsigned i)
 {
     if (i > 2048)
         throw std::out_of_range("Requested out-of-range entity hitbox cache entry!");
-    return array[i];
+
+    auto iterator = array.find(i);
+    if (iterator == array.end())
+        return nullptr;
+    return &iterator->second;
 }
 } // namespace hitbox_cache

@@ -64,7 +64,7 @@ bool trace::FilterDefault::ShouldHitEntity(IHandleEntity *handle, int mask)
                     {
                         auto weapon = ENTITY(weapon_idx);
                         // If holding sniper rifle
-                        if (weapon->m_iClassID() == CL_CLASS(CTFSniperRifle) || weapon->m_iClassID() == CL_CLASS(CTFSniperRifleDecap))
+                        if (!weapon || weapon->m_iClassID() == CL_CLASS(CTFSniperRifle) || weapon->m_iClassID() == CL_CLASS(CTFSniperRifleDecap))
                             return false;
                     }
                 }

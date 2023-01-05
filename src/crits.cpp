@@ -278,7 +278,7 @@ bool shouldMeleeCrit()
         }
         else
         {
-            for (auto &ent_data : hacks::tf2::backtrack::bt_data)
+            for (auto const &ent_data : hacks::tf2::backtrack::bt_data)
             {
                 for (auto &tick : ent_data)
                 {

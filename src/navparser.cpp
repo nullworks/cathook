@@ -221,7 +221,7 @@ public:
             // If the extern blacklist is running, ensure we don't try to use a bad area
             bool is_blacklisted = false;
             if (!free_blacklist_blocked)
-                for (auto &entry : free_blacklist)
+                for (auto const &entry : free_blacklist)
                 {
                     if (entry.first == connection.area)
                     {
@@ -630,7 +630,7 @@ static void followCrumbs()
         fall_vec.erase(fall_vec.begin());
 
     bool reset_z = true;
-    for (auto &entry : fall_vec)
+    for (auto const &entry : fall_vec)
     {
         if (!(entry <= 0.01f && entry >= -0.01f))
             reset_z = false;
@@ -800,7 +800,7 @@ void checkBlacklist()
         return;
     }
     CNavArea *local_area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
-    for (auto &entry : map->free_blacklist)
+    for (auto const &entry : map->free_blacklist)
     {
         // Local player is in a blocked area, so temporarily remove the blacklist as else we would be stuck
         if (entry.first == local_area)
@@ -820,7 +820,7 @@ void checkBlacklist()
         if (should_abandon)
             break;
         // A path Node is blacklisted, abandon pathing
-        for (auto &entry : map->free_blacklist)
+        for (auto const &entry : map->free_blacklist)
         {
             if (entry.first == crumb.navarea)
                 should_abandon = true;
@@ -932,7 +932,7 @@ std::unordered_map<CNavArea *, BlacklistReason> *getFreeBlacklist()
 std::unordered_map<CNavArea *, BlacklistReason> getFreeBlacklist(BlacklistReason reason)
 {
     std::unordered_map<CNavArea *, BlacklistReason> return_map;
-    for (auto &entry : map->free_blacklist)
+    for (auto const &entry : map->free_blacklist)
     {
         // Category matches
         if (entry.second.value == reason.value)

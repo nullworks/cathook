@@ -263,8 +263,10 @@ bool ShouldRenderChams(IClientEntity *entity)
     if (entity->entindex() < 0)
         return false;
     CachedEntity *ent = ENTITY(entity->entindex());
-    if (ent->m_IDX == LOCAL_E->m_IDX)
+    if (ent && LOCAL_E && ent->m_IDX == LOCAL_E->m_IDX)
         return *chamsself;
+    else
+        return false;
     switch (ent->m_Type())
     {
     case ENTITY_BUILDING:

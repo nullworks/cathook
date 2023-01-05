@@ -287,8 +287,7 @@ void dodgeProj()
                 if (trace.DidHit())
                 {
 
-                    float dist = trace.endpos.DistToSqr(player_pos);
-                    // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
+                                       // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
                     Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
 
                     if (0 <= result.y)
@@ -299,8 +298,6 @@ void dodgeProj()
                     {
                         was_hurt   = true;
                         warp_dodge = true;
-
-                        auto iterator = entity_cache::proj_map.find(key);
                         entity_cache::proj_map.erase(key);
                     }
                 } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
@@ -313,15 +310,12 @@ void dodgeProj()
                         yaw_amount = -90.0f;
                     else
                         yaw_amount = 90.0f;
-
-                    auto iterator = entity_cache::proj_map.find(key);
                     entity_cache::proj_map.erase(key);
                 }
             }
         }
         else
         {
-            auto iterator = entity_cache::proj_map.find(key);
             entity_cache::proj_map.erase(key);
         }
     }

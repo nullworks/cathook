@@ -135,7 +135,7 @@ int getCarriedBuilding()
 {
     if (CE_INT(LOCAL_E, netvar.m_bCarryingObject))
         return HandleToIDX(CE_INT(LOCAL_E, netvar.m_hCarriedObject));
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (ent->m_Type() != ENTITY_BUILDING)
             continue;
@@ -405,7 +405,7 @@ void Draw()
 {
     if (misc_drawhitboxes)
     {
-        for (auto &entry : wireframe_queue)
+        for (auto const &entry : wireframe_queue)
             DrawWireframeHitbox(entry);
         wireframe_queue.clear();
     }
@@ -748,7 +748,7 @@ static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of 
                                         if (args.ArgC() < 2)
                                             return;
                                         std::string name(args.Arg(1));
-                                        for (auto &ent : entity_cache::valid_ents)
+                                        for (auto const &ent : entity_cache::valid_ents)
                                         {
 
                                             ClientClass *clz = RAW_ENT(ent)->GetClientClass();

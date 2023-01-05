@@ -25,7 +25,7 @@ void CTeamRoundTimer::Update()
     IClientEntity *ent;
 
     entity = 0;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         auto result_ent = ent->InternalEntity();
         if (ent && result_ent->GetClientClass()->m_ClassID == CL_CLASS(CTeamRoundTimer))

@@ -87,7 +87,6 @@ void dispatchUserMessage(bf_read &buffer, int type)
     {
         // TODO: Add always vote no/vote no on friends. Cvar is "vote option2"
         was_local_player = false;
-        int team         = buffer.ReadByte();
         int vote_id      = buffer.ReadLong();
         int caller       = buffer.ReadByte();
         char reason[64];

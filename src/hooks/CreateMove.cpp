@@ -134,7 +134,6 @@ namespace hooked_methods
 {
 void speedHack(CUserCmd *cmd, bool &ret)
 {
-    bool speedapplied = false;
     float speed, yaw;
     Vector vsilent, ang;
     if (cmd->buttons & IN_DUCK && (CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
@@ -169,7 +168,6 @@ void speedHack(CUserCmd *cmd, bool &ret)
             cmd->viewangles.y                = res;
             cmd->viewangles.z                = 90.0f;
             g_pLocalPlayer->bUseSilentAngles = true;
-            speedapplied                     = true;
         }
     }
 }

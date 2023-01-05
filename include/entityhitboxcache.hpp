@@ -31,8 +31,9 @@ struct CachedHitbox
 class EntityHitboxCache
 {
 public:
+ 
     EntityHitboxCache() = default;
-    EntityHitboxCache(int idx);
+    EntityHitboxCache(int in_IDX);
     ~EntityHitboxCache();
 
     CachedHitbox *GetHitbox(int id);
@@ -48,12 +49,12 @@ public:
     void UpdateBones();
 
     int m_nNumHitboxes;
+   int hit_idx;
     bool m_bModelSet;
     bool m_bInit;
     bool m_bSuccess;
-    int idx;
     model_t *m_pLastModel;
-    CachedEntity *parent_ref; // TODO FIXME turn this into an actual reference
+    CachedEntity *parent_ref;
 
     bool m_VisCheckValidationFlags[CACHE_MAX_HITBOXES]{ false };
     bool m_VisCheck[CACHE_MAX_HITBOXES]{ false };
@@ -63,16 +64,4 @@ public:
     std::vector<matrix3x4_t> bones;
     bool bones_setup{ false };
 };
-
-extern std::unordered_map<int, EntityHitboxCache> array;
-inline EntityHitboxCache *Get(unsigned i)
-{
-    if (i > 2048)
-        throw std::out_of_range("Requested out-of-range entity hitbox cache entry!");
-
-    auto iterator = array.find(i);
-    if (iterator == array.end())
-        return nullptr;
-    return &iterator->second;
-}
 } // namespace hitbox_cache

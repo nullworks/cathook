@@ -335,25 +335,16 @@ static void cm()
         { // Prof section ends when out of scope, these brackets here.
             PROF_SECTION(CM_ESP_EntityLoop);
             // Loop through entities
-            for (int i = 0; i <= max_clients; ++i)
+            for (auto const &ent : entity_cache::player_cache)
             {
                 // Get an entity from the loop tick and process it
-                CachedEntity *ent = ENTITY(i);
+
                 if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
                     continue;
 
-                bool player = i < max_clients;
+                ProcessEntity(ent);
+                hitboxUpdate(ent);
 
-                if (player)
-                {
-                    ProcessEntity(ent);
-                    hitboxUpdate(ent);
-                }
-                else if (entity_tick)
-                {
-                    ProcessEntity(ent);
-                    hitboxUpdate(ent);
-                }
                 data.emplace(std::make_pair(ent, ESPData{}));
                 if (data[ent].needs_paint)
                 {

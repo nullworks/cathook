@@ -182,11 +182,12 @@ void draw()
     }
     else
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
             // Get and check player
-            auto ent = ENTITY(i);
+   
             Vector origin;
+            int i = ent->m_IDX;
             std::optional<rgba_t> color = std::nullopt;
 
             if (CE_INVALID(ent))

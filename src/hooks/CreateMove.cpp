@@ -288,7 +288,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     }
     g_Settings.bInvalid = false;
 
-    if (CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(g_pLocalPlayer->entity) && g_pLocalPlayer->entity)
     {
         if (!g_pLocalPlayer->life_state && CE_GOOD(g_pLocalPlayer->weapon()))
         {
@@ -353,6 +353,8 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 projectile_logging::Update();
         }
     }
+    else
+        return false;
     {
         PROF_SECTION(CM_WRAPPER);
         EC::run(EC::CreateMove_NoEnginePred);

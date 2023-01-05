@@ -354,7 +354,7 @@ public:
         // Find sentries and stickies
         for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
         {
-            CachedEntity *ent = ENTITY(i);
+            CachedEntity* ent = ENTITY(i);
             if (CE_INVALID(ent) || !ent->m_bAlivePlayer() || ent->m_iTeam() == g_pLocalPlayer->team)
                 continue;
             bool is_sentry = ent->m_iClassID() == CL_CLASS(CObjectSentrygun);

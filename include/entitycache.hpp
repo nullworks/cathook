@@ -223,20 +223,19 @@ namespace entity_cache
 extern int max;
 extern int previous_max;
 extern std::vector<CachedEntity *> valid_ents;
-extern std::unordered_map<int, CachedEntity> array;
+extern std::unordered_map<u_int16_t, CachedEntity> array;
 extern std::map<Vector, CachedEntity *> proj_map;
 extern std::vector<CachedEntity *> skip_these;
-inline CachedEntity *Get(int idx)
+extern std::vector<CachedEntity*> player_cache;
+inline CachedEntity *Get(u_int16_t idx)
 {
-    if (idx < 0 || idx >= 2048)
-        throw std::out_of_range("Entity index out of range!");
-
     auto iterator = array.find(idx);
     if (iterator == array.end())
         return nullptr;
     else
         return &iterator->second;
 }
+void dodgeProj(CachedEntity *proj_ptr);
 void Update();
 void Invalidate();
 void Shutdown();

@@ -12,12 +12,10 @@
 
 namespace hitbox_cache
 {
-
-EntityHitboxCache::EntityHitboxCache(int in_idx) :idx{in_idx}
+EntityHitboxCache::EntityHitboxCache(int in_IDX) : hit_idx(in_IDX)
 {
     Reset();
 }
-
 int EntityHitboxCache::GetNumHitboxes()
 {
     if (!m_bInit)
@@ -53,8 +51,8 @@ void EntityHitboxCache::Init()
     model_t *model;
     studiohdr_t *shdr;
     mstudiohitboxset_t *set;
-    parent_ref = &entity_cache::array[idx];
-    m_bInit = true;
+    m_bInit    = true;
+    parent_ref = &(entity_cache::array[hit_idx]);
     if (CE_BAD(parent_ref))
         return;
     model = (model_t *) RAW_ENT(parent_ref)->GetModel();
@@ -109,7 +107,8 @@ static std::mutex setupbones_mutex;
 void EntityHitboxCache::UpdateBones()
 {
     // Do not run for bad ents/non player ents
-    parent_ref = &entity_cache::array[idx];
+    if (!m_bInit)
+        Init();
     if (CE_BAD(parent_ref) || parent_ref->m_Type() != ENTITY_PLAYER)
         return;
     auto bone_ptr = GetBones();
@@ -240,8 +239,6 @@ CachedHitbox *EntityHitboxCache::GetHitbox(int id)
     m_CacheValidationFlags[id] = true;
     return &m_CacheInternal[id];
 }
-
-std::unordered_map<int,EntityHitboxCache> array;
 
 void Update()
 {

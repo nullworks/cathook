@@ -798,9 +798,9 @@ void warpLogic()
                 // Find an entity meeting the Criteria and closest to crosshair
                 std::pair<CachedEntity *, float> result{ nullptr, FLT_MAX };
 
-                for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+                for (auto const &ent: entity_cache::player_cache)
                 {
-                    CachedEntity *ent = ENTITY(i);
+                    
                     if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
                         continue;
                     // No hitboxes

@@ -26,11 +26,12 @@ static void cm()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &pEntity : entity_cache::player_cache)
     {
+        int i = pEntity->m_IDX;
         if (g_pLocalPlayer->entity_idx == i)
             continue;
-        CachedEntity *pEntity = ENTITY(i);
+
         if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
         {
             drawEsp[i] = false;
@@ -57,12 +58,10 @@ void draw()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &pEntity : entity_cache::player_cache)
     {
+        int i = pEntity->m_IDX;
         if (!drawEsp[i])
-            continue;
-        CachedEntity *pEntity = ENTITY(i);
-        if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
             continue;
         if (pEntity == LOCAL_E)
             continue;

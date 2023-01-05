@@ -180,7 +180,6 @@ void DrawWireframeHitbox(wireframe_data data)
 
 #endif
 
-
 static float normalizeRad(float a) noexcept
 {
     return std::isfinite(a) ? std::remainder(a, PI * 2) : 0.0f;
@@ -208,9 +207,9 @@ void CreateMove()
 #if ENABLE_VISUALS
     if (misc_drawhitboxes)
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent : entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
+
             if (CE_INVALID(ent) || ent == LOCAL_E || (!misc_drawhitboxes_dead && !ent->m_bAlivePlayer()))
                 continue;
             QueueWireframeHitboxes(ent->hitboxes);
@@ -415,12 +414,12 @@ void Draw()
     }*/
     if (show_spectators)
     {
-        for (int i = 0; i < PLAYER_ARRAY_SIZE; ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
             // Assign the for loops tick number to an ent
-            CachedEntity *ent = ENTITY(i);
+            
             player_info_s info;
-            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && GetPlayerInfo(i, &info))
+            if (ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && CE_INT(ent, netvar.iObserverMode) >= 4 && GetPlayerInfo(ent->m_IDX, &info))
             {
                 auto observermode = "N/A";
                 rgba_t color      = colors::green;

@@ -142,6 +142,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     auto hb = ent->hitboxes.GetHitbox(hitbox);
 
     trace_t trace;
+
     if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, &trace))
     {
         if (trace.hitbox == hitbox)
@@ -414,7 +415,7 @@ void doAutoZoom(bool target_found)
 CachedEntity *target_last = 0;
 bool aimed_this_tick      = false;
 Vector viewangles_this_tick(0.0f);
- AimbotCalculatedData_s cd;
+AimbotCalculatedData_s cd;
 // If slow aimbot allows autoshoot
 bool slow_can_shoot = false;
 bool projectileAimbotRequired;
@@ -959,8 +960,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
             return false;
 
-       
-        cd.hitbox                  = BestHitbox(entity);
+        cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint && is_player)
         {
             if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE)
@@ -1280,8 +1280,8 @@ void DoAutoshoot(CachedEntity *target_entity)
 Vector PredictEntity(CachedEntity *entity)
 {
     // Pull out predicted data
-    Vector &result             = cd.aim_position;
-    const short int curr_type  = entity->m_Type();
+    Vector &result            = cd.aim_position;
+    const short int curr_type = entity->m_Type();
 
     // Players
 
@@ -1641,9 +1641,8 @@ static void DrawText()
     // Debug stuff
     if (!aimbot_debug)
         return;
-    for (int i = 1; i < PLAYER_ARRAY_SIZE; ++i)
+    for (auto const &ent : entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_GOOD(ent))
         {
             Vector screen;

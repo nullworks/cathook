@@ -259,9 +259,9 @@ static std::pair<CachedEntity *, float> getNearestPlayerDistance()
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         if (CE_VALID(ent) && ent->m_vecDormantOrigin() && g_pPlayerResource->isAlive(ent->m_IDX) && ent->m_bEnemy() && g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin()) < distance && player_tools::shouldTarget(ent) && !IsPlayerInvisible(ent))
         {
             distance = g_pLocalPlayer->v_Origin.DistTo(*ent->m_vecDormantOrigin());
@@ -491,14 +491,14 @@ void updateEnemyBlacklist(int slot)
     std::unordered_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
 
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         // Entity is generally invalid, ignore
-        if (CE_INVALID(ent) || !g_pPlayerResource->isAlive(i))
+        if (CE_INVALID(ent) || !g_pPlayerResource->isAlive(ent->m_IDX))
             continue;
         // On our team, do not care
-        if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team)
+        if (g_pPlayerResource->GetTeam(ent->m_IDX) == g_pLocalPlayer->team)
             continue;
 
         bool is_dormant = CE_BAD(ent);
@@ -843,11 +843,12 @@ bool stayNear()
     // Test all entities
     for (int i = lowest_check_index; i <= g_IEngine->GetMaxClients(); ++i)
     {
+        CachedEntity* ent = ENTITY(i);
         if (calls >= advance_count)
             break;
         calls++;
         lowest_check_index++;
-        CachedEntity *ent = ENTITY(i);
+        
         if (!isStayNearTargetValid(ent))
         {
             calls--;

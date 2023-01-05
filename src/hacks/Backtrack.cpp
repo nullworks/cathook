@@ -279,9 +279,9 @@ void CreateMoveEarly()
     if ((int) bt_data.size() != g_IEngine->GetMaxClients())
         bt_data.resize(g_IEngine->GetMaxClients());
 
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        int i = ent->m_IDX;
         int index         = i - 1;
 
         auto &ent_data = bt_data[index];

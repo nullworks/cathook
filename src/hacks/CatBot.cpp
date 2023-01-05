@@ -564,9 +564,9 @@ void reportall()
         patch.Patch();
         patched_report = true;
     }
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+       
         // We only want a nullptr check since dormant entities are still on the
         // server
         if (!ent)
@@ -576,7 +576,7 @@ void reportall()
         if (ent == LOCAL_E)
             continue;
         player_info_s info;
-        if (GetPlayerInfo(i, &info) && info.friendsID)
+        if (GetPlayerInfo(ent->m_IDX, &info) && info.friendsID)
         {
             if (!player_tools::shouldTargetSteamId(info.friendsID))
                 continue;
@@ -634,9 +634,8 @@ void smart_crouch()
     static bool crouch = false;
     if (crouchcdr.test_and_set(2000))
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER || ent->m_iTeam() == LOCAL_E->m_iTeam() || !(ent->hitboxes.GetHitbox(0)) || !(ent->m_bAlivePlayer()) || !player_tools::shouldTarget(ent))
                 continue;
             bool failedvis = false;
@@ -786,8 +785,9 @@ void update()
         ipc_list.clear();
         int count_total = 0;
 
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
+            int i = ent->m_IDX;
             if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
             else

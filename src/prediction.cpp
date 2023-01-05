@@ -317,9 +317,9 @@ void Prediction_PaintTraverse()
                 return;
         }
 
-        for (int i = 1; i < g_GlobalVars->maxClients; i++)
+        for (auto const &ent : entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
+            
             if (CE_BAD(ent) || !ent->m_bAlivePlayer())
                 continue;
 
@@ -732,10 +732,10 @@ static InitRoutine init(
                 // Don't run if we don't use it
                 if (!hacks::shared::aimbot::engine_projpred && !debug_pp_draw)
                     return;
-                for (int i = 1; i < g_GlobalVars->maxClients; i++)
+                for (auto const &ent: entity_cache::player_cache)
                 {
-                    auto ent     = ENTITY(i);
-                    auto &buffer = previous_positions.at(i - 1);
+                    
+                    auto &buffer = previous_positions.at(ent->m_IDX - 1);
 
                     if (CE_BAD(LOCAL_E) || CE_BAD(ent) || !ent->m_bAlivePlayer())
                     {

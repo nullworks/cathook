@@ -712,9 +712,9 @@ CachedEntity *getClosestEntity(Vector vec)
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         if (CE_VALID(ent) && ent->m_vecDormantOrigin() && ent->m_bAlivePlayer() && ent->m_bEnemy() && vec.DistTo(ent->m_vecOrigin()) < distance)
         {
             distance = vec.DistTo(*ent->m_vecDormantOrigin());
@@ -728,9 +728,9 @@ CachedEntity *getClosestNonlocalEntity(Vector vec)
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         if (CE_VALID(ent) && ent->m_IDX != g_pLocalPlayer->entity_idx && ent->m_vecDormantOrigin() && ent->m_bAlivePlayer() && ent->m_bEnemy() && vec.DistTo(ent->m_vecOrigin()) < distance)
         {
             distance = vec.DistTo(*ent->m_vecDormantOrigin());
@@ -2020,9 +2020,10 @@ bool GetPlayerInfo(int idx, player_info_s *info)
 
 int GetPlayerForUserID(int userID)
 {
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
         player_info_s player_info;
+        int i = ent->m_IDX;
         if (!GetPlayerInfo(i, &player_info))
             continue;
         // Found player

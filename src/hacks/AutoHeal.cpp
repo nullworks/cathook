@@ -97,9 +97,9 @@ int BulletDangerValue(CachedEntity *patient)
         return 0;
     bool any_zoomed_snipers = false;
     // Find dangerous snipers in other team
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         if (CE_BAD(ent))
             continue;
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
@@ -142,9 +142,9 @@ int FireDangerValue(CachedEntity *patient)
     uint8_t should_switch = 0;
     if (auto_vacc_pop_if_pyro)
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
-            CachedEntity *ent = ENTITY(i);
+            
             if (CE_BAD(ent))
                 continue;
             if (!ent->m_bEnemy())
@@ -424,11 +424,12 @@ bool IsVaccinator()
 
 void UpdateData()
 {
-    for (int i = 1; i <= MAX_PLAYERS; ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
+        int i = ent->m_IDX;
         if (reset_cd[i].test_and_set(10000))
             data[i] = {};
-        CachedEntity *ent = ENTITY(i);
+        
         if (CE_GOOD(ent) && ent->m_bAlivePlayer())
         {
             int health = ent->m_iHealth();
@@ -577,12 +578,12 @@ int BestTarget()
     int best_score = INT_MIN;
     if (steamid_only)
         return best;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        int score = HealingPriority(i);
+        int score = HealingPriority(ent->m_IDX);
         if (score > best_score && score != -1)
         {
-            best       = i;
+            best       = ent->m_IDX;
             best_score = score;
         }
     }
@@ -622,10 +623,10 @@ void CreateMove()
         }
         if (current_id != steamid)
         {
-            for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+            for (auto const &ent: entity_cache::player_cache)
             {
-                CachedEntity *ent = ENTITY(i);
-                if (CE_BAD(ent) || !ent->player_info.friendsID)
+                int i = ent->m_IDX;
+                if (!ent->player_info.friendsID)
                     continue;
                 if (ent->player_info.friendsID == steamid && CanHeal(i))
                 {

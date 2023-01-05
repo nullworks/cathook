@@ -64,9 +64,9 @@ static CatCommand follow_steam("fb_steam", "Follow Steam Id",
 static CatCommand steam_debug("debug_steamid", "Print steamids",
                               []()
                               {
-                                  for (int i = 0; i <= g_IEngine->GetMaxClients(); ++i)
+                                  for (auto const &ent: entity_cache::player_cache)
                                   {
-                                      auto ent = ENTITY(i);
+                                     
                                       logging::Info("%u", ent->player_info.friendsID);
                                   }
                               });
@@ -359,9 +359,9 @@ static void cm()
         {
             if (ENTITY(valid_target)->player_info.friendsID != steamid)
             {
-                for (int i = 1; i <= ent_count; ++i)
+                for (auto const &entity: entity_cache::player_cache)
                 {
-                    auto entity = ENTITY(i);
+               
                     if (!isValidTarget(entity))
                         continue;
                     // No enemy check, since steamid is very specific
@@ -393,9 +393,9 @@ static void cm()
 
                 if (accountid != ENTITY(valid_target)->player_info.friendsID)
                 {
-                    for (int i = 1; i <= ent_count; ++i)
+                    for (auto const &entity: entity_cache::player_cache)
                     {
-                        auto entity = ENTITY(i);
+                      
                         if (!isValidTarget(entity))
                             continue;
                         if (entity->m_bEnemy())
@@ -420,9 +420,9 @@ static void cm()
         {
             if (!playerlist::IsFriend(ENTITY(valid_target)))
             {
-                for (int i = 1; i <= ent_count; ++i)
+                for (auto const &entity: entity_cache::player_cache)
                 {
-                    auto entity = ENTITY(i);
+                    
                     if (!isValidTarget(entity))
                         continue;
                     if (entity->m_bEnemy())
@@ -453,10 +453,10 @@ static void cm()
         // Try to get a new target
         if (!followcart)
         {
-            int ent_count = g_IEngine->GetMaxClients();
-            for (int i = 1; i <= ent_count; ++i)
+         
+            for (auto const &entity: entity_cache::player_cache)
             {
-                auto entity = ENTITY(i);
+              
                 if (!isValidTarget(entity))
                     continue;
                 if (!follow_target)
@@ -478,15 +478,15 @@ static void cm()
                         continue;
                     // check if new target has a higher priority than current
                     // target
-                    if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(ENTITY(i)))
+                    if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(entity))
                         continue;
                 }
                 if (startFollow(entity, isNavBotCM))
                 {
                     // ooooo, a target
                     navinactivity.update();
-                    follow_target = i;
-                    afkTicks[i].update(); // set afk time to 03
+                    follow_target = entity->m_IDX;
+                    afkTicks[entity->m_IDX].update(); // set afk time to 03
                     break;
                 }
             }

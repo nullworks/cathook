@@ -316,7 +316,10 @@ static void cm()
     if (!*enable)
         return;
     if (CE_BAD(LOCAL_E))
+    {
+        data.clear();
         return;
+    }
 
     // Update entites every 1/5s
     const bool entity_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.20f) == 0;
@@ -338,10 +341,6 @@ static void cm()
             for (auto const &ent : entity_cache::player_cache)
             {
                 // Get an entity from the loop tick and process it
-
-                if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
-                    continue;
-
                 ProcessEntity(ent);
                 hitboxUpdate(ent);
 

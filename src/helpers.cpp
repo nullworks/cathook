@@ -1024,7 +1024,6 @@ bool IsEntityVisible(CachedEntity *entity, int hb)
         return entity->hitboxes.VisibilityCheck(hb);
 }
 
-std::mutex trace_lock;
 bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset, unsigned int mask, trace_t *trace)
 {
     trace_t trace_object;

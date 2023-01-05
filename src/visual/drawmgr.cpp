@@ -60,7 +60,6 @@ void BeginCheatVisuals()
     ResetStrings();
 }
 
-std::mutex drawing_mutex;
 
 double getRandom(double lower_bound, double upper_bound)
 {

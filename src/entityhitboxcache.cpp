@@ -102,8 +102,6 @@ bool EntityHitboxCache::VisibilityCheck(int id)
 
 static settings::Int setupbones_time{ "source.setupbones-time", "2" };
 
-static std::mutex setupbones_mutex;
-
 void EntityHitboxCache::UpdateBones()
 {
     // Do not run for bad ents/non player ents

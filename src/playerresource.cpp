@@ -11,8 +11,6 @@
 
 void TFPlayerResource::Update()
 {
-    IClientEntity *ent;
-
     entity = 0;
     for (auto const &ent_not_raw : entity_cache::valid_ents)
     {

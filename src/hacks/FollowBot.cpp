@@ -354,7 +354,6 @@ static void cm()
     {
         auto &valid_target = follow_target;
         // Find a target with the steam id, as it is prioritized
-        auto ent_count = g_IEngine->GetMaxClients();
         if (steamid)
         {
             if (ENTITY(valid_target)->player_info.friendsID != steamid)

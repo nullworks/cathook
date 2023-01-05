@@ -201,8 +201,6 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         backtrack::MoveToTick(*best_data);
     return { bestent, predicted };
 }
-static float slow_change_dist_y{};
-static float slow_change_dist_p{};
 void DoSlowAim(Vector &input_angle, int speed)
 {
     auto viewangles = current_user_cmd->viewangles;

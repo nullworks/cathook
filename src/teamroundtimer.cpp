@@ -22,7 +22,6 @@ round_states CTeamRoundTimer::GetRoundState()
 
 void CTeamRoundTimer::Update()
 {
-    IClientEntity *ent;
 
     entity = 0;
     for (auto const &ent : entity_cache::valid_ents)

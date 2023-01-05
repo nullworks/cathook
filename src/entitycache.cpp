@@ -288,12 +288,16 @@ void Update()
 void Invalidate()
 {
    array.clear();
+   previous_max = 0;
+   max = -1;
   
 }
 
 void Shutdown()
 {
-    array.clear();
+   array.clear();
+   previous_max = 0;
+   max = -1;
 }
 int max = -1;
 } // namespace entity_cache

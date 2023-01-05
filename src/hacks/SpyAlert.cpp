@@ -41,9 +41,9 @@ void Draw()
         last_say = 0;
     for (auto const &ent: entity_cache::player_cache)
     {
-        if (CE_INT(ent, netvar.iClass) != tf_class::tf_spy)
+        if (ent->m_iClassID() != tf_spy)
             continue;
-        if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team)
+        if (!ent->m_bEnemy())
             continue;
         if (IsPlayerInvisible(ent) && !invisible)
             continue;

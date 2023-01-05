@@ -21,7 +21,7 @@ int NearbyEntities()
     int ret = 0;
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return ret;
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
 
         if (ent == LOCAL_E)
@@ -52,7 +52,7 @@ static void CreateMove()
     else
         shouldm2 = false;
 
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (!IsProjectile(ent) && !ent->m_bGrenadeProjectile())
             continue;

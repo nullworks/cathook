@@ -73,8 +73,6 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
         {
             PROF_SECTION(PT_command_stack);
             std::lock_guard<std::mutex> guard(hack::command_stack_mutex);
-            // logging::Info("executing %s",
-            //              hack::command_stack().top().c_str());
             g_IEngine->ClientCmd_Unrestricted(hack::command_stack().top().c_str());
             hack::command_stack().pop();
         }

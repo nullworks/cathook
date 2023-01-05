@@ -22,10 +22,9 @@ static InitRoutine init([]() {
             if (CE_BAD(LOCAL_E))
                 return;
             re::CTFPlayerShared *shared_player = &re::C_BasePlayer::shared_(RAW_ENT(LOCAL_E));
-            for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+            for (auto const &ent: entity_cache::player_cache)
             {
-                CachedEntity *ent = ENTITY(i);
-                if (CE_VALID(ent) && ent->m_bAlivePlayer() && re::CTFPlayerShared::IsDominatingPlayer(shared_player, i))
+                if (CE_VALID(ent) && ent->m_bAlivePlayer() && re::CTFPlayerShared::IsDominatingPlayer(shared_player, ent->m_IDX))
                 {
                     float size;
                     if (!ent->hitboxes.GetHitbox(0))

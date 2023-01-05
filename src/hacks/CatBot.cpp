@@ -118,7 +118,7 @@ std::vector<std::string> config_list(std::string in)
         return config_vec;
     }
 
-    for (i = 0; i < results.gl_pathc; i++)
+    for (i = 0; i < results.gl_pathc; ++i)
         // /configs/ is 9 extra chars i have to remove
         config_vec.push_back(std::string(results.gl_pathv[i]).substr(paths::getDataPath().length() + 9));
 
@@ -564,9 +564,9 @@ void reportall()
         patch.Patch();
         patched_report = true;
     }
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+       
         // We only want a nullptr check since dormant entities are still on the
         // server
         if (!ent)
@@ -576,7 +576,7 @@ void reportall()
         if (ent == LOCAL_E)
             continue;
         player_info_s info;
-        if (GetPlayerInfo(i, &info) && info.friendsID)
+        if (GetPlayerInfo(ent->m_IDX, &info) && info.friendsID)
         {
             if (!player_tools::shouldTargetSteamId(info.friendsID))
                 continue;
@@ -634,9 +634,8 @@ void smart_crouch()
     static bool crouch = false;
     if (crouchcdr.test_and_set(2000))
     {
-        for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+        for (auto const &ent: entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER || ent->m_iTeam() == LOCAL_E->m_iTeam() || !(ent->hitboxes.GetHitbox(0)) || !(ent->m_bAlivePlayer()) || !player_tools::shouldTarget(ent))
                 continue;
             bool failedvis = false;
@@ -669,7 +668,7 @@ CatCommand print_ammo("debug_print_ammo", "debug",
                           if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
                               return;
                           logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
-                          for (int i = 0; i < 10; i++)
+                          for (int i = 0; i < 10; ++i)
                               logging::Info("Ammo Table %d: %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
                       });
 static Timer disguise{};
@@ -786,8 +785,9 @@ void update()
         ipc_list.clear();
         int count_total = 0;
 
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
+        for (auto const &ent: entity_cache::player_cache)
         {
+            int i = ent->m_IDX;
             if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
             else
@@ -825,7 +825,7 @@ void update()
                     auto &peer_mem = ipc::peer->memory;
 
                     // Iterate all ipc peers
-                    for (unsigned i = 0; i < cat_ipc::max_peers; i++)
+                    for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
                     {
                         // If that ipc peer is alive and in has the steamid of that player
                         if (!peer_mem->peer_data[i].free && peer_mem->peer_user_data[i].friendid == id)

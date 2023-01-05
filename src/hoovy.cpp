@@ -41,12 +41,9 @@ void UpdateHoovyList()
     if (CE_BAD(LOCAL_E))
         return;
 
-    static CachedEntity *ent;
-    for (int i = 1; i <= MAX_PLAYERS; i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        ent = ENTITY(i);
-        if (CE_GOOD(ent) && CE_BYTE(ent, netvar.iLifeState) == LIFE_ALIVE)
-        {
+            int i = ent->m_IDX;
             if (!hoovy_list[i - 1])
             {
                 if (IsHoovyHelper(ent))
@@ -57,7 +54,7 @@ void UpdateHoovyList()
                 if (!HasSandvichOut(ent))
                     hoovy_list[i - 1] = false;
             }
-        }
+        
     }
 }
 

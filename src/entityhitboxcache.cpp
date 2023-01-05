@@ -12,12 +12,10 @@
 
 namespace hitbox_cache
 {
-
-EntityHitboxCache::EntityHitboxCache() : parent_ref(&entity_cache::Get(((unsigned) this - (unsigned) &hitbox_cache::array) / sizeof(EntityHitboxCache)))
+EntityHitboxCache::EntityHitboxCache(int in_IDX) : hit_idx(in_IDX)
 {
     Reset();
 }
-
 int EntityHitboxCache::GetNumHitboxes()
 {
     if (!m_bInit)
@@ -53,8 +51,8 @@ void EntityHitboxCache::Init()
     model_t *model;
     studiohdr_t *shdr;
     mstudiohitboxset_t *set;
-
-    m_bInit = true;
+    m_bInit    = true;
+    parent_ref = &(entity_cache::array[hit_idx]);
     if (CE_BAD(parent_ref))
         return;
     model = (model_t *) RAW_ENT(parent_ref)->GetModel();
@@ -104,11 +102,11 @@ bool EntityHitboxCache::VisibilityCheck(int id)
 
 static settings::Int setupbones_time{ "source.setupbones-time", "2" };
 
-static std::mutex setupbones_mutex;
-
 void EntityHitboxCache::UpdateBones()
 {
     // Do not run for bad ents/non player ents
+    if (!m_bInit)
+        Init();
     if (CE_BAD(parent_ref) || parent_ref->m_Type() != ENTITY_PLAYER)
         return;
     auto bone_ptr = GetBones();
@@ -239,8 +237,6 @@ CachedHitbox *EntityHitboxCache::GetHitbox(int id)
     m_CacheValidationFlags[id] = true;
     return &m_CacheInternal[id];
 }
-
-EntityHitboxCache array[MAX_ENTITIES]{};
 
 void Update()
 {

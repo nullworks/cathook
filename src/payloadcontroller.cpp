@@ -14,10 +14,10 @@ void Update()
     if (update_payloads.test_and_set(3000))
     {
         // Reset entries
-        for (auto &entry : payloads)
+        for (auto const &entry : payloads)
             entry.clear();
 
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
             // Not the object we need or invalid (team)
             if (ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
@@ -57,7 +57,7 @@ std::optional<Vector> getClosestPayload(Vector source, int team)
 
 void LevelInit()
 {
-    for (auto &entry : payloads)
+    for (auto const &entry : payloads)
         entry.clear();
 }
 

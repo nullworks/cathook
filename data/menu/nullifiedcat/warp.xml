@@ -16,6 +16,7 @@
             <AutoVariable width="fill" target="warp.charge-passively.jump" label="Charge in jump" tooltip="Charge passively in jump, This will make you fall slower."/>
             <AutoVariable width="fill" target="warp.charge-passively.no-inputs" label="Charge when keys released" tooltip="Charge passively before full stop after releasing movement keys."/>
             <AutoVariable width="fill" target="warp.movement-ratio" label="Movement ratio" tooltip="Every nth movement tick is passively converted to warp."/>
+            <AutoVariable width="fill" target="warp.dodge_proj" label="Dodge projectiles" tooltip="Dodges enemy projectiles using warp."/>
             <AutoVariable width="fill" target="warp.demoknight" label="Demoknight mode" tooltip="This will make you do a swing charge with warp (attack, charge, warp)."/>
             <AutoVariable width="fill" target="warp.peek" label="Peek mode" tooltip="This will teleport you for a tick and then teleport you back."/>
             <AutoVariable width="fill" target="warp.on-hit" label="Warp when hit" tooltip="Warp whenever someone melees you or shoots you with hitscan."/>

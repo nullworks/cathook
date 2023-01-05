@@ -89,7 +89,7 @@ void LocalPlayer::Update()
 
     entity_idx = g_IEngine->GetLocalPlayer();
     entity     = ENTITY(entity_idx);
-    if (CE_BAD(entity))
+    if (!entity || CE_BAD(entity))
     {
         team = 0;
         return;
@@ -100,7 +100,7 @@ void LocalPlayer::Update()
     bRevving                 = false;
     bRevved                  = false;
     wep                      = weapon();
-    if (CE_GOOD(wep))
+    if (wep && CE_GOOD(wep))
     {
         weapon_mode = GetWeaponModeloc();
         if (wep->m_iClassID() == CL_CLASS(CTFSniperRifle) || wep->m_iClassID() == CL_CLASS(CTFSniperRifleDecap))
@@ -152,10 +152,10 @@ void LocalPlayer::Update()
     if (!life_state)
     {
         spectator_state = NONE;
-        for (int i = 0; i < PLAYER_ARRAY_SIZE; i++)
+        for (auto const &ent: entity_cache::player_cache)
         {
             // Assign the for loops tick number to an ent
-            CachedEntity *ent = ENTITY(i);
+            
             if (!CE_BAD(ent) && (HandleToIDX(CE_INT(ent, netvar.hObserverTarget))) == LOCAL_E->m_IDX)
             {
                 auto mode = CE_INT(ent, netvar.iObserverMode);

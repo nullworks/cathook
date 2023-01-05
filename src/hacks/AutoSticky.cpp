@@ -124,7 +124,7 @@ void CreateMove()
     targets.clear();
 
     // Cycle through the ents and search for valid ents
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         // Assign the for loops index to an ent
 

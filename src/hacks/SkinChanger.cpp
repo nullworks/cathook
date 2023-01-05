@@ -46,7 +46,7 @@ CAttribute::CAttribute(uint16_t iAttributeDefinitionIndex, float flValue)
 
 float CAttributeList::GetAttribute(int defindex)
 {
-    for (int i = 0; i < m_Attributes.Count(); i++)
+    for (int i = 0; i < m_Attributes.Count(); ++i)
     {
         const auto &a = m_Attributes[i];
         if (a.defidx == defindex)
@@ -59,7 +59,7 @@ float CAttributeList::GetAttribute(int defindex)
 
 void CAttributeList::RemoveAttribute(int index)
 {
-    for (int i = 0; i < m_Attributes.Count(); i++)
+    for (int i = 0; i < m_Attributes.Count(); ++i)
     {
         const auto &a = m_Attributes[i];
         if (a.defidx == index)
@@ -81,7 +81,7 @@ void CAttributeList::SetAttribute(int index, float value)
     SetRuntimeAttributeValueFn(this, attrib, value);
     // The code below actually is unused now - but I'll keep it just in case!
     // Let's check if attribute exists already. We don't want dupes.
-    /*for (int i = 0; i < m_Attributes.Count(); i++) {
+    /*for (int i = 0; i < m_Attributes.Count(); ++i) {
         auto& a = m_Attributes[i];
         if (a.defidx == index) {
             a.value = value;
@@ -184,7 +184,7 @@ static CatCommand dump_attrs("skinchanger_debug_attrs", "Dump attributes",
                              {
                                  CAttributeList *list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
                                  logging::Info("ATTRIBUTE LIST: %i", list->m_Attributes.Size());
-                                 for (int i = 0; i < list->m_Attributes.Size(); i++)
+                                 for (int i = 0; i < list->m_Attributes.Size(); ++i)
                                  {
                                      logging::Info("%i %.2f", list->m_Attributes[i].defidx, list->m_Attributes[i].value);
                                  }
@@ -290,7 +290,7 @@ void FrameStageNotify(int stage)
         return;
     if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(my_weapon_ptr))
         return;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
     {
         handle = weapon_list[i];
         eid    = HandleToIDX(handle);
@@ -326,7 +326,7 @@ void DrawText()
     {
         AddSideString(format("dIDX: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
-        for (int i = 0; i < list->m_Attributes.Size(); i++)
+        for (int i = 0; i < list->m_Attributes.Size(); ++i)
         {
             AddSideString(format('[', i, "] ", list->m_Attributes[i].defidx, ": ", list->m_Attributes[i].value));
         }
@@ -402,7 +402,7 @@ void Load(std::string filename, bool merge)
         logging::Info("Reading %i entries...", size);
         if (!merge)
             modifier_map.clear();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; ++i)
         {
             int defindex;
             BINARY_FILE_READ(file, defindex);

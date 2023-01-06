@@ -19,7 +19,7 @@ bool IsProjectileACrit(CachedEntity *ent)
     return CE_BYTE(ent, netvar.Rocket_bCritical);
 }
 // This method of const'ing the index is weird.
-CachedEntity::CachedEntity(int idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
+CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
 {
 #if PROXY_ENTITY != true
     m_pEntity = nullptr;
@@ -27,7 +27,7 @@ CachedEntity::CachedEntity(int idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityH
     m_fLastUpdate = 0.0f;
 }
 
-void CachedEntity::Reset()
+inline void CachedEntity::Reset()
 {
     m_bAnyHitboxVisible = false;
     m_bVisCheckComplete = false;
@@ -48,11 +48,8 @@ static settings::Float ve_window{ "debug.ve.window", "0" };
 static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
 static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 
-void CachedEntity::Update()
+inline void CachedEntity::Update()
 {
-    auto raw = RAW_ENT(this);
-    if (!raw)
-        return;
 #if PROXY_ENTITY != true
     m_pEntity = g_IEntityList->GetClientEntity(idx);
     if (!m_pEntity)
@@ -141,12 +138,12 @@ std::vector<CachedEntity *> valid_ents;
 std::map<Vector, CachedEntity *> proj_map;
 std::vector<CachedEntity *> skip_these;
 std::vector<CachedEntity *> player_cache;
-int previous_max = 0;
-int previous_ent = -1;
+u_int16_t previous_max = 0;
+u_int16_t previous_ent = 0;
 void Update()
 {
-    max              = g_IEntityList->GetHighestEntityIndex();
-    int current_ents = g_IEntityList->NumberOfEntities(false);
+    max                    = g_IEntityList->GetHighestEntityIndex();
+    u_int16_t current_ents = g_IEntityList->NumberOfEntities(false);
     valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
     player_cache.clear();
 
@@ -161,9 +158,9 @@ void Update()
             if (CE_GOOD((&val)))
             {
                 val.hitboxes.UpdateBones();
-                valid_ents.push_back(&val);
+                valid_ents.emplace_back(&val);
                 if (val.m_Type() == ENTITY_PLAYER && val.m_bAlivePlayer())
-                    player_cache.push_back(&val);
+                    player_cache.emplace_back(&val);
                 if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && val.m_Type() == ENTITY_PROJECTILE && val.m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &val) == skip_these.end())
                     dodgeProj(&val);
             }
@@ -177,22 +174,19 @@ void Update()
     }
     else
     {
-
-        for (int i = 0; i <= max; ++i)
+        for (u_int16_t i = 0; i <= max; ++i)
         {
-            CachedEntity test(i);
-            if (CE_INVALID((&test)))
+            if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
                 continue;
-
+            CachedEntity test(i);
             test.Update();
-
             array.emplace(std::make_pair(i, test));
             if (CE_GOOD((&array[i])))
             {
                 array[i].hitboxes.UpdateBones();
-                valid_ents.push_back(&array[i]);
+                valid_ents.emplace_back(&array[i]);
                 if (array[i].m_Type() == ENTITY_PLAYER && array[i].m_bAlivePlayer())
-                    player_cache.push_back(&array[i]);
+                    player_cache.emplace_back(&(array[i]));
                 if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
                     dodgeProj(&array[i]);
             }
@@ -256,18 +250,11 @@ void dodgeProj(CachedEntity *proj_ptr)
     }
 }
 
-void Invalidate()
-{
-    array.clear();
-    previous_max = 0;
-    max          = -1;
-}
-
 void Shutdown()
 {
     array.clear();
     previous_max = 0;
     max          = -1;
 }
-int max = -1;
+u_int16_t max = 1;
 } // namespace entity_cache

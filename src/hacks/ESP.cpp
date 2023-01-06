@@ -90,28 +90,6 @@ void __attribute__((fastcall)) DrawBox(CachedEntity *ent, const rgba_t &clr);
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, bool transparent);
 bool GetCollide(CachedEntity *ent);
 
-// Strings
-class ESPString
-{
-public:
-    std::string data;
-    rgba_t color{ colors::empty };
-};
-
-// Cached data
-class ESPData
-{
-public:
-    int string_count{ 0 };
-    std::array<ESPString, 16> strings{};
-    rgba_t color{ colors::empty };
-    bool needs_paint{ false };
-    bool has_collide{ false };
-    Vector collide_max{ 0, 0, 0 };
-    Vector collide_min{ 0, 0, 0 };
-    bool transparent{ false };
-};
-
 // Storage array for keeping strings and other data
 std::unordered_map<CachedEntity *, ESPData> data;
 // Storage vars for entities that need to be re-drawn
@@ -316,10 +294,7 @@ static void cm()
     if (!*enable)
         return;
     if (CE_BAD(LOCAL_E))
-    {
-        data.clear();
         return;
-    }
 
     // Update entites every 1/5s
     const bool entity_tick = g_GlobalVars->tickcount % TIME_TO_TICKS(0.20f) == 0;

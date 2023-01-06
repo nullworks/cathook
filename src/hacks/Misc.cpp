@@ -414,7 +414,7 @@ void Draw()
     }*/
     if (show_spectators)
     {
-        for (auto const &ent: entity_cache::player_cache)
+        for (auto const &ent: entity_cache::valid_ents)
         {
             // Assign the for loops tick number to an ent
             

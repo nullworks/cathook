@@ -458,14 +458,13 @@ void EffectGlow::Render(int x, int y, int w, int h)
     if (!isHackActive() || (clean_screenshots && g_IEngine->IsTakingScreenshot()) || g_Settings.bInvalid || disable_visuals)
         return;
     static ITexture *orig;
-    static IClientEntity *ent;
     static IMaterialVar *blury_bloomamount;
     if (!init)
         Init();
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     orig = ptr->GetRenderTarget();
     BeginRenderGlow();
-    for (auto &ent_non_raw : entity_cache::valid_ents)
+    for (auto const &ent_non_raw : entity_cache::valid_ents)
     {
         auto ent = RAW_ENT(ent_non_raw);
         if (ent && ShouldRenderGlow(ent))

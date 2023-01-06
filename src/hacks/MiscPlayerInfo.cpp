@@ -52,9 +52,9 @@ void Paint()
 {
     if (!*draw_kda && !*mafia_city)
         return;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        int i = ent->m_IDX;
         if (CE_BAD(ent))
             continue;
         if (ent->m_Type() != ENTITY_PLAYER || !ent->player_info.friendsID)

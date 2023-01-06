@@ -126,7 +126,7 @@ void draw()
     // Loop all players
     if (*buildings)
     {
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
             // Get and check player
             const uint16_t curr_idx = ent->m_IDX;
@@ -182,11 +182,12 @@ void draw()
     }
     else
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (auto const &ent: entity_cache::player_cache)
         {
             // Get and check player
-            auto ent = ENTITY(i);
+   
             Vector origin;
+            int i = ent->m_IDX;
             std::optional<rgba_t> color = std::nullopt;
 
             if (CE_INVALID(ent))

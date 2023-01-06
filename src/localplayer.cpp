@@ -152,10 +152,10 @@ void LocalPlayer::Update()
     if (!life_state)
     {
         spectator_state = NONE;
-        for (int i = 0; i < PLAYER_ARRAY_SIZE; i++)
+        for (auto const &ent: entity_cache::player_cache)
         {
             // Assign the for loops tick number to an ent
-            CachedEntity *ent = ENTITY(i);
+            
             if (!CE_BAD(ent) && (HandleToIDX(CE_INT(ent, netvar.hObserverTarget))) == LOCAL_E->m_IDX)
             {
                 auto mode = CE_INT(ent, netvar.iObserverMode);

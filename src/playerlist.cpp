@@ -258,7 +258,7 @@ CatCommand pl_print("pl_print", "Print current player list",
                             if (!include_all && !std::memcmp(&it->second, &empty, sizeof(empty)))
                                 continue;
 
-                            const auto &ent = it->second;
+                            auto const &ent = it->second;
 #if ENABLE_VISUALS
                             logging::Info("%u -> %d (%f,%f,%f,%f) %f %u %u", it->first, ent.state, ent.color.r, ent.color.g, ent.color.b, ent.color.a, ent.inventory_value, ent.deaths_to, ent.kills);
 #else

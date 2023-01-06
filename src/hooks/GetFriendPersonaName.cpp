@@ -37,9 +37,10 @@ bool StolenName()
     int potential_targets_length = 0;
 
     // Go through entities looking for potential targets
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
         // Check if ent is a good target
+        int i = ent->m_IDX;
         if (i == g_pLocalPlayer->entity_idx)
             continue;
         if (g_pPlayerResource->GetTeam(i) != g_pLocalPlayer->team)

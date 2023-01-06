@@ -16,7 +16,7 @@
 #include "MiscTemporary.hpp"
 #include "Think.hpp"
 #include "Aimbot.hpp"
-
+#include <Misc.hpp>
 namespace hacks::tf2::warp
 {
 static settings::Boolean enabled{ "warp.enabled", "false" };
@@ -37,6 +37,7 @@ static settings::Boolean charge_passively{ "warp.charge-passively", "true" };
 static settings::Boolean charge_in_jump{ "warp.charge-passively.jump", "true" };
 static settings::Boolean charge_no_input{ "warp.charge-passively.no-inputs", "false" };
 static settings::Int warp_movement_ratio{ "warp.movement-ratio", "6" };
+settings::Boolean dodge_projectile{ "warp.dodge_proj", "true" };
 static settings::Boolean warp_demoknight{ "warp.demoknight", "false" };
 static settings::Boolean warp_peek{ "warp.peek", "false" };
 static settings::Boolean warp_on_damage{ "warp.on-hit", "false" };
@@ -102,15 +103,15 @@ void DrawWarpStrings()
 }
 #endif
 
-static bool should_charge       = false;
-static int warp_amount          = 0;
-static int warp_amount_override = 0;
-static bool should_melee        = false;
-static bool charged             = false;
-
-static bool should_warp = true;
-static bool was_hurt    = false;
-
+static bool should_charge = false;
+static int warp_amount    = 0;
+int warp_amount_override  = 0;
+static bool should_melee  = false;
+static bool charged       = false;
+static bool was_hurt      = false;
+static bool should_warp   = true;
+static bool warp_dodge    = false;
+static float yaw_amount   = 90.0f;
 // Rapidfire key mode
 static bool key_valid = false;
 
@@ -260,21 +261,92 @@ bool shouldRapidfire()
 
     return buttons_pressed;
 }
+void dodgeProj()
+{
+    if (!LOCAL_E->m_bAlivePlayer() || entity_cache::proj_map.empty() || !dodge_projectile)
+        return;
+    Vector player_pos  = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+    const int max_size = entity_cache::proj_map.size();
+    for (int i = 0; i < max_size; ++i)
+    {
+        auto curr_tuple   = entity_cache::proj_map[i];
+        Vector key        = std::get<0>(curr_tuple);
+        CachedEntity *val = std::get<1>(curr_tuple);
+        if (key.Length() < 0.1f)
+        {
+            if (CE_GOOD(val))
+                continue;
+            else
+                entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+            continue;
+        }
+        if (CE_GOOD(val))
+        {
+            // Since we are sending this warp next tick we need to compensate for fast moving projectiles
+            // 2 Ticks in advance is a fairly safe interval
+            Vector velocity_comp = key * 2 * TICK_INTERVAL;
+            velocity_comp.z -= 2 * TICK_INTERVAL * g_ICvar->FindVar("sv_gravity")->GetFloat() * ProjGravMult(val->m_iClassID(), key.Length());
 
+            Vector proj_next_tik = RAW_ENT(val)->GetAbsOrigin() + velocity_comp;
+            float diff           = proj_next_tik.DistToSqr(player_pos);
+            // Warp sooner for fast moving projectiles.
+            if (diff < (15000 * (key.Length() / 1000)))
+            {
+                trace_t trace;
+                Ray_t ray;
+                ray.Init(proj_next_tik, player_pos, Vector(0, -8, -8), Vector(0, 8, 8));
+                g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
+                if (trace.DidHit())
+                {
+
+                    // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
+                    Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
+
+                    if (0 <= result.y)
+                        yaw_amount = -90.0f;
+                    else
+                        yaw_amount = 90.0f;
+                    if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E))
+                    {
+                        was_hurt   = true;
+                        warp_dodge = true;
+                        entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+                    }
+                } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
+                else
+                {
+                    was_hurt      = true;
+                    warp_dodge    = true;
+                    Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
+                    if (0 <= result.y)
+                        yaw_amount = -90.0f;
+                    else
+                        yaw_amount = 90.0f;
+
+                    entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+                }
+            }
+        }
+        else
+            entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+    }
+}
 // Should we warp?
 bool shouldWarp(bool check_amount)
 {
+
     return
         // Ingame?
-        g_IEngine->IsInGame() &&
-        // Warp key held?
-        (((warp_key && warp_key.isKeyDown())
+        (g_IEngine->IsInGame() &&
+         // Warp key held?
+         ((warp_key && warp_key.isKeyDown())
           // Hurt warp?
           || was_hurt
           // Rapidfire and trying to attack?
-          || shouldRapidfire()) &&
-         // Do we have enough to warp?
-         (!check_amount || warp_amount));
+          || (shouldRapidfire() &&
+              // Do we have enough to warp?
+              (!check_amount || warp_amount)) ||
+          warp_dodge));
 }
 
 // How many ticks of excess we have (for decimal speeds)
@@ -298,6 +370,8 @@ int GetWarpAmount(bool finalTick)
     if (!*maxusrcmdprocessticks)
         max_extra_ticks = INT_MAX;
     float warp_amount_preprocessed = std::max(*speed, 0.05f);
+    if (warp_dodge)
+        warp_amount_preprocessed = 23.0f;
 
     // How many ticks to warp, add excess too
     int warp_amount_processed = std::floor(warp_amount_preprocessed) + std::floor(excess_ticks);
@@ -346,7 +420,7 @@ void Warp(float accumulated_extra_samples, bool finalTick)
 
         // Starts at 1 for the previous packet we already stored
         int packets_sent = 1;
-        for (int i = 0; i < calls; i++)
+        for (int i = 0; i < calls; ++i)
         {
             if (!i)
                 first_warp_tick = true;
@@ -385,6 +459,7 @@ void Warp(float accumulated_extra_samples, bool finalTick)
     if (warp_ticks <= 0)
     {
         was_hurt   = false;
+        warp_dodge = false;
         warp_ticks = 0;
         if (warp_amount_override)
             warp_amount_override = 0;
@@ -423,7 +498,7 @@ int approximateTicksForDist(float distance, float initial_speed, int max_ticks)
             has_booties = true;
     }
     float travelled_dist = 0.0f;
-    for (int i = 0; i <= max_ticks; i++)
+    for (int i = 0; i <= max_ticks; ++i)
     {
         // Compensate for the skullcutter (booties don't speed up, besides with skullcutter)
         travelled_dist += approximateSpeedAtTick(i, initial_speed, is_skullcutter ? (has_booties ? 701.0f : 637.0f) : 750.0f);
@@ -526,6 +601,7 @@ void handleMinigun()
 // This is called first, it subsequently calls all the CreateMove functions.
 void CL_Move_hook(float accumulated_extra_samples, bool bFinalTick)
 {
+
     CL_Move_t original = (CL_Move_t) cl_move_detour.GetOriginalFunc();
     original(accumulated_extra_samples, bFinalTick);
     cl_move_detour.RestorePatch();
@@ -700,7 +776,10 @@ void warpLogic()
             if (yaw_selections.empty())
                 return;
             // Select randomly
-            yaw = yaw_selections[UniformRandomInt(0, yaw_selections.size() - 1)];
+            if (warp_dodge)
+                yaw = yaw_amount;
+            else
+                yaw = yaw_selections[UniformRandomInt(0, yaw_selections.size() - 1)];
         }
         // The yaw we want to achieve
         float actual_yaw = DEG2RAD(yaw);
@@ -730,9 +809,9 @@ void warpLogic()
                 // Find an entity meeting the Criteria and closest to crosshair
                 std::pair<CachedEntity *, float> result{ nullptr, FLT_MAX };
 
-                for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+                for (auto const &ent : entity_cache::player_cache)
                 {
-                    CachedEntity *ent = ENTITY(i);
+
                     if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
                         continue;
                     // No hitboxes
@@ -1096,6 +1175,7 @@ static InitRoutine init(
         EC::Register(EC::CreateMove, CreateMove, "warp_createmove", EC::very_late);
         EC::Register(EC::CreateMoveWarp, CreateMove, "warp_createmovew", EC::very_late);
         EC::Register(EC::CreateMove_NoEnginePred, CreateMovePrePredict, "warp_prepredict");
+        EC::Register(EC::CreateMove, dodgeProj, "warp_dodgeproj", EC::very_early);
         EC::Register(EC::CreateMoveEarly, CreateMoveEarly, "warp_createmove_early", EC::very_early);
         g_IEventManager2->AddListener(&listener, "player_hurt", false);
         EC::Register(

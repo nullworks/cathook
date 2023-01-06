@@ -11,10 +11,8 @@
 
 void TFPlayerResource::Update()
 {
-    IClientEntity *ent;
-
     entity = 0;
-    for (auto &ent_not_raw : entity_cache::valid_ents)
+    for (auto const &ent_not_raw : entity_cache::valid_ents)
     {
         auto ent = RAW_ENT(ent_not_raw);
         if (ent && ent->GetClientClass()->m_ClassID == RCC_PLAYERRESOURCE)
@@ -32,7 +30,7 @@ int TFPlayerResource::GetHealth(CachedEntity *player)
     /* :thinking */
     IF_GAME(!IsTF()) return 100;
     ent = g_IEntityList->GetClientEntity(entity);
-    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE || !player)
         return 0;
     idx = player->m_IDX;
     if (idx >= 64 || idx < 0)
@@ -47,7 +45,7 @@ int TFPlayerResource::GetMaxHealth(CachedEntity *player)
     /* :thinking */
     IF_GAME(!IsTF()) return 100;
     ent = g_IEntityList->GetClientEntity(entity);
-    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE || !player)
         return 0;
     idx = player->m_IDX;
     if (idx >= 64 || idx < 0)
@@ -62,7 +60,7 @@ int TFPlayerResource::GetMaxBuffedHealth(CachedEntity *player)
 
     IF_GAME(!IsTF()) return GetMaxHealth(player);
     ent = g_IEntityList->GetClientEntity(entity);
-    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
+    if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE || !player)
         return 0;
     idx = player->m_IDX;
     if (idx >= 64 || idx < 0)

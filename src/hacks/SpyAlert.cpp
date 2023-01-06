@@ -29,7 +29,7 @@ void Draw()
     PROF_SECTION(DRAW_SpyAlert)
     if (!enable)
         return;
-    CachedEntity *closest_spy, *ent;
+    CachedEntity *closest_spy;
     float closest_spy_distance, distance;
     int spy_count;
     if (g_pLocalPlayer->life_state)
@@ -39,16 +39,11 @@ void Draw()
     spy_count            = 0;
     if (last_say > g_GlobalVars->curtime)
         last_say = 0;
-    for (int i = 0; i <= HIGHEST_ENTITY && i <= MAX_PLAYERS; i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        ent = ENTITY(i);
-        if (CE_BAD(ent))
+        if (ent->m_iClassID() != tf_spy)
             continue;
-        if (CE_BYTE(ent, netvar.iLifeState))
-            continue;
-        if (CE_INT(ent, netvar.iClass) != tf_class::tf_spy)
-            continue;
-        if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team)
+        if (!ent->m_bEnemy())
             continue;
         if (IsPlayerInvisible(ent) && !invisible)
             continue;

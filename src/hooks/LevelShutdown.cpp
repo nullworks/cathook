@@ -6,7 +6,7 @@
 #include <hacks/Aimbot.hpp>
 #include <hacks/hacklist.hpp>
 #include "HookedMethods.hpp"
-
+#include "ESP.hpp"
 namespace hooked_methods
 {
 
@@ -19,6 +19,7 @@ DEFINE_HOOKED_METHOD(LevelShutdown, void, void *this_)
     EC::run(EC::LevelShutdown);
     // Free memory for hitbox cache
     entity_cache::Shutdown();
+    hacks::shared::esp::Shutdown();
 #if ENABLE_IPC
     if (ipc::peer)
     {

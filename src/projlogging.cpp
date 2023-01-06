@@ -14,7 +14,7 @@ Vector prevloc[2048]{};
 
 void Update()
 {
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
 
         const model_t *model    = RAW_ENT(ent)->GetModel();

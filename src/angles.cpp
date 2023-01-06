@@ -85,17 +85,17 @@ angle_data_s &data(const CachedEntity *entity)
 
 void Update()
 {
-    for (int i = 1; i <= MAX_PLAYERS; i++)
+    for (auto const &ent : entity_cache::player_cache)
     {
-        auto &d           = data_idx(i);
-        CachedEntity *ent = ENTITY(i);
+        auto &d = data_idx(ent->m_IDX);
+
         if (CE_GOOD(ent) && !CE_BYTE(ent, netvar.iLifeState))
         {
             if (!d.good)
             {
                 memset(&d, 0, sizeof(angle_data_s));
             }
-            if (i == g_IEngine->GetLocalPlayer())
+            if (ent->m_IDX == g_IEngine->GetLocalPlayer())
             {
                 d.push(current_user_cmd->viewangles);
             }

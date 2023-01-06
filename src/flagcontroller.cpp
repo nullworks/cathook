@@ -22,7 +22,7 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
 
             // We cannot identify a bad entity as a flag due to the unreliability of it

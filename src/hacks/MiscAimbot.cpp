@@ -38,7 +38,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 
     bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 1; ++i)
     {
         if (prevent != -1)
         {
@@ -123,9 +123,8 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         }
     }
     prevent = -1;
-    for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent) || !(ent->m_bAlivePlayer()) || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
             continue;
         if (!teammate && ent->m_iTeam() == LOCAL_E->m_iTeam())
@@ -202,8 +201,6 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         backtrack::MoveToTick(*best_data);
     return { bestent, predicted };
 }
-static float slow_change_dist_y{};
-static float slow_change_dist_p{};
 void DoSlowAim(Vector &input_angle, int speed)
 {
     auto viewangles = current_user_cmd->viewangles;
@@ -315,9 +312,9 @@ static void SapperAimbot()
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
 
-    for (int i = 0; i < entity_cache::max; i++)
+    for (int i = 32; i < entity_cache::max; ++i)
     {
-        CachedEntity *ent = ENTITY(i);
+        CachedEntity* ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
         if (ent->m_Type() != ENTITY_BUILDING)
@@ -455,13 +452,9 @@ CachedEntity *targetBuilding(bool priority)
     float wrench_range   = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
-    for (int i = 0; i < entity_cache::max; i++)
+    for (auto const &ent: entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-
-        if (CE_BAD(ent))
-            continue;
-
+        
         // can't exactly repair Merasmus
         if (ent->m_Type() != ENTITY_BUILDING)
             continue;

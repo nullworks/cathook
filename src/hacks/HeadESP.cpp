@@ -26,11 +26,12 @@ static void cm()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &pEntity : entity_cache::player_cache)
     {
+        int i = pEntity->m_IDX;
         if (g_pLocalPlayer->entity_idx == i)
             continue;
-        CachedEntity *pEntity = ENTITY(i);
+
         if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
         {
             drawEsp[i] = false;
@@ -57,12 +58,10 @@ void draw()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &pEntity : entity_cache::player_cache)
     {
+        int i = pEntity->m_IDX;
         if (!drawEsp[i])
-            continue;
-        CachedEntity *pEntity = ENTITY(i);
-        if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
             continue;
         if (pEntity == LOCAL_E)
             continue;
@@ -91,14 +90,14 @@ void draw()
                     steamID = info.friendsID;
                 if (playerlist::AccessData(steamID).state == playerlist::k_EState::CAT)
                     draw::RectangleTextured(out.x - size / 2, out.y - size / 2, size, size, colors::white, idspec, 2 * 64, 1 * 64, 64, 64, 0);
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; ++i)
                 {
                     if (steamID == steamidarray[i])
                     {
                         static int ii = 1;
                         while (i > 3)
                         {
-                            ii++;
+                            ++ii;
                             i -= 4;
                         }
                         draw::RectangleTextured(out.x - size / 2, out.y - size / 2, size, size, colors::white, idspec, i * 64, ii * 64, 64, 64, 0);

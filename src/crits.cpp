@@ -278,7 +278,7 @@ bool shouldMeleeCrit()
         }
         else
         {
-            for (auto &ent_data : hacks::tf2::backtrack::bt_data)
+            for (auto const &ent_data : hacks::tf2::backtrack::bt_data)
             {
                 for (auto &tick : ent_data)
                 {
@@ -662,13 +662,13 @@ void CreateMove()
     cached_damage = g_pPlayerResource->GetDamage(g_pLocalPlayer->entity_idx) - melee_damage;
 
     // We need to update player states regardless, else we can't sync the observed crit chance
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
+        
         // no valid check needed, GetHealth only uses m_IDX
         if (g_pPlayerResource->GetHealth(ent))
         {
-            auto &status = player_status_list[i - 1];
+            auto &status = player_status_list[ent->m_IDX - 1];
             // Only sync if not updated recently in player_hurt
             // new health is bigger,
             // or they changed classes. We do the rest in player_hurt

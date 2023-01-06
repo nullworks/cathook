@@ -198,8 +198,6 @@ bool ImGui_ImplSdl_ProcessEvent(SDL_Event *event)
 
 bool ImGui_Impl_CreateFontsTexture(ImFontAtlas *font)
 {
-    // Build texture atlas
-    ImGuiIO &io = ImGui::GetIO();
     unsigned char *pixels;
     int width, height;
     font->GetTexDataAsRGBA32(&pixels, &width,

@@ -64,9 +64,9 @@ static CatCommand follow_steam("fb_steam", "Follow Steam Id",
 static CatCommand steam_debug("debug_steamid", "Print steamids",
                               []()
                               {
-                                  for (int i = 0; i <= g_IEngine->GetMaxClients(); i++)
+                                  for (auto const &ent: entity_cache::player_cache)
                                   {
-                                      auto ent = ENTITY(i);
+                                     
                                       logging::Info("%u", ent->player_info.friendsID);
                                   }
                               });
@@ -112,7 +112,7 @@ bool isIdle()
 
 static void checkAFK()
 {
-    for (int i = 1; i < g_GlobalVars->maxClients; i++)
+    for (int i = 1; i < g_GlobalVars->maxClients; ++i)
     {
         if (soundcache::GetSoundLocation(i))
         {
@@ -132,7 +132,7 @@ static void checkAFK()
 
 static void init()
 {
-    for (size_t i = 0; i < afkTicks.size(); i++)
+    for (size_t i = 0; i < afkTicks.size(); ++i)
     {
         afkTicks[i].update();
     }
@@ -148,7 +148,7 @@ static void addCrumbs(CachedEntity *target, Vector corner = g_pLocalPlayer->v_Or
     {
         Vector dist       = corner - g_pLocalPlayer->v_Origin;
         int maxiterations = floor(corner.DistTo(g_pLocalPlayer->v_Origin)) / 40;
-        for (int i = 0; i < maxiterations; i++)
+        for (int i = 0; i < maxiterations; ++i)
         {
             breadcrumbs.push_back(g_pLocalPlayer->v_Origin + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
         }
@@ -156,7 +156,7 @@ static void addCrumbs(CachedEntity *target, Vector corner = g_pLocalPlayer->v_Or
 
     Vector dist       = target->m_vecOrigin() - corner;
     int maxiterations = floor(corner.DistTo(target->m_vecOrigin())) / 40;
-    for (int i = 0; i < maxiterations; i++)
+    for (int i = 0; i < maxiterations; ++i)
     {
         breadcrumbs.push_back(corner + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
     }
@@ -170,7 +170,7 @@ static void addCrumbPair(CachedEntity *player1, CachedEntity *player2, std::pair
     {
         Vector dist       = corner1 - player1->m_vecOrigin();
         int maxiterations = floor(corner1.DistTo(player1->m_vecOrigin())) / 40;
-        for (int i = 0; i < maxiterations; i++)
+        for (int i = 0; i < maxiterations; ++i)
         {
             breadcrumbs.push_back(player1->m_vecOrigin() + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
         }
@@ -178,7 +178,7 @@ static void addCrumbPair(CachedEntity *player1, CachedEntity *player2, std::pair
     {
         Vector dist       = corner2 - corner1;
         int maxiterations = floor(corner2.DistTo(corner1)) / 40;
-        for (int i = 0; i < maxiterations; i++)
+        for (int i = 0; i < maxiterations; ++i)
         {
             breadcrumbs.push_back(corner1 + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
         }
@@ -186,7 +186,7 @@ static void addCrumbPair(CachedEntity *player1, CachedEntity *player2, std::pair
     {
         Vector dist       = player2->m_vecOrigin() - corner2;
         int maxiterations = floor(corner2.DistTo(player2->m_vecOrigin())) / 40;
-        for (int i = 0; i < maxiterations; i++)
+        for (int i = 0; i < maxiterations; ++i)
         {
             breadcrumbs.push_back(corner2 + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1));
         }
@@ -354,14 +354,13 @@ static void cm()
     {
         auto &valid_target = follow_target;
         // Find a target with the steam id, as it is prioritized
-        auto ent_count = g_IEngine->GetMaxClients();
         if (steamid)
         {
             if (ENTITY(valid_target)->player_info.friendsID != steamid)
             {
-                for (int i = 1; i <= ent_count; i++)
+                for (auto const &entity: entity_cache::player_cache)
                 {
-                    auto entity = ENTITY(i);
+               
                     if (!isValidTarget(entity))
                         continue;
                     // No enemy check, since steamid is very specific
@@ -393,9 +392,9 @@ static void cm()
 
                 if (accountid != ENTITY(valid_target)->player_info.friendsID)
                 {
-                    for (int i = 1; i <= ent_count; i++)
+                    for (auto const &entity: entity_cache::player_cache)
                     {
-                        auto entity = ENTITY(i);
+                      
                         if (!isValidTarget(entity))
                             continue;
                         if (entity->m_bEnemy())
@@ -420,9 +419,9 @@ static void cm()
         {
             if (!playerlist::IsFriend(ENTITY(valid_target)))
             {
-                for (int i = 1; i <= ent_count; i++)
+                for (auto const &entity: entity_cache::player_cache)
                 {
-                    auto entity = ENTITY(i);
+                    
                     if (!isValidTarget(entity))
                         continue;
                     if (entity->m_bEnemy())
@@ -453,10 +452,10 @@ static void cm()
         // Try to get a new target
         if (!followcart)
         {
-            int ent_count = g_IEngine->GetMaxClients();
-            for (int i = 1; i <= ent_count; i++)
+         
+            for (auto const &entity: entity_cache::player_cache)
             {
-                auto entity = ENTITY(i);
+              
                 if (!isValidTarget(entity))
                     continue;
                 if (!follow_target)
@@ -478,22 +477,22 @@ static void cm()
                         continue;
                     // check if new target has a higher priority than current
                     // target
-                    if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(ENTITY(i)))
+                    if (ClassPriority(ENTITY(follow_target)) >= ClassPriority(entity))
                         continue;
                 }
                 if (startFollow(entity, isNavBotCM))
                 {
                     // ooooo, a target
                     navinactivity.update();
-                    follow_target = i;
-                    afkTicks[i].update(); // set afk time to 03
+                    follow_target = entity->m_IDX;
+                    afkTicks[entity->m_IDX].update(); // set afk time to 03
                     break;
                 }
             }
         }
         else
         {
-            for (auto &entity : entity_cache::valid_ents)
+            for (auto const &entity : entity_cache::valid_ents)
             {
                 if (!isValidTarget(entity))
                     continue;
@@ -618,7 +617,7 @@ static void cm()
 
     // Prune old and close crumbs that we wont need anymore, update idle
     // timer too
-    for (size_t i = 0; i < breadcrumbs.size(); i++)
+    for (size_t i = 0; i < breadcrumbs.size(); ++i)
     {
         if (loc_orig.DistTo(breadcrumbs.at(i)) < 60.f)
         {
@@ -728,7 +727,7 @@ static void draw()
         return;
     if (breadcrumbs.size() < 2)
         return;
-    for (size_t i = 0; i < breadcrumbs.size() - 1; i++)
+    for (size_t i = 0; i < breadcrumbs.size() - 1; ++i)
     {
         Vector wts1, wts2;
         if (draw::WorldToScreen(breadcrumbs[i], wts1) && draw::WorldToScreen(breadcrumbs[i + 1], wts2))

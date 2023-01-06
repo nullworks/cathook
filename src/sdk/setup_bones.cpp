@@ -2648,16 +2648,13 @@ bool Studio_SolveIK(int iThigh, int iKnee, int iFoot, Vector &targetFoot, Vector
 
     // debugLine( worldKnee, worldThigh + ikTargetKnee, 0, 0, 255, true, 0 );
 
-    int color[3] = { 0, 255, 0 };
+   
 
     // too far away? (0.9998 is about 1 degree)
     if (ikFoot.Length() > (l1 + l2) * KNEEMAX_EPSILON)
     {
         VectorNormalize(ikFoot);
         VectorScale(ikFoot, (l1 + l2) * KNEEMAX_EPSILON, ikFoot);
-        color[0] = 255;
-        color[1] = 0;
-        color[2] = 0;
     }
 
     // too close?
@@ -3210,7 +3207,6 @@ void CIKContext::AddAutoplayLocks(Vector pos[], Quaternion q[])
         // save off current knee direction
         if (pchain->pLink(0)->kneeDir.LengthSqr() > 0.0)
         {
-            Vector tmp = pchain->pLink(0)->kneeDir;
             VectorRotate(pchain->pLink(0)->kneeDir, boneToWorld[pchain->pLink(0)->bone], ikrule.kneeDir);
             MatrixPosition(boneToWorld[pchain->pLink(1)->bone], ikrule.kneePos);
         }
@@ -4142,7 +4138,7 @@ void CIKContext::AddAllLocks(Vector pos[], Quaternion q[])
         // save off current knee direction
         if (pchain->pLink(0)->kneeDir.LengthSqr() > 0.0)
         {
-            Vector tmp = pchain->pLink(0)->kneeDir;
+          
             VectorRotate(pchain->pLink(0)->kneeDir, boneToWorld[pchain->pLink(0)->bone], ikrule.kneeDir);
             MatrixPosition(boneToWorld[pchain->pLink(1)->bone], ikrule.kneePos);
         }

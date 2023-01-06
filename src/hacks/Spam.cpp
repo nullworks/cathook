@@ -182,8 +182,9 @@ int QueryPlayer(Query query)
     }
     std::vector<int> candidates{};
     int index_result = 0;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &ent: entity_cache::player_cache)
     {
+        int i = ent->m_IDX;
         if (PlayerPassesQuery(query, i))
         {
             candidates.push_back(i);

@@ -16,9 +16,9 @@ std::array<CachedEntity *, 32> sniperdot_array;
 
 static inline void modifyAngles()
 {
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (auto const &player : entity_cache::player_cache)
     {
-        auto player = ENTITY(i);
+        
         if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info.friendsID)
             continue;
         auto &data  = resolver_map[player->player_info.friendsID];
@@ -212,7 +212,7 @@ static void hook()
         // "DT_TFPlayer", "tfnonlocaldata"
         if (!strcmp(pszName, "DT_TFPlayer"))
         {
-            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
+            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; ++i)
             {
                 RecvPropRedef *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
                 if (!pProp1)

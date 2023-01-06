@@ -24,7 +24,6 @@
 #include "client_class.h"
 #include "Constants.hpp"
 #include <optional>
-
 struct matrix3x4_t;
 
 class IClientEntity;
@@ -59,7 +58,7 @@ constexpr int MAX_STRINGS = 16;
 #define IDX_BAD(idx) !IDX_GOOD(idx)
 
 #define HIGHEST_ENTITY (entity_cache::max)
-#define ENTITY(idx) (&entity_cache::Get(idx))
+#define ENTITY(idx) (entity_cache::Get(idx))
 
 bool IsProjectileACrit(CachedEntity *ent);
 class CachedEntity
@@ -67,6 +66,7 @@ class CachedEntity
 public:
     typedef CachedEntity ThisClass;
     CachedEntity();
+    CachedEntity(u_int16_t idx);
     ~CachedEntity();
 
     __attribute__((hot)) void Update();
@@ -99,7 +99,7 @@ public:
 
     int m_iClassID()
     {
-        if (RAW_ENT(this))
+        if (this && RAW_ENT(this))
             if (RAW_ENT(this)->GetClientClass())
                 if (RAW_ENT(this)->GetClientClass()->m_ClassID)
                     return RAW_ENT(this)->GetClientClass()->m_ClassID;
@@ -202,7 +202,7 @@ public:
     Vector m_vecVelocity{ 0 };
     Vector m_vecAcceleration{ 0 };
     float m_fLastUpdate{ 0.0f };
-    hitbox_cache::EntityHitboxCache &hitboxes;
+    hitbox_cache::EntityHitboxCache hitboxes;
     player_info_s player_info{};
     Averager<float> velocity_averager{ 8 };
     bool was_dormant()
@@ -219,16 +219,23 @@ namespace entity_cache
 {
 
 // b1g fat array in
+extern u_int16_t max;
+extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
-extern CachedEntity array[MAX_ENTITIES];
-inline CachedEntity &Get(int idx)
+extern std::unordered_map<u_int16_t, CachedEntity> array;
+extern std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
+extern std::vector<CachedEntity*> player_cache;
+inline CachedEntity *Get(const u_int16_t &idx)
 {
-    if (idx < 0 || idx >= 2048)
-        throw std::out_of_range("Entity index out of range!");
-    return array[idx];
+    auto iterator = array.find(idx);
+    if (iterator == array.end())
+        return nullptr;
+    else
+        return &iterator->second;
 }
+void dodgeProj(CachedEntity *proj_ptr);
 void Update();
 void Invalidate();
 void Shutdown();
-extern int max;
+
 } // namespace entity_cache

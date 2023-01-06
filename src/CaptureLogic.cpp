@@ -22,7 +22,7 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
             // We cannot identify a bad entity as a flag due to the unreliability of it
             if (ent->m_iClassID() != CL_CLASS(CCaptureFlag))
@@ -166,7 +166,7 @@ void Update()
         for (auto &entry : payloads)
             entry.clear();
 
-        for (auto &ent : entity_cache::valid_ents)
+        for (auto const &ent : entity_cache::valid_ents)
         {
 
             // Not the object we need or invalid (team)
@@ -192,7 +192,7 @@ std::optional<Vector> getClosestPayload(Vector source, int team)
     std::optional<Vector> best_pos;
 
     // Find best payload
-    for (auto payload : entry)
+    for (auto &payload : entry)
     {
         if (CE_BAD(payload) || payload->m_iClassID() != CL_CLASS(CObjectCartDispenser))
             continue;
@@ -240,7 +240,7 @@ void UpdateObjectiveResource()
     if (CE_GOOD(objective_resource) && objective_resource->m_iClassID() == CL_CLASS(CTFObjectiveResource))
         return;
     // Find ObjectiveResource and gamerules
-    for (auto &ent : entity_cache::valid_ents)
+    for (auto const &ent : entity_cache::valid_ents)
     {
         if (ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))
             continue;

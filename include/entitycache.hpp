@@ -227,7 +227,7 @@ extern std::unordered_map<u_int16_t, CachedEntity> array;
 extern std::vector<std::tuple<Vector,CachedEntity*>> proj_map;
 extern std::vector<CachedEntity *> skip_these;
 extern std::vector<CachedEntity*> player_cache;
-inline CachedEntity *Get(u_int16_t idx)
+inline CachedEntity *Get(const u_int16_t &idx)
 {
     auto iterator = array.find(idx);
     if (iterator == array.end())

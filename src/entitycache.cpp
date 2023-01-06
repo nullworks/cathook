@@ -18,7 +18,7 @@ bool IsProjectileACrit(CachedEntity *ent)
         return CE_BYTE(ent, netvar.Grenade_bCritical);
     return CE_BYTE(ent, netvar.Rocket_bCritical);
 }
-// This method of const'ing the index is weird.
+
 CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
 {
 #if PROXY_ENTITY != true

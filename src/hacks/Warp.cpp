@@ -265,9 +265,13 @@ void dodgeProj()
 {
     if (!LOCAL_E->m_bAlivePlayer() || entity_cache::proj_map.empty() || !dodge_projectile)
         return;
-    Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
-    for (auto const &[key, val] : entity_cache::proj_map)
+    Vector player_pos   = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+    const int proj_size = entity_cache::proj_map.size();
+    for (int i = 0; i < proj_size; ++i)
     {
+        auto curr_tuple   = entity_cache::proj_map[i];
+        Vector key        = std::get<0>(curr_tuple);
+        CachedEntity *val = std::get<1>(curr_tuple);
         if (CE_GOOD(val))
         {
             // Since we are sending this warp next tick we need to compensate for fast moving projectiles
@@ -287,7 +291,7 @@ void dodgeProj()
                 if (trace.DidHit())
                 {
 
-                                       // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
+                    // We need to determine wether the projectile is coming in from the left or right of us so we don't warp into the projectile.
                     Vector result = GetAimAtAngles(g_pLocalPlayer->v_Eye, RAW_ENT(val)->GetAbsOrigin(), LOCAL_E) - g_pLocalPlayer->v_OrigViewangles;
 
                     if (0 <= result.y)
@@ -296,9 +300,10 @@ void dodgeProj()
                         yaw_amount = 90.0f;
                     if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E))
                     {
-                        was_hurt   = true;
-                        warp_dodge = true;
-                        entity_cache::proj_map.erase(key);
+                        was_hurt      = true;
+                        warp_dodge    = true;
+                        auto iterator = entity_cache::proj_map.begin() + i;
+                        entity_cache::proj_map.erase(iterator);
                     }
                 } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
                 else
@@ -310,13 +315,15 @@ void dodgeProj()
                         yaw_amount = -90.0f;
                     else
                         yaw_amount = 90.0f;
-                    entity_cache::proj_map.erase(key);
+                    auto iterator = entity_cache::proj_map.begin() + i;
+                    entity_cache::proj_map.erase(iterator);
                 }
             }
         }
         else
         {
-            entity_cache::proj_map.erase(key);
+            auto iterator = entity_cache::proj_map.begin() + i;
+            entity_cache::proj_map.erase(iterator);
         }
     }
 }
@@ -798,9 +805,9 @@ void warpLogic()
                 // Find an entity meeting the Criteria and closest to crosshair
                 std::pair<CachedEntity *, float> result{ nullptr, FLT_MAX };
 
-                for (auto const &ent: entity_cache::player_cache)
+                for (auto const &ent : entity_cache::player_cache)
                 {
-                    
+
                     if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
                         continue;
                     // No hitboxes

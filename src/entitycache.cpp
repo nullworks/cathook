@@ -135,7 +135,7 @@ namespace entity_cache
 {
 std::unordered_map<u_int16_t, CachedEntity> array;
 std::vector<CachedEntity *> valid_ents;
-std::map<Vector, CachedEntity *> proj_map;
+std::vector<std::tuple<Vector,CachedEntity*>> proj_map;
 std::vector<CachedEntity *> skip_these;
 std::vector<CachedEntity *> player_cache;
 u_int16_t previous_max = 0;
@@ -178,9 +178,9 @@ void Update()
         {
             if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
                 continue;
-            array.emplace(std::make_pair(i, CachedEntity{i}));
+            if (array.find(i) == array.end())
+                array.emplace(std::make_pair(i, CachedEntity{ i }));
             array[i].Update();
-            
             if (CE_GOOD((&array[i])))
             {
                 array[i].hitboxes.UpdateBones();
@@ -242,17 +242,16 @@ void dodgeProj(CachedEntity *proj_ptr)
         }
         if (min_displacement < 20000)
         {
-            proj_map.insert({ eav, proj_ptr });
-            skip_these.push_back(proj_ptr);
+            proj_map.emplace_back((std::make_tuple(eav,proj_ptr)));
+            skip_these.emplace_back(proj_ptr);
         }
         else
-            skip_these.push_back(proj_ptr);
+            skip_these.emplace_back(proj_ptr);
     }
 }
 void Invalidate()
 {
     array.clear();
-    
 }
 void Shutdown()
 {

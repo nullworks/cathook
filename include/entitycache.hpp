@@ -224,7 +224,7 @@ extern u_int16_t max;
 extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
 extern std::unordered_map<u_int16_t, CachedEntity> array;
-extern std::map<Vector, CachedEntity *> proj_map;
+extern std::vector<std::tuple<Vector,CachedEntity*>> proj_map;
 extern std::vector<CachedEntity *> skip_these;
 extern std::vector<CachedEntity*> player_cache;
 inline CachedEntity *Get(u_int16_t idx)

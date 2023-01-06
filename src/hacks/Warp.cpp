@@ -265,13 +265,21 @@ void dodgeProj()
 {
     if (!LOCAL_E->m_bAlivePlayer() || entity_cache::proj_map.empty() || !dodge_projectile)
         return;
-    Vector player_pos   = RAW_ENT(LOCAL_E)->GetAbsOrigin();
-    const int proj_size = entity_cache::proj_map.size();
-    for (int i = 0; i < proj_size; ++i)
+    Vector player_pos  = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+    const int max_size = entity_cache::proj_map.size();
+    for (int i = 0; i < max_size; ++i)
     {
         auto curr_tuple   = entity_cache::proj_map[i];
         Vector key        = std::get<0>(curr_tuple);
         CachedEntity *val = std::get<1>(curr_tuple);
+        if (key.Length() < 0.1f)
+        {
+            if (CE_GOOD(val))
+                continue;
+            else
+                entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+            continue;
+        }
         if (CE_GOOD(val))
         {
             // Since we are sending this warp next tick we need to compensate for fast moving projectiles
@@ -300,10 +308,9 @@ void dodgeProj()
                         yaw_amount = 90.0f;
                     if ((IClientEntity *) trace.m_pEnt == RAW_ENT(LOCAL_E))
                     {
-                        was_hurt      = true;
-                        warp_dodge    = true;
-                        auto iterator = entity_cache::proj_map.begin() + i;
-                        entity_cache::proj_map.erase(iterator);
+                        was_hurt   = true;
+                        warp_dodge = true;
+                        entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
                     }
                 } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
                 else
@@ -315,16 +322,13 @@ void dodgeProj()
                         yaw_amount = -90.0f;
                     else
                         yaw_amount = 90.0f;
-                    auto iterator = entity_cache::proj_map.begin() + i;
-                    entity_cache::proj_map.erase(iterator);
+
+                    entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
                 }
             }
         }
         else
-        {
-            auto iterator = entity_cache::proj_map.begin() + i;
-            entity_cache::proj_map.erase(iterator);
-        }
+            entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
     }
 }
 // Should we warp?
@@ -333,16 +337,16 @@ bool shouldWarp(bool check_amount)
 
     return
         // Ingame?
-        g_IEngine->IsInGame() &&
-            // Warp key held?
-            (((warp_key && warp_key.isKeyDown())
-              // Hurt warp?
-              || was_hurt
-              // Rapidfire and trying to attack?
-              || shouldRapidfire()) &&
-             // Do we have enough to warp?
-             (!check_amount || warp_amount)) ||
-        warp_dodge;
+        (g_IEngine->IsInGame() &&
+         // Warp key held?
+         ((warp_key && warp_key.isKeyDown())
+          // Hurt warp?
+          || was_hurt
+          // Rapidfire and trying to attack?
+          || (shouldRapidfire() &&
+              // Do we have enough to warp?
+              (!check_amount || warp_amount)) ||
+          warp_dodge));
 }
 
 // How many ticks of excess we have (for decimal speeds)

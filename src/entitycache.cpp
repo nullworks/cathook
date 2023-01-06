@@ -135,8 +135,7 @@ namespace entity_cache
 {
 std::unordered_map<u_int16_t, CachedEntity> array;
 std::vector<CachedEntity *> valid_ents;
-std::vector<std::tuple<Vector,CachedEntity*>> proj_map;
-std::vector<CachedEntity *> skip_these;
+std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 std::vector<CachedEntity *> player_cache;
 u_int16_t previous_max = 0;
 u_int16_t previous_ent = 0;
@@ -161,14 +160,8 @@ void Update()
                 valid_ents.emplace_back(&val);
                 if (val.m_Type() == ENTITY_PLAYER && val.m_bAlivePlayer())
                     player_cache.emplace_back(&val);
-                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && val.m_Type() == ENTITY_PROJECTILE && val.m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &val) == skip_these.end())
+                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && val.m_Type() == ENTITY_PROJECTILE && val.m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == &val; }) == proj_map.end())
                     dodgeProj(&val);
-            }
-            else if ((bool) hacks::tf2::warp::dodge_projectile)
-            {
-                auto iter = std::find(skip_these.begin(), skip_these.end(), &val);
-                if (iter != skip_these.end())
-                    skip_these.erase(iter);
             }
         }
     }
@@ -181,20 +174,15 @@ void Update()
             if (array.find(i) == array.end())
                 array.emplace(std::make_pair(i, CachedEntity{ i }));
             array[i].Update();
+
             if (CE_GOOD((&array[i])))
             {
                 array[i].hitboxes.UpdateBones();
                 valid_ents.emplace_back(&array[i]);
                 if (array[i].m_Type() == ENTITY_PLAYER && array[i].m_bAlivePlayer())
                     player_cache.emplace_back(&(array[i]));
-                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find(skip_these.begin(), skip_these.end(), &array[i]) == skip_these.end())
+                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == &array[i]; }) == proj_map.end())
                     dodgeProj(&array[i]);
-            }
-            else if ((bool) hacks::tf2::warp::dodge_projectile)
-            {
-                auto iter = std::find(skip_these.begin(), skip_these.end(), &array[i]);
-                if (iter != skip_these.end())
-                    skip_these.erase(iter);
             }
         }
     }
@@ -241,12 +229,9 @@ void dodgeProj(CachedEntity *proj_ptr)
             multipler += 0.01f;
         }
         if (min_displacement < 20000)
-        {
-            proj_map.emplace_back((std::make_tuple(eav,proj_ptr)));
-            skip_these.emplace_back(proj_ptr);
-        }
+            proj_map.emplace_back((std::make_tuple(eav, proj_ptr)));
         else
-            skip_these.emplace_back(proj_ptr);
+            proj_map.emplace_back((std::make_tuple(Vector{ 0, 0, 0 }, proj_ptr)));
     }
 }
 void Invalidate()

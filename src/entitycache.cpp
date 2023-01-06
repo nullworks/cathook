@@ -178,9 +178,9 @@ void Update()
         {
             if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
                 continue;
-            CachedEntity test(i);
-            test.Update();
-            array.emplace(std::make_pair(i, test));
+            array.emplace(std::make_pair(i, CachedEntity{i}));
+            array[i].Update();
+            
             if (CE_GOOD((&array[i])))
             {
                 array[i].hitboxes.UpdateBones();
@@ -249,7 +249,11 @@ void dodgeProj(CachedEntity *proj_ptr)
             skip_these.push_back(proj_ptr);
     }
 }
-
+void Invalidate()
+{
+    array.clear();
+    
+}
 void Shutdown()
 {
     array.clear();

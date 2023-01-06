@@ -15,7 +15,7 @@
 #include "NavBot.hpp"
 #include "HookTools.hpp"
 #include "teamroundtimer.hpp"
-#include <ESP.hpp>
+
 // Found in C_BasePlayer. It represents "m_pCurrentCommand"
 #define CURR_CUSERCMD_PTR 4452
 #include "HookedMethods.hpp"
@@ -258,10 +258,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         time_replaced         = true;
     }
     if (g_Settings.bInvalid)
-    {
-        hacks::shared::esp::data.clear();
-        entity_cache::array.clear();
-    }
+        entity_cache::Invalidate();
     //	PROF_BEGIN();
     // Do not update if in warp, since the entities will stay identical either way
     if (!hacks::tf2::warp::in_warp)
@@ -362,7 +359,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         PROF_SECTION(CM_WRAPPER);
         EC::run(EC::CreateMove_NoEnginePred);
 
-        if (engine_pred)
+        if (engine_pred && g_pLocalPlayer->weapon_mode == weapon_projectile)
         {
             engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E), current_user_cmd);
             g_pLocalPlayer->UpdateEye();

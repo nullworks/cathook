@@ -90,8 +90,7 @@ void __attribute__((fastcall)) DrawBox(CachedEntity *ent, const rgba_t &clr);
 void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, bool transparent);
 bool GetCollide(CachedEntity *ent);
 
-// Storage array for keeping strings and other data
-std::unordered_map<CachedEntity *, ESPData> data;
+
 // Storage vars for entities that need to be re-drawn
 std::vector<std::pair<int, float>> entities_need_repaint{};
 
@@ -106,7 +105,25 @@ const std::string bonenames_spine[]  = { "bip_pelvis", "bip_spine_0", "bip_spine
 const std::string bonenames_arm_r[]  = { "bip_upperArm_R", "bip_lowerArm_R", "bip_hand_R" };
 const std::string bonenames_arm_l[]  = { "bip_upperArm_L", "bip_lowerArm_L", "bip_hand_L" };
 const std::string bonenames_up[]     = { "bip_upperArm_R", "bip_spine_3", "bip_upperArm_L" };
-
+class ESPString
+{
+public:
+    std::string data;
+    rgba_t color{ colors::empty };
+};
+class ESPData
+{
+public:
+    int string_count{ 0 };
+    std::array<ESPString, 16> strings{};
+    rgba_t color{ colors::empty };
+    bool needs_paint{ false };
+    bool has_collide{ false };
+    Vector collide_max{ 0, 0, 0 };
+    Vector collide_min{ 0, 0, 0 };
+    bool transparent{ false };
+};
+std::unordered_map<CachedEntity *, ESPData> data;
 // Dont fully understand struct but a guess is a group of something.
 // I will return once I have enough knowlage to reverse this.
 // NOTE: No idea on why we cant just use gethitbox and use the displacement on
@@ -1508,7 +1525,10 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
         draw::Line((points[i + 3].x), (points[i + 3].y), (points[i % 4 + 4].x) - (points[i + 3].x), (points[i % 4 + 4].y) - (points[i + 3].y), draw_clr, 0.5f);
     }
 }
-
+void Shutdown()
+{
+    data.clear();
+}
 // Draw a box around a player
 void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 {

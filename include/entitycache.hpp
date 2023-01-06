@@ -67,7 +67,7 @@ class CachedEntity
 public:
     typedef CachedEntity ThisClass;
     CachedEntity();
-    CachedEntity(int idx);
+    CachedEntity(u_int16_t idx);
     ~CachedEntity();
 
     __attribute__((hot)) void Update();
@@ -220,8 +220,8 @@ namespace entity_cache
 {
 
 // b1g fat array in
-extern int max;
-extern int previous_max;
+extern u_int16_t max;
+extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
 extern std::unordered_map<u_int16_t, CachedEntity> array;
 extern std::map<Vector, CachedEntity *> proj_map;

@@ -22,42 +22,48 @@ int count_hits_sniper{ 0 };
 int count_hits{ 0 };
 int count_hits_head{ 0 };
 
-CatCommand clear_hirate("debug_hitrate_clear", "Clear hitrate", []() {
-    count_shots       = 0;
-    count_hits        = 0;
-    count_hits_sniper = 0;
-    count_hits_head   = 0;
-});
+CatCommand clear_hirate("debug_hitrate_clear", "Clear hitrate",
+                        []()
+                        {
+                            count_shots       = 0;
+                            count_hits        = 0;
+                            count_hits_sniper = 0;
+                            count_hits_head   = 0;
+                        });
 
-CatCommand debug_hitrate("debug_hitrate", "Debug hitrate", []() {
-    int p1 = 0;
-    int p2 = 0;
-    if (count_shots)
-    {
-        p1 = float(count_hits) / float(count_shots) * 100.0f;
-    }
-    if (count_hits)
-    {
-        p2 = float(count_hits_head) / float(count_hits) * 100.0f;
-    }
-    logging::Info("%d / %d (%d%%)", count_hits, count_shots, p1);
-    logging::Info("%d / %d (%d%%)", count_hits_head, count_hits_sniper, p2);
-});
+CatCommand debug_hitrate("debug_hitrate", "Debug hitrate",
+                         []()
+                         {
+                             int p1 = 0;
+                             int p2 = 0;
+                             if (count_shots)
+                             {
+                                 p1 = float(count_hits) / float(count_shots) * 100.0f;
+                             }
+                             if (count_hits)
+                             {
+                                 p2 = float(count_hits_head) / float(count_hits) * 100.0f;
+                             }
+                             logging::Info("%d / %d (%d%%)", count_hits, count_shots, p1);
+                             logging::Info("%d / %d (%d%%)", count_hits_head, count_hits_sniper, p2);
+                         });
 
-CatCommand debug_ammo("debug_ammo", "Debug ammo", []() {
-    for (int i = 0; i < 4; i++)
-    {
-        logging::Info("%d %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
-    }
-});
+CatCommand debug_ammo("debug_ammo", "Debug ammo",
+                      []()
+                      {
+                          for (int i = 0; i < 4; i++)
+                          {
+                              logging::Info("%d %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
+                          }
+                      });
 
 // If this is true, Update() will consider increasing the brutenum soon if the shot was a miss
 bool resolve_soon[PLAYER_ARRAY_SIZE];
 std::array<Timer, PLAYER_ARRAY_SIZE> resolve_timer{};
 
-static int aimbot_target_idx   = -1;
-static bool aimbot_target_body = false;
-static Timer aimbot_shot{};
+int aimbot_target_idx   = 0;
+bool aimbot_target_body = false;
+Timer aimbot_shot{};
 
 void OnShot()
 {
@@ -103,7 +109,7 @@ void Update()
     {
 
         int ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 4);
-        if (ammo < lastammo && !aimbot_shot.check(500) && aimbot_target_idx != -1)
+        if (ammo < lastammo && !aimbot_shot.check(500) && !aimbot_target_idx)
             OnShot();
         lastammo = ammo;
         // Resolver
@@ -150,9 +156,11 @@ HurtListener &listener()
     return l;
 }
 
-InitRoutine init([]() {
-    g_IGameEventManager->AddListener(&listener(), false);
-    EC::Register(
-        EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&listener()); }, "shutdown_hitrate");
-});
+InitRoutine init(
+    []()
+    {
+        g_IGameEventManager->AddListener(&listener(), false);
+        EC::Register(
+            EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&listener()); }, "shutdown_hitrate");
+    });
 } // namespace hitrate

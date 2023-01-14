@@ -24,6 +24,9 @@
 #include "client_class.h"
 #include "Constants.hpp"
 #include <optional>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include <soundcache.hpp>
+
 struct matrix3x4_t;
 
 class IClientEntity;
@@ -60,7 +63,6 @@ constexpr int MAX_STRINGS = 16;
 #define HIGHEST_ENTITY (entity_cache::max)
 #define ENTITY(idx) (entity_cache::Get(idx))
 
-bool IsProjectileACrit(CachedEntity *ent);
 class CachedEntity
 {
 public:
@@ -70,27 +72,27 @@ public:
     ~CachedEntity();
 
     __attribute__((hot)) void Update();
+
     bool IsVisible();
-    void Reset();
     __attribute__((always_inline, hot, const)) IClientEntity *InternalEntity() const
     {
         return g_IEntityList->GetClientEntity(m_IDX);
     }
-    __attribute__((always_inline, hot, const)) inline bool Good() const
+    __attribute__((always_inline, hot, const)) bool Good() const
     {
         if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
             return false;
         IClientEntity *const entity = InternalEntity();
         return entity && !entity->IsDormant();
     }
-    __attribute__((always_inline, hot, const)) inline bool Valid() const
+    __attribute__((always_inline, hot, const)) bool Valid() const
     {
         if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
             return false;
         IClientEntity *const entity = InternalEntity();
         return entity;
     }
-    template <typename T> __attribute__((always_inline, hot, const)) inline T &var(uintptr_t offset) const
+    template <typename T> __attribute__((always_inline, hot, const)) T &var(uintptr_t offset) const
     {
         return *reinterpret_cast<T *>(uintptr_t(RAW_ENT(this)) + offset);
     }
@@ -109,7 +111,15 @@ public:
     {
         return RAW_ENT(this)->GetAbsOrigin();
     };
-    std::optional<Vector> m_vecDormantOrigin();
+    std::optional<Vector> m_vecDormantOrigin()
+    {
+        if (!RAW_ENT(this)->IsDormant())
+            return m_vecOrigin();
+        auto vec = soundcache::GetSoundLocation(this->m_IDX);
+        if (vec)
+            return *vec;
+        return std::nullopt;
+    }
     int m_iTeam()
     {
         return NET_INT(RAW_ENT(this), netvar.iTeamNum);
@@ -150,19 +160,18 @@ public:
     // Entity fields start here
     EntityType m_Type()
     {
-        EntityType ret = ENTITY_GENERIC;
-        int classid    = m_iClassID();
+
+        int classid = m_iClassID();
         if (classid == CL_CLASS(CTFPlayer))
-            ret = ENTITY_PLAYER;
+            return ENTITY_PLAYER;
         else if (classid == CL_CLASS(CTFGrenadePipebombProjectile) || classid == CL_CLASS(CTFProjectile_Cleaver) || classid == CL_CLASS(CTFProjectile_Jar) || classid == CL_CLASS(CTFProjectile_JarMilk) || classid == CL_CLASS(CTFProjectile_Arrow) || classid == CL_CLASS(CTFProjectile_EnergyBall) || classid == CL_CLASS(CTFProjectile_EnergyRing) || classid == CL_CLASS(CTFProjectile_GrapplingHook) || classid == CL_CLASS(CTFProjectile_HealingBolt) || classid == CL_CLASS(CTFProjectile_Rocket) || classid == CL_CLASS(CTFProjectile_SentryRocket) || classid == CL_CLASS(CTFProjectile_BallOfFire) || classid == CL_CLASS(CTFProjectile_Flare))
-            ret = ENTITY_PROJECTILE;
+            return ENTITY_PROJECTILE;
         else if (classid == CL_CLASS(CObjectTeleporter) || classid == CL_CLASS(CObjectSentrygun) || classid == CL_CLASS(CObjectDispenser))
-            ret = ENTITY_BUILDING;
+            return ENTITY_BUILDING;
         else if (classid == CL_CLASS(CZombie) || classid == CL_CLASS(CTFTankBoss) || classid == CL_CLASS(CMerasmus) || classid == CL_CLASS(CMerasmusDancer) || classid == CL_CLASS(CEyeballBoss) || classid == CL_CLASS(CHeadlessHatman))
-            ret = ENTITY_NPC;
+            return ENTITY_NPC;
         else
-            ret = ENTITY_GENERIC;
-        return ret;
+            return ENTITY_GENERIC;
     };
 
     float m_flDistance()
@@ -172,7 +181,12 @@ public:
         else
             return FLT_MAX;
     };
-
+    bool IsProjectileACrit(CachedEntity *ent)
+    {
+        if (ent->m_bGrenadeProjectile())
+            return CE_BYTE(ent, netvar.Grenade_bCritical);
+        return CE_BYTE(ent, netvar.Rocket_bCritical);
+    }
     bool m_bCritProjectile()
     {
         if (m_Type() == EntityType::ENTITY_PROJECTILE)
@@ -205,6 +219,19 @@ public:
     hitbox_cache::EntityHitboxCache hitboxes;
     player_info_s player_info{};
     Averager<float> velocity_averager{ 8 };
+    void Reset()
+    {
+        m_bAnyHitboxVisible = false;
+        m_bVisCheckComplete = false;
+        m_lLastSeen         = 0;
+        m_lSeenTicks        = 0;
+        memset(&player_info, 0, sizeof(player_info_s));
+        m_vecAcceleration.Zero();
+        m_vecVOrigin.Zero();
+        m_vecVelocity.Zero();
+        m_fLastUpdate = 0;
+    }
+
     bool was_dormant()
     {
         return RAW_ENT(this)->IsDormant();
@@ -222,16 +249,16 @@ namespace entity_cache
 extern u_int16_t max;
 extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
-extern std::unordered_map<u_int16_t, CachedEntity> array;
+extern boost::unordered_flat_map<u_int16_t, CachedEntity> array;
 extern std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
-extern std::vector<CachedEntity*> player_cache;
+extern std::vector<CachedEntity *> player_cache;
 inline CachedEntity *Get(const u_int16_t &idx)
 {
-    auto iterator = array.find(idx);
-    if (iterator == array.end())
+    auto test = array.find(idx);
+    if (test == array.end())
         return nullptr;
     else
-        return &iterator->second;
+        return &test->second;
 }
 void dodgeProj(CachedEntity *proj_ptr);
 void Update();

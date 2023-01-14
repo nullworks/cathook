@@ -42,7 +42,7 @@ void ApplySwingHook()
     melee_range_hook.RestorePatch();
 }
 
-void RemoveSwingHook()
+inline void RemoveSwingHook()
 {
     melee_range_hook.Shutdown();
 }

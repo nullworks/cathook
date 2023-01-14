@@ -8,7 +8,7 @@
 #include <settings/Bool.hpp>
 #include "common.hpp"
 #include "DetourHook.hpp"
-
+#include "inetmsghandler.h"
 #define MENU_COLOR (menu_color)
 
 // This is a temporary file to put code that needs moving/refactoring in.

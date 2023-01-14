@@ -19,7 +19,6 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<tf2::backtrack::Backt
 CachedEntity *FindEntInSight(float range, bool no_players = false);
 bool HeadPreferable(CachedEntity *target);
 bool UpdateAimkey();
-float EffectiveTargetingRange();
 void Draw();
 bool CheckLineBox(Vector B1, Vector B2, Vector L1, Vector L2, Vector &Hit);
 } // namespace hacks::shared::triggerbot

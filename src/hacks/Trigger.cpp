@@ -30,7 +30,7 @@ static settings::Boolean buildings_sentry{ "trigger.target.buildings-sentry", "t
 static settings::Boolean buildings_other{ "trigger.target.buildings-other", "true" };
 static settings::Boolean stickybot{ "trigger.target.stickybombs", "false" };
 static settings::Boolean teammates{ "trigger.target.teammates", "false" };
-static settings::Int max_range{ "trigger.target.max-range", "4096" };
+static settings::Float max_range{ "trigger.target.max-range", "4096" };
 
 // Vars for usersettings
 
@@ -38,7 +38,17 @@ float target_time = 0.0f;
 
 int last_hb_traced = 0;
 Vector forward;
-
+inline float EffectiveTargetingRange()
+{
+    if (GetWeaponMode() == weapon_melee)
+        return re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+    // Pyros only have so much untill their flames hit
+    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFFlameThrower))
+        return 300.0f;
+    // If user has set a max range, then use their setting,
+    if (max_range)
+        return *max_range;
+}
 // The main function of the triggerbot
 void CreateMove()
 {
@@ -527,20 +537,7 @@ bool UpdateAimkey()
 }
 
 // Func to find value of how far to target ents
-float EffectiveTargetingRange()
-{
-    if (GetWeaponMode() == weapon_melee)
-        return re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-    // Pyros only have so much untill their flames hit
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFFlameThrower))
-        return 300.0f;
-    // If user has set a max range, then use their setting,
-    if (max_range)
-        return *max_range;
-    // else use a pre-set range
-    else
-        return 8012.0f;
-}
+
 
 // Helper functions to trace for hitboxes
 

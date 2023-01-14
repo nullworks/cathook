@@ -11,43 +11,6 @@
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
 #include <Warp.hpp>
-
-bool IsProjectileACrit(CachedEntity *ent)
-{
-    if (ent->m_bGrenadeProjectile())
-        return CE_BYTE(ent, netvar.Grenade_bCritical);
-    return CE_BYTE(ent, netvar.Rocket_bCritical);
-}
-
-CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
-{
-#if PROXY_ENTITY != true
-    m_pEntity = nullptr;
-#endif
-    m_fLastUpdate = 0.0f;
-}
-
-inline void CachedEntity::Reset()
-{
-    m_bAnyHitboxVisible = false;
-    m_bVisCheckComplete = false;
-    m_lLastSeen         = 0;
-    m_lSeenTicks        = 0;
-    memset(&player_info, 0, sizeof(player_info_s));
-    m_vecAcceleration.Zero();
-    m_vecVOrigin.Zero();
-    m_vecVelocity.Zero();
-    m_fLastUpdate = 0;
-}
-
-CachedEntity::~CachedEntity()
-{
-}
-
-static settings::Float ve_window{ "debug.ve.window", "0" };
-static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
-static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
-
 inline void CachedEntity::Update()
 {
 #if PROXY_ENTITY != true
@@ -60,13 +23,27 @@ inline void CachedEntity::Update()
     m_lSeenTicks = 0;
     m_lLastSeen  = 0;
 
-    hitboxes.Update();
+    hitboxes.InvalidateCache();
 
     m_bVisCheckComplete = false;
 
     if (m_Type() == EntityType::ENTITY_PLAYER)
         GetPlayerInfo(m_IDX, &player_info);
 }
+
+inline CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
+{
+#if PROXY_ENTITY != true
+    m_pEntity = nullptr;
+#endif
+    m_fLastUpdate = 0.0f;
+}
+CachedEntity::~CachedEntity()
+{
+}
+static settings::Float ve_window{ "debug.ve.window", "0" };
+static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
+static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 
 // FIXME maybe disable this by default
 static settings::Boolean fast_vischeck{ "debug.fast-vischeck", "true" };
@@ -121,19 +98,9 @@ bool CachedEntity::IsVisible()
 
     return false;
 }
-
-std::optional<Vector> CachedEntity::m_vecDormantOrigin()
-{
-    if (!RAW_ENT(this)->IsDormant())
-        return m_vecOrigin();
-    auto vec = soundcache::GetSoundLocation(this->m_IDX);
-    if (vec)
-        return *vec;
-    return std::nullopt;
-}
 namespace entity_cache
 {
-std::unordered_map<u_int16_t, CachedEntity> array;
+boost::unordered_flat_map<u_int16_t, CachedEntity> array;
 std::vector<CachedEntity *> valid_ents;
 std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 std::vector<CachedEntity *> player_cache;
@@ -145,10 +112,8 @@ void Update()
     u_int16_t current_ents = g_IEntityList->NumberOfEntities(false);
     valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
     player_cache.clear();
-
     if (max >= MAX_ENTITIES)
         max = MAX_ENTITIES - 1;
-
     if (previous_max == max && previous_ent == current_ents)
     {
         for (auto &[key, val] : array)
@@ -171,8 +136,7 @@ void Update()
         {
             if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
                 continue;
-            if (array.find(i) == array.end())
-                array.emplace(std::make_pair(i, CachedEntity{ i }));
+            array.try_emplace(i, CachedEntity{ i });
             array[i].Update();
 
             if (CE_GOOD((&array[i])))

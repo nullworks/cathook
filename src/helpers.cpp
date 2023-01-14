@@ -1704,15 +1704,7 @@ float ATTRIB_HOOK_FLOAT(float base_value, const char *search_string, IClientEnti
     return AttribHookFloat_fn(base_value, search_string, ent, buffer, is_global_const_string);
 }
 
-QAngle VectorToQAngle(Vector in)
-{
-    return *(QAngle *) &in;
-}
 
-Vector QAngleToVector(QAngle in)
-{
-    return *(Vector *) &in;
-}
 
 void AimAt(Vector origin, Vector target, CUserCmd *cmd, bool compensate_punch)
 {
@@ -1996,26 +1988,6 @@ int SharedRandomInt(unsigned iseed, const char *sharedname, int iMinVal, int iMa
     return g_pUniformStream->RandomInt(iMinVal, iMaxVal);
 }
 
-bool GetPlayerInfo(int idx, player_info_s *info)
-{
-    bool res = g_IEngine->GetPlayerInfo(idx, info);
-    if (!res)
-        return res;
-
-    // First try parsing GUID, should always work unless a server is being malicious
-    try
-    {
-        std::string guid = info->guid;
-        guid             = guid.substr(5, guid.length() - 6);
-        info->friendsID  = std::stoul(guid.c_str());
-    }
-    catch (...)
-    {
-        // Fix friends ID with player resource
-        info->friendsID = g_pPlayerResource->GetAccountID(idx);
-    }
-    return res;
-}
 
 int GetPlayerForUserID(int userID)
 {

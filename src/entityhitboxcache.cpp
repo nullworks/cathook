@@ -12,22 +12,6 @@
 
 namespace hitbox_cache
 {
-EntityHitboxCache::EntityHitboxCache(int in_IDX) : hit_idx(in_IDX)
-{
-    Reset();
-}
-int EntityHitboxCache::GetNumHitboxes()
-{
-    if (!m_bInit)
-        Init();
-    if (!m_bSuccess)
-        return 0;
-    return m_nNumHitboxes;
-}
-
-EntityHitboxCache::~EntityHitboxCache()
-{
-}
 
 void EntityHitboxCache::InvalidateCache()
 {
@@ -39,11 +23,6 @@ void EntityHitboxCache::InvalidateCache()
     }
     m_bInit    = false;
     m_bSuccess = false;
-}
-
-void EntityHitboxCache::Update()
-{
-    InvalidateCache();
 }
 
 void EntityHitboxCache::Init()
@@ -183,23 +162,6 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
     return bones.data();
 }
 
-void EntityHitboxCache::Reset()
-{
-    memset(m_VisCheck, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
-    memset(m_VisCheckValidationFlags, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
-    memset(m_CacheValidationFlags, 0, sizeof(bool) * CACHE_MAX_HITBOXES);
-    m_CacheInternal.clear();
-    m_CacheInternal.shrink_to_fit();
-    bones.clear();
-    bones.shrink_to_fit();
-    m_nNumHitboxes = 0;
-    m_bInit        = false;
-    m_bModelSet    = false;
-    m_bSuccess     = false;
-    m_pLastModel   = nullptr;
-    bones_setup    = false;
-}
-
 CachedHitbox *EntityHitboxCache::GetHitbox(int id)
 {
     if (m_CacheValidationFlags[id])
@@ -238,11 +200,4 @@ CachedHitbox *EntityHitboxCache::GetHitbox(int id)
     return &m_CacheInternal[id];
 }
 
-void Update()
-{
-}
-
-void Invalidate()
-{
-}
 } // namespace hitbox_cache

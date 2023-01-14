@@ -8,7 +8,7 @@ namespace soundcache
 constexpr unsigned int EXPIRETIME = 10000;
 
 
-std::map<int, SoundStruct> sound_cache;
+boost::unordered_flat_map<int, SoundStruct> sound_cache;
 static void CreateMove()
 {
     if (CE_BAD(LOCAL_E))
@@ -18,13 +18,9 @@ static void CreateMove()
     for (const auto &i : sound_list)
         cache_sound(i.m_pOrigin, i.m_nSoundSource);
 
-    for (auto it = sound_cache.cbegin(); it != sound_cache.cend();)
-    {
-        if (it->second.last_update.check(EXPIRETIME) || (it->first <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(it->first)))
-            it = sound_cache.erase(it);
-        else
-            ++it;
-    }
+    for (auto const &[key,val]: sound_cache)
+        if (val.last_update.check(EXPIRETIME) || (key <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(key)))
+            sound_cache.erase(key);
 }
 
 static InitRoutine init([]() {

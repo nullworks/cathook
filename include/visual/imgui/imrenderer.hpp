@@ -14,7 +14,7 @@
  *  so only draw in SwapWindow
  */
 
-#include <map>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <string>
 #include "colors.hpp"
 
@@ -37,7 +37,7 @@ struct font
     void changeSize(int new_font_size);
     void rebuild();
     ImFontAtlas *font_atlas{ nullptr };
-    std::map<int, ImFont *> size_map;
+    boost::unordered_flat_map<int, ImFont *> size_map;
 };
 
 class Texture

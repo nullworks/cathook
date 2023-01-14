@@ -51,7 +51,7 @@ static std::set<CidStr_t> regionsSet;
 static void *g_ISteamNetworkingUtils;
 
 // clang-format off
-static std::map<std::string, std::string> dc_name_map{
+static boost::unordered_flat_map<std::string,std::string> dc_name_map{
     {"ams", "Amsterdam"},
     {"atl", "Atlanta"},
     {"bom", "Mumbai"},

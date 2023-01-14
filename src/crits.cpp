@@ -392,7 +392,7 @@ bool canWeaponCrit(bool draw = false)
 // We cycle between the crit cmds so we want to store where we are currently at
 size_t current_index = 0;
 // Cache Weapons
-std::map<int, std::vector<int>> crit_cmds;
+boost::unordered_flat_map<int, std::vector<int>> crit_cmds;
 
 // We need to store a bunch of data for when we kill someone with a crit
 struct player_status

@@ -42,7 +42,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
 
         // Sort all player names by priority
         static int last_sort_tickcount = 0;
-        static std::map<std::string, int> player_names;
+        static boost::unordered_flat_map<std::string, int> player_names;
         // Cache names for every tick
         if (last_sort_tickcount != tickcount)
         {

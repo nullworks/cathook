@@ -97,9 +97,22 @@ void VectorAngles(Vector &forward, Vector &angles);
 void AngleVectors2(const QAngle &angles, Vector *forward);
 void AngleVectors3(const QAngle &angles, Vector *forward, Vector *right, Vector *up);
 bool isRapidFire(IClientEntity *wep);
+void fClampAngle(Vector &qaAng);
+
+inline Vector GetAimAtAngles(Vector origin, Vector target, CachedEntity *punch_correct = nullptr)
+{
+    Vector angles, tr;
+    tr = (target - origin);
+    VectorAngles(tr, angles);
+    // Apply punchangle correction
+    if (punch_correct)
+        angles -= CE_VECTOR(punch_correct, netvar.vecPunchAngle);
+    fClampAngle(angles);
+    return angles;
+}
 extern std::mutex trace_lock;
 bool IsEntityVisible(CachedEntity *entity, int hb);
-bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset = false, unsigned int mask = MASK_SHOT_HULL, trace_t *trace = nullptr);
+bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset = false, unsigned int mask = MASK_SHOT_HULL, trace_t *trace = nullptr, bool hit = false);
 bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt);
 bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, CachedEntity *endEnt);
 Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist, bool checkWalkable);
@@ -112,14 +125,14 @@ bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax);
 void GenerateBoxVertices(const Vector &vOrigin, const QAngle &angles, const Vector &vMins, const Vector &vMaxs, Vector pVerts[8]);
 
 float DistToSqr(CachedEntity *entity);
-void fClampAngle(Vector &qaAng);
+
 // const char* MakeInfoString(IClientEntity* player);
 bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float &start_velocity);
 bool IsVectorVisible(Vector a, Vector b, bool enviroment_only = false, CachedEntity *self = LOCAL_E, unsigned int mask = MASK_SHOT_HULL);
 // A Special function for navparser to check if a Vector is visible.
 bool IsVectorVisibleNavigation(Vector a, Vector b, unsigned int mask = MASK_SHOT_HULL);
 float ProjGravMult(int class_id, float x_speed);
-bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size);
+bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp);
 Vector getShootPos(Vector angle);
 Vector GetForwardVector(Vector origin, Vector viewangles, float distance, CachedEntity *punch_entity = nullptr);
 Vector GetForwardVector(float distance, CachedEntity *punch_entity = nullptr);
@@ -161,18 +174,6 @@ void PrintChat(const char *fmt, ...);
 void ChangeName(std::string name);
 
 void WhatIAmLookingAt(int *result_eindex, Vector *result_pos);
-
-inline Vector GetAimAtAngles(Vector origin, Vector target, CachedEntity *punch_correct = nullptr)
-{
-    Vector angles, tr;
-    tr = (target - origin);
-    VectorAngles(tr, angles);
-    // Apply punchangle correction
-    if (punch_correct)
-        angles -= CE_VECTOR(punch_correct, netvar.vecPunchAngle);
-    fClampAngle(angles);
-    return angles;
-}
 
 void AimAt(Vector origin, Vector target, CUserCmd *cmd, bool compensate_punch = true);
 void FastStop();

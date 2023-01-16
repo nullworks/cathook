@@ -159,8 +159,8 @@ public:
     void RegisterItem(std::string modelpath, k_EItemType type);
     k_EItemType GetItemType(CachedEntity *entity);
 
-    std::unordered_map<std::string, k_EItemType> models;
-    std::unordered_map<uintptr_t, k_EItemType> map;
+    boost::unordered_flat_map<std::string, k_EItemType> models;
+    boost::unordered_flat_map<uintptr_t, k_EItemType> map;
 };
 
 class ItemManager
@@ -171,7 +171,7 @@ public:
     void RegisterSpecialMapping(ItemCheckerFn fn, k_EItemType type);
     k_EItemType GetItemType(CachedEntity *ent);
 
-    std::unordered_map<ItemCheckerFn, k_EItemType> special_map;
+    boost::unordered_flat_map<ItemCheckerFn, k_EItemType> special_map;
     std::vector<ItemSpecialMapperFn> specials;
     ItemModelMapper mapper_special;
     ItemModelMapper mapper;

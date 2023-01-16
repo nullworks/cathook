@@ -1034,7 +1034,7 @@ public:
     described below.
 
     @tparam ObjectType  the container to store objects (e.g., `std::map` or
-    `std::unordered_map`)
+    `boost::unordered_flat_map`)
     @tparam StringType the type of the keys or names (e.g., `std::string`).
     The comparison function `std::less<StringType>` is used to order elements
     inside the container.
@@ -1791,7 +1791,7 @@ public:
       `unordered_multiset` with a `value_type` from which a @ref basic_json
       value can be constructed.
     - **objects**: @ref object_t and all kinds of compatible associative
-      containers such as `std::map`, `std::unordered_map`, `std::multimap`,
+      containers such as `std::map`, `boost::unordered_flat_map`, `std::multimap`,
       and `std::unordered_multimap` with a `key_type` compatible to
       @ref string_t and a `value_type` from which a @ref basic_json value can
       be constructed.
@@ -3003,7 +3003,7 @@ public:
     to other types. There a few things to note: (1) Floating-point numbers can
     be converted to integers\, (2) A JSON array can be converted to a standard
     `std::vector<short>`\, (3) A JSON object can be converted to C++
-    associative containers such as `std::unordered_map<std::string\,
+    associative containers such as `boost::unordered_flat_map<std::string\,
     json>`.,get__ValueType_const}
 
     @since version 2.1.0
@@ -3222,7 +3222,7 @@ public:
     to other types. There a few things to note: (1) Floating-point numbers can
     be converted to integers\, (2) A JSON array can be converted to a standard
     `std::vector<short>`\, (3) A JSON object can be converted to C++
-    associative containers such as `std::unordered_map<std::string\,
+    associative containers such as `boost::unordered_flat_map<std::string\,
     json>`.,operator__ValueType}
 
     @since version 1.0.0

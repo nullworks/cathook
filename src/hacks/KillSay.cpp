@@ -21,7 +21,7 @@ struct KillsayStorage
     std::string message{};
 };
 
-static std::unordered_map<int, KillsayStorage> killsay_storage{};
+static boost::unordered_flat_map<int, KillsayStorage> killsay_storage{};
 
 // Thanks HellJustFroze for linking me http://daviseford.com/shittalk/
 const std::vector<std::string> builtin_default = { "Don't worry guys, I'm a garbage collector. I'm used to carrying trash.", "%name% is the human equivalent of a participation award.", "I would insult %name%, but nature did a better job.", "%name%, perhaps your strategy should include trying.", "Some people get paid to suck, you do it for free, %name%.", "You must really like that respawn timer, %name%.", "If your main is %class%, you should give up.", "Hey %name%, i see you can't play %class%. Try quitting the game.", "%name%@gmail.com to vacreview@valvesoftware.com\nFOUND CHEATER", "\n☐ Not rekt\n ☑ Rekt\n ☑ Really Rekt\n ☑ Tyrannosaurus Rekt" };

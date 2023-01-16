@@ -21,7 +21,7 @@ static settings::Boolean taunting{ "player-tools.ignore.taunting", "true" };
 static settings::Boolean hoovy{ "player-tools.ignore.hoovy", "true" };
 static settings::Boolean ignoreCathook{ "player-tools.ignore.cathook", "true" };
 
-static std::unordered_map<unsigned, unsigned> betrayal_list{};
+static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};
 
 static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { betrayal_list.clear(); });
 

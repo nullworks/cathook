@@ -62,7 +62,7 @@ struct AchivementItem
 };
 
 // A map that allows us to map item ids to achievement names and achievement ids
-static std::unordered_map<int /*item_id*/, AchivementItem> ach_items;
+static boost::unordered_flat_map<int /*item_id*/, AchivementItem> ach_items;
 static std::array<std::vector<std::string>, 3> craft_groups;
 
 bool checkAchMgr()

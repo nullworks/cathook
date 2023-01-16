@@ -651,7 +651,7 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
         return powerup_type::supernova;
     return powerup_type::not_powerup;
 }
-bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size)
+bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp)
 {
 
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
@@ -659,7 +659,7 @@ bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity
     trace_t trace_obj;
     ray.Init(start_point, end_point, Vector(0, -projectile_size, -projectile_size), Vector(0, projectile_size, projectile_size));
     g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace_obj);
-    return (((IClientEntity *) trace_obj.m_pEnt) == RAW_ENT(entity) || !trace_obj.DidHit());
+    return (((IClientEntity *) trace_obj.m_pEnt) == RAW_ENT(entity) || (grav_comp ? !trace_obj.DidHit(): false));
 }
 
 // A function to find a weapon by WeaponID
@@ -1024,7 +1024,7 @@ bool IsEntityVisible(CachedEntity *entity, int hb)
         return entity->hitboxes.VisibilityCheck(hb);
 }
 
-bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset, unsigned int mask, trace_t *trace)
+bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset, unsigned int mask, trace_t *trace, bool hit)
 {
     trace_t trace_object;
 
@@ -1046,7 +1046,7 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }
 
-    return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || !trace->DidHit());
+    return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || (hit ? false: !trace->DidHit()) );
 }
 
 // Get all the corners of a box. Taken from sauce engine.

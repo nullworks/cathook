@@ -5,7 +5,7 @@
 #include "netadr.h"
 #include "AntiCheatBypass.hpp"
 
-std::unordered_map<int, int> command_number_mod{};
+boost::unordered_flat_map<int, int> command_number_mod{};
 
 namespace criticals
 {

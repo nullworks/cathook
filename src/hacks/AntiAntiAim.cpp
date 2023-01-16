@@ -11,7 +11,7 @@ namespace hacks::shared::anti_anti_aim
 static settings::Boolean enable{ "anti-anti-aim.enable", "false" };
 static settings::Boolean debug{ "anti-anti-aim.debug.enable", "false" };
 
-std::unordered_map<unsigned, brutedata> resolver_map;
+boost::unordered_flat_map<unsigned, brutedata> resolver_map;
 std::array<CachedEntity *, 32> sniperdot_array;
 
 static inline void modifyAngles()

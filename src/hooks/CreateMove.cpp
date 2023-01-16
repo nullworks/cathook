@@ -243,14 +243,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
-
-    if (*fuckmode)
-    {
-        static int prevbuttons = 0;
-        current_user_cmd->buttons |= prevbuttons;
-        prevbuttons |= current_user_cmd->buttons;
-    }
-
+    
     if (!g_Settings.bInvalid && CE_GOOD(g_pLocalPlayer->entity))
     {
         servertime            = (float) CE_INT(g_pLocalPlayer->entity, netvar.nTickBase) * g_GlobalVars->interval_per_tick;

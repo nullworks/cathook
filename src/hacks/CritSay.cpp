@@ -19,7 +19,7 @@ struct CritsayStorage
     std::string message{};
 };
 
-static std::unordered_map<int, CritsayStorage> critsay_storage{};
+static boost::unordered_flat_map<int, CritsayStorage> critsay_storage{};
 
 // Thanks HellJustFroze for linking me http://daviseford.com/shittalk/
 const std::vector<std::string> builtin_default = { "Woops, i slipped", "*critical hit* -> %name%", "ok now let's do it again, %name%", "nice" };

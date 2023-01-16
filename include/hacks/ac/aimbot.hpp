@@ -26,7 +26,7 @@ struct ac_data
 extern int amount[MAX_PLAYERS];
 
 void ResetEverything();
-std::unordered_map<int, Vector> &player_orgs();
+boost::unordered_flat_map<int, Vector> &player_orgs();
 void ResetPlayer(int idx);
 
 void Init();

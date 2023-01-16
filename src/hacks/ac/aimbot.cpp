@@ -19,9 +19,9 @@ static settings::Int detections_warning{ "find-cheaters.aimbot.detections", "3" 
 
 ac_data data_table[MAX_PLAYERS];
 int amount[MAX_PLAYERS];
-std::unordered_map<int, Vector> Player_origs{};
+boost::unordered_flat_map<int, Vector> Player_origs{};
 
-std::unordered_map<int, Vector> &player_orgs()
+boost::unordered_flat_map<int, Vector> &player_orgs()
 {
     return Player_origs;
 }

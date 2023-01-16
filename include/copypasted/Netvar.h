@@ -38,7 +38,7 @@ public:
 class netvar_tree
 {
     struct node;
-    using map_type = std::unordered_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
+    using map_type = boost::unordered_flat_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
 
     struct node
     {

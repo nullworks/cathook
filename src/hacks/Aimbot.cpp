@@ -89,7 +89,16 @@ static settings::Float specfov("aimbot.spectator.fov", "0");
 static settings::Int specslow("aimbot.spectator.slow", "0");
 
 settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "1" };
-
+struct AimbotCalculatedData_s
+{
+    unsigned long predict_tick{ 0 };
+    bool predict_type{ 0 };
+    Vector aim_position{ 0 };
+    unsigned long vcheck_tick{ 0 };
+    bool visible{ false };
+    float fov{ 0 };
+    int hitbox{ 0 };
+} static cd;
 int slow_aim;
 float fov;
 bool enable;
@@ -115,6 +124,18 @@ float cur_proj_grav{ 0.0f };
 float cur_proj_start_vel{ 0.0f };
 
 bool shouldbacktrack_cache = false;
+// Func to find value of how far to target ents
+inline float EffectiveTargetingRange()
+{
+    if (GetWeaponMode() == weapon_melee)
+        return (float) re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
+    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
+        return 310.0f; // Pyros only have so much until their flames hit
+    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFWeaponFlameBall))
+        return 512.0f; // Dragons Fury is fast but short range
+
+    return (float) max_range;
+}
 inline bool isHitboxMedium(int hitbox)
 {
     switch (hitbox)
@@ -241,7 +262,6 @@ void spectatorUpdate()
     }
 }
 
-
 #define GET_MIDDLE(c1, c2) (corners[c1] + corners[c2]) / 2.0f
 
 // Get all the valid aim positions
@@ -253,15 +273,11 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 
     trace_t trace;
 
-    if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, &trace))
+    if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, &trace, true))
     {
         if (trace.hitbox == hitbox)
             hitpoints.push_back(hb->center);
     }
-
-    if (!*multipoint)
-        return hitpoints;
-
     // Multipoint
     auto bboxmin = hb->bbox->bbmin;
     auto bboxmax = hb->bbox->bbmax;
@@ -302,7 +318,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     {
         trace_t trace;
 
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace, true))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);
@@ -315,10 +331,14 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
             return hitpoints;
         }
         int i = 0;
-        while (hitpoints.empty() && i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+        const u_int8_t max_box = ent->hitboxes.GetNumHitboxes();
+        while (hitpoints.empty() && i < max_box ) // Prevents returning empty at all costs. Loops through every hitbox
         {
             if (hitbox == i)
+            {
                 ++i;
+                continue;
+            }
             hitpoints = getHitpointsVischeck(ent, i);
             ++i;
         }
@@ -329,12 +349,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 {
     std::vector<Vector> hitpoints;
-    auto hb = ent->hitboxes.GetHitbox(hitbox);
-    if (!*multipoint)
-    {
-        hitpoints.push_back(hb->center);
-        return hitpoints;
-    }
+    auto hb      = ent->hitboxes.GetHitbox(hitbox);
     auto bboxmin = hb->bbox->bbmin;
     auto bboxmax = hb->bbox->bbmax;
 
@@ -374,7 +389,7 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
     {
         trace_t trace;
 
-        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace))
+        if (IsEntityVectorVisible(ent, positions[i], true, MASK_SHOT_HULL, &trace, true))
         {
             if (trace.hitbox == hitbox)
                 hitpoints.push_back(positions[i]);
@@ -390,7 +405,7 @@ std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 
     std::optional<Vector> best_pos = std::nullopt;
     float max_score                = FLT_MAX;
-    for (auto &position : positions)
+    for (auto const &position : positions)
     {
         float score = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, position);
         if (score < max_score)
@@ -402,10 +417,6 @@ std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 
     return best_pos;
 }
-
-
-
-
 
 // Reduce Backtrack lag by checking if the ticks hitboxes are within a reasonable FOV range
 bool validateTickFOV(tf2::backtrack::BacktrackData &tick)
@@ -427,7 +438,6 @@ bool validateTickFOV(tf2::backtrack::BacktrackData &tick)
     }
     return true;
 }
-
 
 void doAutoZoom(bool target_found)
 {
@@ -466,7 +476,7 @@ void doAutoZoom(bool target_found)
 CachedEntity *target_last = 0;
 bool aimed_this_tick      = false;
 Vector viewangles_this_tick(0.0f);
-AimbotCalculatedData_s cd;
+
 // If slow aimbot allows autoshoot
 bool slow_can_shoot = false;
 bool projectileAimbotRequired;
@@ -1014,7 +1024,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint && is_player)
         {
-            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE)
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE || (projectileAimbotRequired && 0.01f < cur_proj_grav) )
             {
                 return true;
             }
@@ -1024,17 +1034,22 @@ bool IsTargetStateGood(CachedEntity *entity)
                 int i = 0;
                 trace_t first_tracer;
 
-                if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer))
+                if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer, true))
                     return true;
-                while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
+
+                 const u_int8_t max_box = entity->hitboxes.GetNumHitboxes();   
+                while (i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
                 {
-                    if (i == cd.hitbox && i != 17)
+                    if (i == cd.hitbox)
+                    {
                         ++i;
+                        continue;
+                    }
                     trace_t test_trace;
 
-                    std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);
+                    Vector centered_hitbox = entity->hitboxes.GetHitbox(i)->center;
 
-                    if (IsEntityVectorVisible(entity, centered_hitbox[0], true, MASK_SHOT_HULL, &test_trace))
+                    if (IsEntityVectorVisible(entity, centered_hitbox, true, MASK_SHOT_HULL, &test_trace, true))
                     {
                         cd.hitbox = i;
                         return true;
@@ -1162,19 +1177,14 @@ bool Aim(CachedEntity *entity)
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     if (!projectileAimbotRequired)
-    {
-        if (!IsEntityVectorVisible(entity, is_it_good, false))
+        if (!IsEntityVectorVisible(entity, is_it_good, true, MASK_SHOT_HULL, nullptr, true))
             return false;
-    }
 
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
 
     if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
-    {
-
-        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID())))
+        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), (0.01f < cur_proj_grav)))
             return false;
-    }
     if (fov > 0 && cd.fov > fov)
         return false;
     // Slow aim
@@ -1183,9 +1193,7 @@ bool Aim(CachedEntity *entity)
 
 #if ENABLE_VISUALS
     if (entity->m_Type() == ENTITY_PLAYER)
-    {
         hacks::shared::esp::SetEntityColor(entity, colors::target);
-    }
 #endif
     // Set angles
     current_user_cmd->viewangles = angles;
@@ -1335,11 +1343,15 @@ Vector PredictEntity(CachedEntity *entity)
             else
             {
                 // Allow multipoint logic to run
+                if (!*multipoint)
+                {
+                    result = entity->hitboxes.GetHitbox(cd.hitbox)->center;
+                    break;
+                }
+
                 std::optional<Vector> best_pos = getBestHitpoint(entity, cd.hitbox);
                 if (best_pos)
                     result = *best_pos;
-                else
-                    GetHitbox(entity, cd.hitbox, result);
             }
         }
         break;
@@ -1471,7 +1483,6 @@ int autoHitbox(CachedEntity *target)
     return preferred;
 }
 
-
 // Function to find the closesnt hitbox to the crosshair for a given ent
 int ClosestHitbox(CachedEntity *target)
 {
@@ -1572,19 +1583,6 @@ bool UpdateAimkey()
     }
     // Return whether the aimkey allows aiming
     return allow_aimkey;
-}
-
-// Func to find value of how far to target ents
-float EffectiveTargetingRange()
-{
-    if (GetWeaponMode() == weapon_melee)
-        return (float) re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
-    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-        return 310.0f; // Pyros only have so much until their flames hit
-    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFWeaponFlameBall))
-        return 512.0f; // Dragons Fury is fast but short range
-
-    return (float) max_range;
 }
 
 // Used mostly by navbot to not accidentally look at path when aiming

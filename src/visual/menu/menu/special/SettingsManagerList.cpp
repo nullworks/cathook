@@ -110,7 +110,7 @@ void zerokernel::special::SettingsManagerList::addCollapsible(std::string name, 
     list.addObject(std::move(entry));
 }
 
-static std::unordered_map<std::string, bool> marks{};
+static boost::unordered_flat_map<std::string, bool> marks{};
 
 void zerokernel::special::SettingsManagerList::markVariable(std::string name)
 {

@@ -46,6 +46,6 @@ public:
     void applyDefaults();
     IVariable *lookup(const std::string &string);
 
-    std::unordered_map<std::string, VariableDescriptor> registered{};
+    boost::unordered_flat_map<std::string, VariableDescriptor> registered{};
 };
 } // namespace settings

@@ -62,20 +62,20 @@ spelltypes getSpellMode()
 // Too much random noise on these maps to force spells
 // static std::array<std::string, 1> noisy_maps{ "" };
 
-static std::unordered_map<int, int> spellmap_normal({ { 0, 4206970 }, { 1, 4206969 }, { 2, 4206972 }, { 3, 4206997 }, { 4, 4206971 }, { 5, 4206977 }, { 7, 4206973 }, { 8, 4206982 }, { 9, 4206976 } });
-static std::unordered_map<int, int> spellmap_normal_rare({ { 7, 4206987 }, { 8, 4206982 }, { 9, 4207006 }, { 10, 4206983 }, { 11, 4206984 } });
+static boost::unordered_flat_map<int, int> spellmap_normal({ { 0, 4206970 }, { 1, 4206969 }, { 2, 4206972 }, { 3, 4206997 }, { 4, 4206971 }, { 5, 4206977 }, { 7, 4206973 }, { 8, 4206982 }, { 9, 4206976 } });
+static boost::unordered_flat_map<int, int> spellmap_normal_rare({ { 7, 4206987 }, { 8, 4206982 }, { 9, 4207006 }, { 10, 4206983 }, { 11, 4206984 } });
 
-static std::unordered_map<int, int> spellmap_helltower({ { 0, 4206998 }, { 1, 4206984 }, { 2, 4206985 }, { 3, 4206986 }, { 4, 4206987 }, { 5, 4206982 }, { 6, 4206983 } });
+static boost::unordered_flat_map<int, int> spellmap_helltower({ { 0, 4206998 }, { 1, 4206984 }, { 2, 4206985 }, { 3, 4206986 }, { 4, 4206987 }, { 5, 4206982 }, { 6, 4206983 } });
 
-static std::unordered_map<int, int> spellmap_doomsday_normal({ { 0, 4206982 }, { 2, 4207006 }, { 4, 4206983 }, { 5, 4206984 } });
-static std::unordered_map<int, int> spellmap_doomsday_rare({ { 7, 4207009 }, { 8, 4207014 }, { 9, 4207008 }, { 10, 4207007 } });
+static boost::unordered_flat_map<int, int> spellmap_doomsday_normal({ { 0, 4206982 }, { 2, 4207006 }, { 4, 4206983 }, { 5, 4206984 } });
+static boost::unordered_flat_map<int, int> spellmap_doomsday_rare({ { 7, 4207009 }, { 8, 4207014 }, { 9, 4207008 }, { 10, 4207007 } });
 
-static std::unordered_map<int, int> spellmap_bumpercar({ { 12, 4206982 }, { 13, 4206983 }, { 14, 4206987 }, { 15, 4206988 } });
-// static std::unordered_map<int, int> hasslecastle_normal({ { 0, 4206990 }, { 1, 4206989 }, { 2, 4206986 }, { 3, 4206997 }, { 4, 4206984 }, { 5, 4206983 }, { 7, 4207000 }, { 8, 4206982 }, { 9, 4207027 } });
+static boost::unordered_flat_map<int, int> spellmap_bumpercar({ { 12, 4206982 }, { 13, 4206983 }, { 14, 4206987 }, { 15, 4206988 } });
+// static boost::unordered_flat_map<int, int> hasslecastle_normal({ { 0, 4206990 }, { 1, 4206989 }, { 2, 4206986 }, { 3, 4206997 }, { 4, 4206984 }, { 5, 4206983 }, { 7, 4207000 }, { 8, 4206982 }, { 9, 4207027 } });
 
 int getCommandForSpellID(int spellidx, int spelltype)
 {
-    std::unordered_map<int, int> spellmap;
+    boost::unordered_flat_map<int, int> spellmap;
 
     // if (levelname.find("koth_slasher") != levelname.npos || levelname.find("pl_bloodwater") != levelname.npos || levelname.find("pl_rumble_event") != levelname.npos)
 

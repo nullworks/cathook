@@ -65,7 +65,7 @@ struct catbot_user_state
     int treacherous_kills{ 0 };
 };
 
-static std::unordered_map<unsigned, catbot_user_state> human_detecting_map{};
+static boost::unordered_flat_map<unsigned, catbot_user_state> human_detecting_map{};
 
 int globerr(const char *path, int eerrno)
 {

@@ -13,7 +13,7 @@ namespace hacks::tf2::killstreak
 {
 static settings::Boolean enable{ "killstreak.enable", "false" };
 
-static std::unordered_map<int, int> ks_map;
+static boost::unordered_flat_map<int, int> ks_map;
 int killstreak{ 0 };
 
 void reset()

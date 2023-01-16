@@ -783,10 +783,12 @@ static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs o
 
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
 // This makes us able to see enemy class and status in scoreboard and player panel
+/*
 static std::unique_ptr<BytePatch> patch_playerpanel;
 static std::unique_ptr<BytePatch> patch_scoreboard1;
 static std::unique_ptr<BytePatch> patch_scoreboard2;
 static std::unique_ptr<BytePatch> patch_scoreboard3;
+*/
 
 // Credits to UNKN0WN
 namespace ScoreboardColoring
@@ -1005,10 +1007,12 @@ void Shutdown()
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
     // unpatching local player
     render_zoomed = false;
+    /*
     patch_playerpanel->Shutdown();
     patch_scoreboard1->Shutdown();
     patch_scoreboard2->Shutdown();
     patch_scoreboard3->Shutdown();
+    */
     if (ScoreboardColoring::addr1 == 3 || ScoreboardColoring::addr2 == 2)
         return;
 
@@ -1081,7 +1085,7 @@ static InitRoutine init(
 #if !ENFORCE_STREAM_SAFETY
         if (render_zoomed)
             tryPatchLocalPlayerShouldDraw(true);
-        render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
+        /*render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
         patch_playerpanel     = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 ? 85 C0 0F 8E", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
         uintptr_t addr_scrbrd = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
 
@@ -1096,7 +1100,7 @@ static InitRoutine init(
         patch_scoreboard1->Patch();
         patch_scoreboard2->Patch();
         patch_scoreboard3->Patch();
-
+        */
         static BytePatch stealth_kill{ gSignatures.GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
         stealth_kill.Patch();
         static BytePatch cyoa_patch{ gSignatures.GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };

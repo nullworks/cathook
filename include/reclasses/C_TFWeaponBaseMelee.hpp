@@ -18,7 +18,7 @@ public:
     inline static bool DoSwingTrace(IClientEntity *self, trace_t *trace)
     {
         typedef bool (*fn_t)(IClientEntity *, trace_t *);
-        return vfunc<fn_t>(self, offsets::PlatformOffset(526, offsets::undefined, 526), 0)(self, trace);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(527, offsets::undefined, 527), 0)(self, trace);
     }
     inline static int GetSwingRange(IClientEntity *self)
     {
@@ -36,7 +36,7 @@ public:
             }
         }
         typedef int (*fn_t)(IClientEntity *);
-        int return_value = vfunc<fn_t>(self, offsets::PlatformOffset(524, offsets::undefined, 524), 0)(self);
+        int return_value = vfunc<fn_t>(self, offsets::PlatformOffset(525, offsets::undefined, 525), 0)(self);
 
         if (add_charging)
         {

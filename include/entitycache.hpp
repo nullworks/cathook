@@ -97,7 +97,7 @@ public:
         return *reinterpret_cast<T *>(uintptr_t(RAW_ENT(this)) + offset);
     }
 
-    const int m_IDX;
+    const u_int16_t m_IDX;
 
     int m_iClassID()
     {
@@ -181,6 +181,10 @@ public:
         else
             return FLT_MAX;
     };
+    bool m_bGrenadeProjectile()
+    {
+        return m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) || m_iClassID() == CL_CLASS(CTFProjectile_Cleaver) || m_iClassID() == CL_CLASS(CTFProjectile_Jar) || m_iClassID() == CL_CLASS(CTFProjectile_JarMilk);
+    };
     bool IsProjectileACrit(CachedEntity *ent)
     {
         if (ent->m_bGrenadeProjectile())
@@ -193,10 +197,6 @@ public:
             return IsProjectileACrit(this);
         else
             return false;
-    };
-    bool m_bGrenadeProjectile()
-    {
-        return m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) || m_iClassID() == CL_CLASS(CTFProjectile_Cleaver) || m_iClassID() == CL_CLASS(CTFProjectile_Jar) || m_iClassID() == CL_CLASS(CTFProjectile_JarMilk);
     };
 
     bool m_bAnyHitboxVisible{ false };
@@ -250,7 +250,6 @@ extern u_int16_t max;
 extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
 extern boost::unordered_flat_map<u_int16_t, CachedEntity> array;
-extern std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 extern std::vector<CachedEntity *> player_cache;
 inline CachedEntity *Get(const u_int16_t &idx)
 {
@@ -261,7 +260,7 @@ inline CachedEntity *Get(const u_int16_t &idx)
         return &test->second;
 }
 void dodgeProj(CachedEntity *proj_ptr);
-void Update();
+__attribute__((hot)) void Update();
 void Invalidate();
 void Shutdown();
 

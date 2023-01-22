@@ -195,11 +195,10 @@ void MoveToTick(BacktrackData data)
     // Mark all the hitboxes as valid so we don't recalc them and use the old data
     // We already have
     target->hitboxes.m_CacheInternal.resize(data.hitboxes.size());
+    // Sets bits 1-18 (Or array indicies 0-17 if this was an array)
+    target->hitboxes.m_CacheValidationFlags |= 262143ULL;
     for (int i = hitbox_t::head; i <= foot_R; ++i)
-    {
-        target->hitboxes.m_CacheValidationFlags[i] = true;
         target->hitboxes.m_CacheInternal.at(i)     = data.hitboxes.at(i);
-    }
 
     // Sync animation properly
     CE_FLOAT(target, netvar.m_flSimulationTime) = data.simtime;

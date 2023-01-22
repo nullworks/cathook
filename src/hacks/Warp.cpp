@@ -47,7 +47,7 @@ static settings::Boolean warp_left{ "warp.on-hit.left", "true" };
 static settings::Boolean warp_right{ "warp.on-hit.right", "true" };
 
 static settings::Boolean debug_seqout{ "debug.warp_seqout", "false" };
-
+static std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 // Hidden control rvars for communtiy servers
 static settings::Int maxusrcmdprocessticks("warp.maxusrcmdprocessticks", "24");
 
@@ -261,15 +261,59 @@ bool shouldRapidfire()
 
     return buttons_pressed;
 }
-void dodgeProj()
+void dodgeProj(CachedEntity *proj_ptr)
 {
-    if (!LOCAL_E->m_bAlivePlayer() || entity_cache::proj_map.empty() || !dodge_projectile)
+
+    Vector eav;
+
+    velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
+    // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
+    // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
+    if (1 < eav.Length())
+    {
+        Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
+        Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
+
+        float displacement      = proj_pos.DistToSqr(player_pos);
+        float displacement_temp = displacement - 1;
+        float min_displacement  = displacement_temp - 1;
+        float multipler         = 0.01f;
+        bool add_grav           = false;
+        float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
+        if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
+            add_grav = true;
+        // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
+        curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+        // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
+        while (displacement_temp < displacement)
+        {
+
+            Vector temp_pos = (eav * multipler) + proj_pos;
+            if (add_grav)
+                temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
+            displacement_temp = temp_pos.DistToSqr(player_pos);
+            if (displacement_temp < min_displacement)
+                min_displacement = displacement_temp;
+            else
+                break;
+
+            multipler += 0.01f;
+        }
+        if (min_displacement < 20000)
+            proj_map.emplace_back((std::make_tuple(eav, proj_ptr)));
+        else
+            proj_map.emplace_back((std::make_tuple(Vector{ 0, 0, 0 }, proj_ptr)));
+    }
+}
+static void dodgeProj_cm()
+{
+    if (!LOCAL_E->m_bAlivePlayer() || proj_map.empty() || !dodge_projectile)
         return;
     Vector player_pos  = RAW_ENT(LOCAL_E)->GetAbsOrigin();
-    const int max_size = entity_cache::proj_map.size();
+    const int max_size = proj_map.size();
     for (int i = 0; i < max_size; ++i)
     {
-        auto curr_tuple   = entity_cache::proj_map[i];
+        auto curr_tuple   = proj_map[i];
         Vector key        = std::get<0>(curr_tuple);
         CachedEntity *val = std::get<1>(curr_tuple);
         if (key.Length() < 0.1f)
@@ -277,7 +321,7 @@ void dodgeProj()
             if (CE_GOOD(val))
                 continue;
             else
-                entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+                proj_map.erase((proj_map.begin() + i));
             continue;
         }
         if (CE_GOOD(val))
@@ -310,7 +354,7 @@ void dodgeProj()
                     {
                         was_hurt   = true;
                         warp_dodge = true;
-                        entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+                        proj_map.erase((proj_map.begin() + i));
                     }
                 } // It didn't hit anything but it has been proven to be very close to us. Dodge. (This is for the huntsman+pills)
                 else
@@ -323,12 +367,12 @@ void dodgeProj()
                     else
                         yaw_amount = 90.0f;
 
-                    entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+                    proj_map.erase((proj_map.begin() + i));
                 }
             }
         }
         else
-            entity_cache::proj_map.erase((entity_cache::proj_map.begin() + i));
+            proj_map.erase((proj_map.begin() + i));
     }
 }
 // Should we warp?
@@ -674,6 +718,10 @@ void CreateMovePrePredict()
 void CreateMove()
 {
     warpLogic();
+    if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity))
+        for (auto const &ent : entity_cache::valid_ents)
+            if ((*ent).m_Type() == ENTITY_PROJECTILE && (*ent).m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == ent; }) == proj_map.end())
+                dodgeProj(ent);
     // Either in rapidfire, or the tick just after. Either way we need to force bSendPackets in some way.
     bool should_rapidfire = shouldRapidfire();
     if (in_rapidfire || should_rapidfire || was_in_warp)
@@ -1175,7 +1223,7 @@ static InitRoutine init(
         EC::Register(EC::CreateMove, CreateMove, "warp_createmove", EC::very_late);
         EC::Register(EC::CreateMoveWarp, CreateMove, "warp_createmovew", EC::very_late);
         EC::Register(EC::CreateMove_NoEnginePred, CreateMovePrePredict, "warp_prepredict");
-        EC::Register(EC::CreateMove, dodgeProj, "warp_dodgeproj", EC::very_early);
+        EC::Register(EC::CreateMove, dodgeProj_cm, "warp_dodgeproj", EC::very_early);
         EC::Register(EC::CreateMoveEarly, CreateMoveEarly, "warp_createmove_early", EC::very_early);
         g_IEventManager2->AddListener(&listener, "player_hurt", false);
         EC::Register(

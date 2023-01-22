@@ -102,7 +102,6 @@ namespace entity_cache
 {
 boost::unordered_flat_map<u_int16_t, CachedEntity> array;
 std::vector<CachedEntity *> valid_ents;
-std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 std::vector<CachedEntity *> player_cache;
 u_int16_t previous_max = 0;
 u_int16_t previous_ent = 0;
@@ -119,16 +118,17 @@ void Update()
         for (auto &[key, val] : array)
         {
             val.Update();
-            if (CE_GOOD((&val)))
+            if (val.InternalEntity() && !val.InternalEntity()->IsDormant())
             {
                 val.hitboxes.UpdateBones();
                 valid_ents.emplace_back(&val);
                 if (val.m_Type() == ENTITY_PLAYER && val.m_bAlivePlayer())
                     player_cache.emplace_back(&val);
-                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && val.m_Type() == ENTITY_PROJECTILE && val.m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == &val; }) == proj_map.end())
-                    dodgeProj(&val);
             }
         }
+        previous_max = max;
+        previous_ent = current_ents;
+        return;
     }
     else
     {
@@ -136,68 +136,22 @@ void Update()
         {
             if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
                 continue;
-            array.try_emplace(i, CachedEntity{ i });
-            array[i].Update();
-
-            if (CE_GOOD((&array[i])))
+            CachedEntity &ent = array.try_emplace(i, CachedEntity{ i }).first->second;
+            ent.Update();
+            if (ent.InternalEntity() && !ent.InternalEntity()->IsDormant())
             {
-                array[i].hitboxes.UpdateBones();
-                valid_ents.emplace_back(&array[i]);
-                if (array[i].m_Type() == ENTITY_PLAYER && array[i].m_bAlivePlayer())
-                    player_cache.emplace_back(&(array[i]));
-                if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity) && array[i].m_Type() == ENTITY_PROJECTILE && array[i].m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == &array[i]; }) == proj_map.end())
-                    dodgeProj(&array[i]);
+                ent.hitboxes.UpdateBones();
+                valid_ents.emplace_back(&ent);
+                if (ent.m_Type() == ENTITY_PLAYER && ent.m_bAlivePlayer())
+                    player_cache.emplace_back(&(ent));
             }
         }
-    }
-    previous_max = max;
-    previous_ent = current_ents;
-}
-
-void dodgeProj(CachedEntity *proj_ptr)
-{
-
-    Vector eav;
-
-    velocity::EstimateAbsVelocity(RAW_ENT(proj_ptr), eav);
-    // Sometimes EstimateAbsVelocity returns completely BS values (as in 0 for everything on say a rocket)
-    // The ent could also be an in-place sticky which we don't care about - we want to catch it while it's in the air
-    if (1 < eav.Length())
-    {
-        Vector proj_pos   = RAW_ENT(proj_ptr)->GetAbsOrigin();
-        Vector player_pos = RAW_ENT(LOCAL_E)->GetAbsOrigin();
-
-        float displacement      = proj_pos.DistToSqr(player_pos);
-        float displacement_temp = displacement - 1;
-        float min_displacement  = displacement_temp - 1;
-        float multipler         = 0.01f;
-        bool add_grav           = false;
-        float curr_grav         = g_ICvar->FindVar("sv_gravity")->GetFloat();
-        if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
-            add_grav = true;
-        // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
-        curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
-        // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
-        while (displacement_temp < displacement)
-        {
-
-            Vector temp_pos = (eav * multipler) + proj_pos;
-            if (add_grav)
-                temp_pos.z = temp_pos.z - 0.5 * curr_grav * multipler * multipler;
-            displacement_temp = temp_pos.DistToSqr(player_pos);
-            if (displacement_temp < min_displacement)
-                min_displacement = displacement_temp;
-            else
-                break;
-
-            multipler += 0.01f;
-        }
-        if (min_displacement < 20000)
-            proj_map.emplace_back((std::make_tuple(eav, proj_ptr)));
-        else
-            proj_map.emplace_back((std::make_tuple(Vector{ 0, 0, 0 }, proj_ptr)));
+        previous_max = max;
+        previous_ent = current_ents;
+        return;
     }
 }
+
 void Invalidate()
 {
     array.clear();

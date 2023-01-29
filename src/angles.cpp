@@ -69,44 +69,18 @@ float angle_data_s::deviation(int steps) const
     return sqrt(hx * hx + hy * hy);
 }
 
-angle_data_s &data_idx(int index)
-{
-    if (index < 1 || index > MAX_PLAYERS)
-    {
-        throw std::out_of_range("Angle table entity index out of range");
-    }
-    return data_[index];
-}
-
-angle_data_s &data(const CachedEntity *entity)
-{
-    return data_idx(entity->m_IDX);
-}
-
 void Update()
 {
     for (auto const &ent : entity_cache::player_cache)
     {
-        auto &d = data_idx(ent->m_IDX);
-
-        if (CE_GOOD(ent) && !CE_BYTE(ent, netvar.iLifeState))
+        auto &d = data_[ent->m_IDX];
+        if (ent->m_IDX == g_IEngine->GetLocalPlayer())
         {
-            if (!d.good)
-            {
-                memset(&d, 0, sizeof(angle_data_s));
-            }
-            if (ent->m_IDX == g_IEngine->GetLocalPlayer())
-            {
-                d.push(current_user_cmd->viewangles);
-            }
-            else
-            {
-                d.push(CE_VECTOR(ent, netvar.m_angEyeAngles));
-            }
+            d.push(current_user_cmd->viewangles);
         }
         else
         {
-            d.good = false;
+            d.push(CE_VECTOR(ent, netvar.m_angEyeAngles));
         }
     }
 }

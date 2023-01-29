@@ -46,7 +46,7 @@ void SetRage(player_info_t info)
         playerlist::ChangeState(info.friendsID, playerlist::k_EState::RAGE);
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (!enable)
         return;

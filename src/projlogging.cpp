@@ -10,7 +10,7 @@
 
 namespace projectile_logging
 {
-Vector prevloc[2048]{};
+boost::unordered_flat_map<u_int16_t, Vector> prevloc;
 
 void Update()
 {

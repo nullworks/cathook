@@ -54,7 +54,7 @@ void Update(CachedEntity *player)
         data.check_timer--;
         if (!data.check_timer)
         {
-            auto &angles      = angles::data(player);
+            auto &angles      = angles::data_[player->m_IDX];
             float deviation   = angles.deviation(2);
             int widx          = HandleToIDX(CE_INT(player, netvar.hActiveWeapon));
             CachedEntity *wep = ENTITY(widx);

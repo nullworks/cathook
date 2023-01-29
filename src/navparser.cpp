@@ -862,7 +862,7 @@ void updateStuckTime()
     }
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (!isReady())
         return;

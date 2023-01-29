@@ -45,54 +45,23 @@ static settings::Float ve_window{ "debug.ve.window", "0" };
 static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
 static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 
-// FIXME maybe disable this by default
-static settings::Boolean fast_vischeck{ "debug.fast-vischeck", "true" };
-
 bool CachedEntity::IsVisible()
 {
-    static constexpr int optimal_hitboxes[] = { hitbox_t::head, hitbox_t::foot_L, hitbox_t::hand_R, hitbox_t::spine_1 };
-    static bool vischeck0, vischeck;
-
     PROF_SECTION(CE_IsVisible);
     if (m_bVisCheckComplete)
         return m_bAnyHitboxVisible;
-
-    vischeck0 = IsEntityVectorVisible(this, m_vecOrigin(), true);
-
-    if (vischeck0)
+    auto hitbox = hitboxes.GetHitbox(std::max(0, (hitboxes.GetNumHitboxes() >> 1) - 1));
+    Vector result = hitbox->center;
+    if (!hitbox)
+        result = m_vecOrigin();
+    // Just check a centered hitbox. This is mostly used for ESP anyway
+    if (IsEntityVectorVisible(this, result, true, MASK_SHOT_HULL, nullptr, true))
     {
         m_bAnyHitboxVisible = true;
         m_bVisCheckComplete = true;
         return true;
     }
 
-    if (m_Type() == ENTITY_PLAYER && fast_vischeck)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (hitboxes.VisibilityCheck(optimal_hitboxes[i]))
-            {
-                m_bAnyHitboxVisible = true;
-                m_bVisCheckComplete = true;
-                return true;
-            }
-        }
-        m_bAnyHitboxVisible = false;
-        m_bVisCheckComplete = true;
-        return false;
-    }
-
-    for (int i = 0; i < hitboxes.m_nNumHitboxes; i++)
-    {
-        vischeck = false;
-        vischeck = hitboxes.VisibilityCheck(i);
-        if (vischeck)
-        {
-            m_bAnyHitboxVisible = true;
-            m_bVisCheckComplete = true;
-            return true;
-        }
-    }
     m_bAnyHitboxVisible = false;
     m_bVisCheckComplete = true;
 
@@ -120,10 +89,12 @@ void Update()
             val.Update();
             if (val.InternalEntity() && !val.InternalEntity()->IsDormant())
             {
-                val.hitboxes.UpdateBones();
                 valid_ents.emplace_back(&val);
                 if (val.m_Type() == ENTITY_PLAYER && val.m_bAlivePlayer())
+                {
+                    val.hitboxes.UpdateBones();
                     player_cache.emplace_back(&val);
+                }
             }
         }
         previous_max = max;
@@ -140,10 +111,12 @@ void Update()
             ent.Update();
             if (ent.InternalEntity() && !ent.InternalEntity()->IsDormant())
             {
-                ent.hitboxes.UpdateBones();
                 valid_ents.emplace_back(&ent);
                 if (ent.m_Type() == ENTITY_PLAYER && ent.m_bAlivePlayer())
+                {
+                    ent.hitboxes.UpdateBones();
                     player_cache.emplace_back(&(ent));
+                }
             }
         }
         previous_max = max;

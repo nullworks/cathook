@@ -73,7 +73,7 @@ bool IsTarget(CachedEntity *ent)
 }
 
 // Function called by game for movement
-void CreateMove()
+static void CreateMove()
 {
     // Check if it enabled in settings, weapon entity exists and current
     // class is pyro

@@ -101,7 +101,7 @@ CachedEntity *ClosestSpy()
     return closest;
 }
 
-void CreateMove()
+static void CreateMove()
 {
     CachedEntity *spy;
     Vector diff;

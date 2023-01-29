@@ -78,8 +78,6 @@ void EntityHitboxCache::UpdateBones()
     // Do not run for bad ents/non player ents
     if (!m_bInit)
         Init();
-    if (CE_BAD(parent_ref) || parent_ref->m_Type() != ENTITY_PLAYER)
-        return;
     auto bone_ptr = GetBones();
     if (!bone_ptr || bones.empty())
         return;

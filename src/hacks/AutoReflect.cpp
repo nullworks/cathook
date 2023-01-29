@@ -130,7 +130,7 @@ static bool ShouldReflect(CachedEntity *ent)
 }
 
 // Function called by game for movement
-void CreateMove()
+static void CreateMove()
 {
     // Check if user settings allow Auto Reflect
     if (!enable || CE_BAD(LOCAL_W) || (blastkey && !blastkey.isKeyDown()))

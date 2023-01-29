@@ -3,7 +3,6 @@
         <List width="200">
             <AutoVariable width="fill" target="debug.cursor-fix" label="Cursor fix"/>
             <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine pred others"/>
-            <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast vischeck"/>
             <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam wait time"/>
             <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log dispatched user messages"/>
             <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>

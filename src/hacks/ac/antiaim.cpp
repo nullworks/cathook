@@ -35,7 +35,7 @@ void Update(CachedEntity *player)
     auto &am = amount[player->m_IDX - 1];
     if (tickcount - last_accusation[player->m_IDX - 1] < 60 * 60)
         return;
-    const auto &d = angles::data(player);
+    const auto &d = angles::data_[player->m_IDX];
     if (d.angle_count)
     {
         int idx = d.angle_index - 1;

@@ -877,7 +877,7 @@ void ProcessEntityPT()
         // Check if entity is on screen, then save screen position if true
         auto position = ent->m_vecDormantOrigin();
         if (!position)
-            return;
+            continue;
 
         // Sightline esp
         if (sightlines && type == ENTITY_PLAYER)

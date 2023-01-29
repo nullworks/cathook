@@ -5,7 +5,7 @@ namespace hacks::tf2::autoviewmodel
 
 static settings::Boolean auto_viewmodel_flipper{ "misc.auto-flip-viewmodel", "false" };
 
-void CreateMove()
+static void CreateMove()
 {
     if (!auto_viewmodel_flipper)
         return;

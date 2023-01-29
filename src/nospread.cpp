@@ -68,7 +68,7 @@ bool shouldNoSpread(bool _projectile)
     return _projectile ? *projectile : *bullet;
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return;
@@ -832,7 +832,7 @@ void FX_FireBullets_hook(IClientEntity *weapon, int player, Vector *origin, Vect
 }*/
 
 static Timer update_nospread_timer{};
-void CreateMove2()
+static void CreateMove2()
 {
     if (bullet)
     {

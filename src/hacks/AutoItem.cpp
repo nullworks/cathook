@@ -332,7 +332,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
 }
 
 static Timer t{};
-void CreateMove()
+static void CreateMove()
 {
     if (!enable || CE_BAD(LOCAL_E) || !t.test_and_set(*interval))
         return;

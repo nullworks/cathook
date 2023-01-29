@@ -2,7 +2,7 @@
  * Credits  To Unknown For most of this
  */
 #include "common.hpp"
-
+#include "boost/unordered/unordered_flat_map.hpp"
 namespace hacks::tf2::bullettracers
 {
 
@@ -224,7 +224,7 @@ typedef void (*FX_Tracer_t)(Vector &, Vector &, int, bool);
 
 FX_Tracer_t FX_Tracer_fn;
 
-char SentryTracerParity[MAX_ENTITIES + 1]{ 0 };
+boost::unordered_flat_map<u_int16_t, char> SentryTracerParity;
 void FX_Tracer_detour(Vector &start, CEffectData &data, int velocity, bool makeWhiz)
 {
     // start and end are reversed, justvalvethings.club
@@ -239,8 +239,9 @@ void FX_Tracer_detour(Vector &start, CEffectData &data, int velocity, bool makeW
     CEffectData dataTracer;
     if (NET_INT(sentry, netvar.iUpgradeLevel) > 1)
     {
-        auto &parity = SentryTracerParity[sentry->entindex()];
-        parity       = !parity;
+        u_int16_t index = sentry->entindex();
+        auto &parity    = SentryTracerParity[index];
+        parity          = !parity;
         vfunc<GetAttachment_t>(sentry, 113, 0)(sentry, parity ? muzzle_l : muzzle_r, dataTracer.m_vStart);
     }
     else

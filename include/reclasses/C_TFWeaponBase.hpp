@@ -84,10 +84,8 @@ public:
     }
     inline static float ApplyFireDelay(IClientEntity *self, float delay)
     {
-        typedef float (*ApplyFireDelay_t)(IClientEntity *, float);
-        static auto signature                     = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 6C C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 8B 5D ? 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 31 F6 89 54 24 ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? 6B 00 00 00 C7 44 24 ? ? ? ? ? C7 44 24 ? 00 00 00 00 C7 44 24 ? 00 00 00 00 C7 44 24 ? 00 00 00 00 C7 44 24 ? 00 00 00 00 FF 50 ? A1 ? ? ? ? 8B 3D ? ? ? ? 8B 55 ? 89 45 ? 8B 45 ? 85 FF 89 55 ? 89 45 ? 0F 85 ? ? ? ? 85 DB 0F 84 ? ? ? ? 8B 7B ? 85 FF 0F 84 ? ? ? ? C7 04 24 ? ? ? ? E8 ? ? ? ? 89 45 ? 8B 07 89 3C 24 FF 10 8B 7D ? 8B 10 C7 44 24 ? 00 00 00 00 89 5C 24 ? C7 44 24 ? 00 00 80 3F 89 7C 24 ? 89 04 24 FF 52 ? D9 5D ? F3 0F 10 45 ? F3 0F 11 04 24 E8 ? ? ? ? D9 5D");
-        static ApplyFireDelay_t ApplyFireDelay_fn = (ApplyFireDelay_t) signature;
-        return ApplyFireDelay_fn(self, delay);
+        typedef float (*fn_t)(IClientEntity *, float);
+        return vfunc<fn_t>(self, offsets::PlatformOffset(478, offsets::undefined, 478), 0)(self, delay);;
     }
     inline static void AddToCritBucket(IClientEntity *self, float value)
     {

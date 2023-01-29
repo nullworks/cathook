@@ -8,7 +8,7 @@ static settings::Boolean auto_f4("mvmtools.auto-f4", "false");
 static Timer revive_timer{};
 static Timer ready_timer{};
 
-void CreateMove()
+static void CreateMove()
 {
     if (CE_INVALID(LOCAL_E))
         return;

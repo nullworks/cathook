@@ -4,7 +4,6 @@
             <AutoVariable width="fill" target="misc.debug-info" label="Debug"/>
             <AutoVariable width="fill" target="hack.log-console" label="Log debug info"/>
             <AutoVariable width="fill" target="debug.engine-pred-others" label="Engine pred others"/>
-            <AutoVariable width="fill" target="debug.fast-vischeck" label="Fast vischeck"/>
             <AutoVariable width="fill" target="debug.join-wait-time" label="Joinspam wait time"/>
             <AutoVariable width="fill" target="debug.log-dispatch-user-msg" label="Log dispatched user messages"/>
             <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>

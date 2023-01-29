@@ -27,6 +27,4 @@ struct angle_data_s
 extern angle_data_s data_[PLAYER_ARRAY_SIZE];
 
 void Update();
-angle_data_s &data_idx(int index);
-angle_data_s &data(const CachedEntity *entity);
 } // namespace angles

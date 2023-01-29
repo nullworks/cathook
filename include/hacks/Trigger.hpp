@@ -12,8 +12,6 @@
 
 namespace hacks::shared::triggerbot
 {
-
-void CreateMove();
 bool ShouldShoot();
 bool IsTargetStateGood(CachedEntity *entity, std::optional<tf2::backtrack::BacktrackData> bt_data = std::nullopt);
 CachedEntity *FindEntInSight(float range, bool no_players = false);

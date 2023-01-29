@@ -673,7 +673,7 @@ void CL_Move_hook(float accumulated_extra_samples, bool bFinalTick)
 
 // Run before we call the original, we need to adjust the tickcount on the command
 // and the global variable so our time based functions are synced properly.
-void CreateMoveEarly()
+static void CreateMoveEarly()
 {
     // Update key state
     key_valid = UpdateRFKey();
@@ -690,7 +690,7 @@ void CreateMoveEarly()
 static float original_curtime = 0.0f;
 
 // Run before prediction so we can do Faststop logic
-void CreateMovePrePredict()
+static void CreateMovePrePredict()
 {
     // Attempt to stop fast in place to make movement smoother
     if (in_rapidfire && no_movement)
@@ -715,12 +715,12 @@ void CreateMovePrePredict()
 
 // This calls the warp logic and applies some rapidfire specific logic afterwards
 // if it applies.
-void CreateMove()
+static void CreateMove()
 {
     warpLogic();
     if ((bool) hacks::tf2::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity))
         for (auto const &ent : entity_cache::valid_ents)
-            if ((*ent).m_Type() == ENTITY_PROJECTILE && (*ent).m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == ent; }) == proj_map.end())
+            if (ent->m_Type() == ENTITY_PROJECTILE && ent->m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == ent; }) == proj_map.end())
                 dodgeProj(ent);
     // Either in rapidfire, or the tick just after. Either way we need to force bSendPackets in some way.
     bool should_rapidfire = shouldRapidfire();

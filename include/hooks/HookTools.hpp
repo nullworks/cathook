@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/profiler.hpp"
-#include "functional"
 #include <array>
 
 namespace EC
@@ -43,7 +42,7 @@ enum ec_priority
     very_late
 };
 
-typedef std::function<void()> EventFunction;
+typedef void (*EventFunction)();
 void Register(enum ec_types type, const EventFunction &function, const std::string &name, enum ec_priority priority = average);
 void Unregister(enum ec_types type, const std::string &name);
 void run(enum ec_types type);

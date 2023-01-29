@@ -255,7 +255,7 @@ void RestoreEntity(int entidx)
     set_data = std::nullopt;
 }
 
-void CreateMoveEarly()
+static void CreateMoveEarly()
 {
     if (hacks::tf2::antianticheat::enabled && *latency > 200.0f)
         latency = 200.0f;
@@ -327,7 +327,7 @@ void CreateMoveEarly()
     }
 }
 
-void CreateMoveLate()
+static void CreateMoveLate()
 {
     if (!isBacktrackEnabled)
         return;

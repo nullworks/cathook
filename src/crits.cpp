@@ -653,7 +653,7 @@ bool isExploitingDoubleAttack()
 }
 
 // Damage this round
-void CreateMove()
+static void CreateMove()
 {
     // It should never go down, if it does we need to compensate for it
     if (g_pPlayerResource->GetDamage(g_pLocalPlayer->entity_idx) < round_damage)

@@ -1563,7 +1563,7 @@ static void updateSlot(std::pair<CachedEntity *, float> &nearest)
     }
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (!enabled || !navparser::NavEngine::isReady())
         return;

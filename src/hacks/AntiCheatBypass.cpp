@@ -38,7 +38,7 @@ bool CanSetCmdNum(int new_cmdnum)
     return true;
 }
 
-void CreateMoveLate()
+static void CreateMoveLate()
 {
     if (!enabled)
         return;

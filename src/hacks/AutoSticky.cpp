@@ -93,7 +93,7 @@ bool IsTarget(CachedEntity *ent)
 }
 
 static int wait_ticks = 0;
-void CreateMove()
+static void CreateMove()
 {
     // Check user settings if auto-sticky is enabled
     if (!enable)

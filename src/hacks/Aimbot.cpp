@@ -330,9 +330,9 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
         {
             return hitpoints;
         }
-        int i = 0;
+        int i                  = 0;
         const u_int8_t max_box = ent->hitboxes.GetNumHitboxes();
-        while (hitpoints.empty() && i < max_box ) // Prevents returning empty at all costs. Loops through every hitbox
+        while (hitpoints.empty() && i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
         {
             if (hitbox == i)
             {
@@ -1024,7 +1024,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint && is_player)
         {
-            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE || (projectileAimbotRequired && 0.01f < cur_proj_grav) )
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE || (projectileAimbotRequired && 0.01f < cur_proj_grav))
             {
                 return true;
             }
@@ -1037,7 +1037,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                 if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer, true))
                     return true;
 
-                 const u_int8_t max_box = entity->hitboxes.GetNumHitboxes();   
+                const u_int8_t max_box = entity->hitboxes.GetNumHitboxes();
                 while (i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
                 {
                     if (i == cd.hitbox)

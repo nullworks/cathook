@@ -22,13 +22,8 @@ inline void CachedEntity::Update()
 #endif
     m_lSeenTicks = 0;
     m_lLastSeen  = 0;
-
     hitboxes.InvalidateCache();
-
     m_bVisCheckComplete = false;
-
-    if (m_Type() == EntityType::ENTITY_PLAYER)
-        GetPlayerInfo(m_IDX, &player_info);
 }
 
 inline CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
@@ -50,7 +45,7 @@ bool CachedEntity::IsVisible()
     PROF_SECTION(CE_IsVisible);
     if (m_bVisCheckComplete)
         return m_bAnyHitboxVisible;
-    auto hitbox = hitboxes.GetHitbox(std::max(0, (hitboxes.GetNumHitboxes() >> 1) - 1));
+    auto hitbox   = hitboxes.GetHitbox(std::max(0, (hitboxes.GetNumHitboxes() >> 1) - 1));
     Vector result = hitbox->center;
     if (!hitbox)
         result = m_vecOrigin();
@@ -90,10 +85,14 @@ void Update()
             if (val.InternalEntity() && !val.InternalEntity()->IsDormant())
             {
                 valid_ents.emplace_back(&val);
-                if (val.m_Type() == ENTITY_PLAYER && val.m_bAlivePlayer())
+                if (val.m_Type() == ENTITY_PLAYER)
                 {
-                    val.hitboxes.UpdateBones();
-                    player_cache.emplace_back(&val);
+                    GetPlayerInfo(val.m_IDX, &val.player_info);
+                    if (val.m_bAlivePlayer()) [[likely]]
+                    {
+                        val.hitboxes.UpdateBones();
+                        player_cache.emplace_back(&val);
+                    }
                 }
             }
         }
@@ -112,10 +111,14 @@ void Update()
             if (ent.InternalEntity() && !ent.InternalEntity()->IsDormant())
             {
                 valid_ents.emplace_back(&ent);
-                if (ent.m_Type() == ENTITY_PLAYER && ent.m_bAlivePlayer())
+                if (ent.m_Type() == ENTITY_PLAYER)
                 {
-                    ent.hitboxes.UpdateBones();
-                    player_cache.emplace_back(&(ent));
+                    GetPlayerInfo(ent.m_IDX, &ent.player_info);
+                    if (ent.m_bAlivePlayer()) [[likely]]
+                    {
+                        ent.hitboxes.UpdateBones();
+                        player_cache.emplace_back(&ent);
+                    }
                 }
             }
         }

@@ -1310,14 +1310,14 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (item_dropped_weapons && classid == CL_CLASS(CTFDroppedWeapon))
             {
                 AddEntityString(ent, "Dropped Weapon");
+                return;
             }
             // Gargoyle esp
             else if (item_gargoyle && classid == CL_CLASS(CHalloweenGiftPickup))
             {
                 if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
-                {
                     AddEntityString(ent, gargoyle_str, colors::FromRGBA8(98, 163, 213, 255));
-                }
+                return;
             }
             // Explosive/Environmental hazard esp
             else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || (itemtype >= BOMB_BALLOONBOMB && itemtype <= BOMB_WALKEREXPLODE)))
@@ -1340,8 +1340,9 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     }
                     AddEntityString(ent, write_str, colors::FromRGBA8(255, 162, 0, 255));
                 }
+                return;
             }
-            if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (itemtype >= FLAG_ATOMBOMB && itemtype <= CART_BOMBCART_RED)))
+            else if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (itemtype >= FLAG_ATOMBOMB && itemtype <= CART_BOMBCART_RED)))
             {
                 rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
 
@@ -1389,6 +1390,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
 
                 if (resettime && classid == CL_CLASS(CCaptureFlag))
                     AddEntityString(ent, time, colors::FromRGBA8(98, 163, 213, 255));
+                return;
             }
             // Other item esp
             else if (itemtype != ITEM_NONE)
@@ -1476,21 +1478,19 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     write_str = crumpkin_str;
                     color     = colors::FromRGBA8(253, 203, 88, 255);
                 }
-                AddEntityString(ent, write_str, color);
-            }
-        }
-        if (item_money && classid == CL_CLASS(CCurrencyPack))
-        {
-            if (CE_BYTE(ent, netvar.bDistributed))
-            {
-                if (item_money_red)
+                else if (item_money && classid == CL_CLASS(CCurrencyPack))
                 {
-                    AddEntityString(ent, mvm_red_money_str);
+                    if (CE_BYTE(ent, netvar.bDistributed))
+                    {
+                        if (item_money_red)
+                            write_str = mvm_red_money_str;
+                    }
+                    else
+                        write_str = mvm_money_str;
                 }
-            }
-            else
-            {
-                AddEntityString(ent, mvm_money_str);
+                else
+                    return;
+                AddEntityString(ent, write_str, color);
             }
         }
     }

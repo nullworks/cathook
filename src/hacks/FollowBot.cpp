@@ -619,7 +619,7 @@ static void cm()
     // timer too
     for (size_t i = 0; i < breadcrumbs.size(); ++i)
     {
-        if (loc_orig.DistTo(breadcrumbs.at(i)) < 60.f)
+        if (loc_orig.DistTo(breadcrumbs[i]) < 60.f)
         {
             idle_time.update();
             for (size_t j = 0; j <= i; j++)

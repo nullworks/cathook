@@ -418,7 +418,7 @@ static int cat_completionCallback(const char *c_partial, char commands[COMMAND_C
 
     for (auto i = 0u; i < partial.size() && j < 3; ++i)
     {
-        auto space = (bool) isspace(partial.at(i));
+        auto space = (bool) isspace(partial[i]);
         if (!space)
         {
             if (j)

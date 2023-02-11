@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "Backtrack.hpp"
 #include "AntiCheatBypass.hpp"
+#include "LevelInit.h"
 
 namespace hacks::tf2::backtrack
 {
@@ -43,18 +44,12 @@ std::optional<BacktrackData> getData()
 // Function to get usable ticks on given entity
 std::optional<std::vector<BacktrackData>> getGoodTicks(CachedEntity *ent)
 {
-    if (CE_BAD(ent) || !ent->m_bAlivePlayer())
-        return std::nullopt;
-    if (ent->m_IDX <= 0 || ent->m_IDX > bt_data.size())
-        return std::nullopt;
-    if (bt_data[ent->m_IDX - 1].empty())
-        return std::nullopt;
     std::optional<std::vector<BacktrackData>> valid_ticks = std::vector<BacktrackData>();
     for (auto &tick : bt_data[ent->m_IDX - 1])
     {
         if (!tick.in_range)
             continue;
-        valid_ticks->push_back(tick);
+        valid_ticks->emplace_back(tick);
     }
 
     return valid_ticks->empty() ? std::nullopt : valid_ticks;
@@ -174,7 +169,6 @@ void adjustPing(INetChannel *ch)
         }
     }
 }
-
 // Move target entity to tick
 void MoveToTick(BacktrackData data)
 {
@@ -198,7 +192,7 @@ void MoveToTick(BacktrackData data)
     // Sets bits 1-18 (Or array indicies 0-17 if this was an array)
     target->hitboxes.m_CacheValidationFlags |= 262143ULL;
     for (int i = hitbox_t::head; i <= foot_R; ++i)
-        target->hitboxes.m_CacheInternal.at(i)     = data.hitboxes.at(i);
+        target->hitboxes.m_CacheInternal[i] = data.hitboxes[i];
 
     // Sync animation properly
     CE_FLOAT(target, netvar.m_flSimulationTime) = data.simtime;
@@ -208,14 +202,6 @@ void MoveToTick(BacktrackData data)
 
     // Thanks to the epic doghook developers (mainly F1ssion and MrSteyk)
     // I do not have to find all of these signatures and dig through ida
-    struct BoneCache;
-
-    typedef BoneCache *(*GetBoneCache_t)(unsigned);
-    typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t * bones, unsigned, float time);
-    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (gSignatures.GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
-    static auto studio_get_bone_cache           = (GetBoneCache_t) gSignatures.GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
-    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) gSignatures.GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
-
     auto hitbox_bone_cache_handle = CE_VAR(target, hitbox_bone_cache_handle_offset, unsigned);
     if (hitbox_bone_cache_handle)
     {
@@ -278,10 +264,10 @@ static void CreateMoveEarly()
     if ((int) bt_data.size() != g_IEngine->GetMaxClients())
         bt_data.resize(g_IEngine->GetMaxClients());
 
-    for (auto const &ent: entity_cache::player_cache)
+    for (auto const &ent : entity_cache::player_cache)
     {
-        int i = ent->m_IDX;
-        int index         = i - 1;
+        int i     = ent->m_IDX;
+        int index = i - 1;
 
         auto &ent_data = bt_data[index];
 
@@ -306,7 +292,7 @@ static void CreateMoveEarly()
         data.bones = ent->hitboxes.bones;
 
         for (int i = head; i <= foot_R; ++i)
-            data.hitboxes.at(i) = *ent->hitboxes.GetHitbox(i);
+            data.hitboxes[i] = *ent->hitboxes.GetHitbox(i);
 
         ent_data.insert(ent_data.begin(), data);
         if (ent_data.size() > MAX_BACKTRACK_TICKS)

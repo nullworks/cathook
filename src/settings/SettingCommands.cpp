@@ -306,7 +306,7 @@ static int cat_completionCallback(const char *c_partial, char commands[COMMAND_C
 
     for (auto i = 0u; i < partial.size() && j < 3; ++i)
     {
-        auto space = (bool) isspace(partial.at(i));
+        auto space = (bool) isspace(partial[i]);
         if (!space)
         {
             if (j)
@@ -366,7 +366,7 @@ static int load_CompletionCallback(const char *c_partial, char commands[COMMAND_
 
     for (auto i = 0u; i < partial.size() && j < 3; ++i)
     {
-        auto space = (bool) isspace(partial.at(i));
+        auto space = (bool) isspace(partial[i]);
         if (!space)
         {
             if (j)
@@ -404,7 +404,7 @@ static int save_CompletionCallback(const char *c_partial, char commands[COMMAND_
 
     for (auto i = 0u; i < partial.size() && j < 3; ++i)
     {
-        auto space = (bool) isspace(partial.at(i));
+        auto space = (bool) isspace(partial[i]);
         if (!space)
         {
             if (j)
@@ -442,7 +442,7 @@ static int toggle_CompletionCallback(const char *c_partial, char commands[COMMAN
 
     for (auto i = 0u; i < partial.size() && j < 4; ++i)
     {
-        auto space = (bool) isspace(partial.at(i));
+        auto space = (bool) isspace(partial[i]);
         if (!space)
         {
             if (j)

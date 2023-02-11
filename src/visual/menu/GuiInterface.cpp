@@ -52,7 +52,7 @@ static void initPlayerlist()
                 auto &pl = playerlist::AccessData(steam);
                 for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; i++)
                 {
-                    if (pl.state == playerlist::k_arrGUIStates.at(i).first)
+                    if (pl.state == playerlist::k_arrGUIStates[i].first)
                     {
                         pl.state = playerlist::k_arrGUIStates.at(i + 1).first;
                         controller->updatePlayerState(userid, playerlist::k_Names[static_cast<size_t>(pl.state)]);

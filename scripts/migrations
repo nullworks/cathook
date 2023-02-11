@@ -55,7 +55,7 @@ function init() {
 #
 
 function updateRepoURL() {
-    local URL="https://github.com/STEVE4git/cathook/"
+    local URL="$(curl --max-time 10 -s -o /dev/null -w %{redirect_url} https://cathook.club/s/ch/git || echo error)"
     local GIT_REMOTE=$(git config --get remote.origin.url || echo unknown)
     if [ "$URL" != "error" ] && [ "$GIT_REMOTE" != "$URL" ]; then
         git remote set-url origin "$URL" && echo -e "\033[1;33m\n\nMigrations: Updated remote URL to new repo! Welcome to $URL!\n\n\033[0m" || :

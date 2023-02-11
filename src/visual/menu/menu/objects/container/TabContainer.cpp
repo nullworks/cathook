@@ -119,9 +119,9 @@ Container *TabContainer::getTab(std::string title)
 {
     for (auto i = 0u; i < selection.options.size(); ++i)
     {
-        if (selection.options.at(i) == title)
+        if (selection.options[i] == title)
         {
-            return containers.at(i).get();
+            return containers[i].get();
         }
     }
     return nullptr;

@@ -168,7 +168,7 @@ bool is_host()
     uint32 id = g_ISteamUser->GetSteamID().GetAccountID();
     for (int i = 0; i < party_hosts.size(); ++i)
     {
-        if (party_hosts.at(i) == id)
+        if (party_hosts[i] == id)
         {
             return true;
         }

@@ -165,11 +165,11 @@ void UpdateControlPoints()
     // Clear the invalid controlpoints
     if (num_cp <= MAX_CONTROL_POINTS)
         for (int i = num_cp; i < MAX_CONTROL_POINTS; i++)
-            controlpoint_data.at(i) = cp_info();
+            controlpoint_data[i] = cp_info();
 
     for (int i = 0; i < num_cp; i++)
     {
-        auto &data    = controlpoint_data.at(i);
+        auto &data    = controlpoint_data[i];
         data.cp_index = i;
 
         // Update position (m_vCPPositions[index])
@@ -179,7 +179,7 @@ void UpdateControlPoints()
     if (capstatus_update.test_and_set(1000))
         for (int i = 0; i < num_cp; i++)
         {
-            auto &data = controlpoint_data.at(i);
+            auto &data = controlpoint_data[i];
             // Check accessibility for both teams, requires alot of checks
             data.can_cap.at(0) = isPointUseable(i, TEAM_RED);
             data.can_cap.at(1) = isPointUseable(i, TEAM_BLU);

@@ -63,9 +63,7 @@ static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "0" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "0" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "0" };
-static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
-static settings::Boolean backtrackVischeckAll{ "aimbot.backtrack.vischeck-all", "0" };
 
 // TODO maybe these should be moved into "Targeting"
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
@@ -224,9 +222,7 @@ inline bool shouldBacktrack(CachedEntity *ent)
 {
     if (!shouldbacktrack_cache)
         return false;
-    else if (ent && ent->m_Type() != ENTITY_PLAYER)
-        return false;
-    else if (!tf2::backtrack::getGoodTicks(ent))
+    else if (!ent || ent->m_Type() != ENTITY_PLAYER || !ent->m_bAlivePlayer())
         return false;
     return true;
 }
@@ -330,9 +326,9 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
         {
             return hitpoints;
         }
-        int i = 0;
+        int i                  = 0;
         const u_int8_t max_box = ent->hitboxes.GetNumHitboxes();
-        while (hitpoints.empty() && i < max_box ) // Prevents returning empty at all costs. Loops through every hitbox
+        while (hitpoints.empty() && i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
         {
             if (hitbox == i)
             {
@@ -419,7 +415,7 @@ std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 }
 
 // Reduce Backtrack lag by checking if the ticks hitboxes are within a reasonable FOV range
-bool validateTickFOV(tf2::backtrack::BacktrackData &tick)
+bool validateTickFOV(tf2::backtrack::BacktrackData const &tick)
 {
     if (fov)
     {
@@ -487,11 +483,11 @@ bool projectileAimbotRequired;
 // The main "loop" of the aimbot.
 static void CreateMove()
 {
-    enable          = *normal_enable;
-    slow_aim        = *normal_slow_aim;
-    fov             = *normal_fov;
-    aimed_this_tick = false;
-
+    enable             = *normal_enable;
+    slow_aim           = *normal_slow_aim;
+    fov                = *normal_fov;
+    aimed_this_tick    = false;
+    aimed_this_tick    = false;
     bool aimkey_status = UpdateAimkey();
 
     if (*specmode != 0)
@@ -775,12 +771,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             if (good_ticks_tmp)
             {
                 auto good_ticks = *good_ticks_tmp;
-                if (backtrackLastTickOnly)
-                {
-                    good_ticks.clear();
-                    good_ticks.push_back(good_ticks_tmp->back());
-                }
-                for (auto &bt_tick : good_ticks)
+                for (auto const &bt_tick : good_ticks)
                 {
                     if (!validateTickFOV(bt_tick))
                         continue;
@@ -820,12 +811,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             if (good_ticks_tmp)
             {
                 auto good_ticks = *good_ticks_tmp;
-                if (backtrackLastTickOnly)
-                {
-                    good_ticks.clear();
-                    good_ticks.push_back(good_ticks_tmp->back());
-                }
-                for (auto &bt_tick : good_ticks)
+                for (auto const &bt_tick : good_ticks)
                 {
                     if (!validateTickFOV(bt_tick))
                         continue;
@@ -1024,7 +1010,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint && is_player)
         {
-            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE || (projectileAimbotRequired && 0.01f < cur_proj_grav) )
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE || (projectileAimbotRequired && 0.01f < cur_proj_grav))
             {
                 return true;
             }
@@ -1037,7 +1023,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                 if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer, true))
                     return true;
 
-                 const u_int8_t max_box = entity->hitboxes.GetNumHitboxes();   
+                const u_int8_t max_box = entity->hitboxes.GetNumHitboxes();
                 while (i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
                 {
                     if (i == cd.hitbox)
@@ -1203,8 +1189,8 @@ bool Aim(CachedEntity *entity)
     // Set tick count to targets (backtrack messes with this)
     if (!shouldBacktrack(entity) && nolerp && entity->m_IDX <= g_IEngine->GetMaxClients())
         current_user_cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(entity, netvar.m_flSimulationTime));
-    aimed_this_tick      = true;
-    viewangles_this_tick = angles;
+    aimed_this_tick        = true;
+    viewangles_this_tick   = angles;
     // Finish function
     return true;
 }

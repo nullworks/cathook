@@ -730,7 +730,7 @@ static InitRoutine init(
             []()
             {
                 // Don't run if we don't use it
-                if (!hacks::shared::aimbot::engine_projpred && !debug_pp_draw)
+                if (hacks::shared::aimbot::engine_projpred && !debug_pp_draw)
                     return;
                 for (auto const &ent: entity_cache::player_cache)
                 {

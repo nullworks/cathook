@@ -15,7 +15,6 @@
 #include "NavBot.hpp"
 #include "HookTools.hpp"
 #include "teamroundtimer.hpp"
-
 // Found in C_BasePlayer. It represents "m_pCurrentCommand"
 #define CURR_CUSERCMD_PTR 4452
 #include "HookedMethods.hpp"
@@ -243,9 +242,10 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
-    
+
     if (!g_Settings.bInvalid && CE_GOOD(g_pLocalPlayer->entity))
     {
+
         servertime            = (float) CE_INT(g_pLocalPlayer->entity, netvar.nTickBase) * g_GlobalVars->interval_per_tick;
         g_GlobalVars->curtime = servertime;
         time_replaced         = true;

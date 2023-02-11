@@ -128,7 +128,7 @@ int ClosestDistanceHitbox(hacks::tf2::backtrack::BacktrackData btd)
     float closest_dist = FLT_MAX, dist = 0.0f;
     for (int i = pelvis; i < spine_3; ++i)
     {
-        dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes.at(i).center);
+        dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes[i].center);
         if (dist < closest_dist)
         {
             closest      = i;

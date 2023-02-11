@@ -21,7 +21,7 @@ Vector loc;
 //    std::string output = "Pathing: Path found! Path: ";
 //    for (int i = 0; i < path.size(); i++)
 //    {
-//        output.append(format(path.at(i).x, ",", format(path.at(i).y)));
+//        output.append(format(path[i].x, ",", format(path[i].y)));
 //    }
 //    logging::Info(output.c_str());
 //});
@@ -84,7 +84,7 @@ bool initiatenavfile()
     {
         std::vector<NavConnect> *connections = &areas->at(i).m_connections;
         int childCount                       = connections->size();
-        navNode *currNode                    = nodes.at(i);
+        navNode *currNode                    = nodes[i];
         for (int j = 0; j < childCount; j++)
         {
             currNode->addChild(nodes.at(connections->at(j).id), 1.0f);
@@ -100,7 +100,7 @@ int findClosestNavSquare(Vector vec)
     int bestSquare = -1;
     for (int i = 0; i < nodes.size(); i++)
     {
-        float dist = nodes.at(i)->vecLoc.DistTo(vec);
+        float dist = nodes[i]->vecLoc.DistTo(vec);
         if (dist < bestDist)
         {
             bestDist   = dist;
@@ -132,7 +132,7 @@ std::vector<Vector> findPath(Vector loc, Vector dest)
     std::vector<Vector> path;
     for (int i = 0; i < pathNodes.size(); i++)
     {
-        path.push_back(pathNodes.at(i)->vecLoc);
+        path.push_back(pathNodes[i]->vecLoc);
     }
     return path;
 }

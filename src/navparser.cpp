@@ -541,7 +541,7 @@ bool navTo(const Vector &destination, int priority, bool should_repath, bool nav
 
     for (size_t i = 0; i < path.size(); i++)
     {
-        CNavArea *area = reinterpret_cast<CNavArea *>(path.at(i));
+        CNavArea *area = reinterpret_cast<CNavArea *>(path[i]);
 
         // All entries besides the last need an extra crumb
         if (i != path.size() - 1)

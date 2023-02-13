@@ -94,7 +94,18 @@ weaponmode GetWeaponMode(CachedEntity *ent);
 
 void FixMovement(CUserCmd &cmd, Vector &viewangles);
 void VectorAngles(Vector &forward, Vector &angles);
-void AngleVectors2(const QAngle &angles, Vector *forward);
+// Get forward vector
+inline void AngleVectors2(const QAngle &angles, Vector *forward)
+{
+    float sp, sy, cp, cy;
+
+    SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
+    SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
+
+    forward->x = cp * cy;
+    forward->y = cp * sy;
+    forward->z = -sp;
+}
 void AngleVectors3(const QAngle &angles, Vector *forward, Vector *right, Vector *up);
 bool isRapidFire(IClientEntity *wep);
 void fClampAngle(Vector &qaAng);

@@ -880,18 +880,6 @@ bool isRapidFire(IClientEntity *wep)
     return ret || wep->GetClientClass()->m_ClassID == CL_CLASS(CTFMinigun);
 }
 
-// Get forward vector
-void AngleVectors2(const QAngle &angles, Vector *forward)
-{
-    float sp, sy, cp, cy;
-
-    SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
-    SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
-
-    forward->x = cp * cy;
-    forward->y = cp * sy;
-    forward->z = -sp;
-}
 
 char GetUpperChar(ButtonCode_t button)
 {
@@ -1892,7 +1880,7 @@ Vector getShootPos(Vector angle)
 
     // Huntsman
     case CL_CLASS(CTFCompoundBow):
-        vecOffset = Vector(23.5f, -8.0f, -3.0f);
+        vecOffset = Vector(23.5f, -4.0f, -3.0f);
         break;
 
     default:

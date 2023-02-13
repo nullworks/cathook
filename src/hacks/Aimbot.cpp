@@ -1183,8 +1183,57 @@ bool Aim(CachedEntity *entity)
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
 
     if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
-        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), (0.01f < cur_proj_grav)))
+    {
+        const Vector &orig   = getShootPos(angles);
+        const bool grav_comp = (0.01f < cur_proj_grav);
+        if (grav_comp)
+        {
+            Vector direction_vec;
+            const QAngle &ang = VectorToQAngle(angles);
+            AngleVectors2(ang, &direction_vec);
+
+            direction_vec *= cur_proj_speed;
+            float grav  = cur_proj_grav * g_ICvar->FindVar("sv_gravity")->GetFloat() * -1.0f;
+            float diff  = (entity->m_vecOrigin().z - orig.z);
+            float z_vel = direction_vec.z;
+            // Direct shots should just use normal vischeck
+            if (30.0f < abs(z_vel))
+            {
+                float time = -1.0f * ((z_vel + fsqrt(z_vel * z_vel + 2.0f * diff * grav)) / grav);
+                if (!time)
+                    time = -1.0f * ((z_vel * fsqrt(z_vel * z_vel + 2 * (LOCAL_E->hitboxes.GetHitbox(14)->center.z - orig.z) * grav)) / grav);
+                direction_vec *= time;
+                direction_vec.z = z_vel * time + 0.5f * grav * time * time;
+                if (direction_vec.Length() * 1.2f < (orig.DistTo(entity->m_vecOrigin())))
+                    return false;
+                AngleVectors2(ang, &direction_vec);
+                direction_vec *= cur_proj_speed;
+                // Don't check the middle of the arc if they're close to us.
+                if (1.0f < time)
+                {
+                    float pitch      = ang.x * -1.0f;
+                    float max_height = -1.0f * direction_vec.z * direction_vec.z * (sin(pitch) * sin(pitch)) / (2.0f * grav);
+                    float time_2     = -1.0f * ((direction_vec.z + fsqrt(direction_vec.z * direction_vec.z + 2.0f * max_height * grav)) / grav);
+                    if (!time_2)
+                        return false;
+                    Vector res = direction_vec * time_2 + orig;
+                    res.z      = z_vel * time_2 + 0.5f * grav * time_2 * time_2;
+                    res.z += orig.z;
+                    // Checking the end of the arc doesn't matter for close range
+                    if (!didProjectileHit(res, is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), true))
+                        return false;
+                    if (!didProjectileHit(orig, res, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), true))
+                        return false;
+                }
+                else if (!didProjectileHit(orig, is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), true))
+                    return false;
+            }
+            else if (!didProjectileHit(orig, is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), true))
+                return false;
+        }
+        else if (!didProjectileHit(orig, is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), grav_comp))
             return false;
+    }
     if (fov > 0 && cd.fov > fov)
         return false;
     // Slow aim

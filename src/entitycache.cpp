@@ -20,8 +20,7 @@ inline void CachedEntity::Update()
         return;
     }
 #endif
-    m_lSeenTicks = 0;
-    m_lLastSeen  = 0;
+    m_lLastSeen = 0;
     hitboxes.InvalidateCache();
     m_bVisCheckComplete = false;
 }
@@ -31,10 +30,14 @@ inline CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_c
 #if PROXY_ENTITY != true
     m_pEntity = nullptr;
 #endif
-    m_fLastUpdate = 0.0f;
 }
-CachedEntity::~CachedEntity()
+inline CachedEntity::~CachedEntity()
 {
+    if (player_info)
+    {
+        delete player_info;
+        player_info = 0;
+    }
 }
 static settings::Float ve_window{ "debug.ve.window", "0" };
 static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
@@ -75,6 +78,8 @@ void Update()
     u_int16_t current_ents = g_IEntityList->NumberOfEntities(false);
     valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
     player_cache.clear();
+    if (g_Settings.bInvalid)
+        return;
     if (max >= MAX_ENTITIES)
         max = MAX_ENTITIES - 1;
     if (previous_max == max && previous_ent == current_ents)
@@ -87,7 +92,7 @@ void Update()
                 valid_ents.emplace_back(&val);
                 if (val.m_Type() == ENTITY_PLAYER)
                 {
-                    GetPlayerInfo(val.m_IDX, &val.player_info);
+                    GetPlayerInfo(val.m_IDX, val.player_info);
                     if (val.m_bAlivePlayer()) [[likely]]
                     {
                         val.hitboxes.UpdateBones();
@@ -104,7 +109,7 @@ void Update()
     {
         for (u_int16_t i = 0; i <= max; ++i)
         {
-            if (g_Settings.bInvalid || !(g_IEntityList->GetClientEntity(i)) || !(g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID))
+            if (!g_IEntityList->GetClientEntity(i) || !g_IEntityList->GetClientEntity(i)->GetClientClass()->m_ClassID)
                 continue;
             CachedEntity &ent = array.try_emplace(i, CachedEntity{ i }).first->second;
             ent.Update();
@@ -113,7 +118,9 @@ void Update()
                 valid_ents.emplace_back(&ent);
                 if (ent.m_Type() == ENTITY_PLAYER)
                 {
-                    GetPlayerInfo(ent.m_IDX, &ent.player_info);
+                    if (!ent.player_info)
+                        ent.player_info = new player_info_s;
+                    GetPlayerInfo(ent.m_IDX, ent.player_info);
                     if (ent.m_bAlivePlayer()) [[likely]]
                     {
                         ent.hitboxes.UpdateBones();

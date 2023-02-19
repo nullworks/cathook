@@ -64,10 +64,10 @@ static CatCommand follow_steam("fb_steam", "Follow Steam Id",
 static CatCommand steam_debug("debug_steamid", "Print steamids",
                               []()
                               {
-                                  for (auto const &ent: entity_cache::player_cache)
+                                  for (auto const &ent : entity_cache::player_cache)
                                   {
-                                     
-                                      logging::Info("%u", ent->player_info.friendsID);
+
+                                      logging::Info("%u", ent->player_info->friendsID);
                                   }
                               });
 
@@ -356,15 +356,15 @@ static void cm()
         // Find a target with the steam id, as it is prioritized
         if (steamid)
         {
-            if (ENTITY(valid_target)->player_info.friendsID != steamid)
+            if (ENTITY(valid_target)->player_info->friendsID != steamid)
             {
-                for (auto const &entity: entity_cache::player_cache)
+                for (auto const &entity : entity_cache::player_cache)
                 {
-               
+
                     if (!isValidTarget(entity))
                         continue;
                     // No enemy check, since steamid is very specific
-                    if (steamid != entity->player_info.friendsID) // steamid check
+                    if (steamid != entity->player_info->friendsID) // steamid check
                         continue;
                     if (startFollow(entity, isNavBotCM))
                     {
@@ -387,19 +387,19 @@ static void cm()
                 CSteamID steamid;
                 pc->GetCurrentPartyLeader(steamid);
                 auto accountid = steamid.GetAccountID();
-                // if (steamid.GetAccountID() != ENTITY(follow_target)->player_info.friendsID)
+                // if (steamid.GetAccountID() != ENTITY(follow_target)->player_info->friendsID)
                 //    continue;
 
-                if (accountid != ENTITY(valid_target)->player_info.friendsID)
+                if (accountid != ENTITY(valid_target)->player_info->friendsID)
                 {
-                    for (auto const &entity: entity_cache::player_cache)
+                    for (auto const &entity : entity_cache::player_cache)
                     {
-                      
+
                         if (!isValidTarget(entity))
                             continue;
                         if (entity->m_bEnemy())
                             continue;
-                        if (accountid != entity->player_info.friendsID)
+                        if (accountid != entity->player_info->friendsID)
                             continue;
                         if (startFollow(entity, isNavBotCM))
                         {
@@ -419,9 +419,9 @@ static void cm()
         {
             if (!playerlist::IsFriend(ENTITY(valid_target)))
             {
-                for (auto const &entity: entity_cache::player_cache)
+                for (auto const &entity : entity_cache::player_cache)
                 {
-                    
+
                     if (!isValidTarget(entity))
                         continue;
                     if (entity->m_bEnemy())
@@ -452,10 +452,10 @@ static void cm()
         // Try to get a new target
         if (!followcart)
         {
-         
-            for (auto const &entity: entity_cache::player_cache)
+
+            for (auto const &entity : entity_cache::player_cache)
             {
-              
+
                 if (!isValidTarget(entity))
                     continue;
                 if (!follow_target)

@@ -1199,9 +1199,9 @@ bool Aim(CachedEntity *entity)
             // Direct shots should just use normal vischeck
             if (30.0f < abs(z_vel))
             {
-                float time = -1.0f * ((z_vel + fsqrt(z_vel * z_vel + 2.0f * diff * grav)) / grav);
+                float time = -1.0f * ((z_vel + sqrt(z_vel * z_vel + 2.0f * diff * grav)) / grav);
                 if (!time)
-                    time = -1.0f * ((z_vel * fsqrt(z_vel * z_vel + 2 * (LOCAL_E->hitboxes.GetHitbox(14)->center.z - orig.z) * grav)) / grav);
+                    time = -1.0f * ((z_vel * sqrt(z_vel * z_vel + 2 * (LOCAL_E->hitboxes.GetHitbox(14)->center.z - orig.z) * grav)) / grav);
                 direction_vec *= time;
                 direction_vec.z = z_vel * time + 0.5f * grav * time * time;
                 if (direction_vec.Length() * 1.2f < (orig.DistTo(entity->m_vecOrigin())))
@@ -1213,7 +1213,7 @@ bool Aim(CachedEntity *entity)
                 {
                     float pitch      = ang.x * -1.0f;
                     float max_height = -1.0f * direction_vec.z * direction_vec.z * (sin(pitch) * sin(pitch)) / (2.0f * grav);
-                    float time_2     = -1.0f * ((direction_vec.z + fsqrt(direction_vec.z * direction_vec.z + 2.0f * max_height * grav)) / grav);
+                    float time_2     = -1.0f * ((direction_vec.z + sqrt(direction_vec.z * direction_vec.z + 2.0f * max_height * grav)) / grav);
                     if (!time_2)
                         return false;
                     Vector res = direction_vec * time_2 + orig;
@@ -1689,15 +1689,13 @@ static void DrawText()
         return;
     for (auto const &ent : entity_cache::player_cache)
     {
-        if (CE_GOOD(ent))
+
+        Vector screen;
+        Vector oscreen;
+        if (draw::WorldToScreen(cd.aim_position, screen) && draw::WorldToScreen(ent->m_vecOrigin(), oscreen))
         {
-            Vector screen;
-            Vector oscreen;
-            if (draw::WorldToScreen(cd.aim_position, screen) && draw::WorldToScreen(ent->m_vecOrigin(), oscreen))
-            {
-                draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::white);
-                draw::Line(oscreen.x, oscreen.y, screen.x - oscreen.x, screen.y - oscreen.y, colors::EntityF(ent), 0.5f);
-            }
+            draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::white);
+            draw::Line(oscreen.x, oscreen.y, screen.x - oscreen.x, screen.y - oscreen.y, colors::EntityF(ent), 0.5f);
         }
     }
 }

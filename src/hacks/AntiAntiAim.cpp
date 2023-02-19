@@ -18,10 +18,10 @@ static inline void modifyAngles()
 {
     for (auto const &player : entity_cache::player_cache)
     {
-        
-        if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info.friendsID)
+
+        if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info->friendsID)
             continue;
-        auto &data  = resolver_map[player->player_info.friendsID];
+        auto &data  = resolver_map[player->player_info->friendsID];
         auto &angle = CE_VECTOR(player, netvar.m_angEyeAngles);
         angle.x     = data.new_angle.x;
         angle.y     = data.new_angle.y;
@@ -142,9 +142,9 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
 void increaseBruteNum(int idx)
 {
     auto ent = ENTITY(idx);
-    if (CE_BAD(ent) || !ent->player_info.friendsID)
+    if (CE_BAD(ent) || !ent->player_info->friendsID)
         return;
-    auto &data = hacks::shared::anti_anti_aim::resolver_map[ent->player_info.friendsID];
+    auto &data = hacks::shared::anti_anti_aim::resolver_map[ent->player_info->friendsID];
     if (data.hits_in_a_row >= 4)
         data.hits_in_a_row = 2;
     else if (data.hits_in_a_row >= 2)
@@ -177,7 +177,7 @@ static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info.friendsID], ent);
+        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info->friendsID], ent);
 }
 
 static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
@@ -194,7 +194,7 @@ static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info.friendsID]);
+        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info->friendsID]);
 }
 
 // *_ptr points to what we need to modify while *_ProxyFn holds the old value

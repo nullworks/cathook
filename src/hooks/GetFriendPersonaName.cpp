@@ -37,7 +37,7 @@ bool StolenName()
     int potential_targets_length = 0;
 
     // Go through entities looking for potential targets
-    for (auto const &ent: entity_cache::player_cache)
+    for (auto const &ent : entity_cache::player_cache)
     {
         // Check if ent is a good target
         int i = ent->m_IDX;
@@ -185,7 +185,7 @@ static InitRoutine init(
                 if (new_val != 0)
                 {
                     std::string new_name = GetNamestealName(g_ISteamUser->GetSteamID());
-                    if (CE_BAD(LOCAL_E) || new_name.empty() || !strcmp(LOCAL_E->player_info.name, new_name.c_str()))
+                    if (CE_BAD(LOCAL_E) || new_name.empty() || !strcmp(LOCAL_E->player_info->name, new_name.c_str()))
                         return;
                     netvar_name = std::move(new_name);
                     NET_SetConVar setname("name", netvar_name.c_str());
@@ -231,7 +231,7 @@ static void cm()
     if (CE_BAD(LOCAL_E) || new_name.empty())
         return;
     // Didn't change name - update timer a bit
-    if (!strcmp(LOCAL_E->player_info.name, new_name.c_str()))
+    if (!strcmp(LOCAL_E->player_info->name, new_name.c_str()))
     {
         set_name.last -= std::chrono::seconds(170);
         return;

@@ -87,7 +87,7 @@ void OnHit(bool crit, int idx, bool is_sniper)
             auto ent = ENTITY(idx);
             if (CE_GOOD(ent))
             {
-                hacks::shared::anti_anti_aim::resolver_map[ent->player_info.friendsID].hits_in_a_row++;
+                hacks::shared::anti_anti_aim::resolver_map[ent->player_info->friendsID].hits_in_a_row++;
                 resolve_soon[idx] = false;
             }
         }

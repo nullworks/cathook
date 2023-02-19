@@ -132,7 +132,7 @@ rgba_t Color(unsigned steamid)
 rgba_t Color(CachedEntity *player)
 {
     if (CE_GOOD(player))
-        return Color(player->player_info.friendsID);
+        return Color(player->player_info->friendsID);
     return colors::empty;
 }
 #endif
@@ -144,8 +144,8 @@ userdata &AccessData(unsigned steamid)
 // Assume player is non-null
 userdata &AccessData(CachedEntity *player)
 {
-    if (player && player->player_info.friendsID)
-        return AccessData(player->player_info.friendsID);
+    if (player && player->player_info->friendsID)
+        return AccessData(player->player_info->friendsID);
     return AccessData(0U);
 }
 
@@ -160,8 +160,8 @@ bool IsDefault(unsigned steamid)
 
 bool IsDefault(CachedEntity *entity)
 {
-    if (entity && entity->player_info.friendsID)
-        return IsDefault(entity->player_info.friendsID);
+    if (entity && entity->player_info->friendsID)
+        return IsDefault(entity->player_info->friendsID);
     return true;
 }
 
@@ -173,8 +173,8 @@ bool IsFriend(unsigned steamid)
 
 bool IsFriend(CachedEntity *entity)
 {
-    if (entity && entity->player_info.friendsID)
-        return IsFriend(entity->player_info.friendsID);
+    if (entity && entity->player_info->friendsID)
+        return IsFriend(entity->player_info->friendsID);
     return false;
 }
 
@@ -238,8 +238,8 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
 
 bool ChangeState(CachedEntity *entity, k_EState state, bool force)
 {
-    if (entity && entity->player_info.friendsID)
-        return ChangeState(entity->player_info.friendsID, state, force);
+    if (entity && entity->player_info->friendsID)
+        return ChangeState(entity->player_info->friendsID, state, force);
     return false;
 }
 

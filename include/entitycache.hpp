@@ -201,7 +201,6 @@ public:
 
     bool m_bAnyHitboxVisible{ false };
     bool m_bVisCheckComplete{ false };
-
     k_EItemType m_ItemType()
     {
         if (m_Type() == ENTITY_GENERIC)
@@ -209,27 +208,20 @@ public:
         else
             return ITEM_NONE;
     };
-
-    unsigned long m_lSeenTicks{ 0 };
     unsigned long m_lLastSeen{ 0 };
-    Vector m_vecVOrigin{ 0 };
     Vector m_vecVelocity{ 0 };
     Vector m_vecAcceleration{ 0 };
-    float m_fLastUpdate{ 0.0f };
     hitbox_cache::EntityHitboxCache hitboxes;
-    player_info_s player_info{};
-    Averager<float> velocity_averager{ 8 };
+    player_info_s *player_info = nullptr;
     void Reset()
     {
         m_bAnyHitboxVisible = false;
         m_bVisCheckComplete = false;
         m_lLastSeen         = 0;
-        m_lSeenTicks        = 0;
-        memset(&player_info, 0, sizeof(player_info_s));
+        if (player_info)
+            memset(player_info, 0, sizeof(player_info_s));
         m_vecAcceleration.Zero();
-        m_vecVOrigin.Zero();
         m_vecVelocity.Zero();
-        m_fLastUpdate = 0;
     }
 
     bool was_dormant()

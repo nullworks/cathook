@@ -89,7 +89,8 @@ static void updateSpamvich() {
   current_user_cmd -> buttons |= IN_ATTACK;
 
   static float flLastSendTime = g_GlobalVars -> curtime; //	dont get disconnected
-  if (fabsf(g_GlobalVars -> curtime - flLastSendTime) > .5 f) {
+    //bruh
+  if (fabsf(g_GlobalVars -> curtime - flLastSendTime) > .5f) {
     hack::ExecuteCommand("taunt");
     flLastSendTime = g_GlobalVars -> curtime;
   }

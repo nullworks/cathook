@@ -75,22 +75,24 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
-static void updateSpamvich()
-{
-            if (!LOCAL_E->m_bAlivePlayer()) { return; }
-        
-           CachedEntity *weapon = g_pLocalPlayer->weapon();
-            //why the fuck is it called lunchbox
-            //bruh
-            if (weapon->m_iClassID() != CL_CLASS(CTFLunchBox)) { return; }
-        
-            current_user_cmd->buttons |= IN_ATTACK;
-        
-            static float flLastSendTime = g_GlobalVars->curtime;		//	dont get disconnected
-            if (fabsf(g_GlobalVars->curtime - flLastSendTime) > .5f) {
-                hack::ExecuteCommand("taunt");
-                flLastSendTime = g_GlobalVars->curtime;
-            }
+static void updateSpamvich() {
+  if (!CE_GOOD(LOCAL_E)) { return; }
+  if (!LOCAL_E -> m_bAlivePlayer()) { return ; }
+  CachedEntity * weapon = g_pLocalPlayer -> weapon();
+  if (!CE_GOOD(weapon)) { return; };
+    //why the fuck is it called lunchbox
+    //bruh
+    if (weapon -> m_iClassID() != CL_CLASS(CTFLunchBox)) {
+      return;
+    }
+
+  current_user_cmd -> buttons |= IN_ATTACK;
+
+  static float flLastSendTime = g_GlobalVars -> curtime; //	dont get disconnected
+  if (fabsf(g_GlobalVars -> curtime - flLastSendTime) > .5 f) {
+    hack::ExecuteCommand("taunt");
+    flLastSendTime = g_GlobalVars -> curtime;
+  }
 }
 static void updateAntiAfk()
 {

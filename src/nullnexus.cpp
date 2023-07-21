@@ -281,7 +281,7 @@ static InitRoutine init(
                 nexus.connect(*address, *port, *endpoint, true);
         }
 
-        uintptr_t processprint_addr = gSignatures.GetEngineSignature("55 89 E5 56 53 83 EC 50 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 89 54 24 ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? 4D 04 00 00");
+        uintptr_t processprint_addr = gSignatures.GetEngineSignature("55 89 E5 56 53 83 EC 50 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0 0F 84 ? ? ? ? 8D 55 ? 89 04 24 89 54 24 ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? 55 04 00 00");
 
         ProcessPrint_detour_hook.Init(processprint_addr, (void *) ProcessPrint_detour_fn);
 

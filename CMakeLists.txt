@@ -97,15 +97,19 @@ if (EnableVisuals)
     endif()
 endif()
 
+
+# fuck boost
 find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)
-# fuck boost
-set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
-add_subdirectory(external/boost-cmake)
-set(BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
-find_package(Boost REQUIRED PATHS ${CMAKE_BINARY_DIR}/_deps/boost-src/tools/boost_install/ NO_DEFAULT_PATH)
-include_directories(${CMAKE_BINARY_DIR}/_deps/boost-src)
+find_package(Boost 1.76.0 EXACT)
+if (NOT ${Boost_FOUND})
+    set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
+    add_subdirectory(external/boost-cmake)
+    SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.76.0 EXACT)
+    include_directories(${Boost_INCLUDE_DIRS})
+    endif()
 
 execute_process(COMMAND
         "${GIT_EXECUTABLE}" log -1 --pretty=\"%h\"

@@ -98,7 +98,7 @@ if (EnableVisuals)
 endif()
 
 
-# fuck boost
+# fixed issue with boost exact version
 find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)

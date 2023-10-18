@@ -6,7 +6,7 @@
 namespace client_classes
 {
 
-boost::unordered_flat_map<std::string, int *> classid_mapping{};
+std::unordered_map<std::string, int *> classid_mapping{};
 
 dynamic::dynamic()
 {

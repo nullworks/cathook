@@ -86,6 +86,6 @@ public:
     std::vector<std::unique_ptr<BaseMenuObject>> modal_stack{};
     Tooltip tooltip{};
     tinyxml2::XMLDocument xml_source{};
-    boost::unordered_flat_map<std::string, tinyxml2::XMLElement *> prefabs{};
+    std::unordered_map<std::string, tinyxml2::XMLElement *> prefabs{};
 };
 } // namespace zerokernel

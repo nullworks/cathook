@@ -121,9 +121,9 @@ struct def_attribute_modifier
     std::vector<attribute_s> modifiers{};
 };
 
-extern boost::unordered_flat_map<int, def_attribute_modifier> modifier_map;
+extern std::unordered_map<int, def_attribute_modifier> modifier_map;
 extern patched_weapon_cookie cookie;
-// extern boost::unordered_flat_map<int, patched_weapon_cookie> cookie_map;
+// extern std::unordered_map<int, patched_weapon_cookie> cookie_map;
 
 def_attribute_modifier &GetModifier(int idx);
 // patched_weapon_cookie& GetCookie(int idx);

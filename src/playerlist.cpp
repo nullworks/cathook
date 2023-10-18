@@ -16,7 +16,7 @@
 namespace playerlist
 {
 
-boost::unordered_flat_map<unsigned, userdata> data{};
+std::unordered_map<unsigned, userdata> data{};
 
 const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };
 const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PARTY" };

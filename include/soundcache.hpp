@@ -17,7 +17,7 @@ struct SoundStruct
     Timer last_update;
 };
 
-extern boost::unordered_flat_map<int, SoundStruct> sound_cache;
+extern std::unordered_map<int, SoundStruct> sound_cache;
 inline void cache_sound(const Vector *Origin, int source)
 {
     // Just in case

@@ -6,7 +6,7 @@ namespace criticals
 {
 extern settings::Boolean enabled;
 extern settings::Boolean melee;
-extern boost::unordered_flat_map<int, std::vector<int>> crit_cmds;
+extern std::unordered_map<int, std::vector<int>> crit_cmds;
 extern size_t current_index;
 extern bool calling_crithelper;
 extern bool isEnabled();

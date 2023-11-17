@@ -8,7 +8,7 @@ namespace soundcache
 constexpr unsigned int EXPIRETIME = 10000;
 
 
-boost::unordered_flat_map<int, SoundStruct> sound_cache;
+std::unordered_map<int, SoundStruct> sound_cache;
 static void CreateMove()
 {
     if (CE_BAD(LOCAL_E))

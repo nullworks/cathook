@@ -82,7 +82,7 @@ class ESPData
 {
 public:
     int string_count{ 0 };
-    boost::unordered_flat_map<std::string, rgba_t> strings{};
+    std::unordered_map<std::string, rgba_t> strings{};
     rgba_t color{ colors::empty };
     bool needs_paint{ false };
     bool has_collide{ false };
@@ -91,7 +91,7 @@ public:
     bool transparent{ false };
 };
 
-boost::unordered_flat_map<u_int16_t, ESPData> data;
+std::unordered_map<u_int16_t, ESPData> data;
 inline void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color = colors::empty)
 {
     ESPData &entity_data = data[entity->m_IDX];
@@ -160,7 +160,7 @@ const std::string bonenames_up[]     = { "bip_upperArm_R", "bip_spine_3", "bip_u
 class bonelist_s
 {
 private:
-    boost::unordered_flat_map<std::string, int> bones{};
+    std::unordered_map<std::string, int> bones{};
     std::vector<int> leg_r;
     std::vector<int> leg_l;
     std::vector<int> bottom;

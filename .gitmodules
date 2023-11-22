@@ -19,9 +19,6 @@
 [submodule "external/clip"]
 	path = external/clip
 	url = https://github.com/nullworks/clip
-[submodule "external/libnullnexus"]
-	path = external/libnullnexus
-	url = https://github.com/nullworks/libnullnexus
 [submodule "external/boost-cmake"]
 	path = external/boost-cmake
 	url = https://github.com/STEVE4git/boost-cmake

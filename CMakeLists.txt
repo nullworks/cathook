@@ -64,7 +64,7 @@ set(EnableProfiler 0 CACHE BOOL "Enable Profiler")
 set(EnableGUI 1 CACHE BOOL "Enable GUI")
 set(EnableIPC 1 CACHE BOOL "Enable IPC")
 set(DataPath "/opt/cathook/data" CACHE FILEPATH "Data location")
-set(VACBypass 0 CACHE BOOL "Textmode VAC bypass")
+set(VACBypass 1 CACHE BOOL "Textmode VAC bypass")
 set(EnableTextmodeStdin 0 CACHE BOOL "Textmode Stdin -> Console bridge (EXPERIMENTAL)")
 set(EnableWarnings 0 CACHE BOOL "Enable compile warnings")
 set(EnableLogging 1 CACHE BOOL "Enable logging to /tmp/")
@@ -99,12 +99,16 @@ endif()
 find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)
-# fuck boost
-set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
-add_subdirectory(external/boost-cmake)
-set(BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
-find_package(Boost REQUIRED PATHS ${CMAKE_BINARY_DIR}/_deps/boost-src/tools/boost_install/ NO_DEFAULT_PATH)
-include_directories(${CMAKE_BINARY_DIR}/_deps/boost-src)
+
+find_package(Boost 1.83.0 )
+if (NOT Boost_FOUND)
+    set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
+    add_subdirectory(external/boost-cmake)
+    set(BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.83.0 )
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 
 execute_process(COMMAND
         "${GIT_EXECUTABLE}" log -1 --pretty=\"%h\"

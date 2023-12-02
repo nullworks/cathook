@@ -13,7 +13,6 @@
 #include "ChatCommands.hpp"
 #include "MiscTemporary.hpp"
 #include <iomanip>
-#include "nullnexus.hpp"
 #include "votelogger.hpp"
 #include "nospread.hpp"
 

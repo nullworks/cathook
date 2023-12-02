@@ -122,14 +122,14 @@ void dispatchUserMessage(bf_read &buffer, int type)
 
             if (*vote_kickn && friendly_kicked)
             {
-                vote_command = { strfmt("vote %d option2", vote_id).get(), 1000u + (rand() % 5000) };
+                vote_command = { strfmt("vote %d option2", vote_id).get(), 0u + (rand() % 0) };
                 vote_command.timer.update();
                 if (*vote_rage_vote && !friendly_caller)
                     pl_caller.state = k_EState::RAGE;
             }
             else if (*vote_kicky && !friendly_kicked)
             {
-                vote_command = { strfmt("vote %d option1", vote_id).get(), 1000u + (rand() % 5000) };
+                vote_command = { strfmt("vote %d option1", vote_id).get(), 0u + (rand() % 0) };
                 vote_command.timer.update();
             }
         }

@@ -14,6 +14,7 @@
             <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>
             <AutoVariable width="fill" target="misc.tauntslide" label="Tauntslide"/>
             <AutoVariable width="fill" target="announcer" label="Enable announcer"/>
+            <AutoVariable width="fill" target="misc.spamvich" label="Enable spamvich" tooltip="Spams sandvich."/>
         </List>
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Fake name" x="215">

@@ -19,6 +19,8 @@
 #include "FollowBot.hpp"
 #include "Warp.hpp"
 #include "AntiCheatBypass.hpp"
+#include "NavBot.hpp"
+
 namespace hacks::shared::aimbot
 {
 static settings::Boolean normal_enable{ "aimbot.enable", "false" };
@@ -59,6 +61,7 @@ static settings::Boolean aimbot_debug{ "aimbot.debug", "0" };
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "0" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "0" };
+static settings::Int zoom_distance{ "aimbot.zoom.distance", "1250" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "0" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "0" };
@@ -438,7 +441,43 @@ bool validateTickFOV(tf2::backtrack::BacktrackData &tick)
     return true;
 }
 
-void doAutoZoom(bool target_found)
+bool CarryingMachina()
+{
+     return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 526 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 30665;
+}
+
+bool allowNoScope(CachedEntity *target)
+{
+    if (CarryingMachina())
+        return false;
+
+    if (target)
+    {
+        float target_health = target->m_iHealth();
+
+        if (IsPlayerCritBoosted(LOCAL_E) && target_health <= 150.0f)
+            return true;
+
+        if (IsPlayerCritBoosted(LOCAL_E))
+        {
+            if (!CarryingHeatmaker() && target_health <= 68.0f)
+                return true;
+
+            if (CarryingHeatmaker() && target_health <= 54.0f)
+                return true;
+        }
+
+        if (!CarryingHeatmaker() && target_health <= 50.0f)
+            return true;
+
+        if (CarryingHeatmaker() && target_health <= 40.0f)
+            return true;
+    }
+
+    return false;
+}
+
+static void doAutoZoom(bool target_found, CachedEntity *target)
 {
     bool isIdle = target_found ? false : hacks::shared::followbot::isIdle();
 
@@ -455,19 +494,22 @@ void doAutoZoom(bool target_found)
         return;
     }
 
-    if (auto_zoom && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle))
+    auto nearest = hacks::tf2::NavBot::getNearestPlayerDistance();
+    if ((auto_zoom && !allowNoScope(target)) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle || nearest.second <= *zoom_distance)) 
     {
         if (target_found)
             zoomTime.update();
         if (not g_pLocalPlayer->bZoomed)
             current_user_cmd->buttons |= IN_ATTACK2;
     }
-    else if (!target_found)
+    else if (!target_found && nearest.second > *zoom_distance)
     {
         // Auto-Unzoom
-        if (auto_unzoom)
+        if (auto_unzoom) 
+    {
             if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && zoomTime.check(3000))
                 current_user_cmd->buttons |= IN_ATTACK2;
+    }
     }
 }
 
@@ -514,7 +556,7 @@ static void CreateMove()
     if (*only_can_shoot && !slow_aim && !CanShoot())
         return;
 
-    doAutoZoom(false);
+        doAutoZoom(false, nullptr);
     if (hacks::tf2::antianticheat::enabled)
         fov = std::min(fov > 0.0f ? fov : FLT_MAX, 10.0f);
     bool should_backtrack    = hacks::tf2::backtrack::backtrackEnabled();
@@ -532,7 +574,7 @@ static void CreateMove()
         if (target_last)
         {
             if (should_zoom)
-                doAutoZoom(true);
+           doAutoZoom(true, target_last);
             int weapon_case = LOCAL_W->m_iClassID();
             if (!hitscanSpecialCases(target_last, weapon_case))
                 DoAutoshoot(target_last);
@@ -1196,8 +1238,8 @@ bool Aim(CachedEntity *entity)
         trace_t tracer;
         Ray_t init_ray;
         init_ray.Init(start, is_it_good);
-        trace::filter_teammates.SetSelf(RAW_ENT(LOCAL_E));
-        g_ITrace->TraceRay(init_ray, MASK_SHOT_HULL, &trace::filter_teammates, &tracer);
+        trace::filter_default.SetSelf(RAW_ENT(LOCAL_E));
+        g_ITrace->TraceRay(init_ray, MASK_SHOT_HULL, &trace::filter_default, &tracer);
         if ((IClientEntity *) tracer.m_pEnt != RAW_ENT(entity))
             return false;
     }
